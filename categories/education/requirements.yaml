@@ -1,0 +1,1821 @@
+- id: "EDU-001"
+  title: "Multiple Choice Quiz Engine"
+  description: "Runs a multiple choice quiz from a JSON definition and scores results"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON quiz definition on stdin, then one letter answer per line interactively"
+  output_format: "Each question with options, then final score 'Score: N/M (P%)'"
+  test_cases:
+    - input: "{\"questions\":[{\"q\":\"2+2?\",\"options\":[\"A.3\",\"B.4\",\"C.5\"],\"answer\":\"B\"}]}\nB"
+      expected_output: "Q1: 2+2?\nA.3\nB.4\nC.5\nCorrect!\nScore: 1/1 (100%)"
+    - input: "{\"questions\":[{\"q\":\"Capital of France?\",\"options\":[\"A.Berlin\",\"B.Paris\"],\"answer\":\"B\"}]}\nA"
+      expected_output: "Q1: Capital of France?\nA.Berlin\nB.Paris\nIncorrect. Answer: B\nScore: 0/1 (0%)"
+  constraints: ["JSON input on first stdin block", "Answers read one per line after", "Percentage rounded to nearest integer"]
+
+- id: "EDU-002"
+  title: "True/False Scorer"
+  description: "Presents true/false questions and scores the answers"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {q, answer} objects on first line, then T or F per question"
+  output_format: "Each result 'Q1: Correct/Incorrect', then final score"
+  test_cases:
+    - input: "[{\"q\":\"The sky is blue\",\"answer\":\"T\"},{\"q\":\"Fire is cold\",\"answer\":\"F\"}]\nT\nF"
+      expected_output: "Q1: Correct\nQ2: Correct\nScore: 2/2 (100%)"
+    - input: "[{\"q\":\"2+2=5\",\"answer\":\"F\"}]\nT"
+      expected_output: "Q1: Incorrect\nScore: 0/1 (0%)"
+  constraints: ["T/F answers only", "Case-insensitive answer input", "Score as fraction and percentage"]
+
+- id: "EDU-003"
+  title: "Fill-in-the-Blank Exercise"
+  description: "Presents fill-in-the-blank sentences and scores answers"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {sentence_with_blank, answer} where blank is ___. Then one answer per line"
+  output_format: "Each sentence, then 'Correct'/'Incorrect', then final score"
+  test_cases:
+    - input: "[{\"sentence\":\"The ___ is a planet.\",\"answer\":\"Earth\"}]\nEarth"
+      expected_output: "The ___ is a planet.\nCorrect\nScore: 1/1 (100%)"
+    - input: "[{\"sentence\":\"Water is ___.\",\"answer\":\"wet\"}]\ndry"
+      expected_output: "Water is ___.\nIncorrect. Answer: wet\nScore: 0/1 (0%)"
+  constraints: ["Case-insensitive answer matching", "Trim whitespace from answers"]
+
+- id: "EDU-004"
+  title: "Matching Exercise"
+  description: "Matches terms to definitions given as pairs"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with 'terms' array and 'definitions' array. Then answers as 'term=definition' pairs"
+  output_format: "Lines of 'term -> definition: Correct/Incorrect', then score"
+  test_cases:
+    - input: "{\"terms\":[\"H2O\"],\"definitions\":[\"Water\"]}\nH2O=Water"
+      expected_output: "H2O -> Water: Correct\nScore: 1/1 (100%)"
+    - input: "{\"terms\":[\"Au\"],\"definitions\":[\"Gold\"]}\nAu=Silver"
+      expected_output: "Au -> Silver: Incorrect. Answer: Gold\nScore: 0/1 (0%)"
+  constraints: ["Case-insensitive matching", "One pair per line in answer section"]
+
+- id: "EDU-005"
+  title: "Flashcard SRS Simulator"
+  description: "Simulates a spaced repetition review session with SM-2 intervals"
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON array of flashcard objects {front, back, ease, interval, due_date}. Then grades 0-5 per card"
+  output_format: "For each card: front, then back reveal, then new interval. Final 'Session complete.'"
+  test_cases:
+    - input: "[{\"front\":\"What is H2O?\",\"back\":\"Water\",\"ease\":2.5,\"interval\":1,\"due_date\":\"2024-01-01\"}]\n5"
+      expected_output: "Q: What is H2O?\nA: Water\nGrade: 5 | New interval: 6 days\nSession complete."
+    - input: "[{\"front\":\"Capital of Japan?\",\"back\":\"Tokyo\",\"ease\":2.5,\"interval\":1,\"due_date\":\"2024-01-01\"}]\n1"
+      expected_output: "Q: Capital of Japan?\nA: Tokyo\nGrade: 1 | New interval: 1 days\nSession complete."
+  constraints: ["SM-2 algorithm: new_interval = interval * ease if grade >= 3 else 1", "ease adjusted by grade", "Round intervals to integer days"]
+
+- id: "EDU-006"
+  title: "Pomodoro Timer"
+  description: "Runs a Pomodoro work/break session tracker from the command line"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "First line: work_minutes break_minutes num_pomodoros"
+  output_format: "Session log lines: 'Pomodoro N: work 25min | break 5min', then 'Total focused time: Nmin'"
+  test_cases:
+    - input: "25 5 4"
+      expected_output: "Pomodoro 1: work 25min | break 5min\nPomodoro 2: work 25min | break 5min\nPomodoro 3: work 25min | break 5min\nPomodoro 4: work 25min | break 5min\nTotal focused time: 100min"
+    - input: "50 10 2"
+      expected_output: "Pomodoro 1: work 50min | break 10min\nPomodoro 2: work 50min | break 10min\nTotal focused time: 100min"
+  constraints: ["No real-time waiting — simulate output only", "Last break omitted", "Total = work_minutes * num_pomodoros"]
+
+- id: "EDU-007"
+  title: "Weighted Grade Calculator"
+  description: "Calculates a final grade given component scores and weights"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Lines of 'component weight score' (e.g. 'exam 0.5 85')"
+  output_format: "Weighted total and letter grade on separate lines"
+  test_cases:
+    - input: "exam 0.5 80\nhomework 0.3 90\nquiz 0.2 70"
+      expected_output: "weighted_total: 81.0\nletter_grade: B"
+    - input: "final 1.0 95"
+      expected_output: "weighted_total: 95.0\nletter_grade: A"
+  constraints: ["Weights must sum to 1.0 (validate)", "A>=90, B>=80, C>=70, D>=60, F<60", "Round to 1 decimal"]
+
+- id: "EDU-008"
+  title: "GPA Calculator"
+  description: "Calculates cumulative GPA from course grades and credit hours"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Lines of 'course_name credits grade' (e.g. 'Math 3 A')"
+  output_format: "Lines of each course with quality points, then 'GPA: N.NN'"
+  test_cases:
+    - input: "Math 3 A\nEnglish 3 B\nHistory 2 C"
+      expected_output: "Math: 12.0 quality points\nEnglish: 9.0 quality points\nHistory: 6.0 quality points\nGPA: 3.38"
+    - input: "Physics 4 A\nBio 4 A"
+      expected_output: "Physics: 16.0 quality points\nBio: 16.0 quality points\nGPA: 4.00"
+  constraints: ["A=4.0, B=3.0, C=2.0, D=1.0, F=0.0", "GPA = sum(quality_points) / sum(credits)", "Round GPA to 2 decimal places"]
+
+- id: "EDU-009"
+  title: "Attendance Tracker"
+  description: "Tracks student attendance and computes attendance percentage"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {name, records} where records is string of P/A chars"
+  output_format: "Lines of 'name: N% (N present / M total)' sorted by name"
+  test_cases:
+    - input: "[{\"name\":\"Alice\",\"records\":\"PPAP\"},{\"name\":\"Bob\",\"records\":\"AAAP\"}]"
+      expected_output: "Alice: 75% (3 present / 4 total)\nBob: 25% (1 present / 4 total)"
+    - input: "[{\"name\":\"Charlie\",\"records\":\"PPP\"}]"
+      expected_output: "Charlie: 100% (3 present / 3 total)"
+  constraints: ["P = present, A = absent", "Percentage rounded to nearest integer", "Sort by name A-Z"]
+
+- id: "EDU-010"
+  title: "Lesson Planner"
+  description: "Generates a structured lesson plan from objectives and duration"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with topic, duration_minutes, and objectives array"
+  output_format: "Formatted lesson plan with time-allocated sections"
+  test_cases:
+    - input: "{\"topic\":\"Fractions\",\"duration_minutes\":60,\"objectives\":[\"Understand numerator\",\"Add fractions\"]}"
+      expected_output: "Lesson: Fractions (60 min)\n00:00 Introduction (10 min)\n00:10 Understand numerator (20 min)\n00:30 Add fractions (20 min)\n00:50 Review and Q&A (10 min)"
+    - input: "{\"topic\":\"Verbs\",\"duration_minutes\":30,\"objectives\":[\"Define verb\"]}"
+      expected_output: "Lesson: Verbs (30 min)\n00:00 Introduction (5 min)\n00:05 Define verb (20 min)\n00:25 Review and Q&A (5 min)"
+  constraints: ["Introduction = 10min for >=60min, 5min otherwise", "Q&A = 10min for >=60min, 5min otherwise", "Remaining time split evenly across objectives"]
+
+- id: "EDU-011"
+  title: "Vocabulary Builder"
+  description: "Manages a vocabulary list and tests word definitions"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {word, definition} objects, then 'QUIZ' followed by words to test"
+  output_format: "For each quiz word: prompt and user answer accepted, then Correct/Incorrect, then score"
+  test_cases:
+    - input: "[{\"word\":\"ephemeral\",\"definition\":\"lasting a very short time\"}]\nQUIZ\nephemeral\nlasting a very short time"
+      expected_output: "Define: ephemeral\nCorrect!\nScore: 1/1 (100%)"
+    - input: "[{\"word\":\"benign\",\"definition\":\"gentle and kindly\"}]\nQUIZ\nbenign\nharmful"
+      expected_output: "Define: benign\nIncorrect. Answer: gentle and kindly\nScore: 0/1 (0%)"
+  constraints: ["Case-insensitive answer matching", "Trim whitespace", "Each quiz word on one line, answer on next"]
+
+- id: "EDU-012"
+  title: "Math Drill Generator"
+  description: "Generates arithmetic drill problems and checks answers"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "First line: 'op count max' (e.g. 'add 5 10'). Then one integer answer per problem"
+  output_format: "Each problem as 'N op M = ?', then Correct/Incorrect, then score"
+  test_cases:
+    - input: "add 2 5\n7\n9"
+      expected_output: "3 + 4 = ?\nCorrect\n5 + 4 = ?\nCorrect\nScore: 2/2 (100%)"
+    - input: "mul 1 3\n6"
+      expected_output: "2 * 3 = ?\nCorrect\nScore: 1/1 (100%)"
+  constraints: ["Operands randomly generated but test uses fixed seed", "Ops: add, sub, mul, div (integer div)", "max is the upper bound for operands"]
+
+- id: "EDU-013"
+  title: "Typing Test"
+  description: "Measures typing accuracy and WPM from a given passage"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "First line: target text. Second line: typed text. Third line: elapsed_seconds"
+  output_format: "Lines: 'wpm: N', 'accuracy: N%', 'errors: N'"
+  test_cases:
+    - input: "the quick brown fox\nthe quick brown fox\n10"
+      expected_output: "wpm: 24\naccuracy: 100%\nerrors: 0"
+    - input: "hello world\nhello wrold\n6"
+      expected_output: "wpm: 20\naccuracy: 90%\nerrors: 1"
+  constraints: ["WPM = (characters/5) / (seconds/60)", "Accuracy = matching_chars/total_chars*100", "Errors = differing character positions"]
+
+- id: "EDU-014"
+  title: "Study Scheduler"
+  description: "Creates a study schedule distributing topics over available days"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with start_date, end_date, topics array, and daily_hours"
+  output_format: "Daily schedule lines: 'YYYY-MM-DD: topic (N hours)'"
+  test_cases:
+    - input: "{\"start_date\":\"2024-01-01\",\"end_date\":\"2024-01-03\",\"topics\":[\"Math\",\"Science\",\"History\"],\"daily_hours\":2}"
+      expected_output: "2024-01-01: Math (2 hours)\n2024-01-02: Science (2 hours)\n2024-01-03: History (2 hours)"
+    - input: "{\"start_date\":\"2024-01-01\",\"end_date\":\"2024-01-01\",\"topics\":[\"Physics\",\"Chemistry\"],\"daily_hours\":4}"
+      expected_output: "2024-01-01: Physics (2 hours)\n2024-01-01: Chemistry (2 hours)"
+  constraints: ["Split hours evenly if multiple topics in one day", "Skip weekends? No - include all days", "Topics distribute round-robin if more days than topics"]
+
+- id: "EDU-015"
+  title: "Bibliography Manager"
+  description: "Stores and retrieves bibliography entries, outputting formatted citations"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {id, author, year, title, type} on stdin"
+  output_format: "Sorted citation list, one per line, in APA format"
+  test_cases:
+    - input: "[{\"id\":1,\"author\":\"Smith J\",\"year\":2020,\"title\":\"Research Paper\",\"type\":\"article\"},{\"id\":2,\"author\":\"Doe A\",\"year\":2019,\"title\":\"Old Study\",\"type\":\"article\"}]"
+      expected_output: "Doe A (2019). Old Study.\nSmith J (2020). Research Paper."
+    - input: "[{\"id\":1,\"author\":\"Brown Z\",\"year\":2021,\"title\":\"New Book\",\"type\":\"book\"}]"
+      expected_output: "Brown Z (2021). New Book."
+  constraints: ["Sort by author last name A-Z", "Format: Author (Year). Title."]
+
+- id: "EDU-016"
+  title: "Progress Tracker"
+  description: "Tracks completion percentage of learning objectives"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {objective, completed} objects"
+  output_format: "Visual progress bar and percentage for each objective, then overall"
+  test_cases:
+    - input: "[{\"objective\":\"Arrays\",\"completed\":true},{\"objective\":\"Loops\",\"completed\":false}]"
+      expected_output: "Arrays:  [##########] 100%\nLoops:   [          ] 0%\nOverall: [#####     ] 50%"
+    - input: "[{\"objective\":\"Math\",\"completed\":true}]"
+      expected_output: "Math:    [##########] 100%\nOverall: [##########] 100%"
+  constraints: ["Progress bar is 10 chars wide", "# = completed portion", "Overall = completed/total * 100"]
+
+- id: "EDU-017"
+  title: "Exam Timer"
+  description: "Simulates an exam countdown timer with section checkpoints"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "First line: total_minutes num_sections. Remaining: section names"
+  output_format: "Lines of 'Section N: <name> | start HH:MM | end HH:MM | duration Nmin'"
+  test_cases:
+    - input: "60 3\nMultiple Choice\nShort Answer\nEssay"
+      expected_output: "Section 1: Multiple Choice | start 00:00 | end 00:20 | duration 20min\nSection 2: Short Answer | start 00:20 | end 00:40 | duration 20min\nSection 3: Essay | start 00:40 | end 01:00 | duration 20min"
+    - input: "30 2\nPart A\nPart B"
+      expected_output: "Section 1: Part A | start 00:00 | end 00:15 | duration 15min\nSection 2: Part B | start 00:15 | end 00:30 | duration 15min"
+  constraints: ["Divide total time equally among sections", "Start from 00:00", "HH:MM format"]
+
+- id: "EDU-018"
+  title: "Rubric Scorer"
+  description: "Scores a submission against a rubric with weighted criteria"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with rubric {criteria: [{name, max_score}]} and scores object"
+  output_format: "Lines of 'criterion: N/M', then 'Total: N/M (P%)'"
+  test_cases:
+    - input: "{\"criteria\":[{\"name\":\"Content\",\"max_score\":40},{\"name\":\"Style\",\"max_score\":20}],\"scores\":{\"Content\":35,\"Style\":18}}"
+      expected_output: "Content: 35/40\nStyle: 18/20\nTotal: 53/60 (88%)"
+    - input: "{\"criteria\":[{\"name\":\"Grammar\",\"max_score\":10}],\"scores\":{\"Grammar\":10}}"
+      expected_output: "Grammar: 10/10\nTotal: 10/10 (100%)"
+  constraints: ["Percentage rounded to nearest integer", "Criteria printed in JSON order"]
+
+- id: "EDU-019"
+  title: "Class Roster Manager"
+  description: "Manages a class roster and outputs sorted student lists"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of student objects {id, name, grade}"
+  output_format: "Sorted roster: 'N. ID: <id> | Name: <name> | Grade: <grade>'"
+  test_cases:
+    - input: "[{\"id\":\"S002\",\"name\":\"Bob Lee\",\"grade\":10},{\"id\":\"S001\",\"name\":\"Alice Wong\",\"grade\":11}]"
+      expected_output: "1. ID: S001 | Name: Alice Wong | Grade: 11\n2. ID: S002 | Name: Bob Lee | Grade: 10"
+    - input: "[{\"id\":\"S001\",\"name\":\"Charlie\",\"grade\":9}]"
+      expected_output: "1. ID: S001 | Name: Charlie | Grade: 9"
+  constraints: ["Sort by ID ascending", "1-indexed numbering"]
+
+- id: "EDU-020"
+  title: "Assignment Tracker"
+  description: "Lists assignments sorted by due date with completion status"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON array of {title, due_date, completed} objects"
+  output_format: "Lines of '[x]' or '[ ]' with due date and title, sorted by due date"
+  test_cases:
+    - input: "[{\"title\":\"Essay\",\"due_date\":\"2024-01-15\",\"completed\":false},{\"title\":\"Quiz\",\"due_date\":\"2024-01-10\",\"completed\":true}]"
+      expected_output: "[x] 2024-01-10 Quiz\n[ ] 2024-01-15 Essay"
+    - input: "[{\"title\":\"Lab\",\"due_date\":\"2024-02-01\",\"completed\":false}]"
+      expected_output: "[ ] 2024-02-01 Lab"
+  constraints: ["Sort by due_date ascending", "[x] = completed, [ ] = incomplete"]
+
+- id: "EDU-021"
+  title: "Learning Streak Calculator"
+  description: "Computes the current and longest learning streak from a daily activity log"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.time, std.collections]
+  input_format: "ISO dates one per line representing days with study activity"
+  output_format: "Two lines: 'current_streak: N days' and 'longest_streak: N days'"
+  test_cases:
+    - input: "2024-01-01\n2024-01-02\n2024-01-03\n2024-01-05"
+      expected_output: "current_streak: 1 days\nlongest_streak: 3 days"
+    - input: "2024-01-01\n2024-01-02\n2024-01-03"
+      expected_output: "current_streak: 3 days\nlongest_streak: 3 days"
+  constraints: ["Dates must be sorted ascending", "Current streak ends at last date in input", "Gaps reset streak"]
+
+- id: "EDU-022"
+  title: "Spaced Repetition Due Date Calculator"
+  description: "Calculates due dates for a set of cards using SM-2 spacing"
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON array of {card_id, last_reviewed, interval_days, ease_factor}"
+  output_format: "Lines of 'card_id: due YYYY-MM-DD (interval N days)' sorted by due date"
+  test_cases:
+    - input: "[{\"card_id\":\"C1\",\"last_reviewed\":\"2024-01-01\",\"interval_days\":1,\"ease_factor\":2.5}]"
+      expected_output: "C1: due 2024-01-02 (interval 1 days)"
+    - input: "[{\"card_id\":\"C2\",\"last_reviewed\":\"2024-01-01\",\"interval_days\":6,\"ease_factor\":2.5}]"
+      expected_output: "C2: due 2024-01-07 (interval 6 days)"
+  constraints: ["Due = last_reviewed + interval_days", "Sort by due date ascending", "Do not recompute interval"]
+
+- id: "EDU-023"
+  title: "Peer Review Assigner"
+  description: "Randomly assigns reviewers to authors ensuring no self-review"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "First line: integer seed. Remaining lines: one student name per line"
+  output_format: "Lines of 'reviewer -> author' assignments"
+  test_cases:
+    - input: "42\nAlice\nBob\nCharlie"
+      expected_output: "Alice -> Bob\nBob -> Charlie\nCharlie -> Alice"
+    - input: "1\nX\nY"
+      expected_output: "X -> Y\nY -> X"
+  constraints: ["No student reviews themselves", "Each student reviews exactly one other", "Use seed for determinism"]
+
+- id: "EDU-024"
+  title: "Group Randomiser"
+  description: "Divides a class into random groups of a specified size"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "First line: integer seed. Second line: group_size. Remaining: one student name per line"
+  output_format: "Lines of 'Group N: name1, name2, ...' for each group"
+  test_cases:
+    - input: "42\n2\nAlice\nBob\nCharlie\nDave"
+      expected_output: "Group 1: Alice, Bob\nGroup 2: Charlie, Dave"
+    - input: "1\n3\nA\nB\nC\nD"
+      expected_output: "Group 1: A, B, C\nGroup 2: D"
+  constraints: ["Last group may be smaller", "Use seed for determinism", "Students shuffled before grouping"]
+
+- id: "EDU-025"
+  title: "Seating Chart Generator"
+  description: "Assigns students to seats in a classroom grid"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "First line: rows cols. Second line: seed. Remaining: one student name per line"
+  output_format: "Grid of seats with student names, row by row"
+  test_cases:
+    - input: "2 2\n1\nAlice\nBob\nCharlie\nDave"
+      expected_output: "Alice      Bob\nCharlie    Dave"
+    - input: "1 3\n0\nX\nY\nZ"
+      expected_output: "X          Y          Z"
+  constraints: ["Names padded to 10 chars", "Empty seats shown as '(empty)'", "Row-major assignment"]
+
+- id: "EDU-026"
+  title: "Timetable Scheduler"
+  description: "Generates a weekly timetable from course and time slot data"
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON array of {course, day, start_time, end_time} objects"
+  output_format: "Weekly grid with days as columns and time slots as rows"
+  test_cases:
+    - input: "[{\"course\":\"Math\",\"day\":\"Monday\",\"start_time\":\"09:00\",\"end_time\":\"10:00\"},{\"course\":\"Science\",\"day\":\"Tuesday\",\"start_time\":\"09:00\",\"end_time\":\"10:00\"}]"
+      expected_output: "Time     | Monday | Tuesday\n09:00-10:00 | Math   | Science"
+    - input: "[{\"course\":\"Art\",\"day\":\"Wednesday\",\"start_time\":\"14:00\",\"end_time\":\"15:00\"}]"
+      expected_output: "Time     | Wednesday\n14:00-15:00 | Art"
+  constraints: ["Sort days Mon-Fri", "Sort time slots ascending", "Column width = max course name + 2"]
+
+- id: "EDU-027"
+  title: "Homework Deadline Reminder"
+  description: "Identifies assignments due within a given number of days"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "First line: reference_date. Second line: days_window. Remaining: JSON array of {title, due_date}"
+  output_format: "Lines of 'N days left: <title>' sorted by due date, or 'No upcoming deadlines'"
+  test_cases:
+    - input: "2024-01-01\n7\n[{\"title\":\"Essay\",\"due_date\":\"2024-01-05\"},{\"title\":\"Project\",\"due_date\":\"2024-01-15\"}]"
+      expected_output: "4 days left: Essay"
+    - input: "2024-01-01\n3\n[{\"title\":\"Lab\",\"due_date\":\"2024-01-10\"}]"
+      expected_output: "No upcoming deadlines"
+  constraints: ["Only show assignments within window", "Sort by due date ascending", "'0 days left' = due today"]
+
+- id: "EDU-028"
+  title: "Student Report Generator"
+  description: "Generates a formatted academic report for a student"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with student {name, id, courses: [{name, grade, credits}]}"
+  output_format: "Formatted report with header, course table, GPA, and standing"
+  test_cases:
+    - input: "{\"name\":\"Alice Smith\",\"id\":\"S001\",\"courses\":[{\"name\":\"Math\",\"grade\":\"A\",\"credits\":3},{\"name\":\"English\",\"grade\":\"B\",\"credits\":3}]}"
+      expected_output: "Student Report\nName: Alice Smith | ID: S001\n---\nMath    3cr  A\nEnglish 3cr  B\n---\nGPA: 3.50 | Standing: Good"
+    - input: "{\"name\":\"Bob Lee\",\"id\":\"S002\",\"courses\":[{\"name\":\"Physics\",\"grade\":\"C\",\"credits\":4}]}"
+      expected_output: "Student Report\nName: Bob Lee | ID: S002\n---\nPhysics 4cr  C\n---\nGPA: 2.00 | Standing: Satisfactory"
+  constraints: ["A=4.0, B=3.0, C=2.0, D=1.0, F=0.0", "Standing: GPA>=3.5=Good, >=2.0=Satisfactory, <2.0=Probation"]
+
+- id: "EDU-029"
+  title: "Certificate Generator"
+  description: "Generates a text-art certificate of completion"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str]
+  input_format: "JSON with name, course, date, issuer"
+  output_format: "ASCII art certificate block with centered text"
+  test_cases:
+    - input: "{\"name\":\"Alice\",\"course\":\"Python 101\",\"date\":\"2024-01-15\",\"issuer\":\"Toke Academy\"}"
+      expected_output: "****************************\n*  CERTIFICATE OF COMPLETION  *\n*                          *\n*  Alice                   *\n*  Python 101              *\n*  2024-01-15              *\n*  Toke Academy            *\n****************************"
+    - input: "{\"name\":\"Bob\",\"course\":\"Math\",\"date\":\"2024-06-01\",\"issuer\":\"School\"}"
+      expected_output: "****************************\n*  CERTIFICATE OF COMPLETION  *\n*                          *\n*  Bob                     *\n*  Math                    *\n*  2024-06-01              *\n*  School                  *\n****************************"
+  constraints: ["Fixed-width 30 char border", "Fields left-aligned within border"]
+
+- id: "EDU-030"
+  title: "Semester GPA Tracker"
+  description: "Tracks GPA over multiple semesters and shows trend"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {semester, gpa} objects"
+  output_format: "Lines of semester GPA with trend indicator (up/down/same), then cumulative average"
+  test_cases:
+    - input: "[{\"semester\":\"Fall 2022\",\"gpa\":3.2},{\"semester\":\"Spring 2023\",\"gpa\":3.5},{\"semester\":\"Fall 2023\",\"gpa\":3.3}]"
+      expected_output: "Fall 2022:   3.20\nSpring 2023: 3.50 ↑\nFall 2023:   3.30 ↓\nCumulative: 3.33"
+    - input: "[{\"semester\":\"S1\",\"gpa\":3.0},{\"semester\":\"S2\",\"gpa\":3.0}]"
+      expected_output: "S1: 3.00\nS2: 3.00 →\nCumulative: 3.00"
+  constraints: ["Arrow based on comparison with previous semester", "Cumulative = mean of all GPAs", "Round GPAs to 2 decimal places"]
+
+- id: "EDU-031"
+  title: "Essay Word Count Enforcer"
+  description: "Checks if an essay meets minimum and maximum word count requirements"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "First line: 'min max' word counts. Remaining: essay text"
+  output_format: "'PASS: N words' or 'FAIL: N words (min M, max M)'"
+  test_cases:
+    - input: "100 500\nThis essay has exactly six words."
+      expected_output: "FAIL: 6 words (min 100, max 500)"
+    - input: "1 100\nShort essay."
+      expected_output: "PASS: 2 words"
+  constraints: ["Word count by whitespace splitting", "Include both min and max in fail message"]
+
+- id: "EDU-032"
+  title: "Reading Time Estimator"
+  description: "Estimates reading time for a text at average reading speed"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "First line: optional WPM (default 200). Remaining: text"
+  output_format: "'reading_time: N min' (rounded up) and 'word_count: N'"
+  test_cases:
+    - input: "200\nword word word word word word word word word word"
+      expected_output: "reading_time: 1 min\nword_count: 200"
+    - input: "100\nword word word word word word word word word word"
+      expected_output: "reading_time: 3 min\nword_count: 250"
+  constraints: ["Round up to nearest minute", "WPM default 200 if first line is not integer"]
+
+- id: "EDU-033"
+  title: "Anki Export Formatter"
+  description: "Formats flashcard data as Anki-compatible tab-separated import format"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {front, back, tags} flashcard objects"
+  output_format: "Tab-separated lines of 'front\\tback\\ttag1 tag2'"
+  test_cases:
+    - input: "[{\"front\":\"What is H2O?\",\"back\":\"Water\",\"tags\":[\"chemistry\",\"basics\"]}]"
+      expected_output: "What is H2O?\tWater\tchemistry basics"
+    - input: "[{\"front\":\"2+2\",\"back\":\"4\",\"tags\":[]}]"
+      expected_output: "2+2\t4\t"
+  constraints: ["Tags space-separated in third column", "Empty tags = empty string (trailing tab)"]
+
+- id: "EDU-034"
+  title: "Lecture Note Formatter"
+  description: "Formats raw lecture notes into structured outline format"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str]
+  input_format: "Lines prefixed by spaces indicating indent level (0, 2, 4 spaces)"
+  output_format: "Outline with I., A., 1. hierarchy markers"
+  test_cases:
+    - input: "Main topic\n  Sub topic\n    Detail"
+      expected_output: "I. Main topic\n  A. Sub topic\n    1. Detail"
+    - input: "Topic A\nTopic B"
+      expected_output: "I. Topic A\nII. Topic B"
+  constraints: ["Level 0 = Roman numerals", "Level 2 = uppercase letters", "Level 4 = Arabic numerals"]
+
+- id: "EDU-035"
+  title: "Practice Test Generator"
+  description: "Generates a randomised subset of questions from a question bank"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "First line: seed and num_questions. Second line: JSON array of question objects"
+  output_format: "Numbered questions from selected subset"
+  test_cases:
+    - input: "42 2\n[{\"q\":\"Q1\"},{\"q\":\"Q2\"},{\"q\":\"Q3\"},{\"q\":\"Q4\"}]"
+      expected_output: "1. Q3\n2. Q1"
+    - input: "0 1\n[{\"q\":\"A\"},{\"q\":\"B\"}]"
+      expected_output: "1. B"
+  constraints: ["Use seed for determinism", "No repeat questions", "num_questions <= total questions"]
+
+- id: "EDU-036"
+  title: "Topic Mind Map Text Generator"
+  description: "Generates a text-based mind map from topic and subtopics"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with central topic and nested subtopics"
+  output_format: "Indented tree with connecting characters"
+  test_cases:
+    - input: "{\"topic\":\"Science\",\"subtopics\":[{\"name\":\"Physics\",\"subtopics\":[\"Motion\",\"Force\"]},{\"name\":\"Chemistry\"}]}"
+      expected_output: "Science\n├── Physics\n│   ├── Motion\n│   └── Force\n└── Chemistry"
+    - input: "{\"topic\":\"Art\",\"subtopics\":[\"Painting\",\"Sculpture\"]}"
+      expected_output: "Art\n├── Painting\n└── Sculpture"
+  constraints: ["Use ├── for non-last items, └── for last", "│   prefix for continuation lines"]
+
+- id: "EDU-037"
+  title: "Concept Map Validator"
+  description: "Validates that a concept map has required connections between terms"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with required_connections [{from, to, label}] and actual_connections"
+  output_format: "'PASS' or lines of 'MISSING: from -> to (label)'"
+  test_cases:
+    - input: "{\"required\":[{\"from\":\"A\",\"to\":\"B\",\"label\":\"causes\"}],\"actual\":[{\"from\":\"A\",\"to\":\"B\",\"label\":\"causes\"}]}"
+      expected_output: "PASS"
+    - input: "{\"required\":[{\"from\":\"X\",\"to\":\"Y\",\"label\":\"implies\"}],\"actual\":[]}"
+      expected_output: "MISSING: X -> Y (implies)"
+  constraints: ["All required connections must be present in actual", "Label matching is case-insensitive"]
+
+- id: "EDU-038"
+  title: "Grade Distribution Visualiser"
+  description: "Creates a text histogram of grade distributions"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Space-separated list of letter grades on stdin"
+  output_format: "Histogram with grade bands and bar charts"
+  test_cases:
+    - input: "A A B B B C D F"
+      expected_output: "A: ## (2)\nB: ### (3)\nC: # (1)\nD: # (1)\nF: # (1)"
+    - input: "A A A"
+      expected_output: "A: ### (3)\nB: (0)\nC: (0)\nD: (0)\nF: (0)"
+  constraints: ["Always show all 5 grade bands A-F", "# per occurrence", "Show count in parentheses"]
+
+- id: "EDU-039"
+  title: "Study Timer with Break Alerts"
+  description: "Generates a study session plan with work and break intervals"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "First line: work_min break_min total_min"
+  output_format: "Schedule lines showing work blocks and breaks with cumulative times"
+  test_cases:
+    - input: "25 5 60"
+      expected_output: "00:00-00:25 WORK\n00:25-00:30 BREAK\n00:30-00:55 WORK\n00:55-01:00 BREAK"
+    - input: "30 10 40"
+      expected_output: "00:00-00:30 WORK\n00:30-00:40 BREAK"
+  constraints: ["Alternate WORK and BREAK blocks", "Stop when total_min reached", "HH:MM format"]
+
+- id: "EDU-040"
+  title: "Learning Objective Validator"
+  description: "Checks learning objectives use Bloom's Taxonomy action verbs"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "One learning objective per line on stdin"
+  output_format: "Lines of 'objective: LEVEL (verb)' where LEVEL is Bloom's level"
+  test_cases:
+    - input: "Students will identify key concepts.\nStudents will create a model."
+      expected_output: "Students will identify key concepts.: REMEMBER (identify)\nStudents will create a model.: CREATE (create)"
+    - input: "Students will explain the process."
+      expected_output: "Students will explain the process.: UNDERSTAND (explain)"
+  constraints: ["Detect first Bloom's verb found", "Levels: REMEMBER, UNDERSTAND, APPLY, ANALYSE, EVALUATE, CREATE", "Case-insensitive verb detection"]
+
+- id: "EDU-041"
+  title: "Course Prerequisite Checker"
+  description: "Checks if a student meets prerequisites for a course"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with courses {id, prerequisites} and student_completed array"
+  output_format: "For each course: 'course_id: ELIGIBLE' or 'course_id: MISSING prereqs: [...]'"
+  test_cases:
+    - input: "{\"courses\":[{\"id\":\"CS201\",\"prerequisites\":[\"CS101\"]}],\"student_completed\":[\"CS101\"]}"
+      expected_output: "CS201: ELIGIBLE"
+    - input: "{\"courses\":[{\"id\":\"CS301\",\"prerequisites\":[\"CS201\",\"CS202\"]}],\"student_completed\":[\"CS201\"]}"
+      expected_output: "CS301: MISSING prereqs: [CS202]"
+  constraints: ["All prerequisites must be met", "List missing prereqs in sorted order"]
+
+- id: "EDU-042"
+  title: "Test Score Normaliser"
+  description: "Normalises test scores to a 0-100 scale"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "First line: max_possible_score. Remaining: one raw score per line"
+  output_format: "One normalised score per line rounded to 1 decimal place"
+  test_cases:
+    - input: "50\n45\n30\n10"
+      expected_output: "90.0\n60.0\n20.0"
+    - input: "25\n25"
+      expected_output: "100.0"
+  constraints: ["Normalised = (raw / max) * 100", "Round to 1 decimal"]
+
+- id: "EDU-043"
+  title: "Bell Curve Grade Adjuster"
+  description: "Adjusts grades to fit a normal distribution curve"
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "First line: target_mean target_stddev. Remaining: one raw score per line"
+  output_format: "Adjusted scores one per line rounded to 1 decimal"
+  test_cases:
+    - input: "75 10\n80 70 60 90 50"
+      expected_output: "79.0\n72.1\n65.2\n85.9\n58.3"
+    - input: "70 5\n70"
+      expected_output: "70.0"
+  constraints: ["Z-score normalisation then re-scale to target_mean, target_stddev", "Clamp to 0-100"]
+
+- id: "EDU-044"
+  title: "Bloom's Taxonomy Level Sorter"
+  description: "Sorts learning activities by Bloom's Taxonomy level"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {activity, level} objects where level is 1-6"
+  output_format: "Activities sorted by level ascending with level name prefix"
+  test_cases:
+    - input: "[{\"activity\":\"Build a model\",\"level\":6},{\"activity\":\"List facts\",\"level\":1}]"
+      expected_output: "REMEMBER: List facts\nCREATE: Build a model"
+    - input: "[{\"activity\":\"Analyse data\",\"level\":4}]"
+      expected_output: "ANALYSE: Analyse data"
+  constraints: ["Levels: 1=REMEMBER, 2=UNDERSTAND, 3=APPLY, 4=ANALYSE, 5=EVALUATE, 6=CREATE"]
+
+- id: "EDU-045"
+  title: "Student Feedback Aggregator"
+  description: "Aggregates and summarises student feedback ratings"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.math]
+  input_format: "JSON array of {category, score} feedback items"
+  output_format: "Average score per category sorted by score descending, then overall average"
+  test_cases:
+    - input: "[{\"category\":\"Content\",\"score\":4},{\"category\":\"Delivery\",\"score\":3},{\"category\":\"Content\",\"score\":5}]"
+      expected_output: "Content: 4.5\nDelivery: 3.0\nOverall: 4.0"
+    - input: "[{\"category\":\"Pace\",\"score\":2},{\"category\":\"Pace\",\"score\":4}]"
+      expected_output: "Pace: 3.0\nOverall: 3.0"
+  constraints: ["Round averages to 1 decimal", "Sort categories by average score descending"]
+
+- id: "EDU-046"
+  title: "Homework Submission Counter"
+  description: "Counts on-time, late, and missing submissions"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with due_date and submissions array {student, submitted_date}"
+  output_format: "Lines: 'on_time: N', 'late: N', 'missing: N' and percentage each"
+  test_cases:
+    - input: "{\"due_date\":\"2024-01-10\",\"total_students\":3,\"submissions\":[{\"student\":\"A\",\"submitted_date\":\"2024-01-09\"},{\"student\":\"B\",\"submitted_date\":\"2024-01-11\"}]}"
+      expected_output: "on_time: 1 (33%)\nlate: 1 (33%)\nmissing: 1 (33%)"
+    - input: "{\"due_date\":\"2024-01-10\",\"total_students\":2,\"submissions\":[{\"student\":\"A\",\"submitted_date\":\"2024-01-10\"},{\"student\":\"B\",\"submitted_date\":\"2024-01-10\"}]}"
+      expected_output: "on_time: 2 (100%)\nlate: 0 (0%)\nmissing: 0 (0%)"
+  constraints: ["On-time = submitted_date <= due_date", "Late = submitted_date > due_date", "Missing = total_students - len(submissions)"]
+
+- id: "EDU-047"
+  title: "Knowledge Check Randomiser"
+  description: "Randomly selects N questions from a topic pool for a quick check"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "First line: seed num_questions. Second line: JSON question bank"
+  output_format: "Selected questions numbered and formatted"
+  test_cases:
+    - input: "7 2\n[{\"topic\":\"Math\",\"q\":\"What is pi?\"},{\"topic\":\"Science\",\"q\":\"What is H2O?\"},{\"topic\":\"Math\",\"q\":\"What is e?\"}]"
+      expected_output: "1. [Math] What is pi?\n2. [Science] What is H2O?"
+    - input: "0 1\n[{\"topic\":\"A\",\"q\":\"Q1\"},{\"topic\":\"B\",\"q\":\"Q2\"}]"
+      expected_output: "1. [A] Q1"
+  constraints: ["Use seed for determinism", "Format: 'N. [topic] question'"]
+
+- id: "EDU-048"
+  title: "Class Performance Summary"
+  description: "Generates a statistical summary of class test performance"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "Space-separated list of integer scores on stdin"
+  output_format: "Summary with mean, median, mode, min, max, std dev, pass rate (>=50)"
+  test_cases:
+    - input: "60 70 80 70 90 40"
+      expected_output: "mean: 68.3\nmedian: 70.0\nmode: 70\nmin: 40\nmax: 90\nstddev: 16.1\npass_rate: 83%"
+    - input: "100"
+      expected_output: "mean: 100.0\nmedian: 100.0\nmode: 100\nmin: 100\nmax: 100\nstddev: 0.0\npass_rate: 100%"
+  constraints: ["Mean and stddev to 1 decimal", "Pass = score >= 50", "Mode = most frequent, alphabetical tie-break"]
+
+- id: "EDU-049"
+  title: "Learning Path Recommender"
+  description: "Recommends the next learning topic based on completion status"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with topics [{id, title, prerequisites, completed}]"
+  output_format: "List of recommended next topics (prerequisites met, not yet completed)"
+  test_cases:
+    - input: "{\"topics\":[{\"id\":\"T1\",\"title\":\"Intro\",\"prerequisites\":[],\"completed\":true},{\"id\":\"T2\",\"title\":\"Advanced\",\"prerequisites\":[\"T1\"],\"completed\":false}]}"
+      expected_output: "Recommended:\n- Advanced"
+    - input: "{\"topics\":[{\"id\":\"T1\",\"title\":\"Basics\",\"prerequisites\":[],\"completed\":false}]}"
+      expected_output: "Recommended:\n- Basics"
+  constraints: ["All prerequisites must be completed", "Topics not yet completed qualify", "Sort by title alphabetically"]
+
+- id: "EDU-050"
+  title: "Vocabulary Frequency in Text"
+  description: "Identifies which vocabulary terms from a list appear in a text"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "First line: comma-separated vocabulary terms. Remaining: text"
+  output_format: "Lines of 'term: N occurrences' for terms found, sorted by frequency"
+  test_cases:
+    - input: "photosynthesis,osmosis,mitosis\nPlants use photosynthesis. Osmosis occurs too. Photosynthesis again."
+      expected_output: "photosynthesis: 2\nosmosis: 1"
+    - input: "algebra,calculus\nNo math here"
+      expected_output: ""
+  constraints: ["Case-insensitive", "Only show terms with count > 0", "Sort descending by count"]
+
+- id: "EDU-051"
+  title: "Outline to Flashcard Converter"
+  description: "Converts a hierarchical outline to question-answer flashcard pairs"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str]
+  input_format: "Indented outline where indented items are details of the parent"
+  output_format: "JSON array of {front, back} flashcard objects"
+  test_cases:
+    - input: "Mitosis\n  Cell division process\n  Produces 2 cells"
+      expected_output: "[{\"front\":\"What is Mitosis?\",\"back\":\"Cell division process. Produces 2 cells.\"}]"
+    - input: "Photosynthesis\n  Converts light to energy"
+      expected_output: "[{\"front\":\"What is Photosynthesis?\",\"back\":\"Converts light to energy.\"}]"
+  constraints: ["Parent becomes question front", "Children join as answer", "JSON array output"]
+
+- id: "EDU-052"
+  title: "Exam Question Difficulty Tagger"
+  description: "Tags exam questions with difficulty levels based on Bloom's verb usage"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {id, question} objects"
+  output_format: "Lines of 'id: difficulty_level' sorted by id"
+  test_cases:
+    - input: "[{\"id\":\"Q1\",\"question\":\"List the planets.\"},{\"id\":\"Q2\",\"question\":\"Analyse the data.\"}]"
+      expected_output: "Q1: REMEMBER\nQ2: ANALYSE"
+    - input: "[{\"id\":\"Q1\",\"question\":\"Design a solution.\"}]"
+      expected_output: "Q1: CREATE"
+  constraints: ["Match first Bloom's verb found", "Default to UNDERSTAND if no verb found"]
+
+- id: "EDU-053"
+  title: "Reading Comprehension Scorer"
+  description: "Scores comprehension quiz answers against a passage"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with passage, questions [{q, answer}], and student_answers array"
+  output_format: "Question-by-question results and overall score"
+  test_cases:
+    - input: "{\"passage\":\"The sky is blue.\",\"questions\":[{\"q\":\"What colour is the sky?\",\"answer\":\"blue\"}],\"student_answers\":[\"blue\"]}"
+      expected_output: "Q1: Correct\nScore: 1/1 (100%)"
+    - input: "{\"passage\":\"Water is wet.\",\"questions\":[{\"q\":\"Is water wet?\",\"answer\":\"yes\"}],\"student_answers\":[\"no\"]}"
+      expected_output: "Q1: Incorrect. Answer: yes\nScore: 0/1 (0%)"
+  constraints: ["Case-insensitive answer matching", "Trim whitespace"]
+
+- id: "EDU-054"
+  title: "Daily Review Queue Builder"
+  description: "Builds a prioritised review queue from study card due dates"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "First line: today's date. Second line: JSON array of {id, topic, due_date, priority}"
+  output_format: "Sorted review queue: overdue first by priority, then due today, then upcoming"
+  test_cases:
+    - input: "2024-01-10\n[{\"id\":\"C1\",\"topic\":\"Math\",\"due_date\":\"2024-01-08\",\"priority\":2},{\"id\":\"C2\",\"topic\":\"Science\",\"due_date\":\"2024-01-10\",\"priority\":1}]"
+      expected_output: "OVERDUE: C1 - Math (was due 2024-01-08)\nDUE TODAY: C2 - Science"
+    - input: "2024-01-10\n[{\"id\":\"C1\",\"topic\":\"Art\",\"due_date\":\"2024-01-15\",\"priority\":1}]"
+      expected_output: "UPCOMING: C1 - Art (due 2024-01-15)"
+  constraints: ["Overdue = due_date < today", "Due today = due_date == today", "Upcoming = due_date > today"]
+
+- id: "EDU-055"
+  title: "Spelling Bee Word List Formatter"
+  description: "Formats a spelling bee word list with difficulty tiers"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {word, definition, difficulty} objects"
+  output_format: "Words grouped by difficulty tier, sorted alphabetically within tier"
+  test_cases:
+    - input: "[{\"word\":\"cat\",\"definition\":\"A pet\",\"difficulty\":1},{\"word\":\"ephemeral\",\"definition\":\"Short-lived\",\"difficulty\":3},{\"word\":\"bat\",\"definition\":\"A flying mammal\",\"difficulty\":1}]"
+      expected_output: "--- Tier 1 ---\nbat: A flying mammal\ncat: A pet\n--- Tier 3 ---\nephemeral: Short-lived"
+    - input: "[{\"word\":\"zoo\",\"definition\":\"Animal place\",\"difficulty\":2}]"
+      expected_output: "--- Tier 2 ---\nzoo: Animal place"
+  constraints: ["Sort words alphabetically within tier", "Sort tiers numerically", "Format: word: definition"]
+
+- id: "EDU-056"
+  title: "Topic Dependency Graph Text Renderer"
+  description: "Renders a text representation of topic dependencies"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {id, title, depends_on} topic objects"
+  output_format: "Topologically sorted list showing dependency arrows"
+  test_cases:
+    - input: "[{\"id\":\"T1\",\"title\":\"Intro\",\"depends_on\":[]},{\"id\":\"T2\",\"title\":\"Advanced\",\"depends_on\":[\"T1\"]}]"
+      expected_output: "T1: Intro\nT2: Advanced (requires: T1)"
+    - input: "[{\"id\":\"A\",\"title\":\"Alpha\",\"depends_on\":[]},{\"id\":\"B\",\"title\":\"Beta\",\"depends_on\":[\"A\"]},{\"id\":\"C\",\"title\":\"Gamma\",\"depends_on\":[\"A\",\"B\"]}]"
+      expected_output: "A: Alpha\nB: Beta (requires: A)\nC: Gamma (requires: A, B)"
+  constraints: ["Topological sort", "Comma-separate multiple dependencies"]
+
+- id: "EDU-057"
+  title: "Student Absent Reason Tracker"
+  description: "Categorises and counts student absence reasons"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {student, date, reason} absence records"
+  output_format: "Lines of 'reason: N absences' sorted by count descending, then 'total: N'"
+  test_cases:
+    - input: "[{\"student\":\"A\",\"date\":\"2024-01-02\",\"reason\":\"sick\"},{\"student\":\"B\",\"date\":\"2024-01-03\",\"reason\":\"sick\"},{\"student\":\"C\",\"date\":\"2024-01-04\",\"reason\":\"family\"}]"
+      expected_output: "sick: 2 absences\nfamily: 1 absences\ntotal: 3"
+    - input: "[{\"student\":\"X\",\"date\":\"2024-01-01\",\"reason\":\"trip\"}]"
+      expected_output: "trip: 1 absences\ntotal: 1"
+  constraints: ["Case-insensitive reason grouping", "Sort by count desc then reason asc for tie-break"]
+
+- id: "EDU-058"
+  title: "Parent-Teacher Meeting Scheduler"
+  description: "Schedules parent-teacher meeting slots from availability data"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with meeting_duration_min and teachers [{name, available_slots}]"
+  output_format: "Schedule of time slots assigned per teacher"
+  test_cases:
+    - input: "{\"meeting_duration_min\":15,\"teachers\":[{\"name\":\"Ms A\",\"available_slots\":[\"09:00\",\"09:15\",\"09:30\"]}]}"
+      expected_output: "Ms A:\n  09:00-09:15\n  09:15-09:30\n  09:30-09:45"
+    - input: "{\"meeting_duration_min\":30,\"teachers\":[{\"name\":\"Mr B\",\"available_slots\":[\"10:00\"]}]}"
+      expected_output: "Mr B:\n  10:00-10:30"
+  constraints: ["End time = start + duration", "Indent slots 2 spaces", "HH:MM-HH:MM format"]
+
+- id: "EDU-059"
+  title: "Extra Credit Calculator"
+  description: "Applies extra credit to a grade without exceeding the maximum"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Lines of 'base_score extra_credit max_score' (e.g. '85 10 100')"
+  output_format: "Final score capped at max_score per line"
+  test_cases:
+    - input: "85 10 100\n95 10 100"
+      expected_output: "95\n100"
+    - input: "80 5 90"
+      expected_output: "85"
+  constraints: ["Final = min(base + extra, max)", "Integer output"]
+
+- id: "EDU-060"
+  title: "Study Material Tagger"
+  description: "Auto-tags study material lines with subject keywords"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "First line: JSON tag dictionary {tag: [keywords]}. Remaining: text lines"
+  output_format: "Lines of '<original_line> [tag1, tag2]' where tags matched"
+  test_cases:
+    - input: "{\"math\":[\"equation\",\"number\"],\"biology\":[\"cell\",\"organism\"]}\nSolve the equation\nStudy the cell"
+      expected_output: "Solve the equation [math]\nStudy the cell [biology]"
+    - input: "{\"history\":[\"war\",\"empire\"]}\nThe Roman empire fell"
+      expected_output: "The Roman empire fell [history]"
+  constraints: ["Case-insensitive keyword matching", "Sort tags alphabetically", "No tag appended if no match"]
+
+- id: "EDU-061"
+  title: "Class Average Calculator"
+  description: "Computes class averages per subject from student grade data"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.math]
+  input_format: "JSON array of {student, grades: {subject: score}} objects"
+  output_format: "Lines of 'subject: N.N' sorted alphabetically"
+  test_cases:
+    - input: "[{\"student\":\"A\",\"grades\":{\"Math\":80,\"Science\":90}},{\"student\":\"B\",\"grades\":{\"Math\":70,\"Science\":80}}]"
+      expected_output: "Math: 75.0\nScience: 85.0"
+    - input: "[{\"student\":\"X\",\"grades\":{\"Art\":100}}]"
+      expected_output: "Art: 100.0"
+  constraints: ["Average rounded to 1 decimal", "Sort subjects A-Z"]
+
+- id: "EDU-062"
+  title: "Lecture Engagement Scorer"
+  description: "Scores lecture engagement based on questions asked and participation"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with total_students and engagement_events [{student, type}] where type is question/answer/comment"
+  output_format: "Per-student engagement score and class engagement rate"
+  test_cases:
+    - input: "{\"total_students\":3,\"engagement_events\":[{\"student\":\"A\",\"type\":\"question\"},{\"student\":\"A\",\"type\":\"answer\"},{\"student\":\"B\",\"type\":\"comment\"}]}"
+      expected_output: "A: 2 events\nB: 1 events\nC: 0 events\nEngagement rate: 67%"
+    - input: "{\"total_students\":2,\"engagement_events\":[{\"student\":\"X\",\"type\":\"question\"},{\"student\":\"Y\",\"type\":\"answer\"}]}"
+      expected_output: "X: 1 events\nY: 1 events\nEngagement rate: 100%"
+  constraints: ["Engagement rate = students_with_events / total_students * 100", "Sort students alphabetically", "Show all students including 0-event ones"]
+
+- id: "EDU-063"
+  title: "Writing Prompt Generator"
+  description: "Generates structured writing prompts from topic, genre, and constraints"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with topic, genre, word_count, and constraints array"
+  output_format: "Formatted writing prompt block"
+  test_cases:
+    - input: "{\"topic\":\"Space exploration\",\"genre\":\"persuasive\",\"word_count\":500,\"constraints\":[\"Use statistics\",\"Address counterarguments\"]}"
+      expected_output: "Writing Prompt\nTopic: Space exploration\nGenre: Persuasive\nTarget: 500 words\nRequirements:\n- Use statistics\n- Address counterarguments"
+    - input: "{\"topic\":\"Friendship\",\"genre\":\"narrative\",\"word_count\":300,\"constraints\":[\"First person\"]}"
+      expected_output: "Writing Prompt\nTopic: Friendship\nGenre: Narrative\nTarget: 300 words\nRequirements:\n- First person"
+  constraints: ["Genre capitalised", "Requirements as bulleted list", "Fixed header 'Writing Prompt'"]
+
+- id: "EDU-064"
+  title: "Academic Integrity Checker"
+  description: "Detects similarity between a submitted essay and reference texts"
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "First block: submission. '===' separator. One reference document per block separated by '==='"
+  output_format: "Similarity percentage to each reference and flag if any exceed 30%"
+  test_cases:
+    - input: "the cat sat on the mat\n===\nthe cat sat on the mat"
+      expected_output: "Reference 1: 100% similar\nFLAGGED: Similarity exceeds 30%"
+    - input: "hello world\n===\nfoo bar baz"
+      expected_output: "Reference 1: 0% similar\nCLEAN"
+  constraints: ["Jaccard word-set similarity", "Flag if any reference >= 30%", "Round percentage to integer"]
+
+- id: "EDU-065"
+  title: "Homework Points Aggregator"
+  description: "Sums homework points across all assignments per student"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {assignment, student, points_earned, points_possible} records"
+  output_format: "Lines of 'student: N/M (P%)' sorted by percentage descending"
+  test_cases:
+    - input: "[{\"assignment\":\"HW1\",\"student\":\"Alice\",\"points_earned\":9,\"points_possible\":10},{\"assignment\":\"HW1\",\"student\":\"Bob\",\"points_earned\":7,\"points_possible\":10}]"
+      expected_output: "Alice: 9/10 (90%)\nBob: 7/10 (70%)"
+    - input: "[{\"assignment\":\"A1\",\"student\":\"X\",\"points_earned\":5,\"points_possible\":5},{\"assignment\":\"A2\",\"student\":\"X\",\"points_earned\":3,\"points_possible\":5}]"
+      expected_output: "X: 8/10 (80%)"
+  constraints: ["Sum all assignments per student", "Percentage rounded to nearest integer", "Sort by percentage descending then name ascending"]
+
+- id: "EDU-066"
+  title: "Revision Schedule Generator"
+  description: "Creates a spaced revision schedule leading up to an exam"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with exam_date and topics array"
+  output_format: "Revision schedule lines 'YYYY-MM-DD: Revise <topic>'"
+  test_cases:
+    - input: "{\"exam_date\":\"2024-01-15\",\"topics\":[\"Algebra\",\"Geometry\",\"Calculus\"]}"
+      expected_output: "2024-01-12: Revise Algebra\n2024-01-13: Revise Geometry\n2024-01-14: Revise Calculus"
+    - input: "{\"exam_date\":\"2024-02-01\",\"topics\":[\"History\",\"Geography\"]}"
+      expected_output: "2024-01-30: Revise History\n2024-01-31: Revise Geography"
+  constraints: ["Work backwards from exam_date", "One topic per day", "Last revision day is exam_date - 1"]
+
+- id: "EDU-067"
+  title: "Multiple Choice Answer Sheet Scanner"
+  description: "Compares a filled answer sheet to an answer key and grades it"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "First line: comma-separated answer key. Second line: comma-separated student answers"
+  output_format: "Lines of 'QN: Correct/Incorrect' then score"
+  test_cases:
+    - input: "A,B,C,D\nA,C,C,D"
+      expected_output: "Q1: Correct\nQ2: Incorrect\nQ3: Correct\nQ4: Correct\nScore: 3/4 (75%)"
+    - input: "A,A\nA,A"
+      expected_output: "Q1: Correct\nQ2: Correct\nScore: 2/2 (100%)"
+  constraints: ["Case-insensitive answers", "Percentage rounded to nearest integer"]
+
+- id: "EDU-068"
+  title: "Jigsaw Group Activity Planner"
+  description: "Plans a jigsaw learning activity by assigning expert topics to groups"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with students list and topics list"
+  output_format: "Expert groups then jigsaw groups"
+  test_cases:
+    - input: "{\"students\":[\"A\",\"B\",\"C\",\"D\"],\"topics\":[\"T1\",\"T2\"]}"
+      expected_output: "Expert Groups:\nT1: A, B\nT2: C, D\nJigsaw Groups:\nGroup 1: A (T1), C (T2)\nGroup 2: B (T1), D (T2)"
+    - input: "{\"students\":[\"X\",\"Y\"],\"topics\":[\"Math\"]}"
+      expected_output: "Expert Groups:\nMath: X, Y\nJigsaw Groups:\nGroup 1: X (Math)\nGroup 2: Y (Math)"
+  constraints: ["Distribute students evenly across topics", "Jigsaw groups have one student from each topic"]
+
+- id: "EDU-069"
+  title: "Course Completion Certificate Data Extractor"
+  description: "Extracts completion data from course records to populate certificates"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, course, completion_date, score}"
+  output_format: "Lines of 'CERTIFICATE | student | course | date | grade'"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"course\":\"Python\",\"completion_date\":\"2024-01-15\",\"score\":92}]"
+      expected_output: "CERTIFICATE | Alice | Python | 2024-01-15 | A"
+    - input: "[{\"student\":\"Bob\",\"course\":\"Math\",\"completion_date\":\"2024-02-01\",\"score\":75}]"
+      expected_output: "CERTIFICATE | Bob | Math | 2024-02-01 | C"
+  constraints: ["Letter grade: A>=90, B>=80, C>=70, D>=60, F<60"]
+
+- id: "EDU-070"
+  title: "Error Analysis Report Generator"
+  description: "Categorises errors in student work and recommends focus areas"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {student, errors: [{type, count}]} objects"
+  output_format: "Per-student error summary with top error type and recommendation"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"errors\":[{\"type\":\"calculation\",\"count\":5},{\"type\":\"conceptual\",\"count\":2}]}]"
+      expected_output: "Alice:\n  Total errors: 7\n  Top error: calculation (5)\n  Recommendation: Practice calculation drills"
+    - input: "[{\"student\":\"Bob\",\"errors\":[{\"type\":\"spelling\",\"count\":3}]}]"
+      expected_output: "Bob:\n  Total errors: 3\n  Top error: spelling (3)\n  Recommendation: Practice spelling drills"
+  constraints: ["Recommendation format: 'Practice X drills'", "Sort students alphabetically"]
+
+- id: "EDU-071"
+  title: "Concept Prerequisite Map"
+  description: "Maps which concepts must be learned before others"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {concept, must_know_first} dependency pairs"
+  output_format: "Topologically sorted learning order list"
+  test_cases:
+    - input: "[{\"concept\":\"Calculus\",\"must_know_first\":\"Algebra\"},{\"concept\":\"Algebra\",\"must_know_first\":\"\"}]"
+      expected_output: "1. Algebra\n2. Calculus"
+    - input: "[{\"concept\":\"C\",\"must_know_first\":\"B\"},{\"concept\":\"B\",\"must_know_first\":\"A\"},{\"concept\":\"A\",\"must_know_first\":\"\"}]"
+      expected_output: "1. A\n2. B\n3. C"
+  constraints: ["Topological sort", "Empty must_know_first means no prerequisite"]
+
+- id: "EDU-072"
+  title: "Daily Vocabulary Word"
+  description: "Selects a vocabulary word for the day based on the date"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "First line: ISO date. Second line: JSON array of {word, definition, example}"
+  output_format: "Formatted word-of-the-day block"
+  test_cases:
+    - input: "2024-01-01\n[{\"word\":\"ephemeral\",\"definition\":\"lasting a short time\",\"example\":\"The ephemeral bloom of cherry blossoms.\"}]"
+      expected_output: "Word of the Day: ephemeral\nDefinition: lasting a short time\nExample: The ephemeral bloom of cherry blossoms."
+    - input: "2024-01-02\n[{\"word\":\"benevolent\",\"definition\":\"well meaning\",\"example\":\"A benevolent leader.\"}]"
+      expected_output: "Word of the Day: benevolent\nDefinition: well meaning\nExample: A benevolent leader."
+  constraints: ["Select word_index = day_of_year % len(words)", "Formatted as shown"]
+
+- id: "EDU-073"
+  title: "Socratic Question Generator"
+  description: "Generates Socratic follow-up questions for a given topic"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with topic and claim"
+  output_format: "Numbered list of Socratic questions"
+  test_cases:
+    - input: "{\"topic\":\"gravity\",\"claim\":\"Objects fall due to gravity\"}"
+      expected_output: "1. What evidence supports this claim about gravity?\n2. Are there exceptions to this rule?\n3. How would you test this claim?\n4. What assumptions are being made?\n5. What are the implications if this is true?"
+    - input: "{\"topic\":\"democracy\",\"claim\":\"Democracy is the best system\"}"
+      expected_output: "1. What evidence supports this claim about democracy?\n2. Are there exceptions to this rule?\n3. How would you test this claim?\n4. What assumptions are being made?\n5. What are the implications if this is true?"
+  constraints: ["5 fixed Socratic question templates", "Substitute topic into question 1"]
+
+- id: "EDU-074"
+  title: "Kahoot-Style Live Quiz Formatter"
+  description: "Formats a quiz for rapid-fire live quiz presentation"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {question, options, correct, time_limit_sec}"
+  output_format: "Each question formatted with options labelled A-D, time limit, and answer"
+  test_cases:
+    - input: "[{\"question\":\"2+2?\",\"options\":[\"3\",\"4\",\"5\",\"6\"],\"correct\":1,\"time_limit_sec\":10}]"
+      expected_output: "Q1: 2+2? (10s)\nA: 3\nB: 4\nC: 5\nD: 6\nAnswer: B"
+    - input: "[{\"question\":\"Sky colour?\",\"options\":[\"Red\",\"Blue\"],\"correct\":1,\"time_limit_sec\":5}]"
+      expected_output: "Q1: Sky colour? (5s)\nA: Red\nB: Blue\nAnswer: B"
+  constraints: ["correct is 0-indexed", "Label options A, B, C, D", "Answer shown as letter"]
+
+- id: "EDU-075"
+  title: "Exit Ticket Generator"
+  description: "Generates exit ticket questions based on lesson objectives"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with lesson_topic and objectives array"
+  output_format: "3 exit ticket questions based on the objectives"
+  test_cases:
+    - input: "{\"lesson_topic\":\"Fractions\",\"objectives\":[\"Add fractions\",\"Simplify fractions\"]}"
+      expected_output: "Exit Ticket: Fractions\n1. What is one thing you learned about Add fractions today?\n2. What is one thing you learned about Simplify fractions today?\n3. What is one question you still have about Fractions?"
+    - input: "{\"lesson_topic\":\"Poetry\",\"objectives\":[\"Identify metaphors\"]}"
+      expected_output: "Exit Ticket: Poetry\n1. What is one thing you learned about Identify metaphors today?\n2. What is one question you still have about Poetry?\n3. Rate your understanding of Poetry today (1-5): ___"
+  constraints: ["Always end with open question or rating", "Use objective text verbatim in questions"]
+
+- id: "EDU-076"
+  title: "Peer Feedback Form Processor"
+  description: "Aggregates peer feedback forms and produces summary per reviewee"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.math]
+  input_format: "JSON array of {reviewer, reviewee, scores: {criterion: score}, comment}"
+  output_format: "Per-reviewee average scores per criterion and aggregated comments"
+  test_cases:
+    - input: "[{\"reviewer\":\"A\",\"reviewee\":\"B\",\"scores\":{\"clarity\":4,\"effort\":3},\"comment\":\"Good work\"},{\"reviewer\":\"C\",\"reviewee\":\"B\",\"scores\":{\"clarity\":2,\"effort\":5},\"comment\":\"Needs polish\"}]"
+      expected_output: "Feedback for B:\n  clarity: 3.0\n  effort: 4.0\n  Comments: Good work; Needs polish"
+    - input: "[{\"reviewer\":\"X\",\"reviewee\":\"Y\",\"scores\":{\"quality\":5},\"comment\":\"Excellent\"}]"
+      expected_output: "Feedback for Y:\n  quality: 5.0\n  Comments: Excellent"
+  constraints: ["Average scores per criterion", "Join comments with '; '", "Sort criteria alphabetically"]
+
+- id: "EDU-077"
+  title: "Curriculum Alignment Checker"
+  description: "Checks if lesson activities align with curriculum standards"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with standards [{id, description}] and activities [{name, standard_id}]"
+  output_format: "Lines of 'activity: standard_description' or 'activity: UNALIGNED' if no match"
+  test_cases:
+    - input: "{\"standards\":[{\"id\":\"CCSS.1\",\"description\":\"Add whole numbers\"}],\"activities\":[{\"name\":\"Addition drill\",\"standard_id\":\"CCSS.1\"},{\"name\":\"Art project\",\"standard_id\":\"CCSS.9\"}]}"
+      expected_output: "Addition drill: Add whole numbers\nArt project: UNALIGNED"
+    - input: "{\"standards\":[{\"id\":\"S1\",\"description\":\"Describe motion\"}],\"activities\":[{\"name\":\"Lab\",\"standard_id\":\"S1\"}]}"
+      expected_output: "Lab: Describe motion"
+  constraints: ["Match by standard_id", "Preserve activity order"]
+
+- id: "EDU-078"
+  title: "IQ Test Score Interpreter"
+  description: "Interprets raw IQ-style test scores to classification bands"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "One integer score per line"
+  output_format: "Lines of 'score: classification'"
+  test_cases:
+    - input: "130\n110\n90\n70\n55"
+      expected_output: "130: Very Superior\n110: High Average\n90: Average\n70: Borderline\n55: Extremely Low"
+    - input: "145"
+      expected_output: "145: Very Superior"
+  constraints: ["Bands: >=130=Very Superior, 120-129=Superior, 110-119=High Average, 90-109=Average, 80-89=Low Average, 70-79=Borderline, <70=Extremely Low"]
+
+- id: "EDU-079"
+  title: "Formative Assessment Tracker"
+  description: "Tracks formative assessment results and flags students needing support"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, assessments: [score]} objects, and threshold"
+  output_format: "Students below threshold flagged with 'NEEDS SUPPORT', others with 'ON TRACK'"
+  test_cases:
+    - input: "{\"threshold\":70,\"students\":[{\"student\":\"Alice\",\"assessments\":[80,90,75]},{\"student\":\"Bob\",\"assessments\":[60,55,65]}]}"
+      expected_output: "Alice: 81.7 - ON TRACK\nBob: 60.0 - NEEDS SUPPORT"
+    - input: "{\"threshold\":50,\"students\":[{\"student\":\"X\",\"assessments\":[45]}]}"
+      expected_output: "X: 45.0 - NEEDS SUPPORT"
+  constraints: ["Average of assessments rounded to 1 decimal", "Below threshold = NEEDS SUPPORT", "Sort by student name"]
+
+- id: "EDU-080"
+  title: "Lesson Reflection Prompter"
+  description: "Generates structured reflection questions after a lesson"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Lesson topic on stdin"
+  output_format: "Five structured reflection questions"
+  test_cases:
+    - input: "Photosynthesis"
+      expected_output: "Reflection: Photosynthesis\n1. What were the key points of today's lesson on Photosynthesis?\n2. What did you find most challenging?\n3. What connections can you make to previous learning?\n4. How might you apply what you learned today?\n5. What would you like to explore further?"
+    - input: "World War II"
+      expected_output: "Reflection: World War II\n1. What were the key points of today's lesson on World War II?\n2. What did you find most challenging?\n3. What connections can you make to previous learning?\n4. How might you apply what you learned today?\n5. What would you like to explore further?"
+  constraints: ["5 fixed question templates", "Substitute topic name into questions 1 and title"]
+
+- id: "EDU-081"
+  title: "Lab Report Formatter"
+  description: "Formats a structured lab report from JSON data"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with title, hypothesis, materials, procedure steps, results, conclusion"
+  output_format: "Formatted lab report with section headers"
+  test_cases:
+    - input: "{\"title\":\"Boiling Point\",\"hypothesis\":\"Water boils at 100C\",\"materials\":[\"Water\",\"Thermometer\"],\"procedure\":[\"Heat water\",\"Record temp\"],\"results\":\"100C at boiling\",\"conclusion\":\"Hypothesis confirmed\"}"
+      expected_output: "LAB REPORT: Boiling Point\n\nHypothesis:\nWater boils at 100C\n\nMaterials:\n- Water\n- Thermometer\n\nProcedure:\n1. Heat water\n2. Record temp\n\nResults:\n100C at boiling\n\nConclusion:\nHypothesis confirmed"
+    - input: "{\"title\":\"Density\",\"hypothesis\":\"Oil floats\",\"materials\":[\"Oil\",\"Water\"],\"procedure\":[\"Mix\"],\"results\":\"Oil on top\",\"conclusion\":\"Confirmed\"}"
+      expected_output: "LAB REPORT: Density\n\nHypothesis:\nOil floats\n\nMaterials:\n- Oil\n- Water\n\nProcedure:\n1. Mix\n\nResults:\nOil on top\n\nConclusion:\nConfirmed"
+  constraints: ["Materials as bulleted list", "Procedure as numbered list", "Blank line between sections"]
+
+- id: "EDU-082"
+  title: "Student Goal Tracker"
+  description: "Tracks student goals with milestones and completion status"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {goal, milestones: [{title, completed}]} objects"
+  output_format: "Goal with progress bar and milestone checklist"
+  test_cases:
+    - input: "[{\"goal\":\"Learn Python\",\"milestones\":[{\"title\":\"Variables\",\"completed\":true},{\"title\":\"Functions\",\"completed\":false}]}]"
+      expected_output: "Goal: Learn Python [#####     ] 50%\n  [x] Variables\n  [ ] Functions"
+    - input: "[{\"goal\":\"Read 10 books\",\"milestones\":[{\"title\":\"Book 1\",\"completed\":true}]}]"
+      expected_output: "Goal: Read 10 books [##########] 100%\n  [x] Book 1"
+  constraints: ["Progress bar 10 chars", "# per completed milestone proportion", "[x] completed, [ ] incomplete"]
+
+- id: "EDU-083"
+  title: "Quiz Result Exporter"
+  description: "Exports quiz results as a structured CSV report"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, answers: [{question_id, answer, correct}]}"
+  output_format: "CSV with student, total_correct, total_questions, percentage"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"answers\":[{\"question_id\":1,\"answer\":\"A\",\"correct\":true},{\"question_id\":2,\"answer\":\"B\",\"correct\":false}]}]"
+      expected_output: "student,total_correct,total_questions,percentage\nAlice,1,2,50%"
+    - input: "[{\"student\":\"Bob\",\"answers\":[{\"question_id\":1,\"answer\":\"C\",\"correct\":true}]}]"
+      expected_output: "student,total_correct,total_questions,percentage\nBob,1,1,100%"
+  constraints: ["CSV header always first", "Percentage rounded to nearest integer"]
+
+- id: "EDU-084"
+  title: "Academic Calendar Generator"
+  description: "Generates an academic calendar for a semester with key dates"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with semester_start, semester_end, and events array [{name, date}]"
+  output_format: "Calendar weeks with events marked"
+  test_cases:
+    - input: "{\"semester_start\":\"2024-01-08\",\"semester_end\":\"2024-01-21\",\"events\":[{\"name\":\"Quiz 1\",\"date\":\"2024-01-12\"}]}"
+      expected_output: "Week 1: 2024-01-08 to 2024-01-14\n  2024-01-12: Quiz 1\nWeek 2: 2024-01-15 to 2024-01-21"
+    - input: "{\"semester_start\":\"2024-02-01\",\"semester_end\":\"2024-02-07\",\"events\":[]}"
+      expected_output: "Week 1: 2024-02-01 to 2024-02-07"
+  constraints: ["Weeks start on semester_start day of week", "Events indented 2 spaces", "No trailing blank week"]
+
+- id: "EDU-085"
+  title: "Subject Difficulty Ranker"
+  description: "Ranks subjects by student-reported difficulty scores"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.math]
+  input_format: "JSON array of {student, subject_scores: {subject: difficulty}} objects (1-10 scale)"
+  output_format: "Lines of 'rank. subject: N.N avg difficulty' sorted by average descending"
+  test_cases:
+    - input: "[{\"student\":\"A\",\"subject_scores\":{\"Math\":8,\"English\":5}},{\"student\":\"B\",\"subject_scores\":{\"Math\":6,\"English\":7}}]"
+      expected_output: "1. Math: 7.0\n2. English: 6.0"
+    - input: "[{\"student\":\"X\",\"subject_scores\":{\"Art\":3}}]"
+      expected_output: "1. Art: 3.0"
+  constraints: ["Average across all students per subject", "Round to 1 decimal", "Rank from 1"]
+
+- id: "EDU-086"
+  title: "Homework Late Policy Calculator"
+  description: "Applies a late submission penalty policy to calculate final scores"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with penalty_per_day (percent), max_penalty (percent), and submissions [{score, due_date, submitted_date}]"
+  output_format: "Lines of 'submission N: raw N -> adjusted N (N days late)'"
+  test_cases:
+    - input: "{\"penalty_per_day\":10,\"max_penalty\":50,\"submissions\":[{\"score\":80,\"due_date\":\"2024-01-10\",\"submitted_date\":\"2024-01-12\"}]}"
+      expected_output: "submission 1: raw 80 -> adjusted 64 (2 days late)"
+    - input: "{\"penalty_per_day\":10,\"max_penalty\":50,\"submissions\":[{\"score\":100,\"due_date\":\"2024-01-10\",\"submitted_date\":\"2024-01-10\"}]}"
+      expected_output: "submission 1: raw 100 -> adjusted 100 (0 days late)"
+  constraints: ["Penalty = min(days_late * penalty_per_day, max_penalty)", "Adjusted = score * (1 - penalty/100)", "Round adjusted to integer"]
+
+- id: "EDU-087"
+  title: "Reading Log Tracker"
+  description: "Tracks books read over time and calculates reading statistics"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON array of {title, pages, start_date, end_date}"
+  output_format: "Log entries, total books, total pages, avg pages/day, longest book"
+  test_cases:
+    - input: "[{\"title\":\"Book A\",\"pages\":300,\"start_date\":\"2024-01-01\",\"end_date\":\"2024-01-10\"},{\"title\":\"Book B\",\"pages\":150,\"start_date\":\"2024-01-11\",\"end_date\":\"2024-01-15\"}]"
+      expected_output: "Book A: 300 pages (10 days)\nBook B: 150 pages (5 days)\nTotal books: 2\nTotal pages: 450\nAvg pages/day: 30.0\nLongest book: Book A"
+    - input: "[{\"title\":\"Short\",\"pages\":50,\"start_date\":\"2024-01-01\",\"end_date\":\"2024-01-02\"}]"
+      expected_output: "Short: 50 pages (2 days)\nTotal books: 1\nTotal pages: 50\nAvg pages/day: 25.0\nLongest book: Short"
+  constraints: ["Days = end - start + 1", "Avg pages/day = total_pages / total_days", "Round avg to 1 decimal"]
+
+- id: "EDU-088"
+  title: "Classroom Rules Formatter"
+  description: "Formats a list of classroom rules into a poster-style numbered list"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "First line: classroom name. Remaining: one rule per line"
+  output_format: "Formatted poster with title, border, and numbered rules"
+  test_cases:
+    - input: "Room 5A\nRaise your hand before speaking\nRespect your classmates"
+      expected_output: "========================\n   RULES FOR ROOM 5A   \n========================\n1. Raise your hand before speaking\n2. Respect your classmates\n========================"
+    - input: "Lab\nWear safety goggles"
+      expected_output: "========================\n   RULES FOR LAB   \n========================\n1. Wear safety goggles\n========================"
+  constraints: ["Fixed 24-char = border", "Title centred in header", "Numbered from 1"]
+
+- id: "EDU-089"
+  title: "Knowledge Retention Score"
+  description: "Estimates knowledge retention based on review frequency and recency"
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.json, std.time, std.math]
+  input_format: "First line: today's date. Second line: JSON array of {topic, review_dates}"
+  output_format: "Lines of 'topic: N% retention' sorted by retention descending"
+  test_cases:
+    - input: "2024-01-15\n[{\"topic\":\"Math\",\"review_dates\":[\"2024-01-14\",\"2024-01-13\"]},{\"topic\":\"History\",\"review_dates\":[\"2024-01-01\"]}]"
+      expected_output: "Math: 87% retention\nHistory: 32% retention"
+    - input: "2024-01-10\n[{\"topic\":\"Science\",\"review_dates\":[\"2024-01-10\"]}]"
+      expected_output: "Science: 100% retention"
+  constraints: ["Forgetting curve: retention = 100 * e^(-days_since_last_review/7)", "Round to nearest integer", "days_since_last_review from most recent date"]
+
+- id: "EDU-090"
+  title: "Text Difficulty Level Assessor"
+  description: "Assesses whether a text is appropriate for a given educational grade level"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "First line: target_grade (1-12). Remaining: text"
+  output_format: "'APPROPRIATE', 'TOO EASY (grade N)', or 'TOO HARD (grade N)'"
+  test_cases:
+    - input: "5\nThe cat sat on the mat."
+      expected_output: "TOO EASY (grade 1)"
+    - input: "10\nThe utilisation of complex syntactical structures necessitates considerable cognitive engagement."
+      expected_output: "TOO HARD (grade 14)"
+  constraints: ["Compute FK Grade Level", "±2 grades = APPROPRIATE", "FK Grade = 0.39*(words/sentences) + 11.8*(syllables/words) - 15.59"]
+
+- id: "EDU-091"
+  title: "Class Participation Tracker"
+  description: "Tracks and scores student participation events in class"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, event_type} records. Event types: question, answer, comment"
+  output_format: "Lines of 'student: N points' sorted by points descending"
+  test_cases:
+    - input: "[{\"student\":\"A\",\"event_type\":\"question\"},{\"student\":\"A\",\"event_type\":\"answer\"},{\"student\":\"B\",\"event_type\":\"comment\"}]"
+      expected_output: "A: 3 points\nB: 1 points"
+    - input: "[{\"student\":\"X\",\"event_type\":\"answer\"},{\"student\":\"X\",\"event_type\":\"answer\"}]"
+      expected_output: "X: 4 points"
+  constraints: ["question=1pt, answer=2pt, comment=1pt", "Sort by points desc then name asc"]
+
+- id: "EDU-092"
+  title: "Math Word Problem Generator"
+  description: "Generates math word problems from templates"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with template, variables {name: [values]}, and seed"
+  output_format: "Generated word problem and solution"
+  test_cases:
+    - input: "{\"template\":\"{name} has {n} apples and eats {m}. How many are left?\",\"variables\":{\"name\":[\"Alice\",\"Bob\"],\"n\":[5,8,10],\"m\":[2,3]},\"seed\":42}"
+      expected_output: "Bob has 8 apples and eats 3. How many are left?\nAnswer: 5"
+    - input: "{\"template\":\"{name} runs {n} km per day for {m} days. Total?\",\"variables\":{\"name\":[\"Sam\"],\"n\":[5],\"m\":[7]},\"seed\":0}"
+      expected_output: "Sam runs 5 km per day for 7 days. Total?\nAnswer: 35"
+  constraints: ["Use seed for variable selection", "Solve arithmetic expressions in template", "Answer computed automatically"]
+
+- id: "EDU-093"
+  title: "Weekly Learning Summary"
+  description: "Generates a weekly learning summary from daily notes"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON array of {date, topics_covered, questions_raised} daily entries"
+  output_format: "Week summary with topic count, unique topics, and unresolved questions"
+  test_cases:
+    - input: "[{\"date\":\"2024-01-01\",\"topics_covered\":[\"Math\",\"Science\"],\"questions_raised\":[\"Why is pi irrational?\"]},{\"date\":\"2024-01-02\",\"topics_covered\":[\"Math\",\"History\"],\"questions_raised\":[]}]"
+      expected_output: "Weekly Summary\nDays studied: 2\nTopics covered: History, Math, Science (3 unique)\nUnresolved questions:\n- Why is pi irrational?"
+    - input: "[{\"date\":\"2024-01-03\",\"topics_covered\":[\"Art\"],\"questions_raised\":[]}]"
+      expected_output: "Weekly Summary\nDays studied: 1\nTopics covered: Art (1 unique)\nUnresolved questions: none"
+  constraints: ["Sort topics alphabetically", "Deduplicate topics across days", "Questions from all days"]
+
+- id: "EDU-094"
+  title: "Student Interest Survey Analyser"
+  description: "Analyses student interest survey results to find most popular topics"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {student, interests: [topic]} survey responses"
+  output_format: "Topics ranked by popularity: 'rank. topic: N votes (P%)'"
+  test_cases:
+    - input: "[{\"student\":\"A\",\"interests\":[\"Science\",\"Math\"]},{\"student\":\"B\",\"interests\":[\"Science\",\"Art\"]},{\"student\":\"C\",\"interests\":[\"Math\"]}]"
+      expected_output: "1. Science: 2 votes (67%)\n2. Math: 2 votes (67%)\n3. Art: 1 votes (33%)"
+    - input: "[{\"student\":\"X\",\"interests\":[\"Music\"]}]"
+      expected_output: "1. Music: 1 votes (100%)"
+  constraints: ["Percentage = votes / num_students * 100", "Sort by votes desc then topic asc", "Round percentage to nearest integer"]
+
+- id: "EDU-095"
+  title: "Differentiated Instruction Planner"
+  description: "Plans differentiated activities for different learning levels"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with topic and activity_bank [{title, level}] where level is below/on/above"
+  output_format: "Three sections: Below Level, On Level, Above Level with activities"
+  test_cases:
+    - input: "{\"topic\":\"Fractions\",\"activity_bank\":[{\"title\":\"Basic addition\",\"level\":\"below\"},{\"title\":\"Mixed numbers\",\"level\":\"on\"},{\"title\":\"Algebra fractions\",\"level\":\"above\"}]}"
+      expected_output: "Differentiated Plan: Fractions\nBelow Level:\n- Basic addition\nOn Level:\n- Mixed numbers\nAbove Level:\n- Algebra fractions"
+    - input: "{\"topic\":\"Poetry\",\"activity_bank\":[{\"title\":\"Identify rhyme\",\"level\":\"below\"},{\"title\":\"Write haiku\",\"level\":\"above\"}]}"
+      expected_output: "Differentiated Plan: Poetry\nBelow Level:\n- Identify rhyme\nOn Level:\n(none)\nAbove Level:\n- Write haiku"
+  constraints: ["Always show all three levels", "'(none)' if no activities at that level"]
+
+- id: "EDU-096"
+  title: "Test Blueprint Generator"
+  description: "Generates a test blueprint showing question distribution across topics and Bloom's levels"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with topics and bloom_levels, total_questions, and weights"
+  output_format: "Grid table with topics as rows and Bloom's levels as columns"
+  test_cases:
+    - input: "{\"topics\":[\"Algebra\",\"Geometry\"],\"bloom_levels\":[\"REMEMBER\",\"APPLY\"],\"total_questions\":8,\"weights\":{\"Algebra\":0.5,\"Geometry\":0.5}}"
+      expected_output: "Topic     | REMEMBER | APPLY\nAlgebra   | 2        | 2\nGeometry  | 2        | 2"
+    - input: "{\"topics\":[\"History\"],\"bloom_levels\":[\"UNDERSTAND\"],\"total_questions\":4,\"weights\":{\"History\":1.0}}"
+      expected_output: "Topic   | UNDERSTAND\nHistory | 4"
+  constraints: ["Questions = total * topic_weight / num_bloom_levels (integer)", "Padded columns"]
+
+- id: "EDU-097"
+  title: "Classroom Debate Organiser"
+  description: "Organises students into debate teams and assigns positions"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON with students list, motion, and seed"
+  output_format: "For/Against team assignments and motion statement"
+  test_cases:
+    - input: "{\"students\":[\"Alice\",\"Bob\",\"Charlie\",\"Dave\"],\"motion\":\"Technology improves education\",\"seed\":1}"
+      expected_output: "Motion: Technology improves education\nFOR: Alice, Charlie\nAGAINST: Bob, Dave"
+    - input: "{\"students\":[\"X\",\"Y\",\"Z\"],\"motion\":\"Homework should be banned\",\"seed\":2}"
+      expected_output: "Motion: Homework should be banned\nFOR: X, Z\nAGAINST: Y"
+  constraints: ["Split students as evenly as possible", "Use seed for determinism", "FOR gets extra student if odd number"]
+
+- id: "EDU-098"
+  title: "Concept Glossary Formatter"
+  description: "Formats a subject glossary in alphabetical order with definitions"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {term, definition} objects"
+  output_format: "Alphabetically sorted glossary with formatted entries"
+  test_cases:
+    - input: "[{\"term\":\"photosynthesis\",\"definition\":\"Process of converting light to energy\"},{\"term\":\"cell\",\"definition\":\"Basic unit of life\"}]"
+      expected_output: "cell\n  Basic unit of life\n\nphotosynthesis\n  Process of converting light to energy"
+    - input: "[{\"term\":\"orbit\",\"definition\":\"Path of a planet around a star\"}]"
+      expected_output: "orbit\n  Path of a planet around a star"
+  constraints: ["Sorted case-insensitively", "Definition indented 2 spaces", "Blank line between entries"]
+
+- id: "EDU-099"
+  title: "Pop Quiz Auto-Grader"
+  description: "Auto-grades a pop quiz from an answer key and student responses"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with answer_key array and student_responses array"
+  output_format: "Detailed results per question and summary"
+  test_cases:
+    - input: "{\"answer_key\":[\"A\",\"B\",\"C\"],\"student_responses\":[\"A\",\"C\",\"C\"]}"
+      expected_output: "Q1: A (correct)\nQ2: C (incorrect, answer: B)\nQ3: C (correct)\nScore: 2/3 (67%)"
+    - input: "{\"answer_key\":[\"T\",\"F\"],\"student_responses\":[\"T\",\"F\"]}"
+      expected_output: "Q1: T (correct)\nQ2: F (correct)\nScore: 2/2 (100%)"
+  constraints: ["Case-insensitive", "Percentage rounded to nearest integer", "Format: 'QN: answer (correct/incorrect, answer: X)'"]
+
+- id: "EDU-100"
+  title: "Student Rank Calculator"
+  description: "Calculates and displays student rankings from scores"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, score} objects"
+  output_format: "Ranked list with ties sharing same rank, dense ranking"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"score\":95},{\"student\":\"Bob\",\"score\":88},{\"student\":\"Charlie\",\"score\":95}]"
+      expected_output: "1. Alice - 95\n1. Charlie - 95\n2. Bob - 88"
+    - input: "[{\"student\":\"X\",\"score\":70},{\"student\":\"Y\",\"score\":80}]"
+      expected_output: "1. Y - 80\n2. X - 70"
+  constraints: ["Dense ranking (ties share rank, next rank is sequential)", "Within same score sort alphabetically", "Sort score descending"]
+
+- id: "EDU-101"
+  title: "Kahoot Winner Extractor"
+  description: "Extracts top N winners from a gamified quiz leaderboard"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "First line: N. Second line: JSON array of {player, score, correct_answers}"
+  output_format: "Podium lines: '1st: player (score pts)', '2nd: ...', '3rd: ...', then remaining top N"
+  test_cases:
+    - input: "3\n[{\"player\":\"Alice\",\"score\":900,\"correct_answers\":9},{\"player\":\"Bob\",\"score\":700,\"correct_answers\":7},{\"player\":\"Charlie\",\"score\":800,\"correct_answers\":8}]"
+      expected_output: "1st: Alice (900 pts)\n2nd: Charlie (800 pts)\n3rd: Bob (700 pts)"
+    - input: "1\n[{\"player\":\"X\",\"score\":500,\"correct_answers\":5}]"
+      expected_output: "1st: X (500 pts)"
+  constraints: ["Sort by score descending", "Ordinal suffixes: 1st, 2nd, 3rd, Nth", "Only show top N"]
+
+- id: "EDU-102"
+  title: "Study Habit Survey Scorer"
+  description: "Scores a study habit survey and provides recommendations"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {habit, score} objects where score is 1-5"
+  output_format: "Scores per habit, total, and personalised recommendations for low scores"
+  test_cases:
+    - input: "[{\"habit\":\"regular_review\",\"score\":2},{\"habit\":\"active_recall\",\"score\":5},{\"habit\":\"sleep\",\"score\":3}]"
+      expected_output: "regular_review: 2/5\nactive_recall: 5/5\nsleep: 3/5\nTotal: 10/15\nRecommendations:\n- Improve regular_review: schedule daily review sessions"
+    - input: "[{\"habit\":\"exercise\",\"score\":4}]"
+      expected_output: "exercise: 4/5\nTotal: 4/5\nRecommendations: none"
+  constraints: ["Recommend for scores <= 2", "Recommendation: 'Improve X: schedule daily X sessions'", "Sort habits alphabetically"]
+
+- id: "EDU-103"
+  title: "Exam Anxiety Mitigation Tip Generator"
+  description: "Generates personalised exam tips based on student stress indicators"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with anxiety_level (1-10) and specific_concerns array"
+  output_format: "Tiered tips based on anxiety level, addressing each concern"
+  test_cases:
+    - input: "{\"anxiety_level\":8,\"specific_concerns\":[\"time management\",\"blank mind\"]}"
+      expected_output: "Exam Preparation Tips (High Anxiety)\n1. Practice timed mock exams\n2. Use memory techniques for blank mind\n3. Do deep breathing before the exam\n4. Get 8 hours sleep the night before\nFor time management: allocate time per question\nFor blank mind: start with easier questions"
+    - input: "{\"anxiety_level\":3,\"specific_concerns\":[]}"
+      expected_output: "Exam Preparation Tips (Low Anxiety)\n1. Review your notes\n2. Get a good night's sleep\n3. Eat a healthy breakfast"
+  constraints: ["1-4=Low, 5-7=Medium, 8-10=High", "Add concern-specific tip for each concern listed", "Tier affects tip list length"]
+
+- id: "EDU-104"
+  title: "Learning Style Inventory Scorer"
+  description: "Scores a VARK learning style inventory and identifies dominant style"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {question_id, answer} where answer is V, A, R, or K"
+  output_format: "Count per style, dominant style, and brief description"
+  test_cases:
+    - input: "[{\"question_id\":1,\"answer\":\"V\"},{\"question_id\":2,\"answer\":\"V\"},{\"question_id\":3,\"answer\":\"A\"}]"
+      expected_output: "Visual: 2\nAural: 1\nRead/Write: 0\nKinesthetic: 0\nDominant style: Visual\nYou learn best through diagrams, charts, and visual representations."
+    - input: "[{\"question_id\":1,\"answer\":\"K\"}]"
+      expected_output: "Visual: 0\nAural: 0\nRead/Write: 0\nKinesthetic: 1\nDominant style: Kinesthetic\nYou learn best through hands-on experience and practice."
+  constraints: ["V=Visual, A=Aural, R=Read/Write, K=Kinesthetic", "Dominant = highest count (alphabetical tie-break)", "Fixed descriptions per style"]
+
+- id: "EDU-105"
+  title: "Assignment Rubric Builder"
+  description: "Builds a printable assignment rubric from criteria and performance descriptors"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with title and criteria [{name, excellent, good, satisfactory, needs_improvement, weight}]"
+  output_format: "Formatted rubric table"
+  test_cases:
+    - input: "{\"title\":\"Essay\",\"criteria\":[{\"name\":\"Content\",\"excellent\":\"Deep analysis\",\"good\":\"Clear analysis\",\"satisfactory\":\"Basic analysis\",\"needs_improvement\":\"Minimal\",\"weight\":40}]}"
+      expected_output: "Rubric: Essay\nContent (40pts)\n  Excellent: Deep analysis\n  Good: Clear analysis\n  Satisfactory: Basic analysis\n  Needs Improvement: Minimal"
+    - input: "{\"title\":\"Lab\",\"criteria\":[{\"name\":\"Safety\",\"excellent\":\"Perfect\",\"good\":\"Good\",\"satisfactory\":\"OK\",\"needs_improvement\":\"Poor\",\"weight\":20}]}"
+      expected_output: "Rubric: Lab\nSafety (20pts)\n  Excellent: Perfect\n  Good: Good\n  Satisfactory: OK\n  Needs Improvement: Poor"
+  constraints: ["Each criterion on its own section", "Indent descriptors 2 spaces"]
+
+- id: "EDU-106"
+  title: "Lesson Hook Generator"
+  description: "Generates engaging lesson opening hooks for different subject areas"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with subject, topic, grade_level, and hook_type"
+  output_format: "Formatted lesson hook"
+  test_cases:
+    - input: "{\"subject\":\"Science\",\"topic\":\"Gravity\",\"grade_level\":7,\"hook_type\":\"question\"}"
+      expected_output: "Lesson Hook: Gravity (Science, Grade 7)\nOpening Question: If there were no gravity, what would happen to everything on Earth?\nPurpose: Activate prior knowledge and curiosity about Gravity."
+    - input: "{\"subject\":\"Math\",\"topic\":\"Pi\",\"grade_level\":9,\"hook_type\":\"fact\"}"
+      expected_output: "Lesson Hook: Pi (Math, Grade 9)\nInteresting Fact: Pi has been calculated to over 100 trillion digits and never repeats.\nPurpose: Engage students with an intriguing fact about Pi."
+  constraints: ["hook_type: question or fact", "Fixed template per type", "Substitute topic and subject"]
+
+- id: "EDU-107"
+  title: "Think-Pair-Share Organiser"
+  description: "Organises students into think-pair-share pairs for collaborative discussion"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON with students list, prompt, and seed"
+  output_format: "Pairs list then share order"
+  test_cases:
+    - input: "{\"students\":[\"Alice\",\"Bob\",\"Charlie\",\"Dave\"],\"prompt\":\"What is democracy?\",\"seed\":1}"
+      expected_output: "Prompt: What is democracy?\nPairs:\n  Alice & Bob\n  Charlie & Dave\nShare order: Charlie & Dave, Alice & Bob"
+    - input: "{\"students\":[\"X\",\"Y\",\"Z\"],\"prompt\":\"What is science?\",\"seed\":0}"
+      expected_output: "Prompt: What is science?\nPairs:\n  X & Y\n  Z (solo)\nShare order: Z, X & Y"
+  constraints: ["Odd student gets solo", "Use seed for pair randomisation", "Share order reverses pair order"]
+
+- id: "EDU-108"
+  title: "Standards Mastery Tracker"
+  description: "Tracks student mastery of curriculum standards"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with standards list and student_scores [{student, standard_id, score}]"
+  output_function: "Mastery matrix showing each student's status per standard"
+  output_format: "Grid with students as rows and standards as columns, showing M/D/N (Mastered/Developing/Not Started)"
+  test_cases:
+    - input: "{\"standards\":[\"S1\",\"S2\"],\"student_scores\":[{\"student\":\"Alice\",\"standard_id\":\"S1\",\"score\":85},{\"student\":\"Alice\",\"standard_id\":\"S2\",\"score\":55}]}"
+      expected_output: "Student | S1 | S2\nAlice   | M  | D"
+    - input: "{\"standards\":[\"S1\"],\"student_scores\":[{\"student\":\"Bob\",\"standard_id\":\"S1\",\"score\":95}]}"
+      expected_output: "Student | S1\nBob     | M"
+  constraints: ["M = score>=80, D = score>=50, N = no score or <50", "Align columns"]
+
+- id: "EDU-109"
+  title: "Graduation Credits Checker"
+  description: "Checks if a student has met graduation credit requirements"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with requirements [{subject, min_credits}] and student_credits [{subject, credits}]"
+  output_format: "'ELIGIBLE FOR GRADUATION' or list of unmet requirements"
+  test_cases:
+    - input: "{\"requirements\":[{\"subject\":\"Math\",\"min_credits\":4},{\"subject\":\"English\",\"min_credits\":4}],\"student_credits\":[{\"subject\":\"Math\",\"credits\":4},{\"subject\":\"English\",\"credits\":4}]}"
+      expected_output: "ELIGIBLE FOR GRADUATION"
+    - input: "{\"requirements\":[{\"subject\":\"Science\",\"min_credits\":3}],\"student_credits\":[{\"subject\":\"Science\",\"credits\":2}]}"
+      expected_output: "MISSING: Science needs 1 more credit(s)"
+  constraints: ["List all unmet requirements", "shortfall = min_credits - student_credits"]
+
+- id: "EDU-110"
+  title: "Question Stem Improver"
+  description: "Rewrites weak question stems following best practices"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {id, question, issue} objects"
+  output_format: "Original and improved versions with explanation"
+  test_cases:
+    - input: "[{\"id\":\"Q1\",\"question\":\"Which of the following is NOT correct?\",\"issue\":\"negative_stem\"}]"
+      expected_output: "Q1 Original: Which of the following is NOT correct?\nQ1 Improved: Which of the following is correct?\nReason: Avoid negative stems — they increase reading difficulty."
+    - input: "[{\"id\":\"Q2\",\"question\":\"This process is called ___.\",\"issue\":\"fill_blank\"}]"
+      expected_output: "Q2 Original: This process is called ___.\nQ2 Improved: What is the name of this process?\nReason: Use direct questions rather than incomplete statements."
+  constraints: ["Support issues: negative_stem, fill_blank, double_negative, vague", "Fixed improvement templates per issue type"]
+
+- id: "EDU-111"
+  title: "Topic Review Card Generator"
+  description: "Generates structured review cards for each topic in a unit"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {topic, key_facts, key_terms, example}"
+  output_format: "Formatted review card per topic"
+  test_cases:
+    - input: "[{\"topic\":\"Cell Mitosis\",\"key_facts\":[\"Produces 2 cells\",\"Preserves chromosome count\"],\"key_terms\":[\"telophase\",\"anaphase\"],\"example\":\"Skin cell regeneration\"}]"
+      expected_output: "=== Cell Mitosis ===\nKey Facts:\n- Produces 2 cells\n- Preserves chromosome count\nKey Terms: telophase, anaphase\nExample: Skin cell regeneration"
+    - input: "[{\"topic\":\"Gravity\",\"key_facts\":[\"Force of attraction\"],\"key_terms\":[\"mass\",\"acceleration\"],\"example\":\"Apple falling\"}]"
+      expected_output: "=== Gravity ===\nKey Facts:\n- Force of attraction\nKey Terms: mass, acceleration\nExample: Apple falling"
+  constraints: ["=== header ===", "Key facts as bullet list", "Key terms comma-separated"]
+
+- id: "EDU-112"
+  title: "Formative Question Bank Filter"
+  description: "Filters a question bank by topic, difficulty, and question type"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "First line: JSON filter {topic, difficulty, type}. Second line: JSON question bank"
+  output_format: "Filtered questions numbered"
+  test_cases:
+    - input: "{\"topic\":\"Math\",\"difficulty\":2,\"type\":\"mcq\"}\n[{\"id\":1,\"topic\":\"Math\",\"difficulty\":2,\"type\":\"mcq\",\"q\":\"What is 2+2?\"},{\"id\":2,\"topic\":\"Science\",\"difficulty\":2,\"type\":\"mcq\",\"q\":\"What is H2O?\"}]"
+      expected_output: "1. [Math, d2, mcq] What is 2+2?"
+    - input: "{\"topic\":\"Science\",\"difficulty\":1,\"type\":\"tf\"}\n[{\"id\":1,\"topic\":\"Science\",\"difficulty\":1,\"type\":\"tf\",\"q\":\"Water is wet.\"}]"
+      expected_output: "1. [Science, d1, tf] Water is wet."
+  constraints: ["Filter by all three criteria (AND logic)", "null filter field matches any value"]
+
+- id: "EDU-113"
+  title: "Homework Feedback Generator"
+  description: "Generates personalised homework feedback from a rubric score and notes"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with student_name, assignment, score, max_score, strengths, improvements"
+  output_format: "Formatted feedback letter"
+  test_cases:
+    - input: "{\"student_name\":\"Alice\",\"assignment\":\"Essay\",\"score\":85,\"max_score\":100,\"strengths\":[\"Clear thesis\"],\"improvements\":[\"Add more examples\"]}"
+      expected_output: "Feedback for Alice - Essay\nScore: 85/100 (85%)\n\nStrengths:\n- Clear thesis\n\nAreas for Improvement:\n- Add more examples\n\nKeep up the good work!"
+    - input: "{\"student_name\":\"Bob\",\"assignment\":\"Lab Report\",\"score\":60,\"max_score\":100,\"strengths\":[\"Good data\"],\"improvements\":[\"Improve conclusion\"]}"
+      expected_output: "Feedback for Bob - Lab Report\nScore: 60/100 (60%)\n\nStrengths:\n- Good data\n\nAreas for Improvement:\n- Improve conclusion\n\nKeep up the good work!"
+  constraints: ["Percentage = score/max*100 rounded to integer", "Fixed closing line"]
+
+- id: "EDU-114"
+  title: "Speed Math Drill Timer"
+  description: "Generates timed math drill problems and reports problems per minute"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math, std.time]
+  input_format: "First line: elapsed_seconds. Remaining: one 'problem=answer' per line"
+  output_format: "Correct count, total attempted, ppm (problems per minute)"
+  test_cases:
+    - input: "60\n2+2=4\n3*3=9\n10-4=6"
+      expected_output: "correct: 3\ntotal: 3\nppm: 3.0"
+    - input: "30\n5+5=10\n4*4=16"
+      expected_output: "correct: 2\ntotal: 2\nppm: 4.0"
+  constraints: ["ppm = (total / elapsed_seconds) * 60", "Round ppm to 1 decimal", "Evaluate expressions on left of ="]
+
+- id: "EDU-115"
+  title: "Language Learning Word Match"
+  description: "Presents a word in one language and checks if translation is correct"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON dictionary {word: translation}, then pairs of 'word=attempted_translation'"
+  output_function: "Scores the translations"
+  output_format: "Lines of 'word: Correct/Incorrect', then score"
+  test_cases:
+    - input: "{\"chat\":\"cat\",\"chien\":\"dog\"}\nchat=cat\nchien=bird"
+      expected_output: "chat: Correct\nchien: Incorrect (dog)\nScore: 1/2 (50%)"
+    - input: "{\"hola\":\"hello\"}\nhola=hello"
+      expected_output: "hola: Correct\nScore: 1/1 (100%)"
+  constraints: ["Case-insensitive matching", "Show correct answer on wrong", "Percentage rounded to integer"]
+
+- id: "EDU-116"
+  title: "Curriculum Coverage Auditor"
+  description: "Audits how much of a curriculum is covered by existing lesson plans"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with curriculum_standards [{id, topic}] and lesson_plans [{title, standards_covered}]"
+  output_format: "Coverage percentage and list of uncovered standards"
+  test_cases:
+    - input: "{\"curriculum_standards\":[{\"id\":\"S1\",\"topic\":\"Addition\"},{\"id\":\"S2\",\"topic\":\"Subtraction\"}],\"lesson_plans\":[{\"title\":\"Lesson 1\",\"standards_covered\":[\"S1\"]}]}"
+      expected_output: "Coverage: 50% (1/2 standards)\nUncovered standards:\n- S2: Subtraction"
+    - input: "{\"curriculum_standards\":[{\"id\":\"S1\",\"topic\":\"Reading\"}],\"lesson_plans\":[{\"title\":\"L1\",\"standards_covered\":[\"S1\"]}]}"
+      expected_output: "Coverage: 100% (1/1 standards)\nAll standards covered."
+  constraints: ["Coverage = covered_count / total * 100", "List uncovered in id order"]
+
+- id: "EDU-117"
+  title: "Student Portfolio Compiler"
+  description: "Compiles a student portfolio summary from work samples"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with student_name and work_samples [{title, subject, date, grade, reflection}]"
+  output_format: "Formatted portfolio document"
+  test_cases:
+    - input: "{\"student_name\":\"Alice\",\"work_samples\":[{\"title\":\"My Essay\",\"subject\":\"English\",\"date\":\"2024-01-15\",\"grade\":\"A\",\"reflection\":\"I improved my thesis writing.\"}]}"
+      expected_output: "Portfolio: Alice\n\nSample 1: My Essay\nSubject: English | Date: 2024-01-15 | Grade: A\nReflection: I improved my thesis writing."
+    - input: "{\"student_name\":\"Bob\",\"work_samples\":[{\"title\":\"Lab Report\",\"subject\":\"Science\",\"date\":\"2024-02-01\",\"grade\":\"B\",\"reflection\":\"I learned about density.\"}]}"
+      expected_output: "Portfolio: Bob\n\nSample 1: Lab Report\nSubject: Science | Date: 2024-02-01 | Grade: B\nReflection: I learned about density."
+  constraints: ["Numbered samples", "Blank line between samples", "Grade on same line as subject and date"]
+
+- id: "EDU-118"
+  title: "Interdisciplinary Connection Mapper"
+  description: "Identifies connections between topics across different subjects"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with topics [{subject, topic, keywords}] - find topics sharing keywords"
+  output_format: "Lines of 'topic1 <-> topic2: shared keywords'"
+  test_cases:
+    - input: "{\"topics\":[{\"subject\":\"Math\",\"topic\":\"Statistics\",\"keywords\":[\"data\",\"average\"]},{\"subject\":\"Science\",\"topic\":\"Experiments\",\"keywords\":[\"data\",\"results\"]}]}"
+      expected_output: "Statistics <-> Experiments: data"
+    - input: "{\"topics\":[{\"subject\":\"Art\",\"topic\":\"Perspective\",\"keywords\":[\"geometry\",\"lines\"]},{\"subject\":\"Math\",\"topic\":\"Geometry\",\"keywords\":[\"shapes\",\"lines\"]}]}"
+      expected_output: "Perspective <-> Geometry: lines"
+  constraints: ["Only show pairs with at least 1 shared keyword", "Sort shared keywords alphabetically", "No duplicate pairs"]
+
+- id: "EDU-119"
+  title: "Error Pattern Analyser"
+  description: "Analyses patterns in student errors across multiple tests"
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.json, std.collections]
+  input_format: "JSON array of {student, test, wrong_topics: [topic]} records"
+  output_format: "Most common error topics across all students ranked by frequency"
+  test_cases:
+    - input: "[{\"student\":\"A\",\"test\":\"T1\",\"wrong_topics\":[\"fractions\",\"decimals\"]},{\"student\":\"B\",\"test\":\"T1\",\"wrong_topics\":[\"fractions\",\"algebra\"]}]"
+      expected_output: "fractions: 2 errors\ndecimals: 1 errors\nalgebra: 1 errors"
+    - input: "[{\"student\":\"X\",\"test\":\"T1\",\"wrong_topics\":[\"reading\"]}]"
+      expected_output: "reading: 1 errors"
+  constraints: ["Sort by error count descending then topic ascending", "Count per topic across all records"]
+
+- id: "EDU-120"
+  title: "Student Strength Identifier"
+  description: "Identifies each student's strongest and weakest subjects from grade data"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, grades: {subject: score}} objects"
+  output_format: "Lines of 'student: strongest=subject (score), weakest=subject (score)'"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"grades\":{\"Math\":95,\"English\":70,\"Science\":85}}]"
+      expected_output: "Alice: strongest=Math (95), weakest=English (70)"
+    - input: "[{\"student\":\"Bob\",\"grades\":{\"Art\":88,\"PE\":92}}]"
+      expected_output: "Bob: strongest=PE (92), weakest=Art (88)"
+  constraints: ["Alphabetical tie-break for equal scores", "Sort output by student name"]
+
+- id: "EDU-121"
+  title: "Homework Planner PDF Text"
+  description: "Generates a plain-text weekly homework planner layout"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "First line: week start date (Monday). Second line: student name"
+  output_format: "Weekly planner grid with day columns and subject rows"
+  test_cases:
+    - input: "2024-01-08\nAlice"
+      expected_output: "Weekly Planner: Alice (Jan 08 - Jan 12 2024)\n           | Mon | Tue | Wed | Thu | Fri |\nMath       |     |     |     |     |     |\nEnglish    |     |     |     |     |     |\nScience    |     |     |     |     |     |\nHistory    |     |     |     |     |     |\nOther      |     |     |     |     |     |"
+    - input: "2024-02-05\nBob"
+      expected_output: "Weekly Planner: Bob (Feb 05 - Feb 09 2024)\n           | Mon | Tue | Wed | Thu | Fri |\nMath       |     |     |     |     |     |\nEnglish    |     |     |     |     |     |\nScience    |     |     |     |     |     |\nHistory    |     |     |     |     |     |\nOther      |     |     |     |     |     |"
+  constraints: ["Fixed subjects: Math, English, Science, History, Other", "Mon-Fri columns", "Blank cells for user to fill"]
+
+- id: "EDU-122"
+  title: "Peer Teaching Planner"
+  description: "Plans peer teaching sessions where advanced students teach peers"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with students [{name, strong_subjects, weak_subjects}]"
+  output_format: "Matched pairs where one student's strength covers another's weakness"
+  test_cases:
+    - input: "{\"students\":[{\"name\":\"Alice\",\"strong_subjects\":[\"Math\"],\"weak_subjects\":[\"English\"]},{\"name\":\"Bob\",\"strong_subjects\":[\"English\"],\"weak_subjects\":[\"Math\"]}]}"
+      expected_output: "Alice teaches Bob: Math\nBob teaches Alice: English"
+    - input: "{\"students\":[{\"name\":\"X\",\"strong_subjects\":[\"Science\"],\"weak_subjects\":[\"Art\"]},{\"name\":\"Y\",\"strong_subjects\":[\"Art\"],\"weak_subjects\":[\"Science\"]}]}"
+      expected_output: "X teaches Y: Science\nY teaches X: Art"
+  constraints: ["Match by strength-weakness overlap", "One session per pair per direction", "Sort by teacher name"]
+
+- id: "EDU-123"
+  title: "Assessment Calendar Planner"
+  description: "Plans assessment dates ensuring no two assessments on the same day"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json, std.time]
+  input_format: "JSON with start_date, excluded_dates, and assessments [{title, min_days_gap}]"
+  output_format: "Assigned dates for each assessment"
+  test_cases:
+    - input: "{\"start_date\":\"2024-01-08\",\"excluded_dates\":[\"2024-01-12\"],\"assessments\":[{\"title\":\"Quiz 1\",\"min_days_gap\":0},{\"title\":\"Test 1\",\"min_days_gap\":2}]}"
+      expected_output: "Quiz 1: 2024-01-08\nTest 1: 2024-01-10"
+    - input: "{\"start_date\":\"2024-02-01\",\"excluded_dates\":[],\"assessments\":[{\"title\":\"Exam\",\"min_days_gap\":0}]}"
+      expected_output: "Exam: 2024-02-01"
+  constraints: ["Never assign excluded dates", "Enforce min_days_gap from previous assessment", "Greedy scheduling"]
+
+- id: "EDU-124"
+  title: "Grade Book Exporter"
+  description: "Exports a grade book to a formatted text report"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with class_name, students [{name, grades: {assignment: score}}]"
+  output_format: "Grade book table with student names, all assignment scores, and row averages"
+  test_cases:
+    - input: "{\"class_name\":\"Math 101\",\"students\":[{\"name\":\"Alice\",\"grades\":{\"HW1\":90,\"HW2\":85}},{\"name\":\"Bob\",\"grades\":{\"HW1\":70,\"HW2\":80}}]}"
+      expected_output: "Grade Book: Math 101\nName  | HW1 | HW2 | Avg\nAlice | 90  | 85  | 87.5\nBob   | 70  | 80  | 75.0"
+    - input: "{\"class_name\":\"English\",\"students\":[{\"name\":\"X\",\"grades\":{\"Essay\":95}}]}"
+      expected_output: "Grade Book: English\nName | Essay | Avg\nX    | 95    | 95.0"
+  constraints: ["Assignments sorted alphabetically as columns", "Avg rounded to 1 decimal", "Column widths aligned"]
+
+- id: "EDU-125"
+  title: "Academic Integrity Pledge Generator"
+  description: "Generates a personalised academic integrity pledge for students to sign"
+  difficulty: 1
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with student_name, course_name, institution_name, date"
+  output_format: "Formatted pledge document"
+  test_cases:
+    - input: "{\"student_name\":\"Alice Smith\",\"course_name\":\"CS101\",\"institution_name\":\"Tech University\",\"date\":\"2024-01-15\"}"
+      expected_output: "ACADEMIC INTEGRITY PLEDGE\nTech University\n\nI, Alice Smith, enrolled in CS101, hereby pledge to uphold academic integrity in all my work.\n\nI will not plagiarise, cheat, or misrepresent my work.\nI will cite all sources properly.\nI understand the consequences of academic dishonesty.\n\nSigned: Alice Smith\nDate: 2024-01-15"
+    - input: "{\"student_name\":\"Bob Lee\",\"course_name\":\"Math201\",\"institution_name\":\"City College\",\"date\":\"2024-02-01\"}"
+      expected_output: "ACADEMIC INTEGRITY PLEDGE\nCity College\n\nI, Bob Lee, enrolled in Math201, hereby pledge to uphold academic integrity in all my work.\n\nI will not plagiarise, cheat, or misrepresent my work.\nI will cite all sources properly.\nI understand the consequences of academic dishonesty.\n\nSigned: Bob Lee\nDate: 2024-02-01"
+  constraints: ["Fixed pledge text with name and course substituted", "Signed line at bottom"]
+
+- id: "EDU-126"
+  title: "Knowledge Gap Analyser"
+  description: "Identifies knowledge gaps from pre/post assessment comparisons"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON with pre_assessment and post_assessment [{topic, score}] for same student"
+  output_format: "Topics with improvement, regression, or remaining gap"
+  test_cases:
+    - input: "{\"pre\":[{\"topic\":\"Fractions\",\"score\":40},{\"topic\":\"Decimals\",\"score\":70}],\"post\":[{\"topic\":\"Fractions\",\"score\":75},{\"topic\":\"Decimals\",\"score\":65}]}"
+      expected_output: "Fractions: 40 -> 75 (+35) IMPROVED\nDecimals: 70 -> 65 (-5) REGRESSED"
+    - input: "{\"pre\":[{\"topic\":\"Algebra\",\"score\":50}],\"post\":[{\"topic\":\"Algebra\",\"score\":50}]}"
+      expected_output: "Algebra: 50 -> 50 (0) NO CHANGE"
+  constraints: ["Sort by topic alphabetically", "Status: IMPROVED if delta>0, REGRESSED if delta<0, NO CHANGE if delta=0"]
+
+- id: "EDU-127"
+  title: "Student Award Generator"
+  description: "Generates end-of-term student awards based on performance metrics"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, gpa, attendance_pct, participation_score}"
+  output_format: "List of students and their earned awards"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"gpa\":3.9,\"attendance_pct\":98,\"participation_score\":9}]"
+      expected_output: "Alice: Academic Excellence, Perfect Attendance, Most Engaged"
+    - input: "[{\"student\":\"Bob\",\"gpa\":2.8,\"attendance_pct\":75,\"participation_score\":5}]"
+      expected_output: "Bob: (no awards)"
+  constraints: ["Academic Excellence: gpa>=3.5", "Perfect Attendance: attendance>=95%", "Most Engaged: participation>=8", "Sort awards alphabetically"]
+
+- id: "EDU-128"
+  title: "Subject Matter Expert Identifier"
+  description: "Identifies top-performing students per subject who could serve as peer tutors"
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, grades: {subject: score}} objects"
+  output_format: "Lines of 'subject: expert_student (score)' for each subject"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"grades\":{\"Math\":95,\"Science\":80}},{\"student\":\"Bob\",\"grades\":{\"Math\":88,\"Science\":92}}]"
+      expected_output: "Math: Alice (95)\nScience: Bob (92)"
+    - input: "[{\"student\":\"X\",\"grades\":{\"Art\":100}}]"
+      expected_output: "Art: X (100)"
+  constraints: ["Expert = highest scorer per subject", "Alphabetical tie-break", "Sort subjects A-Z"]
+
+- id: "EDU-129"
+  title: "Comprehension Level Classifier"
+  description: "Classifies student comprehension based on quiz performance pattern"
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "JSON array of {student, quiz_scores: [score]} objects"
+  output_format: "Lines of 'student: level (avg_score)' where level is Mastery/Developing/Beginning"
+  test_cases:
+    - input: "[{\"student\":\"Alice\",\"quiz_scores\":[90,85,92]},{\"student\":\"Bob\",\"quiz_scores\":[55,60,50]}]"
+      expected_output: "Alice: Mastery (89.0)\nBob: Beginning (55.0)"
+    - input: "[{\"student\":\"Charlie\",\"quiz_scores\":[72,68,75]}]"
+      expected_output: "Charlie: Developing (71.7)"
+  constraints: ["Mastery>=80, Developing>=60, Beginning<60", "Avg rounded to 1 decimal", "Sort by student name"]
+
+- id: "EDU-130"
+  title: "End-of-Year Progress Report"
+  description: "Generates a comprehensive end-of-year student progress report"
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.json, std.math, std.time]
+  input_format: "JSON with student info, semester grades, attendance, and teacher comment"
+  output_format: "Multi-section annual report with grades, stats, attendance, and recommendation"
+  test_cases:
+    - input: "{\"name\":\"Alice Smith\",\"year\":2024,\"semester_grades\":[{\"subject\":\"Math\",\"s1\":88,\"s2\":92},{\"subject\":\"English\",\"s1\":75,\"s2\":80}],\"attendance\":{\"present\":172,\"total\":180},\"teacher_comment\":\"Shows strong improvement.\"}"
+      expected_output: "ANNUAL PROGRESS REPORT 2024\nStudent: Alice Smith\n\nAcademic Performance:\nMath:    S1=88  S2=92  Avg=90.0  Grade=A\nEnglish: S1=75  S2=80  Avg=77.5  Grade=C\n\nOverall GPA: 2.75\n\nAttendance: 172/180 (96%)\n\nTeacher Comment:\nShows strong improvement.\n\nRecommendation: Promote to next year"
+    - input: "{\"name\":\"Bob Lee\",\"year\":2024,\"semester_grades\":[{\"subject\":\"Science\",\"s1\":45,\"s2\":50}],\"attendance\":{\"present\":140,\"total\":180},\"teacher_comment\":\"Needs additional support.\"}"
+      expected_output: "ANNUAL PROGRESS REPORT 2024\nStudent: Bob Lee\n\nAcademic Performance:\nScience: S1=45  S2=50  Avg=47.5  Grade=F\n\nOverall GPA: 0.00\n\nAttendance: 140/180 (78%)\n\nTeacher Comment:\nNeeds additional support.\n\nRecommendation: Consider retention"
+  constraints: ["Overall GPA from all subject averages using A=4.0 B=3.0 C=2.0 D=1.0 F=0.0", "Attendance percent to nearest integer", "Promote if GPA>=2.0, else Consider retention"]

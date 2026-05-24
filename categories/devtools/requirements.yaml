@@ -1,0 +1,1820 @@
+- id: "DEV-001"
+  title: "Line Counter (cloc-lite)"
+  description: "Counts lines of code, comments, and blank lines per file extension"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Table: 'ext | files | code | comment | blank | total'"
+  test_cases:
+    - input: "/dev/stdin"
+      expected_output: "ext    | files | code | comment | blank | total"
+    - input: "src/main.py\nlib/utils.py"
+      expected_output: "py     | 2     | N    | N       | N     | N"
+  constraints: ["Group by extension", "Sort by total lines descending", "Comment detection: # for py, // for js/ts/c/go, -- for lua"]
+
+- id: "DEV-002"
+  title: "Dependency Analyser"
+  description: "Extracts import/require statements from source files and lists dependencies"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path]
+  input_format: "First line: language ('python', 'node', 'go'). Remaining: file paths"
+  output_format: "Sorted unique dependency list, one per line"
+  test_cases:
+    - input: "python\nmain.py"
+      expected_output: "os\nsys"
+    - input: "node\napp.js"
+      expected_output: "express\npath"
+  constraints: ["Python: import X, from X import Y", "Node: require('X'), import from 'X'", "Go: import \"X\"", "Deduplicate, sort alphabetically"]
+
+- id: "DEV-003"
+  title: "Semver Parser and Comparator"
+  description: "Parses semantic version strings and compares or sorts them"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: 'sort', 'compare', or 'validate'. Remaining: version strings"
+  output_format: "For sort: versions sorted ascending. For compare: '-1', '0', or '1'. For validate: 'VALID' or 'INVALID' per line"
+  test_cases:
+    - input: "sort\n2.0.0\n1.9.1\n1.10.0"
+      expected_output: "1.9.1\n1.10.0\n2.0.0"
+    - input: "compare\n1.2.3\n1.2.4"
+      expected_output: "-1"
+  constraints: ["MAJOR.MINOR.PATCH format", "Numeric comparison (not lexicographic)", "Pre-release suffixes (-alpha, -beta) sort before release"]
+
+- id: "DEV-004"
+  title: "Changelog Generator"
+  description: "Generates a CHANGELOG.md from conventional commit messages"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.time, std.collections]
+  input_format: "Lines of 'YYYY-MM-DD <type>: <message>' (types: feat, fix, chore, docs, refactor)"
+  output_format: "Markdown changelog grouped by type under version heading"
+  test_cases:
+    - input: "2024-01-15 feat: add login page\n2024-01-15 fix: correct header bug"
+      expected_output: "## Unreleased\n\n### Features\n- add login page\n\n### Bug Fixes\n- correct header bug"
+    - input: "2024-01-10 docs: update README"
+      expected_output: "## Unreleased\n\n### Documentation\n- update README"
+  constraints: ["Group: feat->Features, fix->Bug Fixes, docs->Documentation, refactor->Refactoring, chore->Chores", "Sort entries within group alphabetically"]
+
+- id: "DEV-005"
+  title: "Git Commit Stats"
+  description: "Parses git log output and produces author contribution statistics"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Lines of 'author|date|files_changed|insertions|deletions' (pipe-separated)"
+  output_format: "Per-author stats: commits, files changed, insertions, deletions. Sorted by commits desc"
+  test_cases:
+    - input: "Alice|2024-01-01|3|50|10\nAlice|2024-01-02|1|20|5\nBob|2024-01-03|2|30|15"
+      expected_output: "Alice: 2 commits, 4 files, +70 -15\nBob: 1 commits, 2 files, +30 -15"
+    - input: "Dev|2024-01-01|5|100|50"
+      expected_output: "Dev: 1 commits, 5 files, +100 -50"
+  constraints: ["Sum all fields per author", "Sort by commit count descending then author name ascending"]
+
+- id: "DEV-006"
+  title: "Simple Test Runner"
+  description: "Runs test cases defined in a JSON manifest and reports pass/fail"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.json, std.process]
+  input_format: "JSON test manifest with {command, tests: [{name, input, expected_output}]}"
+  output_format: "PASS/FAIL per test, then summary 'N/M tests passed'"
+  test_cases:
+    - input: "{\"command\":\"echo\",\"tests\":[{\"name\":\"hello\",\"input\":\"hello\",\"expected_output\":\"hello\"}]}"
+      expected_output: "PASS: hello\n1/1 tests passed"
+    - input: "{\"command\":\"echo\",\"tests\":[{\"name\":\"t1\",\"input\":\"a\",\"expected_output\":\"b\"}]}"
+      expected_output: "FAIL: t1\n  expected: b\n  got: a\n0/1 tests passed"
+  constraints: ["Run command with input piped to stdin", "Compare stdout with expected_output", "Trim trailing whitespace from output"]
+
+- id: "DEV-007"
+  title: "Benchmark Harness"
+  description: "Runs a command N times and reports timing statistics"
+  difficulty: 3
+  stdlib_modules: [std.process, std.str, std.io, std.time, std.math]
+  input_format: "First line: N iterations. Second line: command to benchmark"
+  output_format: "Lines: 'min: Nms', 'max: Nms', 'mean: Nms', 'stddev: Nms'"
+  test_cases:
+    - input: "3\necho hello"
+      expected_output: "min: Nms\nmax: Nms\nmean: Nms\nstddev: Nms"
+    - input: "5\ntrue"
+      expected_output: "min: Nms\nmax: Nms\nmean: Nms\nstddev: Nms"
+  constraints: ["Times in milliseconds", "Round all values to 1 decimal", "stddev = population std dev"]
+
+- id: "DEV-008"
+  title: "Doc Comment Extractor"
+  description: "Extracts doc comments (/** */, #:, or ---) from source files and formats as documentation"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path]
+  input_format: "First line: language. Remaining: file paths"
+  output_format: "Extracted doc comments with their associated function/type signatures"
+  test_cases:
+    - input: "python\nexample.py"
+      expected_output: "function_name: docstring text"
+    - input: "js\nlib.js"
+      expected_output: "functionName: jsdoc comment"
+  constraints: ["Python: triple-quoted strings after def/class", "JS: /** */ before function", "Go: // comment before func", "Output format: name: comment"]
+
+- id: "DEV-009"
+  title: "Linter Rule Engine"
+  description: "Applies configurable linting rules to source code and reports violations"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: JSON rules array [{id, pattern, message, severity}]. Remaining: source code"
+  output_format: "Lines of 'line N: [severity] rule_id - message' for each violation"
+  test_cases:
+    - input: "[{\"id\":\"no-console\",\"pattern\":\"console\\.log\",\"message\":\"No console.log\",\"severity\":\"warn\"}]\nconsole.log('hi');"
+      expected_output: "line 1: [warn] no-console - No console.log"
+    - input: "[{\"id\":\"no-todo\",\"pattern\":\"TODO\",\"message\":\"Unresolved TODO\",\"severity\":\"error\"}]\n// TODO: fix this"
+      expected_output: "line 1: [error] no-todo - Unresolved TODO"
+  constraints: ["Pattern is a regex", "Multiple rules applied per line", "Sort violations by line number then rule id"]
+
+- id: "DEV-010"
+  title: "Database Migration Generator"
+  description: "Generates SQL migration files from a schema diff description"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.time]
+  input_format: "JSON with table_name and changes [{type, field, data_type}] where type is add/drop/modify"
+  output_format: "UP and DOWN SQL migration statements"
+  test_cases:
+    - input: "{\"table_name\":\"users\",\"changes\":[{\"type\":\"add\",\"field\":\"email\",\"data_type\":\"VARCHAR(255)\"}]}"
+      expected_output: "-- UP\nALTER TABLE users ADD COLUMN email VARCHAR(255);\n\n-- DOWN\nALTER TABLE users DROP COLUMN email;"
+    - input: "{\"table_name\":\"orders\",\"changes\":[{\"type\":\"drop\",\"field\":\"notes\",\"data_type\":\"TEXT\"}]}"
+      expected_output: "-- UP\nALTER TABLE orders DROP COLUMN notes;\n\n-- DOWN\nALTER TABLE orders ADD COLUMN notes TEXT;"
+  constraints: ["Generate reversible DOWN migration", "Multiple changes in order", "Standard SQL syntax"]
+
+- id: "DEV-011"
+  title: "Config File Validator"
+  description: "Validates a config file against a JSON schema"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.file]
+  input_format: "First block: JSON schema. '---' separator. Second block: config JSON to validate"
+  output_format: "'VALID' or lines of 'ERROR: field - message' for each violation"
+  test_cases:
+    - input: "{\"required\":[\"host\",\"port\"],\"types\":{\"host\":\"string\",\"port\":\"integer\"}}\n---\n{\"host\":\"localhost\",\"port\":3000}"
+      expected_output: "VALID"
+    - input: "{\"required\":[\"host\",\"port\"],\"types\":{\"host\":\"string\",\"port\":\"integer\"}}\n---\n{\"host\":\"localhost\"}"
+      expected_output: "ERROR: port - required field missing"
+  constraints: ["Check required fields", "Check type compatibility (string/integer/boolean/array/object)", "Report all errors not just first"]
+
+- id: "DEV-012"
+  title: "Environment Checker"
+  description: "Checks that required environment variables are set"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json, std.process]
+  input_format: "JSON array of {name, required, default} environment variable specs"
+  output_format: "Lines of 'NAME: SET (value)' or 'NAME: MISSING' or 'NAME: USING DEFAULT (value)'"
+  test_cases:
+    - input: "[{\"name\":\"HOME\",\"required\":true,\"default\":\"\"},{\"name\":\"MISSING_VAR\",\"required\":true,\"default\":\"\"},{\"name\":\"OPT_VAR\",\"required\":false,\"default\":\"fallback\"}]"
+      expected_output: "HOME: SET (/home/user)\nMISSING_VAR: MISSING\nOPT_VAR: USING DEFAULT (fallback)"
+    - input: "[{\"name\":\"PATH\",\"required\":true,\"default\":\"\"}]"
+      expected_output: "PATH: SET (/usr/bin:/bin)"
+  constraints: ["Read actual environment variables", "MISSING only for required=true unset vars", "Show truncated value (max 40 chars)"]
+
+- id: "DEV-013"
+  title: "Build Script Generator"
+  description: "Generates a Makefile from a build configuration JSON"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON with project_name, language, and targets [{name, command, depends_on}]"
+  output_format: "Makefile text with all targets"
+  test_cases:
+    - input: "{\"project_name\":\"myapp\",\"language\":\"go\",\"targets\":[{\"name\":\"build\",\"command\":\"go build ./...\",\"depends_on\":[]},{\"name\":\"test\",\"command\":\"go test ./...\",\"depends_on\":[\"build\"]}]}"
+      expected_output: ".PHONY: build test\n\nbuild:\n\tgo build ./...\n\ntest: build\n\tgo test ./..."
+    - input: "{\"project_name\":\"lib\",\"language\":\"python\",\"targets\":[{\"name\":\"lint\",\"command\":\"flake8 .\",\"depends_on\":[]}]}"
+      expected_output: ".PHONY: lint\n\nlint:\n\tflake8 ."
+  constraints: [".PHONY line first with all target names", "depends_on as prerequisite list", "Tab indentation for commands"]
+
+- id: "DEV-014"
+  title: "Task Runner (Taskfile interpreter)"
+  description: "Parses and executes tasks from a YAML-like task definition file"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.process]
+  input_format: "First line: task name to run. Second block: JSON task definitions {name: {command, deps}}"
+  output_format: "Task execution log with dependency order"
+  test_cases:
+    - input: "test\n{\"build\":{\"command\":\"echo building\",\"deps\":[]},\"test\":{\"command\":\"echo testing\",\"deps\":[\"build\"]}}"
+      expected_output: "[build] echo building\nbuilding\n[test] echo testing\ntesting"
+    - input: "lint\n{\"lint\":{\"command\":\"echo linting\",\"deps\":[]}}"
+      expected_output: "[lint] echo linting\nlinting"
+  constraints: ["Execute deps first (topological order)", "Print [task_name] before each command", "Print command output"]
+
+- id: "DEV-015"
+  title: "Package Manifest Parser"
+  description: "Parses package.json or go.mod and extracts dependency information"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "First line: 'npm' or 'go'. Remaining: manifest file content"
+  output_format: "Lines of 'name: version' sorted alphabetically"
+  test_cases:
+    - input: "npm\n{\"dependencies\":{\"express\":\"^4.18.0\",\"lodash\":\"4.17.21\"}}"
+      expected_output: "express: ^4.18.0\nlodash: 4.17.21"
+    - input: "npm\n{\"dependencies\":{\"react\":\"^18.0.0\"},\"devDependencies\":{\"jest\":\"^29.0.0\"}}"
+      expected_output: "jest: ^29.0.0 (dev)\nreact: ^18.0.0"
+  constraints: ["For npm: parse dependencies and devDependencies", "devDependencies marked with (dev)", "Sort all alphabetically"]
+
+- id: "DEV-016"
+  title: "Lockfile Analyser"
+  description: "Analyses a lockfile to find packages with multiple versions"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: 'npm' or 'yarn'. Remaining: lockfile content"
+  output_format: "Lines of 'package: N versions (v1, v2, ...)' for packages with duplicates"
+  test_cases:
+    - input: "yarn\nlodash@4.17.20:\n  version \"4.17.20\"\nlodash@^4.0.0:\n  version \"4.17.21\""
+      expected_output: "lodash: 2 versions (4.17.20, 4.17.21)"
+    - input: "yarn\nexpress@4.18.0:\n  version \"4.18.0\""
+      expected_output: ""
+  constraints: ["Only show packages with >1 distinct resolved version", "Sort versions ascending", "Sort packages alphabetically"]
+
+- id: "DEV-017"
+  title: "Test Coverage Reporter"
+  description: "Parses coverage data and generates a coverage report"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.math]
+  input_format: "JSON array of {file, total_lines, covered_lines} coverage records"
+  output_format: "Per-file coverage percentage and overall summary"
+  test_cases:
+    - input: "[{\"file\":\"main.py\",\"total_lines\":100,\"covered_lines\":85},{\"file\":\"utils.py\",\"total_lines\":50,\"covered_lines\":40}]"
+      expected_output: "main.py:  85% (85/100)\nutils.py: 80% (40/50)\nOverall:  83% (125/150)"
+    - input: "[{\"file\":\"app.js\",\"total_lines\":200,\"covered_lines\":200}]"
+      expected_output: "app.js: 100% (200/200)\nOverall: 100% (200/200)"
+  constraints: ["Percentage rounded to nearest integer", "Overall = sum(covered) / sum(total) * 100", "Sort files by coverage ascending"]
+
+- id: "DEV-018"
+  title: "Dead Code Detector"
+  description: "Detects exported functions that are never referenced in the codebase"
+  difficulty: 5
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language ('python', 'js'). Remaining: file paths"
+  output_format: "Lines of 'file:line: unreferenced symbol: name'"
+  test_cases:
+    - input: "python\nmain.py"
+      expected_output: ""
+    - input: "js\nlib.js"
+      expected_output: "lib.js:5: unreferenced symbol: unusedFunction"
+  constraints: ["Python: detect def not referenced elsewhere in scanned files", "JS: detect function declarations not referenced", "Only cross-file unreferences (not self-reference)"]
+
+- id: "DEV-019"
+  title: "Import Graph Generator"
+  description: "Generates a dependency graph of imports between files"
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language. Remaining: file paths"
+  output_format: "Lines of 'file -> imported_file' for each import relationship"
+  test_cases:
+    - input: "python\nmain.py\nutils.py"
+      expected_output: "main.py -> utils.py"
+    - input: "js\nindex.js\nhelper.js"
+      expected_output: "index.js -> helper.js"
+  constraints: ["Only show intra-project imports (relative paths)", "Sort by source file then target file", "No stdlib imports"]
+
+- id: "DEV-020"
+  title: "Circular Dependency Finder"
+  description: "Detects circular import dependencies in a project"
+  difficulty: 5
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "Lines of 'file -> dependency' pairs representing import graph"
+  output_format: "Lines of circular cycle paths, or 'No circular dependencies found'"
+  test_cases:
+    - input: "a -> b\nb -> c\nc -> a"
+      expected_output: "Cycle: a -> b -> c -> a"
+    - input: "a -> b\nb -> c"
+      expected_output: "No circular dependencies found"
+  constraints: ["Detect all distinct cycles", "Report shortest cycle representation", "Sort cycles by first node"]
+
+- id: "DEV-021"
+  title: "File Size Tracker"
+  description: "Tracks and reports file sizes for a given directory listing"
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Lines of 'size file_path' sorted by size descending, then total"
+  test_cases:
+    - input: "/etc/hosts\n/etc/hostname"
+      expected_output: "/etc/hosts: 256 B\n/etc/hostname: 12 B\nTotal: 268 B"
+    - input: "/dev/null"
+      expected_output: "/dev/null: 0 B\nTotal: 0 B"
+  constraints: ["Auto-scale to B, KB, MB, GB", "Total in appropriate unit", "Sort largest first"]
+
+- id: "DEV-022"
+  title: "Binary Size Analyser"
+  description: "Analyses a binary file and reports section sizes"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path]
+  input_format: "Binary file path on stdin"
+  output_format: "File type, total size, and printable string count"
+  test_cases:
+    - input: "/bin/ls"
+      expected_output: "file: /bin/ls\nsize: N KB\nstrings: N"
+    - input: "/bin/sh"
+      expected_output: "file: /bin/sh\nsize: N KB\nstrings: N"
+  constraints: ["Count printable ASCII strings of length >= 4", "Report size in KB (2 decimal places)", "Detect ELF vs Mach-O vs PE from magic bytes"]
+
+- id: "DEV-023"
+  title: "Build Time Logger"
+  description: "Parses build log output and reports phase durations"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.time, std.collections]
+  input_format: "Lines of 'HH:MM:SS.mmm phase_name: start|end'"
+  output_format: "Lines of 'phase_name: Nms' sorted by duration descending, then 'Total: Nms'"
+  test_cases:
+    - input: "10:00:00.000 compile: start\n10:00:05.000 compile: end\n10:00:05.000 link: start\n10:00:06.000 link: end"
+      expected_output: "compile: 5000ms\nlink: 1000ms\nTotal: 6000ms"
+    - input: "00:00:00.100 test: start\n00:00:00.500 test: end"
+      expected_output: "test: 400ms\nTotal: 400ms"
+  constraints: ["Parse HH:MM:SS.mmm timestamps", "Duration = end_time - start_time in ms", "Sort by duration descending"]
+
+- id: "DEV-024"
+  title: "Error Message Formatter"
+  description: "Parses raw compiler errors and formats them with context"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Compiler error output on stdin (file:line:col: error: message format)"
+  output_format: "Grouped errors by file with formatted display"
+  test_cases:
+    - input: "main.go:10:5: error: undefined: foo\nmain.go:15:3: error: undefined: bar\nutils.go:3:1: error: syntax error"
+      expected_output: "main.go (2 errors)\n  line 10, col 5: undefined: foo\n  line 15, col 3: undefined: bar\nutils.go (1 error)\n  line 3, col 1: syntax error"
+    - input: "app.py:1:0: error: invalid syntax"
+      expected_output: "app.py (1 error)\n  line 1, col 0: invalid syntax"
+  constraints: ["Group by file", "Sort by file name then line number", "'error' vs 'errors' grammatical pluralisation"]
+
+- id: "DEV-025"
+  title: "Stack Trace Parser"
+  description: "Parses a stack trace and formats it as a readable call chain"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Stack trace in Go, Python, or Java format on stdin"
+  output_format: "Formatted call chain with file, line, and function name"
+  test_cases:
+    - input: "goroutine 1 [running]:\nmain.main()\n\t/app/main.go:10 +0x50"
+      expected_output: "Stack trace:\n  main.main() at /app/main.go:10"
+    - input: "Traceback (most recent call last):\n  File \"app.py\", line 5, in main\n    raise ValueError(\"bad\")"
+      expected_output: "Stack trace:\n  main() at app.py:5"
+  constraints: ["Support Python, Go, Java formats", "Most recent frame first", "Skip runtime/stdlib frames"]
+
+- id: "DEV-026"
+  title: "Memory Usage Annotator"
+  description: "Annotates source lines with estimated memory allocation comments"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "First line: language. Remaining: source code lines"
+  output_format: "Source lines with allocation annotations where detectable"
+  test_cases:
+    - input: "python\nx = [0] * 1000000"
+      expected_output: "x = [0] * 1000000  # ~8MB"
+    - input: "python\nx = 'a' * 1024"
+      expected_output: "x = 'a' * 1024  # ~1KB"
+  constraints: ["Python: detect list/dict/string literal allocations", "Annotate only lines with detectable allocations", "Units: B, KB, MB"]
+
+- id: "DEV-027"
+  title: "API Diff Tool"
+  description: "Compares two OpenAPI spec versions and reports breaking changes"
+  difficulty: 5
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "Two JSON OpenAPI specs separated by a line containing '---'"
+  output_format: "Lines of breaking and non-breaking changes"
+  test_cases:
+    - input: "{\"paths\":{\"/users\":{\"get\":{}}}}\n---\n{\"paths\":{\"/users\":{\"get\":{}},\"/posts\":{\"get\":{}}}}"
+      expected_output: "ADDED (non-breaking): GET /posts"
+    - input: "{\"paths\":{\"/users\":{\"get\":{}}}}\n---\n{\"paths\":{}}"
+      expected_output: "REMOVED (breaking): GET /users"
+  constraints: ["Breaking: removed endpoint, changed method, removed required param", "Non-breaking: added endpoint, added optional param", "Sort by path then method"]
+
+- id: "DEV-028"
+  title: "JSON Schema Comparator"
+  description: "Compares two JSON schemas and reports structural differences"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "Two JSON schemas separated by '---'"
+  output_format: "Lines of 'ADDED: field', 'REMOVED: field', 'CHANGED: field (old->new)'"
+  test_cases:
+    - input: "{\"properties\":{\"name\":{\"type\":\"string\"},\"age\":{\"type\":\"integer\"}}}\n---\n{\"properties\":{\"name\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"}}}"
+      expected_output: "REMOVED: age\nADDED: email"
+    - input: "{\"properties\":{\"x\":{\"type\":\"integer\"}}}\n---\n{\"properties\":{\"x\":{\"type\":\"string\"}}}"
+      expected_output: "CHANGED: x (integer->string)"
+  constraints: ["Compare properties at top level only", "Sort changes alphabetically by field name"]
+
+- id: "DEV-029"
+  title: "Regex Tester"
+  description: "Tests a regex pattern against input strings and reports matches"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: regex pattern. Remaining: strings to test, one per line"
+  output_format: "Lines of 'MATCH: line' or 'NO MATCH: line', then match count summary"
+  test_cases:
+    - input: "^\\d+$\n123\nabc\n456"
+      expected_output: "MATCH: 123\nNO MATCH: abc\nMATCH: 456\n2/3 matched"
+    - input: "hello\nhello world\nfoo bar"
+      expected_output: "MATCH: hello world\nNO MATCH: foo bar\n1/2 matched"
+  constraints: ["Full regex support", "Partial match (contains) unless anchored", "Match count as fraction at end"]
+
+- id: "DEV-030"
+  title: "Glob Pattern Matcher"
+  description: "Tests whether file paths match a given glob pattern"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.path]
+  input_format: "First line: glob pattern. Remaining: file paths to test, one per line"
+  output_format: "Lines of 'MATCH: path' or 'NO MATCH: path', then match count"
+  test_cases:
+    - input: "**/*.go\nsrc/main.go\nlib/utils.py\ncmd/run.go"
+      expected_output: "MATCH: src/main.go\nNO MATCH: lib/utils.py\nMATCH: cmd/run.go\n2/3 matched"
+    - input: "*.json\npackage.json\nREADME.md"
+      expected_output: "MATCH: package.json\nNO MATCH: README.md\n1/2 matched"
+  constraints: ["Support * (any in segment) and ** (any path)", "Support ? (single char)", "Support [abc] character classes"]
+
+- id: "DEV-031"
+  title: "Path Resolver"
+  description: "Resolves relative paths, symlinks, and normalises path strings"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.path]
+  input_format: "First line: base directory. Remaining: paths to resolve (one per line)"
+  output_format: "Resolved absolute path per input line"
+  test_cases:
+    - input: "/home/user\n./docs/../src/main.go"
+      expected_output: "/home/user/src/main.go"
+    - input: "/var/www\n../log/access.log"
+      expected_output: "/var/log/access.log"
+  constraints: ["Resolve . and ..", "Combine base with relative paths", "No filesystem access for resolution — pure string logic"]
+
+- id: "DEV-032"
+  title: "License Header Checker"
+  description: "Checks if source files have the required license header"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path]
+  input_format: "First block: expected license header template. '---' separator. Remaining: file paths"
+  output_format: "Lines of 'PASS: file' or 'FAIL: file - reason'"
+  test_cases:
+    - input: "// Copyright 2024 TokeLang\n---\n/tmp/good.go\n/tmp/bad.go"
+      expected_output: "PASS: /tmp/good.go\nFAIL: /tmp/bad.go - missing license header"
+    - input: "# Apache 2.0\n---\n/tmp/script.py"
+      expected_output: "PASS: /tmp/script.py"
+  constraints: ["Check first N lines of file match template", "FAIL reasons: missing, outdated, malformed"]
+
+- id: "DEV-033"
+  title: "TODO Comment Scanner"
+  description: "Scans source files for TODO, FIXME, HACK, and XXX comments"
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Lines of 'file:N: [TYPE] comment text' sorted by file then line"
+  test_cases:
+    - input: "/tmp/test.py"
+      expected_output: "/tmp/test.py:3: [TODO] add error handling"
+    - input: "/tmp/clean.py"
+      expected_output: ""
+  constraints: ["Detect: TODO, FIXME, HACK, XXX (case-insensitive)", "Include full comment text after marker", "Summary: 'N items found' at end"]
+
+- id: "DEV-034"
+  title: "Cyclomatic Complexity Calculator"
+  description: "Computes cyclomatic complexity for functions in source files"
+  difficulty: 5
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language. Remaining: file paths"
+  output_format: "Lines of 'file: function_name: complexity_score' sorted by score descending"
+  test_cases:
+    - input: "python\n/tmp/example.py"
+      expected_output: "/tmp/example.py: complex_func: 8\n/tmp/example.py: simple_func: 1"
+    - input: "go\n/tmp/main.go"
+      expected_output: "/tmp/main.go: main: 3"
+  constraints: ["CC = 1 + count(if, elif, else, for, while, and, or, case)", "Python and Go support", "Only top-level functions/methods"]
+
+- id: "DEV-035"
+  title: "Diff Stat Reporter"
+  description: "Generates a diff stat summary from a unified diff"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Unified diff format on stdin"
+  output_format: "Lines of 'file | +N -M' for each changed file, then summary"
+  test_cases:
+    - input: "--- a/main.go\n+++ b/main.go\n@@ -1,3 +1,4 @@\n-removed\n+added\n+extra\n context"
+      expected_output: "main.go | +2 -1\n1 file changed, 2 insertions(+), 1 deletion(-)"
+    - input: "--- a/x.py\n+++ b/x.py\n@@ -1 +1 @@\n-old\n+new"
+      expected_output: "x.py | +1 -1\n1 file changed, 1 insertion(+), 1 deletion(-)"
+  constraints: ["Parse unified diff format", "Count + and - lines (not @@ or ---/+++ lines)", "Grammar: 'insertion' vs 'insertions'"]
+
+- id: "DEV-036"
+  title: "JSON Path Extractor"
+  description: "Extracts values from JSON using JSONPath expressions"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "First line: JSONPath expression. Remaining: JSON document"
+  output_format: "One value per line for all matches"
+  test_cases:
+    - input: "$.name\n{\"name\":\"Alice\",\"age\":30}"
+      expected_output: "Alice"
+    - input: "$.items[*].id\n{\"items\":[{\"id\":1},{\"id\":2}]}"
+      expected_output: "1\n2"
+  constraints: ["Support $. dot notation, [*] array wildcard, [N] array index", "Output each match on its own line"]
+
+- id: "DEV-037"
+  title: "YAML to JSON Converter"
+  description: "Converts YAML documents to equivalent JSON"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "YAML document on stdin"
+  output_format: "Pretty-printed JSON"
+  test_cases:
+    - input: "name: Alice\nage: 30\nhobbies:\n  - reading\n  - coding"
+      expected_output: "{\n  \"age\": 30,\n  \"hobbies\": [\n    \"reading\",\n    \"coding\"\n  ],\n  \"name\": \"Alice\"\n}"
+    - input: "key: value"
+      expected_output: "{\n  \"key\": \"value\"\n}"
+  constraints: ["Handle strings, integers, booleans, lists, nested maps", "Keys sorted alphabetically in output", "2-space indentation"]
+
+- id: "DEV-038"
+  title: "JSON to YAML Converter"
+  description: "Converts JSON documents to YAML"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON document on stdin"
+  output_format: "YAML representation"
+  test_cases:
+    - input: "{\"name\":\"Alice\",\"scores\":[90,85,92]}"
+      expected_output: "name: Alice\nscores:\n  - 90\n  - 85\n  - 92"
+    - input: "{\"active\":true,\"count\":5}"
+      expected_output: "active: true\ncount: 5"
+  constraints: ["Keys in original order", "List items with - prefix", "Booleans as true/false", "2-space indentation for nested structures"]
+
+- id: "DEV-039"
+  title: "Env File Parser"
+  description: "Parses a .env file and exports variables as JSON"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: ".env file content on stdin (KEY=VALUE format)"
+  output_format: "JSON object of all key-value pairs"
+  test_cases:
+    - input: "DATABASE_URL=postgres://localhost/db\nPORT=3000\n# comment line"
+      expected_output: "{\"DATABASE_URL\":\"postgres://localhost/db\",\"PORT\":\"3000\"}"
+    - input: "FOO=bar\nBAZ=\"quoted value\""
+      expected_output: "{\"BAZ\":\"quoted value\",\"FOO\":\"bar\"}"
+  constraints: ["Skip comment lines (#)", "Skip blank lines", "Strip surrounding quotes from values", "Keys sorted alphabetically in output"]
+
+- id: "DEV-040"
+  title: "Secret Scanner"
+  description: "Scans files for hardcoded secrets matching common patterns"
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Lines of 'file:N: [TYPE] redacted_value' for each finding"
+  test_cases:
+    - input: "/tmp/config.py"
+      expected_output: "/tmp/config.py:5: [API_KEY] AKI...redacted"
+    - input: "/tmp/clean.py"
+      expected_output: ""
+  constraints: ["Detect: AWS keys (AKIA...), generic api_key=, password=, secret=, token= patterns", "Redact: show first 3 chars + ...redacted", "Severity: HIGH for AWS, MEDIUM for generic"]
+
+- id: "DEV-041"
+  title: "Function Length Analyser"
+  description: "Reports functions exceeding a line-length threshold"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: threshold_lines language. Remaining: file paths"
+  output_format: "Lines of 'file:start_line: function_name (N lines)' for over-threshold functions"
+  test_cases:
+    - input: "20 python\n/tmp/example.py"
+      expected_output: "/tmp/example.py:5: long_function (45 lines)"
+    - input: "100 python\n/tmp/short.py"
+      expected_output: ""
+  constraints: ["Python: detect def blocks", "Go: detect func blocks", "Count from def/func line to last line of function body"]
+
+- id: "DEV-042"
+  title: "Duplicate Code Detector"
+  description: "Detects duplicate or near-duplicate code blocks across files"
+  difficulty: 5
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: min_lines threshold. Remaining: file paths"
+  output_format: "Duplicate blocks listed with file locations"
+  test_cases:
+    - input: "3\n/tmp/a.py\n/tmp/b.py"
+      expected_output: "Duplicate block (3 lines):\n  /tmp/a.py:5\n  /tmp/b.py:10"
+    - input: "5\n/tmp/unique.py"
+      expected_output: "No duplicates found"
+  constraints: ["Exact line matching only (no fuzzy)", "Ignore blank lines and comment-only lines", "Minimum block size = min_lines"]
+
+- id: "DEV-043"
+  title: "API Response Time Benchmarker"
+  description: "Makes multiple requests to an endpoint and reports latency statistics"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.time, std.math, std.process]
+  input_format: "First line: N requests. Second line: URL"
+  output_format: "Per-request latency, then min/max/mean/p95 stats"
+  test_cases:
+    - input: "3\nhttps://httpbin.org/get"
+      expected_output: "req 1: Nms\nreq 2: Nms\nreq 3: Nms\nmin: Nms | max: Nms | mean: Nms | p95: Nms"
+    - input: "1\nhttps://httpbin.org/status/200"
+      expected_output: "req 1: Nms\nmin: Nms | max: Nms | mean: Nms | p95: Nms"
+  constraints: ["p95 = 95th percentile", "Round all times to 1 decimal", "Use curl or system HTTP for requests"]
+
+- id: "DEV-044"
+  title: "Config Diff Tool"
+  description: "Compares two config files and shows differences"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: format ('json', 'env', 'ini'). Then two config blocks separated by '---'"
+  output_format: "Lines of 'ADDED: key=val', 'REMOVED: key=val', 'CHANGED: key (old -> new)'"
+  test_cases:
+    - input: "json\n{\"host\":\"localhost\",\"port\":3000}\n---\n{\"host\":\"localhost\",\"port\":4000,\"debug\":true}"
+      expected_output: "ADDED: debug=true\nCHANGED: port (3000 -> 4000)"
+    - input: "env\nFOO=bar\nBAZ=1\n---\nFOO=bar"
+      expected_output: "REMOVED: BAZ=1"
+  constraints: ["Sort output alphabetically by key", "Flat key comparison (no nested diffs for json)"]
+
+- id: "DEV-045"
+  title: "Dockerfile Linter"
+  description: "Lints a Dockerfile for common best practice violations"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Dockerfile content on stdin"
+  output_format: "Lines of 'line N: [LEVEL] rule - message', then 'N issues found'"
+  test_cases:
+    - input: "FROM ubuntu:latest\nRUN apt-get update\nRUN apt-get install -y git"
+      expected_output: "line 1: [WARN] DL3007 - Using latest tag\nline 2: [WARN] DL3009 - Delete apt-get lists after install\nline 2: [INFO] DL3015 - Combine RUN commands\n3 issues found"
+    - input: "FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*"
+      expected_output: "0 issues found"
+  constraints: ["Check: latest tag, non-combined RUN, no apt-get cleanup, ADD instead of COPY, root user", "Levels: INFO, WARN, ERROR"]
+
+- id: "DEV-046"
+  title: "Git Blame Summary"
+  description: "Parses git blame output and summarises line ownership by author"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "git blame output on stdin (abbreviated format: hash author date line)"
+  output_format: "Lines of 'author: N lines (P%)' sorted by line count descending"
+  test_cases:
+    - input: "abc1234 Alice 2024-01-01 1: x = 1\ndef5678 Bob 2024-01-02 2: y = 2\nabc1234 Alice 2024-01-01 3: z = 3"
+      expected_output: "Alice: 2 lines (67%)\nBob: 1 lines (33%)"
+    - input: "aaa1111 Dev 2024-01-01 1: code"
+      expected_output: "Dev: 1 lines (100%)"
+  constraints: ["Group by author name", "Percentage rounded to nearest integer", "Pipe-separated internal format"]
+
+- id: "DEV-047"
+  title: "Source Code Formatter Check"
+  description: "Checks if source code would be changed by a formatter (dry-run mode)"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.process]
+  input_format: "First line: formatter command. Remaining: file paths to check"
+  output_format: "Lines of 'PASS: file' or 'NEEDS FORMAT: file' per file"
+  test_cases:
+    - input: "gofmt -l\n/tmp/formatted.go\n/tmp/unformatted.go"
+      expected_output: "PASS: /tmp/formatted.go\nNEEDS FORMAT: /tmp/unformatted.go"
+    - input: "black --check\n/tmp/clean.py"
+      expected_output: "PASS: /tmp/clean.py"
+  constraints: ["Run formatter command with file as argument", "Exit code 0 = formatted, non-zero = needs format", "Do not modify files"]
+
+- id: "DEV-048"
+  title: "Release Notes Generator"
+  description: "Generates human-readable release notes from a structured JSON input"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.time]
+  input_format: "JSON with version, date, and changes [{category, items: [text]}]"
+  output_format: "Formatted markdown release notes"
+  test_cases:
+    - input: "{\"version\":\"2.1.0\",\"date\":\"2024-01-15\",\"changes\":[{\"category\":\"New Features\",\"items\":[\"Added dark mode\",\"Improved search\"]},{\"category\":\"Bug Fixes\",\"items\":[\"Fixed login issue\"]}]}"
+      expected_output: "# Release 2.1.0 (2024-01-15)\n\n## New Features\n- Added dark mode\n- Improved search\n\n## Bug Fixes\n- Fixed login issue"
+    - input: "{\"version\":\"1.0.1\",\"date\":\"2024-02-01\",\"changes\":[{\"category\":\"Hotfix\",\"items\":[\"Critical patch\"]}]}"
+      expected_output: "# Release 1.0.1 (2024-02-01)\n\n## Hotfix\n- Critical patch"
+  constraints: ["H1 for release header", "H2 per category", "Bullet list items", "Preserve category order from input"]
+
+- id: "DEV-049"
+  title: "Code Comment Ratio Analyser"
+  description: "Computes the ratio of comment lines to total code lines per file"
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language. Remaining: file paths"
+  output_format: "Lines of 'file: N% comments (N comment / N code lines)'"
+  test_cases:
+    - input: "python\n/tmp/example.py"
+      expected_output: "/tmp/example.py: 25% comments (5 comment / 20 code lines)"
+    - input: "go\n/tmp/main.go"
+      expected_output: "/tmp/main.go: 10% comments (2 comment / 18 code lines)"
+  constraints: ["Python: # lines", "Go: // and /* */ lines", "Skip blank lines in both counts", "Percentage = comment_lines / (comment_lines + code_lines) * 100"]
+
+- id: "DEV-050"
+  title: "Dependency Version Updater Diff"
+  description: "Shows which package versions would change when updating dependencies"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "Two JSON package manifests (current and proposed) separated by '---'"
+  output_format: "Lines of 'package: old_ver -> new_ver' for changed packages"
+  test_cases:
+    - input: "{\"express\":\"4.17.0\",\"lodash\":\"4.17.20\"}\n---\n{\"express\":\"4.18.0\",\"lodash\":\"4.17.20\"}"
+      expected_output: "express: 4.17.0 -> 4.18.0"
+    - input: "{\"react\":\"17.0.0\"}\n---\n{\"react\":\"18.0.0\",\"react-dom\":\"18.0.0\"}"
+      expected_output: "react: 17.0.0 -> 18.0.0\nreact-dom: ADDED 18.0.0"
+  constraints: ["ADDED for new packages", "REMOVED for deleted packages", "Sort by package name ascending"]
+
+- id: "DEV-051"
+  title: "Code Duplication Metric"
+  description: "Calculates what percentage of a codebase is duplicated"
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Lines of 'file: N lines (P% duplicated)', then overall duplication rate"
+  test_cases:
+    - input: "/tmp/a.py\n/tmp/b.py"
+      expected_output: "/tmp/a.py: 50 lines (20% duplicated)\n/tmp/b.py: 50 lines (20% duplicated)\nOverall: 20% duplication"
+    - input: "/tmp/unique.py"
+      expected_output: "/tmp/unique.py: 30 lines (0% duplicated)\nOverall: 0% duplication"
+  constraints: ["Exact line match (not tokens)", "Skip blank and comment-only lines", "Deduplicated line set comparison"]
+
+- id: "DEV-052"
+  title: "Test File Mapper"
+  description: "Maps source files to their corresponding test files"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.path, std.file, std.collections]
+  input_format: "One source file path per line on stdin"
+  output_format: "Lines of 'source -> test_file' or 'source -> MISSING' if no test found"
+  test_cases:
+    - input: "src/auth.go\nsrc/db.go"
+      expected_output: "src/auth.go -> src/auth_test.go\nsrc/db.go -> MISSING"
+    - input: "lib/utils.py"
+      expected_output: "lib/utils.py -> lib/test_utils.py"
+  constraints: ["Go: file -> file_test.go", "Python: file -> test_file.py", "JS: file -> file.test.js or file.spec.js", "Check file existence"]
+
+- id: "DEV-053"
+  title: "API Endpoint Lister"
+  description: "Extracts all API endpoint definitions from a web framework source file"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: framework ('express', 'flask', 'gin'). Remaining: file paths"
+  output_format: "Lines of 'METHOD /path' sorted by method then path"
+  test_cases:
+    - input: "express\n/tmp/routes.js"
+      expected_output: "DELETE /api/users/:id\nGET /api/users\nPOST /api/users"
+    - input: "flask\n/tmp/app.py"
+      expected_output: "GET /\nGET /users\nPOST /users"
+  constraints: ["Express: app.get/post/put/delete patterns", "Flask: @app.route with methods", "Gin: r.GET/POST patterns", "Uppercase METHOD"]
+
+- id: "DEV-054"
+  title: "TypeScript Type Extractor"
+  description: "Extracts type definitions and interfaces from TypeScript source"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "TypeScript file path on stdin"
+  output_format: "Lines listing each type/interface with its fields"
+  test_cases:
+    - input: "/tmp/types.ts"
+      expected_output: "interface User {\n  id: number\n  name: string\n}"
+    - input: "/tmp/models.ts"
+      expected_output: "type Status = 'active' | 'inactive'"
+  constraints: ["Extract interface and type alias definitions", "Preserve field names and types", "One blank line between definitions"]
+
+- id: "DEV-055"
+  title: "Commit Message Validator"
+  description: "Validates commit messages against conventional commit format"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Commit message on stdin (one per line)"
+  output_format: "Lines of 'PASS: message' or 'FAIL: message - reason'"
+  test_cases:
+    - input: "feat: add login page\nfix(auth): resolve token expiry\nBad commit message"
+      expected_output: "PASS: feat: add login page\nPASS: fix(auth): resolve token expiry\nFAIL: Bad commit message - does not match conventional commit format"
+    - input: "chore: update deps"
+      expected_output: "PASS: chore: update deps"
+  constraints: ["Format: type(scope)?: description", "Valid types: feat, fix, chore, docs, refactor, test, style, perf, ci, build", "Description must be non-empty lowercase after colon+space"]
+
+- id: "DEV-056"
+  title: "Log Level Filter"
+  description: "Filters log output to show only messages at or above a given severity"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: min_level (DEBUG, INFO, WARN, ERROR, FATAL). Remaining: log lines"
+  output_format: "Filtered log lines at or above min_level"
+  test_cases:
+    - input: "WARN\n2024-01-01 DEBUG init\n2024-01-01 INFO started\n2024-01-01 WARN low memory\n2024-01-01 ERROR crash"
+      expected_output: "2024-01-01 WARN low memory\n2024-01-01 ERROR crash"
+    - input: "INFO\n2024-01-01 DEBUG trace\n2024-01-01 INFO ready"
+      expected_output: "2024-01-01 INFO ready"
+  constraints: ["Level ordering: DEBUG<INFO<WARN<ERROR<FATAL", "Pass-through lines that don't match log format"]
+
+- id: "DEV-057"
+  title: "JSON Schema Generator"
+  description: "Infers a JSON Schema from a sample JSON document"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON document on stdin"
+  output_format: "Inferred JSON Schema (draft-07)"
+  test_cases:
+    - input: "{\"name\":\"Alice\",\"age\":30,\"active\":true}"
+      expected_output: "{\"type\":\"object\",\"properties\":{\"active\":{\"type\":\"boolean\"},\"age\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}},\"required\":[\"active\",\"age\",\"name\"]}"
+    - input: "[1,2,3]"
+      expected_output: "{\"type\":\"array\",\"items\":{\"type\":\"integer\"}}"
+  constraints: ["Detect: string, integer, number, boolean, array, object, null", "required = all present top-level keys", "Keys sorted alphabetically in properties"]
+
+- id: "DEV-058"
+  title: "Cron Expression Parser"
+  description: "Parses a cron expression and describes the schedule in plain English"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.time]
+  input_format: "Cron expression on stdin (5-field: min hour dom month dow)"
+  output_format: "Human-readable schedule description"
+  test_cases:
+    - input: "0 9 * * 1-5"
+      expected_output: "At 09:00, Monday through Friday"
+    - input: "*/15 * * * *"
+      expected_output: "Every 15 minutes"
+  constraints: ["Support *, */N, ranges (N-M), lists (N,M), specific values", "Five-field standard cron only"]
+
+- id: "DEV-059"
+  title: "HTTP Status Code Reference"
+  description: "Looks up HTTP status codes and returns their meaning and category"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "One HTTP status code per line"
+  output_format: "Lines of 'code: message (category)'"
+  test_cases:
+    - input: "200\n404\n500\n301"
+      expected_output: "200: OK (2xx Success)\n404: Not Found (4xx Client Error)\n500: Internal Server Error (5xx Server Error)\n301: Moved Permanently (3xx Redirection)"
+    - input: "418"
+      expected_output: "418: I'm a Teapot (4xx Client Error)"
+  constraints: ["Support all standard codes 100-599", "UNKNOWN for unrecognised codes", "Category based on hundreds digit"]
+
+- id: "DEV-060"
+  title: "Port Scanner (localhost)"
+  description: "Scans localhost for open TCP ports in a given range"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.process, std.time]
+  input_format: "First line: start_port end_port"
+  output_format: "Lines of 'port N: OPEN' for each open port, then count"
+  test_cases:
+    - input: "80 81"
+      expected_output: "port 80: OPEN\n1 port(s) open"
+    - input: "9999 9999"
+      expected_output: "0 port(s) open"
+  constraints: ["TCP only", "2 second connection timeout", "Scan sequentially", "Only report OPEN ports"]
+
+- id: "DEV-061"
+  title: "Environment Variable Injector"
+  description: "Substitutes ${VAR} placeholders in a file with environment variable values"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.process]
+  input_format: "Text with ${VAR} placeholders on stdin"
+  output_format: "Text with all known env vars substituted, unknown vars left as-is"
+  test_cases:
+    - input: "host=${HOST}\nport=${PORT}"
+      expected_output: "host=localhost\nport=8080"
+    - input: "value=${UNDEFINED_VAR}"
+      expected_output: "value=${UNDEFINED_VAR}"
+  constraints: ["Read from actual process environment", "Leave ${VAR} unchanged if unset", "Support both ${VAR} and $VAR syntax"]
+
+- id: "DEV-062"
+  title: "Code Churn Calculator"
+  description: "Calculates file churn rate from a git log history"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections, std.time]
+  input_format: "Lines of 'YYYY-MM-DD file_path' representing each commit touching a file"
+  output_format: "Lines of 'file: N changes (last changed YYYY-MM-DD)' sorted by change count desc"
+  test_cases:
+    - input: "2024-01-01 main.py\n2024-01-05 main.py\n2024-01-02 utils.py\n2024-01-06 main.py"
+      expected_output: "main.py: 3 changes (last changed 2024-01-06)\nutils.py: 1 changes (last changed 2024-01-02)"
+    - input: "2024-02-01 app.go"
+      expected_output: "app.go: 1 changes (last changed 2024-02-01)"
+  constraints: ["Sort by change count descending then file name ascending", "Track most recent change date per file"]
+
+- id: "DEV-063"
+  title: "Package Size Calculator"
+  description: "Calculates total installed size of dependencies from a lockfile"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.math]
+  input_format: "JSON array of {name, version, size_kb} package entries"
+  output_format: "Top 10 by size, then total size"
+  test_cases:
+    - input: "[{\"name\":\"react\",\"version\":\"18.0.0\",\"size_kb\":150},{\"name\":\"lodash\",\"version\":\"4.17.21\",\"size_kb\":72}]"
+      expected_output: "react@18.0.0: 150 KB\nlodash@4.17.21: 72 KB\nTotal: 222 KB (0.22 MB)"
+    - input: "[{\"name\":\"tiny\",\"version\":\"1.0.0\",\"size_kb\":2}]"
+      expected_output: "tiny@1.0.0: 2 KB\nTotal: 2 KB (0.00 MB)"
+  constraints: ["Sort by size_kb descending", "Show top 10 only", "Total in both KB and MB (2 decimal places)"]
+
+- id: "DEV-064"
+  title: "Source Map Parser"
+  description: "Parses a JavaScript source map and maps minified positions to original"
+  difficulty: 5
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: 'line:col' position. Second line: JSON source map"
+  output_format: "Original file and position: 'original: file:line:col'"
+  test_cases:
+    - input: "1:0\n{\"version\":3,\"sources\":[\"app.js\"],\"mappings\":\"AAAA\"}"
+      expected_output: "original: app.js:1:0"
+    - input: "1:4\n{\"version\":3,\"sources\":[\"main.js\"],\"mappings\":\"AAAA,IAAI\"}"
+      expected_output: "original: main.js:1:4"
+  constraints: ["Decode VLQ-encoded mappings", "Support version 3 source maps only", "Return 'unmapped' if position not found"]
+
+- id: "DEV-065"
+  title: "OpenAPI Spec Validator"
+  description: "Validates an OpenAPI 3.0 spec for required fields and structural correctness"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON OpenAPI spec on stdin"
+  output_format: "'VALID' or lines of 'ERROR: path - message' for each violation"
+  test_cases:
+    - input: "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"My API\",\"version\":\"1.0.0\"},\"paths\":{}}"
+      expected_output: "VALID"
+    - input: "{\"openapi\":\"3.0.0\",\"paths\":{}}"
+      expected_output: "ERROR: /info - required field missing"
+  constraints: ["Required: openapi version, info.title, info.version, paths", "Validate each path operation has at least one response", "Report all errors"]
+
+- id: "DEV-066"
+  title: "Unused Variable Detector"
+  description: "Detects variables that are assigned but never used in source code"
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language. Remaining: file paths"
+  output_format: "Lines of 'file:N: unused variable: name'"
+  test_cases:
+    - input: "python\n/tmp/example.py"
+      expected_output: "/tmp/example.py:3: unused variable: unused_var"
+    - input: "python\n/tmp/clean.py"
+      expected_output: ""
+  constraints: ["Python: track assignments vs usage within function scope", "Ignore variables starting with _", "Function parameters not counted"]
+
+- id: "DEV-067"
+  title: "File Extension Stats"
+  description: "Reports a breakdown of file counts and sizes by extension"
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Lines of 'ext: N files, X KB' sorted by file count descending"
+  test_cases:
+    - input: "/tmp/a.go\n/tmp/b.go\n/tmp/c.py"
+      expected_output: "go: 2 files, N KB\npy: 1 files, N KB"
+    - input: "/tmp/README.md"
+      expected_output: "md: 1 files, N KB"
+  constraints: ["Group by extension (lowercase)", "Report size in KB rounded to 2 decimal places", "Files without extension: group as 'no-ext'"]
+
+- id: "DEV-068"
+  title: "License Identifier"
+  description: "Identifies the license of a project from LICENSE or README content"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path]
+  input_format: "File path to LICENSE or README on stdin"
+  output_format: "Identified license SPDX identifier or 'UNKNOWN'"
+  test_cases:
+    - input: "/tmp/LICENSE-MIT"
+      expected_output: "MIT"
+    - input: "/tmp/LICENSE-APACHE"
+      expected_output: "Apache-2.0"
+  constraints: ["Detect: MIT, Apache-2.0, GPL-2.0, GPL-3.0, BSD-2-Clause, BSD-3-Clause, ISC, MPL-2.0", "Pattern match key phrases in file content", "Return SPDX identifier"]
+
+- id: "DEV-069"
+  title: "Security Vulnerability Report"
+  description: "Generates a security audit report from a dependency vulnerability list"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {package, version, cve_id, severity, description, fix_version}"
+  output_format: "Grouped by severity report with package details"
+  test_cases:
+    - input: "[{\"package\":\"lodash\",\"version\":\"4.17.15\",\"cve_id\":\"CVE-2020-8203\",\"severity\":\"HIGH\",\"description\":\"Prototype pollution\",\"fix_version\":\"4.17.19\"}]"
+      expected_output: "Security Audit Report\n\nHIGH (1 issue)\n  lodash@4.17.15 - CVE-2020-8203\n  Prototype pollution\n  Fix: upgrade to 4.17.19\n\nTotal: 1 vulnerability found"
+    - input: "[{\"package\":\"xml2js\",\"version\":\"0.4.19\",\"cve_id\":\"CVE-2023-0842\",\"severity\":\"MEDIUM\",\"description\":\"ReDoS\",\"fix_version\":\"0.5.0\"}]"
+      expected_output: "Security Audit Report\n\nMEDIUM (1 issue)\n  xml2js@0.4.19 - CVE-2023-0842\n  ReDoS\n  Fix: upgrade to 0.5.0\n\nTotal: 1 vulnerability found"
+  constraints: ["Groups ordered: CRITICAL, HIGH, MEDIUM, LOW, INFO", "Alphabetical sort within group", "Grammar: '1 vulnerability' vs 'N vulnerabilities'"]
+
+- id: "DEV-070"
+  title: "Build Matrix Generator"
+  description: "Generates a CI/CD build matrix from configuration"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON with axes {os: [...], version: [...], arch: [...]}"
+  output_format: "All combinations as YAML-style matrix entries"
+  test_cases:
+    - input: "{\"os\":[\"ubuntu\",\"macos\"],\"version\":[\"3.11\",\"3.12\"]}"
+      expected_output: "- os: ubuntu\n  version: 3.11\n- os: ubuntu\n  version: 3.12\n- os: macos\n  version: 3.11\n- os: macos\n  version: 3.12"
+    - input: "{\"os\":[\"linux\"],\"arch\":[\"amd64\",\"arm64\"]}"
+      expected_output: "- os: linux\n  arch: amd64\n- os: linux\n  arch: arm64"
+  constraints: ["Cartesian product of all axes", "Preserve axis key order from input", "YAML list format with - prefix"]
+
+- id: "DEV-071"
+  title: "Error Rate Calculator"
+  description: "Calculates error rate from a log file"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections, std.math]
+  input_format: "Log lines on stdin with level words (INFO, ERROR, WARN, etc.)"
+  output_format: "Count per level, total lines, and error rate percentage"
+  test_cases:
+    - input: "2024-01-01 INFO request ok\n2024-01-01 ERROR timeout\n2024-01-01 INFO request ok\n2024-01-01 WARN slow"
+      expected_output: "INFO: 2\nWARN: 1\nERROR: 1\nTotal: 4\nError rate: 25.0%"
+    - input: "2024-01-01 INFO all good\n2024-01-01 INFO done"
+      expected_output: "INFO: 2\nTotal: 2\nError rate: 0.0%"
+  constraints: ["Detect level as first word after timestamp or as any word in line matching known levels", "Error rate = ERROR / total * 100", "Sort levels by count descending"]
+
+- id: "DEV-072"
+  title: "Test Flakiness Detector"
+  description: "Identifies flaky tests from a series of test run results"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {run_id, test_name, status} records where status is pass/fail"
+  output_format: "Lines of 'FLAKY: test_name (N passes, M fails)' sorted by fail count desc"
+  test_cases:
+    - input: "[{\"run_id\":1,\"test_name\":\"auth_test\",\"status\":\"pass\"},{\"run_id\":2,\"test_name\":\"auth_test\",\"status\":\"fail\"},{\"run_id\":1,\"test_name\":\"db_test\",\"status\":\"pass\"},{\"run_id\":2,\"test_name\":\"db_test\",\"status\":\"pass\"}]"
+      expected_output: "FLAKY: auth_test (1 passes, 1 fails)"
+    - input: "[{\"run_id\":1,\"test_name\":\"stable\",\"status\":\"pass\"},{\"run_id\":2,\"test_name\":\"stable\",\"status\":\"pass\"}]"
+      expected_output: "No flaky tests detected"
+  constraints: ["Flaky = has both pass and fail results", "Sort by fail count descending then test name ascending"]
+
+- id: "DEV-073"
+  title: "Package Dependency Tree"
+  description: "Renders a dependency tree from package.json dependencies"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON with {root_package, dependencies: {pkg: {version, dependencies: {}}}} nested"
+  output_format: "Indented tree with ├── and └── connectors"
+  test_cases:
+    - input: "{\"root_package\":\"myapp\",\"dependencies\":{\"express\":{\"version\":\"4.18.0\",\"dependencies\":{\"accepts\":{\"version\":\"1.3.8\",\"dependencies\":{}}}}}}"
+      expected_output: "myapp\n└── express@4.18.0\n    └── accepts@1.3.8"
+    - input: "{\"root_package\":\"app\",\"dependencies\":{\"a\":{\"version\":\"1.0.0\",\"dependencies\":{}},\"b\":{\"version\":\"2.0.0\",\"dependencies\":{}}}}"
+      expected_output: "app\n├── a@1.0.0\n└── b@2.0.0"
+  constraints: ["├── for non-last sibling", "└── for last sibling", "│   for continuation lines", "Sort siblings alphabetically"]
+
+- id: "DEV-074"
+  title: "Token Counter"
+  description: "Counts approximate GPT-style tokens in text for LLM context estimation"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Lines: 'chars: N', 'words: N', 'approx_tokens: N'"
+  test_cases:
+    - input: "Hello, world!"
+      expected_output: "chars: 13\nwords: 2\napprox_tokens: 4"
+    - input: "The quick brown fox jumps over the lazy dog."
+      expected_output: "chars: 44\nwords: 9\napprox_tokens: 11"
+  constraints: ["approx_tokens = chars / 4 (rounded up, GPT-3.5 approximation)", "Word count by whitespace splitting"]
+
+- id: "DEV-075"
+  title: "OpenAPI Mock Data Generator"
+  description: "Generates mock JSON response data from an OpenAPI schema definition"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON schema object on stdin"
+  output_format: "Mock JSON data conforming to the schema"
+  test_cases:
+    - input: "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"age\":{\"type\":\"integer\"},\"active\":{\"type\":\"boolean\"}}}"
+      expected_output: "{\"active\":true,\"age\":42,\"name\":\"example_string\"}"
+    - input: "{\"type\":\"array\",\"items\":{\"type\":\"integer\"}}"
+      expected_output: "[1,2,3]"
+  constraints: ["string -> 'example_string'", "integer -> 42", "boolean -> true", "array -> [1,2,3]", "object -> recurse", "Keys sorted in output"]
+
+- id: "DEV-076"
+  title: "Release Checklist Validator"
+  description: "Validates a release checklist JSON and reports incomplete items"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON array of {item, required, completed} checklist items"
+  output_format: "'RELEASE READY' or 'BLOCKED' with list of incomplete required items"
+  test_cases:
+    - input: "[{\"item\":\"Tests pass\",\"required\":true,\"completed\":true},{\"item\":\"Changelog updated\",\"required\":true,\"completed\":false}]"
+      expected_output: "BLOCKED\nIncomplete required items:\n- Changelog updated"
+    - input: "[{\"item\":\"Tests pass\",\"required\":true,\"completed\":true}]"
+      expected_output: "RELEASE READY"
+  constraints: ["Only required items block release", "List incomplete required items alphabetically", "Optional incomplete items ignored"]
+
+- id: "DEV-077"
+  title: "Git Branch Name Validator"
+  description: "Validates git branch names against naming conventions"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "One branch name per line on stdin"
+  output_format: "Lines of 'VALID: name' or 'INVALID: name - reason'"
+  test_cases:
+    - input: "feature/add-login\nbugfix/fix-crash\nmain\nFeature/Bad Name"
+      expected_output: "VALID: feature/add-login\nVALID: bugfix/fix-crash\nVALID: main\nINVALID: Feature/Bad Name - contains uppercase"
+    - input: "-starts-with-dash"
+      expected_output: "INVALID: -starts-with-dash - cannot start with hyphen"
+  constraints: ["Allowed: lowercase a-z, 0-9, hyphens, forward slashes", "Cannot start/end with hyphen or slash", "Cannot contain consecutive hyphens"]
+
+- id: "DEV-078"
+  title: "Code Metrics Dashboard"
+  description: "Generates a summary metrics dashboard from multiple analysis inputs"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.math, std.collections]
+  input_format: "JSON with files [{path, lines, complexity, coverage_pct, test_exists}]"
+  output_format: "Dashboard report with averages and risk indicators"
+  test_cases:
+    - input: "{\"files\":[{\"path\":\"main.go\",\"lines\":200,\"complexity\":5,\"coverage_pct\":80,\"test_exists\":true},{\"path\":\"utils.go\",\"lines\":50,\"complexity\":2,\"coverage_pct\":40,\"test_exists\":false}]}"
+      expected_output: "Code Metrics Dashboard\nFiles: 2 | Total lines: 250\nAvg complexity: 3.5 | Max complexity: 5\nAvg coverage: 60.0% | Files with tests: 1/2\nRisk files:\n  utils.go (coverage: 40%, no tests)"
+    - input: "{\"files\":[{\"path\":\"app.py\",\"lines\":100,\"complexity\":3,\"coverage_pct\":90,\"test_exists\":true}]}"
+      expected_output: "Code Metrics Dashboard\nFiles: 1 | Total lines: 100\nAvg complexity: 3.0 | Max complexity: 3\nAvg coverage: 90.0% | Files with tests: 1/1\nRisk files: none"
+  constraints: ["Risk file = coverage < 60% OR no tests", "Sort risk files by coverage ascending", "Averages to 1 decimal place"]
+
+- id: "DEV-079"
+  title: "Webhook Payload Validator"
+  description: "Validates incoming webhook JSON payloads against expected field requirements"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: JSON required fields spec {field: type}. Remaining: JSON payload"
+  output_format: "'VALID' or lines of 'MISSING: field' and 'TYPE ERROR: field (expected X got Y)'"
+  test_cases:
+    - input: "{\"event\":\"string\",\"timestamp\":\"integer\"}\n{\"event\":\"push\",\"timestamp\":1234567890}"
+      expected_output: "VALID"
+    - input: "{\"event\":\"string\",\"payload\":\"object\"}\n{\"event\":\"ping\"}"
+      expected_output: "MISSING: payload"
+  constraints: ["Types: string, integer, number, boolean, object, array", "Report all errors", "type check uses typeof JSON value"]
+
+- id: "DEV-080"
+  title: "Log Aggregator"
+  description: "Aggregates log entries by time window and reports event frequency"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.time, std.collections]
+  input_format: "First line: window_size_minutes. Remaining: log lines with ISO timestamp prefix"
+  output_format: "Lines of 'YYYY-MM-DD HH:MM: N events' for each time window"
+  test_cases:
+    - input: "5\n2024-01-01T09:00:00 event\n2024-01-01T09:02:00 event\n2024-01-01T09:07:00 event"
+      expected_output: "2024-01-01 09:00: 2 events\n2024-01-01 09:05: 1 events"
+    - input: "10\n2024-01-01T10:00:00 A\n2024-01-01T10:05:00 B"
+      expected_output: "2024-01-01 10:00: 2 events"
+  constraints: ["Window starts at first event's floor(minute/window)*window", "Each event falls in exactly one window", "Skip empty windows"]
+
+- id: "DEV-081"
+  title: "Database Query Analyser"
+  description: "Analyses SQL queries for common performance issues"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "SQL query on stdin"
+  output_format: "Lines of 'ISSUE: description' for each detected problem, or 'CLEAN'"
+  test_cases:
+    - input: "SELECT * FROM users WHERE name LIKE '%foo%';"
+      expected_output: "ISSUE: SELECT * - avoid selecting all columns\nISSUE: Leading wildcard LIKE - cannot use index"
+    - input: "SELECT id, name FROM users WHERE id = 1;"
+      expected_output: "CLEAN"
+  constraints: ["Detect: SELECT *, N+1 patterns, leading wildcard LIKE, missing WHERE on UPDATE/DELETE, OR in WHERE", "Case-insensitive SQL keyword detection"]
+
+- id: "DEV-082"
+  title: "Container Image Size Analyser"
+  description: "Analyses Docker layer sizes from image history and reports largest layers"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Lines of 'SIZE COMMAND' from docker history output"
+  output_format: "Top 5 layers by size, then total size"
+  test_cases:
+    - input: "200MB RUN apt-get install -y nodejs\n50MB COPY . /app\n10MB RUN npm install"
+      expected_output: "1. 200MB: RUN apt-get install -y nodejs\n2. 50MB: COPY . /app\n3. 10MB: RUN npm install\nTotal: 260MB"
+    - input: "5MB ADD app /app"
+      expected_output: "1. 5MB: ADD app /app\nTotal: 5MB"
+  constraints: ["Parse size units: B, KB, MB, GB", "Sort by size descending", "Convert to common unit for comparison"]
+
+- id: "DEV-083"
+  title: "PR Review Checklist Generator"
+  description: "Generates a pull request review checklist from a diff stats summary"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON with changed_files, lines_added, lines_deleted, has_tests, has_docs"
+  output_format: "Generated review checklist in markdown format"
+  test_cases:
+    - input: "{\"changed_files\":5,\"lines_added\":150,\"lines_deleted\":30,\"has_tests\":true,\"has_docs\":false}"
+      expected_output: "PR Review Checklist\n\n- [ ] Code changes are clear and well-organised\n- [ ] Logic is correct\n- [x] Tests are included\n- [ ] Documentation updated\n- [ ] No security concerns\n- [ ] Performance implications considered"
+    - input: "{\"changed_files\":1,\"lines_added\":10,\"lines_deleted\":5,\"has_tests\":true,\"has_docs\":true}"
+      expected_output: "PR Review Checklist\n\n- [ ] Code changes are clear and well-organised\n- [ ] Logic is correct\n- [x] Tests are included\n- [x] Documentation updated\n- [ ] No security concerns\n- [ ] Performance implications considered"
+  constraints: ["[x] for has_tests and has_docs when true", "[ ] otherwise", "Fixed 6-item checklist"]
+
+- id: "DEV-084"
+  title: "AWS Policy Validator"
+  description: "Validates an AWS IAM policy document for common security issues"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "AWS IAM policy JSON on stdin"
+  output_format: "'SECURE' or lines of 'RISK: description' for each security concern"
+  test_cases:
+    - input: "{\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\"}]}"
+      expected_output: "RISK: Statement allows all actions (*)\nRISK: Statement allows all resources (*)"
+    - input: "{\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::my-bucket/*\"}]}"
+      expected_output: "SECURE"
+  constraints: ["Detect: Action=*, Resource=*, Effect=Allow with broad scope, missing Condition", "Check each statement independently"]
+
+- id: "DEV-085"
+  title: "Code Review Comment Formatter"
+  description: "Formats code review comments with file, line, severity, and message"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON array of {file, line, severity, message} review comments"
+  output_format: "Formatted review sorted by file then severity then line"
+  test_cases:
+    - input: "[{\"file\":\"main.go\",\"line\":5,\"severity\":\"error\",\"message\":\"null dereference\"},{\"file\":\"main.go\",\"line\":3,\"severity\":\"warning\",\"message\":\"unused var\"}]"
+      expected_output: "main.go:5 [ERROR] null dereference\nmain.go:3 [WARNING] unused var"
+    - input: "[{\"file\":\"utils.py\",\"line\":10,\"severity\":\"info\",\"message\":\"simplify\"}]"
+      expected_output: "utils.py:10 [INFO] simplify"
+  constraints: ["Sort: file asc, severity (error>warning>info), line asc", "Uppercase severity in brackets"]
+
+- id: "DEV-086"
+  title: "Feature Flag Config Generator"
+  description: "Generates a feature flag configuration file from a spec"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json, std.time]
+  input_format: "JSON array of {name, enabled, rollout_pct, description} feature flag specs"
+  output_format: "JSON feature flag config with metadata"
+  test_cases:
+    - input: "[{\"name\":\"dark_mode\",\"enabled\":true,\"rollout_pct\":100,\"description\":\"Enable dark mode\"},{\"name\":\"new_ui\",\"enabled\":false,\"rollout_pct\":0,\"description\":\"New UI redesign\"}]"
+      expected_output: "{\"flags\":{\"dark_mode\":{\"description\":\"Enable dark mode\",\"enabled\":true,\"rollout_pct\":100},\"new_ui\":{\"description\":\"New UI redesign\",\"enabled\":false,\"rollout_pct\":0}}}"
+    - input: "[{\"name\":\"beta\",\"enabled\":true,\"rollout_pct\":20,\"description\":\"Beta features\"}]"
+      expected_output: "{\"flags\":{\"beta\":{\"description\":\"Beta features\",\"enabled\":true,\"rollout_pct\":20}}}"
+  constraints: ["Output compact JSON", "Keys in flags object sorted alphabetically", "No top-level metadata"]
+
+- id: "DEV-087"
+  title: "Terraform Resource Lister"
+  description: "Parses a Terraform HCL file and lists all defined resources"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Terraform HCL file content on stdin"
+  output_format: "Lines of 'resource_type.resource_name' sorted alphabetically"
+  test_cases:
+    - input: "resource \"aws_s3_bucket\" \"my_bucket\" {\n  bucket = \"my-bucket\"\n}\n\nresource \"aws_lambda_function\" \"my_fn\" {\n  function_name = \"fn\"\n}"
+      expected_output: "aws_lambda_function.my_fn\naws_s3_bucket.my_bucket"
+    - input: "variable \"region\" {\n  default = \"us-east-1\"\n}"
+      expected_output: ""
+  constraints: ["Only 'resource' blocks, not variable/data/module", "Sort by resource_type then resource_name"]
+
+- id: "DEV-088"
+  title: "GraphQL Schema Parser"
+  description: "Parses a GraphQL schema and lists types with their fields"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "GraphQL schema SDL on stdin"
+  output_format: "Lines of 'Type: field: TypeName' for each field of each type"
+  test_cases:
+    - input: "type User {\n  id: ID!\n  name: String\n  age: Int\n}\n\ntype Query {\n  user(id: ID!): User\n}"
+      expected_output: "Query:\n  user: User\nUser:\n  id: ID!\n  name: String\n  age: Int"
+    - input: "type Post {\n  title: String!\n}"
+      expected_output: "Post:\n  title: String!"
+  constraints: ["List types alphabetically", "Preserve field order within type", "Show ! for non-null types"]
+
+- id: "DEV-089"
+  title: "Kubernetes Manifest Validator"
+  description: "Validates Kubernetes YAML manifests for required fields and common mistakes"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "Kubernetes manifest JSON on stdin"
+  output_format: "'VALID' or lines of 'ERROR: path - message'"
+  test_cases:
+    - input: "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"myapp\"},\"spec\":{\"replicas\":1}}"
+      expected_output: "VALID"
+    - input: "{\"kind\":\"Deployment\",\"spec\":{}}"
+      expected_output: "ERROR: /apiVersion - required field missing\nERROR: /metadata/name - required field missing"
+  constraints: ["Required: apiVersion, kind, metadata.name", "Deployment: spec.replicas should be >= 1", "Check for missing resource limits in containers if present"]
+
+- id: "DEV-090"
+  title: "CI Pipeline Duration Analyser"
+  description: "Analyses CI pipeline run durations and identifies bottlenecks"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.math, std.collections]
+  input_format: "JSON array of {pipeline_id, stages: [{name, duration_sec}]}"
+  output_format: "Average stage durations and bottleneck identification"
+  test_cases:
+    - input: "[{\"pipeline_id\":1,\"stages\":[{\"name\":\"build\",\"duration_sec\":120},{\"name\":\"test\",\"duration_sec\":300}]},{\"pipeline_id\":2,\"stages\":[{\"name\":\"build\",\"duration_sec\":100},{\"name\":\"test\",\"duration_sec\":280}]}]"
+      expected_output: "Stage averages:\n  build: 110s\n  test: 290s\nBottleneck: test (290s avg)\nTotal avg pipeline time: 400s"
+    - input: "[{\"pipeline_id\":1,\"stages\":[{\"name\":\"deploy\",\"duration_sec\":60}]}]"
+      expected_output: "Stage averages:\n  deploy: 60s\nBottleneck: deploy (60s avg)\nTotal avg pipeline time: 60s"
+  constraints: ["Average across all pipeline runs", "Bottleneck = stage with highest average", "Total = sum of stage averages"]
+
+- id: "DEV-091"
+  title: "Serverless Function Config Linter"
+  description: "Lints a serverless.yml functions config for best practices"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON representation of serverless functions config"
+  output_function: "Lint checks"
+  output_format: "Lines of 'function_name: ISSUE description' or 'ALL OK'"
+  test_cases:
+    - input: "{\"functions\":{\"myFunc\":{\"handler\":\"src/handler.main\",\"timeout\":900,\"memory\":128}}}"
+      expected_output: "myFunc: timeout too high (900s, max recommended 300s)"
+    - input: "{\"functions\":{\"api\":{\"handler\":\"src/api.main\",\"timeout\":30,\"memory\":512}}}"
+      expected_output: "ALL OK"
+  constraints: ["Check: timeout>300s=warn, memory<128MB=warn, no handler=error, no events for HTTP functions", "Sort by function name"]
+
+- id: "DEV-092"
+  title: "Dependency Update Impact Scorer"
+  description: "Scores the risk of updating a dependency based on semver change type"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {package, current_version, new_version}"
+  output_format: "Lines of 'package: current -> new [RISK_LEVEL]' sorted by risk descending"
+  test_cases:
+    - input: "[{\"package\":\"express\",\"current_version\":\"4.17.0\",\"new_version\":\"5.0.0\"},{\"package\":\"lodash\",\"current_version\":\"4.17.20\",\"new_version\":\"4.17.21\"}]"
+      expected_output: "express: 4.17.0 -> 5.0.0 [HIGH - major version change]\nlodash: 4.17.20 -> 4.17.21 [LOW - patch update]"
+    - input: "[{\"package\":\"react\",\"current_version\":\"17.0.0\",\"new_version\":\"17.1.0\"}]"
+      expected_output: "react: 17.0.0 -> 17.1.0 [MEDIUM - minor version change]"
+  constraints: ["Major change = HIGH, minor = MEDIUM, patch = LOW", "Sort: HIGH first then MEDIUM then LOW, alphabetical within level"]
+
+- id: "DEV-093"
+  title: "Function Signature Extractor"
+  description: "Extracts function signatures from source code for API documentation"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language. Remaining: file paths"
+  output_format: "Lines of 'file: signature' for each function found"
+  test_cases:
+    - input: "python\n/tmp/math.py"
+      expected_output: "/tmp/math.py: def add(a: int, b: int) -> int"
+    - input: "go\n/tmp/utils.go"
+      expected_output: "/tmp/utils.go: func Reverse(s string) string"
+  constraints: ["Python: extract def lines", "Go: extract func lines", "JS: extract function declarations and arrow functions", "Include full signature with return type if present"]
+
+- id: "DEV-094"
+  title: "Code Complexity Trend Analyser"
+  description: "Tracks complexity changes over time from multiple analysis snapshots"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.collections]
+  input_format: "JSON array of {date, file, complexity} snapshots sorted by date"
+  output_format: "Per-file complexity trend with delta from first to last snapshot"
+  test_cases:
+    - input: "[{\"date\":\"2024-01-01\",\"file\":\"main.go\",\"complexity\":5},{\"date\":\"2024-02-01\",\"file\":\"main.go\",\"complexity\":8}]"
+      expected_output: "main.go: 5 -> 8 (+3) INCREASING"
+    - input: "[{\"date\":\"2024-01-01\",\"file\":\"utils.py\",\"complexity\":10},{\"date\":\"2024-02-01\",\"file\":\"utils.py\",\"complexity\":6}]"
+      expected_output: "utils.py: 10 -> 6 (-4) DECREASING"
+  constraints: ["INCREASING if delta>0, DECREASING if delta<0, STABLE if delta=0", "Sort by file name alphabetically"]
+
+- id: "DEV-095"
+  title: "Middleware Chain Validator"
+  description: "Validates that a middleware chain configuration has no conflicting or circular dependencies"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {name, before, after} middleware ordering constraints"
+  output_format: "'VALID ORDER: m1, m2, ...' or 'CONFLICT: description'"
+  test_cases:
+    - input: "[{\"name\":\"auth\",\"before\":[\"handler\"],\"after\":[]},{\"name\":\"logging\",\"before\":[\"auth\"],\"after\":[]},{\"name\":\"handler\",\"before\":[],\"after\":[\"auth\"]}]"
+      expected_output: "VALID ORDER: logging, auth, handler"
+    - input: "[{\"name\":\"A\",\"before\":[\"B\"],\"after\":[]},{\"name\":\"B\",\"before\":[\"A\"],\"after\":[]}]"
+      expected_output: "CONFLICT: circular dependency between A and B"
+  constraints: ["Topological sort based on before/after constraints", "Report first circular dependency found"]
+
+- id: "DEV-096"
+  title: "Test Coverage Gap Finder"
+  description: "Identifies source functions that lack corresponding tests"
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "First line: language. Second line: source file. Third line: test file"
+  output_format: "Lines of 'UNTESTED: function_name' or 'ALL COVERED'"
+  test_cases:
+    - input: "python\n/tmp/math.py\n/tmp/test_math.py"
+      expected_output: "UNTESTED: divide"
+    - input: "python\n/tmp/fully_tested.py\n/tmp/test_fully_tested.py"
+      expected_output: "ALL COVERED"
+  constraints: ["Match function names in source to test_<name> or <name>_test functions in test file", "Python and Go support", "Case-sensitive matching"]
+
+- id: "DEV-097"
+  title: "API Rate Limit Simulator"
+  description: "Simulates a token bucket rate limiter and shows which requests are allowed or throttled"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.math]
+  input_format: "First line: rate_per_second burst_size. Remaining: JSON requests [{time_ms, endpoint}]"
+  output_format: "Lines of 'time_ms endpoint: ALLOWED/THROTTLED'"
+  test_cases:
+    - input: "2 5\n[{\"time_ms\":0,\"endpoint\":\"/api\"},{\"time_ms\":100,\"endpoint\":\"/api\"},{\"time_ms\":200,\"endpoint\":\"/api\"},{\"time_ms\":300,\"endpoint\":\"/api\"},{\"time_ms\":400,\"endpoint\":\"/api\"},{\"time_ms\":500,\"endpoint\":\"/api\"}]"
+      expected_output: "0 /api: ALLOWED\n100 /api: ALLOWED\n200 /api: THROTTLED\n300 /api: THROTTLED\n400 /api: THROTTLED\n500 /api: ALLOWED"
+    - input: "1 1\n[{\"time_ms\":0,\"endpoint\":\"/\"},{\"time_ms\":0,\"endpoint\":\"/\"}]"
+      expected_output: "0 /: ALLOWED\n0 /: THROTTLED"
+  constraints: ["Token bucket: tokens refill at rate_per_second", "burst_size is max tokens", "Tokens added per ms = rate_per_second / 1000"]
+
+- id: "DEV-098"
+  title: "Semver Range Resolver"
+  description: "Resolves which versions from a list satisfy a semver range"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: semver range (e.g. '^1.2.0', '>=2.0.0 <3.0.0'). Remaining: version list"
+  output_format: "Lines of matching versions in ascending order, or 'No versions match'"
+  test_cases:
+    - input: "^1.2.0\n1.1.0\n1.2.0\n1.3.5\n2.0.0"
+      expected_output: "1.2.0\n1.3.5"
+    - input: ">=2.0.0\n1.9.9\n2.0.0\n3.5.1"
+      expected_output: "2.0.0\n3.5.1"
+  constraints: ["Support: ^, ~, >=, <=, >, <, = ranges", "^X.Y.Z = compatible (>=X.Y.Z <(X+1).0.0)", "~X.Y.Z = patch compatible (>=X.Y.Z <X.(Y+1).0)"]
+
+- id: "DEV-099"
+  title: "Code Style Report Generator"
+  description: "Generates a code style compliance report from lint output"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json, std.collections, std.math]
+  input_format: "JSON array of {file, rule_id, severity, message, line} lint findings"
+  output_format: "Summary by rule with counts, plus per-file violation counts"
+  test_cases:
+    - input: "[{\"file\":\"main.go\",\"rule_id\":\"gofmt\",\"severity\":\"error\",\"message\":\"needs formatting\",\"line\":1},{\"file\":\"utils.go\",\"rule_id\":\"gofmt\",\"severity\":\"error\",\"message\":\"needs formatting\",\"line\":3},{\"file\":\"main.go\",\"rule_id\":\"vet\",\"severity\":\"warn\",\"message\":\"suspicious\",\"line\":5}]"
+      expected_output: "Style Report\n\nBy rule:\n  gofmt: 2 violations\n  vet: 1 violations\n\nBy file:\n  main.go: 2 violations\n  utils.go: 1 violations\n\nTotal: 3 violations"
+    - input: "[]"
+      expected_output: "Style Report\n\nNo violations found."
+  constraints: ["Sort rules by violation count descending", "Sort files by violation count descending", "Grammar: '1 violation' vs 'N violations'"]
+
+- id: "DEV-100"
+  title: "Microservice Dependency Map"
+  description: "Generates a service dependency map from service call logs"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {caller, callee, call_count} service call records"
+  output_format: "Dependency map showing each service's dependencies and call volumes"
+  test_cases:
+    - input: "[{\"caller\":\"api\",\"callee\":\"auth\",\"call_count\":100},{\"caller\":\"api\",\"callee\":\"db\",\"call_count\":50},{\"caller\":\"auth\",\"callee\":\"db\",\"call_count\":80}]"
+      expected_output: "api:\n  -> auth (100 calls)\n  -> db (50 calls)\nauth:\n  -> db (80 calls)"
+    - input: "[{\"caller\":\"frontend\",\"callee\":\"backend\",\"call_count\":200}]"
+      expected_output: "frontend:\n  -> backend (200 calls)"
+  constraints: ["Sort callers alphabetically", "Sort callees by call count descending", "Indent callees with -> prefix"]
+
+- id: "DEV-101"
+  title: "Package Upgrade Path Planner"
+  description: "Plans a step-by-step upgrade path between two major versions of a package"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON with package_name, from_version, to_version, and breaking_changes [{version, change}]"
+  output_format: "Step-by-step upgrade plan with breaking changes per step"
+  test_cases:
+    - input: "{\"package_name\":\"express\",\"from_version\":\"3.0.0\",\"to_version\":\"5.0.0\",\"breaking_changes\":[{\"version\":\"4.0.0\",\"change\":\"Router API changed\"},{\"version\":\"5.0.0\",\"change\":\"async error handling\"}]}"
+      expected_output: "Upgrade plan: express 3.0.0 -> 5.0.0\nStep 1: 3.0.0 -> 4.0.0\n  Breaking: Router API changed\nStep 2: 4.0.0 -> 5.0.0\n  Breaking: async error handling"
+    - input: "{\"package_name\":\"lib\",\"from_version\":\"1.0.0\",\"to_version\":\"2.0.0\",\"breaking_changes\":[{\"version\":\"2.0.0\",\"change\":\"API redesign\"}]}"
+      expected_output: "Upgrade plan: lib 1.0.0 -> 2.0.0\nStep 1: 1.0.0 -> 2.0.0\n  Breaking: API redesign"
+  constraints: ["Include only breaking changes for versions > from and <= to", "One step per breaking change version"]
+
+- id: "DEV-102"
+  title: "Dependency License Audit"
+  description: "Audits dependency licenses for compatibility with a project license"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: project_license (e.g. MIT). Second line: JSON array of {package, license}"
+  output_format: "Lines of 'COMPATIBLE: package (license)' or 'INCOMPATIBLE: package (license) - reason'"
+  test_cases:
+    - input: "MIT\n[{\"package\":\"lodash\",\"license\":\"MIT\"},{\"package\":\"react\",\"license\":\"MIT\"},{\"package\":\"gpl-lib\",\"license\":\"GPL-3.0\"}]"
+      expected_output: "COMPATIBLE: lodash (MIT)\nCOMPATIBLE: react (MIT)\nINCOMPATIBLE: gpl-lib (GPL-3.0) - copyleft incompatible with MIT"
+    - input: "Apache-2.0\n[{\"package\":\"tool\",\"license\":\"MIT\"}]"
+      expected_output: "COMPATIBLE: tool (MIT)"
+  constraints: ["GPL-3.0 incompatible with MIT/Apache-2.0/BSD", "MIT compatible with Apache-2.0, BSD", "Sort by package name"]
+
+- id: "DEV-103"
+  title: "API Mock Server Config Generator"
+  description: "Generates a mock server configuration from API endpoint specs"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {method, path, response_code, response_body} mock specs"
+  output_format: "JSON mock server configuration file"
+  test_cases:
+    - input: "[{\"method\":\"GET\",\"path\":\"/users\",\"response_code\":200,\"response_body\":{\"users\":[]}},{\"method\":\"POST\",\"path\":\"/users\",\"response_code\":201,\"response_body\":{\"id\":1}}]"
+      expected_output: "{\"mocks\":[{\"method\":\"GET\",\"path\":\"/users\",\"response\":{\"body\":{\"users\":[]},\"status\":200}},{\"method\":\"POST\",\"path\":\"/users\",\"response\":{\"body\":{\"id\":1},\"status\":201}}]}"
+    - input: "[{\"method\":\"DELETE\",\"path\":\"/item/:id\",\"response_code\":204,\"response_body\":null}]"
+      expected_output: "{\"mocks\":[{\"method\":\"DELETE\",\"path\":\"/item/:id\",\"response\":{\"body\":null,\"status\":204}}]}"
+  constraints: ["Preserve order from input", "response body nested under response key", "Compact JSON output"]
+
+- id: "DEV-104"
+  title: "Service Health Dashboard"
+  description: "Generates a health status dashboard from service health check data"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json, std.time]
+  input_format: "JSON array of {service, status, last_check, latency_ms, uptime_pct}"
+  output_format: "Formatted health dashboard"
+  test_cases:
+    - input: "[{\"service\":\"api\",\"status\":\"UP\",\"last_check\":\"2024-01-15T10:00:00\",\"latency_ms\":45,\"uptime_pct\":99.9},{\"service\":\"db\",\"status\":\"DOWN\",\"last_check\":\"2024-01-15T10:00:00\",\"latency_ms\":0,\"uptime_pct\":95.0}]"
+      expected_output: "Service Health Dashboard\n\n[UP]   api    45ms   99.9% uptime\n[DOWN] db     0ms    95.0% uptime\n\nAll UP: 1/2"
+    - input: "[{\"service\":\"cache\",\"status\":\"UP\",\"last_check\":\"2024-01-15T09:00:00\",\"latency_ms\":2,\"uptime_pct\":100.0}]"
+      expected_output: "Service Health Dashboard\n\n[UP]   cache  2ms    100.0% uptime\n\nAll UP: 1/1"
+  constraints: ["Sort: DOWN services first, then by service name", "Column-aligned output", "All UP count at end"]
+
+- id: "DEV-105"
+  title: "Cross-Platform Path Converter"
+  description: "Converts file paths between Windows, Unix, and URL formats"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.path]
+  input_format: "First line: target format ('unix', 'windows', 'url'). Remaining: paths"
+  output_format: "Converted path per line"
+  test_cases:
+    - input: "unix\nC:\\Users\\Alice\\file.txt"
+      expected_output: "/Users/Alice/file.txt"
+    - input: "windows\n/home/alice/doc.pdf"
+      expected_output: "C:\\home\\alice\\doc.pdf"
+  constraints: ["Unix -> Windows: prepend C: drive, / to \\", "Windows -> Unix: strip drive letter, \\ to /", "URL: percent-encode spaces, convert to forward slashes"]
+
+- id: "DEV-106"
+  title: "Version Constraint Checker"
+  description: "Checks if installed package versions satisfy all declared constraints"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: JSON installed {pkg: version}. Second line: JSON constraints {pkg: constraint}"
+  output_format: "Lines of 'pkg: SATISFIED (version)' or 'pkg: VIOLATED (version, requires constraint)'"
+  test_cases:
+    - input: "{\"lodash\":\"4.17.21\",\"express\":\"4.18.0\"}\n{\"lodash\":\">=4.0.0\",\"express\":\"^4.17.0\"}"
+      expected_output: "express: SATISFIED (4.18.0)\nlodash: SATISFIED (4.17.21)"
+    - input: "{\"react\":\"16.0.0\"}\n{\"react\":\">=18.0.0\"}"
+      expected_output: "react: VIOLATED (16.0.0, requires >=18.0.0)"
+  constraints: ["Support >= <= > < = ^ ~ constraints", "Sort packages alphabetically", "Check against semver comparison"]
+
+- id: "DEV-107"
+  title: "Build Artifact Tracker"
+  description: "Tracks build artifacts, their sizes, and checksums"
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.time]
+  input_format: "One artifact file path per line"
+  output_format: "Lines of 'file: size checksum (YYYY-MM-DD HH:MM)' sorted by file name"
+  test_cases:
+    - input: "/tmp/app.tar.gz"
+      expected_output: "/tmp/app.tar.gz: 512 KB  sha256:abc123def  2024-01-15 10:30"
+    - input: "/dev/null"
+      expected_output: "/dev/null: 0 B  sha256:e3b0c442  2024-01-15 10:30"
+  constraints: ["Compute SHA-256 of file content", "Show first 8 hex chars of hash", "File modification time in YYYY-MM-DD HH:MM format"]
+
+- id: "DEV-108"
+  title: "Error Budget Calculator"
+  description: "Calculates SLO error budget consumption from uptime data"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.math, std.time]
+  input_format: "JSON with slo_target_pct, measurement_period_days, and incidents [{start, end_minutes_duration}]"
+  output_format: "Error budget analysis: total budget, consumed, remaining, burn rate"
+  test_cases:
+    - input: "{\"slo_target_pct\":99.9,\"measurement_period_days\":30,\"incidents\":[{\"duration_minutes\":30}]}"
+      expected_output: "SLO: 99.9%\nMeasurement period: 30 days\nTotal error budget: 43.2 minutes\nConsumed: 30.0 minutes (69.4%)\nRemaining: 13.2 minutes (30.6%)\nBurn rate: 2.31x"
+    - input: "{\"slo_target_pct\":99.5,\"measurement_period_days\":7,\"incidents\":[]}"
+      expected_output: "SLO: 99.5%\nMeasurement period: 7 days\nTotal error budget: 50.4 minutes\nConsumed: 0.0 minutes (0.0%)\nRemaining: 50.4 minutes (100.0%)\nBurn rate: 0.00x"
+  constraints: ["Error budget = period_minutes * (1 - slo/100)", "Burn rate = consumed / (period / 30) in minutes per 30-day equivalent", "Round to 1 decimal place"]
+
+- id: "DEV-109"
+  title: "Monorepo Package Detector"
+  description: "Detects packages in a monorepo from directory structure"
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "Root directory path on stdin"
+  output_format: "Lines of 'package_name: type (path)' sorted by package name"
+  test_cases:
+    - input: "/tmp/monorepo"
+      expected_output: "api: node (packages/api)\ncli: go (packages/cli)\nweb: node (packages/web)"
+    - input: "/tmp/simple"
+      expected_output: "No packages detected"
+  constraints: ["Detect package.json -> node, go.mod -> go, setup.py -> python", "Recurse max 2 levels deep", "Package name from manifest file"]
+
+- id: "DEV-110"
+  title: "Regression Test Selector"
+  description: "Selects relevant regression tests based on changed files"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: JSON test-to-file mapping {test: [files]}. Second line: space-separated changed files"
+  output_format: "Lines of tests that should be run, sorted alphabetically"
+  test_cases:
+    - input: "{\"test_auth\":[\"/src/auth.go\",\"/src/middleware.go\"],\"test_db\":[\"/src/db.go\"],\"test_api\":[\"/src/api.go\",\"/src/auth.go\"]}\n/src/auth.go /src/db.go"
+      expected_output: "test_api\ntest_auth\ntest_db"
+    - input: "{\"test_x\":[\"/a.py\"],\"test_y\":[\"/b.py\"]}\n/a.py"
+      expected_output: "test_x"
+  constraints: ["Test selected if any of its files appear in changed files", "Deduplicate selected tests", "Sort alphabetically"]
+
+- id: "DEV-111"
+  title: "Debug Log Compressor"
+  description: "Compresses repetitive log lines using run-length notation"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Log file content on stdin"
+  output_format: "Compressed log with repeated consecutive lines collapsed"
+  test_cases:
+    - input: "2024-01-01 INFO heartbeat\n2024-01-02 INFO heartbeat\n2024-01-03 INFO heartbeat\n2024-01-04 INFO different"
+      expected_output: "2024-01-01 INFO heartbeat (repeated 3 times)\n2024-01-04 INFO different"
+    - input: "line 1\nline 2\nline 2\nline 3"
+      expected_output: "line 1\nline 2 (repeated 2 times)\nline 3"
+  constraints: ["Compare lines with timestamps stripped for matching", "Show first occurrence with count", "Single lines not annotated"]
+
+- id: "DEV-112"
+  title: "Schema Migration Planner"
+  description: "Plans schema migration steps from current to target schema"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "Two JSON schema definitions separated by '---'"
+  output_format: "Ordered migration steps as SQL DDL statements"
+  test_cases:
+    - input: "{\"tables\":{\"users\":{\"columns\":{\"id\":\"INTEGER\",\"name\":\"VARCHAR(50)\"}}}}\n---\n{\"tables\":{\"users\":{\"columns\":{\"id\":\"INTEGER\",\"name\":\"VARCHAR(100)\",\"email\":\"VARCHAR(255)\"}}}}"
+      expected_output: "ALTER TABLE users MODIFY COLUMN name VARCHAR(100);\nALTER TABLE users ADD COLUMN email VARCHAR(255);"
+    - input: "{\"tables\":{}}\n---\n{\"tables\":{\"posts\":{\"columns\":{\"id\":\"INTEGER\",\"title\":\"TEXT\"}}}}"
+      expected_output: "CREATE TABLE posts (id INTEGER, title TEXT);"
+  constraints: ["Order: CREATE TABLE before ALTER TABLE", "Within ALTER: MODIFY before ADD before DROP", "Standard SQL syntax"]
+
+- id: "DEV-113"
+  title: "Network Latency Heatmap"
+  description: "Generates a text heatmap of network latency by hour and day"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.collections, std.math]
+  input_format: "JSON array of {timestamp, latency_ms} measurements"
+  output_format: "7-day x 24-hour text heatmap with low/medium/high indicators"
+  test_cases:
+    - input: "[{\"timestamp\":\"2024-01-08T14:00:00\",\"latency_ms\":50},{\"timestamp\":\"2024-01-08T14:01:00\",\"latency_ms\":200}]"
+      expected_output: "Latency Heatmap (Mon=0, Sun=6)\nHour | Mon\n14   | [MED]"
+    - input: "[{\"timestamp\":\"2024-01-09T10:00:00\",\"latency_ms\":15}]"
+      expected_output: "Latency Heatmap (Mon=0, Sun=6)\nHour | Tue\n10   | [LOW]"
+  constraints: ["LOW <50ms, MED 50-200ms, HIGH >200ms", "Average per hour+day cell", "Empty cells shown as [ . ]"]
+
+- id: "DEV-114"
+  title: "Service Mesh Traffic Analyser"
+  description: "Analyses service mesh traffic logs and identifies high-traffic routes"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.collections]
+  input_format: "JSON array of {from_service, to_service, request_count, error_count, avg_latency_ms}"
+  output_format: "Traffic summary with top routes and error rates"
+  test_cases:
+    - input: "[{\"from_service\":\"frontend\",\"to_service\":\"api\",\"request_count\":1000,\"error_count\":10,\"avg_latency_ms\":50},{\"from_service\":\"api\",\"to_service\":\"db\",\"request_count\":800,\"error_count\":2,\"avg_latency_ms\":5}]"
+      expected_output: "Traffic Summary\nfrontend -> api: 1000 req/s, 1.0% errors, 50ms avg\napi -> db: 800 req/s, 0.3% errors, 5ms avg\nTotal requests: 1800\nOverall error rate: 0.7%"
+    - input: "[{\"from_service\":\"A\",\"to_service\":\"B\",\"request_count\":100,\"error_count\":0,\"avg_latency_ms\":10}]"
+      expected_output: "Traffic Summary\nA -> B: 100 req/s, 0.0% errors, 10ms avg\nTotal requests: 100\nOverall error rate: 0.0%"
+  constraints: ["Sort by request_count descending", "Error rate = error_count/request_count*100", "Round error rate to 1 decimal"]
+
+- id: "DEV-115"
+  title: "Configuration Template Renderer"
+  description: "Renders infrastructure configuration templates with environment-specific values"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.file]
+  input_format: "First block: template with {{var}} placeholders. '---' separator. Second block: JSON vars"
+  output_format: "Rendered configuration with all vars substituted"
+  test_cases:
+    - input: "server {\n  listen {{port}};\n  server_name {{domain}};\n}\n---\n{\"port\":443,\"domain\":\"example.com\"}"
+      expected_output: "server {\n  listen 443;\n  server_name example.com;\n}"
+    - input: "DB_URL={{db_host}}:{{db_port}}/{{db_name}}\n---\n{\"db_host\":\"localhost\",\"db_port\":5432,\"db_name\":\"mydb\"}"
+      expected_output: "DB_URL=localhost:5432/mydb"
+  constraints: ["All {{var}} placeholders replaced", "Unknown vars cause error: 'ERROR: undefined variable: var'", "Integer values substituted as strings"]
+
+- id: "DEV-116"
+  title: "Hotspot Identifier"
+  description: "Identifies code hotspots by combining complexity and churn metrics"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.math, std.collections]
+  input_format: "JSON array of {file, complexity, churn_count}"
+  output_format: "Hotspot score per file sorted by score descending with risk label"
+  test_cases:
+    - input: "[{\"file\":\"auth.go\",\"complexity\":15,\"churn_count\":20},{\"file\":\"utils.go\",\"complexity\":3,\"churn_count\":2}]"
+      expected_output: "auth.go: score=300 [HIGH RISK]\nutils.go: score=6 [LOW RISK]"
+    - input: "[{\"file\":\"main.py\",\"complexity\":8,\"churn_count\":10}]"
+      expected_output: "main.py: score=80 [MEDIUM RISK]"
+  constraints: ["score = complexity * churn_count", "HIGH: score>=100, MEDIUM: score>=20, LOW: score<20", "Sort by score descending"]
+
+- id: "DEV-117"
+  title: "Container Registry Image Lister"
+  description: "Lists and filters container images from a registry manifest JSON"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.collections]
+  input_format: "First line: filter (e.g. 'tag:latest', 'before:2024-01-01', 'all'). Second line: JSON image list"
+  output_format: "Filtered images: 'repo:tag (digest_short) pushed_date'"
+  test_cases:
+    - input: "all\n[{\"repo\":\"myapp\",\"tag\":\"latest\",\"digest\":\"sha256:abc123\",\"pushed\":\"2024-01-10\"},{\"repo\":\"myapp\",\"tag\":\"v1.0\",\"digest\":\"sha256:def456\",\"pushed\":\"2024-01-05\"}]"
+      expected_output: "myapp:latest (sha256:abc) 2024-01-10\nmyapp:v1.0 (sha256:def) 2024-01-05"
+    - input: "tag:latest\n[{\"repo\":\"app\",\"tag\":\"latest\",\"digest\":\"sha256:111\",\"pushed\":\"2024-01-01\"}]"
+      expected_output: "app:latest (sha256:111) 2024-01-01"
+  constraints: ["Short digest = first 10 chars", "Filter before:DATE keeps images pushed before that date", "Sort by pushed date descending"]
+
+- id: "DEV-118"
+  title: "OpenAPI Client SDK Stub Generator"
+  description: "Generates function stub signatures for client SDK from an OpenAPI spec"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "First line: language ('python', 'go'). Remaining: JSON OpenAPI paths object"
+  output_format: "Generated function stubs, one per operation"
+  test_cases:
+    - input: "python\n{\"/users\":{\"get\":{\"operationId\":\"listUsers\"},\"post\":{\"operationId\":\"createUser\"}}}"
+      expected_output: "def list_users():\n    \"\"\"GET /users\"\"\"\n    pass\n\ndef create_user(body):\n    \"\"\"POST /users\"\"\"\n    pass"
+    - input: "go\n{\"/items/{id}\":{\"get\":{\"operationId\":\"getItem\"}}}"
+      expected_output: "func GetItem(id string) (interface{}, error) {\n\t// GET /items/{id}\n\treturn nil, nil\n}"
+  constraints: ["camelCase for Go, snake_case for Python", "POST/PUT get body parameter", "Path params extracted as function params"]
+
+- id: "DEV-119"
+  title: "Plugin Manifest Validator"
+  description: "Validates a plugin manifest JSON against a plugin API schema"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON plugin manifest on stdin"
+  output_format: "'VALID' or lines of validation errors"
+  test_cases:
+    - input: "{\"name\":\"my-plugin\",\"version\":\"1.0.0\",\"main\":\"index.js\",\"api_version\":\"2\"}"
+      expected_output: "VALID"
+    - input: "{\"name\":\"bad plugin\",\"version\":\"not-semver\"}"
+      expected_output: "ERROR: name - must not contain spaces\nERROR: version - must be valid semver\nERROR: main - required field missing\nERROR: api_version - required field missing"
+  constraints: ["Required: name, version, main, api_version", "name: lowercase letters, digits, hyphens only", "version: valid semver format"]
+
+- id: "DEV-120"
+  title: "Incremental Build Planner"
+  description: "Determines which targets need rebuilding based on changed inputs"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON with targets [{name, inputs, depends_on}] and changed_files list"
+  output_format: "Lines of targets that need rebuilding in dependency order"
+  test_cases:
+    - input: "{\"targets\":[{\"name\":\"lib\",\"inputs\":[\"src/lib.go\"],\"depends_on\":[]},{\"name\":\"app\",\"inputs\":[\"src/main.go\"],\"depends_on\":[\"lib\"]}],\"changed_files\":[\"src/lib.go\"]}"
+      expected_output: "Needs rebuild:\n1. lib (input changed)\n2. app (dependency lib changed)"
+    - input: "{\"targets\":[{\"name\":\"test\",\"inputs\":[\"src/test.go\"],\"depends_on\":[]}],\"changed_files\":[\"src/other.go\"]}"
+      expected_output: "Needs rebuild: none"
+  constraints: ["A target needs rebuild if its inputs changed or any dependency needs rebuild", "Topological build order", "Indicate reason: 'input changed' or 'dependency X changed'"]
+
+- id: "DEV-121"
+  title: "Log Sampling Tool"
+  description: "Samples log lines at a given rate to reduce volume"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: sample_rate (0.0-1.0). Second line: seed. Remaining: log lines"
+  output_format: "Sampled subset of log lines preserving relative order"
+  test_cases:
+    - input: "0.5\n42\nline1\nline2\nline3\nline4"
+      expected_output: "line1\nline3"
+    - input: "1.0\n0\nA\nB"
+      expected_output: "A\nB"
+  constraints: ["Use seed for determinism", "Uniform random sampling", "Preserve line order"]
+
+- id: "DEV-122"
+  title: "Distributed Trace Viewer"
+  description: "Renders a distributed trace as a text Gantt-style timeline"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.time, std.collections]
+  input_format: "JSON array of {span_id, parent_id, service, operation, start_ms, duration_ms}"
+  output_format: "Indented timeline showing span hierarchy and durations"
+  test_cases:
+    - input: "[{\"span_id\":\"s1\",\"parent_id\":null,\"service\":\"frontend\",\"operation\":\"http_get\",\"start_ms\":0,\"duration_ms\":100},{\"span_id\":\"s2\",\"parent_id\":\"s1\",\"service\":\"api\",\"operation\":\"db_query\",\"start_ms\":10,\"duration_ms\":50}]"
+      expected_output: "frontend.http_get [0ms - 100ms]\n  api.db_query [10ms - 60ms]"
+    - input: "[{\"span_id\":\"r\",\"parent_id\":null,\"service\":\"svc\",\"operation\":\"op\",\"start_ms\":0,\"duration_ms\":20}]"
+      expected_output: "svc.op [0ms - 20ms]"
+  constraints: ["Indent child spans 2 spaces per nesting level", "Sort children by start_ms", "Format: service.operation [start - end]"]
+
+- id: "DEV-123"
+  title: "Memory Allocation Profile Parser"
+  description: "Parses a memory allocation profile and reports top allocating call sites"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.collections]
+  input_format: "JSON array of {function, file, line, alloc_bytes, alloc_count}"
+  output_format: "Top 10 allocators sorted by alloc_bytes descending"
+  test_cases:
+    - input: "[{\"function\":\"parseJSON\",\"file\":\"parser.go\",\"line\":42,\"alloc_bytes\":1048576,\"alloc_count\":100},{\"function\":\"buildIndex\",\"file\":\"index.go\",\"line\":88,\"alloc_bytes\":524288,\"alloc_count\":50}]"
+      expected_output: "1. parseJSON (parser.go:42)\n   1.0 MB in 100 allocs\n2. buildIndex (index.go:88)\n   512.0 KB in 50 allocs"
+    - input: "[{\"function\":\"small\",\"file\":\"x.go\",\"line\":1,\"alloc_bytes\":1024,\"alloc_count\":10}]"
+      expected_output: "1. small (x.go:1)\n   1.0 KB in 10 allocs"
+  constraints: ["Auto-scale bytes to B/KB/MB/GB", "Round to 1 decimal place", "Top 10 only"]
+
+- id: "DEV-124"
+  title: "Synthetic Monitor Config Generator"
+  description: "Generates synthetic monitoring check configurations from endpoint specs"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json, std.time]
+  input_format: "JSON array of {name, url, method, expected_status, check_interval_sec}"
+  output_format: "JSON monitoring configuration file"
+  test_cases:
+    - input: "[{\"name\":\"API Health\",\"url\":\"https://api.example.com/health\",\"method\":\"GET\",\"expected_status\":200,\"check_interval_sec\":60}]"
+      expected_output: "{\"monitors\":[{\"check_interval_sec\":60,\"expected_status\":200,\"method\":\"GET\",\"name\":\"API Health\",\"url\":\"https://api.example.com/health\"}]}"
+    - input: "[{\"name\":\"Login\",\"url\":\"https://app.example.com/login\",\"method\":\"POST\",\"expected_status\":200,\"check_interval_sec\":300}]"
+      expected_output: "{\"monitors\":[{\"check_interval_sec\":300,\"expected_status\":200,\"method\":\"POST\",\"name\":\"Login\",\"url\":\"https://app.example.com/login\"}]}"
+  constraints: ["Keys sorted alphabetically", "Compact JSON output", "Preserve input order"]
+
+- id: "DEV-125"
+  title: "Technical Debt Scorer"
+  description: "Estimates technical debt in developer-hours from code metrics"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json, std.math, std.collections]
+  input_format: "JSON array of {file, complexity, duplication_pct, coverage_pct, age_days}"
+  output_format: "Debt estimate per file and total"
+  test_cases:
+    - input: "[{\"file\":\"legacy.go\",\"complexity\":25,\"duplication_pct\":40,\"coverage_pct\":20,\"age_days\":730}]"
+      expected_output: "legacy.go: 8.5h\nTotal: 8.5h"
+    - input: "[{\"file\":\"clean.go\",\"complexity\":2,\"duplication_pct\":0,\"coverage_pct\":90,\"age_days\":30}]"
+      expected_output: "clean.go: 0.2h\nTotal: 0.2h"
+  constraints: ["Debt = (complexity/10 + duplication_pct/20 + (100-coverage_pct)/20) * (1 + age_days/1000)", "Round to 1 decimal", "Sort by debt descending"]
+
+- id: "DEV-126"
+  title: "Deployment Manifest Generator"
+  description: "Generates a deployment manifest from application configuration"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.time]
+  input_format: "JSON with app_name, version, image, replicas, env_vars {key: value}, port"
+  output_format: "Kubernetes-style JSON deployment manifest"
+  test_cases:
+    - input: "{\"app_name\":\"myapp\",\"version\":\"1.2.0\",\"image\":\"myapp:1.2.0\",\"replicas\":3,\"env_vars\":{\"LOG_LEVEL\":\"info\"},\"port\":8080}"
+      expected_output: "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"myapp\",\"labels\":{\"app\":\"myapp\",\"version\":\"1.2.0\"}},\"spec\":{\"replicas\":3,\"template\":{\"spec\":{\"containers\":[{\"env\":[{\"name\":\"LOG_LEVEL\",\"value\":\"info\"}],\"image\":\"myapp:1.2.0\",\"name\":\"myapp\",\"ports\":[{\"containerPort\":8080}]}]}}}}"
+    - input: "{\"app_name\":\"api\",\"version\":\"2.0.0\",\"image\":\"api:2.0.0\",\"replicas\":1,\"env_vars\":{},\"port\":3000}"
+      expected_output: "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"api\",\"labels\":{\"app\":\"api\",\"version\":\"2.0.0\"}},\"spec\":{\"replicas\":1,\"template\":{\"spec\":{\"containers\":[{\"env\":[],\"image\":\"api:2.0.0\",\"name\":\"api\",\"ports\":[{\"containerPort\":3000}]}]}}}}"
+  constraints: ["env_vars as sorted array of {name, value}", "Compact JSON output", "Keys sorted alphabetically throughout"]
+
+- id: "DEV-127"
+  title: "Dead Dependency Finder"
+  description: "Finds declared dependencies that are never imported in any source file"
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.json, std.collections]
+  input_format: "First line: JSON {dependencies: {pkg: ver}}. Second line: source directory path"
+  output_format: "Lines of 'UNUSED: package' sorted alphabetically, or 'ALL DEPENDENCIES USED'"
+  test_cases:
+    - input: "{\"dependencies\":{\"express\":\"4.18.0\",\"lodash\":\"4.17.21\"}}\n/tmp/project"
+      expected_output: "UNUSED: lodash"
+    - input: "{\"dependencies\":{\"react\":\"18.0.0\"}}\n/tmp/react-project"
+      expected_output: "ALL DEPENDENCIES USED"
+  constraints: ["Scan .js and .ts files for require/import statements", "Package name match is prefix match (e.g. 'lodash' matches 'lodash/get')", "Ignore scoped package scope (@org) in check"]
+
+- id: "DEV-128"
+  title: "Infrastructure Cost Estimator"
+  description: "Estimates monthly cloud infrastructure cost from a resource list"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json, std.math, std.collections]
+  input_format: "JSON array of {resource_type, size_or_count, region} infrastructure items"
+  output_format: "Cost per resource and total monthly estimate"
+  test_cases:
+    - input: "[{\"resource_type\":\"ec2_t3_medium\",\"size_or_count\":2,\"region\":\"us-east-1\"},{\"resource_type\":\"rds_t3_small\",\"size_or_count\":1,\"region\":\"us-east-1\"}]"
+      expected_output: "ec2_t3_medium x2: $67.60/mo\nrds_t3_small x1: $29.20/mo\nTotal: $96.80/mo"
+    - input: "[{\"resource_type\":\"s3_standard_gb\",\"size_or_count\":100,\"region\":\"us-east-1\"}]"
+      expected_output: "s3_standard_gb x100: $2.30/mo\nTotal: $2.30/mo"
+  constraints: ["Use fixed pricing: ec2_t3_medium=$0.0464/hr, rds_t3_small=$0.040/hr, s3_standard_gb=$0.023/GB/mo", "Calculate monthly as 730 hours", "Round to 2 decimal places"]
+
+- id: "DEV-129"
+  title: "Git Hook Script Generator"
+  description: "Generates git hook shell scripts from a JSON configuration"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON with hook_type and commands array"
+  output_format: "Shell script for the git hook"
+  test_cases:
+    - input: "{\"hook_type\":\"pre-commit\",\"commands\":[\"npm run lint\",\"npm test\"]}"
+      expected_output: "#!/bin/sh\nset -e\n\n# pre-commit hook\nnpm run lint\nnpm test\n\necho 'pre-commit checks passed'"
+    - input: "{\"hook_type\":\"commit-msg\",\"commands\":[\"node scripts/validate-msg.js $1\"]}"
+      expected_output: "#!/bin/sh\nset -e\n\n# commit-msg hook\nnode scripts/validate-msg.js $1\n\necho 'commit-msg checks passed'"
+  constraints: ["#!/bin/sh shebang first", "set -e after shebang", "Comment with hook type", "Final echo on success"]
+
+- id: "DEV-130"
+  title: "Polyglot Project Analyser"
+  description: "Detects languages used in a project and generates a technology stack report"
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.io, std.path, std.collections]
+  input_format: "One file path per line on stdin"
+  output_format: "Technology stack report with languages, frameworks detected, and stats"
+  test_cases:
+    - input: "/tmp/project/main.go\n/tmp/project/package.json\n/tmp/project/requirements.txt\n/tmp/project/Dockerfile"
+      expected_output: "Technology Stack Report\n\nLanguages:\n  Go: 1 file\n  JavaScript: 1 file\n  Python: 1 file\n\nInfrastructure:\n  Docker: yes\n\nTotal files analysed: 4"
+    - input: "/tmp/app/server.py\n/tmp/app/client.js"
+      expected_output: "Technology Stack Report\n\nLanguages:\n  JavaScript: 1 file\n  Python: 1 file\n\nInfrastructure:\n  Docker: no\n\nTotal files analysed: 2"
+  constraints: ["Detect by extension: .go=Go, .py=Python, .js=JavaScript, .ts=TypeScript, .rs=Rust, .java=Java", "Infrastructure: Dockerfile=Docker, docker-compose.yml=Docker Compose, terraform.tf=Terraform", "Sort languages alphabetically"]

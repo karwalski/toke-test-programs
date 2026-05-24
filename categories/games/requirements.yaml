@@ -1,0 +1,1847 @@
+- id: "GAM-001"
+  title: "Blackjack Hand Evaluator"
+  description: "Evaluate a blackjack hand and determine its total value, handling aces as 1 or 11 to avoid busting."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Space-separated card values on a single line (e.g. A 7 K)"
+  output_format: "Integer total followed by 'Bust' if over 21, otherwise 'Safe'"
+  test_cases:
+    - input: "A 7 K"
+      expected_output: "18 Safe"
+    - input: "A A 9"
+      expected_output: "21 Safe"
+    - input: "K Q 5"
+      expected_output: "25 Bust"
+  constraints: ["Must read from stdin", "Face cards count as 10", "Aces counted optimally"]
+
+- id: "GAM-002"
+  title: "Poker Hand Classifier"
+  description: "Classify a five-card poker hand into its category (Royal Flush, Straight Flush, Four of a Kind, etc.)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Five space-separated cards in rank+suit format (e.g. AS KS QS JS TS)"
+  output_format: "Hand category name"
+  test_cases:
+    - input: "AS KS QS JS TS"
+      expected_output: "Royal Flush"
+    - input: "2H 2D 2C 2S 5H"
+      expected_output: "Four of a Kind"
+    - input: "3H 3D 5C 5S 5H"
+      expected_output: "Full House"
+  constraints: ["Must read from stdin", "Suits: H D C S", "Ranks: 2-9 T J Q K A"]
+
+- id: "GAM-003"
+  title: "War Card Game Simulator"
+  description: "Simulate a full game of War between two players, dealing a shuffled deck and playing rounds until one player wins all cards."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Integer seed on first line"
+  output_format: "Round-by-round results and final winner"
+  test_cases:
+    - input: "42"
+      expected_output: "Player 1 wins after 47 rounds"
+    - input: "7"
+      expected_output: "Player 2 wins after 31 rounds"
+  constraints: ["Must read from stdin", "Use seed for deterministic shuffle", "Handle war ties correctly"]
+
+- id: "GAM-004"
+  title: "Tic-Tac-Toe State Checker"
+  description: "Given a tic-tac-toe board state, determine if there is a winner, a draw, or the game is still ongoing."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Three lines of three characters each (X, O, or .)"
+  output_format: "'X wins', 'O wins', 'Draw', or 'Ongoing'"
+  test_cases:
+    - input: "XOX\nXXO\nOXX"
+      expected_output: "X wins"
+    - input: "XOX\nOXO\nOXO"
+      expected_output: "Draw"
+    - input: "X..\nOO.\nX.."
+      expected_output: "Ongoing"
+  constraints: ["Must read from stdin", "Board is always 3x3"]
+
+- id: "GAM-005"
+  title: "Tic-Tac-Toe AI (Minimax)"
+  description: "Play tic-tac-toe against a minimax AI. Accept a board state and whose turn it is, output the AI's best move."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Three lines of board state then a line 'X' or 'O' indicating AI's turn"
+  output_format: "Row and column of best move (0-indexed, space-separated)"
+  test_cases:
+    - input: "XOX\nOO.\nX..\nO"
+      expected_output: "1 2"
+    - input: "...\n...\n...\nX"
+      expected_output: "1 1"
+  constraints: ["Must read from stdin", "AI must play optimally", "Row then column"]
+
+- id: "GAM-006"
+  title: "Connect Four Move Validator"
+  description: "Given a Connect Four board and a proposed column move, determine if the move is valid and what row the piece would land in."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "6 lines of 7 characters (. R Y), then a column number (0-6)"
+  output_format: "'Valid row N' or 'Invalid'"
+  test_cases:
+    - input: ".......\n.......\n.......\n.......\n.......\n.RRYY..\n3"
+      expected_output: "Valid row 4"
+    - input: "RRRRRRR\nYYYYYYY\nRRRRRRR\nYYYYYYY\nRRRRRRR\nYYYYYYY\n2"
+      expected_output: "Invalid"
+  constraints: ["Must read from stdin", "Board is 6 rows x 7 cols", "Bottom row is row 5"]
+
+- id: "GAM-007"
+  title: "Connect Four Win Detector"
+  description: "Detect if a Connect Four board has a winner, checking all horizontal, vertical, and diagonal lines."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "6 lines of 7 characters (. R Y)"
+  output_format: "'R wins', 'Y wins', or 'No winner'"
+  test_cases:
+    - input: ".......\n.......\n.......\n.......\nRRR....\nRRRR..."
+      expected_output: "R wins"
+    - input: ".......\n.......\n.......\n.......\n.......\n......."
+      expected_output: "No winner"
+  constraints: ["Must read from stdin", "Four in a row in any direction wins"]
+
+- id: "GAM-008"
+  title: "Chess Piece Move Generator"
+  description: "Given a chess piece type and its position on an empty board, list all squares it can legally move to."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Piece type (K Q R B N P) and position (e.g. e4) on one line"
+  output_format: "Sorted list of reachable squares, one per line"
+  test_cases:
+    - input: "N e4"
+      expected_output: "c3\nc5\nd2\nd6\nf2\nf6\ng3\ng5"
+    - input: "K a1"
+      expected_output: "a2\nb1\nb2"
+  constraints: ["Must read from stdin", "Board is 8x8 a1-h8", "Empty board assumed"]
+
+- id: "GAM-009"
+  title: "Chess Material Evaluator"
+  description: "Evaluate the material balance of a chess position from FEN notation, returning the score difference (positive = white advantage)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str]
+  input_format: "FEN string (piece placement section only)"
+  output_format: "Integer material score (white minus black)"
+  test_cases:
+    - input: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+      expected_output: "0"
+    - input: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKN1R"
+      expected_output: "-3"
+  constraints: ["Must read from stdin", "Q=9 R=5 B=3 N=3 P=1", "King has no material value"]
+
+- id: "GAM-010"
+  title: "Sudoku Validator"
+  description: "Validate whether a completed 9x9 sudoku grid is a valid solution."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "9 lines of 9 digits (1-9)"
+  output_format: "'Valid' or 'Invalid'"
+  test_cases:
+    - input: "534678912\n672195348\n198342567\n859761423\n426853791\n713924856\n961537284\n287419635\n345286179"
+      expected_output: "Valid"
+    - input: "534678912\n672195348\n198342567\n859761423\n426853791\n713924856\n961537284\n287419635\n345286178"
+      expected_output: "Invalid"
+  constraints: ["Must read from stdin", "Check rows, columns, and 3x3 boxes"]
+
+- id: "GAM-011"
+  title: "Sudoku Solver"
+  description: "Solve a 9x9 sudoku puzzle using backtracking, outputting the completed grid."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "9 lines of 9 characters (1-9 or . for empty)"
+  output_format: "9 lines of 9 digits representing the solution"
+  test_cases:
+    - input: "53..7....\n6..195...\n.98....6.\n8...6...3\n4..8.3..1\n7...2...6\n.6....28.\n...419..5\n....8..79"
+      expected_output: "534678912\n672195348\n198342567\n859761423\n426853791\n713924856\n961537284\n287419635\n345286179"
+    - input: ".........\n.........\n.........\n.........\n.........\n.........\n.........\n.........\n........."
+      expected_output: "123456789\n456789123\n789123456\n214365897\n365897214\n897214365\n531642978\n642978531\n978531642"
+  constraints: ["Must read from stdin", "Exactly one solution guaranteed"]
+
+- id: "GAM-012"
+  title: "N-Queens Solver"
+  description: "Find all solutions to the N-Queens problem for a given board size N."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Single integer N"
+  output_format: "Number of solutions on first line, then each solution as N space-separated column positions"
+  test_cases:
+    - input: "4"
+      expected_output: "2\n2 4 1 3\n3 1 4 2"
+    - input: "1"
+      expected_output: "1\n1"
+  constraints: ["Must read from stdin", "N between 1 and 12", "Solutions sorted lexicographically"]
+
+- id: "GAM-013"
+  title: "Tower of Hanoi Solver"
+  description: "Output the sequence of moves to solve the Tower of Hanoi puzzle for N disks."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str]
+  input_format: "Integer N (number of disks)"
+  output_format: "One move per line in format 'Move disk D from peg X to peg Y'"
+  test_cases:
+    - input: "2"
+      expected_output: "Move disk 1 from peg A to peg C\nMove disk 2 from peg A to peg B\nMove disk 1 from peg C to peg B"
+    - input: "3"
+      expected_output: "Move disk 1 from peg A to peg C\nMove disk 2 from peg A to peg B\nMove disk 1 from peg C to peg B\nMove disk 3 from peg A to peg C\nMove disk 1 from peg B to peg A\nMove disk 2 from peg B to peg C\nMove disk 1 from peg A to peg C"
+  constraints: ["Must read from stdin", "N between 1 and 15", "Pegs labelled A B C"]
+
+- id: "GAM-014"
+  title: "Hangman Game Engine"
+  description: "Run one round of hangman: given a word and a sequence of guessed letters, output the masked word and remaining lives."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Word on first line, guessed letters space-separated on second line"
+  output_format: "Masked word (underscores for unguessed) then remaining lives (start 6, lose 1 per wrong guess)"
+  test_cases:
+    - input: "PYTHON\nP Y O"
+      expected_output: "P_T_ON\n5"
+    - input: "HELLO\nA B C D"
+      expected_output: "_____\n2"
+  constraints: ["Must read from stdin", "Uppercase letters only", "6 starting lives"]
+
+- id: "GAM-015"
+  title: "Wordle Feedback Generator"
+  description: "Given a target word and a guess, output Wordle-style feedback: G (green), Y (yellow), B (black/grey) for each letter."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Target word on first line, guess on second line (both 5 uppercase letters)"
+  output_format: "5-character feedback string using G Y B"
+  test_cases:
+    - input: "CRANE\nSLATE"
+      expected_output: "BBGBB"
+    - input: "CRANE\nCRANE"
+      expected_output: "GGGGG"
+    - input: "CRANE\nCAREL"
+      expected_output: "GYBGB"
+  constraints: ["Must read from stdin", "Yellow means letter in word but wrong position", "Handle duplicate letters correctly"]
+
+- id: "GAM-016"
+  title: "Wordle Solver"
+  description: "Given a list of previous guesses with their feedback, output the best next guess from a provided word list."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Word list (one per line), blank line, then guess:feedback pairs one per line"
+  output_format: "Best next guess word"
+  test_cases:
+    - input: "CRANE\nSLATE\nPOUND\n\nCRANE:BBGBB"
+      expected_output: "SLATE"
+    - input: "CRANE\nSLATE\n\n"
+      expected_output: "CRANE"
+  constraints: ["Must read from stdin", "Maximise information entropy", "Output single word"]
+
+- id: "GAM-017"
+  title: "Anagram Finder"
+  description: "Given a word, find all anagrams of it within a provided dictionary."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Target word on first line, dictionary words one per line after"
+  output_format: "All anagrams sorted alphabetically, one per line"
+  test_cases:
+    - input: "LISTEN\nENLIST\nTINSEL\nSILENT\nHELLO\nINLETS"
+      expected_output: "ENLIST\nINLETS\nSILENT\nTINSEL"
+    - input: "CAT\nACT\nTAC\nDOG\nATC"
+      expected_output: "ACT\nATC\nTAC"
+  constraints: ["Must read from stdin", "Case insensitive", "Exclude the word itself"]
+
+- id: "GAM-018"
+  title: "Anagram Chain Builder"
+  description: "Given a list of words, find the longest chain where each word is an anagram of the previous."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Words one per line"
+  output_format: "Longest chain words space-separated"
+  test_cases:
+    - input: "LISTEN\nSILENT\nENLIST\nCAT\nACT\nDOG"
+      expected_output: "LISTEN SILENT ENLIST"
+    - input: "ABC\nBCA\nCAB\nXYZ"
+      expected_output: "ABC BCA CAB"
+  constraints: ["Must read from stdin", "Each consecutive pair must be anagrams", "Output first longest found"]
+
+- id: "GAM-019"
+  title: "Yahtzee Scorer"
+  description: "Given five dice values and a scoring category, calculate the score for that category in Yahtzee."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Five dice values space-separated on first line, category name on second line"
+  output_format: "Integer score"
+  test_cases:
+    - input: "1 1 1 1 1\nYahtzee"
+      expected_output: "50"
+    - input: "1 2 3 4 5\nSmall Straight"
+      expected_output: "30"
+    - input: "3 3 3 2 2\nFull House"
+      expected_output: "25"
+  constraints: ["Must read from stdin", "Categories: Ones Twos Threes Fours Fives Sixes Three of a Kind Four of a Kind Full House Small Straight Large Straight Yahtzee Chance"]
+
+- id: "GAM-020"
+  title: "Yahtzee Optimal Category Selector"
+  description: "Given five dice values and a list of remaining scoring categories, recommend the optimal category to score."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Five dice values on first line, remaining categories one per line"
+  output_format: "Best category name"
+  test_cases:
+    - input: "5 5 5 5 5\nYahtzee\nChance\nFives"
+      expected_output: "Yahtzee"
+    - input: "1 2 3 4 6\nSmall Straight\nLarge Straight\nChance"
+      expected_output: "Small Straight"
+  constraints: ["Must read from stdin", "Maximise expected score", "Output single category name"]
+
+- id: "GAM-021"
+  title: "Craps Roll Evaluator"
+  description: "Evaluate the outcome of a craps roll given the current game state (come-out or point phase)."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str]
+  input_format: "Phase ('comeout' or point number), then two dice values space-separated"
+  output_format: "'Win', 'Lose', or 'Point N' indicating the new point"
+  test_cases:
+    - input: "comeout\n7 4"
+      expected_output: "Win"
+    - input: "comeout\n2 1"
+      expected_output: "Lose"
+    - input: "comeout\n4 2"
+      expected_output: "Point 6"
+    - input: "6\n3 3"
+      expected_output: "Win"
+  constraints: ["Must read from stdin", "Natural (7,11) wins on come-out", "Craps (2,3,12) loses on come-out"]
+
+- id: "GAM-022"
+  title: "24-Game Solver"
+  description: "Given four numbers, determine if 24 can be made using each exactly once with +, -, *, / and parentheses."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "Four space-separated integers (1-13)"
+  output_format: "An expression equalling 24, or 'Impossible'"
+  test_cases:
+    - input: "4 1 8 7"
+      expected_output: "(8 - 4) * (7 - 1)"
+    - input: "1 1 1 1"
+      expected_output: "Impossible"
+    - input: "3 3 8 8"
+      expected_output: "8 / (3 - 8 / 3)"
+  constraints: ["Must read from stdin", "Use each number exactly once", "Division is real-valued"]
+
+- id: "GAM-023"
+  title: "Mastermind Code Breaker"
+  description: "Play Mastermind: given a secret code and a guess, return the number of exact (black) and colour-only (white) matches."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Secret code on first line, guess on second line (4 digits 1-6 each)"
+  output_format: "Black pegs count and white pegs count space-separated"
+  test_cases:
+    - input: "1234\n1256"
+      expected_output: "2 0"
+    - input: "1234\n4321"
+      expected_output: "0 4"
+    - input: "1111\n1234"
+      expected_output: "1 0"
+  constraints: ["Must read from stdin", "Black = right colour right position", "White = right colour wrong position"]
+
+- id: "GAM-024"
+  title: "Mastermind AI Solver"
+  description: "Implement the Knuth algorithm to solve Mastermind, outputting each guess and the sequence of guesses to crack a code."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Secret 4-digit code (digits 1-6)"
+  output_format: "Each guess on its own line followed by response, then 'Solved in N guesses'"
+  test_cases:
+    - input: "1234"
+      expected_output: "1122 1B0W\n1344 1B1W\n1234 4B0W\nSolved in 3 guesses"
+    - input: "6666"
+      expected_output: "1122 0B0W\n3344 0B0W\n5566 0B2W\n5665 0B2W\n6556 0B2W\n6666 4B0W\nSolved in 6 guesses"
+  constraints: ["Must read from stdin", "Knuth algorithm guarantees <=5 guesses", "Output each guess + response"]
+
+- id: "GAM-025"
+  title: "Text Adventure Engine"
+  description: "Run a simple text adventure from a map definition file, processing movement commands and tracking player state."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.json]
+  input_format: "JSON map on first block (rooms with exits and items), blank line, then commands one per line"
+  output_format: "Room description and available exits after each command"
+  test_cases:
+    - input: "{\"start\":\"hall\",\"rooms\":{\"hall\":{\"desc\":\"A dark hall\",\"exits\":{\"north\":\"garden\"}},\"garden\":{\"desc\":\"A sunny garden\",\"exits\":{\"south\":\"hall\"}}}}\n\nnorth\nlook"
+      expected_output: "A sunny garden\nExits: south\nA sunny garden\nExits: south"
+    - input: "{\"start\":\"hall\",\"rooms\":{\"hall\":{\"desc\":\"A dark hall\",\"exits\":{}}}}\n\nnorth"
+      expected_output: "No exit that way."
+  constraints: ["Must read from stdin", "Commands: north south east west up down look", "Track visited rooms"]
+
+- id: "GAM-026"
+  title: "Dungeon Room Generator"
+  description: "Procedurally generate a dungeon floor layout given dimensions and a seed, outputting an ASCII map."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Width height seed on one line"
+  output_format: "ASCII dungeon map using # for walls and . for floor"
+  test_cases:
+    - input: "20 10 42"
+      expected_output: "####################\n#....#.............#\n#....#.............#\n#....###############\n#..................#\n#..................#\n########.####.######\n#..................#\n#..................#\n####################"
+    - input: "10 5 1"
+      expected_output: "##########\n#........#\n#........#\n#........#\n##########"
+  constraints: ["Must read from stdin", "Rooms must be connected", "Border always walls"]
+
+- id: "GAM-027"
+  title: "A* Pathfinder"
+  description: "Find the shortest path between two points on an ASCII grid using A* search."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Grid lines (# wall, . floor), blank line, then 'start row col' and 'end row col'"
+  output_format: "Path length then grid with path marked as *, or 'No path'"
+  test_cases:
+    - input: ".....\n.###.\n.....\n\nstart 0 0\nend 2 4"
+      expected_output: "8\n*....\n*###.\n****."
+    - input: "#####\n#...#\n#####\n\nstart 1 1\nend 1 3"
+      expected_output: "2\n#####\n#***#\n#####"
+  constraints: ["Must read from stdin", "4-directional movement", "Manhattan distance heuristic"]
+
+- id: "GAM-028"
+  title: "Snake Game Line Scorer"
+  description: "Given a sequence of snake moves on a grid and food positions, simulate the game and return the final score."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid size on first line, food positions one per line, blank line, move sequence (UDLR)"
+  output_format: "Final score and 'Game Over' or 'Alive'"
+  test_cases:
+    - input: "5\n2 2\n\nRRDDLL"
+      expected_output: "0 Alive"
+    - input: "5\n1 1\n\nRD"
+      expected_output: "1 Alive"
+  constraints: ["Must read from stdin", "Snake starts at 0,0 facing right", "Score 1 per food eaten"]
+
+- id: "GAM-029"
+  title: "Tetris Line Clearer"
+  description: "Given a Tetris board state, identify and remove completed lines, returning the cleared board and score."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "10 lines of 10 characters (. or X representing empty or filled)"
+  output_format: "Lines cleared count, then updated board"
+  test_cases:
+    - input: "..........\n..........\n..........\n..........\n..........\n..........\n..........\n..........\n..........\nXXXXXXXXXX"
+      expected_output: "1\n..........\n..........\n..........\n..........\n..........\n..........\n..........\n..........\n..........\n.........."
+    - input: "XXXXXXXXXX\nXXXXXXXXXX\n.........."
+      expected_output: "2\n..........\n..........\n.........."
+  constraints: ["Must read from stdin", "Full rows cleared and replaced with empty row at top", "Board is exactly 10 wide"]
+
+- id: "GAM-030"
+  title: "Tetris Piece Placer"
+  description: "Given a Tetris board and a piece type and column, determine the lowest valid row the piece lands in."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Board lines (. or X), blank line, piece type (I O T S Z J L) and column"
+  output_format: "Row number where piece top-left lands (0-indexed), or 'Invalid'"
+  test_cases:
+    - input: "..........\n..........\n..........\n..........\n.......X..\nXXXXXXXX..\n\nI 0"
+      expected_output: "2"
+    - input: "..........\nXXXXXXXXXX\n\nO 0"
+      expected_output: "Invalid"
+  constraints: ["Must read from stdin", "Piece falls to lowest valid position", "Gravity applied"]
+
+- id: "GAM-031"
+  title: "Game of Life Step"
+  description: "Given a Game of Life grid, compute the next generation according to Conway's rules."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid lines of . (dead) and * (alive)"
+  output_format: "Next generation grid"
+  test_cases:
+    - input: ".....\n.***.\n....."
+      expected_output: "..*..\n..*..\n..*.."
+    - input: ".**\n.**\n..."
+      expected_output: ".**\n.**\n..."
+  constraints: ["Must read from stdin", "Standard Conway rules", "Grid edges treated as dead"]
+
+- id: "GAM-032"
+  title: "Game of Life Oscillator Detector"
+  description: "Run Game of Life for up to 100 generations and detect if the pattern is stable, oscillating, or chaotic."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid lines of . and *"
+  output_format: "'Stable', 'Oscillator period N', or 'Chaotic'"
+  test_cases:
+    - input: ".....\n.***.\n....."
+      expected_output: "Oscillator period 2"
+    - input: ".**\n.**\n..."
+      expected_output: "Stable"
+  constraints: ["Must read from stdin", "Check up to 100 generations", "Period reported for oscillators"]
+
+- id: "GAM-033"
+  title: "Predator-Prey Simulator"
+  description: "Simulate a predator-prey ecosystem using Lotka-Volterra equations for N time steps and report population at each step."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Initial prey, initial predators, alpha, beta, gamma, delta, steps (space-separated)"
+  output_format: "Step number, prey count, predator count (one per line, integer rounded)"
+  test_cases:
+    - input: "100 10 1.1 0.4 0.4 0.1 3"
+      expected_output: "0 100 10\n1 73 14\n2 44 15\n3 27 14"
+    - input: "50 5 1.0 0.1 0.5 0.1 2"
+      expected_output: "0 50 5\n1 44 7\n2 36 9"
+  constraints: ["Must read from stdin", "Euler method integration", "Round populations to nearest integer"]
+
+- id: "GAM-034"
+  title: "Monte Carlo Pi Estimator"
+  description: "Estimate the value of pi using Monte Carlo simulation with a given number of random samples and seed."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math, std.crypto]
+  input_format: "Number of samples and seed space-separated"
+  output_format: "Pi estimate to 6 decimal places"
+  test_cases:
+    - input: "1000000 42"
+      expected_output: "3.141600"
+    - input: "100 7"
+      expected_output: "3.160000"
+  constraints: ["Must read from stdin", "Use seed for deterministic results", "6 decimal places"]
+
+- id: "GAM-035"
+  title: "Slot Machine Simulator"
+  description: "Simulate N spins of a 3-reel slot machine and report total payout given a bet amount and seed."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math, std.crypto]
+  input_format: "Number of spins, bet per spin, seed (space-separated)"
+  output_format: "Total payout and net gain/loss"
+  test_cases:
+    - input: "100 1 42"
+      expected_output: "Total payout: 87\nNet: -13"
+    - input: "10 5 1"
+      expected_output: "Total payout: 35\nNet: -15"
+  constraints: ["Must read from stdin", "7 symbols: cherry lemon orange plum bell bar sevens", "Three of a kind pays 10x bet"]
+
+- id: "GAM-036"
+  title: "Cricket Score Calculator"
+  description: "Parse a ball-by-ball cricket scorecard and compute team total, extras, and wickets."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Ball-by-ball events one per line (0-6, W for wicket, nb for no-ball, wd for wide)"
+  output_format: "Total/Wickets then Extras breakdown"
+  test_cases:
+    - input: "4\n6\n1\nW\n0\n2\nnb\nwd"
+      expected_output: "13/1\nExtras: 2 (1nb 1wd)"
+    - input: "6\n6\n6\n6\n6"
+      expected_output: "30/0\nExtras: 0"
+  constraints: ["Must read from stdin", "No-balls and wides add 1 extra run each", "Wickets do not add to total"]
+
+- id: "GAM-037"
+  title: "Tournament Bracket Generator"
+  description: "Generate a single-elimination tournament bracket for N teams and display it in ASCII format."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Team names one per line"
+  output_format: "ASCII bracket showing all matchups"
+  test_cases:
+    - input: "Alpha\nBeta\nGamma\nDelta"
+      expected_output: "Alpha ─┐\n       ├─ TBD ─┐\nBeta  ─┘       ├─ WINNER\nGamma ─┐       │\n       ├─ TBD ─┘\nDelta ─┘"
+    - input: "Team1\nTeam2"
+      expected_output: "Team1 ─┐\n       ├─ WINNER\nTeam2 ─┘"
+  constraints: ["Must read from stdin", "N must be power of 2", "Bye entries if needed"]
+
+- id: "GAM-038"
+  title: "Resource Management Sim"
+  description: "Simulate a simple resource management turn-based game: collect, spend, and track resources over N turns."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Initial resources on first line (gold wood food), then actions one per line (collect TYPE, spend TYPE AMOUNT, build STRUCTURE)"
+  output_format: "Resource state after each action"
+  test_cases:
+    - input: "100 50 30\ncollect gold\nspend gold 20\nbuild farm"
+      expected_output: "Gold:110 Wood:50 Food:30\nGold:90 Wood:50 Food:30\nGold:90 Wood:40 Food:50"
+    - input: "0 0 0\ncollect wood\ncollect food"
+      expected_output: "Gold:0 Wood:10 Food:0\nGold:0 Wood:10 Food:10"
+  constraints: ["Must read from stdin", "Collect adds 10 of given resource", "Build farm costs 10 wood produces +20 food"]
+
+- id: "GAM-039"
+  title: "Trading Simulator"
+  description: "Simulate a simple stock trading game given price history and a sequence of buy/sell commands."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Prices space-separated on first line, starting cash, then commands (buy N, sell N, hold)"
+  output_format: "Portfolio value at end of each day"
+  test_cases:
+    - input: "10 12 8 15 11\n100\nbuy 5\nhold\nsell 5\nbuy 3\nhold"
+      expected_output: "Day 1: $100.00\nDay 2: $110.00\nDay 3: $90.00\nDay 4: $125.00\nDay 5: $92.00"
+    - input: "5 10\n50\nbuy 10\nsell 10"
+      expected_output: "Day 1: $0.00\nDay 2: $100.00"
+  constraints: ["Must read from stdin", "Cannot go negative cash", "Report 2 decimal places"]
+
+- id: "GAM-040"
+  title: "Word Ladder Solver"
+  description: "Find the shortest word ladder between two words, changing one letter at a time, using a provided dictionary."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Start word on first line, end word on second line, then dictionary words one per line"
+  output_format: "Words in ladder space-separated, or 'No ladder'"
+  test_cases:
+    - input: "CAT\nDOG\nCAT\nCOT\nCOG\nDOG\nBAT"
+      expected_output: "CAT COT COG DOG"
+    - input: "ABC\nXYZ\nABC\nXYZ"
+      expected_output: "No ladder"
+  constraints: ["Must read from stdin", "BFS for shortest path", "Same length words only"]
+
+- id: "GAM-041"
+  title: "Minesweeper Board Generator"
+  description: "Generate a Minesweeper board given grid dimensions, mine count, and seed, then display with mine counts revealed."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Rows cols mines seed (space-separated)"
+  output_format: "Board with digits for mine counts and M for mines"
+  test_cases:
+    - input: "5 5 3 42"
+      expected_output: "00011\n00012\n0001M\n0001M\n001M2"
+    - input: "3 3 1 1"
+      expected_output: "110\n1M1\n110"
+  constraints: ["Must read from stdin", "Use seed for mine placement", "Standard 8-neighbour counting"]
+
+- id: "GAM-042"
+  title: "Minesweeper Solver"
+  description: "Given a partially revealed Minesweeper board, identify all cells that are definitely safe or definitely mines using constraint logic."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Board lines with digits (revealed), ? (unrevealed), M (known mine)"
+  output_format: "List of cells: 'SAFE row col' or 'MINE row col', or 'No deductions'"
+  test_cases:
+    - input: "1??\n?1?\n??1"
+      expected_output: "No deductions"
+    - input: "1M1\n1?1\n111"
+      expected_output: "SAFE 1 1"
+  constraints: ["Must read from stdin", "Only certain deductions", "0-indexed coordinates"]
+
+- id: "GAM-043"
+  title: "Boggle Word Finder"
+  description: "Find all valid words of length 3 or more in a 4x4 Boggle grid given a dictionary."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "4 lines of 4 uppercase characters, blank line, then dictionary words one per line"
+  output_format: "Found words sorted by length descending then alphabetically, one per line"
+  test_cases:
+    - input: "SERS\nPATI\nNEAT\nEWIS\n\nSEAT\nNEAT\nSET\nPAN\nPAT\nTIN\nEAT"
+      expected_output: "SEAT\nNEAT\nEAT\nPAN\nPAT\nSET\nTIN"
+    - input: "ABCD\nEFGH\nIJKL\nMNOP\n\nABCG\nAB"
+      expected_output: "ABCG"
+  constraints: ["Must read from stdin", "Adjacent includes diagonals", "No cell reuse in single word"]
+
+- id: "GAM-044"
+  title: "Scrabble Score Calculator"
+  description: "Calculate the Scrabble score for a word given standard letter values and optional multiplier squares."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Word on first line, multiplier squares as 'pos type' pairs (DL TL DW TW) one per line"
+  output_format: "Total score"
+  test_cases:
+    - input: "QUIZ\n0 DL\n1 TW"
+      expected_output: "62"
+    - input: "CAT\n"
+      expected_output: "5"
+  constraints: ["Must read from stdin", "Standard Scrabble values", "Apply letter then word multipliers"]
+
+- id: "GAM-045"
+  title: "Crossword Validator"
+  description: "Validate that all words in a completed crossword grid match a provided answer list."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid lines (letters and # for black squares), blank line, word list one per line"
+  output_format: "'Valid' or list of invalid entries"
+  test_cases:
+    - input: "CAT\n#A#\nSAT\n\nCAT\nSAT\nAA"
+      expected_output: "Invalid: AA"
+    - input: "CAT\n#A#\nSAT\n\nCAT\nSAT"
+      expected_output: "Valid"
+  constraints: ["Must read from stdin", "Words run horizontally or vertically", "Minimum word length 2"]
+
+- id: "GAM-046"
+  title: "Maze Generator (Recursive Backtracking)"
+  description: "Generate a perfect maze using recursive backtracking given width, height, and a seed."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Width height seed (space-separated)"
+  output_format: "ASCII maze with # walls and spaces for passages"
+  test_cases:
+    - input: "5 5 42"
+      expected_output: "#########\n#   #   #\n# ### # #\n# #   # #\n# # ### #\n# #   # #\n# ##### #\n#       #\n#########"
+    - input: "3 3 1"
+      expected_output: "#######\n#     #\n##### #\n#     #\n#######"
+  constraints: ["Must read from stdin", "Perfect maze: exactly one path between any two cells", "Use seed for determinism"]
+
+- id: "GAM-047"
+  title: "Maze Solver"
+  description: "Find the solution path through a maze from S to E using BFS."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Maze lines (# walls, space passages, S start, E end)"
+  output_format: "Maze with solution path marked as *, or 'No solution'"
+  test_cases:
+    - input: "#####\n#S  #\n### #\n# E #\n#####"
+      expected_output: "#####\n#S**#\n###*#\n# E*#\n#####"
+    - input: "#####\n#S#E#\n#####"
+      expected_output: "No solution"
+  constraints: ["Must read from stdin", "4-directional movement", "Mark path with *"]
+
+- id: "GAM-048"
+  title: "Number Guessing Game Engine"
+  description: "Simulate a number guessing game: given a secret number and a sequence of guesses, report feedback for each."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Secret number on first line, guesses one per line"
+  output_format: "'Too low', 'Too high', or 'Correct!' for each guess"
+  test_cases:
+    - input: "42\n20\n60\n42"
+      expected_output: "Too low\nToo high\nCorrect!"
+    - input: "1\n1"
+      expected_output: "Correct!"
+  constraints: ["Must read from stdin", "Positive integers only"]
+
+- id: "GAM-049"
+  title: "Battleship Hit Detector"
+  description: "Given a fleet placement and a sequence of shots, report Hit, Miss, or Sunk for each shot."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Ship placements (name startrow startcol endrow endcol) then blank line then shot coordinates"
+  output_format: "'Hit', 'Miss', or 'Sunk SHIPNAME' per shot"
+  test_cases:
+    - input: "Destroyer 0 0 0 1\nCarrier 2 2 2 4\n\n0 0\n1 1\n0 1\n2 2\n2 3\n2 4"
+      expected_output: "Hit\nMiss\nSunk Destroyer\nHit\nHit\nSunk Carrier"
+    - input: "Sub 3 3 5 3\n\n3 3"
+      expected_output: "Hit"
+  constraints: ["Must read from stdin", "Ships are horizontal or vertical", "Track partial hits"]
+
+- id: "GAM-050"
+  title: "Card Memory Game Evaluator"
+  description: "Simulate a card memory/concentration game: given card layout and a sequence of flip pairs, track matches and score."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid size on first line, card layout (values in row-major order), then flip pairs one per line"
+  output_format: "Score and remaining unmatched cards after all flips"
+  test_cases:
+    - input: "4\n1 2 3 4 4 3 2 1 5 6 5 6 7 8 7 8\n0 7\n1 6\n2 5\n3 4"
+      expected_output: "Score: 4\nRemaining: 0"
+    - input: "2\n1 2 1 2\n0 1\n2 3"
+      expected_output: "Score: 2\nRemaining: 0"
+  constraints: ["Must read from stdin", "Match = same value", "Score +1 per matched pair"]
+
+- id: "GAM-051"
+  title: "Dice Probability Calculator"
+  description: "Calculate the probability distribution of the sum when rolling N dice with S sides."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "Number of dice and sides space-separated"
+  output_format: "Each possible sum and its probability as percentage (2 decimal places), one per line"
+  test_cases:
+    - input: "2 6"
+      expected_output: "2: 2.78%\n3: 5.56%\n4: 8.33%\n5: 11.11%\n6: 13.89%\n7: 16.67%\n8: 13.89%\n9: 11.11%\n10: 8.33%\n11: 5.56%\n12: 2.78%"
+    - input: "1 6"
+      expected_output: "1: 16.67%\n2: 16.67%\n3: 16.67%\n4: 16.67%\n5: 16.67%\n6: 16.67%"
+  constraints: ["Must read from stdin", "Dynamic programming approach", "2 decimal places"]
+
+- id: "GAM-052"
+  title: "Fibonacci Nim Solver"
+  description: "Determine the optimal move in a Nim game where allowed take amounts are Fibonacci numbers."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "Number of stones in a pile"
+  output_format: "Optimal stones to take, or 'Losing position'"
+  test_cases:
+    - input: "10"
+      expected_output: "2"
+    - input: "1"
+      expected_output: "1"
+    - input: "3"
+      expected_output: "Losing position"
+  constraints: ["Must read from stdin", "Fibonacci numbers: 1,2,3,5,8,13...", "Zeckendorf representation used"]
+
+- id: "GAM-053"
+  title: "Conway's Soldiers Checker"
+  description: "Determine if a given peg solitaire configuration can be simplified, checking for valid jump sequences."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid of pegs (. empty, O peg), blank line, then sequence of jump moves"
+  output_format: "'Valid' or 'Invalid move at step N'"
+  test_cases:
+    - input: "O..\n.OO\n...\n\n1,0 right"
+      expected_output: "Invalid move at step 1"
+    - input: "OOO\n...\n...\n\n0,1 down"
+      expected_output: "Valid"
+  constraints: ["Must read from stdin", "Jumps: left right up down", "Remove jumped peg"]
+
+- id: "GAM-054"
+  title: "Fifteen Puzzle Solver"
+  description: "Solve a 4x4 sliding tile puzzle (15-puzzle) using A* and output the sequence of moves."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "4 lines of 4 space-separated numbers (0 = blank)"
+  output_format: "Sequence of slide directions (U D L R) or 'Unsolvable'"
+  test_cases:
+    - input: "1 2 3 4\n5 6 7 8\n9 10 11 12\n13 14 0 15"
+      expected_output: "R"
+    - input: "1 2 3 4\n5 6 7 8\n9 10 11 12\n13 15 14 0"
+      expected_output: "Unsolvable"
+  constraints: ["Must read from stdin", "Manhattan distance heuristic", "Output move for blank tile"]
+
+- id: "GAM-055"
+  title: "Roulette Simulator"
+  description: "Simulate N roulette spins given bets and a seed, reporting outcome of each spin and cumulative balance."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math, std.crypto]
+  input_format: "Starting balance on first line, seed on second line, then bets (type amount) one per line"
+  output_format: "Spin result, win/loss, running balance per spin"
+  test_cases:
+    - input: "100\n42\nred 10\nblack 20\nnumber17 5"
+      expected_output: "Spin 1: 23 Red - Win $10 - Balance: $110\nSpin 2: 36 Red - Lose $20 - Balance: $90\nSpin 3: 17 Green - Win $175 - Balance: $265"
+    - input: "50\n1\neven 25"
+      expected_output: "Spin 1: 7 Red - Lose $25 - Balance: $25"
+  constraints: ["Must read from stdin", "European roulette 0-36", "Red/black pays 1:1, number pays 35:1"]
+
+- id: "GAM-056"
+  title: "Bulls and Cows"
+  description: "Play Bulls and Cows (Mastermind variant with digits): evaluate guesses against a 4-digit secret with no repeated digits."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Secret 4-digit number on first line, guesses one per line"
+  output_format: "'Na Nb' format per guess where a=bulls b=cows"
+  test_cases:
+    - input: "1807\n7810\n3451"
+      expected_output: "1A3B\n0A0B"
+    - input: "4271\n4271"
+      expected_output: "4A0B"
+  constraints: ["Must read from stdin", "No repeated digits in secret", "Bulls=right position, Cows=wrong position"]
+
+- id: "GAM-057"
+  title: "Rock Paper Scissors Tournament"
+  description: "Simulate a round-robin Rock Paper Scissors tournament between N players with given strategies."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Player names and strategies (R P S patterns) one per line, number of rounds"
+  output_format: "Final standings with wins draws losses"
+  test_cases:
+    - input: "Alice RRR\nBob PPP\nCharlie SSS\n3"
+      expected_output: "1. Bob: 2W 0D 1L\n2. Charlie: 1W 0D 2L\n3. Alice: 0W 0D 3L"
+    - input: "X R\nY P\n1"
+      expected_output: "1. Y: 1W 0D 0L\n2. X: 0W 0D 1L"
+  constraints: ["Must read from stdin", "Strategy repeats cyclically", "Sort by wins descending"]
+
+- id: "GAM-058"
+  title: "Simon Says Pattern Evaluator"
+  description: "Given a Simon Says colour sequence and a player's response, evaluate correctness and score."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Target sequence on first line (RGBY letters), player sequence on second line"
+  output_format: "'Correct N' where N is length matched, or 'Wrong at position N'"
+  test_cases:
+    - input: "RGRBYG\nRGRBYG"
+      expected_output: "Correct 6"
+    - input: "RGRB\nRGGB"
+      expected_output: "Wrong at position 3"
+  constraints: ["Must read from stdin", "Positions are 1-indexed", "Case insensitive"]
+
+- id: "GAM-059"
+  title: "Magic Square Validator"
+  description: "Determine if a given NxN grid is a valid magic square (all rows, columns, diagonals sum to same value)."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "N lines of N space-separated integers"
+  output_format: "'Magic square with sum N', or 'Not a magic square'"
+  test_cases:
+    - input: "2 7 6\n9 5 1\n4 3 8"
+      expected_output: "Magic square with sum 15"
+    - input: "1 2 3\n4 5 6\n7 8 9"
+      expected_output: "Not a magic square"
+  constraints: ["Must read from stdin", "Check all rows, columns, and both diagonals", "N between 2 and 9"]
+
+- id: "GAM-060"
+  title: "Othello/Reversi Move Evaluator"
+  description: "Given an Othello board and a proposed move, determine if it is valid and show the resulting board."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "8 lines of 8 characters (. B W), whose turn (B or W), move (row col)"
+  output_format: "Updated board or 'Invalid move'"
+  test_cases:
+    - input: "........\n........\n........\n...WB...\n...BW...\n........\n........\n........\nB\n2 3"
+      expected_output: "........\n........\n...B....\n...BB...\n...BW...\n........\n........\n........"
+    - input: "........\n........\n........\n...WB...\n...BW...\n........\n........\n........\nB\n0 0"
+      expected_output: "Invalid move"
+  constraints: ["Must read from stdin", "Must flip at least one opponent disc", "8-directional scan"]
+
+- id: "GAM-061"
+  title: "Cribbage Hand Scorer"
+  description: "Score a cribbage hand of 4 cards plus a starter card, counting all fifteens, pairs, runs, and flush."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Four hand cards then starter card (space-separated, e.g. 5H 5D 5C JH 5S)"
+  output_format: "Score breakdown and total"
+  test_cases:
+    - input: "5H 5D 5C JH 5S"
+      expected_output: "Fifteens: 8\nPairs: 6\nRuns: 0\nFlush: 0\nNobs: 1\nTotal: 29"
+    - input: "AH 2H 3H 4H 5H"
+      expected_output: "Fifteens: 2\nPairs: 0\nRuns: 5\nFlush: 5\nNobs: 0\nTotal: 12"
+  constraints: ["Must read from stdin", "Cribbage scoring rules", "Nobs = J matching starter suit"]
+
+- id: "GAM-062"
+  title: "Dice Roller with Notation"
+  description: "Parse and evaluate standard dice notation expressions (e.g. 3d6+2, 2d10-1) and return total and individual rolls."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math, std.crypto]
+  input_format: "Dice expression and seed space-separated"
+  output_format: "Individual rolls in brackets then total"
+  test_cases:
+    - input: "3d6+2 42"
+      expected_output: "[4, 3, 6] + 2 = 15"
+    - input: "2d10-1 7"
+      expected_output: "[8, 2] - 1 = 9"
+  constraints: ["Must read from stdin", "Support +/- modifier", "Use seed for deterministic rolls"]
+
+- id: "GAM-063"
+  title: "Chess Clock Timer"
+  description: "Simulate a chess clock given time controls and a sequence of moves with elapsed times, warning when time is low."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Initial time in seconds per player, then alternating move times in seconds"
+  output_format: "After each move: both players' remaining time, flag if someone's time expires"
+  test_cases:
+    - input: "300\n10\n15\n12\n280\n5"
+      expected_output: "White: 290s Black: 300s\nWhite: 290s Black: 285s\nWhite: 278s Black: 285s\nWhite: -2s Black: 285s - White flags!"
+    - input: "60\n30\n30"
+      expected_output: "White: 30s Black: 60s\nWhite: 30s Black: 30s"
+  constraints: ["Must read from stdin", "White moves first", "Flag = time reaches 0"]
+
+- id: "GAM-064"
+  title: "Poker Equity Calculator"
+  description: "Calculate the win/tie/loss probability for two Texas Hold'em hands given community cards using Monte Carlo."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections, std.math, std.crypto]
+  input_format: "Hand1 cards, Hand2 cards, community cards (space-separated, . for unknown), sample count and seed"
+  output_format: "Win% Tie% Loss% for Hand1"
+  test_cases:
+    - input: "AH AD\nKH KD\n. . . . .\n10000 42"
+      expected_output: "Win: 82.51% Tie: 0.46% Lose: 17.03%"
+    - input: "AH KH\n2D 7C\n. . . . .\n10000 1"
+      expected_output: "Win: 64.73% Tie: 0.51% Lose: 34.76%"
+  constraints: ["Must read from stdin", "Monte Carlo simulation", "2 decimal places"]
+
+- id: "GAM-065"
+  title: "Nonogram Row Solver"
+  description: "Given a nonogram row clue and current state, determine all possible completions and mark definite cells."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Row length on first line, clue numbers space-separated on second line, current state (. unknown X filled O empty)"
+  output_format: "Definite cells marked: X for definitely filled, O for definitely empty, . for unknown"
+  test_cases:
+    - input: "10\n3 4\n.........."
+      expected_output: "...X..XXX."
+    - input: "5\n5\n....."
+      expected_output: "XXXXX"
+  constraints: ["Must read from stdin", "Mark only definite cells", "Enumerate all valid placements"]
+
+- id: "GAM-066"
+  title: "Picross Puzzle Validator"
+  description: "Validate a completed picross (nonogram) grid against row and column clues."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid (X filled, O empty), blank line, row clues one per line, blank line, column clues one per line"
+  output_format: "'Valid' or 'Invalid: row N' or 'Invalid: col N' (1-indexed)"
+  test_cases:
+    - input: "XO\nXX\n\n1\n2\n\n2\n1"
+      expected_output: "Valid"
+    - input: "XX\nXO\n\n2\n1\n\n1\n2"
+      expected_output: "Invalid: col 2"
+  constraints: ["Must read from stdin", "Report first invalid row/col found"]
+
+- id: "GAM-067"
+  title: "Nim Strategy Advisor"
+  description: "Implement the Sprague-Grundy theorem for multi-pile Nim, outputting the optimal move or 'Losing position'."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Pile sizes space-separated"
+  output_format: "'Take N from pile M' or 'Losing position'"
+  test_cases:
+    - input: "3 4 5"
+      expected_output: "Take 2 from pile 3"
+    - input: "1 1"
+      expected_output: "Losing position"
+    - input: "7"
+      expected_output: "Take 7 from pile 1"
+  constraints: ["Must read from stdin", "Compute XOR of all piles", "1-indexed pile numbers"]
+
+- id: "GAM-068"
+  title: "Poker Chip Stack Manager"
+  description: "Manage a poker chip stack: given denominations and amounts, calculate optimal breakdown for a given value."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Denominations and counts space-separated on first line (e.g. 100:5 25:10 10:20 5:40 1:100), then amounts to break"
+  output_format: "Chip breakdown for each amount or 'Cannot make amount'"
+  test_cases:
+    - input: "100:5 25:10 10:20 5:40 1:100\n175\n999"
+      expected_output: "175: 1x100 3x25\n999: 9x100 3x25 2x10 4x1"
+    - input: "5:2 1:1\n12"
+      expected_output: "Cannot make amount"
+  constraints: ["Must read from stdin", "Greedy algorithm", "Use exact amounts"]
+
+- id: "GAM-069"
+  title: "Kalah (Mancala) Board Evaluator"
+  description: "Evaluate a Kalah board position and determine valid moves and their resulting board states."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Two lines: player 1 pits (6 numbers), player 2 pits (6 numbers), then stores (p1store p2store), then current player"
+  output_format: "Each valid move with resulting board state"
+  test_cases:
+    - input: "4 4 4 4 4 4\n4 4 4 4 4 4\n0 0\n1"
+      expected_output: "Move 1: 0 4 4 4 4 4 | 5 5 5 5 4 4 | 1 0\nMove 2: 4 0 4 4 4 4 | 5 5 5 5 4 4 | 1 0\nMove 3: 4 4 0 4 4 4 | 5 5 5 5 4 4 | 1 0\nMove 4: 4 4 4 0 4 4 | 5 5 5 5 4 4 | 1 0\nMove 5: 4 4 4 4 0 4 | 5 5 5 5 5 4 | 1 0\nMove 6: 4 4 4 4 4 0 | 5 5 5 5 5 5 | 1 0"
+    - input: "0 0 0 0 0 1\n0 0 0 0 0 0\n23 23\n1"
+      expected_output: "Move 6: 0 0 0 0 0 0 | 0 0 0 0 0 0 | 24 23"
+  constraints: ["Must read from stdin", "Sowing rules apply", "Extra turn if last seed lands in store"]
+
+- id: "GAM-070"
+  title: "Countdown Numbers Game Solver"
+  description: "Solve the Countdown numbers game: reach a target using 6 numbers with +, -, *, / (each used at most once)."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "Target number on first line, six available numbers space-separated"
+  output_format: "Expression equalling or closest to target, with score"
+  test_cases:
+    - input: "952\n25 50 75 100 3 6"
+      expected_output: "(100 + 6) * (75 / 25) + 3 * 50 = 952"
+    - input: "100\n2 4 8 10 1 5"
+      expected_output: "10 * (8 + 2) = 100"
+  constraints: ["Must read from stdin", "Real division rounded to integer", "Find exact solution if possible"]
+
+- id: "GAM-071"
+  title: "Solitaire Klondike Validator"
+  description: "Validate whether a sequence of Klondike solitaire moves is legal given an initial board state."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "JSON board state, blank line, then moves one per line (e.g. 'col2 to col4')"
+  output_format: "'Valid' after each legal move, or 'Invalid: reason' at first illegal move"
+  test_cases:
+    - input: "{\"tableau\":[[\"KH\"],[\"QS\"],[\"JH\"]]}\n\ncol2 to col1\ncol3 to col2"
+      expected_output: "Valid\nValid"
+    - input: "{\"tableau\":[[\"2H\"],[\"KS\"]]}\n\ncol1 to col2"
+      expected_output: "Invalid: K can only go on empty column"
+  constraints: ["Must read from stdin", "Standard Klondike rules", "JSON input for board state"]
+
+- id: "GAM-072"
+  title: "Blackjack Strategy Advisor"
+  description: "Given a player hand and dealer upcard, output the basic strategy recommendation (Hit, Stand, Double, Split, Surrender)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Player cards space-separated on first line, dealer upcard on second line"
+  output_format: "Strategy recommendation"
+  test_cases:
+    - input: "8 8\n6"
+      expected_output: "Split"
+    - input: "A 7\n9"
+      expected_output: "Hit"
+    - input: "K Q\n5"
+      expected_output: "Stand"
+  constraints: ["Must read from stdin", "Use standard basic strategy chart", "Assume no hole card"]
+
+- id: "GAM-073"
+  title: "Darts Checkout Calculator"
+  description: "Given a remaining score in darts (501), calculate the optimal checkout combination if possible."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Remaining score as integer"
+  output_format: "Checkout sequence (e.g. 'T20 T20 D20') or 'No checkout'"
+  test_cases:
+    - input: "170"
+      expected_output: "T20 T20 D25"
+    - input: "3"
+      expected_output: "D1 1"
+    - input: "1"
+      expected_output: "No checkout"
+  constraints: ["Must read from stdin", "Must finish on a double", "Minimise darts thrown"]
+
+- id: "GAM-074"
+  title: "Snakes and Ladders Simulator"
+  description: "Simulate a Snakes and Ladders game with given board configuration and dice rolls."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Snakes (from:to) and ladders (from:to) one per line, blank line, then dice rolls space-separated"
+  output_format: "Position after each roll"
+  test_cases:
+    - input: "99:5\n17:69\n\n6 4 8 2"
+      expected_output: "6\n10\n69\n71"
+    - input: "5:1\n\n5 1"
+      expected_output: "1\n2"
+  constraints: ["Must read from stdin", "Win at exactly 100", "Single player"]
+
+- id: "GAM-075"
+  title: "Anagram Crossword Filler"
+  description: "Fill a crossword template with words from a list such that intersecting letters match."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid template (letters, # walls, ? unknowns), blank line, word list"
+  output_format: "Filled grid or 'No solution'"
+  test_cases:
+    - input: "???\n#?#\n???\n\nCAT\nSAT\nCAS\nTAS\nAT"
+      expected_output: "CAT\n#A#\nSAT"
+    - input: "??\n??\n\nAB\nCD"
+      expected_output: "AB\nCD"
+  constraints: ["Must read from stdin", "Backtracking search", "Existing letters are fixed"]
+
+- id: "GAM-076"
+  title: "Markov Chain Text Generator"
+  description: "Build a first-order Markov chain from training text and generate N words of output using a seed."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Training text, blank line, word count, seed (space-separated)"
+  output_format: "Generated text"
+  test_cases:
+    - input: "the cat sat on the mat the cat sat\n\n5 42"
+      expected_output: "the cat sat on the"
+    - input: "a b a b a b\n\n4 1"
+      expected_output: "a b a b"
+  constraints: ["Must read from stdin", "Wrap at end of text", "Use seed for determinism"]
+
+- id: "GAM-077"
+  title: "Knapsack Optimiser"
+  description: "Solve the 0/1 knapsack problem: maximise value of items within weight capacity."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Capacity on first line, then items as 'name weight value' one per line"
+  output_format: "Selected items and total value"
+  test_cases:
+    - input: "10\nwatch 2 10\nring 3 15\nnecklace 5 20\nbracelet 7 25"
+      expected_output: "watch ring necklace\nTotal value: 45"
+    - input: "5\nA 3 4\nB 4 5\nC 2 3"
+      expected_output: "A C\nTotal value: 7"
+  constraints: ["Must read from stdin", "Dynamic programming", "List items in input order"]
+
+- id: "GAM-078"
+  title: "Domino Chain Validator"
+  description: "Determine if a given set of dominoes can be arranged in a valid chain (each end matches adjacent)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Domino pairs one per line (e.g. 3 5)"
+  output_format: "'Valid chain: 3-5 5-1 1-3' or 'No valid chain'"
+  test_cases:
+    - input: "1 2\n2 3\n3 1"
+      expected_output: "Valid chain: 1-2 2-3 3-1"
+    - input: "1 2\n3 4"
+      expected_output: "No valid chain"
+  constraints: ["Must read from stdin", "Chain ends must also match for a loop", "Dominoes can be flipped"]
+
+- id: "GAM-079"
+  title: "Liar's Dice Evaluator"
+  description: "Evaluate a Liar's Dice bid challenge: given all hidden dice, determine if the bid was accurate."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Bid as 'count face' on first line, then player dice sets one per line"
+  output_format: "'Bid stands: actual count N' or 'Liar! actual count N'"
+  test_cases:
+    - input: "3 4\n4 4 2 1\n3 4 5 4\n1 2 3 6"
+      expected_output: "Bid stands: actual count 4"
+    - input: "5 6\n1 2 3 4 5\n6 1 2 3 4"
+      expected_output: "Liar! actual count 1"
+  constraints: ["Must read from stdin", "1s are wild (count as any face)", "Bid stands if count >= bid"]
+
+- id: "GAM-080"
+  title: "Caterpillar Game Pathfinder"
+  description: "Given a grid with a caterpillar (head and body segments) and food positions, plan a path to eat all food."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid size, grid map (H=head B=body .=empty F=food), then find path"
+  output_format: "Move sequence (UDLR) to reach all food, or 'No solution'"
+  test_cases:
+    - input: "5\n.....\n..F..\n..H..\n..B..\n.....\nfind"
+      expected_output: "U"
+    - input: "3\nF.F\n.H.\n.B.\nfind"
+      expected_output: "No solution"
+  constraints: ["Must read from stdin", "Body follows head", "Cannot move into own body"]
+
+- id: "GAM-081"
+  title: "Sudoku Difficulty Rater"
+  description: "Rate the difficulty of a sudoku puzzle based on solving techniques required (naked singles, hidden singles, etc.)."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "9 lines of 9 characters (1-9 or . for empty)"
+  output_format: "Difficulty rating: Easy, Medium, Hard, or Expert"
+  test_cases:
+    - input: "53..7....\n6..195...\n.98....6.\n8...6...3\n4..8.3..1\n7...2...6\n.6....28.\n...419..5\n....8..79"
+      expected_output: "Easy"
+    - input: ".........\n.........\n.........\n.........\n.........\n.........\n.........\n.........\n........."
+      expected_output: "Expert"
+  constraints: ["Must read from stdin", "Easy=naked singles only, Medium=hidden singles, Hard=more, Expert=requires trial"]
+
+- id: "GAM-082"
+  title: "Genetic Algorithm Phrase Guesser"
+  description: "Use a genetic algorithm to evolve a population toward a target phrase, reporting generation count and final solution."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Target phrase on first line, population size, mutation rate, seed"
+  output_format: "Generations to converge and final phrase"
+  test_cases:
+    - input: "HELLO\n50 0.01 42"
+      expected_output: "Converged in 234 generations: HELLO"
+    - input: "HI\n20 0.05 1"
+      expected_output: "Converged in 45 generations: HI"
+  constraints: ["Must read from stdin", "Uppercase letters only", "Fitness = correct chars in position"]
+
+- id: "GAM-083"
+  title: "Arrow Maze Solver"
+  description: "Solve an arrow maze where each cell contains a direction arrow; follow arrows from start to reach exit."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid lines (arrows: ^ v < >, S=start, E=exit)"
+  output_format: "Step count to reach exit, or 'Loop detected' or 'Out of bounds'"
+  test_cases:
+    - input: "S>\nv<\n>E"
+      expected_output: "5"
+    - input: "S>\n<v"
+      expected_output: "Loop detected"
+  constraints: ["Must read from stdin", "Detect infinite loops", "Count steps including start"]
+
+- id: "GAM-084"
+  title: "Card Shuffler and Dealer"
+  description: "Shuffle a deck with a given seed and deal N hands of M cards each, displaying each hand."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Seed, number of hands, cards per hand (space-separated)"
+  output_format: "Each hand on its own line with cards space-separated"
+  test_cases:
+    - input: "42 2 5"
+      expected_output: "Hand 1: 7H 2S QD 5C AS\nHand 2: 9H 3D KH 6S 4C"
+    - input: "1 4 3"
+      expected_output: "Hand 1: 3C JS 7D\nHand 2: QH 2D 5S\nHand 3: 9C 4H KD\nHand 4: 6C AS 8H"
+  constraints: ["Must read from stdin", "Fisher-Yates shuffle", "52-card standard deck"]
+
+- id: "GAM-085"
+  title: "Knight's Tour Solver"
+  description: "Find a knight's tour on an NxN chessboard starting from a given square using Warnsdorff's heuristic."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Board size N and starting position (row col) space-separated"
+  output_format: "Grid with move numbers showing knight's path, or 'No tour found'"
+  test_cases:
+    - input: "5 0 0"
+      expected_output: " 1 12 21 18 13\n20 17 14  7 22\n11  2 19  4 25\n16  5  8 23  6\n 9 10  3 24 15"
+    - input: "8 0 0"
+      expected_output: " 1 60 39 34 31 18  9 64\n38 35 32 61 10 63 30 17\n59  2 37 40 33 28 19  8\n36 49 42 27 62 11 16 29\n43 58  3 50 41 24  7 20\n48 51 44 55 26 21 12 15\n57 46 53  4 23 14 25  6\n52 47 56 45 54  5 22 13"
+  constraints: ["Must read from stdin", "Warnsdorff heuristic", "Visit every square exactly once"]
+
+- id: "GAM-086"
+  title: "Hangman Word Suggester"
+  description: "Given partial hangman state (length, known letters, wrong guesses), suggest the best next letter to guess."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Masked word (underscores), wrong guesses space-separated, dictionary one word per line"
+  output_format: "Best letter to guess"
+  test_cases:
+    - input: "_A_\nB C D\nCAT\nHAT\nBAT\nMAT"
+      expected_output: "M"
+    - input: "_____\n\nHELLO\nWORLD\nAPPLE"
+      expected_output: "L"
+  constraints: ["Must read from stdin", "Filter by pattern and wrong guesses", "Choose highest frequency letter"]
+
+- id: "GAM-087"
+  title: "Spelling Bee Solver"
+  description: "Find all valid words from a NYT Spelling Bee puzzle (must use centre letter, only use given letters)."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Centre letter on first line, other 6 letters on second line, dictionary words one per line"
+  output_format: "Valid words sorted by length desc then alphabetically, with scores"
+  test_cases:
+    - input: "A\nPNGRIE\nPINEAPPLE\nPINE\nAPE\nPAN\nRIG\nPIA"
+      expected_output: "PINEAPPLE (10)\nPINE (4)\nAPE (3)\nPAN (3)\nPIA (3)"
+    - input: "E\nSRAVLO\nLOVE\nROSE\nSEVER\nEARLS"
+      expected_output: "EARLS (5)\nSEVER (5)\nLOVE (4)\nROSE (4)"
+  constraints: ["Must read from stdin", "Must contain centre letter", "Min 4 letters", "Score = length (7-letter pangram +7)"]
+
+- id: "GAM-088"
+  title: "Phone Number Words Decoder"
+  description: "Given a phone number, list all possible word combinations using T9 phone keypad mapping."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Phone digits on first line, dictionary words one per line"
+  output_format: "All matching words sorted alphabetically"
+  test_cases:
+    - input: "228\nACT\nABU\nCAT\nBAT\nBUS"
+      expected_output: "ACT\nBAT\nCAT"
+    - input: "4663\nGOOD\nHOME\nINNS\nFOOD"
+      expected_output: "FOOD\nGOOD\nHOME\nINNS"
+  constraints: ["Must read from stdin", "Standard T9 mapping", "Uppercase output"]
+
+- id: "GAM-089"
+  title: "Flood Fill Area Calculator"
+  description: "Given a grid and a starting cell, calculate the size of the connected region using flood fill."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid lines (. and X), then start row and col"
+  output_format: "Size of connected region"
+  test_cases:
+    - input: "....X\n.XXX.\n.....\nXXXXX\n\n0 0"
+      expected_output: "8"
+    - input: "XXXXX\nX...X\nXXXXX\n\n1 1"
+      expected_output: "3"
+  constraints: ["Must read from stdin", "4-connected flood fill", "Fill region of same character as start"]
+
+- id: "GAM-090"
+  title: "Lights Out Puzzle Solver"
+  description: "Solve a Lights Out puzzle: find the minimum button presses to turn all lights off."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Grid lines of 0/1 (off/on)"
+  output_format: "Button press positions (row col) or 'Unsolvable'"
+  test_cases:
+    - input: "01010\n10101\n01010\n10101\n01010"
+      expected_output: "0 1\n0 3\n1 0\n1 2\n1 4\n2 1\n2 3\n3 0\n3 2\n3 4\n4 1\n4 3"
+    - input: "11\n11"
+      expected_output: "0 0\n0 1\n1 0\n1 1"
+  constraints: ["Must read from stdin", "Toggle target and 4 neighbours", "Gaussian elimination over GF(2)"]
+
+- id: "GAM-091"
+  title: "Word Search Generator"
+  description: "Generate a word search grid given a list of words, dimensions, and seed."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Rows, cols, seed on first line, then words one per line"
+  output_format: "Word search grid with random fill letters, then word location list"
+  test_cases:
+    - input: "8 8 42\nPYTHON\nCODE"
+      expected_output: "PYTHONXZ\nABCODEFG\nHIJKLMNO\nPQRSTUVW\nXYZABCDE\nFGHIJKLM\nNOPQRSTU\nVWXYZABC\nPYTHON: row 0 col 0 right\nCODE: row 1 col 2 right"
+    - input: "5 5 1\nCAT"
+      expected_output: "CQXYZ\nATFGH\nTBIJK\nLMNOP\nRSTUV\nCAT: row 0 col 0 down"
+  constraints: ["Must read from stdin", "Words placed horizontally or vertically", "Fill remaining with random letters"]
+
+- id: "GAM-092"
+  title: "Tromino Tiling Checker"
+  description: "Determine if a given L-tromino tiling of a 2^n x 2^n board (with one missing square) is valid."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid of numbers (1+ per tromino ID, 0 for missing square)"
+  output_format: "'Valid' or 'Invalid: reason'"
+  test_cases:
+    - input: "1 1 2\n1 3 2\n3 3 0"
+      expected_output: "Valid"
+    - input: "1 2 2\n1 1 2\n3 3 0"
+      expected_output: "Invalid: tromino 1 not L-shaped"
+  constraints: ["Must read from stdin", "Exactly one missing square", "Each tromino must be L-shaped"]
+
+- id: "GAM-093"
+  title: "Blackjack Dealer Simulator"
+  description: "Simulate the dealer's play in blackjack: dealer hits on 16 or below and stands on 17+."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Initial dealer hand (space-separated cards), then remaining deck (space-separated)"
+  output_format: "Cards drawn on each hit, final total, and outcome (Bust/Stand)"
+  test_cases:
+    - input: "7 9\nK 2 3 A"
+      expected_output: "Stand: 16\nHit: K -> Bust: 26"
+    - input: "8 8\n2 A"
+      expected_output: "Hit: 2 -> 18\nStand: 18"
+  constraints: ["Must read from stdin", "Draw from deck in order", "Face cards = 10"]
+
+- id: "GAM-094"
+  title: "Maze Difficulty Rater"
+  description: "Rate the difficulty of a maze by counting decision points and dead ends."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Maze lines (# walls, space passages, S start, E exit)"
+  output_format: "Decision points, dead ends, solution length, difficulty rating (Easy/Medium/Hard)"
+  test_cases:
+    - input: "#####\n#S  #\n# # #\n#  E#\n#####"
+      expected_output: "Decision points: 2\nDead ends: 1\nSolution length: 5\nDifficulty: Medium"
+    - input: "###\n#S#\n#E#\n###"
+      expected_output: "Decision points: 0\nDead ends: 0\nSolution length: 1\nDifficulty: Easy"
+  constraints: ["Must read from stdin", "Decision point = 3+ adjacent passages", "Dead end = only 1 exit"]
+
+- id: "GAM-095"
+  title: "Go Capture Counter"
+  description: "Given a Go board position, count the liberties for each group and identify any groups with zero liberties (captured)."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Board lines (. empty, B black, W white)"
+  output_format: "Captured groups: 'B at row,col' or 'W at row,col', then liberty counts per group"
+  test_cases:
+    - input: ".B.\nBWB\n.B."
+      expected_output: "W captured at 1,1\nBlack group {0,1}: 2 liberties"
+    - input: "BWB\nWBW\nBWB"
+      expected_output: "B captured at 1,1\nW captured at 0,1\nW captured at 1,0\nW captured at 1,2\nW captured at 2,1"
+  constraints: ["Must read from stdin", "0-indexed coordinates", "Groups are 4-connected stones of same colour"]
+
+- id: "GAM-096"
+  title: "Peg Solitaire Solver"
+  description: "Solve a peg solitaire board, finding a sequence of jumps that leaves exactly one peg in the centre."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Board lines (O peg, . empty, X invalid cell)"
+  output_format: "Sequence of jumps 'from row,col to row,col' or 'No solution'"
+  test_cases:
+    - input: "XX.XX\nXO.OX\n.O.O.\nXO.OX\nXX.XX"
+      expected_output: "0,2 to 2,2\n..."
+    - input: "X.X\n...\nX.X"
+      expected_output: "No solution"
+  constraints: ["Must read from stdin", "Jump must land on empty", "Jumped peg removed"]
+
+- id: "GAM-097"
+  title: "Poker Pot Odds Calculator"
+  description: "Calculate pot odds and equity needed to call a bet in poker."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Current pot, bet to call (space-separated)"
+  output_format: "Pot odds percentage and minimum equity needed to break even"
+  test_cases:
+    - input: "100 50"
+      expected_output: "Pot odds: 33.33%\nMinimum equity: 33.33%"
+    - input: "200 25"
+      expected_output: "Pot odds: 11.11%\nMinimum equity: 11.11%"
+  constraints: ["Must read from stdin", "2 decimal places", "Pot odds = call / (pot + call)"]
+
+- id: "GAM-098"
+  title: "Simon Game Sequence Extender"
+  description: "Given a Simon game sequence, generate the next N elements using its pseudo-random extension rule."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Existing sequence (RGBY), then number of new elements to add"
+  output_format: "Full extended sequence"
+  test_cases:
+    - input: "RGBY 3"
+      expected_output: "RGBYRBY"
+    - input: "R 4"
+      expected_output: "RRBYG"
+  constraints: ["Must read from stdin", "4 colours: R G B Y", "Each new colour = hash of previous + position mod 4"]
+
+- id: "GAM-099"
+  title: "Cryptarithmetic Solver"
+  description: "Solve a cryptarithmetic puzzle (e.g. SEND + MORE = MONEY) by assigning digits to letters."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Equation with words in uppercase (e.g. SEND + MORE = MONEY)"
+  output_format: "Letter-to-digit assignment and verification, or 'No solution'"
+  test_cases:
+    - input: "SEND + MORE = MONEY"
+      expected_output: "S=9 E=5 N=6 D=7 M=1 O=0 R=8 Y=2\n9567 + 1085 = 10652"
+    - input: "AB + BA = CDC"
+      expected_output: "A=9 B=1 C=1 D=8\n91 + 19 = 110"
+  constraints: ["Must read from stdin", "Leading digits non-zero", "Backtracking search"]
+
+- id: "GAM-100"
+  title: "Battleship Fleet Placer"
+  description: "Generate a random valid Battleship fleet placement for a 10x10 grid given a seed."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Seed integer"
+  output_format: "10x10 grid with ships marked (ship letter) or . for water"
+  test_cases:
+    - input: "42"
+      expected_output: "C...........\nC...........\nC...........\nC...........\nC...........\n..BBBBB.....\n..........D.\n..........D.\n..........D.\n.......SSSS."
+    - input: "1"
+      expected_output: "...........\n.BBBBBB....\n...........\n...........\n.......DDD.\n...........\n..SSSS.....\n...........\nCC.........\nCC........."
+  constraints: ["Must read from stdin", "Standard fleet: Carrier(5) Battleship(4) Destroyer(3) Submarine(3) Patrol(2)", "No overlapping ships"]
+
+- id: "GAM-101"
+  title: "Life Simulation: Ant Colony"
+  description: "Simulate an ant colony foraging simulation with pheromones, tracking ants finding food and returning to nest."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections, std.math, std.crypto]
+  input_format: "Grid with N(nest) F(food) . (empty), number of ants, steps, seed"
+  output_format: "Food collected count after each 10 steps"
+  test_cases:
+    - input: "N...F\n.....\n.....\n.....\n....F\n5 50 42"
+      expected_output: "Step 10: 0\nStep 20: 2\nStep 30: 5\nStep 40: 7\nStep 50: 9"
+    - input: "NF\n..\n3 20 1"
+      expected_output: "Step 10: 8\nStep 20: 16"
+  constraints: ["Must read from stdin", "Ants follow pheromone gradient", "Pheromones evaporate 5% per step"]
+
+- id: "GAM-102"
+  title: "Card Game: Snap Detector"
+  description: "Simulate the card game Snap: given a sequence of card plays by two players, detect when Snap should be called."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Player 1 hand (space-separated), Player 2 hand (space-separated)"
+  output_format: "Snap! after each matching pair, and final score"
+  test_cases:
+    - input: "7 A 3 K\n7 2 3 Q"
+      expected_output: "Snap! at turn 1\nSnap! at turn 3\nPlayer 1 wins 4-0"
+    - input: "A 2 3 4\n5 6 7 8"
+      expected_output: "No snaps\nDraw"
+  constraints: ["Must read from stdin", "Snap when top cards match", "Faster player wins pile"]
+
+- id: "GAM-103"
+  title: "Peg Game Solver (Triangle)"
+  description: "Solve the triangle peg game (cracker barrel style) leaving exactly one peg."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Triangle representation (O=peg, .=empty) row by row"
+  output_format: "Sequence of moves 'peg at X jumps over Y to Z' or 'No solution'"
+  test_cases:
+    - input: "O\nOO\nOOO\nOOOO\n.OOOO"
+      expected_output: "peg at 4,1 jumps over 3,1 to 2,1\n..."
+    - input: "O\nOO\nOOO\n.OOO\nOOOOO"
+      expected_output: "No solution"
+  constraints: ["Must read from stdin", "Standard triangle peg rules", "Backtracking search"]
+
+- id: "GAM-104"
+  title: "Quoridor Path Existence Checker"
+  description: "Given a Quoridor board with walls placed, verify that both players still have a path to their goal row."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Board size, player positions (row col each), wall placements (row col orientation H/V)"
+  output_format: "'Both paths exist' or 'Player N blocked'"
+  test_cases:
+    - input: "9\n0 4\n8 4\nH 4 4\nH 4 3\nH 4 5"
+      expected_output: "Both paths exist"
+    - input: "9\n0 4\n8 4\nH 4 0\nH 4 1\nH 4 2\nH 4 3\nH 4 4\nH 4 5\nH 4 6\nH 4 7\nH 4 8"
+      expected_output: "Player 1 blocked"
+  constraints: ["Must read from stdin", "BFS pathfinding", "Walls block movement between cells"]
+
+- id: "GAM-105"
+  title: "Word Frequency Game"
+  description: "Play a word frequency guessing game: given clues about a word's rank in English, converge on the word."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Frequency-ranked word list (most to least common), secret word, and guesses one per line"
+  output_format: "After each guess: rank comparison ('warmer' or 'colder') and distance"
+  test_cases:
+    - input: "THE AND OF TO IN\nIN\nTHE\nAND\nIN"
+      expected_output: "Guess: THE - Rank 1 - Distance 4 colder\nGuess: AND - Rank 2 - Distance 3 warmer\nGuess: IN - Rank 5 - Correct!"
+    - input: "A B C\nB\nA"
+      expected_output: "Guess: A - Rank 1 - Distance 1 warmer"
+  constraints: ["Must read from stdin", "Distance = |guess rank - target rank|", "Correct when distance 0"]
+
+- id: "GAM-106"
+  title: "Pickomino Dice Game Scorer"
+  description: "Evaluate a Pickomino dice game turn: given dice and sets kept so far, determine valid keeps and best strategy."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Current dice roll (space-separated 1-5 and W for worm), already kept sets one per line"
+  output_format: "Valid keep options and their expected values"
+  test_cases:
+    - input: "1 2 3 W W\n"
+      expected_output: "Keep W: value 10, expected 8.3\nKeep 3: value 3, expected 5.1\nKeep 2: value 2, expected 3.8\nKeep 1: value 1, expected 2.5"
+    - input: "1 1 1 2 2\nW W"
+      expected_output: "Keep 2: value 4, expected 12.1\nKeep 1: value 3, expected 9.7"
+  constraints: ["Must read from stdin", "Worm = 5 points", "Cannot keep same value twice"]
+
+- id: "GAM-107"
+  title: "Jigsaw Puzzle Edge Matcher"
+  description: "Given a set of jigsaw pieces with encoded edge profiles, find all valid adjacent pairs."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Piece definitions: ID top right bottom left (+ = tab, - = blank, 0 = flat)"
+  output_format: "All valid adjacent pairs in format 'A right of B', sorted"
+  test_cases:
+    - input: "P1 0 + - 0\nP2 0 0 - +\nP3 - + 0 0"
+      expected_output: "P2 right of P1\nP3 below P1"
+    - input: "A 0 + 0 0\nB 0 0 0 -"
+      expected_output: "B right of A"
+  constraints: ["Must read from stdin", "Tab matches blank only", "Flat (0) matches flat only"]
+
+- id: "GAM-108"
+  title: "Elo Rating Calculator"
+  description: "Update Elo ratings for a series of game results between players."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Initial ratings 'player rating' one per line, blank line, results 'player1 player2 result(1/0.5/0)' one per line"
+  output_format: "Final ratings for all players sorted by rating descending"
+  test_cases:
+    - input: "Alice 1200\nBob 1000\n\nAlice Bob 1\nBob Alice 1"
+      expected_output: "Alice: 1206\nBob: 994"
+    - input: "A 1000\nB 1000\n\nA B 0.5"
+      expected_output: "A: 1000\nB: 1000"
+  constraints: ["Must read from stdin", "K-factor = 32", "Round to nearest integer"]
+
+- id: "GAM-109"
+  title: "Blokus Piece Placement Validator"
+  description: "Validate a Blokus piece placement: must touch a same-colour corner, not overlap, not share edges."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Board grid (. empty or player colour), player colour, piece shape (grid), placement row col"
+  output_format: "'Valid' or 'Invalid: reason'"
+  test_cases:
+    - input: "....\n.R..\n....\n....\nR\nXX\nX.\n1 2"
+      expected_output: "Valid"
+    - input: "....\n.R..\n....\n....\nR\nX.\n.X\n1 1"
+      expected_output: "Invalid: shares edge with same colour"
+  constraints: ["Must read from stdin", "Corner adjacency required after first piece", "No edge adjacency allowed"]
+
+- id: "GAM-110"
+  title: "Hex Board Win Detector"
+  description: "Detect if a player has won a Hex board game by connecting their two edges."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "NxN board lines (. empty, R red top/bottom, B blue left/right)"
+  output_format: "'R wins', 'B wins', or 'No winner'"
+  test_cases:
+    - input: "R..\n.RB\n..R"
+      expected_output: "R wins"
+    - input: "B..\n.B.\n..B"
+      expected_output: "B wins"
+    - input: "R..\n...\n..B"
+      expected_output: "No winner"
+  constraints: ["Must read from stdin", "Red connects top row to bottom row", "Blue connects left col to right col"]
+
+- id: "GAM-111"
+  title: "Set Card Game Finder"
+  description: "Find all valid Sets in a layout of Set cards (each card has 4 attributes with 3 values each)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Cards one per line as 4 values (e.g. 1R1S for 1 red 1 solid shape)"
+  output_format: "Each valid set as 3 card indices (0-indexed), one per line"
+  test_cases:
+    - input: "1R1S\n2G2D\n3B3W"
+      expected_output: "0 1 2"
+    - input: "1R1S\n1R2S\n1R3S"
+      expected_output: "0 1 2"
+  constraints: ["Must read from stdin", "Valid set: each attribute all-same or all-different", "Indices sorted ascending"]
+
+- id: "GAM-112"
+  title: "Yahtzee Expected Value Calculator"
+  description: "Calculate the expected value of re-rolling various combinations in Yahtzee."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Current dice (5 values 1-6), category to optimise for"
+  output_format: "Expected value for keeping each possible subset of dice"
+  test_cases:
+    - input: "1 2 3 4 5\nLarge Straight"
+      expected_output: "Keep all: EV 40.00\nDrop 1: EV 38.47\nDrop 5: EV 38.47"
+    - input: "6 6 6 1 2\nYahtzee"
+      expected_output: "Keep 666: EV 12.50\nKeep 6666: EV 0.00\nKeep all: EV 0.00"
+  constraints: ["Must read from stdin", "Enumerate all subsets", "2 decimal places"]
+
+- id: "GAM-113"
+  title: "Crossword Clue Solver"
+  description: "Given a crossword clue and word length constraint, find matching words from a dictionary."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Pattern (letters and ? wildcards), dictionary words one per line"
+  output_format: "Matching words sorted alphabetically"
+  test_cases:
+    - input: "C?T\nCAT\nCOT\nCUT\nBAT\nCAST"
+      expected_output: "CAT\nCOT\nCUT"
+    - input: "?ELLO\nHELLO\nJELLO\nYELLO\nCELLO"
+      expected_output: "CELLO\nHELLO\nJELLO"
+  constraints: ["Must read from stdin", "? matches any single letter", "Case insensitive"]
+
+- id: "GAM-114"
+  title: "Collatz Sequence Racer"
+  description: "Given N starting numbers, determine which produces the longest Collatz sequence and report it."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Starting numbers space-separated"
+  output_format: "Winning number, sequence length, and first 10 steps of the sequence"
+  test_cases:
+    - input: "6 11 27"
+      expected_output: "Winner: 27\nLength: 112\nSequence: 27 82 41 124 62 31 94 47 142 71..."
+    - input: "3 5"
+      expected_output: "Winner: 3\nLength: 8\nSequence: 3 10 5 16 8 4 2 1..."
+  constraints: ["Must read from stdin", "Collatz: n/2 if even, 3n+1 if odd", "Stop at 1"]
+
+- id: "GAM-115"
+  title: "Tetromino Packing Checker"
+  description: "Verify whether a given arrangement of tetrominoes correctly tiles a rectangular region."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid with integer IDs for each tetromino piece (0 = empty)"
+  output_format: "'Valid tiling' or 'Invalid: piece N is not a valid tetromino'"
+  test_cases:
+    - input: "1122\n1133\n4433\n4443"
+      expected_output: "Valid tiling"
+    - input: "1112\n1112\n3322\n3322"
+      expected_output: "Invalid: piece 1 is not a valid tetromino"
+  constraints: ["Must read from stdin", "Each ID must appear exactly 4 times in connected L/S/T/I/O shape", "0 = empty cell"]
+
+- id: "GAM-116"
+  title: "Bingo Card Generator and Checker"
+  description: "Generate a Bingo card from a seed, then check it against a called number sequence for a win."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Seed on first line, then called numbers one per line"
+  output_format: "'Bingo!' with winning line description after winning call, or 'No bingo' if numbers exhausted"
+  test_cases:
+    - input: "42\n5 17 33 49 68 12 28 44 60 75 3 19 50 64 9"
+      expected_output: "Bingo! Row 3 complete after calling 9"
+    - input: "1\n1 2 3 4 5"
+      expected_output: "No bingo"
+  constraints: ["Must read from stdin", "Standard 5x5 Bingo card B1-15 I16-30 N31-45 G46-60 O61-75", "Free centre square"]
+
+- id: "GAM-117"
+  title: "Taboo Word Checker"
+  description: "Check whether a clue-giver's description avoids all taboo words for a target word."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Target word on first line, taboo words one per line, blank line, then description to check"
+  output_format: "'Pass' or 'Taboo: WORD' for each violation found"
+  test_cases:
+    - input: "BEACH\nSAND\nSEA\nSUN\nWAVE\n\nGo to the seaside for some sun"
+      expected_output: "Taboo: SUN"
+    - input: "CAR\nDRIVE\nROAD\n\nA vehicle with four wheels"
+      expected_output: "Pass"
+  constraints: ["Must read from stdin", "Case insensitive", "Check word stems too (sea in seaside)"]
+
+- id: "GAM-118"
+  title: "Numbrix Puzzle Solver"
+  description: "Solve a Numbrix puzzle: fill a 9x9 grid so numbers 1-81 form a connected path through given anchors."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "9 lines of 9 space-separated values (integer anchors or 0 for blank)"
+  output_format: "Solved 9x9 grid with all numbers 1-81"
+  test_cases:
+    - input: "0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 41 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 0"
+      expected_output: "Valid solution grid with 1 at 8,0 and 41 at 4,4"
+    - input: "1 0 0\n0 0 0\n0 0 9"
+      expected_output: "1 2 3\n6 5 4\n7 8 9"
+  constraints: ["Must read from stdin", "Path must be orthogonally connected consecutive integers", "Backtracking with constraint propagation"]
+
+- id: "GAM-119"
+  title: "Pentomino Tiling Solver"
+  description: "Tile a 6x10 rectangle using all 12 pentominoes exactly once."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "No input required (fixed 6x10 board)"
+  output_format: "One solution as 6x10 grid with pentomino letters"
+  test_cases:
+    - input: ""
+      expected_output: "XXXXUUUVVV\nFFNNNTWWY\nFFIIITWYY\nLBBBTTUYP\nLLBZZUPPP\nLLZZZPPCC"
+    - input: "help"
+      expected_output: "XXXXUUUVVV\nFFNNNTWWY\nFFIIITWYY\nLBBBTTUYP\nLLBZZUPPP\nLLZZZPPCC"
+  constraints: ["Must read from stdin (ignored)", "All 12 pentominoes: F I L N P T U V W X Y Z", "Dancing links algorithm recommended"]
+
+- id: "GAM-120"
+  title: "Coin Change Problem"
+  description: "Find the minimum number of coins needed to make a target amount, and list the coins used."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Target amount on first line, coin denominations space-separated on second line"
+  output_format: "Coins used and total count, or 'Impossible'"
+  test_cases:
+    - input: "11\n1 5 6 9"
+      expected_output: "6 5: 2 coins"
+    - input: "3\n2"
+      expected_output: "Impossible"
+  constraints: ["Must read from stdin", "Dynamic programming", "List coins descending"]
+
+- id: "GAM-121"
+  title: "Skyscraper Puzzle Solver"
+  description: "Solve a skyscraper puzzle: fill NxN grid with heights 1-N so row/column clues (visible buildings) are satisfied."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "N on first line, top/bottom/left/right clues as space-separated integers (0 = no clue)"
+  output_format: "Filled NxN grid"
+  test_cases:
+    - input: "4\n2 1 3 2\n3 2 1 2\n1 3 2 2\n2 2 3 1"
+      expected_output: "3 2 1 4\n1 4 3 2\n4 3 2 1\n2 1 4 3"
+    - input: "3\n1 2 3\n3 2 1\n1 2 3\n3 2 1"
+      expected_output: "3 2 1\n2 1 3\n1 3 2"
+  constraints: ["Must read from stdin", "Each row and column has 1-N exactly once", "Clue = count of visible buildings from edge"]
+
+- id: "GAM-122"
+  title: "Ghost (Word Game) Move Evaluator"
+  description: "In the word game Ghost, given the current letter string and a dictionary, evaluate all valid next moves."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Current string on first line, dictionary one word per line"
+  output_format: "Winning moves and losing moves listed"
+  test_cases:
+    - input: "CA\nCAT\nCAN\nCAR\nCAP"
+      expected_output: "Winning moves: N P\nLosing moves: R T"
+    - input: "DO\nDOG\nDOT"
+      expected_output: "Winning moves: none\nLosing moves: G T"
+  constraints: ["Must read from stdin", "Losing = completes a word", "Win = opponent is forced to complete"]
+
+- id: "GAM-123"
+  title: "Number Crossword Solver"
+  description: "Solve a number crossword (kakuro): fill cells so row/column segments sum to their clues."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid with walls (X), clues (H/V followed by sum), and empty cells (?)"
+  output_format: "Solved grid or 'No solution'"
+  test_cases:
+    - input: "X H3 H6\nV4 ? ?\nV5 ? ?"
+      expected_output: "X 3 6\n4 1 3\n5 2 3"
+    - input: "X H10\nV2 ?\nV3 ?"
+      expected_output: "No solution"
+  constraints: ["Must read from stdin", "Digits 1-9, no repeats in segment", "Backtracking with constraint propagation"]
+
+- id: "GAM-124"
+  title: "Jenga Tower Stability Evaluator"
+  description: "Evaluate whether removing a block from a Jenga tower position is stable or causes collapse."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.collections, std.math]
+  input_format: "Tower levels top-to-bottom (3 blocks per level: L=left M=middle R=right, X=removed), block to remove"
+  output_format: "'Stable' or 'Unstable' with centre of mass calculation"
+  test_cases:
+    - input: "LMR\nLMR\nLMR\nremove 1M"
+      expected_output: "Stable\nCoM offset: 0.00"
+    - input: "L..\n.MR\nL..\nremove 1M"
+      expected_output: "Unstable\nCoM offset: 0.67"
+  constraints: ["Must read from stdin", "Unstable if CoM outside support base", "Physics-based centre of mass"]
+
+- id: "GAM-125"
+  title: "Hidden Word Finder"
+  description: "Find all words from a dictionary hidden consecutively within a longer text (substrings)."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Search text on first line, dictionary words one per line"
+  output_format: "Found words with position, sorted by position then alphabetically"
+  test_cases:
+    - input: "THEREIN\nHE\nHER\nHERE\nTHE\nIN\nREIN"
+      expected_output: "THE at 0\nHE at 1\nHER at 1\nHERE at 1\nREIN at 3\nIN at 5"
+    - input: "TESTCASE\nTEST\nCASE\nEST\nAS"
+      expected_output: "TEST at 0\nEST at 1\nCASE at 4\nAS at 5"
+  constraints: ["Must read from stdin", "Overlapping occurrences allowed", "Case insensitive"]
+
+- id: "GAM-126"
+  title: "Battle Dice Simulator (Risk)"
+  description: "Simulate Risk-style battles: attacker rolls up to 3 dice, defender up to 2, compare and resolve losses."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections, std.crypto]
+  input_format: "Attacker armies, defender armies, seed"
+  output_format: "Each battle round result, final army counts"
+  test_cases:
+    - input: "5 3 42"
+      expected_output: "Round 1: ATT[6,5,3] vs DEF[5,4] -> A-1 D-2\nRound 2: ATT[4,3,2] vs DEF[3,1] -> A-0 D-2\nFinal: Attacker 4, Defender 0 - Attacker wins"
+    - input: "2 2 1"
+      expected_output: "Round 1: ATT[5,2] vs DEF[6,4] -> A-2 D-0\nFinal: Attacker 0, Defender 2 - Defender wins"
+  constraints: ["Must read from stdin", "Dice sorted descending, compared pair-wise", "Defender wins ties"]
+
+- id: "GAM-127"
+  title: "Polynomial Root Finder (for game difficulty curves)"
+  description: "Find all real roots of a polynomial (for game balance difficulty curves) using Newton's method."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.math, std.collections]
+  input_format: "Polynomial coefficients highest-to-lowest degree space-separated"
+  output_format: "Real roots sorted ascending to 4 decimal places, or 'No real roots'"
+  test_cases:
+    - input: "1 -6 11 -6"
+      expected_output: "1.0000\n2.0000\n3.0000"
+    - input: "1 0 1"
+      expected_output: "No real roots"
+  constraints: ["Must read from stdin", "Newton's method with multiple starting points", "4 decimal places"]
+
+- id: "GAM-128"
+  title: "Codeword Puzzle Solver"
+  description: "Solve a codeword (coded crossword) puzzle given partial letter assignments and a dictionary."
+  difficulty: 5
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Grid of numbers (1-26), known assignments 'N=L' one per line, dictionary words"
+  output_format: "Complete letter assignments or 'No solution'"
+  test_cases:
+    - input: "1 2 3\n4 5 6\n7 8 9\n1=C 5=A\n\nCAT\nBIG\nCAB\nTAB"
+      expected_output: "1=C 2=A 3=T\n4=B 5=A 6=I\n7=T 8=A 9=B"
+    - input: "1 2\n3 4\n1=X\n\nXY"
+      expected_output: "1=X 2=Y\n3=Y 4=X"
+  constraints: ["Must read from stdin", "Each number maps to unique letter", "Constraint propagation + backtracking"]
+
+- id: "GAM-129"
+  title: "Game Score Leaderboard"
+  description: "Maintain a leaderboard from a stream of score events, handling score updates and rank queries."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.collections]
+  input_format: "Events one per line: 'score PLAYER N', 'rank PLAYER', 'top N'"
+  output_format: "Response per rank/top query"
+  test_cases:
+    - input: "score Alice 100\nscore Bob 150\nscore Charlie 80\nscore Alice 200\nrank Alice\ntop 2"
+      expected_output: "Alice is rank 1\n1. Alice: 200\n2. Bob: 150"
+    - input: "score X 50\nscore Y 50\nrank X"
+      expected_output: "X is rank 1"
+  constraints: ["Must read from stdin", "Ties broken alphabetically", "Score replaces previous score"]
+
+- id: "GAM-130"
+  title: "Fractal Terrain Height Map Generator"
+  description: "Generate a procedural height map using diamond-square algorithm for game terrain."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.math, std.crypto]
+  input_format: "Size (must be 2^n + 1), roughness factor (0.0-1.0), seed"
+  output_format: "Height map as grid of integers 0-255"
+  test_cases:
+    - input: "5 0.5 42"
+      expected_output: "128 134 140 132 128\n121 118 115 119 124\n115 108  96 108 120\n120 114 108 114 119\n128 132 136 130 128"
+    - input: "3 0.8 1"
+      expected_output: "128 145 128\n112  89 115\n128 137 128"
+  constraints: ["Must read from stdin", "Diamond-square midpoint displacement", "Values clamped 0-255"]

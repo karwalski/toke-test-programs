@@ -1,0 +1,2156 @@
+# Security requirements
+# SEC-001 to SEC-130
+
+- id: "SEC-001"
+  title: "Port Scanner"
+  description: "Reads a host and port range from stdin, attempts TCP connections to each port concurrently, and reports open/closed/filtered status with service guesses."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str, std.time, std.json]
+  input_format: "First line: host. Second line: port range (e.g. 1-1024). Third line: concurrency"
+  output_format: "OPEN: <port> (<service_guess>) per open port. Summary: N open found in Xs."
+  test_cases:
+    - input: "localhost\n80-100\n20"
+      expected_output: "Summary:"
+    - input: "127.0.0.1\n8080-8090\n10"
+      expected_output: "Summary:"
+  constraints:
+    - "Timeout per port: 2 seconds"
+    - "Filtered = no response within timeout"
+    - "Service guesses based on well-known ports"
+
+- id: "SEC-002"
+  title: "Password Strength Analyser"
+  description: "Reads a password from stdin and analyses its strength: length, character diversity, common patterns, dictionary words, and entropy. Returns a score and suggestions."
+  difficulty: 2
+  stdlib_modules: [std.str, std.crypto, std.json]
+  input_format: "Single line: password"
+  output_format: "JSON {score (0-100), strength (weak|fair|strong|very_strong), entropy_bits, issues: [...], suggestions: [...]}"
+  test_cases:
+    - input: "password123"
+      expected_output: "weak"
+    - input: "C0rr3ct-H0rs3-B@tt3ry-St4pl3!"
+      expected_output: "very_strong"
+  constraints:
+    - "Penalise: common words, keyboard patterns (qwerty), repeated chars"
+    - "Entropy = log2(charset_size ^ length)"
+    - "Must check against top-1000 common passwords list"
+
+- id: "SEC-003"
+  title: "Brute-Force Attack Detector"
+  description: "Reads an access log file path from stdin. Analyses the log for brute-force patterns: >10 failed logins from same IP within 5 minutes. Reports suspicious IPs."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json, std.time]
+  input_format: "Single line: log file path"
+  output_format: "JSON array of {ip, failedAttempts, firstSeen, lastSeen, recommendation: 'block'|'monitor'}"
+  test_cases:
+    - input: "/tmp/access.log"
+      expected_output: "["
+    - input: "/tmp/auth.log"
+      expected_output: "["
+  constraints:
+    - "Log format: <timestamp> <ip> <user> <result> (space-separated)"
+    - "block if >10 attempts/5min; monitor if 5-10"
+    - "Must show attempt window timeline"
+
+- id: "SEC-004"
+  title: "Log Analyser for Security Events"
+  description: "Reads a log file path from stdin. Scans for security-relevant patterns: privilege escalation, suspicious commands (curl|wget piped to bash), file permission changes, cron modifications."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json, std.time]
+  input_format: "Single line: log file path"
+  output_format: "JSON array of {timestamp, severity (info|warn|critical), event_type, line, recommendation}"
+  test_cases:
+    - input: "/tmp/syslog"
+      expected_output: "["
+    - input: "/tmp/auth.log"
+      expected_output: "["
+  constraints:
+    - "Patterns to detect: sudo, su, chmod 777, curl.*sh, wget.*sh, /etc/cron, /etc/passwd"
+    - "Severity: critical for shell-pipe downloads; warn for sudo; info for permission changes"
+
+- id: "SEC-005"
+  title: "Firewall Rule Validator"
+  description: "Reads a JSON list of firewall rules from stdin. Validates them for correctness, conflicts, redundancy, and shadow rules. Reports issues with severity."
+  difficulty: 4
+  stdlib_modules: [std.json, std.str, std.net]
+  input_format: "JSON array of {id, action (allow|deny), protocol, src_cidr, dst_cidr, port_range, priority}"
+  output_format: "JSON {valid: bool, issues: [{ruleId, issue_type, description, severity}]}"
+  test_cases:
+    - input: "[{\"id\":1,\"action\":\"allow\",\"protocol\":\"tcp\",\"src_cidr\":\"0.0.0.0/0\",\"dst_cidr\":\"10.0.0.1/32\",\"port_range\":\"80\",\"priority\":100}]"
+      expected_output: "valid"
+    - input: "[{\"id\":1,\"action\":\"allow\",\"protocol\":\"tcp\",\"src_cidr\":\"0.0.0.0/0\",\"dst_cidr\":\"0.0.0.0/0\",\"port_range\":\"0-65535\",\"priority\":1}]"
+      expected_output: "issues"
+  constraints:
+    - "Detect: shadow rules (higher-priority rule makes lower one unreachable), allow-all rules, duplicate rules"
+    - "Must check CIDR notation validity"
+
+- id: "SEC-006"
+  title: "IP Reputation Checker"
+  description: "Reads a list of IP addresses from stdin. Checks each against built-in threat intel patterns (known Tor exit nodes prefix list, private RFC 1918, loopback, APIPA, documentation ranges) and classifies reputation."
+  difficulty: 2
+  stdlib_modules: [std.net, std.str, std.json]
+  input_format: "Lines of IP addresses until EOF"
+  output_format: "Per IP: JSON {ip, reputation (clean|suspicious|malicious|private|reserved), reason}"
+  test_cases:
+    - input: "127.0.0.1\n192.168.1.1\n8.8.8.8\n"
+      expected_output: "private"
+    - input: "10.0.0.1\n172.16.0.1\n1.1.1.1\n"
+      expected_output: "private"
+  constraints:
+    - "Must classify: RFC 1918 (10/8, 172.16/12, 192.168/16), loopback, APIPA (169.254/16), documentation (192.0.2/24, 198.51.100/24, 203.0.113/24)"
+    - "Must handle IPv6 addresses"
+
+- id: "SEC-007"
+  title: "File Integrity Monitor"
+  description: "Reads a directory path from stdin. Computes SHA-256 hashes of all files and stores a baseline. On second run with same dir, compares against baseline and reports changes."
+  difficulty: 3
+  stdlib_modules: [std.file, std.crypto, std.str, std.json, std.time]
+  input_format: "First line: directory path. Second line: mode (baseline|check)"
+  output_format: "baseline mode: saves hashes to <dir>/.fim-baseline.json. check mode: prints ADDED/MODIFIED/DELETED per changed file."
+  test_cases:
+    - input: "/tmp/monitored\nbaseline"
+      expected_output: "Baseline saved"
+    - input: "/tmp/monitored\ncheck"
+      expected_output: "No changes detected"
+  constraints:
+    - "Must recurse subdirectories"
+    - "Must record file size, permissions, and modification time alongside hash"
+    - "Must exclude .fim-baseline.json from monitoring"
+
+- id: "SEC-008"
+  title: "Role-Based Access Control (RBAC) Engine"
+  description: "Reads an RBAC policy (roles, permissions, role-user assignments) and an access check request from stdin. Evaluates whether the user is permitted to perform the action."
+  difficulty: 4
+  stdlib_modules: [std.json, std.str]
+  input_format: "First block: JSON policy {roles, permissions, assignments}. Blank line. Second block: {user, action, resource}"
+  output_format: "PERMIT or DENY with the matching rule (or 'no matching rule') as JSON"
+  test_cases:
+    - input: "{\"roles\":{\"admin\":[\"read\",\"write\",\"delete\"]},\"assignments\":{\"alice\":[\"admin\"]}}\n\n{\"user\":\"alice\",\"action\":\"delete\",\"resource\":\"/data\"}"
+      expected_output: "PERMIT"
+    - input: "{\"roles\":{\"viewer\":[\"read\"]},\"assignments\":{\"bob\":[\"viewer\"]}}\n\n{\"user\":\"bob\",\"action\":\"write\",\"resource\":\"/data\"}"
+      expected_output: "DENY"
+  constraints:
+    - "Must support role inheritance (role can extend another role)"
+    - "Explicit DENY overrides any PERMIT"
+    - "Unknown users default to DENY"
+
+- id: "SEC-009"
+  title: "Session Management Auditor"
+  description: "Reads a JSON dump of active sessions from stdin. Audits for security issues: sessions without expiry, sessions older than 24h, concurrent sessions from different countries, suspicious user agents."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.time]
+  input_format: "JSON array of {sessionId, userId, createdAt, lastActiveAt, ip, userAgent, expiresAt}"
+  output_format: "JSON {issues: [{sessionId, issue_type, severity, recommendation}], summary: {total, flagged}}"
+  test_cases:
+    - input: "[{\"sessionId\":\"s1\",\"userId\":\"u1\",\"createdAt\":\"2020-01-01T00:00:00Z\",\"lastActiveAt\":\"2020-01-01T00:00:00Z\",\"ip\":\"1.2.3.4\",\"userAgent\":\"Mozilla/5.0\",\"expiresAt\":null}]"
+      expected_output: "issues"
+    - input: "[{\"sessionId\":\"s2\",\"userId\":\"u2\",\"createdAt\":\"2025-01-01T00:00:00Z\",\"lastActiveAt\":\"2025-01-01T01:00:00Z\",\"ip\":\"10.0.0.1\",\"userAgent\":\"Mozilla/5.0\",\"expiresAt\":\"2025-01-02T00:00:00Z\"}]"
+      expected_output: "summary"
+  constraints:
+    - "Flag: no expiry, idle >8h, created >24h ago with no expiry, userAgent changes mid-session"
+    - "Severity: critical for no-expiry, warn for idle, info for old sessions"
+
+- id: "SEC-010"
+  title: "CSRF Token Generator and Validator"
+  description: "Generates CSRF tokens tied to session IDs using HMAC. Reads a command (generate|validate) and session ID from stdin. On validate, also reads the token to check."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.time, std.json]
+  input_format: "First line: command (generate|validate). Second line: session ID. Third line (validate only): token to verify"
+  output_format: "generate: JSON {token, expiresAt}. validate: VALID or INVALID with reason"
+  test_cases:
+    - input: "generate\nsession-abc123"
+      expected_output: "token"
+    - input: "validate\nsession-abc123\ninvalid-token"
+      expected_output: "INVALID"
+  constraints:
+    - "Token = base64(HMAC-SHA256(sessionId + timestamp, secret))"
+    - "Tokens expire after 1 hour"
+    - "Must detect token reuse after validation (single-use tokens)"
+
+- id: "SEC-011"
+  title: "Input Sanitiser"
+  description: "Reads a raw user input string from stdin. Sanitises it for safe use in HTML, SQL, shell commands, and file paths. Returns sanitised versions and a summary of what was removed."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.crypto]
+  input_format: "First line: context (html|sql|shell|filepath|all). Second line: raw input"
+  output_format: "JSON {original, sanitised, removedPatterns: [{pattern, count, context}]}"
+  test_cases:
+    - input: "html\n<script>alert('xss')</script>"
+      expected_output: "&lt;script&gt;"
+    - input: "sql\nSELECT * FROM users WHERE id='1' OR '1'='1'"
+      expected_output: "sanitised"
+  constraints:
+    - "HTML: escape <, >, &, \", '"
+    - "SQL: escape quotes, remove/neutralise SQL keywords"
+    - "Shell: escape metacharacters: ; | & $ ` ( ) { } [ ] < >"
+    - "Filepath: remove .. sequences, null bytes, absolute path prefixes"
+
+- id: "SEC-012"
+  title: "SQL Injection Pattern Detector"
+  description: "Reads HTTP request logs (or raw SQL queries) from stdin and identifies SQL injection patterns. Classifies attack types and suggests parameterised query fixes."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.file]
+  input_format: "Lines of raw query strings or HTTP query params until EOF"
+  output_format: "Per detected injection: {input, attack_type, confidence (high|medium|low), example_fix}"
+  test_cases:
+    - input: "id=1' OR '1'='1\n"
+      expected_output: "boolean_based"
+    - input: "name=alice\n"
+      expected_output: "[]"
+  constraints:
+    - "Detect: union-based, boolean-based, time-based blind, error-based, stacked queries"
+    - "Must flag but not block ambiguous inputs at medium confidence"
+
+- id: "SEC-013"
+  title: "XSS Filter"
+  description: "Reads HTML content from stdin. Detects and removes XSS payloads (script tags, event handlers, javascript: URLs, data: URIs) while preserving safe HTML structure."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json]
+  input_format: "Lines of HTML content until EOF"
+  output_format: "Sanitised HTML to stdout; JSON summary of removed elements to stderr"
+  test_cases:
+    - input: "<p>Hello <script>alert(1)</script> World</p>"
+      expected_output: "<p>Hello  World</p>"
+    - input: "<a href=\"javascript:void(0)\" onclick=\"steal()\">Click</a>"
+      expected_output: "<a>Click</a>"
+  constraints:
+    - "Remove: <script>, <iframe>, <object>, <embed>, <base>"
+    - "Remove: on* event attributes"
+    - "Remove: href/src with javascript:, data:, vbscript: schemes"
+    - "Must preserve safe tags: p, div, span, a (without js), img (without data:)"
+
+- id: "SEC-014"
+  title: "TLS Certificate Checker"
+  description: "Reads a host:port from stdin. Connects via TLS and inspects the certificate chain: expiry, issuer, SANs, key size, signature algorithm, and known vulnerabilities (SHA1, short keys)."
+  difficulty: 4
+  stdlib_modules: [std.net, std.crypto, std.str, std.json, std.time]
+  input_format: "Single line: host:port"
+  output_format: "JSON {subject, issuer, notBefore, notAfter, daysUntilExpiry, sans, keyBits, sigAlg, issues: [...], grade (A|B|C|F)}"
+  test_cases:
+    - input: "example.com:443"
+      expected_output: "grade"
+    - input: "expired.badssl.com:443"
+      expected_output: "issues"
+  constraints:
+    - "Flag: expiry <30 days (warn), <7 days (critical), expired (critical)"
+    - "Flag: SHA1 signature (critical), RSA key <2048 bits (critical), RSA <4096 (warn)"
+    - "Grade A: no issues. B: warnings only. C: major warnings. F: critical issues."
+
+- id: "SEC-015"
+  title: "Security Audit Report Generator"
+  description: "Reads a JSON security scan result from stdin (list of findings from multiple tools). Aggregates, deduplicates, and generates a formatted security audit report."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.time, std.file]
+  input_format: "JSON array of {tool, severity, category, title, description, file?, line?, cve?}"
+  output_format: "Formatted text report: executive summary, findings by severity, remediation list"
+  test_cases:
+    - input: "[{\"tool\":\"bandit\",\"severity\":\"high\",\"category\":\"sql_injection\",\"title\":\"SQL injection\",\"description\":\"Unparameterised query\"}]"
+      expected_output: "CRITICAL"
+    - input: "[]"
+      expected_output: "No findings"
+  constraints:
+    - "Group findings by severity: critical, high, medium, low, info"
+    - "Deduplicate identical findings from multiple tools"
+    - "Must include remediation priority recommendation"
+
+- id: "SEC-016"
+  title: "Security Header Checker"
+  description: "Reads a URL from stdin. Fetches it and grades the response headers against OWASP security header best practices. Returns a detailed report with score and remediation steps."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "JSON {url, score (0-100), grade (A-F), headers: {<name>: {present, value, status (good|warn|missing), recommendation}}}"
+  test_cases:
+    - input: "https://github.com"
+      expected_output: "grade"
+    - input: "http://example.com"
+      expected_output: "score"
+  constraints:
+    - "Headers checked: Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy"
+    - "HSTS must include includeSubDomains and preload for full score"
+
+- id: "SEC-017"
+  title: "OWASP Top 10 Rule Checker"
+  description: "Reads HTTP request/response pairs from stdin (JSON format). Checks each pair against OWASP Top 10 rules and flags violations with remediation advice."
+  difficulty: 4
+  stdlib_modules: [std.json, std.str, std.http, std.crypto]
+  input_format: "JSON array of {request: {method, url, headers, body}, response: {status, headers, body}}"
+  output_format: "JSON {findings: [{owasp_id, title, severity, evidence, remediation}]}"
+  test_cases:
+    - input: "[{\"request\":{\"method\":\"GET\",\"url\":\"http://api.example.com/users?id=1 OR 1=1\",\"headers\":{},\"body\":null},\"response\":{\"status\":200,\"headers\":{},\"body\":\"[...users...]\"}]"
+      expected_output: "A03"
+    - input: "[{\"request\":{\"method\":\"GET\",\"url\":\"http://api.example.com/health\",\"headers\":{},\"body\":null},\"response\":{\"status\":200,\"headers\":{\"x-content-type-options\":\"nosniff\"},\"body\":\"ok\"}}]"
+      expected_output: "findings"
+  constraints:
+    - "Check at minimum: A01 Broken Access Control, A02 Cryptographic Failures, A03 Injection, A05 Security Misconfiguration, A07 Auth Failures"
+    - "Must reference OWASP ID in each finding"
+
+- id: "SEC-018"
+  title: "Encryption Key Auditor"
+  description: "Reads a directory path from stdin. Scans for key files (*.pem, *.key, *.p12, *.pfx, id_rsa, id_ecdsa). Analyses each: key type, size, passphrase-protected, world-readable permissions."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.crypto, std.json]
+  input_format: "Single line: directory path to scan"
+  output_format: "JSON array of {path, keyType, keyBits, passphraseProtected, permissions, issues: [...]}"
+  test_cases:
+    - input: "/tmp/keys"
+      expected_output: "["
+    - input: "/home/user/.ssh"
+      expected_output: "["
+  constraints:
+    - "Issues: world-readable (critical), no passphrase on private key (warn), key <2048 bits (critical), key <4096 bits (warn)"
+    - "Must recurse directories"
+    - "Must not print key contents"
+
+- id: "SEC-019"
+  title: "Access Log Analyser"
+  description: "Reads an nginx/Apache Combined Log Format access log from stdin. Produces a security-focused analysis: top IPs, suspicious user agents, path traversal attempts, anomalous request rates."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json, std.time]
+  input_format: "First line: log file path. Second line: analysis window in hours"
+  output_format: "JSON {top_ips: [...], suspicious_agents: [...], traversal_attempts: [...], rate_anomalies: [...], summary}"
+  test_cases:
+    - input: "/tmp/access.log\n24"
+      expected_output: "summary"
+    - input: "/tmp/nginx.log\n1"
+      expected_output: "top_ips"
+  constraints:
+    - "Combined Log Format: <ip> - - [<date>] \"<method> <path> <proto>\" <status> <size> \"<referer>\" \"<ua>\""
+    - "Traversal patterns: ../, %2e%2e, ..%2f"
+    - "Rate anomaly: >100 req/min from single IP"
+
+- id: "SEC-020"
+  title: "Intrusion Detection System (IDS) Rule Matcher"
+  description: "Reads Snort-like rules from stdin, then reads network packet summaries and checks them against the rules. Reports matches with rule ID, severity, and description."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.net]
+  input_format: "First block: rules (one per line, blank to finish). Second block: packet summaries (JSON, one per line)"
+  output_format: "Per matching packet: {ruleId, packetSummary, severity, description}"
+  test_cases:
+    - input: "alert tcp any any -> any 22 (msg:\"SSH scan\"; threshold:type both,track by_src,count 5,seconds 60;)\n\n{\"proto\":\"tcp\",\"src\":\"1.2.3.4\",\"dst\":\"10.0.0.1\",\"dport\":22}\n"
+      expected_output: "SSH scan"
+    - input: "alert tcp any any -> any 80 (msg:\"HTTP flood\";)\n\n{\"proto\":\"tcp\",\"src\":\"5.6.7.8\",\"dst\":\"10.0.0.2\",\"dport\":80}\n"
+      expected_output: "HTTP flood"
+  constraints:
+    - "Support rule fields: alert/log/pass, proto, src/dst CIDR, src/dst port, msg"
+    - "Support threshold: count per time window"
+
+- id: "SEC-021"
+  title: "Honeypot Request Logger"
+  description: "HTTP server that pretends to be a vulnerable app (fake admin login, phpinfo, .env, wp-admin). Logs all access attempts with IP, user agent, and payload for threat intelligence."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.file]
+  input_format: "First line: port. Second line: log file path"
+  output_format: "Prints 'Honeypot listening on :<port>'. Logs each attempt as JSON to file."
+  test_cases:
+    - input: "8200\n/tmp/honeypot.log"
+      expected_output: "Honeypot listening on :8200"
+    - input: "8201\n/tmp/trap.log"
+      expected_output: "Honeypot listening on :8201"
+  constraints:
+    - "Must respond with plausible decoy content (fake login page, fake env file)"
+    - "Must never return real system information"
+    - "Lure paths: /admin, /login, /.env, /wp-admin, /phpinfo.php, /.git/config"
+
+- id: "SEC-022"
+  title: "TLS Configuration Validator"
+  description: "Reads a host:port from stdin. Tests the TLS configuration for weak cipher suites, old protocol versions (SSLv3, TLS 1.0, TLS 1.1), and missing features (forward secrecy, HSTS)."
+  difficulty: 4
+  stdlib_modules: [std.net, std.crypto, std.str, std.json, std.time]
+  input_format: "Single line: host:port"
+  output_format: "JSON {host, protocols: {TLS13, TLS12, TLS11, TLS10, SSL3}, weakCiphers: [...], forwardSecrecy, hsts, grade (A+|A|B|C|F)}"
+  test_cases:
+    - input: "example.com:443"
+      expected_output: "grade"
+    - input: "tls-v1-0.badssl.com:1010"
+      expected_output: "C"
+  constraints:
+    - "Must test each protocol version separately"
+    - "Weak ciphers: RC4, DES, 3DES, export ciphers, NULL ciphers"
+    - "A+ requires TLS 1.3 only, no weak ciphers, HSTS with preload"
+
+- id: "SEC-023"
+  title: "Vulnerability Pattern Scanner"
+  description: "Reads a source code file path from stdin. Scans for common vulnerability patterns: hardcoded credentials, insecure functions, missing input validation, TODO security items."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json]
+  input_format: "First line: file path. Second line: language (python|javascript|java|go|toke|any)"
+  output_format: "JSON array of {line, col, severity, rule_id, description, snippet (truncated)}"
+  test_cases:
+    - input: "/tmp/app.py\npython"
+      expected_output: "["
+    - input: "/tmp/server.js\njavascript"
+      expected_output: "["
+  constraints:
+    - "Detect: hardcoded passwords (password=, secret=, api_key=), eval(), exec(), system(), shell=True, MD5/SHA1 for passwords"
+    - "Detect: SQL string concatenation, http:// URLs in code, TODO:.*security"
+
+- id: "SEC-024"
+  title: "JWT Security Auditor"
+  description: "Reads one or more JWT tokens from stdin. Audits each for security issues: algorithm confusion (none, RS256 vs HS256), missing claims (exp, iss, aud), weak signatures."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.crypto, std.time]
+  input_format: "Lines of JWT tokens until EOF"
+  output_format: "Per token: JSON {tokenIndex, algorithm, issues: [{id, severity, description}], risk_score (0-100)}"
+  test_cases:
+    - input: "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0In0."
+      expected_output: "none_algorithm"
+    - input: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      expected_output: "issues"
+  constraints:
+    - "Critical issues: alg=none, missing exp, missing iss"
+    - "High: exp >24h, missing aud, HS256 with short key"
+    - "Must detect and flag algorithm=none as critical"
+
+- id: "SEC-025"
+  title: "Password Hash Auditor"
+  description: "Reads a password hash database (CSV: user,hash,algorithm) from stdin. Audits for weak or deprecated algorithms (MD5, SHA1, unsalted, bcrypt cost <10)."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json, std.file]
+  input_format: "CSV lines: username,hash,algorithm until EOF"
+  output_format: "JSON {total, flagged, findings: [{username, algorithm, issue, severity, recommendation}]}"
+  test_cases:
+    - input: "alice,5f4dcc3b5aa765d61d8327deb882cf99,md5\nbob,$2b$10$hash,bcrypt\n"
+      expected_output: "md5"
+    - input: "charlie,$2b$04$hash,bcrypt\n"
+      expected_output: "low_cost"
+  constraints:
+    - "Critical: MD5, SHA1, SHA256 (unsalted)"
+    - "High: bcrypt cost <10, scrypt N<16384"
+    - "Recommended: bcrypt cost >=12, argon2id"
+    - "Must not attempt to crack hashes"
+
+- id: "SEC-026"
+  title: "Network WHOIS Lookup Tool"
+  description: "Reads an IP address or domain from stdin. Performs a WHOIS-style lookup (using RDAP if available, falling back to raw WHOIS) and presents ownership, abuse contact, and registration dates."
+  difficulty: 3
+  stdlib_modules: [std.net, std.http, std.str, std.json, std.time]
+  input_format: "Single line: IP address or domain name"
+  output_format: "JSON {registrant, organization, country, asnumber, registrationDate, expiryDate, abuseContact, nameservers}"
+  test_cases:
+    - input: "8.8.8.8"
+      expected_output: "organization"
+    - input: "example.com"
+      expected_output: "registrant"
+  constraints:
+    - "Use RDAP (https://rdap.org) first, fall back to parsing raw WHOIS"
+    - "Must handle rate limiting from WHOIS servers"
+
+- id: "SEC-027"
+  title: "Secret Scanner (Git History)"
+  description: "Reads a git repository path from stdin. Scans git log history for accidentally committed secrets (API keys, passwords, private keys) across all branches."
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.json, std.crypto]
+  input_format: "Single line: git repository path"
+  output_format: "JSON array of {commit, file, line, secret_type, severity, redacted_value, remediation}"
+  test_cases:
+    - input: "/tmp/test-repo"
+      expected_output: "["
+    - input: "/home/user/project"
+      expected_output: "["
+  constraints:
+    - "Patterns: AWS key (AKIA...), private key header (-----BEGIN), password=, api_key=, token=, secret="
+    - "Must redact found values"
+    - "Must scan all commits, not just HEAD"
+
+- id: "SEC-028"
+  title: "HTTP Request Smuggling Detector"
+  description: "Reads raw HTTP request strings from stdin. Analyses them for HTTP request smuggling vulnerabilities: conflicting Content-Length and Transfer-Encoding headers, malformed chunked encoding."
+  difficulty: 5
+  stdlib_modules: [std.str, std.json]
+  input_format: "HTTP request strings separated by '---' lines"
+  output_format: "Per request: SAFE or VULNERABLE with attack type (CL.TE, TE.CL, TE.TE) and explanation"
+  test_cases:
+    - input: "POST / HTTP/1.1\nContent-Length: 13\nTransfer-Encoding: chunked\n\n0\n\nSMUGGLED\n---"
+      expected_output: "CL.TE"
+    - input: "GET / HTTP/1.1\nHost: example.com\n\n---"
+      expected_output: "SAFE"
+  constraints:
+    - "Must detect CL.TE (Content-Length leads, proxy uses TE)"
+    - "Must detect TE.CL (TE leads, backend uses CL)"
+    - "Must detect obfuscated TE headers: Transfer-Encoding: xchunked"
+
+- id: "SEC-029"
+  title: "Open Redirect Detector"
+  description: "Reads a list of URLs from stdin. Tests each for open redirect vulnerabilities by checking if redirect_uri, next, url, return_to query parameters can redirect to external domains."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.net]
+  input_format: "Lines of URLs until EOF"
+  output_format: "Per URL: SAFE or VULNERABLE with redirect destination and parameter name"
+  test_cases:
+    - input: "https://app.example.com/login?next=https://evil.com\n"
+      expected_output: "VULNERABLE"
+    - input: "https://app.example.com/login?next=/dashboard\n"
+      expected_output: "SAFE"
+  constraints:
+    - "Only flag redirects to different domains (not same-origin)"
+    - "Test params: next, redirect, url, return_to, redirect_uri, destination, goto"
+    - "Must make actual HTTP request to verify redirect"
+
+- id: "SEC-030"
+  title: "SSRF Vulnerability Scanner"
+  description: "Reads a list of API endpoints from stdin. Tests each for Server-Side Request Forgery by injecting internal IP addresses and metadata service URLs into URL parameters."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.net]
+  input_format: "Lines of URLs with {URL_PARAM} placeholder until EOF"
+  output_format: "Per endpoint: SAFE or POTENTIAL_SSRF with evidence (unexpected response, timing difference)"
+  test_cases:
+    - input: "https://api.example.com/fetch?url={URL_PARAM}\n"
+      expected_output: "POTENTIAL_SSRF"
+    - input: "https://api.example.com/user?id={URL_PARAM}\n"
+      expected_output: "SAFE"
+  constraints:
+    - "Test payloads: http://169.254.169.254/latest/meta-data, http://127.0.0.1:22, http://10.0.0.1"
+    - "Timing-based detection: much faster response may indicate internal access"
+    - "Must not send payloads to non-placeholder URLs"
+
+- id: "SEC-031"
+  title: "Directory Traversal Tester"
+  description: "Reads a base URL with a path parameter placeholder from stdin. Tests for directory traversal vulnerabilities using common bypass patterns."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL with {PATH} placeholder (e.g. https://api.example.com/file?name={PATH})"
+  output_format: "Per payload: SAFE or VULNERABLE with evidence (file content detected in response)"
+  test_cases:
+    - input: "https://api.example.com/file?name={PATH}"
+      expected_output: "Testing"
+    - input: "http://localhost:8026/files/{PATH}"
+      expected_output: "Testing"
+  constraints:
+    - "Payloads: ../../../etc/passwd, ..%2f..%2fetc%2fpasswd, ....//....//etc/passwd"
+    - "Detect /etc/passwd content in response (root:x:0:0)"
+    - "Must test at least 5 bypass variants"
+
+- id: "SEC-032"
+  title: "Command Injection Tester"
+  description: "Reads a URL with a parameter placeholder from stdin. Tests for OS command injection by injecting shell metacharacters and observing responses for command output."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL with {CMD_PARAM} placeholder"
+  output_format: "Per payload: SAFE or VULNERABLE with evidence and payload used"
+  test_cases:
+    - input: "https://api.example.com/ping?host={CMD_PARAM}"
+      expected_output: "Testing"
+    - input: "http://localhost:8083/search?q={CMD_PARAM}"
+      expected_output: "Testing"
+  constraints:
+    - "Payloads: ; id, | id, && id, ; sleep 5, $(id)"
+    - "Detect command output patterns: uid=, gid=, sleep delays"
+    - "Must not execute payloads locally"
+
+- id: "SEC-033"
+  title: "CORS Misconfiguration Checker"
+  description: "Reads a URL from stdin. Sends CORS preflight requests with various origins (null, evil.com, subdomain.target.com, attacker.target.com) and identifies permissive CORS policies."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL to test"
+  output_format: "JSON {url, corsEnabled, reflectsOrigin, allowsNull, allowsCredentials, wildcardWithCredentials, issues: [...]}"
+  test_cases:
+    - input: "https://api.example.com/data"
+      expected_output: "corsEnabled"
+    - input: "http://localhost:8091/api"
+      expected_output: "issues"
+  constraints:
+    - "Critical: Access-Control-Allow-Origin: * with Access-Control-Allow-Credentials: true"
+    - "High: arbitrary origin reflected with credentials"
+    - "Medium: null origin allowed with credentials"
+
+- id: "SEC-034"
+  title: "Subdomain Enumerator"
+  description: "Reads a domain name and a wordlist file path from stdin. Brute-forces subdomains using DNS lookups and reports discovered subdomains with their IP addresses."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str, std.json, std.file, std.time]
+  input_format: "First line: domain. Second line: wordlist file path. Third line: concurrency"
+  output_format: "Discovered subdomains as they are found: '<subdomain>.<domain> -> <ip>'. Summary at end."
+  test_cases:
+    - input: "example.com\n/tmp/wordlist.txt\n20"
+      expected_output: "Summary:"
+    - input: "test.local\n/tmp/subdomains.txt\n10"
+      expected_output: "Summary:"
+  constraints:
+    - "Must not use external lookup APIs"
+    - "Timeout per lookup: 3 seconds"
+    - "Must handle wildcard DNS (detect and warn)"
+
+- id: "SEC-035"
+  title: "Two-Factor Authentication TOTP Generator/Validator"
+  description: "Reads a TOTP secret and command (generate|validate) from stdin. Generates a current TOTP code or validates a provided code against the secret."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.time, std.json]
+  input_format: "First line: base32 TOTP secret. Second line: command (generate|validate). Third line (validate): 6-digit code"
+  output_format: "generate: current TOTP code and seconds remaining. validate: VALID or INVALID"
+  test_cases:
+    - input: "JBSWY3DPEHPK3PXP\ngenerate"
+      expected_output: "Code:"
+    - input: "JBSWY3DPEHPK3PXP\nvalidate\n000000"
+      expected_output: "INVALID"
+  constraints:
+    - "RFC 6238 TOTP: HMAC-SHA1, 30-second steps, 6-digit codes"
+    - "Validation allows 1 step clock drift (±30s)"
+    - "Must be time-constant in comparison"
+
+- id: "SEC-036"
+  title: "Clickjacking Detector"
+  description: "Reads a URL from stdin. Checks if the page is vulnerable to clickjacking by inspecting X-Frame-Options and Content-Security-Policy frame-ancestors directive."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "JSON {url, protected, method (X-Frame-Options|CSP|none), value, vulnerable, recommendation}"
+  test_cases:
+    - input: "https://github.com"
+      expected_output: "protected"
+    - input: "http://example.com"
+      expected_output: "vulnerable"
+  constraints:
+    - "X-Frame-Options: DENY or SAMEORIGIN = protected"
+    - "CSP frame-ancestors 'none' or 'self' = protected"
+    - "Missing both = vulnerable"
+
+- id: "SEC-037"
+  title: "Cryptographic Weakness Detector"
+  description: "Reads source code from stdin. Scans for uses of deprecated or weak cryptographic primitives: MD5, SHA1, DES, RC4, ECB mode, small key sizes, hardcoded IVs."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.file]
+  input_format: "First line: language. Remaining lines: source code until EOF"
+  output_format: "JSON array of {line, finding_type, severity, code_snippet (truncated), recommendation}"
+  test_cases:
+    - input: "python\nimport hashlib\nhashlib.md5(data).hexdigest()"
+      expected_output: "MD5"
+    - input: "javascript\nconst cipher = crypto.createCipheriv('DES', key, iv)"
+      expected_output: "DES"
+  constraints:
+    - "Critical: MD5/SHA1 for password hashing, DES, RC4, ECB mode"
+    - "High: SHA1 for digital signatures, 1024-bit RSA, 128-bit AES for secrets"
+    - "Must not flag MD5 used for non-security purposes (checksums) at critical"
+
+- id: "SEC-038"
+  title: "HTTP Method Enumeration Tester"
+  description: "Reads a URL from stdin. Tests all HTTP methods (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT, PROPFIND, MKCOL) and reports which are enabled."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "Table: method, status, notes. Flags dangerous methods (TRACE, CONNECT, PROPFIND)."
+  test_cases:
+    - input: "https://httpbin.org"
+      expected_output: "GET"
+    - input: "http://localhost:8083/users"
+      expected_output: "GET"
+  constraints:
+    - "Flag TRACE as security risk (XST attack)"
+    - "Flag WebDAV methods (PROPFIND, MKCOL, MOVE) as potentially dangerous"
+    - "Timeout per method: 5 seconds"
+
+- id: "SEC-039"
+  title: "Default Credentials Tester"
+  description: "Reads a URL and service type from stdin. Tests a list of known default credentials (admin/admin, admin/password, root/root, etc.) against the login endpoint. Reports any that succeed."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: login URL. Second line: service type (http_basic|json_form|digest)"
+  output_format: "Per credential tried: '.' for fail, 'FOUND: <user>:<pass>' for success. Summary."
+  test_cases:
+    - input: "http://localhost:8040\nhttp_basic"
+      expected_output: "Testing"
+    - input: "https://router.local/login\nhttp_basic"
+      expected_output: "Testing"
+  constraints:
+    - "Test at most 20 common credential pairs"
+    - "Must add 500ms delay between attempts (anti-lockout)"
+    - "Must stop after first success"
+
+- id: "SEC-040"
+  title: "Content Security Policy Analyser"
+  description: "Reads a CSP header value from stdin. Parses it and identifies unsafe directives, missing directives, and bypass-enabling configurations."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json]
+  input_format: "Single line: CSP header value"
+  output_format: "JSON {directives: {<name>: <values>}, issues: [{directive, issue, severity, bypass_technique, recommendation}], score (0-100)}"
+  test_cases:
+    - input: "default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' *;"
+      expected_output: "unsafe-inline"
+    - input: "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'"
+      expected_output: "score"
+  constraints:
+    - "Critical: unsafe-inline, unsafe-eval in script-src; wildcard (*) in script-src"
+    - "High: missing default-src, object-src not 'none', base-uri not set"
+    - "Must detect nonce/hash-based allowlists (these mitigate unsafe-inline)"
+
+- id: "SEC-041"
+  title: "Insecure Deserialization Detector"
+  description: "Reads serialised object data from stdin (Java serialised, Python pickle, PHP serialised, JSON with class hints). Detects patterns indicating unsafe deserialisation."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.crypto]
+  input_format: "First line: format (java|pickle|php|json). Remaining lines: serialised data (hex or base64 for binary formats)"
+  output_format: "SAFE or DANGEROUS with detected gadget chains or exploit patterns"
+  test_cases:
+    - input: "java\naced0005737200"
+      expected_output: "Java serialisation magic bytes"
+    - input: "json\n{\"__class__\":\"subprocess.Popen\",\"args\":[[\"id\"]]}"
+      expected_output: "class hint"
+  constraints:
+    - "Java: detect magic bytes aced0005, known gadget class names (CommonsCollections)"
+    - "PHP: detect O: class instantiation patterns"
+    - "JSON: detect __class__, @type, $type hints"
+
+- id: "SEC-042"
+  title: "API Rate Limit Security Tester"
+  description: "Reads an API URL and endpoint from stdin. Tests whether rate limiting is properly enforced on authentication and sensitive endpoints by firing rapid requests."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "First line: URL. Second line: N requests to fire. Third line: expected_limit"
+  output_format: "Results: requests sent, 200s, 429s, 5xxs. Assessment: PROTECTED or UNPROTECTED with details"
+  test_cases:
+    - input: "http://localhost:8092/login\n50\n10"
+      expected_output: "PROTECTED"
+    - input: "http://localhost:8083/users\n20\n100"
+      expected_output: "Assessment:"
+  constraints:
+    - "Fire all requests as fast as possible (no artificial delay)"
+    - "PROTECTED if >10% of requests returned 429"
+    - "Must report X-RateLimit headers if present"
+
+- id: "SEC-043"
+  title: "Sensitive Data Exposure Scanner"
+  description: "Reads an HTTP response body from stdin. Scans for accidental exposure of sensitive data: credit card numbers, social security numbers, email addresses in debug output, stack traces."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json]
+  input_format: "First line: Content-Type. Remaining lines: response body until EOF"
+  output_format: "JSON {findings: [{type, severity, redacted_sample, location}], risk_score}"
+  test_cases:
+    - input: "application/json\n{\"user\":\"alice\",\"card\":\"4111111111111111\",\"ssn\":\"123-45-6789\"}"
+      expected_output: "credit_card"
+    - input: "text/html\n<html><body>Hello</body></html>"
+      expected_output: "findings"
+  constraints:
+    - "Detect: Luhn-valid credit card numbers, SSN patterns, AWS keys, private keys, stack traces, internal IP addresses in external responses"
+    - "Must redact detected values in output"
+
+- id: "SEC-044"
+  title: "HTTP Strict Transport Security (HSTS) Checker"
+  description: "Reads a domain from stdin. Checks HSTS configuration: header presence, max-age value, includeSubDomains, preload status, and whether the domain is on the HSTS preload list."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Single line: domain name"
+  output_format: "JSON {domain, hstsEnabled, maxAge, includeSubDomains, preload, preloadListStatus, issues: [...], grade}"
+  test_cases:
+    - input: "github.com"
+      expected_output: "hstsEnabled"
+    - input: "example.com"
+      expected_output: "grade"
+  constraints:
+    - "Minimum max-age for grade A: 31536000 (1 year)"
+    - "Must check both http:// and https:// to verify redirect"
+    - "Must flag if HSTS header is on HTTP response (should only be on HTTPS)"
+
+- id: "SEC-045"
+  title: "API Authentication Bypass Tester"
+  description: "Reads an API base URL from stdin. Tests common authentication bypass techniques: empty token, null token, missing header, algorithm=none JWT, expired token with disabled expiry check."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.auth, std.crypto]
+  input_format: "First line: base URL. Second line: protected path"
+  output_format: "Per bypass technique: BLOCKED or BYPASSED with evidence. Summary: N/total bypassed."
+  test_cases:
+    - input: "http://localhost:8008\n/profile"
+      expected_output: "Testing"
+    - input: "http://localhost:8087\n/protected"
+      expected_output: "Testing"
+  constraints:
+    - "Test: no auth header, empty string token, 'null' token, JWT alg=none, expired JWT, valid token for different user"
+    - "BYPASSED if protected resource returns 2xx"
+
+- id: "SEC-046"
+  title: "Mass Assignment Vulnerability Tester"
+  description: "Reads a REST API URL from stdin. Tests POST/PUT endpoints for mass assignment: injects extra fields (isAdmin, role, verified, balance) and checks if they are accepted and persisted."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: base URL. Second line: resource path. Third line: legitimate JSON body"
+  output_format: "Per injected field: BLOCKED or ACCEPTED with evidence. Summary."
+  test_cases:
+    - input: "http://localhost:8004\n/users\n{\"name\":\"Alice\",\"email\":\"alice@example.com\"}"
+      expected_output: "Testing"
+    - input: "http://localhost:8083\n/users\n{\"name\":\"Bob\",\"email\":\"bob@example.com\"}"
+      expected_output: "Testing"
+  constraints:
+    - "Injected fields: isAdmin, admin, role, verified, balance, credits, subscriptionTier"
+    - "ACCEPTED if field appears in GET response"
+
+- id: "SEC-047"
+  title: "Insecure Direct Object Reference (IDOR) Tester"
+  description: "Reads a URL template with an {ID} placeholder from stdin. Tests for IDOR by iterating IDs, authenticating as user A and trying to access resources belonging to user B."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.auth]
+  input_format: "First line: URL template. Second line: user A token. Third line: user B resource ID"
+  output_format: "VULNERABLE if user A can access user B's resource; PROTECTED otherwise"
+  test_cases:
+    - input: "http://localhost:8004/users/{ID}\ntoken-user-a\n2"
+      expected_output: "Testing"
+    - input: "http://localhost:8083/users/{ID}\ntoken-a\n99"
+      expected_output: "PROTECTED"
+  constraints:
+    - "Must first create/identify two separate user resources"
+    - "Must make request with user A's auth token targeting user B's ID"
+
+- id: "SEC-048"
+  title: "Sub-resource Integrity (SRI) Checker"
+  description: "Reads a URL from stdin. Fetches the HTML page and checks all external <script> and <link> tags for SRI attributes (integrity, crossorigin). Reports resources without SRI."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json, std.crypto]
+  input_format: "Single line: URL"
+  output_format: "JSON {url, resources: [{tag, src, hasSri, hashAlgorithm, hashValue, crossorigin}], unprotected_count, recommendation}"
+  test_cases:
+    - input: "https://example.com"
+      expected_output: "resources"
+    - input: "http://localhost:8173/docs"
+      expected_output: "unprotected_count"
+  constraints:
+    - "Must check both <script src> and <link rel=stylesheet href>"
+    - "Only flag external resources (src starting with http:// or //)"
+    - "Must generate correct SRI hash for flagged resources"
+
+- id: "SEC-049"
+  title: "OAuth2 Implicit Flow Security Checker"
+  description: "Reads an OAuth2 authorization URL from stdin. Analyses it for insecure implicit flow usage, missing state parameter, overly broad scopes, and insecure redirect URIs."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.net, std.http]
+  input_format: "Single line: OAuth2 authorization URL"
+  output_format: "JSON {response_type, state_present, scope, redirect_uri_secure, issues: [{id, severity, description, recommendation}]}"
+  test_cases:
+    - input: "https://auth.example.com/authorize?response_type=token&client_id=abc&redirect_uri=http://app.example.com/callback"
+      expected_output: "implicit_flow"
+    - input: "https://auth.example.com/authorize?response_type=code&client_id=abc&state=xyz&redirect_uri=https://app.example.com/callback&scope=openid"
+      expected_output: "issues"
+  constraints:
+    - "Critical: response_type=token (implicit flow deprecated in OAuth 2.1)"
+    - "High: missing state parameter (CSRF), HTTP redirect URI for non-localhost"
+    - "Medium: overly broad scopes (offline_access without reason, admin)"
+
+- id: "SEC-050"
+  title: "Prototype Pollution Detector"
+  description: "Reads JavaScript code from stdin. Scans for prototype pollution vulnerabilities: merge/extend functions that allow __proto__, constructor, prototype key assignment."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.file]
+  input_format: "Lines of JavaScript code until EOF"
+  output_format: "JSON array of {line, code_snippet, vulnerability, severity, recommendation}"
+  test_cases:
+    - input: "function merge(target, source) { for (let key in source) { target[key] = source[key]; } }"
+      expected_output: "prototype_pollution"
+    - input: "const obj = Object.assign({}, safe_defaults, user_input);"
+      expected_output: "prototype_pollution"
+  constraints:
+    - "Detect: for...in without hasOwnProperty check, direct __proto__ assignment, Object.assign with user input"
+    - "Recommend: Object.create(null), hasOwnProperty check, JSON.parse/stringify sanitisation"
+
+- id: "SEC-051"
+  title: "Cookie Security Analyser"
+  description: "Reads HTTP response headers (Set-Cookie lines) from stdin. Analyses each cookie for security attributes: Secure, HttpOnly, SameSite, Domain scope, Path, Expiry."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json, std.time]
+  input_format: "Lines of Set-Cookie header values until EOF"
+  output_format: "Per cookie: JSON {name, secure, httpOnly, sameSite, domain, path, expires, issues: [...], score}"
+  test_cases:
+    - input: "session=abc123; Path=/; HttpOnly; SameSite=Strict"
+      expected_output: "httpOnly"
+    - input: "token=xyz; Path=/"
+      expected_output: "issues"
+  constraints:
+    - "Critical: session cookie without HttpOnly, session cookie without Secure"
+    - "High: SameSite not set, SameSite=None without Secure"
+    - "Medium: no expiry on session cookie, broad Domain scope"
+
+- id: "SEC-052"
+  title: "GraphQL Introspection Security Checker"
+  description: "Reads a GraphQL endpoint URL from stdin. Tests if introspection is enabled (security risk in production) and enumerates exposed types, queries, and mutations if it is."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: GraphQL URL"
+  output_format: "JSON {introspectionEnabled, types: [...], queries: [...], mutations: [...], issues: [{severity, description}]}"
+  test_cases:
+    - input: "https://countries.trevorblades.com"
+      expected_output: "introspectionEnabled"
+    - input: "http://localhost:8136/graphql"
+      expected_output: "introspectionEnabled"
+  constraints:
+    - "Must send standard introspection query"
+    - "Flag introspection-enabled on production endpoints as high severity"
+    - "Must list all exposed operations if introspection is on"
+
+- id: "SEC-053"
+  title: "XML External Entity (XXE) Tester"
+  description: "Reads an XML-accepting URL from stdin. Tests for XXE vulnerabilities by injecting DOCTYPE with external entity references and observing if file contents leak in response."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.file]
+  input_format: "Single line: URL that accepts XML POST body"
+  output_format: "SAFE or VULNERABLE with evidence (file content fragments detected)"
+  test_cases:
+    - input: "https://api.example.com/upload"
+      expected_output: "Testing"
+    - input: "http://localhost:8058/data"
+      expected_output: "Testing"
+  constraints:
+    - "Inject: SYSTEM 'file:///etc/passwd' and SYSTEM 'file:///etc/hosts'"
+    - "Detection: response contains 'root:' or '127.0.0.1 localhost'"
+    - "Must not execute on localhost without explicit user confirmation"
+
+- id: "SEC-054"
+  title: "Race Condition Vulnerability Tester"
+  description: "Reads a URL and concurrent request count from stdin. Tests for race conditions (TOCTOU) by firing N simultaneous requests to a state-changing endpoint."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "First line: URL. Second line: concurrent requests. Third line: JSON body"
+  output_format: "Response distribution: count per status code. Flags if 2xx count > 1 (potential double-spend)."
+  test_cases:
+    - input: "http://localhost:8091/redeem\n10\n{\"code\":\"PROMO\"}"
+      expected_output: "2xx count:"
+    - input: "http://localhost:8083/users\n5\n{\"name\":\"test\"}"
+      expected_output: "2xx count:"
+  constraints:
+    - "All requests fired within 100ms of each other"
+    - "VULNERABLE if multiple 2xx responses for idempotent operation"
+
+- id: "SEC-055"
+  title: "DNS Rebinding Detector"
+  description: "Reads a domain from stdin. Simulates DNS rebinding attack detection: checks if the domain resolves to both public and private IPs across multiple lookups."
+  difficulty: 4
+  stdlib_modules: [std.net, std.str, std.json, std.time]
+  input_format: "Single line: domain name"
+  output_format: "JSON {domain, lookupResults: [{timestamp, ip, isPrivate}], rebindingRisk, evidence}"
+  test_cases:
+    - input: "rebind.example.com"
+      expected_output: "rebindingRisk"
+    - input: "example.com"
+      expected_output: "rebindingRisk"
+  constraints:
+    - "Perform 5 lookups with 1-second intervals"
+    - "Flag if any lookup returns RFC 1918 addresses"
+    - "Must detect TTL=0 or TTL<5 as rebinding risk indicator"
+
+- id: "SEC-056"
+  title: "HTTP Request Header Injection Tester"
+  description: "Reads a URL from stdin. Tests for HTTP header injection by including CR/LF characters in query parameters, looking for reflected newlines in response headers."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "SAFE or VULNERABLE with injected header visible in response and evidence"
+  test_cases:
+    - input: "https://api.example.com/redirect?url=https://example.com"
+      expected_output: "Testing"
+    - input: "http://localhost:8041/redirect"
+      expected_output: "Testing"
+  constraints:
+    - "Test: %0d%0a (URL encoded CRLF) and %0a (LF only)"
+    - "Injected header: X-Injected: pwned"
+    - "Must check all response headers for injected value"
+
+- id: "SEC-057"
+  title: "Timing Attack Detector for Authentication"
+  description: "Reads a login URL, username, and a list of password candidates from stdin. Measures response times to detect timing oracle vulnerabilities (early exit on wrong username vs wrong password)."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "First line: login URL. Second line: known-valid username. Third line: known-invalid username"
+  output_format: "Timing analysis: valid_user_avg_ms vs invalid_user_avg_ms. VULNERABLE if difference >5ms."
+  test_cases:
+    - input: "http://localhost:8010/login\nadmin\nnosuchuser"
+      expected_output: "valid_user_avg:"
+    - input: "https://api.example.com/login\nuser@example.com\nnobody@nowhere.com"
+      expected_output: "valid_user_avg:"
+  constraints:
+    - "Must make at least 20 requests per username for statistical significance"
+    - "VULNERABLE if 95th percentile separation > 10ms"
+
+- id: "SEC-058"
+  title: "Web Application Fingerprinter"
+  description: "Reads a URL from stdin. Fingerprints the web application/server by analysing headers, error pages, response timing, and technology-specific paths."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Single line: URL"
+  output_format: "JSON {url, server, framework, language, cms, cdn, waf, confidence: {<tech>: <0-100>}}"
+  test_cases:
+    - input: "https://wordpress.org"
+      expected_output: "framework"
+    - input: "https://expressjs.com"
+      expected_output: "server"
+  constraints:
+    - "Detect from: Server header, X-Powered-By, cookies, HTML meta, error page content, path patterns"
+    - "Must not be aggressive (max 10 requests)"
+
+- id: "SEC-059"
+  title: "Cipher Suite Strength Ranker"
+  description: "Reads a list of TLS cipher suite names from stdin. Ranks each by security strength, flags deprecated ones, and suggests modern replacements."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "Lines of cipher suite names (e.g. TLS_RSA_WITH_RC4_128_SHA) until EOF"
+  output_format: "Per cipher: {name, strength (strong|acceptable|weak|insecure), issues: [...], recommendation}"
+  test_cases:
+    - input: "TLS_RSA_WITH_RC4_128_SHA\n"
+      expected_output: "insecure"
+    - input: "TLS_AES_256_GCM_SHA384\n"
+      expected_output: "strong"
+  constraints:
+    - "Insecure: RC4, NULL, EXPORT, DES, 3DES, ANON"
+    - "Weak: RSA key exchange (no forward secrecy), SHA1 MAC, CBC mode ciphers"
+    - "Strong: ECDHE/DHE key exchange, AES-GCM/CHACHA20, SHA256+ MAC"
+
+- id: "SEC-060"
+  title: "Denial of Service Vulnerability Tester (Regex ReDoS)"
+  description: "Reads a list of regular expressions from stdin. Analyses each for ReDoS vulnerabilities (catastrophic backtracking) by timing them against crafted worst-case inputs."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.time]
+  input_format: "Lines of regex patterns until EOF"
+  output_format: "Per regex: SAFE or VULNERABLE with worst-case input and measured time at length N"
+  test_cases:
+    - input: "^(a+)+$\n"
+      expected_output: "VULNERABLE"
+    - input: "^\\d{1,10}$\n"
+      expected_output: "SAFE"
+  constraints:
+    - "Test with input lengths: 10, 20, 30 chars of worst-case pattern"
+    - "VULNERABLE if time increases exponentially between lengths"
+    - "Must timeout each test at 5 seconds"
+
+- id: "SEC-061"
+  title: "Public Key Infrastructure (PKI) Validator"
+  description: "Reads a PEM certificate chain from stdin. Validates the chain: each cert signed by the next, root is trusted, no expired certs, key usage matches, no revoked certs (CRL/OCSP)."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json, std.time, std.net, std.http]
+  input_format: "PEM-encoded certificates (one after another) until EOF"
+  output_format: "JSON {chainValid, certs: [{subject, issuer, validFrom, validTo, keyUsage, status (valid|expired|revoked)}], issues: [...]}"
+  test_cases:
+    - input: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"
+      expected_output: "chainValid"
+    - input: "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...\n-----END CERTIFICATE-----\n"
+      expected_output: "chainValid"
+  constraints:
+    - "Must verify signature of each cert against its issuer"
+    - "Must check CRL or OCSP for revocation if URL present in cert"
+    - "Must detect self-signed certificates"
+
+- id: "SEC-062"
+  title: "DNS Security Extensions (DNSSEC) Validator"
+  description: "Reads a domain from stdin. Checks DNSSEC status: is DNSSEC enabled, are RRSIG records present, can the chain be validated to the root trust anchor."
+  difficulty: 4
+  stdlib_modules: [std.net, std.str, std.json, std.crypto]
+  input_format: "Single line: domain name"
+  output_format: "JSON {domain, dnssecEnabled, dnskeyPresent, dsPresent, chainValid, issues: [...]}"
+  test_cases:
+    - input: "isc.org"
+      expected_output: "dnssecEnabled"
+    - input: "example.com"
+      expected_output: "dnssecEnabled"
+  constraints:
+    - "Must check for DNSKEY, RRSIG, DS, NSEC/NSEC3 records"
+    - "Must flag broken DNSSEC chain as critical"
+
+- id: "SEC-063"
+  title: "API Endpoint Security Inventory"
+  description: "Reads a running API base URL from stdin. Crawls by fetching /openapi.json or /swagger.json, then inventories each endpoint: auth required, sensitive data exposed, methods available."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: API base URL"
+  output_format: "JSON {endpoints: [{path, methods, authRequired, sensitiveFields: [...], riskScore}], summary}"
+  test_cases:
+    - input: "http://localhost:8129"
+      expected_output: "endpoints"
+    - input: "https://petstore.swagger.io/v2"
+      expected_output: "endpoints"
+  constraints:
+    - "Sensitive fields: password, token, secret, key, credit_card, ssn"
+    - "Flag endpoints without auth as high risk if they expose sensitive data"
+
+- id: "SEC-064"
+  title: "Malware URL Reputation Checker"
+  description: "Reads a list of URLs from stdin. Checks each against built-in heuristics: suspicious TLDs (.xyz, .tk, .ml, .ga), newly-registered-lookalike domains, URL shorteners, known malware patterns."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.net, std.crypto]
+  input_format: "Lines of URLs until EOF"
+  output_format: "Per URL: {url, score (0-100), risk (low|medium|high|critical), indicators: [...]}"
+  test_cases:
+    - input: "https://paypa1.com/login\n"
+      expected_output: "high"
+    - input: "https://github.com\n"
+      expected_output: "low"
+  constraints:
+    - "Indicators: homograph attack (0 for o, 1 for l), punycode domain, suspicious TLD, URL shortener, IP address as host"
+    - "Must check for lookalike domains against top-20 brands"
+
+- id: "SEC-065"
+  title: "Sensitive File Exposure Scanner"
+  description: "Reads a base URL from stdin. Probes for commonly exposed sensitive files: .env, .git/config, .htpasswd, web.config, phpinfo.php, backup.sql, and others."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Single line: base URL"
+  output_format: "EXPOSED: <path> (<status>, <content_preview>) or NOT FOUND: <path> per probe. Summary."
+  test_cases:
+    - input: "https://example.com"
+      expected_output: "Summary:"
+    - input: "http://localhost:8122"
+      expected_output: "Summary:"
+  constraints:
+    - "Must probe at minimum: /.env, /.git/config, /.htpasswd, /web.config, /phpinfo.php, /backup.sql, /dump.sql, /.DS_Store, /Makefile, /docker-compose.yml"
+    - "EXPOSED only if response is 200 and content looks like the expected file type"
+
+- id: "SEC-066"
+  title: "Network Traffic Anomaly Detector"
+  description: "Reads a CSV of network connection records from stdin (timestamp, src_ip, dst_ip, dst_port, bytes, protocol). Detects anomalies: port scans, data exfiltration, beaconing."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.time, std.net]
+  input_format: "CSV lines: timestamp,src_ip,dst_ip,dst_port,bytes,protocol until EOF"
+  output_format: "JSON {anomalies: [{type, severity, src_ip, evidence, timestamp}], summary}"
+  test_cases:
+    - input: "2025-01-01T00:00:00Z,10.0.0.1,192.168.1.1,22,100,tcp\n2025-01-01T00:00:01Z,10.0.0.1,192.168.1.1,23,100,tcp\n"
+      expected_output: "anomalies"
+    - input: "2025-01-01T00:00:00Z,10.0.0.2,8.8.8.8,443,100,tcp\n"
+      expected_output: "summary"
+  constraints:
+    - "Port scan: same src connecting to >10 different dst_ports within 60s"
+    - "Beaconing: same src->dst at regular intervals (jitter <5s)"
+    - "Exfiltration: single connection transferring >100MB"
+
+- id: "SEC-067"
+  title: "API Key Strength Validator"
+  description: "Reads a list of API keys from stdin. Analyses each for entropy, length, character set, and predictability. Flags weak or predictable keys."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Lines of API keys until EOF"
+  output_format: "Per key: {key_prefix (first 4 chars), length, entropy_bits, charset, strength (weak|fair|strong), issues: [...]}"
+  test_cases:
+    - input: "key-12345678\n"
+      expected_output: "weak"
+    - input: "testkey_a8f3b2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0\n"
+      expected_output: "strong"
+  constraints:
+    - "Minimum acceptable: 128 bits entropy"
+    - "Weak: sequential chars, repeated patterns, common words, UUID v1/v4 format"
+    - "Must not print full key in output"
+
+- id: "SEC-068"
+  title: "Cross-Site Request Forgery (CSRF) Vulnerability Tester"
+  description: "Reads a URL and a state-changing request from stdin. Tests whether the endpoint is vulnerable to CSRF: submits the request without CSRF token, from a different origin."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.crypto]
+  input_format: "First line: target URL. Second line: method. Third line: body. Fourth line: session cookie"
+  output_format: "VULNERABLE if request succeeds without CSRF token; PROTECTED otherwise"
+  test_cases:
+    - input: "http://localhost:8010/transfer\nPOST\n{\"amount\":100}\nsession=abc"
+      expected_output: "Testing"
+    - input: "http://localhost:8089/profile\nPUT\n{\"email\":\"evil@evil.com\"}\nsession=xyz"
+      expected_output: "Testing"
+  constraints:
+    - "Test: no CSRF token, wrong token, token from different session"
+    - "Must set Origin: https://evil.example.com on test requests"
+
+- id: "SEC-069"
+  title: "Container Image Security Scanner"
+  description: "Reads a Docker image name from stdin. Analyses the image manifest and layers for security issues: running as root, sensitive environment variables, exposed ports, world-writable volumes."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "Single line: image name (e.g. nginx:latest)"
+  output_format: "JSON {image, findings: [{severity, category, description, layer?}], riskScore, recommendations}"
+  test_cases:
+    - input: "nginx:latest"
+      expected_output: "findings"
+    - input: "alpine:latest"
+      expected_output: "riskScore"
+  constraints:
+    - "Query Docker Hub API for image manifest"
+    - "Check: USER root, ENV variables containing key/password/secret/token, EXPOSE <high-risk ports>"
+    - "Must not pull the actual image"
+
+- id: "SEC-070"
+  title: "Zero-Width Character Steganography Detector"
+  description: "Reads text from stdin. Detects hidden data encoded in zero-width characters (ZWSP, ZWNJ, ZWJ, BOM) which can be used to watermark or exfiltrate data."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.crypto]
+  input_format: "Lines of text until EOF"
+  output_format: "JSON {totalChars, visibleChars, hiddenChars, hiddenBits, possibleEncoding, decodedData (if decodable)}"
+  test_cases:
+    - input: "Hello World"
+      expected_output: "hiddenChars"
+    - input: "Normal text with no hidden content"
+      expected_output: "hiddenChars"
+  constraints:
+    - "Detect Unicode: U+200B (ZWSP), U+200C (ZWNJ), U+200D (ZWJ), U+FEFF (BOM), U+2060 (WJ)"
+    - "Attempt to decode as binary (ZWSP=0, ZWJ=1)"
+
+- id: "SEC-071"
+  title: "Audit Trail Integrity Verifier"
+  description: "Reads an audit log file path from stdin. Verifies the integrity of the log by checking a hash chain (each entry hashes the previous entry's hash). Reports any tampering."
+  difficulty: 4
+  stdlib_modules: [std.file, std.crypto, std.str, std.json, std.time]
+  input_format: "Single line: audit log file path"
+  output_format: "INTACT or TAMPERED with first tampered entry index, expected hash, and found hash"
+  test_cases:
+    - input: "/tmp/audit-chain.log"
+      expected_output: "INTACT"
+    - input: "/tmp/tampered-audit.log"
+      expected_output: "TAMPERED"
+  constraints:
+    - "Log format: JSON lines, each with {seq, timestamp, event, hash} where hash = SHA256(prev_hash + event data)"
+    - "First entry hash = SHA256('genesis' + event data)"
+
+- id: "SEC-072"
+  title: "API Gateway WAF Rule Tester"
+  description: "Reads a WAF-protected API URL from stdin. Tests common WAF bypass techniques: encoding variations, case changes, comment injection, and HTTP parameter pollution."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "First line: URL. Second line: known-blocked payload"
+  output_format: "Per bypass variant: BLOCKED or BYPASSED with variant description and payload used"
+  test_cases:
+    - input: "https://waf.example.com/api\n<script>alert(1)</script>"
+      expected_output: "Testing"
+    - input: "http://localhost:8017\nSELECT * FROM users"
+      expected_output: "Testing"
+  constraints:
+    - "Bypass variants: URL encoding, double encoding, HTML entity encoding, case variation, null byte insertion"
+    - "Must test at least 10 variants per payload"
+
+- id: "SEC-073"
+  title: "Digital Signature Verifier"
+  description: "Reads a message, signature (hex or base64), and public key (PEM) from stdin. Verifies the digital signature and reports the algorithm, validity, and key details."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json, std.file]
+  input_format: "First line: algorithm (RSA-SHA256|ECDSA-SHA256|Ed25519). Second line: public key path. Third line: message. Fourth line: signature (hex)"
+  output_format: "JSON {valid, algorithm, keyType, keyBits, message_hash, signature_hex_prefix}"
+  test_cases:
+    - input: "RSA-SHA256\n/tmp/pubkey.pem\nhello world\n<hex_sig>"
+      expected_output: "valid"
+    - input: "ECDSA-SHA256\n/tmp/ec_pubkey.pem\ntest message\n<hex_sig>"
+      expected_output: "valid"
+  constraints:
+    - "Must support RSA-SHA256, ECDSA-SHA256, Ed25519"
+    - "Must verify signature before reporting key details"
+
+- id: "SEC-074"
+  title: "Password Policy Enforcer"
+  description: "Reads a password policy (JSON) and a list of passwords from stdin. Validates each password against the policy and returns pass/fail with specific violation details."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str, std.crypto]
+  input_format: "First line: JSON policy. Subsequent lines: passwords to validate (blank to finish)"
+  output_format: "Per password: PASS or FAIL with list of violated rules"
+  test_cases:
+    - input: "{\"minLength\":12,\"requireUpper\":true,\"requireLower\":true,\"requireDigit\":true,\"requireSpecial\":true}\nPassword1!\nweakpass"
+      expected_output: "PASS"
+    - input: "{\"minLength\":8,\"requireDigit\":true}\nnodigits"
+      expected_output: "FAIL"
+  constraints:
+    - "Policy fields: minLength, maxLength, requireUpper, requireLower, requireDigit, requireSpecial, maxRepeating, disallowCommon"
+    - "Must list all violations, not just first"
+
+- id: "SEC-075"
+  title: "Encrypted Backup Verifier"
+  description: "Reads an encrypted backup file path and decryption key from stdin. Verifies the backup can be decrypted, checks its integrity (hash), and validates it is not corrupted."
+  difficulty: 3
+  stdlib_modules: [std.file, std.crypto, std.str, std.json]
+  input_format: "First line: backup file path. Second line: base64 decryption key. Third line: expected SHA-256 hash of plaintext"
+  output_format: "JSON {decryptable, integrityValid, algorithm, keyBits, plaintextSize, issues: [...]}"
+  test_cases:
+    - input: "/tmp/backup.enc\n<base64key>\n<expected_hash>"
+      expected_output: "decryptable"
+    - input: "/tmp/corrupted.enc\n<base64key>\n<hash>"
+      expected_output: "integrityValid"
+  constraints:
+    - "Must support AES-256-GCM and AES-256-CBC formats"
+    - "Must verify HMAC/GCM tag before reporting integrity valid"
+
+- id: "SEC-076"
+  title: "Insecure File Permission Scanner"
+  description: "Reads a directory path from stdin. Finds files and directories with insecure permissions: world-writable files, SUID/SGID binaries, world-readable sensitive files."
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.json]
+  input_format: "Single line: directory path to scan"
+  output_format: "JSON array of {path, permissions (octal), owner, group, issue, severity, recommendation}"
+  test_cases:
+    - input: "/tmp"
+      expected_output: "["
+    - input: "/etc"
+      expected_output: "["
+  constraints:
+    - "Critical: SUID on non-system binaries, world-writable /etc files, world-readable private keys"
+    - "High: world-writable directories in sensitive locations, SGID on user-owned files"
+
+- id: "SEC-077"
+  title: "HTTP Parameter Pollution Tester"
+  description: "Reads a URL from stdin. Tests for HTTP Parameter Pollution vulnerabilities by sending duplicate parameters with different values and observing which value the server uses."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL (may include query params)"
+  output_format: "JSON {parameter, test_values, server_behaviour (first|last|all|error), vulnerable, potential_impact}"
+  test_cases:
+    - input: "https://api.example.com/search?q=safe"
+      expected_output: "server_behaviour"
+    - input: "http://localhost:8083/users?role=user"
+      expected_output: "server_behaviour"
+  constraints:
+    - "Test: ?param=value1&param=value2 and ;param=value2"
+    - "Must detect privilege escalation risk (role=user&role=admin)"
+
+- id: "SEC-078"
+  title: "Security Misconfiguration Detector"
+  description: "Reads a JSON configuration file from stdin (server config, app config, database config). Detects security misconfigurations: debug mode on, default credentials, weak settings."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.file]
+  input_format: "First line: config type (server|app|database|all). Remaining lines: JSON config until EOF"
+  output_format: "JSON {findings: [{path, value_redacted, issue, severity, recommendation}], risk_score}"
+  test_cases:
+    - input: "app\n{\"debug\":true,\"secret_key\":\"development-only-secret\",\"allowed_hosts\":[\"*\"]}"
+      expected_output: "debug"
+    - input: "database\n{\"host\":\"localhost\",\"user\":\"root\",\"password\":\"\",\"ssl\":false}"
+      expected_output: "password"
+  constraints:
+    - "Detect: debug=true, secret_key with 'dev'/'test'/'default', allowed_hosts=*, empty passwords, SSL disabled, default ports with default creds"
+
+- id: "SEC-079"
+  title: "Certificate Transparency Monitor"
+  description: "Reads a domain from stdin. Queries crt.sh for recent certificates and alerts on any certificates issued by unexpected CAs or with unexpected SANs."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: domain. Second line: JSON array of allowed CA names"
+  output_format: "JSON {domain, totalCerts, alertCerts: [{issuer, commonName, notBefore, reason}], summary}"
+  test_cases:
+    - input: "example.com\n[\"Let's Encrypt\",\"DigiCert\"]"
+      expected_output: "totalCerts"
+    - input: "github.com\n[\"DigiCert Inc\"]"
+      expected_output: "summary"
+  constraints:
+    - "Alert if certificate issued by CA not in allowed list"
+    - "Alert if wildcard cert issued for single-level wildcard on TLD"
+    - "Must show certs issued in last 90 days"
+
+- id: "SEC-080"
+  title: "Secure Random Number Quality Tester"
+  description: "Reads N random bytes (hex-encoded) from stdin. Analyses the quality of the randomness: entropy estimation, frequency test, runs test, chi-square test."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "First line: N (number of bytes). Second line: hex-encoded bytes"
+  output_format: "JSON {entropy_per_bit, frequency_test_pass, runs_test_pass, chi_square, chi_square_pass, quality (poor|fair|good|excellent)}"
+  test_cases:
+    - input: "256\n<256_hex_encoded_bytes>"
+      expected_output: "quality"
+    - input: "1000\n<1000_hex_encoded_bytes>"
+      expected_output: "entropy_per_bit"
+  constraints:
+    - "Frequency test: bit ratio must be within 0.5 ± 0.1"
+    - "Chi-square test at 95% confidence level"
+    - "excellent: all tests pass, entropy >0.99 per bit"
+
+- id: "SEC-081"
+  title: "Web Cache Poisoning Tester"
+  description: "Reads a cached URL from stdin. Tests for web cache poisoning by injecting unkeyed headers (X-Forwarded-Host, X-Forwarded-Scheme, X-Original-URL) and checking if they affect the cached response."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL to test"
+  output_format: "Per header injection: SAFE or POTENTIALLY_POISONABLE with evidence of header reflection"
+  test_cases:
+    - input: "https://api.example.com/config"
+      expected_output: "Testing"
+    - input: "http://localhost:8067/cached"
+      expected_output: "Testing"
+  constraints:
+    - "Test headers: X-Forwarded-Host, X-Forwarded-Scheme, X-Forwarded-Proto, X-Original-URL, X-Rewrite-URL"
+    - "Inject canary value in header and check if reflected in response"
+
+- id: "SEC-082"
+  title: "Credential Stuffing Attack Simulator"
+  description: "Reads a login URL and a credential list from stdin. Simulates credential stuffing (using real leaked credential pairs) and reports successful logins. Designed for testing your own systems."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "First line: login URL. Second line: rate (req/s). Subsequent lines: user:password pairs (blank to finish)"
+  output_format: "Per attempt: '.' for fail, 'HIT: <user>' for success. Summary with hit rate."
+  test_cases:
+    - input: "http://localhost:8010/login\n2\nadmin:password\nroot:toor\n"
+      expected_output: "Summary:"
+    - input: "http://localhost:8089/login\n1\ntest:test\n"
+      expected_output: "Summary:"
+  constraints:
+    - "Must enforce rate limiting between attempts"
+    - "Must detect and report lockout (429 responses)"
+    - "Designed for authorised testing only"
+
+- id: "SEC-083"
+  title: "API Security Scorecard Generator"
+  description: "Reads an API base URL from stdin. Runs a suite of security checks and generates a comprehensive security scorecard with scores per category and an overall grade."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.crypto, std.net, std.time]
+  input_format: "Single line: API base URL"
+  output_format: "JSON scorecard: {url, overallGrade, overallScore, categories: {auth, transport, headers, rateLimit, inputValidation, errorHandling}, issues: [...], recommendations: [...]}"
+  test_cases:
+    - input: "http://localhost:8083"
+      expected_output: "overallGrade"
+    - input: "https://api.example.com"
+      expected_output: "overallScore"
+  constraints:
+    - "Must test: HTTPS enforcement, security headers, auth required, rate limiting, error message leakage"
+    - "Overall grade A-F based on weighted scores"
+    - "Must not be destructive (no DELETE or write operations)"
+
+- id: "SEC-084"
+  title: "SSH Configuration Auditor"
+  description: "Reads an SSH server address from stdin. Connects and gathers server capabilities (banner, kex algorithms, ciphers, MACs, host key types) and audits them for security."
+  difficulty: 4
+  stdlib_modules: [std.net, std.str, std.json, std.crypto]
+  input_format: "Single line: host:port"
+  output_format: "JSON {host, banner, kexAlgorithms, ciphers, macs, hostKeyTypes, issues: [...], grade}"
+  test_cases:
+    - input: "localhost:22"
+      expected_output: "grade"
+    - input: "ssh.example.com:22"
+      expected_output: "banner"
+  constraints:
+    - "Weak kex: diffie-hellman-group1-sha1, diffie-hellman-group14-sha1"
+    - "Weak ciphers: 3des-cbc, arcfour, blowfish-cbc"
+    - "Weak MACs: hmac-md5, hmac-sha1"
+    - "Must not attempt authentication"
+
+- id: "SEC-085"
+  title: "Path Traversal Payload Generator"
+  description: "Reads a target file path and encoding type from stdin. Generates a comprehensive set of path traversal payloads targeting that file, in the specified encoding."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json, std.crypto]
+  input_format: "First line: target file (e.g. /etc/passwd). Second line: encoding (none|url|double_url|unicode|all)"
+  output_format: "JSON array of {payload, encoding, description}"
+  test_cases:
+    - input: "/etc/passwd\nnone"
+      expected_output: "../../"
+    - input: "/windows/win.ini\nurl"
+      expected_output: "%2e%2e"
+  constraints:
+    - "Generate at least 10 variants per encoding"
+    - "Variants: ../, ..../, ..\\, //, null byte, URL encoded, double encoded, Unicode encoded"
+
+- id: "SEC-086"
+  title: "Network Reconnaissance Reporter"
+  description: "Reads a CIDR range from stdin. Performs host discovery (ICMP/TCP ping), OS fingerprinting via TTL analysis, and open service identification. Generates a recon report."
+  difficulty: 4
+  stdlib_modules: [std.net, std.str, std.json, std.time]
+  input_format: "First line: CIDR range. Second line: concurrency"
+  output_format: "JSON {hostsScanned, hostsUp: [{ip, ttl, likely_os, open_ports: [...], banners: {...}}], summary}"
+  test_cases:
+    - input: "127.0.0.0/8\n50"
+      expected_output: "hostsScanned"
+    - input: "192.168.1.0/24\n20"
+      expected_output: "hostsUp"
+  constraints:
+    - "TTL OS guess: >100 = Windows, 64 = Linux/macOS, 255 = network device"
+    - "Must limit to RFC 1918 and loopback ranges only"
+    - "Open ports: only check common service ports (22, 80, 443, 3306, 5432, 6379, 8080)"
+
+- id: "SEC-087"
+  title: "Blind SQL Injection Time-Based Tester"
+  description: "Reads a URL with a {INJECT} placeholder from stdin. Tests for time-based blind SQL injection by measuring response times when sleep/waitfor SQL commands are injected."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Single line: URL with {INJECT} placeholder"
+  output_format: "Per payload: baseline_ms, injected_ms, time_delta. VULNERABLE if delta > 4000ms."
+  test_cases:
+    - input: "http://localhost:8083/users?id={INJECT}"
+      expected_output: "baseline_ms:"
+    - input: "https://api.example.com/products?name={INJECT}"
+      expected_output: "baseline_ms:"
+  constraints:
+    - "Test payloads: 1; WAITFOR DELAY '0:0:5', 1 AND SLEEP(5), 1' AND SLEEP(5)--"
+    - "Must test MySQL, MSSQL, and PostgreSQL sleep variants"
+    - "Baseline: 5 requests without injection, average time"
+
+- id: "SEC-088"
+  title: "Kubernetes RBAC Auditor"
+  description: "Reads a JSON dump of Kubernetes RBAC policies (ClusterRoles, Roles, Bindings) from stdin. Audits for over-privileged service accounts, wildcard permissions, and privilege escalation paths."
+  difficulty: 4
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON {clusterRoles: [...], roles: [...], clusterRoleBindings: [...], roleBindings: [...]}"
+  output_format: "JSON {findings: [{severity, subject, permission, issue, recommendation}], riskScore}"
+  test_cases:
+    - input: "{\"clusterRoles\":[{\"name\":\"admin-role\",\"rules\":[{\"apiGroups\":[\"*\"],\"resources\":[\"*\"],\"verbs\":[\"*\"]}]}],\"roles\":[],\"clusterRoleBindings\":[{\"name\":\"admin-binding\",\"roleRef\":\"admin-role\",\"subjects\":[{\"kind\":\"ServiceAccount\",\"name\":\"default\"}]}],\"roleBindings\":[]}"
+      expected_output: "wildcard"
+    - input: "{\"clusterRoles\":[],\"roles\":[],\"clusterRoleBindings\":[],\"roleBindings\":[]}"
+      expected_output: "riskScore"
+  constraints:
+    - "Critical: wildcard verbs/resources/apiGroups, default service account in high-privilege binding"
+    - "High: secrets read access, pod exec, privilege escalation verbs (impersonate, escalate, bind)"
+
+- id: "SEC-089"
+  title: "OWASP ZAP-style Passive Scanner"
+  description: "Reads HTTP response pairs (request + response) from stdin. Passively analyses them for security issues without sending additional requests: information disclosure, insecure redirects."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.http]
+  input_format: "JSON objects separated by '---': {request: {method,url,headers,body}, response: {status,headers,body}}"
+  output_format: "JSON {alerts: [{risk (High|Medium|Low|Informational), name, description, solution, evidence}]}"
+  test_cases:
+    - input: "{\"request\":{\"method\":\"GET\",\"url\":\"https://api.example.com\",\"headers\":{},\"body\":null},\"response\":{\"status\":200,\"headers\":{\"server\":\"Apache/2.2.15\"},\"body\":\"ok\"}}"
+      expected_output: "alerts"
+    - input: "{\"request\":{\"method\":\"GET\",\"url\":\"https://secure.example.com\",\"headers\":{},\"body\":null},\"response\":{\"status\":200,\"headers\":{\"strict-transport-security\":\"max-age=31536000; includeSubDomains\",\"x-frame-options\":\"DENY\"},\"body\":\"ok\"}}"
+      expected_output: "alerts"
+  constraints:
+    - "Passive checks: version disclosure in headers, missing security headers, insecure cookie flags, sensitive data in URL params"
+    - "Must not modify requests"
+
+- id: "SEC-090"
+  title: "Environment Variable Secret Leakage Detector"
+  description: "Reads an API URL from stdin. Checks if any endpoint inadvertently exposes environment variables (debug endpoints, error responses containing ENV vars, /env, /actuator/env)."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: base URL"
+  output_format: "Per probed path: SAFE or EXPOSED with type of leaked data. Summary."
+  test_cases:
+    - input: "http://localhost:8027"
+      expected_output: "Probing"
+    - input: "https://api.example.com"
+      expected_output: "Probing"
+  constraints:
+    - "Probe paths: /env, /actuator/env, /debug/vars, /api/debug, /config, /settings"
+    - "Detect: secrets with 'KEY', 'SECRET', 'PASSWORD', 'TOKEN' in name"
+    - "Must redact found values"
+
+- id: "SEC-091"
+  title: "Broken Function Level Authorisation Tester"
+  description: "Reads an API URL, user token, and admin-only paths from stdin. Tests whether non-admin tokens can access admin functions by calling them directly."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.auth]
+  input_format: "First line: base URL. Second line: regular user token. Subsequent lines: admin paths to test (blank to finish)"
+  output_format: "Per path: BLOCKED (403/401) or ACCESSIBLE (2xx). Summary: N/total accessible (should be 0)."
+  test_cases:
+    - input: "http://localhost:8083\nuser-token\n/admin\n/users/delete-all\n"
+      expected_output: "BLOCKED"
+    - input: "https://api.example.com\nbearer-token\n/admin/users\n/internal/config\n"
+      expected_output: "Summary:"
+  constraints:
+    - "Must also test with no auth token"
+    - "Must test GET, POST, DELETE on each path"
+
+- id: "SEC-092"
+  title: "Supply Chain Dependency Auditor"
+  description: "Reads a dependency manifest file path from stdin (package.json, requirements.txt, go.mod). Checks each dependency for known vulnerabilities using OSV.dev API."
+  difficulty: 4
+  stdlib_modules: [std.file, std.http, std.json, std.str]
+  input_format: "Single line: manifest file path"
+  output_format: "JSON {total_deps, vulnerable_deps: [{name, version, vulnerabilities: [{id, severity, description, fixedIn}]}], summary}"
+  test_cases:
+    - input: "/tmp/package.json"
+      expected_output: "total_deps"
+    - input: "/tmp/requirements.txt"
+      expected_output: "vulnerable_deps"
+  constraints:
+    - "Use OSV.dev batch query API (https://api.osv.dev/v1/querybatch)"
+    - "Must handle package.json, requirements.txt, and go.mod formats"
+    - "Must show fix version if available"
+
+- id: "SEC-093"
+  title: "Host Header Injection Tester"
+  description: "Reads a URL from stdin. Tests for Host header injection vulnerabilities by sending requests with manipulated Host headers and checking if they are reflected in responses or cause redirects."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "Per test: SAFE or VULNERABLE with reflected host value and impact description"
+  test_cases:
+    - input: "https://app.example.com/reset-password"
+      expected_output: "Testing"
+    - input: "http://localhost:8083/users"
+      expected_output: "Testing"
+  constraints:
+    - "Test: evil.com, evil.com:8080, target.com@evil.com"
+    - "Detect reflection in: password reset links, redirect URLs, absolute URLs in response body"
+    - "Flag as critical if reflected in password reset flow"
+
+- id: "SEC-094"
+  title: "SMTP Injection Tester"
+  description: "Reads a form submission URL from stdin that accepts email addresses. Tests for SMTP header injection by injecting newlines and additional recipients into email fields."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "First line: form URL. Second line: email field name"
+  output_format: "Per injection payload: SAFE or POTENTIALLY_VULNERABLE with payload and server response"
+  test_cases:
+    - input: "http://localhost:8017/contact\nemail"
+      expected_output: "Testing"
+    - input: "https://app.example.com/subscribe\nemail_address"
+      expected_output: "Testing"
+  constraints:
+    - "Payloads: 'victim@example.com%0aCc: attacker@evil.com', 'victim@example.com%0d%0aBcc: attacker@evil.com'"
+    - "Must submit via POST with application/x-www-form-urlencoded"
+
+- id: "SEC-095"
+  title: "Mobile API Certificate Pinning Bypass Detector"
+  description: "Reads a HTTPS URL from stdin. Attempts to connect using an invalid/self-signed certificate to detect whether certificate pinning is implemented."
+  difficulty: 3
+  stdlib_modules: [std.net, std.crypto, std.str, std.json]
+  input_format: "Single line: HTTPS URL"
+  output_format: "JSON {url, certificatePinningDetected, method (tls_error|connection_refused|accepted), details}"
+  test_cases:
+    - input: "https://api.example.com"
+      expected_output: "certificatePinningDetected"
+    - input: "https://github.com"
+      expected_output: "certificatePinningDetected"
+  constraints:
+    - "Must attempt connection with a generated self-signed certificate"
+    - "PINNING DETECTED if connection fails due to certificate error"
+    - "Must not modify system certificate store"
+
+- id: "SEC-096"
+  title: "Weak Encryption Configuration Finder"
+  description: "Reads a configuration file path from stdin. Searches for weak encryption configurations: CBC mode, static IVs, short keys, hardcoded salts, low iteration counts for KDFs."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json]
+  input_format: "Single line: configuration file path"
+  output_format: "JSON array of {line, config_key, value_redacted, issue, severity, recommendation}"
+  test_cases:
+    - input: "/tmp/app.yaml"
+      expected_output: "["
+    - input: "/tmp/encryption.json"
+      expected_output: "["
+  constraints:
+    - "Detect: AES-CBC without explicit IV rotation, iteration_count <100000, key_size <256, salt='static', iv='0000...'"
+    - "Must handle JSON, YAML, and INI formats"
+
+- id: "SEC-097"
+  title: "Data Exfiltration Simulation Detector"
+  description: "Reads a DNS resolver address and a domain from stdin. Simulates DNS-based data exfiltration detection: listens for unusual subdomain queries that encode data."
+  difficulty: 4
+  stdlib_modules: [std.net, std.str, std.json, std.crypto, std.time]
+  input_format: "First line: listen address. Second line: domain suffix to monitor. Third line: duration seconds"
+  output_format: "JSON {queries: [{subdomain, decoded_data?, exfil_suspected, entropy}], summary}"
+  test_cases:
+    - input: "127.0.0.1:5353\nexfil.example.com\n10"
+      expected_output: "queries"
+    - input: "127.0.0.1:5353\ntest.local\n5"
+      expected_output: "summary"
+  constraints:
+    - "Suspect exfiltration: subdomain >20 chars, entropy >3.5 bits/char, base64/hex patterns"
+    - "Must listen on UDP port for DNS queries"
+
+- id: "SEC-098"
+  title: "Web Shell Detector"
+  description: "Reads a directory path from stdin. Scans PHP, ASP, JSP, and shell script files for web shell signatures: eval(base64_decode), system(), passthru(), $_REQUEST execution."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json]
+  input_format: "Single line: directory path to scan"
+  output_format: "JSON array of {file, line, signature_type, severity, code_snippet (truncated, 80 chars)}"
+  test_cases:
+    - input: "/var/www/html"
+      expected_output: "["
+    - input: "/tmp/webroot"
+      expected_output: "["
+  constraints:
+    - "Signatures: eval(base64_decode, eval($_POST, passthru(, system(, exec(, shell_exec(, popen("
+    - "Must recurse directories"
+    - "Must check file extension before scanning (php, php3, php4, phtml, asp, aspx, jsp)"
+
+- id: "SEC-099"
+  title: "Hardcoded Secret Entropy Scanner"
+  description: "Reads a file path from stdin. Scans for hardcoded secrets by identifying high-entropy strings (potential tokens, keys, passwords) using Shannon entropy analysis."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json, std.crypto]
+  input_format: "First line: file path. Second line: entropy threshold (e.g. 3.5)"
+  output_format: "JSON array of {line, entropy_bits, string_prefix (first 8 chars), context_line, likely_type}"
+  test_cases:
+    - input: "/tmp/config.py\n3.5"
+      expected_output: "["
+    - input: "/tmp/application.properties\n4.0"
+      expected_output: "["
+  constraints:
+    - "Calculate Shannon entropy: -sum(p(c) * log2(p(c))) for each char c"
+    - "Min string length: 20 characters"
+    - "Ignore common false positives: Lorem ipsum, long URLs, base64 images in HTML"
+
+- id: "SEC-100"
+  title: "Security Event Correlation Engine"
+  description: "Reads multiple log streams from stdin (JSON events with type, timestamp, source_ip, user). Correlates events across streams to detect complex attack patterns."
+  difficulty: 5
+  stdlib_modules: [std.str, std.json, std.time, std.file]
+  input_format: "JSON events, one per line, until EOF. Each: {source, timestamp, type, ip, user, details}"
+  output_format: "JSON {patterns_detected: [{attack_type, confidence, involved_ips: [...], event_chain: [...], recommendation}]}"
+  test_cases:
+    - input: "{\"source\":\"auth\",\"timestamp\":\"2025-01-01T00:00:00Z\",\"type\":\"login_fail\",\"ip\":\"1.2.3.4\",\"user\":\"admin\",\"details\":{}}\n{\"source\":\"auth\",\"timestamp\":\"2025-01-01T00:00:05Z\",\"type\":\"login_fail\",\"ip\":\"1.2.3.4\",\"user\":\"admin\",\"details\":{}}\n"
+      expected_output: "patterns_detected"
+    - input: "{\"source\":\"web\",\"timestamp\":\"2025-01-01T00:01:00Z\",\"type\":\"404\",\"ip\":\"5.6.7.8\",\"user\":\"\",\"details\":{\"path\":\"/admin\"}}\n"
+      expected_output: "patterns_detected"
+  constraints:
+    - "Detect: brute force (>5 failures/5min), reconnaissance (>20 404s/1min), credential stuffing (failures across many usernames), lateral movement (same IP, different users, success)"
+    - "Must correlate events across different log sources by IP"
+
+- id: "SEC-101"
+  title: "API Abuse Pattern Detector"
+  description: "Reads API access log entries from stdin. Detects API abuse patterns: scraping (sequential ID enumeration), account takeover sequences, volumetric attacks, token harvesting."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.time]
+  input_format: "JSON log entries, one per line: {timestamp, ip, method, path, status, user_id}"
+  output_format: "JSON {abuse_patterns: [{type, ip, evidence, severity, recommendation}], flagged_ips: [...]}"
+  test_cases:
+    - input: "{\"timestamp\":\"2025-01-01T00:00:00Z\",\"ip\":\"1.2.3.4\",\"method\":\"GET\",\"path\":\"/users/1\",\"status\":200,\"user_id\":\"anon\"}\n{\"timestamp\":\"2025-01-01T00:00:01Z\",\"ip\":\"1.2.3.4\",\"method\":\"GET\",\"path\":\"/users/2\",\"status\":200,\"user_id\":\"anon\"}\n"
+      expected_output: "abuse_patterns"
+    - input: "{\"timestamp\":\"2025-01-01T00:00:00Z\",\"ip\":\"9.9.9.9\",\"method\":\"GET\",\"path\":\"/products/1\",\"status\":200,\"user_id\":\"u1\"}\n"
+      expected_output: "flagged_ips"
+  constraints:
+    - "Sequential enumeration: N sequential IDs accessed in < 60s"
+    - "Token harvesting: >100 successful GET requests with no POST in session"
+
+- id: "SEC-102"
+  title: "Cryptographic Nonce Reuse Detector"
+  description: "Reads a JSON log of encryption operations from stdin. Detects nonce reuse (using the same nonce twice with the same key in GCM mode, which is catastrophic)."
+  difficulty: 4
+  stdlib_modules: [std.json, std.str, std.crypto]
+  input_format: "JSON array of {operation, key_id, nonce_hex, ciphertext_preview}"
+  output_format: "JSON {nonce_reuse_found: bool, incidents: [{key_id, nonce, first_use_index, reuse_index, severity: 'CRITICAL'}]}"
+  test_cases:
+    - input: "[{\"operation\":\"encrypt\",\"key_id\":\"k1\",\"nonce_hex\":\"aabbccdd00112233\",\"ciphertext_preview\":\"aaa\"},{\"operation\":\"encrypt\",\"key_id\":\"k1\",\"nonce_hex\":\"aabbccdd00112233\",\"ciphertext_preview\":\"bbb\"}]"
+      expected_output: "CRITICAL"
+    - input: "[{\"operation\":\"encrypt\",\"key_id\":\"k1\",\"nonce_hex\":\"aabbccdd00112233\",\"ciphertext_preview\":\"aaa\"},{\"operation\":\"encrypt\",\"key_id\":\"k1\",\"nonce_hex\":\"aabbccdd00112244\",\"ciphertext_preview\":\"bbb\"}]"
+      expected_output: "nonce_reuse_found"
+  constraints:
+    - "Reuse = same (key_id, nonce) pair appearing more than once"
+    - "Must flag as CRITICAL (nonce reuse in GCM recovers plaintext)"
+
+- id: "SEC-103"
+  title: "Subdomain Takeover Checker"
+  description: "Reads a list of subdomains from stdin. Checks each for subdomain takeover vulnerability: DNS resolves but the target service returns a 'not found' page indicating the resource was deleted."
+  difficulty: 3
+  stdlib_modules: [std.net, std.http, std.str, std.json]
+  input_format: "Lines of subdomain names until EOF"
+  output_format: "Per subdomain: SAFE, VULNERABLE (<platform>), or DANGLING_DNS with evidence"
+  test_cases:
+    - input: "staging.example.com\ndev.example.com\n"
+      expected_output: "SAFE"
+    - input: "old-app.example.com\n"
+      expected_output: "SAFE"
+  constraints:
+    - "Platforms with known fingerprints: GitHub Pages ('There isn't a GitHub Pages site'), Heroku, Netlify, Vercel, Fastly"
+    - "DANGLING_DNS: DNS resolves but HTTP returns connection refused"
+
+- id: "SEC-104"
+  title: "HTTP Response Splitting Tester"
+  description: "Reads a URL with a reflection point placeholder from stdin. Tests for HTTP response splitting by injecting CRLF sequences into the reflected parameter."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL with {INJECT} placeholder"
+  output_format: "Per payload: SAFE or VULNERABLE with injected headers found in response"
+  test_cases:
+    - input: "https://app.example.com/redirect?url={INJECT}"
+      expected_output: "Testing"
+    - input: "http://localhost:8041?name={INJECT}"
+      expected_output: "Testing"
+  constraints:
+    - "Payloads: value%0d%0aX-Custom-Header:%20injected, value%0aX-Custom-Header:%20injected"
+    - "VULNERABLE if X-Custom-Header appears in response headers"
+
+- id: "SEC-105"
+  title: "Side Channel Timing Attack Simulator"
+  description: "Reads a function type (string_compare|hash_compare|hmac_verify) and test inputs from stdin. Simulates timing measurements to demonstrate constant-time vs variable-time comparison."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json, std.time]
+  input_format: "First line: function type. Second line: secret value. Subsequent lines: guesses to test"
+  output_format: "Per guess: timing_ns, correctly_rejected (bool). Timing chart showing correlation."
+  test_cases:
+    - input: "string_compare\npassword123\npassword\npassword1\npassword12\npassword123"
+      expected_output: "timing_ns"
+    - input: "hmac_verify\nsecret\ninvalid\nsecret"
+      expected_output: "timing_ns"
+  constraints:
+    - "Must show that simple string compare leaks prefix length via timing"
+    - "Must show constant-time compare does not leak"
+    - "Repeat each comparison 1000 times for statistical significance"
+
+- id: "SEC-106"
+  title: "HTTP Desync Probe"
+  description: "Reads a URL from stdin. Probes for HTTP desync vulnerabilities by sending ambiguous Content-Length/Transfer-Encoding requests through a simulated frontend/backend setup."
+  difficulty: 5
+  stdlib_modules: [std.net, std.str, std.json, std.time, std.http]
+  input_format: "Single line: target URL"
+  output_format: "JSON {url, desync_risk, probes: [{type, payload, response_time_delta, evidence}]}"
+  test_cases:
+    - input: "https://api.example.com"
+      expected_output: "desync_risk"
+    - input: "http://localhost:8113"
+      expected_output: "probes"
+  constraints:
+    - "Probe types: CL.TE, TE.CL, TE.TE"
+    - "Must not send exploitative payloads, only detection probes"
+    - "Timing-based detection: anomalous response time indicates parsing difference"
+
+- id: "SEC-107"
+  title: "Security Policy Compliance Checker"
+  description: "Reads a security policy JSON and a system configuration JSON from stdin. Checks whether the system configuration complies with the policy and reports gaps."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "First block: JSON security policy. Blank line. Second block: JSON system config."
+  output_format: "JSON {compliant: bool, gaps: [{policy_rule, required, actual, severity, remediation}], compliance_score}"
+  test_cases:
+    - input: "{\"require_https\":true,\"min_tls\":\"1.2\",\"require_hsts\":true}\n\n{\"protocol\":\"https\",\"tls_version\":\"1.0\",\"hsts\":false}"
+      expected_output: "gaps"
+    - input: "{\"require_https\":true,\"min_tls\":\"1.2\"}\n\n{\"protocol\":\"https\",\"tls_version\":\"1.3\"}"
+      expected_output: "compliant"
+  constraints:
+    - "Must check each policy rule independently"
+    - "Compliance score = (passing rules / total rules) * 100"
+
+- id: "SEC-108"
+  title: "Malicious Payload Generator (Defensive Research)"
+  description: "Reads a vulnerability type and target context from stdin. Generates common test payloads for that vulnerability for use in defensive testing of WAFs and input validation."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json, std.crypto]
+  input_format: "First line: vuln type (xss|sqli|cmd_injection|path_traversal|xxe|ssti). Second line: context (html|url|json|xml|shell)"
+  output_format: "JSON array of {payload, description, expected_impact, detection_bypass_technique}"
+  test_cases:
+    - input: "xss\nhtml"
+      expected_output: "<script>"
+    - input: "sqli\nurl"
+      expected_output: "OR"
+  constraints:
+    - "At least 10 payloads per vuln type"
+    - "Must include both basic and WAF-bypass variants"
+    - "Must include description of each payload's technique"
+
+- id: "SEC-109"
+  title: "Access Control Matrix Validator"
+  description: "Reads an access control matrix (subjects x objects x permissions) from stdin. Validates it for principle of least privilege: finds over-privileged subjects and redundant permissions."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON {subjects: [...], objects: [...], permissions: {subject: {object: [permissions]}}}"
+  output_format: "JSON {issues: [{type, subject, object, permissions, recommendation}], leastPrivilegeScore}"
+  test_cases:
+    - input: "{\"subjects\":[\"user\",\"admin\"],\"objects\":[\"db\",\"config\"],\"permissions\":{\"user\":{\"db\":[\"read\",\"write\",\"delete\",\"admin\"],\"config\":[\"read\",\"write\"]},\"admin\":{\"db\":[\"read\",\"write\",\"delete\",\"admin\"],\"config\":[\"read\",\"write\",\"delete\"]}}}"
+      expected_output: "issues"
+    - input: "{\"subjects\":[\"user\"],\"objects\":[\"data\"],\"permissions\":{\"user\":{\"data\":[\"read\"]}}}"
+      expected_output: "leastPrivilegeScore"
+  constraints:
+    - "Flag: users with delete/admin permissions not required for their role"
+    - "Suggest minimum required permissions based on object type"
+
+- id: "SEC-110"
+  title: "Log Tampering Detector"
+  description: "Reads a log file path from stdin. Analyses the log for signs of tampering: timestamps out of order, missing sequence numbers, suspicious deletions, entries with future timestamps."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json, std.time]
+  input_format: "Single line: log file path"
+  output_format: "JSON {integrity: 'intact'|'suspicious'|'tampered', issues: [{lineNumber, type, description}], summary}"
+  test_cases:
+    - input: "/tmp/clean.log"
+      expected_output: "intact"
+    - input: "/tmp/tampered.log"
+      expected_output: "tampered"
+  constraints:
+    - "Detect: timestamps going backwards, gaps in sequence numbers, lines with future timestamps >5min, duplicate entries"
+    - "Must handle logs with and without sequence numbers"
+
+- id: "SEC-111"
+  title: "DNS Hijacking Detector"
+  description: "Reads a domain and expected DNS records from stdin. Compares live DNS responses against expected values across multiple resolvers to detect DNS hijacking or cache poisoning."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str, std.json]
+  input_format: "First line: domain. Second line: expected A record (IP). Third line: comma-separated resolvers"
+  output_format: "Per resolver: {resolver, returned_ip, matches_expected, suspicious}. Summary: CONSISTENT or HIJACKED"
+  test_cases:
+    - input: "example.com\n93.184.216.34\n8.8.8.8,1.1.1.1,9.9.9.9"
+      expected_output: "CONSISTENT"
+    - input: "test.local\n192.168.1.1\n8.8.8.8,1.1.1.1"
+      expected_output: "CONSISTENT"
+  constraints:
+    - "HIJACKED if any resolver returns a different IP"
+    - "Must use multiple resolvers for comparison"
+
+- id: "SEC-112"
+  title: "Security-Focused HTTP Client"
+  description: "HTTP client with built-in security: certificate pinning, request signing (HMAC), automatic sensitive-header scrubbing from logs, and anomaly detection on responses."
+  difficulty: 4
+  stdlib_modules: [std.http, std.crypto, std.str, std.json, std.time, std.file]
+  input_format: "First line: URL. Second line: pinned cert hash (SHA256). Third line: HMAC signing secret"
+  output_format: "Response body; security log showing cert validation, signature, and anomaly checks"
+  test_cases:
+    - input: "https://example.com\n<sha256_hash>\nsigning-secret"
+      expected_output: "200"
+    - input: "https://api.example.com\n<sha256_hash>\nmysecret"
+      expected_output: "200"
+  constraints:
+    - "Must reject if server cert SHA256 does not match pinned hash"
+    - "Must sign requests with X-Signature: sha256=<hmac>"
+    - "Anomaly: response size >10x baseline, unexpected status code, missing expected headers"
+
+- id: "SEC-113"
+  title: "Public Key Pinning Report Generator"
+  description: "Reads a list of domains from stdin. Fetches each TLS certificate chain, computes public key hashes (HPKP-style), and generates a report with recommended pin values."
+  difficulty: 3
+  stdlib_modules: [std.net, std.crypto, std.str, std.json, std.time]
+  input_format: "Lines of domain:port pairs until EOF"
+  output_format: "Per domain: {domain, pins: [{subject, hash_base64, validUntil}], recommended_pins, backupPinAvailable}"
+  test_cases:
+    - input: "example.com:443\ngithub.com:443\n"
+      expected_output: "pins"
+    - input: "localhost:8443\n"
+      expected_output: "pins"
+  constraints:
+    - "Pin format: base64(SHA256(SubjectPublicKeyInfo))"
+    - "Must pin both leaf and intermediate certificates"
+    - "Must warn if only one unique pin found (no backup)"
+
+- id: "SEC-114"
+  title: "Malformed Input Fuzzer"
+  description: "Reads a target URL and an input field description from stdin. Generates and sends malformed inputs (boundary values, type confusion, format strings, special chars) and reports unexpected behaviour."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.crypto, std.time]
+  input_format: "First line: URL. Second line: HTTP method. Third line: JSON body template with {FUZZ} placeholder"
+  output_format: "Per fuzz case: payload_type, status code, response_time, anomalous (bool). Summary."
+  test_cases:
+    - input: "http://localhost:8083/users\nPOST\n{\"name\":\"{FUZZ}\",\"email\":\"test@example.com\"}"
+      expected_output: "Summary:"
+    - input: "http://localhost:8079/items\nPOST\n{\"price\":{FUZZ}}"
+      expected_output: "Summary:"
+  constraints:
+    - "Fuzz cases: null, true, false, 0, -1, MAX_INT, empty string, 10KB string, SQL chars, HTML, null byte, unicode edge cases"
+    - "Anomalous: 5xx response or response time >2x baseline"
+
+- id: "SEC-115"
+  title: "Server-Side Template Injection (SSTI) Tester"
+  description: "Reads a URL with a reflection point from stdin. Tests for SSTI by injecting template syntax for common engines (Jinja2, Twig, Freemarker, Pebble) and detecting evaluated output."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL with {INJECT} placeholder"
+  output_format: "Per payload: SAFE or VULNERABLE with engine identified and proof of execution"
+  test_cases:
+    - input: "https://app.example.com/greet?name={INJECT}"
+      expected_output: "Testing"
+    - input: "http://localhost:8017/render?template={INJECT}"
+      expected_output: "Testing"
+  constraints:
+    - "Payloads: {{7*7}} (Jinja2/Twig), ${7*7} (Freemarker), #{7*7} (Pebble)"
+    - "Detect execution if '49' appears in response"
+    - "Must test at least 5 template engines"
+
+- id: "SEC-116"
+  title: "OAuth2 State Parameter CSRF Tester"
+  description: "Reads an OAuth2 authorization URL from stdin. Tests whether the state parameter is properly validated by completing the OAuth flow without a state param and with a wrong state value."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.auth]
+  input_format: "First line: authorization URL. Second line: callback URL. Third line: token URL"
+  output_format: "PROTECTED if server validates state; VULNERABLE if it accepts missing or wrong state"
+  test_cases:
+    - input: "https://auth.example.com/authorize\nhttps://app.example.com/callback\nhttps://auth.example.com/token"
+      expected_output: "Testing"
+    - input: "http://localhost:8098/oauth/authorize\nhttp://localhost:8098/callback\nhttp://localhost:8098/oauth/token"
+      expected_output: "Testing"
+  constraints:
+    - "Test: no state param, wrong state value, replayed state value"
+    - "VULNERABLE if any test case allows token exchange"
+
+- id: "SEC-117"
+  title: "Password Reset Token Security Tester"
+  description: "Reads a password reset endpoint from stdin. Tests the reset token for: sufficient entropy, single-use enforcement, expiry enforcement, and predictability."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto, std.time]
+  input_format: "First line: reset request URL. Second line: reset confirm URL. Third line: test email"
+  output_format: "Per security check: PASS or FAIL with evidence. Summary."
+  test_cases:
+    - input: "http://localhost:8010/forgot-password\nhttp://localhost:8010/reset\ntest@example.com"
+      expected_output: "Testing"
+    - input: "https://app.example.com/forgot\nhttps://app.example.com/reset-confirm\ntest@example.com"
+      expected_output: "Testing"
+  constraints:
+    - "Entropy test: request 5 tokens, check all are different and high-entropy"
+    - "Single-use test: use token, try using same token again (should fail)"
+    - "Expiry test: check if token expiry is enforced"
+
+- id: "SEC-118"
+  title: "Cryptographic Key Derivation Auditor"
+  description: "Reads a password and KDF configuration from stdin. Evaluates the KDF parameters (PBKDF2/bcrypt/scrypt/argon2) for security and estimates crack time on modern hardware."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json, std.time]
+  input_format: "First line: algorithm (pbkdf2|bcrypt|scrypt|argon2id). Second line: JSON parameters"
+  output_format: "JSON {algorithm, parameters, derivation_time_ms, security_rating (weak|fair|strong|very_strong), estimated_crack_time, recommendations}"
+  test_cases:
+    - input: "pbkdf2\n{\"iterations\":1000,\"hash\":\"sha1\",\"key_len\":32}"
+      expected_output: "weak"
+    - input: "argon2id\n{\"memory\":65536,\"iterations\":3,\"parallelism\":4}"
+      expected_output: "strong"
+  constraints:
+    - "PBKDF2: minimum 600000 iterations with SHA-256 for strong"
+    - "bcrypt: minimum cost factor 12 for strong"
+    - "argon2id: minimum 64MB memory, 3 iterations for strong"
+
+- id: "SEC-119"
+  title: "HTTP Flood Attack Pattern Detector"
+  description: "Reads a server access log from stdin. Detects HTTP flood attack patterns: high request rate, low response variety, bot-like user agents, missing browser fingerprints."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.json, std.time]
+  input_format: "Single line: access log file path"
+  output_format: "JSON {flood_detected: bool, suspected_bots: [{ip, req_rate_per_sec, ua_entropy, evidence}], mitigation: [...]}"
+  test_cases:
+    - input: "/tmp/flood.log"
+      expected_output: "flood_detected"
+    - input: "/tmp/normal.log"
+      expected_output: "suspected_bots"
+  constraints:
+    - "Bot indicators: req/s >50, no Referer header, curl/python/wget user agents, identical Accept headers across IPs"
+    - "Flood: total req/s >1000 or single IP >100 req/s"
+
+- id: "SEC-120"
+  title: "Encryption Oracle Detector"
+  description: "Reads an API URL from stdin. Tests for padding oracle vulnerabilities in encryption by modifying ciphertext byte by byte and observing different error responses."
+  difficulty: 5
+  stdlib_modules: [std.http, std.str, std.json, std.time, std.crypto]
+  input_format: "First line: URL with {CIPHER} placeholder. Second line: sample ciphertext (base64)"
+  output_format: "JSON {oracle_detected: bool, oracle_type (padding|timing|error_message), evidence, severity}"
+  test_cases:
+    - input: "http://localhost:8017/decrypt?token={CIPHER}\nYWJjZGVmZ2g="
+      expected_output: "oracle_detected"
+    - input: "https://app.example.com/verify?mac={CIPHER}\nYWJj"
+      expected_output: "oracle_detected"
+  constraints:
+    - "Test: bit-flip modified ciphertext, different padding lengths"
+    - "Oracle detected if different ciphertexts produce distinguishably different errors"
+
+- id: "SEC-121"
+  title: "Cloud Metadata Service SSRF Tester"
+  description: "Reads a URL with a URL-parameter injection point from stdin. Tests for access to cloud metadata services (AWS, GCP, Azure) via SSRF injection."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL with {URL} placeholder"
+  output_format: "Per metadata endpoint tested: ACCESSIBLE or BLOCKED. CRITICAL if any accessible."
+  test_cases:
+    - input: "https://api.example.com/fetch?url={URL}"
+      expected_output: "Testing"
+    - input: "http://localhost:8030/proxy?target={URL}"
+      expected_output: "Testing"
+  constraints:
+    - "Test: http://169.254.169.254/latest/meta-data (AWS), http://metadata.google.internal/computeMetadata/v1/, http://169.254.169.254/metadata/instance (Azure)"
+    - "ACCESSIBLE if response contains cloud-specific patterns (ami-id, project-id, etc.)"
+
+- id: "SEC-122"
+  title: "XML Bomb (Billion Laughs) Detector"
+  description: "Reads XML content from stdin. Detects XML bomb/billion laughs attacks: recursive entity expansion patterns that cause memory exhaustion."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json]
+  input_format: "Lines of XML content until EOF"
+  output_format: "SAFE or VULNERABLE with expansion_depth, estimated_expanded_size, and example chain"
+  test_cases:
+    - input: "<?xml version=\"1.0\"?><!DOCTYPE bomb [<!ENTITY a \"AAAA\"><!ENTITY b \"&a;&a;&a;&a;\">]><bomb>&b;</bomb>"
+      expected_output: "VULNERABLE"
+    - input: "<?xml version=\"1.0\"?><root><item>safe</item></root>"
+      expected_output: "SAFE"
+  constraints:
+    - "Must detect: recursive entity definitions, deeply nested entities"
+    - "Estimate expanded size without actually expanding"
+    - "Flag as VULNERABLE if estimated size >1MB"
+
+- id: "SEC-123"
+  title: "JWT Secret Brute-Forcer"
+  description: "Reads a JWT token and wordlist file path from stdin. Attempts to brute-force the HMAC secret by trying each word from the wordlist. Reports if secret is found."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json, std.file, std.time]
+  input_format: "First line: JWT token. Second line: wordlist file path"
+  output_format: "Progress: 'Trying N/total'. If found: 'SECRET FOUND: <secret>'. If not: 'Not found after N attempts in Xs'"
+  test_cases:
+    - input: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U\n/tmp/jwt-wordlist.txt"
+      expected_output: "Trying"
+    - input: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature\n/tmp/wordlist.txt"
+      expected_output: "Trying"
+  constraints:
+    - "Must verify candidate secret by re-signing and comparing"
+    - "Must handle large wordlists efficiently (stream, don't load all into memory)"
+    - "Designed for testing your own JWT implementations"
+
+- id: "SEC-124"
+  title: "Network Segmentation Validator"
+  description: "Reads a network topology (JSON) and security policy from stdin. Validates that the segmentation rules are correctly implemented by testing connectivity between segments."
+  difficulty: 4
+  stdlib_modules: [std.net, std.str, std.json, std.time]
+  input_format: "JSON {segments: [{name, cidr, allowed_outbound: [...]}], test_pairs: [{src, dst, expected: allow|deny}]}"
+  output_format: "Per test pair: PASS or FAIL with actual connectivity result. Summary."
+  test_cases:
+    - input: "{\"segments\":[{\"name\":\"DMZ\",\"cidr\":\"10.0.1.0/24\",\"allowed_outbound\":[\"10.0.2.0/24\"]}],\"test_pairs\":[{\"src\":\"10.0.1.1\",\"dst\":\"10.0.2.1\",\"expected\":\"allow\"}]}"
+      expected_output: "PASS"
+    - input: "{\"segments\":[],\"test_pairs\":[]}"
+      expected_output: "Summary:"
+  constraints:
+    - "Tests connectivity using TCP connect attempts"
+    - "Must test both allowed and denied connections"
+
+- id: "SEC-125"
+  title: "Cryptographic Agility Checker"
+  description: "Reads an API base URL from stdin. Tests whether the API enforces strong algorithms: sends requests with weak algorithm negotiation headers and checks if they are rejected."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.net]
+  input_format: "Single line: API base URL"
+  output_format: "JSON {checks: [{test, result (enforced|downgrade_accepted), evidence}], overall_grade}"
+  test_cases:
+    - input: "https://api.example.com"
+      expected_output: "overall_grade"
+    - input: "http://localhost:8087"
+      expected_output: "checks"
+  constraints:
+    - "Check: JWT alg downgrade (HS256 when RS256 expected), TLS cipher negotiation, hash algorithm in signature"
+    - "DOWNGRADE_ACCEPTED means the API does not enforce algorithm strength"
+
+- id: "SEC-126"
+  title: "Security Regression Test Runner"
+  description: "Reads a list of previously-exploited vulnerabilities (CVE-like records with reproduction steps) from stdin. Re-tests each to verify they are still patched."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: base URL. Remaining lines: JSON vulnerability records until EOF"
+  output_format: "Per vulnerability: PATCHED or REGRESSION with evidence. Summary. Exit non-zero if any regression."
+  test_cases:
+    - input: "http://localhost:8083\n{\"id\":\"VULN-001\",\"type\":\"sqli\",\"path\":\"/users\",\"param\":\"id\",\"payload\":\"1' OR '1'='1\",\"expected_blocked\":true}\n"
+      expected_output: "PATCHED"
+    - input: "https://api.example.com\n{\"id\":\"VULN-002\",\"type\":\"xss\",\"path\":\"/search\",\"param\":\"q\",\"payload\":\"<script>alert(1)</script>\",\"expected_blocked\":true}\n"
+      expected_output: "PATCHED"
+  constraints:
+    - "REGRESSION if a previously-fixed vulnerability is now exploitable"
+    - "Must exit with code 1 if any regression found"
+
+- id: "SEC-127"
+  title: "Zero-Day Triage Tool"
+  description: "Reads a vulnerability report (natural language description + indicators) from stdin. Performs automated triage: assesses severity, identifies affected components, checks public exploits, suggests mitigations."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json, std.http, std.time]
+  input_format: "JSON {description, indicators: {affected_software, cwe_ids, attack_vectors}, reported_at}"
+  output_format: "JSON {severity_score, cvss_estimate, affected_components: [...], public_exploit_likely, recommended_mitigations: [...], escalation_required}"
+  test_cases:
+    - input: "{\"description\":\"Unauthenticated RCE via deserialization in admin API\",\"indicators\":{\"affected_software\":\"AdminPanel v2.3\",\"cwe_ids\":[\"CWE-502\"],\"attack_vectors\":[\"network\"]},\"reported_at\":\"2025-01-01T00:00:00Z\"}"
+      expected_output: "severity_score"
+    - input: "{\"description\":\"Reflected XSS in search box\",\"indicators\":{\"affected_software\":\"WebApp\",\"cwe_ids\":[\"CWE-79\"],\"attack_vectors\":[\"network\"]},\"reported_at\":\"2025-01-01T00:00:00Z\"}"
+      expected_output: "severity_score"
+  constraints:
+    - "Must look up CWE severity baseline from built-in CWE table"
+    - "RCE, SQLi, deserialization: critical. XSS: medium/high. Info disclosure: low/medium."
+
+- id: "SEC-128"
+  title: "Infrastructure as Code Security Scanner"
+  description: "Reads a Terraform or CloudFormation template file path from stdin. Scans for security misconfigurations: public S3 buckets, unrestricted security groups, unencrypted databases."
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.json]
+  input_format: "First line: file path. Second line: format (terraform|cloudformation)"
+  output_format: "JSON {findings: [{resource, property, issue, severity, recommendation, line?}], summary}"
+  test_cases:
+    - input: "/tmp/main.tf\nterraform"
+      expected_output: "findings"
+    - input: "/tmp/template.json\ncloudformation"
+      expected_output: "summary"
+  constraints:
+    - "Terraform checks: aws_s3_bucket with acl=public, aws_security_group with 0.0.0.0/0, aws_db_instance without encryption"
+    - "CloudFormation checks: S3 BlockPublicAcls: false, SecurityGroup with 0.0.0.0/0 ingress"
+
+- id: "SEC-129"
+  title: "Incident Response Timeline Builder"
+  description: "Reads multiple log files from stdin (syslog, auth.log, access.log, application.log). Correlates events around a specified incident time and builds a timeline of security-relevant events."
+  difficulty: 4
+  stdlib_modules: [std.file, std.str, std.json, std.time]
+  input_format: "First line: incident timestamp (ISO-8601). Second line: window minutes (before/after). Subsequent lines: log file paths (blank to finish)"
+  output_format: "Chronological timeline of events: {timestamp, source, event, relevance_score}. Most relevant events highlighted."
+  test_cases:
+    - input: "2025-01-01T12:00:00Z\n30\n/tmp/auth.log\n/tmp/access.log\n"
+      expected_output: "Timeline"
+    - input: "2025-06-01T08:30:00Z\n60\n/tmp/syslog\n"
+      expected_output: "Timeline"
+  constraints:
+    - "Must parse Common Log Format, syslog RFC 3164, and ISO-8601 timestamps"
+    - "Relevance score based on: auth events, error events, privilege changes, unusual times"
+
+- id: "SEC-130"
+  title: "Full Security Audit Suite Runner"
+  description: "Reads a target URL from stdin and runs a comprehensive automated security audit suite covering: headers, TLS, authentication, injection, CORS, rate limiting, and information disclosure. Generates a full PDF-style text report."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.crypto, std.net, std.time, std.file]
+  input_format: "First line: target URL. Second line: output report file path"
+  output_format: "Detailed text report written to file; summary to stdout with overall risk rating (critical|high|medium|low|info)"
+  test_cases:
+    - input: "https://example.com\n/tmp/audit-report.txt"
+      expected_output: "Audit complete"
+    - input: "http://localhost:8083\n/tmp/api-audit.txt"
+      expected_output: "Audit complete"
+  constraints:
+    - "Must run at least 20 distinct security checks"
+    - "Report must include: executive summary, methodology, findings by severity, remediation roadmap"
+    - "Must not be destructive (no data modification)"
+    - "Must complete within 120 seconds"

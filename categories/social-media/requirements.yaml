@@ -1,0 +1,1860 @@
+# Social Media Engine - Program Requirements
+# 130+ unique requirements covering user management, content, feeds, interactions,
+# comments, social graph, search, notifications, moderation, analytics, API design,
+# trending, DMs, lists/groups. All REST API patterns with JSON request/response.
+
+# =============================================================================
+# USER MANAGEMENT (SOC-001 to SOC-015)
+# =============================================================================
+
+- id: "SOC-001"
+  title: "User registration"
+  description: "Register a new user with email, username, and password. Hash password before storage."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.crypto]
+  input_format: "stdin: JSON request with action, email, username, password"
+  output_format: "stdout: JSON response with user id and status"
+  test_cases:
+    - input: "{\"action\":\"register\",\"email\":\"alice@example.com\",\"username\":\"alice\",\"password\":\"s3cur3!\"}"
+      expected_output: "{\"id\":1,\"username\":\"alice\",\"status\":\"registered\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Password must be hashed"]
+
+- id: "SOC-002"
+  title: "User login with JWT"
+  description: "Authenticate user with email and password, return a JWT access token."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.crypto, std.auth]
+  input_format: "stdin: JSON request with action, email, password"
+  output_format: "stdout: JSON response with token and expiry"
+  test_cases:
+    - input: "{\"action\":\"login\",\"email\":\"alice@example.com\",\"password\":\"s3cur3!\"}"
+      expected_output: "{\"token\":\"eyJ...\",\"expires_in\":3600,\"status\":\"authenticated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "JWT token format"]
+
+- id: "SOC-003"
+  title: "User profile retrieval"
+  description: "Fetch a user profile by user ID, returning public profile information."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action and user_id"
+  output_format: "stdout: JSON response with user profile fields"
+  test_cases:
+    - input: "{\"action\":\"get_profile\",\"user_id\":1}"
+      expected_output: "{\"id\":1,\"username\":\"alice\",\"bio\":\"\",\"avatar_url\":null,\"follower_count\":0,\"following_count\":0}"
+  constraints: ["REST API pattern", "JSON in/out"]
+
+- id: "SOC-004"
+  title: "Update user profile"
+  description: "Update bio, display name, and avatar URL for the authenticated user."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, and profile fields"
+  output_format: "stdout: JSON response with updated profile"
+  test_cases:
+    - input: "{\"action\":\"update_profile\",\"token\":\"eyJ...\",\"bio\":\"Hello world\",\"display_name\":\"Alice W\"}"
+      expected_output: "{\"id\":1,\"bio\":\"Hello world\",\"display_name\":\"Alice W\",\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-005"
+  title: "Change password"
+  description: "Allow authenticated user to change password by providing old and new password."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.crypto, std.auth]
+  input_format: "stdin: JSON request with action, token, old_password, new_password"
+  output_format: "stdout: JSON response with status"
+  test_cases:
+    - input: "{\"action\":\"change_password\",\"token\":\"eyJ...\",\"old_password\":\"s3cur3!\",\"new_password\":\"n3wP@ss\"}"
+      expected_output: "{\"status\":\"password_changed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Verify old password first"]
+
+- id: "SOC-006"
+  title: "Password reset request"
+  description: "Generate a password reset token and return it for email delivery."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.crypto, std.time]
+  input_format: "stdin: JSON request with action and email"
+  output_format: "stdout: JSON response with reset token and expiry"
+  test_cases:
+    - input: "{\"action\":\"request_reset\",\"email\":\"alice@example.com\"}"
+      expected_output: "{\"reset_token\":\"abc123\",\"expires_in\":900,\"status\":\"reset_sent\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Token expires in 15 minutes"]
+
+- id: "SOC-007"
+  title: "Deactivate account"
+  description: "Soft-delete user account, marking it as deactivated but preserving data."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, confirmation"
+  output_format: "stdout: JSON response with status"
+  test_cases:
+    - input: "{\"action\":\"deactivate\",\"token\":\"eyJ...\",\"confirm\":true}"
+      expected_output: "{\"status\":\"deactivated\",\"reactivation_window_days\":30}"
+  constraints: ["REST API pattern", "JSON in/out", "Soft delete only"]
+
+- id: "SOC-008"
+  title: "User search by username"
+  description: "Search for users by partial username match, returning paginated results."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, query, page, limit"
+  output_format: "stdout: JSON response with matched users array and pagination"
+  test_cases:
+    - input: "{\"action\":\"search_users\",\"query\":\"ali\",\"page\":1,\"limit\":10}"
+      expected_output: "{\"users\":[{\"id\":1,\"username\":\"alice\"}],\"total\":1,\"page\":1,\"has_next\":false}"
+  constraints: ["REST API pattern", "JSON in/out", "Case-insensitive match"]
+
+- id: "SOC-009"
+  title: "Email verification"
+  description: "Verify a user's email address using a verification token."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.crypto]
+  input_format: "stdin: JSON request with action and verification_token"
+  output_format: "stdout: JSON response with verification status"
+  test_cases:
+    - input: "{\"action\":\"verify_email\",\"verification_token\":\"tok_abc123\"}"
+      expected_output: "{\"status\":\"verified\",\"email\":\"alice@example.com\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Token single-use"]
+
+- id: "SOC-010"
+  title: "User session management"
+  description: "List active sessions for a user and allow revoking specific sessions."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with sessions array"
+  test_cases:
+    - input: "{\"action\":\"list_sessions\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"sessions\":[{\"id\":\"s1\",\"device\":\"Chrome/Mac\",\"created_at\":\"2026-01-01T00:00:00Z\",\"current\":true}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Mark current session"]
+
+- id: "SOC-011"
+  title: "Revoke session"
+  description: "Revoke a specific user session by session ID."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, session_id"
+  output_format: "stdout: JSON response with status"
+  test_cases:
+    - input: "{\"action\":\"revoke_session\",\"token\":\"eyJ...\",\"session_id\":\"s2\"}"
+      expected_output: "{\"status\":\"revoked\",\"session_id\":\"s2\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Cannot revoke current session"]
+
+- id: "SOC-012"
+  title: "Two-factor authentication setup"
+  description: "Generate a TOTP secret and provisioning URI for 2FA enrollment."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.crypto, std.auth]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with secret and provisioning_uri"
+  test_cases:
+    - input: "{\"action\":\"setup_2fa\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"secret\":\"JBSWY3DPEHPK3PXP\",\"provisioning_uri\":\"otpauth://totp/SocialApp:alice?secret=JBSWY3DPEHPK3PXP\",\"status\":\"pending_verification\"}"
+  constraints: ["REST API pattern", "JSON in/out", "TOTP standard"]
+
+- id: "SOC-013"
+  title: "Verify 2FA code"
+  description: "Verify a TOTP code to complete 2FA enrollment or login."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.crypto, std.auth]
+  input_format: "stdin: JSON request with action, token, code"
+  output_format: "stdout: JSON response with verification status"
+  test_cases:
+    - input: "{\"action\":\"verify_2fa\",\"token\":\"eyJ...\",\"code\":\"123456\"}"
+      expected_output: "{\"status\":\"2fa_enabled\",\"backup_codes\":[\"abc123\",\"def456\"]}"
+  constraints: ["REST API pattern", "JSON in/out", "Time-based OTP validation"]
+
+- id: "SOC-014"
+  title: "User privacy settings"
+  description: "Get and update user privacy settings: profile visibility, DM permissions, activity visibility."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, settings object"
+  output_format: "stdout: JSON response with updated settings"
+  test_cases:
+    - input: "{\"action\":\"update_privacy\",\"token\":\"eyJ...\",\"settings\":{\"profile_public\":true,\"allow_dms\":\"followers\",\"show_activity\":false}}"
+      expected_output: "{\"settings\":{\"profile_public\":true,\"allow_dms\":\"followers\",\"show_activity\":false},\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-015"
+  title: "Account data export"
+  description: "Request a full data export of user account, returning a job ID for async processing."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, format"
+  output_format: "stdout: JSON response with job_id and estimated completion"
+  test_cases:
+    - input: "{\"action\":\"export_data\",\"token\":\"eyJ...\",\"format\":\"json\"}"
+      expected_output: "{\"job_id\":\"exp_001\",\"status\":\"processing\",\"estimated_minutes\":5}"
+  constraints: ["REST API pattern", "JSON in/out", "GDPR compliance"]
+
+# =============================================================================
+# CONTENT CRUD (SOC-016 to SOC-030)
+# =============================================================================
+
+- id: "SOC-016"
+  title: "Create text post"
+  description: "Create a new text post with content, optional tags, and visibility setting."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, content, tags, visibility"
+  output_format: "stdout: JSON response with post object"
+  test_cases:
+    - input: "{\"action\":\"create_post\",\"token\":\"eyJ...\",\"content\":\"Hello world!\",\"tags\":[\"intro\"],\"visibility\":\"public\"}"
+      expected_output: "{\"id\":1,\"content\":\"Hello world!\",\"tags\":[\"intro\"],\"visibility\":\"public\",\"created_at\":\"2026-01-01T00:00:00Z\",\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 500 chars"]
+
+- id: "SOC-017"
+  title: "Create media post"
+  description: "Create a post with attached media URLs and alt text descriptions."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, content, media array"
+  output_format: "stdout: JSON response with post object including media"
+  test_cases:
+    - input: "{\"action\":\"create_media_post\",\"token\":\"eyJ...\",\"content\":\"Check this out\",\"media\":[{\"url\":\"https://img.example.com/1.jpg\",\"alt\":\"sunset\"}]}"
+      expected_output: "{\"id\":2,\"content\":\"Check this out\",\"media\":[{\"url\":\"https://img.example.com/1.jpg\",\"alt\":\"sunset\"}],\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 4 media items"]
+
+- id: "SOC-018"
+  title: "Get post by ID"
+  description: "Retrieve a single post by its ID including engagement counts."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action and post_id"
+  output_format: "stdout: JSON response with full post object"
+  test_cases:
+    - input: "{\"action\":\"get_post\",\"post_id\":1}"
+      expected_output: "{\"id\":1,\"author\":{\"id\":1,\"username\":\"alice\"},\"content\":\"Hello world!\",\"likes\":0,\"shares\":0,\"comments\":0,\"created_at\":\"2026-01-01T00:00:00Z\"}"
+  constraints: ["REST API pattern", "JSON in/out"]
+
+- id: "SOC-019"
+  title: "Update post content"
+  description: "Edit an existing post's content. Only the author can edit. Track edit history."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, post_id, content"
+  output_format: "stdout: JSON response with updated post and edit timestamp"
+  test_cases:
+    - input: "{\"action\":\"update_post\",\"token\":\"eyJ...\",\"post_id\":1,\"content\":\"Hello world! (edited)\"}"
+      expected_output: "{\"id\":1,\"content\":\"Hello world! (edited)\",\"edited_at\":\"2026-01-01T01:00:00Z\",\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Author only"]
+
+- id: "SOC-020"
+  title: "Delete post"
+  description: "Soft-delete a post. Only the author or a moderator can delete."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with deletion status"
+  test_cases:
+    - input: "{\"action\":\"delete_post\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"status\":\"deleted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Soft delete"]
+
+- id: "SOC-021"
+  title: "Create poll post"
+  description: "Create a post with an embedded poll containing 2-4 options and a duration."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, question, options, duration_hours"
+  output_format: "stdout: JSON response with poll post object"
+  test_cases:
+    - input: "{\"action\":\"create_poll\",\"token\":\"eyJ...\",\"question\":\"Favorite color?\",\"options\":[\"Red\",\"Blue\",\"Green\"],\"duration_hours\":24}"
+      expected_output: "{\"id\":3,\"type\":\"poll\",\"question\":\"Favorite color?\",\"options\":[{\"id\":1,\"text\":\"Red\",\"votes\":0},{\"id\":2,\"text\":\"Blue\",\"votes\":0},{\"id\":3,\"text\":\"Green\",\"votes\":0}],\"expires_at\":\"2026-01-02T00:00:00Z\",\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "2-4 options required"]
+
+- id: "SOC-022"
+  title: "Vote on poll"
+  description: "Cast a vote on a poll option. Each user can vote once per poll."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, option_id"
+  output_format: "stdout: JSON response with updated poll results"
+  test_cases:
+    - input: "{\"action\":\"vote_poll\",\"token\":\"eyJ...\",\"post_id\":3,\"option_id\":2}"
+      expected_output: "{\"post_id\":3,\"voted_option\":2,\"results\":[{\"id\":1,\"text\":\"Red\",\"votes\":0},{\"id\":2,\"text\":\"Blue\",\"votes\":1},{\"id\":3,\"text\":\"Green\",\"votes\":0}],\"status\":\"voted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "One vote per user"]
+
+- id: "SOC-023"
+  title: "Schedule post"
+  description: "Create a post scheduled for future publication at a specified time."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, content, scheduled_at"
+  output_format: "stdout: JSON response with scheduled post object"
+  test_cases:
+    - input: "{\"action\":\"schedule_post\",\"token\":\"eyJ...\",\"content\":\"Coming soon!\",\"scheduled_at\":\"2026-02-01T12:00:00Z\"}"
+      expected_output: "{\"id\":4,\"content\":\"Coming soon!\",\"scheduled_at\":\"2026-02-01T12:00:00Z\",\"status\":\"scheduled\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Must be future time"]
+
+- id: "SOC-024"
+  title: "Pin post to profile"
+  description: "Pin a post to the top of the user's profile. Max 3 pinned posts."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with pin status"
+  test_cases:
+    - input: "{\"action\":\"pin_post\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"pinned\":true,\"pin_position\":1,\"status\":\"pinned\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 3 pins"]
+
+- id: "SOC-025"
+  title: "Get user posts timeline"
+  description: "Retrieve all posts by a specific user in reverse chronological order with pagination."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, user_id, cursor, limit"
+  output_format: "stdout: JSON response with posts array and pagination cursor"
+  test_cases:
+    - input: "{\"action\":\"user_posts\",\"user_id\":1,\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"posts\":[{\"id\":1,\"content\":\"Hello world!\",\"created_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null,\"has_more\":false}"
+  constraints: ["REST API pattern", "JSON in/out", "Cursor pagination"]
+
+- id: "SOC-026"
+  title: "Create thread"
+  description: "Create a thread of multiple connected posts in sequence."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, posts array"
+  output_format: "stdout: JSON response with thread object"
+  test_cases:
+    - input: "{\"action\":\"create_thread\",\"token\":\"eyJ...\",\"posts\":[{\"content\":\"Thread 1/3\"},{\"content\":\"Thread 2/3\"},{\"content\":\"Thread 3/3\"}]}"
+      expected_output: "{\"thread_id\":\"t1\",\"posts\":[{\"id\":5,\"content\":\"Thread 1/3\",\"position\":1},{\"id\":6,\"content\":\"Thread 2/3\",\"position\":2},{\"id\":7,\"content\":\"Thread 3/3\",\"position\":3}],\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 25 posts per thread"]
+
+- id: "SOC-027"
+  title: "Repost content"
+  description: "Repost another user's post to your timeline, optionally with a quote."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, post_id, quote"
+  output_format: "stdout: JSON response with repost object"
+  test_cases:
+    - input: "{\"action\":\"repost\",\"token\":\"eyJ...\",\"post_id\":1,\"quote\":\"Great post!\"}"
+      expected_output: "{\"id\":8,\"type\":\"repost\",\"original_post_id\":1,\"quote\":\"Great post!\",\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Cannot repost own posts"]
+
+- id: "SOC-028"
+  title: "Post visibility update"
+  description: "Change post visibility between public, followers-only, and private."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, visibility"
+  output_format: "stdout: JSON response with updated visibility"
+  test_cases:
+    - input: "{\"action\":\"set_visibility\",\"token\":\"eyJ...\",\"post_id\":1,\"visibility\":\"followers\"}"
+      expected_output: "{\"post_id\":1,\"visibility\":\"followers\",\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Author only"]
+
+- id: "SOC-029"
+  title: "Content warning label"
+  description: "Add or remove a content warning label on a post."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, warning_text"
+  output_format: "stdout: JSON response with updated post"
+  test_cases:
+    - input: "{\"action\":\"add_content_warning\",\"token\":\"eyJ...\",\"post_id\":1,\"warning_text\":\"Spoiler alert\"}"
+      expected_output: "{\"post_id\":1,\"content_warning\":\"Spoiler alert\",\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Author only"]
+
+- id: "SOC-030"
+  title: "Post translation"
+  description: "Request machine translation of a post to a target language."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, post_id, target_language"
+  output_format: "stdout: JSON response with translated content"
+  test_cases:
+    - input: "{\"action\":\"translate_post\",\"post_id\":1,\"target_language\":\"es\"}"
+      expected_output: "{\"post_id\":1,\"original_language\":\"en\",\"target_language\":\"es\",\"translated_content\":\"Hola mundo!\",\"status\":\"translated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "ISO 639-1 language codes"]
+
+# =============================================================================
+# FEEDS (SOC-031 to SOC-042)
+# =============================================================================
+
+- id: "SOC-031"
+  title: "Home feed - chronological"
+  description: "Retrieve home feed showing posts from followed users in reverse chronological order."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, cursor, limit"
+  output_format: "stdout: JSON response with feed posts and pagination"
+  test_cases:
+    - input: "{\"action\":\"home_feed\",\"token\":\"eyJ...\",\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"posts\":[{\"id\":1,\"author\":\"alice\",\"content\":\"Hello!\",\"created_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":\"c_abc\",\"has_more\":true}"
+  constraints: ["REST API pattern", "JSON in/out", "Only followed users"]
+
+- id: "SOC-032"
+  title: "Home feed - algorithmic"
+  description: "Retrieve algorithmically ranked feed based on engagement signals and user preferences."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, cursor, limit"
+  output_format: "stdout: JSON response with ranked feed posts"
+  test_cases:
+    - input: "{\"action\":\"algorithmic_feed\",\"token\":\"eyJ...\",\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"posts\":[{\"id\":5,\"author\":\"bob\",\"content\":\"Viral post\",\"score\":0.95,\"reason\":\"trending_in_network\"}],\"next_cursor\":\"c_def\",\"has_more\":true}"
+  constraints: ["REST API pattern", "JSON in/out", "Score-based ranking"]
+
+- id: "SOC-033"
+  title: "Explore feed"
+  description: "Public discovery feed showing popular content from users not yet followed."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, category, cursor"
+  output_format: "stdout: JSON response with discover posts"
+  test_cases:
+    - input: "{\"action\":\"explore_feed\",\"token\":\"eyJ...\",\"category\":\"all\",\"cursor\":null}"
+      expected_output: "{\"posts\":[{\"id\":10,\"author\":\"charlie\",\"content\":\"Trending content\",\"likes\":500}],\"next_cursor\":\"c_ghi\",\"has_more\":true}"
+  constraints: ["REST API pattern", "JSON in/out", "Exclude followed users"]
+
+- id: "SOC-034"
+  title: "Tag feed"
+  description: "Retrieve posts matching a specific hashtag, sorted by recency."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.str, std.time]
+  input_format: "stdin: JSON request with action, tag, cursor, limit"
+  output_format: "stdout: JSON response with tagged posts"
+  test_cases:
+    - input: "{\"action\":\"tag_feed\",\"tag\":\"programming\",\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"tag\":\"programming\",\"posts\":[{\"id\":12,\"content\":\"Love coding!\",\"author\":\"dev1\"}],\"total_posts\":150,\"next_cursor\":\"c_jkl\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Case-insensitive tag matching"]
+
+- id: "SOC-035"
+  title: "Bookmarked posts feed"
+  description: "Retrieve the authenticated user's bookmarked posts in saved order."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, cursor, limit"
+  output_format: "stdout: JSON response with bookmarked posts"
+  test_cases:
+    - input: "{\"action\":\"bookmarks_feed\",\"token\":\"eyJ...\",\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"bookmarks\":[{\"post_id\":5,\"content\":\"Saved this\",\"bookmarked_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null,\"has_more\":false}"
+  constraints: ["REST API pattern", "JSON in/out", "Private to user"]
+
+- id: "SOC-036"
+  title: "Mentions feed"
+  description: "Retrieve posts where the authenticated user is mentioned."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.str]
+  input_format: "stdin: JSON request with action, token, cursor"
+  output_format: "stdout: JSON response with mention posts"
+  test_cases:
+    - input: "{\"action\":\"mentions_feed\",\"token\":\"eyJ...\",\"cursor\":null}"
+      expected_output: "{\"mentions\":[{\"post_id\":15,\"author\":\"bob\",\"content\":\"Hey @alice check this\",\"mentioned_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-037"
+  title: "List feed"
+  description: "Retrieve posts from members of a specific user-created list."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, list_id, cursor"
+  output_format: "stdout: JSON response with list feed posts"
+  test_cases:
+    - input: "{\"action\":\"list_feed\",\"token\":\"eyJ...\",\"list_id\":\"lst_1\",\"cursor\":null}"
+      expected_output: "{\"list_id\":\"lst_1\",\"list_name\":\"Tech People\",\"posts\":[{\"id\":20,\"author\":\"techie\",\"content\":\"New framework\"}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "List owner or subscriber"]
+
+- id: "SOC-038"
+  title: "Media-only feed"
+  description: "Retrieve only posts containing media (images/videos) from a user's timeline."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, user_id, cursor, limit"
+  output_format: "stdout: JSON response with media posts"
+  test_cases:
+    - input: "{\"action\":\"media_feed\",\"user_id\":1,\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"posts\":[{\"id\":2,\"media\":[{\"url\":\"https://img.example.com/1.jpg\",\"type\":\"image\"}],\"created_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Media posts only"]
+
+- id: "SOC-039"
+  title: "Feed filtering"
+  description: "Apply content filters to feed: hide reposts, show only original, or filter by media type."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, filters object"
+  output_format: "stdout: JSON response with filtered feed"
+  test_cases:
+    - input: "{\"action\":\"filtered_feed\",\"token\":\"eyJ...\",\"filters\":{\"hide_reposts\":true,\"media_only\":false,\"min_likes\":5}}"
+      expected_output: "{\"posts\":[{\"id\":25,\"content\":\"Popular original\",\"likes\":10,\"type\":\"original\"}],\"filters_applied\":{\"hide_reposts\":true,\"media_only\":false,\"min_likes\":5}}"
+  constraints: ["REST API pattern", "JSON in/out", "Combinable filters"]
+
+- id: "SOC-040"
+  title: "Feed position sync"
+  description: "Save and retrieve the user's last-read position in their feed for sync across devices."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, last_seen_id"
+  output_format: "stdout: JSON response with sync status and unread count"
+  test_cases:
+    - input: "{\"action\":\"sync_position\",\"token\":\"eyJ...\",\"last_seen_id\":50}"
+      expected_output: "{\"last_seen_id\":50,\"unread_count\":12,\"status\":\"synced\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Per-device tracking"]
+
+- id: "SOC-041"
+  title: "Muted words filter"
+  description: "Manage muted words that filter posts containing those terms from feeds."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.str]
+  input_format: "stdin: JSON request with action, token, words array"
+  output_format: "stdout: JSON response with muted words list"
+  test_cases:
+    - input: "{\"action\":\"mute_words\",\"token\":\"eyJ...\",\"words\":[\"spoiler\",\"politics\"]}"
+      expected_output: "{\"muted_words\":[\"spoiler\",\"politics\"],\"total\":2,\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Case-insensitive matching"]
+
+- id: "SOC-042"
+  title: "Feed preferences"
+  description: "Set feed algorithm preferences: content types, topic weights, language filters."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, preferences object"
+  output_format: "stdout: JSON response with saved preferences"
+  test_cases:
+    - input: "{\"action\":\"set_feed_prefs\",\"token\":\"eyJ...\",\"preferences\":{\"preferred_topics\":[\"tech\",\"science\"],\"languages\":[\"en\"],\"reduce_reposts\":true}}"
+      expected_output: "{\"preferences\":{\"preferred_topics\":[\"tech\",\"science\"],\"languages\":[\"en\"],\"reduce_reposts\":true},\"status\":\"saved\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+# =============================================================================
+# INTERACTIONS (SOC-043 to SOC-058)
+# =============================================================================
+
+- id: "SOC-043"
+  title: "Like a post"
+  description: "Add a like to a post from the authenticated user."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with like status and count"
+  test_cases:
+    - input: "{\"action\":\"like_post\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"liked\":true,\"like_count\":1,\"status\":\"liked\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Idempotent"]
+
+- id: "SOC-044"
+  title: "Unlike a post"
+  description: "Remove a like from a post for the authenticated user."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with unlike status and count"
+  test_cases:
+    - input: "{\"action\":\"unlike_post\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"liked\":false,\"like_count\":0,\"status\":\"unliked\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Idempotent"]
+
+- id: "SOC-045"
+  title: "Get post likes list"
+  description: "Retrieve paginated list of users who liked a specific post."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, post_id, cursor, limit"
+  output_format: "stdout: JSON response with likers array"
+  test_cases:
+    - input: "{\"action\":\"get_likes\",\"post_id\":1,\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"post_id\":1,\"likers\":[{\"id\":2,\"username\":\"bob\",\"liked_at\":\"2026-01-01T01:00:00Z\"}],\"total\":1,\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Cursor pagination"]
+
+- id: "SOC-046"
+  title: "Bookmark a post"
+  description: "Add a post to the authenticated user's private bookmarks collection."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with bookmark status"
+  test_cases:
+    - input: "{\"action\":\"bookmark_post\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"bookmarked\":true,\"status\":\"bookmarked\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Private to user"]
+
+- id: "SOC-047"
+  title: "Remove bookmark"
+  description: "Remove a post from the user's bookmarks."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with unbookmark status"
+  test_cases:
+    - input: "{\"action\":\"remove_bookmark\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"bookmarked\":false,\"status\":\"removed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Idempotent"]
+
+- id: "SOC-048"
+  title: "Share post externally"
+  description: "Generate a shareable link for a post with optional expiry."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.crypto, std.time]
+  input_format: "stdin: JSON request with action, post_id, expires_in_hours"
+  output_format: "stdout: JSON response with shareable URL"
+  test_cases:
+    - input: "{\"action\":\"share_link\",\"post_id\":1,\"expires_in_hours\":48}"
+      expected_output: "{\"post_id\":1,\"share_url\":\"https://social.app/s/abc123\",\"expires_at\":\"2026-01-03T00:00:00Z\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Optional expiry"]
+
+- id: "SOC-049"
+  title: "React with emoji"
+  description: "Add an emoji reaction to a post. Multiple reaction types allowed per post."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, emoji"
+  output_format: "stdout: JSON response with reaction status and counts"
+  test_cases:
+    - input: "{\"action\":\"react\",\"token\":\"eyJ...\",\"post_id\":1,\"emoji\":\"heart\"}"
+      expected_output: "{\"post_id\":1,\"emoji\":\"heart\",\"reactions\":{\"heart\":1},\"status\":\"reacted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "One reaction type per user per post"]
+
+- id: "SOC-050"
+  title: "Get post reactions summary"
+  description: "Retrieve aggregated reaction counts and top reactors for a post."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, post_id"
+  output_format: "stdout: JSON response with reactions breakdown"
+  test_cases:
+    - input: "{\"action\":\"get_reactions\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"reactions\":{\"heart\":5,\"laugh\":3,\"fire\":2},\"total\":10,\"top_reactors\":[{\"username\":\"bob\",\"emoji\":\"heart\"}]}"
+  constraints: ["REST API pattern", "JSON in/out"]
+
+- id: "SOC-051"
+  title: "Report post"
+  description: "Report a post for policy violation with a reason category and optional details."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, post_id, reason, details"
+  output_format: "stdout: JSON response with report confirmation"
+  test_cases:
+    - input: "{\"action\":\"report_post\",\"token\":\"eyJ...\",\"post_id\":99,\"reason\":\"spam\",\"details\":\"Repeated promotional content\"}"
+      expected_output: "{\"report_id\":\"rpt_001\",\"post_id\":99,\"reason\":\"spam\",\"status\":\"submitted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Valid reason categories"]
+
+- id: "SOC-052"
+  title: "Mute user"
+  description: "Mute a user so their posts don't appear in feeds, without unfollowing."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id, duration"
+  output_format: "stdout: JSON response with mute status"
+  test_cases:
+    - input: "{\"action\":\"mute_user\",\"token\":\"eyJ...\",\"user_id\":5,\"duration\":\"permanent\"}"
+      expected_output: "{\"user_id\":5,\"muted\":true,\"duration\":\"permanent\",\"status\":\"muted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Does not notify target"]
+
+- id: "SOC-053"
+  title: "Block user"
+  description: "Block a user, preventing all interaction and visibility between both parties."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with block status"
+  test_cases:
+    - input: "{\"action\":\"block_user\",\"token\":\"eyJ...\",\"user_id\":5}"
+      expected_output: "{\"user_id\":5,\"blocked\":true,\"status\":\"blocked\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Mutual invisibility"]
+
+- id: "SOC-054"
+  title: "Get blocked users list"
+  description: "Retrieve the list of users blocked by the authenticated user."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with blocked users array"
+  test_cases:
+    - input: "{\"action\":\"list_blocked\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"blocked_users\":[{\"id\":5,\"username\":\"spammer\",\"blocked_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-055"
+  title: "Unblock user"
+  description: "Remove a block on a user, restoring normal visibility."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with unblock status"
+  test_cases:
+    - input: "{\"action\":\"unblock_user\",\"token\":\"eyJ...\",\"user_id\":5}"
+      expected_output: "{\"user_id\":5,\"blocked\":false,\"status\":\"unblocked\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Does not re-follow"]
+
+- id: "SOC-056"
+  title: "Post engagement metrics"
+  description: "Retrieve detailed engagement analytics for a post: views, clicks, shares breakdown."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, post_id"
+  output_format: "stdout: JSON response with detailed engagement metrics"
+  test_cases:
+    - input: "{\"action\":\"post_metrics\",\"token\":\"eyJ...\",\"post_id\":1}"
+      expected_output: "{\"post_id\":1,\"views\":1000,\"unique_views\":800,\"likes\":50,\"shares\":10,\"link_clicks\":25,\"profile_visits\":15,\"reach\":1200}"
+  constraints: ["REST API pattern", "JSON in/out", "Author only"]
+
+- id: "SOC-057"
+  title: "Bookmark folder management"
+  description: "Create, list, and organize bookmark folders for categorizing saved posts."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, folder_name"
+  output_format: "stdout: JSON response with folder details"
+  test_cases:
+    - input: "{\"action\":\"create_bookmark_folder\",\"token\":\"eyJ...\",\"folder_name\":\"Tech Articles\"}"
+      expected_output: "{\"folder_id\":\"bf_1\",\"name\":\"Tech Articles\",\"post_count\":0,\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 50 folders"]
+
+- id: "SOC-058"
+  title: "Move bookmark to folder"
+  description: "Move a bookmarked post into a specific bookmark folder."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, folder_id"
+  output_format: "stdout: JSON response with move status"
+  test_cases:
+    - input: "{\"action\":\"move_bookmark\",\"token\":\"eyJ...\",\"post_id\":1,\"folder_id\":\"bf_1\"}"
+      expected_output: "{\"post_id\":1,\"folder_id\":\"bf_1\",\"folder_name\":\"Tech Articles\",\"status\":\"moved\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Must be bookmarked first"]
+
+# =============================================================================
+# COMMENTS (SOC-059 to SOC-070)
+# =============================================================================
+
+- id: "SOC-059"
+  title: "Create comment"
+  description: "Add a comment to a post."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, post_id, content"
+  output_format: "stdout: JSON response with comment object"
+  test_cases:
+    - input: "{\"action\":\"create_comment\",\"token\":\"eyJ...\",\"post_id\":1,\"content\":\"Great post!\"}"
+      expected_output: "{\"comment_id\":1,\"post_id\":1,\"content\":\"Great post!\",\"author\":\"alice\",\"created_at\":\"2026-01-01T00:00:00Z\",\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 300 chars"]
+
+- id: "SOC-060"
+  title: "Reply to comment"
+  description: "Create a nested reply to an existing comment, supporting threaded discussions."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, comment_id, content"
+  output_format: "stdout: JSON response with reply object"
+  test_cases:
+    - input: "{\"action\":\"reply_comment\",\"token\":\"eyJ...\",\"comment_id\":1,\"content\":\"Thanks!\"}"
+      expected_output: "{\"comment_id\":2,\"parent_comment_id\":1,\"content\":\"Thanks!\",\"author\":\"bob\",\"depth\":1,\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max depth 5"]
+
+- id: "SOC-061"
+  title: "Get comments for post"
+  description: "Retrieve paginated comments on a post with like counts, sorted by recency or popularity."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, post_id, sort, cursor, limit"
+  output_format: "stdout: JSON response with comments array"
+  test_cases:
+    - input: "{\"action\":\"get_comments\",\"post_id\":1,\"sort\":\"recent\",\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"post_id\":1,\"comments\":[{\"id\":1,\"content\":\"Great post!\",\"author\":\"alice\",\"likes\":0,\"replies\":1}],\"total\":1,\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Sort: recent or popular"]
+
+- id: "SOC-062"
+  title: "Delete comment"
+  description: "Delete a comment. Author or post owner can delete."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, comment_id"
+  output_format: "stdout: JSON response with deletion status"
+  test_cases:
+    - input: "{\"action\":\"delete_comment\",\"token\":\"eyJ...\",\"comment_id\":1}"
+      expected_output: "{\"comment_id\":1,\"status\":\"deleted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Author or post owner"]
+
+- id: "SOC-063"
+  title: "Edit comment"
+  description: "Edit an existing comment's content. Only the author can edit."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, comment_id, content"
+  output_format: "stdout: JSON response with updated comment"
+  test_cases:
+    - input: "{\"action\":\"edit_comment\",\"token\":\"eyJ...\",\"comment_id\":1,\"content\":\"Great post! (edited)\"}"
+      expected_output: "{\"comment_id\":1,\"content\":\"Great post! (edited)\",\"edited_at\":\"2026-01-01T02:00:00Z\",\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Author only"]
+
+- id: "SOC-064"
+  title: "Like comment"
+  description: "Add a like to a comment."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, comment_id"
+  output_format: "stdout: JSON response with like status"
+  test_cases:
+    - input: "{\"action\":\"like_comment\",\"token\":\"eyJ...\",\"comment_id\":1}"
+      expected_output: "{\"comment_id\":1,\"liked\":true,\"like_count\":1,\"status\":\"liked\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Idempotent"]
+
+- id: "SOC-065"
+  title: "Get comment thread"
+  description: "Retrieve a full comment thread with all nested replies expanded."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, comment_id"
+  output_format: "stdout: JSON response with threaded comments"
+  test_cases:
+    - input: "{\"action\":\"get_thread\",\"comment_id\":1}"
+      expected_output: "{\"root\":{\"id\":1,\"content\":\"Great post!\",\"author\":\"alice\",\"replies\":[{\"id\":2,\"content\":\"Thanks!\",\"author\":\"bob\",\"replies\":[]}]}}"
+  constraints: ["REST API pattern", "JSON in/out", "Recursive nesting"]
+
+- id: "SOC-066"
+  title: "Pin comment"
+  description: "Post author can pin a comment to the top of the comments section."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, comment_id"
+  output_format: "stdout: JSON response with pin status"
+  test_cases:
+    - input: "{\"action\":\"pin_comment\",\"token\":\"eyJ...\",\"post_id\":1,\"comment_id\":1}"
+      expected_output: "{\"comment_id\":1,\"pinned\":true,\"status\":\"pinned\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Post owner only, max 1 pin"]
+
+- id: "SOC-067"
+  title: "Comment moderation controls"
+  description: "Post author can limit who can comment: everyone, followers, mentioned, or nobody."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_id, allowed"
+  output_format: "stdout: JSON response with comment settings"
+  test_cases:
+    - input: "{\"action\":\"set_comment_policy\",\"token\":\"eyJ...\",\"post_id\":1,\"allowed\":\"followers\"}"
+      expected_output: "{\"post_id\":1,\"comment_policy\":\"followers\",\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Post owner only"]
+
+- id: "SOC-068"
+  title: "Mention in comment"
+  description: "Parse @mentions in comment content and create notification links."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.str]
+  input_format: "stdin: JSON request with action, token, post_id, content with @mentions"
+  output_format: "stdout: JSON response with comment and parsed mentions"
+  test_cases:
+    - input: "{\"action\":\"create_comment\",\"token\":\"eyJ...\",\"post_id\":1,\"content\":\"Hey @bob and @carol check this\"}"
+      expected_output: "{\"comment_id\":3,\"content\":\"Hey @bob and @carol check this\",\"mentions\":[{\"username\":\"bob\",\"id\":2},{\"username\":\"carol\",\"id\":3}],\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Validate mentioned users exist"]
+
+- id: "SOC-069"
+  title: "Report comment"
+  description: "Report a comment for policy violation."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, comment_id, reason"
+  output_format: "stdout: JSON response with report confirmation"
+  test_cases:
+    - input: "{\"action\":\"report_comment\",\"token\":\"eyJ...\",\"comment_id\":5,\"reason\":\"harassment\"}"
+      expected_output: "{\"report_id\":\"rpt_002\",\"comment_id\":5,\"reason\":\"harassment\",\"status\":\"submitted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Valid reason required"]
+
+- id: "SOC-070"
+  title: "Comment count summary"
+  description: "Get comment count and top-level preview for multiple posts in batch."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, post_ids array"
+  output_format: "stdout: JSON response with counts per post"
+  test_cases:
+    - input: "{\"action\":\"comment_counts\",\"post_ids\":[1,2,3]}"
+      expected_output: "{\"counts\":[{\"post_id\":1,\"count\":5,\"preview\":\"Great post!\"},{\"post_id\":2,\"count\":0,\"preview\":null},{\"post_id\":3,\"count\":12,\"preview\":\"Interesting\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Batch operation"]
+
+# =============================================================================
+# FOLLOW / SOCIAL GRAPH (SOC-071 to SOC-083)
+# =============================================================================
+
+- id: "SOC-071"
+  title: "Follow user"
+  description: "Follow another user. Creates a follow relationship in the social graph."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with follow status"
+  test_cases:
+    - input: "{\"action\":\"follow\",\"token\":\"eyJ...\",\"user_id\":2}"
+      expected_output: "{\"user_id\":2,\"following\":true,\"status\":\"followed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Cannot follow self"]
+
+- id: "SOC-072"
+  title: "Unfollow user"
+  description: "Unfollow a user, removing the follow relationship."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with unfollow status"
+  test_cases:
+    - input: "{\"action\":\"unfollow\",\"token\":\"eyJ...\",\"user_id\":2}"
+      expected_output: "{\"user_id\":2,\"following\":false,\"status\":\"unfollowed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Idempotent"]
+
+- id: "SOC-073"
+  title: "Get followers list"
+  description: "Retrieve paginated list of users following a specific user."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, user_id, cursor, limit"
+  output_format: "stdout: JSON response with followers array"
+  test_cases:
+    - input: "{\"action\":\"get_followers\",\"user_id\":1,\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"user_id\":1,\"followers\":[{\"id\":2,\"username\":\"bob\",\"followed_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1,\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Cursor pagination"]
+
+- id: "SOC-074"
+  title: "Get following list"
+  description: "Retrieve paginated list of users that a specific user is following."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, user_id, cursor, limit"
+  output_format: "stdout: JSON response with following array"
+  test_cases:
+    - input: "{\"action\":\"get_following\",\"user_id\":1,\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"user_id\":1,\"following\":[{\"id\":3,\"username\":\"carol\",\"followed_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1,\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Cursor pagination"]
+
+- id: "SOC-075"
+  title: "Mutual followers"
+  description: "Find mutual followers between two users (users who follow both)."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, user_id_a, user_id_b, limit"
+  output_format: "stdout: JSON response with mutual followers"
+  test_cases:
+    - input: "{\"action\":\"mutual_followers\",\"user_id_a\":1,\"user_id_b\":2,\"limit\":20}"
+      expected_output: "{\"mutual\":[{\"id\":3,\"username\":\"carol\"}],\"total\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "Set intersection"]
+
+- id: "SOC-076"
+  title: "Follow suggestions"
+  description: "Generate follow suggestions based on mutual connections and interests."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, limit"
+  output_format: "stdout: JSON response with suggested users and reasons"
+  test_cases:
+    - input: "{\"action\":\"follow_suggestions\",\"token\":\"eyJ...\",\"limit\":10}"
+      expected_output: "{\"suggestions\":[{\"id\":4,\"username\":\"dave\",\"reason\":\"followed_by_3_mutuals\",\"mutual_count\":3}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Exclude already-followed"]
+
+- id: "SOC-077"
+  title: "Follow request (private accounts)"
+  description: "Send a follow request to a private account that requires approval."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with request status"
+  test_cases:
+    - input: "{\"action\":\"follow_request\",\"token\":\"eyJ...\",\"user_id\":5}"
+      expected_output: "{\"user_id\":5,\"status\":\"pending\",\"requested_at\":\"2026-01-01T00:00:00Z\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Only for private accounts"]
+
+- id: "SOC-078"
+  title: "Accept/reject follow request"
+  description: "Accept or reject a pending follow request."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, requester_id, decision"
+  output_format: "stdout: JSON response with decision result"
+  test_cases:
+    - input: "{\"action\":\"decide_follow_request\",\"token\":\"eyJ...\",\"requester_id\":3,\"decision\":\"accept\"}"
+      expected_output: "{\"requester_id\":3,\"decision\":\"accepted\",\"status\":\"now_following\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Accept or reject only"]
+
+- id: "SOC-079"
+  title: "Remove follower"
+  description: "Remove a follower without blocking them."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with removal status"
+  test_cases:
+    - input: "{\"action\":\"remove_follower\",\"token\":\"eyJ...\",\"user_id\":2}"
+      expected_output: "{\"user_id\":2,\"removed\":true,\"status\":\"follower_removed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Does not block"]
+
+- id: "SOC-080"
+  title: "Close friends list"
+  description: "Manage a close friends list for sharing exclusive content."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_ids to add"
+  output_format: "stdout: JSON response with close friends list"
+  test_cases:
+    - input: "{\"action\":\"update_close_friends\",\"token\":\"eyJ...\",\"add_user_ids\":[2,3]}"
+      expected_output: "{\"close_friends\":[{\"id\":2,\"username\":\"bob\"},{\"id\":3,\"username\":\"carol\"}],\"total\":2,\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 100 members"]
+
+- id: "SOC-081"
+  title: "Relationship status check"
+  description: "Check the relationship status between two users: following, followed_by, blocked, muted."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id"
+  output_format: "stdout: JSON response with relationship details"
+  test_cases:
+    - input: "{\"action\":\"check_relationship\",\"token\":\"eyJ...\",\"user_id\":2}"
+      expected_output: "{\"user_id\":2,\"following\":true,\"followed_by\":true,\"blocked\":false,\"muted\":false,\"close_friend\":false}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-082"
+  title: "Follower growth analytics"
+  description: "Retrieve follower count changes over time for the authenticated user."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, period"
+  output_format: "stdout: JSON response with growth data points"
+  test_cases:
+    - input: "{\"action\":\"follower_growth\",\"token\":\"eyJ...\",\"period\":\"7d\"}"
+      expected_output: "{\"period\":\"7d\",\"data\":[{\"date\":\"2026-01-01\",\"followers\":100,\"gained\":5,\"lost\":1}],\"net_change\":4}"
+  constraints: ["REST API pattern", "JSON in/out", "Daily granularity"]
+
+- id: "SOC-083"
+  title: "Social graph distance"
+  description: "Calculate the shortest path distance between two users in the follow graph."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, user_id_a, user_id_b, max_depth"
+  output_format: "stdout: JSON response with distance and path"
+  test_cases:
+    - input: "{\"action\":\"graph_distance\",\"user_id_a\":1,\"user_id_b\":10,\"max_depth\":4}"
+      expected_output: "{\"distance\":2,\"path\":[{\"id\":1,\"username\":\"alice\"},{\"id\":5,\"username\":\"eve\"},{\"id\":10,\"username\":\"frank\"}],\"status\":\"found\"}"
+  constraints: ["REST API pattern", "JSON in/out", "BFS with max depth limit"]
+
+# =============================================================================
+# SEARCH (SOC-084 to SOC-093)
+# =============================================================================
+
+- id: "SOC-084"
+  title: "Full-text post search"
+  description: "Search posts by content text with relevance ranking."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, query, page, limit"
+  output_format: "stdout: JSON response with matched posts and relevance scores"
+  test_cases:
+    - input: "{\"action\":\"search_posts\",\"query\":\"machine learning\",\"page\":1,\"limit\":20}"
+      expected_output: "{\"results\":[{\"id\":15,\"content\":\"Machine learning is amazing\",\"author\":\"techie\",\"relevance\":0.95}],\"total\":5,\"page\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "Relevance-ranked"]
+
+- id: "SOC-085"
+  title: "Search with filters"
+  description: "Advanced search with filters: date range, author, media type, engagement threshold."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.str, std.time]
+  input_format: "stdin: JSON request with action, query, filters"
+  output_format: "stdout: JSON response with filtered results"
+  test_cases:
+    - input: "{\"action\":\"search_advanced\",\"query\":\"rust\",\"filters\":{\"from_user\":\"alice\",\"has_media\":true,\"min_likes\":10,\"date_from\":\"2026-01-01\"}}"
+      expected_output: "{\"results\":[{\"id\":20,\"content\":\"Rust with images\",\"author\":\"alice\",\"likes\":15,\"has_media\":true}],\"total\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "All filters optional"]
+
+- id: "SOC-086"
+  title: "Hashtag search"
+  description: "Search for hashtags by prefix, returning usage counts and trending status."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, prefix, limit"
+  output_format: "stdout: JSON response with matching hashtags"
+  test_cases:
+    - input: "{\"action\":\"search_hashtags\",\"prefix\":\"prog\",\"limit\":10}"
+      expected_output: "{\"hashtags\":[{\"tag\":\"programming\",\"post_count\":1500,\"trending\":true},{\"tag\":\"productivity\",\"post_count\":800,\"trending\":false}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Prefix matching"]
+
+- id: "SOC-087"
+  title: "Search suggestions"
+  description: "Provide autocomplete suggestions as the user types a search query."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, partial_query"
+  output_format: "stdout: JSON response with suggestions array"
+  test_cases:
+    - input: "{\"action\":\"search_suggest\",\"partial_query\":\"mac\"}"
+      expected_output: "{\"suggestions\":[{\"type\":\"query\",\"text\":\"machine learning\"},{\"type\":\"user\",\"text\":\"@macdev\"},{\"type\":\"hashtag\",\"text\":\"#macos\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Mixed result types"]
+
+- id: "SOC-088"
+  title: "Recent searches"
+  description: "Retrieve and manage the user's recent search history."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with recent searches"
+  test_cases:
+    - input: "{\"action\":\"recent_searches\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"searches\":[{\"query\":\"rust programming\",\"searched_at\":\"2026-01-01T00:00:00Z\"},{\"query\":\"@alice\",\"searched_at\":\"2025-12-31T00:00:00Z\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 50 entries"]
+
+- id: "SOC-089"
+  title: "Clear search history"
+  description: "Delete all or specific entries from the user's search history."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, clear_all or query_id"
+  output_format: "stdout: JSON response with clear status"
+  test_cases:
+    - input: "{\"action\":\"clear_searches\",\"token\":\"eyJ...\",\"clear_all\":true}"
+      expected_output: "{\"cleared\":true,\"status\":\"search_history_cleared\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-090"
+  title: "Search users with filters"
+  description: "Search users with filters: verified status, follower count range, location."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, query, filters"
+  output_format: "stdout: JSON response with filtered user results"
+  test_cases:
+    - input: "{\"action\":\"search_users_filtered\",\"query\":\"developer\",\"filters\":{\"verified\":true,\"min_followers\":1000}}"
+      expected_output: "{\"users\":[{\"id\":10,\"username\":\"topdev\",\"verified\":true,\"followers\":5000,\"bio\":\"Senior developer\"}],\"total\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "Combinable filters"]
+
+- id: "SOC-091"
+  title: "Search within conversation"
+  description: "Search for messages within a specific DM conversation."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.str]
+  input_format: "stdin: JSON request with action, token, conversation_id, query"
+  output_format: "stdout: JSON response with matched messages"
+  test_cases:
+    - input: "{\"action\":\"search_conversation\",\"token\":\"eyJ...\",\"conversation_id\":\"conv_1\",\"query\":\"meeting\"}"
+      expected_output: "{\"messages\":[{\"id\":\"msg_5\",\"content\":\"Let's schedule a meeting\",\"sent_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "Participant only"]
+
+- id: "SOC-092"
+  title: "Saved search"
+  description: "Save a search query with filters for quick re-execution and notifications."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, query, filters, notify"
+  output_format: "stdout: JSON response with saved search object"
+  test_cases:
+    - input: "{\"action\":\"save_search\",\"token\":\"eyJ...\",\"query\":\"toke language\",\"filters\":{},\"notify\":true}"
+      expected_output: "{\"saved_search_id\":\"ss_1\",\"query\":\"toke language\",\"notify\":true,\"status\":\"saved\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 25 saved searches"]
+
+- id: "SOC-093"
+  title: "Trending searches"
+  description: "Get currently trending search queries across the platform."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, region, limit"
+  output_format: "stdout: JSON response with trending queries"
+  test_cases:
+    - input: "{\"action\":\"trending_searches\",\"region\":\"global\",\"limit\":10}"
+      expected_output: "{\"trending\":[{\"rank\":1,\"query\":\"world cup\",\"search_volume\":50000},{\"rank\":2,\"query\":\"new album\",\"search_volume\":35000}],\"updated_at\":\"2026-01-01T00:00:00Z\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Regional filtering"]
+
+# =============================================================================
+# NOTIFICATIONS (SOC-094 to SOC-103)
+# =============================================================================
+
+- id: "SOC-094"
+  title: "Get notifications"
+  description: "Retrieve paginated notifications for the authenticated user."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, cursor, limit"
+  output_format: "stdout: JSON response with notifications array"
+  test_cases:
+    - input: "{\"action\":\"get_notifications\",\"token\":\"eyJ...\",\"cursor\":null,\"limit\":20}"
+      expected_output: "{\"notifications\":[{\"id\":\"n1\",\"type\":\"like\",\"actor\":\"bob\",\"post_id\":1,\"read\":false,\"created_at\":\"2026-01-01T00:00:00Z\"}],\"unread_count\":1,\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Grouped by type"]
+
+- id: "SOC-095"
+  title: "Mark notification as read"
+  description: "Mark one or all notifications as read."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, notification_id or mark_all"
+  output_format: "stdout: JSON response with read status"
+  test_cases:
+    - input: "{\"action\":\"mark_read\",\"token\":\"eyJ...\",\"notification_id\":\"n1\"}"
+      expected_output: "{\"notification_id\":\"n1\",\"read\":true,\"status\":\"marked_read\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-096"
+  title: "Notification preferences"
+  description: "Configure which notification types to receive: likes, follows, comments, mentions, DMs."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, preferences"
+  output_format: "stdout: JSON response with saved preferences"
+  test_cases:
+    - input: "{\"action\":\"notification_prefs\",\"token\":\"eyJ...\",\"preferences\":{\"likes\":true,\"follows\":true,\"comments\":true,\"mentions\":true,\"dms\":true,\"reposts\":false}}"
+      expected_output: "{\"preferences\":{\"likes\":true,\"follows\":true,\"comments\":true,\"mentions\":true,\"dms\":true,\"reposts\":false},\"status\":\"saved\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Per-type toggles"]
+
+- id: "SOC-097"
+  title: "Push notification registration"
+  description: "Register a device token for push notifications."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, device_token, platform"
+  output_format: "stdout: JSON response with registration status"
+  test_cases:
+    - input: "{\"action\":\"register_push\",\"token\":\"eyJ...\",\"device_token\":\"fcm_abc123\",\"platform\":\"ios\"}"
+      expected_output: "{\"device_token\":\"fcm_abc123\",\"platform\":\"ios\",\"status\":\"registered\"}"
+  constraints: ["REST API pattern", "JSON in/out", "iOS/Android/Web"]
+
+- id: "SOC-098"
+  title: "Unread notification count"
+  description: "Get the count of unread notifications, broken down by type."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with unread counts"
+  test_cases:
+    - input: "{\"action\":\"unread_count\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"total\":5,\"breakdown\":{\"likes\":2,\"comments\":1,\"follows\":1,\"mentions\":1}}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-099"
+  title: "Notification grouping"
+  description: "Group similar notifications: e.g., 'bob and 3 others liked your post'."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, cursor"
+  output_format: "stdout: JSON response with grouped notifications"
+  test_cases:
+    - input: "{\"action\":\"grouped_notifications\",\"token\":\"eyJ...\",\"cursor\":null}"
+      expected_output: "{\"groups\":[{\"type\":\"like\",\"post_id\":1,\"actors\":[\"bob\",\"carol\",\"dave\"],\"count\":3,\"latest_at\":\"2026-01-01T03:00:00Z\"}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Group by type+target"]
+
+- id: "SOC-100"
+  title: "Delete notification"
+  description: "Delete a specific notification from the user's notification list."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, notification_id"
+  output_format: "stdout: JSON response with deletion status"
+  test_cases:
+    - input: "{\"action\":\"delete_notification\",\"token\":\"eyJ...\",\"notification_id\":\"n1\"}"
+      expected_output: "{\"notification_id\":\"n1\",\"status\":\"deleted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-101"
+  title: "Notification snooze"
+  description: "Temporarily snooze all notifications for a specified duration."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, duration_minutes"
+  output_format: "stdout: JSON response with snooze status"
+  test_cases:
+    - input: "{\"action\":\"snooze_notifications\",\"token\":\"eyJ...\",\"duration_minutes\":60}"
+      expected_output: "{\"snoozed\":true,\"until\":\"2026-01-01T01:00:00Z\",\"status\":\"snoozed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 24 hours"]
+
+- id: "SOC-102"
+  title: "Activity digest"
+  description: "Generate a daily/weekly activity digest summarizing key interactions."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, period"
+  output_format: "stdout: JSON response with digest summary"
+  test_cases:
+    - input: "{\"action\":\"activity_digest\",\"token\":\"eyJ...\",\"period\":\"daily\"}"
+      expected_output: "{\"period\":\"daily\",\"date\":\"2026-01-01\",\"summary\":{\"new_followers\":3,\"total_likes\":25,\"total_comments\":8,\"top_post\":{\"id\":1,\"likes\":15}},\"status\":\"generated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Daily or weekly"]
+
+- id: "SOC-103"
+  title: "Notification filter by type"
+  description: "Retrieve notifications filtered by a specific type."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, type, cursor"
+  output_format: "stdout: JSON response with filtered notifications"
+  test_cases:
+    - input: "{\"action\":\"filter_notifications\",\"token\":\"eyJ...\",\"type\":\"mentions\",\"cursor\":null}"
+      expected_output: "{\"type\":\"mentions\",\"notifications\":[{\"id\":\"n5\",\"actor\":\"carol\",\"post_id\":10,\"created_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Single type filter"]
+
+# =============================================================================
+# MODERATION (SOC-104 to SOC-112)
+# =============================================================================
+
+- id: "SOC-104"
+  title: "Review reported content"
+  description: "Moderator retrieves queue of reported posts pending review."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, status, limit"
+  output_format: "stdout: JSON response with moderation queue"
+  test_cases:
+    - input: "{\"action\":\"mod_queue\",\"token\":\"eyJ...\",\"status\":\"pending\",\"limit\":20}"
+      expected_output: "{\"reports\":[{\"id\":\"rpt_001\",\"post_id\":99,\"reason\":\"spam\",\"reporter\":\"alice\",\"reported_at\":\"2026-01-01T00:00:00Z\"}],\"total_pending\":5}"
+  constraints: ["REST API pattern", "JSON in/out", "Moderator role required"]
+
+- id: "SOC-105"
+  title: "Take moderation action"
+  description: "Apply a moderation decision: remove content, warn user, or dismiss report."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, report_id, decision, reason"
+  output_format: "stdout: JSON response with action result"
+  test_cases:
+    - input: "{\"action\":\"mod_action\",\"token\":\"eyJ...\",\"report_id\":\"rpt_001\",\"decision\":\"remove\",\"reason\":\"Confirmed spam\"}"
+      expected_output: "{\"report_id\":\"rpt_001\",\"decision\":\"remove\",\"post_removed\":true,\"user_warned\":true,\"status\":\"resolved\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Audit trail required"]
+
+- id: "SOC-106"
+  title: "User suspension"
+  description: "Suspend a user account for a specified duration with reason."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, user_id, duration_days, reason"
+  output_format: "stdout: JSON response with suspension details"
+  test_cases:
+    - input: "{\"action\":\"suspend_user\",\"token\":\"eyJ...\",\"user_id\":99,\"duration_days\":7,\"reason\":\"Repeated policy violations\"}"
+      expected_output: "{\"user_id\":99,\"suspended\":true,\"duration_days\":7,\"expires_at\":\"2026-01-08T00:00:00Z\",\"reason\":\"Repeated policy violations\",\"status\":\"suspended\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Admin role required"]
+
+- id: "SOC-107"
+  title: "Content auto-moderation"
+  description: "Run automated content moderation scoring on a post for toxicity, spam, and NSFW."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.str]
+  input_format: "stdin: JSON request with action, content"
+  output_format: "stdout: JSON response with moderation scores"
+  test_cases:
+    - input: "{\"action\":\"auto_moderate\",\"content\":\"Buy cheap followers now! Visit spam.com\"}"
+      expected_output: "{\"scores\":{\"spam\":0.95,\"toxicity\":0.1,\"nsfw\":0.0},\"flagged\":true,\"primary_reason\":\"spam\",\"action\":\"hold_for_review\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Score 0.0 to 1.0"]
+
+- id: "SOC-108"
+  title: "Appeal moderation decision"
+  description: "Allow a user to appeal a moderation action taken against their content."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, report_id, appeal_text"
+  output_format: "stdout: JSON response with appeal status"
+  test_cases:
+    - input: "{\"action\":\"appeal\",\"token\":\"eyJ...\",\"report_id\":\"rpt_001\",\"appeal_text\":\"This was satire, not spam\"}"
+      expected_output: "{\"appeal_id\":\"app_001\",\"report_id\":\"rpt_001\",\"status\":\"under_review\",\"estimated_response_hours\":48}"
+  constraints: ["REST API pattern", "JSON in/out", "One appeal per action"]
+
+- id: "SOC-109"
+  title: "Moderation log"
+  description: "Retrieve the audit log of all moderation actions for transparency."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, date_from, date_to, limit"
+  output_format: "stdout: JSON response with moderation log entries"
+  test_cases:
+    - input: "{\"action\":\"mod_log\",\"token\":\"eyJ...\",\"date_from\":\"2026-01-01\",\"date_to\":\"2026-01-31\",\"limit\":50}"
+      expected_output: "{\"entries\":[{\"id\":\"ml_1\",\"moderator\":\"mod_user\",\"action\":\"remove\",\"target_post\":99,\"reason\":\"spam\",\"at\":\"2026-01-01T00:00:00Z\"}],\"total\":1}"
+  constraints: ["REST API pattern", "JSON in/out", "Admin role required"]
+
+- id: "SOC-110"
+  title: "Bulk content removal"
+  description: "Remove multiple posts by a user in bulk as part of moderation action."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, user_id, post_ids"
+  output_format: "stdout: JSON response with removal results"
+  test_cases:
+    - input: "{\"action\":\"bulk_remove\",\"token\":\"eyJ...\",\"user_id\":99,\"post_ids\":[101,102,103]}"
+      expected_output: "{\"removed\":[101,102,103],\"failed\":[],\"total_removed\":3,\"status\":\"completed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Admin role, max 100 per batch"]
+
+- id: "SOC-111"
+  title: "Word filter management"
+  description: "Manage platform-wide banned words list for auto-moderation."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.str]
+  input_format: "stdin: JSON request with action, token, words, severity"
+  output_format: "stdout: JSON response with filter list update"
+  test_cases:
+    - input: "{\"action\":\"add_banned_words\",\"token\":\"eyJ...\",\"words\":[\"scam\",\"phishing\"],\"severity\":\"high\"}"
+      expected_output: "{\"added\":[\"scam\",\"phishing\"],\"severity\":\"high\",\"total_banned_words\":50,\"status\":\"updated\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Admin role required"]
+
+- id: "SOC-112"
+  title: "User warning system"
+  description: "Issue a formal warning to a user with strike tracking."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, user_id, warning_type, message"
+  output_format: "stdout: JSON response with warning details and strike count"
+  test_cases:
+    - input: "{\"action\":\"issue_warning\",\"token\":\"eyJ...\",\"user_id\":99,\"warning_type\":\"harassment\",\"message\":\"Your comment violated our harassment policy\"}"
+      expected_output: "{\"warning_id\":\"w_001\",\"user_id\":99,\"type\":\"harassment\",\"strikes\":2,\"max_strikes\":3,\"status\":\"warned\"}"
+  constraints: ["REST API pattern", "JSON in/out", "3 strikes = suspension"]
+
+# =============================================================================
+# ANALYTICS (SOC-113 to SOC-119)
+# =============================================================================
+
+- id: "SOC-113"
+  title: "Account analytics overview"
+  description: "Get high-level analytics: impressions, engagements, follower change over period."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, period"
+  output_format: "stdout: JSON response with analytics overview"
+  test_cases:
+    - input: "{\"action\":\"analytics_overview\",\"token\":\"eyJ...\",\"period\":\"30d\"}"
+      expected_output: "{\"period\":\"30d\",\"impressions\":50000,\"engagements\":2500,\"engagement_rate\":0.05,\"follower_change\":120,\"top_post\":{\"id\":15,\"impressions\":5000}}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-114"
+  title: "Audience demographics"
+  description: "Get follower demographics: location distribution, activity hours, interests."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with demographic data"
+  test_cases:
+    - input: "{\"action\":\"audience_demographics\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"locations\":[{\"country\":\"US\",\"percentage\":40},{\"country\":\"UK\",\"percentage\":15}],\"active_hours\":[{\"hour\":9,\"percentage\":12},{\"hour\":18,\"percentage\":15}],\"top_interests\":[\"technology\",\"science\"]}"
+  constraints: ["REST API pattern", "JSON in/out", "Min 100 followers required"]
+
+- id: "SOC-115"
+  title: "Post performance comparison"
+  description: "Compare performance metrics across multiple posts side by side."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, post_ids"
+  output_format: "stdout: JSON response with comparative metrics"
+  test_cases:
+    - input: "{\"action\":\"compare_posts\",\"token\":\"eyJ...\",\"post_ids\":[1,5,10]}"
+      expected_output: "{\"comparison\":[{\"post_id\":1,\"impressions\":1000,\"likes\":50,\"shares\":10},{\"post_id\":5,\"impressions\":2000,\"likes\":100,\"shares\":25},{\"post_id\":10,\"impressions\":500,\"likes\":20,\"shares\":5}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 10 posts"]
+
+- id: "SOC-116"
+  title: "Best posting times"
+  description: "Analyze historical engagement to suggest optimal posting times."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with recommended times"
+  test_cases:
+    - input: "{\"action\":\"best_times\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"recommendations\":[{\"day\":\"Tuesday\",\"hour\":10,\"timezone\":\"UTC\",\"avg_engagement\":150},{\"day\":\"Thursday\",\"hour\":18,\"timezone\":\"UTC\",\"avg_engagement\":130}],\"based_on_posts\":50}"
+  constraints: ["REST API pattern", "JSON in/out", "Min 20 posts required"]
+
+- id: "SOC-117"
+  title: "Hashtag analytics"
+  description: "Analyze performance of hashtags used by the user."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.str]
+  input_format: "stdin: JSON request with action, token, period"
+  output_format: "stdout: JSON response with hashtag performance"
+  test_cases:
+    - input: "{\"action\":\"hashtag_analytics\",\"token\":\"eyJ...\",\"period\":\"30d\"}"
+      expected_output: "{\"hashtags\":[{\"tag\":\"programming\",\"uses\":10,\"avg_impressions\":2000,\"avg_engagement\":100},{\"tag\":\"rust\",\"uses\":5,\"avg_impressions\":1500,\"avg_engagement\":80}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-118"
+  title: "Engagement rate by content type"
+  description: "Break down engagement rates by content type: text, image, video, poll, thread."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, period"
+  output_format: "stdout: JSON response with per-type engagement rates"
+  test_cases:
+    - input: "{\"action\":\"engagement_by_type\",\"token\":\"eyJ...\",\"period\":\"30d\"}"
+      expected_output: "{\"types\":[{\"type\":\"image\",\"posts\":15,\"avg_engagement_rate\":0.08},{\"type\":\"text\",\"posts\":30,\"avg_engagement_rate\":0.04},{\"type\":\"poll\",\"posts\":3,\"avg_engagement_rate\":0.12}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-119"
+  title: "Viral post detection"
+  description: "Identify posts that went viral based on abnormal engagement velocity."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, threshold_multiplier"
+  output_format: "stdout: JSON response with viral posts"
+  test_cases:
+    - input: "{\"action\":\"detect_viral\",\"token\":\"eyJ...\",\"threshold_multiplier\":5}"
+      expected_output: "{\"viral_posts\":[{\"id\":15,\"engagement_velocity\":500,\"normal_velocity\":80,\"multiplier\":6.25,\"peak_hour\":\"2026-01-01T14:00:00Z\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Velocity = engagements per hour"]
+
+# =============================================================================
+# TRENDING (SOC-120 to SOC-125)
+# =============================================================================
+
+- id: "SOC-120"
+  title: "Trending topics"
+  description: "Get currently trending topics with post volume and velocity metrics."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, region, limit"
+  output_format: "stdout: JSON response with trending topics"
+  test_cases:
+    - input: "{\"action\":\"trending_topics\",\"region\":\"global\",\"limit\":10}"
+      expected_output: "{\"topics\":[{\"rank\":1,\"name\":\"World Cup\",\"post_count\":25000,\"velocity\":500,\"category\":\"sports\"},{\"rank\":2,\"name\":\"AI Release\",\"post_count\":18000,\"velocity\":350,\"category\":\"technology\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Updated every 5 minutes"]
+
+- id: "SOC-121"
+  title: "Trending hashtags"
+  description: "Get trending hashtags with usage growth rate."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, period, limit"
+  output_format: "stdout: JSON response with trending hashtags"
+  test_cases:
+    - input: "{\"action\":\"trending_hashtags\",\"period\":\"24h\",\"limit\":20}"
+      expected_output: "{\"hashtags\":[{\"tag\":\"breaking\",\"posts_24h\":5000,\"growth_rate\":2.5},{\"tag\":\"newrelease\",\"posts_24h\":3000,\"growth_rate\":1.8}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Growth rate relative to baseline"]
+
+- id: "SOC-122"
+  title: "Trending in network"
+  description: "Get topics trending specifically within the user's follow network."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, limit"
+  output_format: "stdout: JSON response with network-specific trends"
+  test_cases:
+    - input: "{\"action\":\"network_trends\",\"token\":\"eyJ...\",\"limit\":5}"
+      expected_output: "{\"trends\":[{\"topic\":\"rust programming\",\"network_posts\":50,\"participants\":[\"alice\",\"bob\",\"carol\"],\"started_at\":\"2026-01-01T10:00:00Z\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Scoped to followed users"]
+
+- id: "SOC-123"
+  title: "Trending posts for topic"
+  description: "Get the most engaging posts for a specific trending topic."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.time]
+  input_format: "stdin: JSON request with action, topic, limit"
+  output_format: "stdout: JSON response with top posts for topic"
+  test_cases:
+    - input: "{\"action\":\"trending_posts\",\"topic\":\"AI Release\",\"limit\":10}"
+      expected_output: "{\"topic\":\"AI Release\",\"posts\":[{\"id\":100,\"content\":\"Just tried the new AI...\",\"author\":\"techie\",\"likes\":5000,\"shares\":1200}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Ranked by engagement"]
+
+- id: "SOC-124"
+  title: "Personalized trending"
+  description: "Get trending content personalized to user interests and past engagement."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, limit"
+  output_format: "stdout: JSON response with personalized trends"
+  test_cases:
+    - input: "{\"action\":\"personalized_trends\",\"token\":\"eyJ...\",\"limit\":10}"
+      expected_output: "{\"trends\":[{\"topic\":\"systems programming\",\"relevance_score\":0.92,\"reason\":\"matches_interests\",\"post_count\":500}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Interest-based filtering"]
+
+- id: "SOC-125"
+  title: "Trending events"
+  description: "Curate and return live trending events with associated posts and updates."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.time, std.str]
+  input_format: "stdin: JSON request with action, limit"
+  output_format: "stdout: JSON response with live events"
+  test_cases:
+    - input: "{\"action\":\"trending_events\",\"limit\":5}"
+      expected_output: "{\"events\":[{\"id\":\"evt_1\",\"title\":\"Product Launch 2026\",\"description\":\"Major tech company announcing new product\",\"post_count\":10000,\"started_at\":\"2026-01-01T09:00:00Z\",\"status\":\"live\"}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Live status tracking"]
+
+# =============================================================================
+# DIRECT MESSAGES (SOC-126 to SOC-135)
+# =============================================================================
+
+- id: "SOC-126"
+  title: "Send direct message"
+  description: "Send a text message to another user in a direct conversation."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, recipient_id, content"
+  output_format: "stdout: JSON response with sent message object"
+  test_cases:
+    - input: "{\"action\":\"send_dm\",\"token\":\"eyJ...\",\"recipient_id\":2,\"content\":\"Hey, how are you?\"}"
+      expected_output: "{\"message_id\":\"msg_1\",\"conversation_id\":\"conv_1\",\"content\":\"Hey, how are you?\",\"sent_at\":\"2026-01-01T00:00:00Z\",\"status\":\"sent\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Recipient must allow DMs"]
+
+- id: "SOC-127"
+  title: "Get conversation messages"
+  description: "Retrieve messages in a conversation with pagination."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, conversation_id, cursor, limit"
+  output_format: "stdout: JSON response with messages array"
+  test_cases:
+    - input: "{\"action\":\"get_messages\",\"token\":\"eyJ...\",\"conversation_id\":\"conv_1\",\"cursor\":null,\"limit\":50}"
+      expected_output: "{\"conversation_id\":\"conv_1\",\"messages\":[{\"id\":\"msg_1\",\"sender\":\"alice\",\"content\":\"Hey!\",\"sent_at\":\"2026-01-01T00:00:00Z\",\"read\":true}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Participant only"]
+
+- id: "SOC-128"
+  title: "List conversations"
+  description: "Get list of all DM conversations for the authenticated user, sorted by last activity."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, cursor"
+  output_format: "stdout: JSON response with conversations list"
+  test_cases:
+    - input: "{\"action\":\"list_conversations\",\"token\":\"eyJ...\",\"cursor\":null}"
+      expected_output: "{\"conversations\":[{\"id\":\"conv_1\",\"participants\":[\"alice\",\"bob\"],\"last_message\":\"Hey!\",\"last_at\":\"2026-01-01T00:00:00Z\",\"unread\":0}],\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-129"
+  title: "Delete message"
+  description: "Delete a sent message. Can delete for self only or for everyone."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, message_id, for_everyone"
+  output_format: "stdout: JSON response with deletion status"
+  test_cases:
+    - input: "{\"action\":\"delete_message\",\"token\":\"eyJ...\",\"message_id\":\"msg_1\",\"for_everyone\":true}"
+      expected_output: "{\"message_id\":\"msg_1\",\"deleted_for\":\"everyone\",\"status\":\"deleted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Sender only for everyone"]
+
+- id: "SOC-130"
+  title: "Mark conversation read"
+  description: "Mark all messages in a conversation as read."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, conversation_id"
+  output_format: "stdout: JSON response with read status"
+  test_cases:
+    - input: "{\"action\":\"mark_conv_read\",\"token\":\"eyJ...\",\"conversation_id\":\"conv_1\"}"
+      expected_output: "{\"conversation_id\":\"conv_1\",\"all_read\":true,\"status\":\"marked_read\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-131"
+  title: "Create group conversation"
+  description: "Create a group DM conversation with multiple participants."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, participant_ids, name"
+  output_format: "stdout: JSON response with group conversation object"
+  test_cases:
+    - input: "{\"action\":\"create_group_dm\",\"token\":\"eyJ...\",\"participant_ids\":[2,3,4],\"name\":\"Project Chat\"}"
+      expected_output: "{\"conversation_id\":\"conv_2\",\"name\":\"Project Chat\",\"participants\":[{\"id\":1,\"username\":\"alice\"},{\"id\":2,\"username\":\"bob\"},{\"id\":3,\"username\":\"carol\"},{\"id\":4,\"username\":\"dave\"}],\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 50 participants"]
+
+- id: "SOC-132"
+  title: "Message reactions"
+  description: "Add an emoji reaction to a message in a conversation."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, message_id, emoji"
+  output_format: "stdout: JSON response with reaction status"
+  test_cases:
+    - input: "{\"action\":\"react_message\",\"token\":\"eyJ...\",\"message_id\":\"msg_1\",\"emoji\":\"thumbsup\"}"
+      expected_output: "{\"message_id\":\"msg_1\",\"emoji\":\"thumbsup\",\"reactions\":{\"thumbsup\":1},\"status\":\"reacted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Participant only"]
+
+- id: "SOC-133"
+  title: "Message read receipts"
+  description: "Get read receipt status for messages in a conversation."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, conversation_id, message_ids"
+  output_format: "stdout: JSON response with read status per message"
+  test_cases:
+    - input: "{\"action\":\"read_receipts\",\"token\":\"eyJ...\",\"conversation_id\":\"conv_1\",\"message_ids\":[\"msg_1\",\"msg_2\"]}"
+      expected_output: "{\"receipts\":[{\"message_id\":\"msg_1\",\"read_by\":[{\"user\":\"bob\",\"read_at\":\"2026-01-01T00:01:00Z\"}]},{\"message_id\":\"msg_2\",\"read_by\":[]}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Sender can see receipts"]
+
+- id: "SOC-134"
+  title: "Share post via DM"
+  description: "Share a post to a DM conversation with optional message."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, post_id, conversation_id, message"
+  output_format: "stdout: JSON response with shared message"
+  test_cases:
+    - input: "{\"action\":\"share_to_dm\",\"token\":\"eyJ...\",\"post_id\":1,\"conversation_id\":\"conv_1\",\"message\":\"Check this out\"}"
+      expected_output: "{\"message_id\":\"msg_3\",\"type\":\"shared_post\",\"post_id\":1,\"message\":\"Check this out\",\"status\":\"sent\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Post must be visible to recipient"]
+
+- id: "SOC-135"
+  title: "DM message encryption"
+  description: "Send an end-to-end encrypted message using recipient's public key."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.crypto, std.time]
+  input_format: "stdin: JSON request with action, token, recipient_id, content, public_key"
+  output_format: "stdout: JSON response with encrypted message confirmation"
+  test_cases:
+    - input: "{\"action\":\"send_encrypted_dm\",\"token\":\"eyJ...\",\"recipient_id\":2,\"content\":\"Secret message\",\"public_key\":\"pk_bob_abc\"}"
+      expected_output: "{\"message_id\":\"msg_4\",\"encrypted\":true,\"algorithm\":\"x25519-xsalsa20-poly1305\",\"status\":\"sent\"}"
+  constraints: ["REST API pattern", "JSON in/out", "E2E encryption required"]
+
+# =============================================================================
+# LISTS AND GROUPS (SOC-136 to SOC-145)
+# =============================================================================
+
+- id: "SOC-136"
+  title: "Create user list"
+  description: "Create a curated list of users for organized feed viewing."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, name, description, private"
+  output_format: "stdout: JSON response with list object"
+  test_cases:
+    - input: "{\"action\":\"create_list\",\"token\":\"eyJ...\",\"name\":\"Tech Leaders\",\"description\":\"Top tech voices\",\"private\":false}"
+      expected_output: "{\"list_id\":\"lst_1\",\"name\":\"Tech Leaders\",\"description\":\"Top tech voices\",\"private\":false,\"member_count\":0,\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 50 lists per user"]
+
+- id: "SOC-137"
+  title: "Add member to list"
+  description: "Add a user to an existing list."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, list_id, user_id"
+  output_format: "stdout: JSON response with membership status"
+  test_cases:
+    - input: "{\"action\":\"add_to_list\",\"token\":\"eyJ...\",\"list_id\":\"lst_1\",\"user_id\":2}"
+      expected_output: "{\"list_id\":\"lst_1\",\"user_id\":2,\"member_count\":1,\"status\":\"added\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 500 members per list"]
+
+- id: "SOC-138"
+  title: "Remove member from list"
+  description: "Remove a user from a list."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, list_id, user_id"
+  output_format: "stdout: JSON response with removal status"
+  test_cases:
+    - input: "{\"action\":\"remove_from_list\",\"token\":\"eyJ...\",\"list_id\":\"lst_1\",\"user_id\":2}"
+      expected_output: "{\"list_id\":\"lst_1\",\"user_id\":2,\"member_count\":0,\"status\":\"removed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "List owner only"]
+
+- id: "SOC-139"
+  title: "Get list members"
+  description: "Retrieve all members of a specific list."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db]
+  input_format: "stdin: JSON request with action, list_id, cursor, limit"
+  output_format: "stdout: JSON response with list members"
+  test_cases:
+    - input: "{\"action\":\"list_members\",\"list_id\":\"lst_1\",\"cursor\":null,\"limit\":50}"
+      expected_output: "{\"list_id\":\"lst_1\",\"members\":[{\"id\":2,\"username\":\"bob\",\"added_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1,\"next_cursor\":null}"
+  constraints: ["REST API pattern", "JSON in/out", "Public lists visible to all"]
+
+- id: "SOC-140"
+  title: "Subscribe to list"
+  description: "Subscribe to another user's public list to see it in your lists tab."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, list_id"
+  output_format: "stdout: JSON response with subscription status"
+  test_cases:
+    - input: "{\"action\":\"subscribe_list\",\"token\":\"eyJ...\",\"list_id\":\"lst_1\"}"
+      expected_output: "{\"list_id\":\"lst_1\",\"subscribed\":true,\"status\":\"subscribed\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Public lists only"]
+
+- id: "SOC-141"
+  title: "Get user's lists"
+  description: "Retrieve all lists created by or subscribed to by the authenticated user."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with lists array"
+  test_cases:
+    - input: "{\"action\":\"my_lists\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"owned\":[{\"id\":\"lst_1\",\"name\":\"Tech Leaders\",\"member_count\":5}],\"subscribed\":[{\"id\":\"lst_2\",\"name\":\"News Sources\",\"owner\":\"bob\",\"member_count\":20}]}"
+  constraints: ["REST API pattern", "JSON in/out", "Auth required"]
+
+- id: "SOC-142"
+  title: "Delete list"
+  description: "Delete a user-created list and all its memberships."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, list_id"
+  output_format: "stdout: JSON response with deletion status"
+  test_cases:
+    - input: "{\"action\":\"delete_list\",\"token\":\"eyJ...\",\"list_id\":\"lst_1\"}"
+      expected_output: "{\"list_id\":\"lst_1\",\"status\":\"deleted\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Owner only"]
+
+- id: "SOC-143"
+  title: "Create interest group"
+  description: "Create a public or private interest group that users can join."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, name, description, rules, private"
+  output_format: "stdout: JSON response with group object"
+  test_cases:
+    - input: "{\"action\":\"create_group\",\"token\":\"eyJ...\",\"name\":\"Rust Developers\",\"description\":\"For Rust enthusiasts\",\"rules\":[\"Be respectful\",\"Stay on topic\"],\"private\":false}"
+      expected_output: "{\"group_id\":\"grp_1\",\"name\":\"Rust Developers\",\"description\":\"For Rust enthusiasts\",\"member_count\":1,\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Creator becomes admin"]
+
+- id: "SOC-144"
+  title: "Join group"
+  description: "Join a public group or request to join a private group."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, group_id"
+  output_format: "stdout: JSON response with join status"
+  test_cases:
+    - input: "{\"action\":\"join_group\",\"token\":\"eyJ...\",\"group_id\":\"grp_1\"}"
+      expected_output: "{\"group_id\":\"grp_1\",\"member\":true,\"role\":\"member\",\"status\":\"joined\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Private groups need approval"]
+
+- id: "SOC-145"
+  title: "Group post"
+  description: "Create a post within a group, visible only to group members."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token, group_id, content"
+  output_format: "stdout: JSON response with group post object"
+  test_cases:
+    - input: "{\"action\":\"group_post\",\"token\":\"eyJ...\",\"group_id\":\"grp_1\",\"content\":\"Anyone tried the new Rust 2026 features?\"}"
+      expected_output: "{\"id\":50,\"group_id\":\"grp_1\",\"content\":\"Anyone tried the new Rust 2026 features?\",\"author\":\"alice\",\"visibility\":\"group\",\"status\":\"created\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Member only"]
+
+# =============================================================================
+# API DESIGN & UTILITY (SOC-146 to SOC-150)
+# =============================================================================
+
+- id: "SOC-146"
+  title: "Rate limit status"
+  description: "Check current API rate limit status and remaining quota."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.auth, std.time]
+  input_format: "stdin: JSON request with action, token"
+  output_format: "stdout: JSON response with rate limit info"
+  test_cases:
+    - input: "{\"action\":\"rate_limit_status\",\"token\":\"eyJ...\"}"
+      expected_output: "{\"limit\":300,\"remaining\":250,\"reset_at\":\"2026-01-01T00:15:00Z\",\"window_seconds\":900}"
+  constraints: ["REST API pattern", "JSON in/out", "Per-user limits"]
+
+- id: "SOC-147"
+  title: "API health check"
+  description: "Check API service health and response time across subsystems."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.time]
+  input_format: "stdin: JSON request with action"
+  output_format: "stdout: JSON response with health status"
+  test_cases:
+    - input: "{\"action\":\"health_check\"}"
+      expected_output: "{\"status\":\"healthy\",\"services\":{\"database\":\"up\",\"cache\":\"up\",\"search\":\"up\"},\"response_time_ms\":12,\"version\":\"1.0.0\"}"
+  constraints: ["REST API pattern", "JSON in/out", "No auth required"]
+
+- id: "SOC-148"
+  title: "Batch operations"
+  description: "Execute multiple API operations in a single request for efficiency."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.db, std.auth]
+  input_format: "stdin: JSON request with action, token, operations array"
+  output_format: "stdout: JSON response with results per operation"
+  test_cases:
+    - input: "{\"action\":\"batch\",\"token\":\"eyJ...\",\"operations\":[{\"action\":\"like_post\",\"post_id\":1},{\"action\":\"like_post\",\"post_id\":2},{\"action\":\"follow\",\"user_id\":3}]}"
+      expected_output: "{\"results\":[{\"index\":0,\"status\":\"success\",\"data\":{\"liked\":true}},{\"index\":1,\"status\":\"success\",\"data\":{\"liked\":true}},{\"index\":2,\"status\":\"success\",\"data\":{\"following\":true}}],\"total\":3,\"succeeded\":3,\"failed\":0}"
+  constraints: ["REST API pattern", "JSON in/out", "Max 25 operations per batch"]
+
+- id: "SOC-149"
+  title: "Webhook registration"
+  description: "Register a webhook URL to receive real-time notifications for events."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.db, std.auth, std.crypto]
+  input_format: "stdin: JSON request with action, token, url, events"
+  output_format: "stdout: JSON response with webhook registration"
+  test_cases:
+    - input: "{\"action\":\"register_webhook\",\"token\":\"eyJ...\",\"url\":\"https://myapp.com/hooks/social\",\"events\":[\"new_follower\",\"new_mention\"]}"
+      expected_output: "{\"webhook_id\":\"wh_1\",\"url\":\"https://myapp.com/hooks/social\",\"events\":[\"new_follower\",\"new_mention\"],\"secret\":\"whsec_abc123\",\"status\":\"active\"}"
+  constraints: ["REST API pattern", "JSON in/out", "HMAC signature verification"]
+
+- id: "SOC-150"
+  title: "API versioning"
+  description: "Handle API version negotiation and return appropriate response format."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "stdin: JSON request with action, api_version"
+  output_format: "stdout: JSON response with version info and deprecation warnings"
+  test_cases:
+    - input: "{\"action\":\"version_info\",\"api_version\":\"v1\"}"
+      expected_output: "{\"current_version\":\"v2\",\"requested_version\":\"v1\",\"supported\":true,\"deprecated\":true,\"sunset_date\":\"2026-06-01\",\"migration_guide\":\"https://docs.social.app/migrate/v1-to-v2\"}"
+  constraints: ["REST API pattern", "JSON in/out", "Backward compatible"]

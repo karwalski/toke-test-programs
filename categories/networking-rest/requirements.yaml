@@ -1,0 +1,3243 @@
+# Networking / REST requirements
+# NET-001 to NET-200
+# Servers: NET-001..NET-100  |  Clients: NET-101..NET-200
+
+- id: "NET-001"
+  title: "Hello World HTTP Server"
+  description: "Starts an HTTP server on a configurable port, responds to GET / with 'Hello, World!' and a 200 status code."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str]
+  input_format: "Single line: port number (e.g. 8080)"
+  output_format: "Prints 'Listening on :<port>' then logs each request as '<METHOD> <PATH> <STATUS>'"
+  test_cases:
+    - input: "8080"
+      expected_output: "Listening on :8080"
+    - input: "3000"
+      expected_output: "Listening on :3000"
+  constraints:
+    - "Must read port from stdin"
+    - "Must return Content-Type: text/plain"
+
+- id: "NET-002"
+  title: "HTTP Router Server"
+  description: "HTTP server with named routes: GET /hello returns 'Hello', GET /ping returns 'pong', any other path returns 404."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: port number"
+  output_format: "Prints 'Listening on :<port>' then logs '<METHOD> <PATH> <STATUS>' per request"
+  test_cases:
+    - input: "8081"
+      expected_output: "Listening on :8081"
+    - input: "9000"
+      expected_output: "Listening on :9000"
+  constraints:
+    - "Must return 404 JSON body for unknown routes"
+    - "Must return Content-Type: application/json for JSON responses"
+
+- id: "NET-003"
+  title: "HTTP Method Handler Server"
+  description: "Server that handles GET, POST, PUT, DELETE on /resource and returns the method name and body as JSON."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "Logs each request; responds with JSON {method, body}"
+  test_cases:
+    - input: "8082"
+      expected_output: "Listening on :8082"
+    - input: "7070"
+      expected_output: "Listening on :7070"
+  constraints:
+    - "Must return 405 Method Not Allowed for unsupported methods"
+    - "Must echo request body in response"
+
+- id: "NET-004"
+  title: "User CRUD API Server"
+  description: "In-memory REST API for users. Supports GET /users, POST /users, GET /users/:id, PUT /users/:id, DELETE /users/:id."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON responses; logs each operation"
+  test_cases:
+    - input: "8083"
+      expected_output: "Listening on :8083"
+    - input: "4000"
+      expected_output: "Listening on :4000"
+  constraints:
+    - "Must return 404 for unknown user IDs"
+    - "Must validate required fields (name, email)"
+    - "IDs must be auto-incremented integers"
+
+- id: "NET-005"
+  title: "Product CRUD API Server"
+  description: "In-memory REST API for products with fields: id, name, price, stock. Full CRUD on /products."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON responses"
+  test_cases:
+    - input: "8084"
+      expected_output: "Listening on :8084"
+    - input: "5000"
+      expected_output: "Listening on :5000"
+  constraints:
+    - "Price must be positive float"
+    - "Stock must be non-negative integer"
+
+- id: "NET-006"
+  title: "Order CRUD API Server"
+  description: "In-memory REST API for orders. Each order has id, userId, items (array), status, createdAt. Full CRUD on /orders."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON responses with ISO-8601 timestamps"
+  test_cases:
+    - input: "8085"
+      expected_output: "Listening on :8085"
+    - input: "6000"
+      expected_output: "Listening on :6000"
+  constraints:
+    - "Status must be one of: pending, processing, shipped, delivered, cancelled"
+    - "createdAt set automatically on POST"
+
+- id: "NET-007"
+  title: "Comment CRUD API Server"
+  description: "In-memory REST API for comments. Each comment has id, postId, author, body, createdAt. Supports filtering by postId via query param."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON array or object responses"
+  test_cases:
+    - input: "8086"
+      expected_output: "Listening on :8086"
+    - input: "6001"
+      expected_output: "Listening on :6001"
+  constraints:
+    - "GET /comments?postId=X filters by postId"
+    - "Must return empty array, not 404, when no comments found"
+
+- id: "NET-008"
+  title: "JWT Authentication Middleware Server"
+  description: "HTTP server with JWT-based auth. POST /login returns a signed JWT. Protected routes require Authorization: Bearer <token>."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.crypto, std.auth, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON responses; 401 for missing/invalid token"
+  test_cases:
+    - input: "8087"
+      expected_output: "Listening on :8087"
+    - input: "7001"
+      expected_output: "Listening on :7001"
+  constraints:
+    - "JWT must be signed with HS256"
+    - "Token expiry: 1 hour"
+    - "POST /login accepts {username, password} JSON"
+
+- id: "NET-009"
+  title: "API Key Authentication Middleware Server"
+  description: "HTTP server where clients pass X-API-Key header. Server validates against a set of allowed keys read from stdin."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: port. Subsequent lines: valid API keys (one per line, blank line to finish)"
+  output_format: "JSON responses; 401 for invalid/missing key"
+  test_cases:
+    - input: "8088\nkey-abc123\nkey-xyz789\n"
+      expected_output: "Listening on :8088"
+    - input: "7002\nsecret-key\n"
+      expected_output: "Listening on :7002"
+  constraints:
+    - "Must constant-time compare API keys"
+    - "Must log authentication failures"
+
+- id: "NET-010"
+  title: "Session-Based Authentication Server"
+  description: "HTTP server with cookie-based sessions. POST /login creates a session, GET /profile requires a valid session cookie, POST /logout destroys the session."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.crypto, std.auth, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON responses; sets/clears Set-Cookie header"
+  test_cases:
+    - input: "8089"
+      expected_output: "Listening on :8089"
+    - input: "7003"
+      expected_output: "Listening on :7003"
+  constraints:
+    - "Session IDs must be cryptographically random (32 bytes hex)"
+    - "Sessions expire after 30 minutes of inactivity"
+    - "Must set HttpOnly and SameSite=Strict cookie flags"
+
+- id: "NET-011"
+  title: "Request Logging Middleware Server"
+  description: "HTTP server that logs every request to stdout in Combined Log Format: IP, timestamp, method, path, status, response size."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.time, std.net]
+  input_format: "Single line: port number"
+  output_format: "Combined Log Format lines per request, then passes through to a simple 200 OK handler"
+  test_cases:
+    - input: "8090"
+      expected_output: "Listening on :8090"
+    - input: "7004"
+      expected_output: "Listening on :7004"
+  constraints:
+    - "Timestamp format: DD/MMM/YYYY:HH:MM:SS +0000"
+    - "Must record response size in bytes"
+
+- id: "NET-012"
+  title: "CORS Middleware Server"
+  description: "HTTP server that adds CORS headers to all responses. Reads allowed origins from stdin. Handles preflight OPTIONS requests."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "First line: port. Second line: comma-separated allowed origins"
+  output_format: "Passes requests through; adds CORS headers"
+  test_cases:
+    - input: "8091\nhttps://example.com,https://app.example.com"
+      expected_output: "Listening on :8091"
+    - input: "7005\n*"
+      expected_output: "Listening on :7005"
+  constraints:
+    - "Preflight OPTIONS must return 204 No Content"
+    - "Must set Access-Control-Allow-Methods and Access-Control-Allow-Headers"
+    - "Wildcard origin must not be combined with credentials"
+
+- id: "NET-013"
+  title: "Rate Limiting Middleware Server"
+  description: "HTTP server that enforces a per-IP rate limit (N requests per second). Returns 429 Too Many Requests when exceeded."
+  difficulty: 4
+  stdlib_modules: [std.http, std.net, std.str, std.time, std.json]
+  input_format: "First line: port. Second line: requests_per_second limit"
+  output_format: "Passes requests through until limit hit; returns 429 with Retry-After header"
+  test_cases:
+    - input: "8092\n10"
+      expected_output: "Listening on :8092"
+    - input: "7006\n2"
+      expected_output: "Listening on :7006"
+  constraints:
+    - "Token bucket algorithm"
+    - "Must include Retry-After header on 429 responses"
+    - "Rate limit per IP address"
+
+- id: "NET-014"
+  title: "Request Timeout Middleware Server"
+  description: "HTTP server that enforces a per-request timeout. If a handler takes longer than N milliseconds, returns 503 Service Unavailable."
+  difficulty: 3
+  stdlib_modules: [std.http, std.time, std.str, std.json]
+  input_format: "First line: port. Second line: timeout in milliseconds"
+  output_format: "Returns 503 with JSON error if handler exceeds timeout"
+  test_cases:
+    - input: "8093\n5000"
+      expected_output: "Listening on :8093"
+    - input: "7007\n1000"
+      expected_output: "Listening on :7007"
+  constraints:
+    - "Must return 503 with {error: 'Request timeout'} JSON body"
+    - "Must log timeout events with path and duration"
+
+- id: "NET-015"
+  title: "404 Not Found Error Handler"
+  description: "HTTP server with a custom 404 handler that returns a JSON error body with the requested path and a helpful message."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON {error, path, suggestion} on unknown routes"
+  test_cases:
+    - input: "8094"
+      expected_output: "Listening on :8094"
+    - input: "7008"
+      expected_output: "Listening on :7008"
+  constraints:
+    - "Must return Content-Type: application/json"
+    - "Must include the requested path in the error body"
+
+- id: "NET-016"
+  title: "500 Internal Server Error Handler"
+  description: "HTTP server with a global panic/error recovery middleware that catches handler panics and returns 500 with a sanitised error message."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON {error, requestId, timestamp} on panics; logs full stack trace to stderr"
+  test_cases:
+    - input: "8095"
+      expected_output: "Listening on :8095"
+    - input: "7009"
+      expected_output: "Listening on :7009"
+  constraints:
+    - "Must not leak stack traces to clients"
+    - "Must generate a unique requestId per request"
+    - "Must log stack trace to stderr"
+
+- id: "NET-017"
+  title: "Request Validation Middleware Server"
+  description: "HTTP server with JSON schema validation middleware. POST /data accepts JSON; validates against a schema and returns 422 with field errors on failure."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: port. Following lines: JSON schema (until blank line)"
+  output_format: "422 with {errors: [{field, message}]} on validation failure; 200 on success"
+  test_cases:
+    - input: "8096\n{\"required\":[\"name\",\"email\"]}\n"
+      expected_output: "Listening on :8096"
+    - input: "7010\n{\"required\":[\"id\"]}\n"
+      expected_output: "Listening on :7010"
+  constraints:
+    - "Must list all validation errors, not just the first"
+    - "Must return 422 Unprocessable Entity status code"
+
+- id: "NET-018"
+  title: "Pagination API Server"
+  description: "REST API server for a list of items supporting cursor-based pagination. GET /items?cursor=X&limit=N returns a page of results plus next cursor."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: port. Second line: total number of dummy items to generate"
+  output_format: "JSON {data: [...], nextCursor, total} responses"
+  test_cases:
+    - input: "8097\n100"
+      expected_output: "Listening on :8097"
+    - input: "7011\n500"
+      expected_output: "Listening on :7011"
+  constraints:
+    - "Default page size: 20"
+    - "Max page size: 100"
+    - "nextCursor is null on last page"
+    - "Cursor must be opaque (base64 encoded)"
+
+- id: "NET-019"
+  title: "ETag Caching Server"
+  description: "HTTP server that generates ETags for responses and handles If-None-Match conditional requests with 304 Not Modified."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.crypto, std.str]
+  input_format: "Single line: port number"
+  output_format: "Sets ETag header; returns 304 with empty body on matching If-None-Match"
+  test_cases:
+    - input: "8098"
+      expected_output: "Listening on :8098"
+    - input: "7012"
+      expected_output: "Listening on :7012"
+  constraints:
+    - "ETag must be MD5 hash of response body"
+    - "Must handle both strong and weak ETags"
+
+- id: "NET-020"
+  title: "TTL Cache Server"
+  description: "HTTP server with an in-memory TTL cache. GET /cache/:key returns cached value or 404. POST /cache/:key stores value with TTL from X-Cache-TTL header."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON {value, expiresAt} on cache hit; 404 on miss"
+  test_cases:
+    - input: "8099"
+      expected_output: "Listening on :8099"
+    - input: "7013"
+      expected_output: "Listening on :7013"
+  constraints:
+    - "Default TTL: 60 seconds"
+    - "Must evict expired entries on read"
+    - "DELETE /cache/:key must invalidate entry"
+
+- id: "NET-021"
+  title: "WebSocket Echo Server"
+  description: "WebSocket server that echoes every received message back to the sender with a 'echo: ' prefix."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.str, std.http]
+  input_format: "Single line: port number"
+  output_format: "Prints 'WS Listening on :<port>'; logs each connection/disconnection"
+  test_cases:
+    - input: "8100"
+      expected_output: "WS Listening on :8100"
+    - input: "7014"
+      expected_output: "WS Listening on :7014"
+  constraints:
+    - "Must support text and binary frames"
+    - "Must send pong on ping"
+    - "Must handle client disconnections gracefully"
+
+- id: "NET-022"
+  title: "WebSocket Broadcast Server"
+  description: "WebSocket server that broadcasts every message received from any client to all currently connected clients."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.str, std.http, std.json]
+  input_format: "Single line: port number"
+  output_format: "Prints 'WS Listening on :<port>'; logs connected client count"
+  test_cases:
+    - input: "8101"
+      expected_output: "WS Listening on :8101"
+    - input: "7015"
+      expected_output: "WS Listening on :7015"
+  constraints:
+    - "Must include sender info in broadcast"
+    - "Must handle concurrent sends safely"
+
+- id: "NET-023"
+  title: "WebSocket Chat Rooms Server"
+  description: "WebSocket server supporting named rooms. Clients send JSON {action: 'join'|'leave'|'message', room, text}. Messages are broadcast only to room members."
+  difficulty: 4
+  stdlib_modules: [std.ws, std.json, std.str, std.http, std.time]
+  input_format: "Single line: port number"
+  output_format: "Prints 'WS Listening on :<port>'; logs room join/leave events"
+  test_cases:
+    - input: "8102"
+      expected_output: "WS Listening on :8102"
+    - input: "7016"
+      expected_output: "WS Listening on :7016"
+  constraints:
+    - "Unknown action returns {error: 'unknown action'}"
+    - "Room names must be alphanumeric"
+    - "Must clean up empty rooms"
+
+- id: "NET-024"
+  title: "Server-Sent Events (SSE) Server"
+  description: "HTTP server that streams server-sent events. GET /events streams a counter event every second. GET /events?topic=X filters by topic."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "Single line: port number"
+  output_format: "SSE format: 'data: <json>\\n\\n' lines; keeps connection open"
+  test_cases:
+    - input: "8103"
+      expected_output: "Listening on :8103"
+    - input: "7017"
+      expected_output: "Listening on :7017"
+  constraints:
+    - "Must set Content-Type: text/event-stream"
+    - "Must set Cache-Control: no-cache"
+    - "Must send 'retry: 3000' on connect"
+
+- id: "NET-025"
+  title: "File Upload Server"
+  description: "HTTP server that accepts multipart/form-data file uploads on POST /upload. Saves files to a temp directory and returns JSON with filename and size."
+  difficulty: 4
+  stdlib_modules: [std.http, std.file, std.json, std.str, std.crypto]
+  input_format: "Single line: port number"
+  output_format: "JSON {filename, size, checksum} on success; 400 on invalid upload"
+  test_cases:
+    - input: "8104"
+      expected_output: "Listening on :8104"
+    - input: "7018"
+      expected_output: "Listening on :7018"
+  constraints:
+    - "Max file size: 10 MB"
+    - "Must validate Content-Type of uploaded file"
+    - "Checksum must be SHA-256 of file contents"
+
+- id: "NET-026"
+  title: "File Download Server"
+  description: "HTTP server that serves files from a directory specified on stdin. GET /files/:name streams the file with correct Content-Type and Content-Disposition."
+  difficulty: 3
+  stdlib_modules: [std.http, std.file, std.str, std.json]
+  input_format: "First line: port. Second line: directory path to serve"
+  output_format: "File bytes with appropriate headers; 404 JSON for missing files"
+  test_cases:
+    - input: "8105\n/tmp"
+      expected_output: "Listening on :8105"
+    - input: "7019\n/var/data"
+      expected_output: "Listening on :7019"
+  constraints:
+    - "Must prevent directory traversal (no .. in path)"
+    - "Must set Content-Length header"
+    - "Must support Range requests for partial downloads"
+
+- id: "NET-027"
+  title: "Health Check Endpoint Server"
+  description: "HTTP server with GET /health that returns {status, uptime, version} JSON and GET /ready that returns 200 or 503 based on readiness."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: port. Second line: version string"
+  output_format: "JSON health/readiness responses"
+  test_cases:
+    - input: "8106\nv1.0.0"
+      expected_output: "Listening on :8106"
+    - input: "7020\nv2.3.1"
+      expected_output: "Listening on :7020"
+  constraints:
+    - "Uptime in seconds, rounded to 2 decimal places"
+    - "/health always returns 200; /ready may return 503"
+
+- id: "NET-028"
+  title: "Prometheus Metrics Endpoint Server"
+  description: "HTTP server with GET /metrics that returns Prometheus-format text metrics: request count, response latency histogram, error rate."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "Single line: port number"
+  output_format: "Prometheus text format on /metrics; normal JSON on other routes"
+  test_cases:
+    - input: "8107"
+      expected_output: "Listening on :8107"
+    - input: "7021"
+      expected_output: "Listening on :7021"
+  constraints:
+    - "Must use Prometheus text exposition format 0.0.4"
+    - "Histogram buckets: 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1000ms"
+
+- id: "NET-029"
+  title: "API Versioning Server (URL Path)"
+  description: "HTTP server supporting two API versions via URL prefix: /v1/items and /v2/items. v2 returns additional fields."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON responses; v1 and v2 schemas differ"
+  test_cases:
+    - input: "8108"
+      expected_output: "Listening on :8108"
+    - input: "7022"
+      expected_output: "Listening on :7022"
+  constraints:
+    - "v1 items: {id, name}"
+    - "v2 items: {id, name, description, createdAt}"
+    - "Both versions must coexist"
+
+- id: "NET-030"
+  title: "API Versioning Server (Accept Header)"
+  description: "HTTP server that uses the Accept: application/vnd.api.v1+json or v2+json header to route to different response schemas."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON responses per Accept header version; 406 Not Acceptable for unknown versions"
+  test_cases:
+    - input: "8109"
+      expected_output: "Listening on :8109"
+    - input: "7023"
+      expected_output: "Listening on :7023"
+  constraints:
+    - "Default to v1 if no Accept header"
+    - "Must set Content-Type to match requested version"
+
+- id: "NET-031"
+  title: "Webhook Receiver Server"
+  description: "HTTP server that receives POST /webhook payloads, validates HMAC-SHA256 signature from X-Webhook-Signature header, and logs valid payloads."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.crypto, std.str]
+  input_format: "First line: port. Second line: webhook secret key"
+  output_format: "200 OK on valid signature; 401 on invalid; logs payload summary"
+  test_cases:
+    - input: "8110\nmysecret"
+      expected_output: "Listening on :8110"
+    - input: "7024\nwebhooksecret123"
+      expected_output: "Listening on :7024"
+  constraints:
+    - "Signature format: sha256=<hex>"
+    - "Must use constant-time comparison"
+    - "Must log event type from payload"
+
+- id: "NET-032"
+  title: "Webhook Dispatcher Server"
+  description: "HTTP server that accepts POST /events and fans out to a list of registered webhook URLs. Reads target URLs from stdin. Retries failed deliveries up to 3 times."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.crypto]
+  input_format: "First line: port. Subsequent lines: webhook target URLs (blank line to finish)"
+  output_format: "202 Accepted immediately; logs delivery status per target"
+  test_cases:
+    - input: "8111\nhttps://hook.example.com/a\nhttps://hook.example.com/b\n"
+      expected_output: "Listening on :8111"
+    - input: "7025\nhttps://example.com/hook\n"
+      expected_output: "Listening on :7025"
+  constraints:
+    - "Delivery must be async (non-blocking)"
+    - "Retry with exponential backoff: 1s, 2s, 4s"
+    - "Must sign payloads with HMAC-SHA256"
+
+- id: "NET-033"
+  title: "Circuit Breaker Pattern Server"
+  description: "HTTP server with a circuit breaker wrapping a downstream service. Reads downstream URL from stdin. Opens circuit after 5 consecutive failures, half-opens after 30s."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net]
+  input_format: "First line: port. Second line: downstream service URL"
+  output_format: "Proxies requests; returns 503 with {state: 'open'} when circuit is open"
+  test_cases:
+    - input: "8112\nhttps://downstream.example.com"
+      expected_output: "Listening on :8112"
+    - input: "7026\nhttp://localhost:9999"
+      expected_output: "Listening on :7026"
+  constraints:
+    - "States: closed, open, half-open"
+    - "Half-open allows one probe request"
+    - "Must log state transitions"
+
+- id: "NET-034"
+  title: "Retry Proxy Server"
+  description: "HTTP reverse proxy that retries failed upstream requests (5xx or network errors) up to N times with exponential backoff. Reads N and upstream URL from stdin."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net]
+  input_format: "First line: port. Second line: upstream URL. Third line: max retries"
+  output_format: "Proxied response or 502 Bad Gateway after exhausting retries"
+  test_cases:
+    - input: "8113\nhttps://upstream.example.com\n3"
+      expected_output: "Listening on :8113"
+    - input: "7027\nhttp://localhost:8888\n5"
+      expected_output: "Listening on :7027"
+  constraints:
+    - "Retry only on 5xx and network errors, not 4xx"
+    - "Exponential backoff: 100ms * 2^attempt"
+    - "Must add X-Retry-Count header to final response"
+
+- id: "NET-035"
+  title: "Load Balancer Server (Round Robin)"
+  description: "HTTP reverse proxy that distributes requests to multiple upstream servers in round-robin. Reads upstream list from stdin."
+  difficulty: 4
+  stdlib_modules: [std.http, std.net, std.str, std.json]
+  input_format: "First line: port. Subsequent lines: upstream URLs (blank line to finish)"
+  output_format: "Proxied responses; logs which upstream handled each request"
+  test_cases:
+    - input: "8114\nhttp://a.example.com\nhttp://b.example.com\n"
+      expected_output: "Listening on :8114"
+    - input: "7028\nhttp://s1:8080\nhttp://s2:8080\nhttp://s3:8080\n"
+      expected_output: "Listening on :7028"
+  constraints:
+    - "Must mark unhealthy upstreams and skip them"
+    - "Health check: HEAD / every 10s"
+
+- id: "NET-036"
+  title: "GraphQL-style Query Server"
+  description: "HTTP server accepting POST /query with {fields: [...], filter: {...}} and returning only the requested fields from an in-memory dataset."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON {data: {<requested_fields>}} or {errors: [...]}"
+  test_cases:
+    - input: "8115"
+      expected_output: "Listening on :8115"
+    - input: "7029"
+      expected_output: "Listening on :7029"
+  constraints:
+    - "Must return 400 for unknown fields"
+    - "Must support nested field selection"
+
+- id: "NET-037"
+  title: "Content Negotiation Server"
+  description: "HTTP server that responds with JSON, XML, or plain text based on the Accept header from the client."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "Response body in requested format; 406 if format not supported"
+  test_cases:
+    - input: "8116"
+      expected_output: "Listening on :8116"
+    - input: "7030"
+      expected_output: "Listening on :7030"
+  constraints:
+    - "Supports: application/json, application/xml, text/plain"
+    - "Default to JSON if Accept is */*"
+
+- id: "NET-038"
+  title: "Request ID Middleware Server"
+  description: "HTTP server that assigns a unique UUID to every request, propagates it as X-Request-ID header in the response, and includes it in logs."
+  difficulty: 2
+  stdlib_modules: [std.http, std.crypto, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "All responses include X-Request-ID header; logs include request ID"
+  test_cases:
+    - input: "8117"
+      expected_output: "Listening on :8117"
+    - input: "7031"
+      expected_output: "Listening on :7031"
+  constraints:
+    - "If client sends X-Request-ID, use that value"
+    - "Generated IDs must be UUID v4 format"
+
+- id: "NET-039"
+  title: "Body Size Limit Middleware Server"
+  description: "HTTP server that rejects requests with bodies larger than N bytes. Returns 413 Payload Too Large with JSON error."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: port. Second line: max body size in bytes"
+  output_format: "413 JSON error for oversized bodies; passes through otherwise"
+  test_cases:
+    - input: "8118\n1024"
+      expected_output: "Listening on :8118"
+    - input: "7032\n65536"
+      expected_output: "Listening on :7032"
+  constraints:
+    - "Must check Content-Length if provided"
+    - "Must also check actual body size during read"
+
+- id: "NET-040"
+  title: "Basic Auth Middleware Server"
+  description: "HTTP server with HTTP Basic Authentication. Reads username:password pairs from stdin. Returns 401 with WWW-Authenticate header when unauthenticated."
+  difficulty: 2
+  stdlib_modules: [std.http, std.auth, std.str, std.crypto]
+  input_format: "First line: port. Second line: realm name. Subsequent lines: user:pass pairs (blank to finish)"
+  output_format: "401 with WWW-Authenticate header on failure; 200 on success"
+  test_cases:
+    - input: "8119\nSecure Area\nadmin:password123\n"
+      expected_output: "Listening on :8119"
+    - input: "7033\nAPI\nuser:secret\n"
+      expected_output: "Listening on :7033"
+  constraints:
+    - "Credentials in Authorization: Basic <base64> header"
+    - "Must not store plaintext passwords; compare hashes"
+
+- id: "NET-041"
+  title: "Redirect Server"
+  description: "HTTP server that reads a list of source-to-destination URL redirects from stdin and performs permanent (301) or temporary (302) redirects."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "First line: port. Subsequent lines: <type> <from> <to> (type is 301 or 302, blank line to finish)"
+  output_format: "Redirect responses; 404 for unmapped paths"
+  test_cases:
+    - input: "8120\n301 /old /new\n302 /temp /elsewhere\n"
+      expected_output: "Listening on :8120"
+    - input: "7034\n301 /legacy /current\n"
+      expected_output: "Listening on :7034"
+  constraints:
+    - "Must set Location header"
+    - "Must log redirect events"
+
+- id: "NET-042"
+  title: "Reverse Proxy Server"
+  description: "Simple HTTP reverse proxy that forwards all requests to an upstream URL, passing through headers and body, and returning the upstream response."
+  difficulty: 3
+  stdlib_modules: [std.http, std.net, std.str, std.json]
+  input_format: "First line: port. Second line: upstream base URL"
+  output_format: "Proxied response with X-Proxied-By header added"
+  test_cases:
+    - input: "8121\nhttps://httpbin.org"
+      expected_output: "Listening on :8121"
+    - input: "7035\nhttp://localhost:9000"
+      expected_output: "Listening on :7035"
+  constraints:
+    - "Must strip hop-by-hop headers"
+    - "Must forward X-Forwarded-For and X-Real-IP"
+
+- id: "NET-043"
+  title: "Static File Server"
+  description: "HTTP server that serves static files from a directory. Supports directory listings, index.html fallback, and correct MIME types."
+  difficulty: 3
+  stdlib_modules: [std.http, std.file, std.str, std.json, std.time]
+  input_format: "First line: port. Second line: root directory"
+  output_format: "File bytes or directory listing HTML; 404 for missing files"
+  test_cases:
+    - input: "8122\n/tmp/www"
+      expected_output: "Listening on :8122"
+    - input: "7036\n/var/www/html"
+      expected_output: "Listening on :7036"
+  constraints:
+    - "Must set Last-Modified header"
+    - "Must handle If-Modified-Since conditional requests"
+    - "Must prevent directory traversal"
+
+- id: "NET-044"
+  title: "Gzip Compression Middleware Server"
+  description: "HTTP server that gzip-compresses responses when the client sends Accept-Encoding: gzip. Sets Content-Encoding: gzip header."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: port number"
+  output_format: "Compressed or uncompressed body based on Accept-Encoding"
+  test_cases:
+    - input: "8123"
+      expected_output: "Listening on :8123"
+    - input: "7037"
+      expected_output: "Listening on :7037"
+  constraints:
+    - "Only compress if Content-Type is text/* or application/json"
+    - "Do not compress bodies < 1 KB"
+
+- id: "NET-045"
+  title: "JSON RPC Server"
+  description: "HTTP server implementing JSON-RPC 2.0 over POST /rpc. Supports methods: add, subtract, multiply with numeric params."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON-RPC 2.0 response objects"
+  test_cases:
+    - input: "8124"
+      expected_output: "Listening on :8124"
+    - input: "7038"
+      expected_output: "Listening on :7038"
+  constraints:
+    - "Must handle batch requests (array of requests)"
+    - "Must return correct error codes: -32700 parse, -32600 invalid, -32601 method not found"
+    - "Must handle notifications (id=null)"
+
+- id: "NET-046"
+  title: "Token Bucket Rate Limiter Server"
+  description: "HTTP server with token bucket rate limiting per API key. Each key gets a separate bucket. Reads key-to-rate mapping from stdin."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.crypto]
+  input_format: "First line: port. Subsequent lines: <apikey> <tokens_per_second> (blank to finish)"
+  output_format: "429 with X-RateLimit-Remaining and X-RateLimit-Reset headers; 200 on allowed"
+  test_cases:
+    - input: "8125\nkey-abc 10\nkey-xyz 5\n"
+      expected_output: "Listening on :8125"
+    - input: "7039\npremium-key 100\nfree-key 2\n"
+      expected_output: "Listening on :7039"
+  constraints:
+    - "Must include X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset headers"
+    - "Unknown keys get default rate of 1 req/s"
+
+- id: "NET-047"
+  title: "Server-Side Search API"
+  description: "HTTP server with GET /search?q=<term>&page=<n>&limit=<n> that searches an in-memory list of documents by title and body text."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: port. Subsequent lines: JSON document objects (blank to finish)"
+  output_format: "JSON {results: [...], total, page, limit} with ranked results"
+  test_cases:
+    - input: "8126\n{\"id\":1,\"title\":\"Toke\",\"body\":\"A language\"}\n"
+      expected_output: "Listening on :8126"
+    - input: "7040\n{\"id\":1,\"title\":\"Hello\",\"body\":\"World\"}\n"
+      expected_output: "Listening on :7040"
+  constraints:
+    - "Case-insensitive search"
+    - "Title matches rank higher than body matches"
+    - "Must support pagination"
+
+- id: "NET-048"
+  title: "Bulk Operations API Server"
+  description: "HTTP server with POST /bulk that accepts an array of operations (create/update/delete) and applies them atomically, returning per-operation results."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON {results: [{id, status, error?}]} — one entry per operation"
+  test_cases:
+    - input: "8127"
+      expected_output: "Listening on :8127"
+    - input: "7041"
+      expected_output: "Listening on :7041"
+  constraints:
+    - "Max 100 operations per batch"
+    - "Individual operation failures must not abort the whole batch"
+    - "Must return 207 Multi-Status"
+
+- id: "NET-049"
+  title: "Long Polling Server"
+  description: "HTTP server where GET /poll?lastId=N holds the connection open until a new event with id > lastId is available, then responds with the event."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON event object when available; 204 No Content on timeout"
+  test_cases:
+    - input: "8128"
+      expected_output: "Listening on :8128"
+    - input: "7042"
+      expected_output: "Listening on :7042"
+  constraints:
+    - "Max poll wait: 30 seconds"
+    - "New events posted via POST /events"
+    - "Must handle concurrent pollers"
+
+- id: "NET-050"
+  title: "REST API with Full OpenAPI Spec Server"
+  description: "HTTP server serving GET /openapi.json that returns a valid OpenAPI 3.0 spec document describing the server's own endpoints."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "OpenAPI 3.0 JSON on /openapi.json; documented endpoints respond normally"
+  test_cases:
+    - input: "8129"
+      expected_output: "Listening on :8129"
+    - input: "7043"
+      expected_output: "Listening on :7043"
+  constraints:
+    - "Spec must include all defined paths"
+    - "Must include request/response schemas"
+    - "Must include authentication requirements"
+
+- id: "NET-051"
+  title: "Idempotency Key Server"
+  description: "HTTP server where POST requests include an Idempotency-Key header. Duplicate requests with the same key return the cached first response instead of re-processing."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto, std.time]
+  input_format: "First line: port. Second line: idempotency window in seconds"
+  output_format: "Cached or fresh JSON response; X-Idempotent-Replayed: true header on cache hit"
+  test_cases:
+    - input: "8130\n3600"
+      expected_output: "Listening on :8130"
+    - input: "7044\n86400"
+      expected_output: "Listening on :7044"
+  constraints:
+    - "Must return 422 if Idempotency-Key missing on POST"
+    - "Must expire cache entries after window"
+
+- id: "NET-052"
+  title: "Server-Timing Header Server"
+  description: "HTTP server that measures and reports timing for each phase (db, cache, render) in the Server-Timing response header."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "Single line: port number"
+  output_format: "All responses include Server-Timing header with simulated phase durations"
+  test_cases:
+    - input: "8131"
+      expected_output: "Listening on :8131"
+    - input: "7045"
+      expected_output: "Listening on :7045"
+  constraints:
+    - "Format: Server-Timing: db;dur=12.5, cache;dur=1.2, render;dur=34.0"
+    - "All durations in milliseconds"
+
+- id: "NET-053"
+  title: "Streaming JSON Response Server"
+  description: "HTTP server that streams a large JSON array line-by-line (NDJSON format) for GET /stream, allowing clients to parse incrementally."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: port. Second line: number of items to stream"
+  output_format: "NDJSON: one JSON object per line, streamed with 10ms delay between items"
+  test_cases:
+    - input: "8132\n1000"
+      expected_output: "Listening on :8132"
+    - input: "7046\n50"
+      expected_output: "Listening on :7046"
+  constraints:
+    - "Content-Type: application/x-ndjson"
+    - "Must flush after each line"
+
+- id: "NET-054"
+  title: "HTTP/2 Server Push Server"
+  description: "HTTP server that uses HTTP/2 server push to proactively send CSS and JS assets when serving an HTML page."
+  difficulty: 5
+  stdlib_modules: [std.http, std.file, std.str]
+  input_format: "Single line: port number"
+  output_format: "HTML page with server-pushed CSS/JS assets; logs push events"
+  test_cases:
+    - input: "8133"
+      expected_output: "Listening on :8133"
+    - input: "7047"
+      expected_output: "Listening on :7047"
+  constraints:
+    - "Must require TLS for HTTP/2"
+    - "Push assets defined by Link: </style.css>; rel=preload headers"
+
+- id: "NET-055"
+  title: "Conditional PUT Server"
+  description: "HTTP server implementing optimistic concurrency with conditional PUT. PUT /resources/:id requires If-Match: <etag> header and returns 412 if ETag does not match."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.crypto, std.str]
+  input_format: "Single line: port number"
+  output_format: "200 on success; 412 Precondition Failed with {current_etag} on mismatch"
+  test_cases:
+    - input: "8134"
+      expected_output: "Listening on :8134"
+    - input: "7048"
+      expected_output: "Listening on :7048"
+  constraints:
+    - "Must return ETag header on GET responses"
+    - "Must return 428 Precondition Required if If-Match missing"
+
+- id: "NET-056"
+  title: "Audit Log Middleware Server"
+  description: "HTTP server with an audit logging middleware that records all mutating requests (POST, PUT, PATCH, DELETE) to an append-only log file."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.file]
+  input_format: "First line: port. Second line: log file path"
+  output_format: "Passes all requests through; writes JSON audit records to log file"
+  test_cases:
+    - input: "8135\n/tmp/audit.log"
+      expected_output: "Listening on :8135"
+    - input: "7049\n/tmp/api-audit.log"
+      expected_output: "Listening on :7049"
+  constraints:
+    - "Audit record: {timestamp, method, path, status, duration, requestId}"
+    - "Log file must be append-only"
+
+- id: "NET-057"
+  title: "GraphQL Mutation Server"
+  description: "HTTP server implementing a minimal GraphQL endpoint supporting queries and mutations for a User type over POST /graphql."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "GraphQL JSON response: {data: {...}} or {errors: [...]}"
+  test_cases:
+    - input: "8136"
+      expected_output: "Listening on :8136"
+    - input: "7050"
+      expected_output: "Listening on :7050"
+  constraints:
+    - "Supports: query { user(id) }, mutation { createUser, updateUser, deleteUser }"
+    - "Must return 200 even for GraphQL errors"
+
+- id: "NET-058"
+  title: "Multipart Form Data Parser Server"
+  description: "HTTP server that parses multipart/form-data requests and returns a JSON summary of all fields and files received."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.file]
+  input_format: "Single line: port number"
+  output_format: "JSON {fields: {<name>: <value>}, files: [{name, size, contentType}]}"
+  test_cases:
+    - input: "8137"
+      expected_output: "Listening on :8137"
+    - input: "7051"
+      expected_output: "Listening on :7051"
+  constraints:
+    - "Must support multiple files in one request"
+    - "Must return 400 for malformed multipart data"
+
+- id: "NET-059"
+  title: "Geo-location Header Enricher Server"
+  description: "HTTP server that reads X-Client-IP, performs a lookup against a built-in GeoIP stub, and adds X-Country, X-Region headers before proxying."
+  difficulty: 4
+  stdlib_modules: [std.http, std.net, std.str, std.json]
+  input_format: "First line: port. Second line: upstream URL"
+  output_format: "Proxied request with geo headers added; logs enrichment"
+  test_cases:
+    - input: "8138\nhttp://localhost:9000"
+      expected_output: "Listening on :8138"
+    - input: "7052\nhttps://api.example.com"
+      expected_output: "Listening on :7052"
+  constraints:
+    - "Stub GeoIP: RFC 1918 addresses -> 'private network'"
+    - "Must not block if GeoIP lookup times out (>100ms)"
+
+- id: "NET-060"
+  title: "Request Deduplication Server"
+  description: "HTTP server that deduplicates concurrent identical GET requests (same path + query). While the first request is in-flight, subsequent duplicates wait and share the result."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.crypto]
+  input_format: "First line: port. Second line: simulated upstream latency in ms"
+  output_format: "JSON response; X-Request-Deduped: true header on deduplicated responses"
+  test_cases:
+    - input: "8139\n200"
+      expected_output: "Listening on :8139"
+    - input: "7053\n500"
+      expected_output: "Listening on :7053"
+  constraints:
+    - "Deduplication key: method + path + query string"
+    - "Only deduplicates GET and HEAD"
+
+- id: "NET-061"
+  title: "WebSocket Heartbeat Server"
+  description: "WebSocket server that sends a ping frame every N seconds. Disconnects clients that miss 3 consecutive pings."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.str, std.http, std.time]
+  input_format: "First line: port. Second line: ping interval in seconds"
+  output_format: "Logs ping/pong events and client disconnections"
+  test_cases:
+    - input: "8140\n30"
+      expected_output: "WS Listening on :8140"
+    - input: "7054\n10"
+      expected_output: "WS Listening on :7054"
+  constraints:
+    - "Must use WebSocket ping/pong frames, not application-level"
+    - "Must log reason for disconnection"
+
+- id: "NET-062"
+  title: "WebSocket Message Queue Server"
+  description: "WebSocket server that buffers messages sent while a client is temporarily disconnected and replays them on reconnect (using a client ID cookie)."
+  difficulty: 5
+  stdlib_modules: [std.ws, std.json, std.str, std.http, std.time]
+  input_format: "First line: port. Second line: max buffered messages per client"
+  output_format: "Replays buffered messages on reconnect; logs queue depth"
+  test_cases:
+    - input: "8141\n100"
+      expected_output: "WS Listening on :8141"
+    - input: "7055\n50"
+      expected_output: "WS Listening on :7055"
+  constraints:
+    - "Client identifies with X-Client-ID header on connect"
+    - "Buffer expires after 5 minutes"
+
+- id: "NET-063"
+  title: "SSE with Reconnect Server"
+  description: "SSE server that supports the 'Last-Event-ID' header for resumable streams. Replays missed events after reconnect."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "Single line: port number"
+  output_format: "SSE format with id: field; replays events since Last-Event-ID"
+  test_cases:
+    - input: "8142"
+      expected_output: "Listening on :8142"
+    - input: "7056"
+      expected_output: "Listening on :7056"
+  constraints:
+    - "Must store last 1000 events in memory"
+    - "Must include id: field in every event"
+    - "Must send retry: 5000 on connect"
+
+- id: "NET-064"
+  title: "HTTP Digest Auth Server"
+  description: "HTTP server implementing HTTP Digest Authentication (RFC 7616) with MD5 algorithm."
+  difficulty: 5
+  stdlib_modules: [std.http, std.auth, std.crypto, std.str, std.time]
+  input_format: "First line: port. Second line: realm. Third line: user:password"
+  output_format: "401 with WWW-Authenticate: Digest on first request; 200 on valid digest"
+  test_cases:
+    - input: "8143\nTestRealm\nadmin:secret"
+      expected_output: "Listening on :8143"
+    - input: "7057\nAPI\nuser:pass123"
+      expected_output: "Listening on :7057"
+  constraints:
+    - "Must generate fresh nonce per challenge"
+    - "Must support qop=auth"
+    - "Must reject replayed nonces"
+
+- id: "NET-065"
+  title: "Partial Content Server (Range Requests)"
+  description: "HTTP server implementing Range request support for large file downloads. Responds with 206 Partial Content and the requested byte range."
+  difficulty: 4
+  stdlib_modules: [std.http, std.file, std.str, std.json]
+  input_format: "First line: port. Second line: file path to serve"
+  output_format: "206 with Content-Range header for range requests; 200 for full requests"
+  test_cases:
+    - input: "8144\n/tmp/large.bin"
+      expected_output: "Listening on :8144"
+    - input: "7058\n/tmp/video.mp4"
+      expected_output: "Listening on :7058"
+  constraints:
+    - "Must support multiple ranges (multipart/byteranges)"
+    - "Must return 416 Range Not Satisfiable for invalid ranges"
+
+- id: "NET-066"
+  title: "Event Sourcing API Server"
+  description: "HTTP server storing resources as an immutable event log. POST /events appends events. GET /state/:id reconstructs current state by replaying events."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.crypto]
+  input_format: "Single line: port number"
+  output_format: "Current state JSON on GET; event confirmation on POST"
+  test_cases:
+    - input: "8145"
+      expected_output: "Listening on :8145"
+    - input: "7059"
+      expected_output: "Listening on :7059"
+  constraints:
+    - "Events are immutable once written"
+    - "Must include event sequence numbers"
+    - "GET /events/:id returns full event history"
+
+- id: "NET-067"
+  title: "HTTP Proxy with Cache Server"
+  description: "Caching HTTP forward proxy. Serves GET requests from cache if cached and not expired (per Cache-Control: max-age). Otherwise fetches from origin."
+  difficulty: 5
+  stdlib_modules: [std.http, std.net, std.str, std.time, std.json, std.crypto]
+  input_format: "Single line: port number"
+  output_format: "Proxied response with X-Cache: HIT|MISS header"
+  test_cases:
+    - input: "8146"
+      expected_output: "Listening on :8146"
+    - input: "7060"
+      expected_output: "Listening on :7060"
+  constraints:
+    - "Must respect Cache-Control: no-store and no-cache"
+    - "Cache key: method + URL"
+
+- id: "NET-068"
+  title: "Microservice Service Registry Server"
+  description: "HTTP server acting as a service registry. Services POST /register with {name, host, port, healthUrl}. GET /services returns healthy services. Registry polls health URLs."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net]
+  input_format: "Single line: port number"
+  output_format: "JSON service list; logs registration and health check events"
+  test_cases:
+    - input: "8147"
+      expected_output: "Listening on :8147"
+    - input: "7061"
+      expected_output: "Listening on :7061"
+  constraints:
+    - "Health check interval: 10 seconds"
+    - "Service deregistered after 3 consecutive health check failures"
+    - "TTL-based auto-deregistration if service doesn't re-register within 60s"
+
+- id: "NET-069"
+  title: "HTTP Tunnel Server (CONNECT)"
+  description: "HTTP proxy implementing the CONNECT method for HTTPS tunnelling. Client sends CONNECT host:port, proxy opens TCP connection and bridges both ends."
+  difficulty: 5
+  stdlib_modules: [std.http, std.net, std.str]
+  input_format: "Single line: port number"
+  output_format: "Logs each tunnel: 'TUNNEL host:port established'; tunnels TCP data transparently"
+  test_cases:
+    - input: "8148"
+      expected_output: "Listening on :8148"
+    - input: "7062"
+      expected_output: "Listening on :7062"
+  constraints:
+    - "Must respond with '200 Connection established' on success"
+    - "Must reject CONNECT to internal/private IPs"
+
+- id: "NET-070"
+  title: "Graceful Shutdown Server"
+  description: "HTTP server that handles SIGTERM/SIGINT by stopping new connections and waiting up to 30 seconds for in-flight requests to complete before exiting."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "Logs 'Shutdown initiated', 'Waiting for N requests', 'Shutdown complete'"
+  test_cases:
+    - input: "8149"
+      expected_output: "Listening on :8149"
+    - input: "7063"
+      expected_output: "Listening on :7063"
+  constraints:
+    - "Must stop accepting new connections immediately on signal"
+    - "Must return 503 to any requests arriving during shutdown"
+
+- id: "NET-071"
+  title: "REST API with HATEOAS Links"
+  description: "HTTP server returning HATEOAS-style JSON responses where each resource includes _links with related action URLs."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON with _links.self, _links.edit, _links.delete for each resource"
+  test_cases:
+    - input: "8150"
+      expected_output: "Listening on :8150"
+    - input: "7064"
+      expected_output: "Listening on :7064"
+  constraints:
+    - "Links must be absolute URLs"
+    - "Collection responses must include _links.next and _links.prev for pagination"
+
+- id: "NET-072"
+  title: "WebSocket Binary Protocol Server"
+  description: "WebSocket server that accepts binary frames containing a simple protocol: 4-byte message type + payload. Parses and responds with acknowledgement frames."
+  difficulty: 4
+  stdlib_modules: [std.ws, std.str, std.http, std.json]
+  input_format: "Single line: port number"
+  output_format: "Binary acknowledgement frames; logs message type and size"
+  test_cases:
+    - input: "8151"
+      expected_output: "WS Listening on :8151"
+    - input: "7065"
+      expected_output: "WS Listening on :7065"
+  constraints:
+    - "Message type 1: echo; type 2: reverse; type 99: close"
+    - "Malformed frames: respond with type 0 error frame"
+
+- id: "NET-073"
+  title: "IP Allowlist Middleware Server"
+  description: "HTTP server with IP allowlist middleware. Reads allowed CIDR ranges from stdin. Returns 403 Forbidden for requests from unlisted IPs."
+  difficulty: 3
+  stdlib_modules: [std.http, std.net, std.str, std.json]
+  input_format: "First line: port. Subsequent lines: CIDR ranges (blank to finish)"
+  output_format: "403 JSON for blocked IPs; passes through for allowed IPs"
+  test_cases:
+    - input: "8152\n127.0.0.0/8\n10.0.0.0/8\n"
+      expected_output: "Listening on :8152"
+    - input: "7066\n192.168.0.0/16\n"
+      expected_output: "Listening on :7066"
+  constraints:
+    - "Must handle X-Forwarded-For header"
+    - "Must support both IPv4 and IPv6 CIDR notation"
+
+- id: "NET-074"
+  title: "Feature Flag API Server"
+  description: "HTTP server serving feature flags. GET /flags/:key returns {enabled: true|false}. Flags can be toggled via POST /flags/:key {enabled: bool}. Supports percentage rollouts."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: port. Subsequent lines: <flagName> <percentage> (blank to finish)"
+  output_format: "JSON {enabled, percentage, flagName} on GET; 204 on toggle"
+  test_cases:
+    - input: "8153\nnew-feature 50\nbeta-ui 100\n"
+      expected_output: "Listening on :8153"
+    - input: "7067\ndark-mode 0\n"
+      expected_output: "Listening on :7067"
+  constraints:
+    - "Percentage rollout uses hash of userId for determinism"
+    - "Must require X-User-ID header for percentage flags"
+
+- id: "NET-075"
+  title: "API Gateway with Route Config Server"
+  description: "HTTP API gateway that reads a routing config from stdin (JSON) and proxies requests to appropriate microservices based on path prefix rules."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.net]
+  input_format: "First line: port. Second line onwards: JSON routing config until blank line"
+  output_format: "Proxied responses; logs routing decisions"
+  test_cases:
+    - input: "8154\n{\"routes\":[{\"prefix\":\"/users\",\"upstream\":\"http://user-svc:8080\"}]}\n"
+      expected_output: "Listening on :8154"
+    - input: "7068\n{\"routes\":[{\"prefix\":\"/api\",\"upstream\":\"http://api:3000\"}]}\n"
+      expected_output: "Listening on :7068"
+  constraints:
+    - "Most specific prefix wins on conflict"
+    - "Must return 404 if no route matches"
+    - "Must add X-Gateway-Route header to upstream request"
+
+- id: "NET-076"
+  title: "HTTP Metrics Aggregator Server"
+  description: "HTTP server that aggregates request metrics (count, latency percentiles, error rate) per endpoint and returns them as JSON on GET /stats."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON {endpoints: {<path>: {count, p50, p95, p99, errorRate}}} on /stats"
+  test_cases:
+    - input: "8155"
+      expected_output: "Listening on :8155"
+    - input: "7069"
+      expected_output: "Listening on :7069"
+  constraints:
+    - "Percentiles computed over sliding 5-minute window"
+    - "Must support GET /stats/reset to clear metrics"
+
+- id: "NET-077"
+  title: "Multiversion Data API Server"
+  description: "HTTP server maintaining multiple versions of resource data. GET /v/:version/items returns the state of items at that version. POST /items increments version."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON {version, items: [...]} per version query"
+  test_cases:
+    - input: "8156"
+      expected_output: "Listening on :8156"
+    - input: "7070"
+      expected_output: "Listening on :7070"
+  constraints:
+    - "Versions are monotonically increasing integers"
+    - "Must support version diff: GET /diff/:v1/:v2"
+
+- id: "NET-078"
+  title: "Health Dashboard SSE Server"
+  description: "HTTP server streaming real-time service health updates via SSE. Monitors registered services and pushes status change events."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.time, std.json, std.net]
+  input_format: "First line: port. Subsequent lines: service URLs to monitor (blank to finish)"
+  output_format: "SSE events: {service, status, latencyMs, timestamp}"
+  test_cases:
+    - input: "8157\nhttps://example.com/health\n"
+      expected_output: "Listening on :8157"
+    - input: "7071\nhttp://localhost:9000/health\n"
+      expected_output: "Listening on :7071"
+  constraints:
+    - "Poll each service every 5 seconds"
+    - "Only push events when status changes"
+
+- id: "NET-079"
+  title: "Rate-Limited JSON API Server"
+  description: "Full-featured JSON REST API with built-in rate limiting, request validation, pagination, and error handling for a 'tasks' resource."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net]
+  input_format: "Single line: port number"
+  output_format: "JSON responses with X-RateLimit-* headers; paginated lists"
+  test_cases:
+    - input: "8158"
+      expected_output: "Listening on :8158"
+    - input: "7072"
+      expected_output: "Listening on :7072"
+  constraints:
+    - "Rate limit: 100 req/min per IP"
+    - "Tasks have: id, title, done, priority, createdAt"
+    - "Supports ?priority=high|medium|low filter"
+
+- id: "NET-080"
+  title: "Mock Server from OpenAPI Spec"
+  description: "HTTP server that reads an OpenAPI 3.0 JSON spec from stdin and automatically generates mock responses based on the schema examples."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: port. Remaining lines: OpenAPI 3.0 JSON spec (until EOF)"
+  output_format: "Mock responses matching schema for each defined route"
+  test_cases:
+    - input: "8159"
+      expected_output: "Listening on :8159"
+    - input: "7073"
+      expected_output: "Listening on :7073"
+  constraints:
+    - "Must use 'example' values from spec if present"
+    - "Must generate valid random data matching 'type' if no example"
+    - "Must return correct status codes per spec"
+
+- id: "NET-081"
+  title: "Batch Request Fan-out Server"
+  description: "HTTP server accepting POST /batch with a JSON array of sub-requests. Executes all sub-requests concurrently and returns their responses in order."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.net, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON array of {status, headers, body} for each sub-request"
+  test_cases:
+    - input: "8160"
+      expected_output: "Listening on :8160"
+    - input: "7074"
+      expected_output: "Listening on :7074"
+  constraints:
+    - "Max 20 sub-requests per batch"
+    - "Sub-request timeout: 5 seconds each"
+    - "Must preserve order in response array"
+
+- id: "NET-082"
+  title: "Hierarchical Resource API Server"
+  description: "REST API server for hierarchical resources: /orgs/:orgId/teams/:teamId/members. Full CRUD at each level with parent-child relationship validation."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "JSON CRUD responses with nested resource URLs"
+  test_cases:
+    - input: "8161"
+      expected_output: "Listening on :8161"
+    - input: "7075"
+      expected_output: "Listening on :7075"
+  constraints:
+    - "Must return 404 if parent resource does not exist"
+    - "Deleting a parent must cascade-delete children"
+
+- id: "NET-083"
+  title: "Soft Delete API Server"
+  description: "HTTP server where DELETE /resources/:id performs a soft delete (sets deletedAt timestamp). Deleted resources are excluded from GET /resources unless ?include_deleted=true."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON responses; 404 for accessing soft-deleted resources normally"
+  test_cases:
+    - input: "8162"
+      expected_output: "Listening on :8162"
+    - input: "7076"
+      expected_output: "Listening on :7076"
+  constraints:
+    - "POST /resources/:id/restore reinstates a soft-deleted resource"
+    - "Hard delete via DELETE /resources/:id?permanent=true"
+
+- id: "NET-084"
+  title: "Header Forwarding Proxy Server"
+  description: "HTTP proxy that forwards a configurable set of headers from client to upstream and from upstream back to client. Reads header lists from stdin."
+  difficulty: 3
+  stdlib_modules: [std.http, std.net, std.str, std.json]
+  input_format: "First line: port. Second line: upstream URL. Third line: comma-separated headers to forward"
+  output_format: "Proxied responses with correct header forwarding; logs forwarded headers"
+  test_cases:
+    - input: "8163\nhttps://api.example.com\nX-User-ID,X-Org-ID"
+      expected_output: "Listening on :8163"
+    - input: "7077\nhttp://internal:9000\nAuthorization,X-Trace-ID"
+      expected_output: "Listening on :7077"
+  constraints:
+    - "Must not forward security-sensitive headers like Cookie unless explicitly listed"
+
+- id: "NET-085"
+  title: "WebSocket Load Tester Server"
+  description: "HTTP server with GET /ws-stats returning real-time WebSocket connection stats (total, active, messages sent/received) as JSON."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON {totalConnections, activeConnections, messagesSent, messagesReceived, uptime}"
+  test_cases:
+    - input: "8164"
+      expected_output: "Listening on :8164"
+    - input: "7078"
+      expected_output: "Listening on :7078"
+  constraints:
+    - "Stats reset on server restart"
+    - "Thread-safe counter updates"
+
+- id: "NET-086"
+  title: "Signed URL Generator Server"
+  description: "HTTP server where POST /sign generates a time-limited signed URL for a resource. GET /resource validates the signature and expiry before serving."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.crypto, std.str, std.time]
+  input_format: "First line: port. Second line: signing secret"
+  output_format: "JSON {signedUrl, expiresAt} on POST /sign; 403 on invalid/expired signed URL"
+  test_cases:
+    - input: "8165\nmysigningsecret"
+      expected_output: "Listening on :8165"
+    - input: "7079\nsecret-key-456"
+      expected_output: "Listening on :7079"
+  constraints:
+    - "Signature includes resource path + expiry timestamp"
+    - "Default expiry: 15 minutes"
+
+- id: "NET-087"
+  title: "Schema Migration API Server"
+  description: "HTTP server with GET /migrations returning pending migrations, POST /migrations/run applying them, and GET /migrations/history showing applied migrations."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.file]
+  input_format: "First line: port. Second line: migrations directory path"
+  output_format: "JSON migration status and history"
+  test_cases:
+    - input: "8166\n/tmp/migrations"
+      expected_output: "Listening on :8166"
+    - input: "7080\n/var/migrations"
+      expected_output: "Listening on :7080"
+  constraints:
+    - "Migrations are numbered SQL-like files: 001_name.json"
+    - "Applied migrations recorded in state file"
+    - "Must be idempotent: running applied migration is a no-op"
+
+- id: "NET-088"
+  title: "WebSocket Pub/Sub Broker Server"
+  description: "WebSocket server implementing publish-subscribe. Clients send {action: 'subscribe'|'publish'|'unsubscribe', topic, message}."
+  difficulty: 4
+  stdlib_modules: [std.ws, std.json, std.str, std.http, std.time]
+  input_format: "Single line: port number"
+  output_format: "Delivered messages to subscribers; logs topic activity"
+  test_cases:
+    - input: "8167"
+      expected_output: "WS Listening on :8167"
+    - input: "7081"
+      expected_output: "WS Listening on :7081"
+  constraints:
+    - "Wildcard subscriptions: topic 'events.*' matches 'events.user', 'events.order'"
+    - "Must support retained messages per topic"
+
+- id: "NET-089"
+  title: "Connection Pool Proxy Server"
+  description: "HTTP proxy that maintains a connection pool to an upstream service, reusing TCP connections. Reports pool stats (active, idle, total) on GET /pool/stats."
+  difficulty: 5
+  stdlib_modules: [std.http, std.net, std.json, std.str, std.time]
+  input_format: "First line: port. Second line: upstream URL. Third line: pool size"
+  output_format: "Proxied responses; JSON pool stats on /pool/stats"
+  test_cases:
+    - input: "8168\nhttp://upstream:8080\n10"
+      expected_output: "Listening on :8168"
+    - input: "7082\nhttps://api.example.com\n5"
+      expected_output: "Listening on :7082"
+  constraints:
+    - "Max wait for connection from pool: 5 seconds"
+    - "Idle connections closed after 30 seconds"
+
+- id: "NET-090"
+  title: "Trace Propagation Middleware Server"
+  description: "HTTP server middleware that propagates distributed tracing headers (W3C Trace Context: traceparent, tracestate) to upstream calls."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.crypto, std.net]
+  input_format: "First line: port. Second line: upstream URL"
+  output_format: "Proxied response with traceparent header; logs trace IDs"
+  test_cases:
+    - input: "8169\nhttps://api.example.com"
+      expected_output: "Listening on :8169"
+    - input: "7083\nhttp://svc:9000"
+      expected_output: "Listening on :7083"
+  constraints:
+    - "Generates new trace ID if none in request"
+    - "Format: 00-<traceId>-<spanId>-01"
+
+- id: "NET-091"
+  title: "REST API with Optimistic Locking Server"
+  description: "HTTP server where every resource has a 'version' field. PUT requires X-Version header matching current version; mismatches return 409 Conflict."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "200 with incremented version on success; 409 with {currentVersion} on conflict"
+  test_cases:
+    - input: "8170"
+      expected_output: "Listening on :8170"
+    - input: "7084"
+      expected_output: "Listening on :7084"
+  constraints:
+    - "Version starts at 1, increments by 1 on each update"
+    - "Must include X-Resource-Version header in all responses"
+
+- id: "NET-092"
+  title: "Multi-Tenant API Server"
+  description: "HTTP server extracting tenant ID from subdomain or X-Tenant-ID header. Each tenant has isolated data. Reads initial tenant configs from stdin."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: port. Subsequent lines: tenantId:name pairs (blank to finish)"
+  output_format: "JSON responses scoped to tenant; 404 for unknown tenants"
+  test_cases:
+    - input: "8171\ntenant-a:Acme Corp\ntenant-b:Beta Inc\n"
+      expected_output: "Listening on :8171"
+    - input: "7085\nt1:Org One\n"
+      expected_output: "Listening on :7085"
+  constraints:
+    - "Data must not leak between tenants"
+    - "Must support both header and subdomain tenant identification"
+
+- id: "NET-093"
+  title: "HTTP Cache-Control Parser Server"
+  description: "HTTP server that parses and enforces Cache-Control directives. Implements must-revalidate, no-cache, no-store, max-age, s-maxage, private."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "Cached or fresh responses with X-Cache: HIT|MISS|EXPIRED and Age headers"
+  test_cases:
+    - input: "8172"
+      expected_output: "Listening on :8172"
+    - input: "7086"
+      expected_output: "Listening on :7086"
+  constraints:
+    - "max-age has precedence over Expires"
+    - "must-revalidate must contact origin even when cached"
+
+- id: "NET-094"
+  title: "API Blueprint Documentation Server"
+  description: "HTTP server with GET /docs that renders HTML API documentation generated from inline route metadata (title, description, params, response schema)."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Single line: port number"
+  output_format: "HTML documentation page; application/json schema on /docs.json"
+  test_cases:
+    - input: "8173"
+      expected_output: "Listening on :8173"
+    - input: "7087"
+      expected_output: "Listening on :7087"
+  constraints:
+    - "Must auto-generate docs from route definitions"
+    - "HTML must include try-it section with form inputs"
+
+- id: "NET-095"
+  title: "gRPC-style HTTP/2 Server"
+  description: "HTTP/2 server implementing a simple binary framing protocol over POST requests. Supports unary and server-streaming RPC patterns."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.net]
+  input_format: "Single line: port number"
+  output_format: "Binary framed responses; logs RPC method name and duration"
+  test_cases:
+    - input: "8174"
+      expected_output: "Listening on :8174"
+    - input: "7088"
+      expected_output: "Listening on :7088"
+  constraints:
+    - "Content-Type: application/grpc"
+    - "5-byte frame: 1-byte compressed flag + 4-byte message length"
+
+- id: "NET-096"
+  title: "Presence API Server (WebSocket)"
+  description: "WebSocket server tracking user online/offline presence. Clients announce identity on connect. GET /presence returns current online users."
+  difficulty: 4
+  stdlib_modules: [std.ws, std.http, std.json, std.str, std.time]
+  input_format: "Single line: port number"
+  output_format: "JSON {online: [userId, ...]} on GET /presence; WS events on connect/disconnect"
+  test_cases:
+    - input: "8175"
+      expected_output: "Listening on :8175"
+    - input: "7089"
+      expected_output: "Listening on :7089"
+  constraints:
+    - "Clients send {userId} JSON on connect"
+    - "Must broadcast presence-change events to all connected clients"
+
+- id: "NET-097"
+  title: "Adaptive Timeout Server"
+  description: "HTTP server that adjusts per-route timeout based on observed p95 latency. Routes that consistently take longer get automatic timeout extension."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: port. Second line: initial timeout in milliseconds"
+  output_format: "Logs timeout adjustments; GET /timeouts shows current per-route timeouts"
+  test_cases:
+    - input: "8176\n5000"
+      expected_output: "Listening on :8176"
+    - input: "7090\n2000"
+      expected_output: "Listening on :7090"
+  constraints:
+    - "Minimum timeout: 100ms, maximum: 60000ms"
+    - "Adjustment based on sliding window of last 100 requests"
+
+- id: "NET-098"
+  title: "OAuth2 Authorization Server (Mock)"
+  description: "Mock OAuth2 authorization server implementing authorization_code and client_credentials flows. Issues JWTs as access tokens."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.crypto, std.auth, std.str, std.time]
+  input_format: "First line: port. Second line: client_id. Third line: client_secret"
+  output_format: "OAuth2 token responses; 401/400 for invalid requests"
+  test_cases:
+    - input: "8177\nmyclient\nmyclientsecret"
+      expected_output: "Listening on :8177"
+    - input: "7091\napp-id\napp-secret"
+      expected_output: "Listening on :7091"
+  constraints:
+    - "Implements /oauth/token, /oauth/authorize, /oauth/userinfo"
+    - "Access tokens expire in 3600 seconds"
+
+- id: "NET-099"
+  title: "Link Header Pagination Server"
+  description: "HTTP server using RFC 5988 Link headers for pagination. GET /items returns current page with Link: <url>; rel=next, <url>; rel=prev headers."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: port. Second line: total item count to generate"
+  output_format: "JSON array page; Link headers for navigation; X-Total-Count header"
+  test_cases:
+    - input: "8178\n200"
+      expected_output: "Listening on :8178"
+    - input: "7092\n50"
+      expected_output: "Listening on :7092"
+  constraints:
+    - "First page: no prev link. Last page: no next link"
+    - "Default page size 25; accepts ?page=N&per_page=N"
+
+- id: "NET-100"
+  title: "Service Mesh Sidecar Server"
+  description: "HTTP server acting as a sidecar proxy: intercepts all inbound traffic, applies mTLS validation, rate limiting, and retries, before forwarding to the local service."
+  difficulty: 5
+  stdlib_modules: [std.http, std.net, std.crypto, std.str, std.time, std.json]
+  input_format: "First line: proxy port. Second line: local service port. Third line: mTLS cert path"
+  output_format: "Proxied responses; logs mTLS validation and rate limit events"
+  test_cases:
+    - input: "8179\n8080\n/tmp/cert.pem"
+      expected_output: "Listening on :8179"
+    - input: "7093\n3000\n/tmp/service.pem"
+      expected_output: "Listening on :7093"
+  constraints:
+    - "Must reject requests without valid client certificate"
+    - "Rate limit: 1000 req/s default"
+    - "Must add X-Forwarded-Client-Cert header"
+
+# ---- CLIENT programs (NET-101 to NET-200) ----
+
+- id: "NET-101"
+  title: "HTTP GET Client"
+  description: "Reads a URL from stdin, performs an HTTP GET request, and prints the response status code and body to stdout."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str]
+  input_format: "Single line: URL"
+  output_format: "First line: status code. Remaining lines: response body"
+  test_cases:
+    - input: "https://httpbin.org/get"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/404"
+      expected_output: "404"
+  constraints:
+    - "Must follow redirects (up to 10)"
+    - "Must print error message to stderr and exit non-zero on network failure"
+
+- id: "NET-102"
+  title: "HTTP POST Client"
+  description: "Reads a URL and JSON body from stdin, performs an HTTP POST request with Content-Type: application/json, and prints status and response body."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL. Remaining lines: JSON body"
+  output_format: "First line: status code. Remaining lines: response body"
+  test_cases:
+    - input: "https://httpbin.org/post\n{\"name\":\"test\"}"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/201\n{}"
+      expected_output: "201"
+  constraints:
+    - "Must set Content-Length header"
+    - "Must handle non-JSON response bodies gracefully"
+
+- id: "NET-103"
+  title: "HTTP PUT Client"
+  description: "Reads URL, resource ID, and JSON body from stdin, performs an HTTP PUT request, and prints the result."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL. Second line: JSON body"
+  output_format: "First line: status code. Remaining lines: response body"
+  test_cases:
+    - input: "https://httpbin.org/put\n{\"id\":1,\"name\":\"updated\"}"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/204\n{}"
+      expected_output: "204"
+  constraints:
+    - "Must handle 204 No Content responses (empty body is valid)"
+
+- id: "NET-104"
+  title: "HTTP DELETE Client"
+  description: "Reads a URL from stdin, performs an HTTP DELETE request, and prints the status code and any response body."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str]
+  input_format: "Single line: URL"
+  output_format: "Status code; response body if non-empty"
+  test_cases:
+    - input: "https://httpbin.org/delete"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/204"
+      expected_output: "204"
+  constraints:
+    - "Must exit non-zero on 4xx/5xx responses"
+
+- id: "NET-105"
+  title: "HTTP PATCH Client"
+  description: "Reads a URL and partial JSON body from stdin, performs an HTTP PATCH request, and prints the response."
+  difficulty: 1
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL. Second line: JSON patch body"
+  output_format: "Status code; response body"
+  test_cases:
+    - input: "https://httpbin.org/patch\n{\"status\":\"active\"}"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/200\n{\"x\":1}"
+      expected_output: "200"
+  constraints:
+    - "Content-Type: application/merge-patch+json"
+
+- id: "NET-106"
+  title: "REST API CRUD Consumer Client"
+  description: "Command-line REST API client that reads an operation (list|get|create|update|delete) and parameters from stdin, calls a JSON REST API, and prints results."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: base URL. Second line: operation. Third line (if needed): resource id or JSON body"
+  output_format: "Pretty-printed JSON response"
+  test_cases:
+    - input: "https://jsonplaceholder.typicode.com/posts\nlist\n"
+      expected_output: "["
+    - input: "https://jsonplaceholder.typicode.com/posts\nget\n1"
+      expected_output: "{"
+  constraints:
+    - "Must pretty-print JSON with 2-space indent"
+    - "Must show status code alongside response"
+
+- id: "NET-107"
+  title: "HTTP Header Inspector Client"
+  description: "Reads a URL from stdin, performs an HTTP HEAD request, and prints all response headers as key: value pairs."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str]
+  input_format: "Single line: URL"
+  output_format: "One 'Header-Name: value' line per response header, sorted alphabetically"
+  test_cases:
+    - input: "https://httpbin.org/headers"
+      expected_output: "200"
+    - input: "https://example.com"
+      expected_output: "200"
+  constraints:
+    - "Must use HEAD method (no response body)"
+    - "Output headers in alphabetical order"
+
+- id: "NET-108"
+  title: "Bearer Token Auth Client"
+  description: "Reads a URL and JWT token from stdin, adds Authorization: Bearer header, and prints the API response."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str, std.auth]
+  input_format: "First line: URL. Second line: JWT token"
+  output_format: "Status code and JSON response body"
+  test_cases:
+    - input: "https://httpbin.org/bearer\neyJhbGciOiJIUzI1NiJ9.e30.signature"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/401\nexpired-token"
+      expected_output: "401"
+  constraints:
+    - "Must not log the token"
+    - "Must detect and report 401 Unauthorized"
+
+- id: "NET-109"
+  title: "Login and Token Flow Client"
+  description: "Reads a login URL, username, and password from stdin. POSTs credentials, extracts JWT from response, then calls a protected endpoint using the token."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.auth, std.crypto]
+  input_format: "First line: login URL. Second line: protected URL. Third line: username. Fourth line: password"
+  output_format: "Login status, token (truncated), and protected endpoint response"
+  test_cases:
+    - input: "https://api.example.com/login\nhttps://api.example.com/me\nadmin\npassword"
+      expected_output: "Login: 200"
+    - input: "https://api.example.com/login\nhttps://api.example.com/profile\nuser\nwrongpass"
+      expected_output: "Login: 401"
+  constraints:
+    - "Must extract token from {token: '...'} or {access_token: '...'} JSON"
+    - "Must not print full token"
+
+- id: "NET-110"
+  title: "Token Refresh Client"
+  description: "Reads base URL, access token, and refresh token from stdin. Calls a protected endpoint; if 401, uses refresh endpoint to get a new token and retries."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.auth]
+  input_format: "First line: base URL. Second line: access token. Third line: refresh token"
+  output_format: "Response from protected endpoint; logs if token was refreshed"
+  test_cases:
+    - input: "https://api.example.com\nvalid-token\nrefresh-token"
+      expected_output: "200"
+    - input: "https://api.example.com\nexpired-token\nvalid-refresh"
+      expected_output: "Token refreshed"
+  constraints:
+    - "Must retry exactly once after refresh"
+    - "If refresh also fails, exit with error"
+
+- id: "NET-111"
+  title: "Polling Client with Backoff"
+  description: "Reads a URL and expected condition (e.g. status=200) from stdin. Polls the URL repeatedly with exponential backoff until condition is met or timeout."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: max wait seconds. Third line: expected HTTP status"
+  output_format: "Logs each poll attempt with timestamp; final PASS or FAIL"
+  test_cases:
+    - input: "https://httpbin.org/get\n30\n200"
+      expected_output: "PASS"
+    - input: "https://httpbin.org/status/503\n5\n200"
+      expected_output: "FAIL"
+  constraints:
+    - "Backoff: 1s, 2s, 4s, 8s, capped at 30s"
+    - "Must print total elapsed time"
+
+- id: "NET-112"
+  title: "Long Polling Client"
+  description: "Reads a long-poll URL from stdin. Continuously polls the endpoint and prints new events as they arrive. Handles 204 No Content (no new events) gracefully."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: URL. Second line: timeout seconds"
+  output_format: "Prints each received event as pretty JSON; 'No new events' on 204"
+  test_cases:
+    - input: "https://api.example.com/poll\n60"
+      expected_output: "Polling"
+    - input: "https://api.example.com/events?lastId=0\n10"
+      expected_output: "Polling"
+  constraints:
+    - "Must send lastId param from previous response"
+    - "Must stop after timeout seconds"
+
+- id: "NET-113"
+  title: "Batch API Request Client"
+  description: "Reads a list of URLs from stdin and fetches all of them concurrently, printing status and first line of body for each URL in input order."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Lines of URLs (one per line until EOF)"
+  output_format: "One line per URL: '<url> <status> <first_100_chars_of_body>'"
+  test_cases:
+    - input: "https://httpbin.org/get\nhttps://httpbin.org/ip\n"
+      expected_output: "https://httpbin.org/get 200"
+    - input: "https://httpbin.org/status/200\nhttps://httpbin.org/status/404\n"
+      expected_output: "https://httpbin.org/status/200 200"
+  constraints:
+    - "Max concurrency: 10"
+    - "Results in same order as input"
+    - "Timeout per request: 30 seconds"
+
+- id: "NET-114"
+  title: "WebSocket Client"
+  description: "Reads a WebSocket URL and messages from stdin. Connects, sends each message, and prints received messages until the connection closes."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.str, std.json, std.time]
+  input_format: "First line: WebSocket URL. Subsequent lines: messages to send (blank line means done sending)"
+  output_format: "Received messages one per line; 'Connection closed' at end"
+  test_cases:
+    - input: "ws://localhost:8100\nhello\nworld\n"
+      expected_output: "echo: hello"
+    - input: "ws://echo.websocket.org\nping\n"
+      expected_output: "ping"
+  constraints:
+    - "Must handle server-initiated close gracefully"
+    - "Must print close code and reason"
+
+- id: "NET-115"
+  title: "File Download Client"
+  description: "Reads a URL and destination file path from stdin. Downloads the file with a progress bar (percentage, bytes downloaded, speed)."
+  difficulty: 3
+  stdlib_modules: [std.http, std.file, std.str, std.time]
+  input_format: "First line: URL. Second line: destination file path"
+  output_format: "Progress bar to stderr; final 'Downloaded <N> bytes to <path>' to stdout"
+  test_cases:
+    - input: "https://httpbin.org/bytes/1024\n/tmp/test.bin"
+      expected_output: "Downloaded"
+    - input: "https://httpbin.org/bytes/10240\n/tmp/large.bin"
+      expected_output: "Downloaded"
+  constraints:
+    - "Must use streaming download (not buffer entire file in memory)"
+    - "Must verify Content-Length matches downloaded size"
+
+- id: "NET-116"
+  title: "Resumable Download Client"
+  description: "Downloads a file with resume capability. If the destination file exists, uses HTTP Range requests to continue from where it left off."
+  difficulty: 4
+  stdlib_modules: [std.http, std.file, std.str, std.time]
+  input_format: "First line: URL. Second line: destination file path"
+  output_format: "Logs 'Resuming from byte N' or 'Starting fresh'. Final 'Download complete: <path>'"
+  test_cases:
+    - input: "https://httpbin.org/bytes/10240\n/tmp/resume.bin"
+      expected_output: "Download complete"
+    - input: "https://example.com/file.zip\n/tmp/file.zip"
+      expected_output: "Download complete"
+  constraints:
+    - "Must check Accept-Ranges: bytes header before attempting resume"
+    - "Must verify file integrity with ETag or Content-MD5 if available"
+
+- id: "NET-117"
+  title: "REST API Integration Test Client"
+  description: "Reads a base URL from stdin and runs a test suite: creates a resource, reads it back, updates it, verifies the update, then deletes it. Reports PASS/FAIL."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: base URL (e.g. http://localhost:8083)"
+  output_format: "PASS/FAIL per step; overall PASS/FAIL at end"
+  test_cases:
+    - input: "http://localhost:8083"
+      expected_output: "Step 1 (Create): PASS"
+    - input: "http://localhost:8004"
+      expected_output: "Step 1 (Create): PASS"
+  constraints:
+    - "Each step must depend on previous step's data"
+    - "Must clean up created resources even on failure"
+
+- id: "NET-118"
+  title: "API Rate Limit Aware Client"
+  description: "Reads a URL list and API key from stdin. Makes requests respecting X-RateLimit-Remaining and X-RateLimit-Reset headers to avoid 429 errors."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: API key. Subsequent lines: URLs to request (blank to finish)"
+  output_format: "Status and body per request; logs when rate limit sleep is needed"
+  test_cases:
+    - input: "key-abc\nhttps://api.example.com/v1/a\nhttps://api.example.com/v1/b\n"
+      expected_output: "https://api.example.com/v1/a"
+    - input: "key-xyz\nhttps://api.example.com/v1/c\n"
+      expected_output: "https://api.example.com/v1/c"
+  constraints:
+    - "Must sleep until X-RateLimit-Reset if X-RateLimit-Remaining is 0"
+    - "Must retry once after 429"
+
+- id: "NET-119"
+  title: "HTTP Benchmark Client"
+  description: "Reads a URL, concurrency, and request count from stdin. Sends the specified number of concurrent GET requests and prints latency stats (min, max, mean, p50, p95, p99)."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: concurrency. Third line: total requests"
+  output_format: "Stats table: requests/sec, min/max/mean/p50/p95/p99 latency, error count"
+  test_cases:
+    - input: "https://httpbin.org/get\n5\n50"
+      expected_output: "Requests/sec:"
+    - input: "http://localhost:8080\n10\n100"
+      expected_output: "Requests/sec:"
+  constraints:
+    - "Must track errors separately (4xx, 5xx, network errors)"
+    - "Percentiles computed from all latency samples"
+
+- id: "NET-120"
+  title: "SSE Consumer Client"
+  description: "Reads an SSE endpoint URL from stdin, connects, and prints each incoming event's id, event type, and data fields as they arrive."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.time]
+  input_format: "First line: SSE URL. Second line: max events to receive (0 = unlimited)"
+  output_format: "Per event: 'Event #N: id=<id> type=<type> data=<data>'"
+  test_cases:
+    - input: "http://localhost:8103/events\n5"
+      expected_output: "Event #1:"
+    - input: "http://localhost:8103/events\n10"
+      expected_output: "Event #1:"
+  constraints:
+    - "Must handle multi-line data fields"
+    - "Must reconnect on connection drop (using Last-Event-ID)"
+
+- id: "NET-121"
+  title: "Webhook Sender Client"
+  description: "Reads a webhook URL, secret, and JSON payload from stdin. Signs the payload with HMAC-SHA256 and POSTs it with the signature header."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: webhook URL. Second line: secret. Third line: JSON payload"
+  output_format: "HTTP status and response body; logs signature header sent"
+  test_cases:
+    - input: "https://hook.example.com/receive\nmysecret\n{\"event\":\"user.created\"}"
+      expected_output: "200"
+    - input: "http://localhost:8110/webhook\nwebhooksecret123\n{\"type\":\"test\"}"
+      expected_output: "200"
+  constraints:
+    - "Signature header: X-Webhook-Signature: sha256=<hex>"
+    - "Must print delivery status (delivered/failed)"
+
+- id: "NET-122"
+  title: "API Key Rotation Client"
+  description: "Reads a base URL and current API key from stdin. Calls POST /api-keys/rotate, extracts the new key, verifies it works on a test endpoint, and prints the new key."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: base URL. Second line: current API key"
+  output_format: "'Rotation successful. New key: <first 8 chars>...' or 'Rotation failed: <reason>'"
+  test_cases:
+    - input: "https://api.example.com\nkey-abc123"
+      expected_output: "Rotation"
+    - input: "http://localhost:8088\nkey-xyz789"
+      expected_output: "Rotation"
+  constraints:
+    - "Must verify new key before reporting success"
+    - "Must not print full new key"
+
+- id: "NET-123"
+  title: "JSON Diff Client"
+  description: "Reads two API endpoint URLs from stdin. Fetches both, diffs the JSON responses, and prints a human-readable diff showing added, removed, and changed fields."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL 1. Second line: URL 2"
+  output_format: "JSON diff: '+' for added, '-' for removed, '~' for changed, with path notation"
+  test_cases:
+    - input: "https://jsonplaceholder.typicode.com/posts/1\nhttps://jsonplaceholder.typicode.com/posts/2"
+      expected_output: "~"
+    - input: "https://httpbin.org/json\nhttps://httpbin.org/json"
+      expected_output: "No differences"
+  constraints:
+    - "Must handle nested objects and arrays"
+    - "Array diffs show index of change"
+
+- id: "NET-124"
+  title: "HTTP Response Validator Client"
+  description: "Reads a URL and a JSON schema for the expected response from stdin. Fetches the URL and validates the response body against the schema. Prints PASS or FAIL with details."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL. Remaining lines: JSON schema until EOF"
+  output_format: "PASS or FAIL with validation error details"
+  test_cases:
+    - input: "https://jsonplaceholder.typicode.com/posts/1\n{\"required\":[\"id\",\"title\"]}"
+      expected_output: "PASS"
+    - input: "https://httpbin.org/json\n{\"required\":[\"nonexistent_field\"]}"
+      expected_output: "FAIL"
+  constraints:
+    - "Must check status code is 2xx before schema validation"
+    - "Must list all schema violations"
+
+- id: "NET-125"
+  title: "GraphQL Query Client"
+  description: "Reads a GraphQL endpoint URL and query string from stdin. Sends the query as POST with application/json Content-Type and pretty-prints the JSON response."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: GraphQL URL. Remaining lines: GraphQL query"
+  output_format: "Pretty-printed JSON response or error details"
+  test_cases:
+    - input: "https://countries.trevorblades.com\n{countries{code name}}"
+      expected_output: "{"
+    - input: "http://localhost:8136/graphql\n{user(id:1){name}}"
+      expected_output: "{"
+  constraints:
+    - "Must wrap query in {\"query\": \"...\"} JSON"
+    - "Must detect and display GraphQL errors even with 200 status"
+
+- id: "NET-126"
+  title: "Paginated API Consumer Client"
+  description: "Reads a paginated API base URL from stdin. Fetches all pages following Link headers or nextCursor until exhausted. Writes all items as NDJSON to stdout."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL. Second line: max items (0 = all)"
+  output_format: "NDJSON: one JSON object per line. Final line: 'Total: N items'"
+  test_cases:
+    - input: "https://api.example.com/items\n100"
+      expected_output: "Total:"
+    - input: "http://localhost:8097/items\n0"
+      expected_output: "Total:"
+  constraints:
+    - "Must support both Link header and JSON cursor pagination"
+    - "Must respect max items limit"
+
+- id: "NET-127"
+  title: "HTTP Client with Retry Logic"
+  description: "Reads a URL and retry config from stdin. Makes GET requests with configurable retry on 5xx errors, using jittered exponential backoff."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json, std.crypto]
+  input_format: "First line: URL. Second line: max retries. Third line: base delay ms"
+  output_format: "Final status code and body; logs each attempt with delay"
+  test_cases:
+    - input: "https://httpbin.org/get\n3\n100"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/503\n3\n100"
+      expected_output: "Attempt 1"
+  constraints:
+    - "Jitter: random 0-100ms added to each backoff"
+    - "Only retry on 5xx and connection errors, not 4xx"
+
+- id: "NET-128"
+  title: "Concurrent API Stress Client"
+  description: "Reads a URL and scenario config from stdin. Runs a ramp-up stress test: gradually increases concurrent users, measures throughput and error rate."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: start users. Third line: max users. Fourth line: ramp duration seconds"
+  output_format: "Per-second stats: users, req/s, errors, p95 latency"
+  test_cases:
+    - input: "http://localhost:8080\n1\n20\n30"
+      expected_output: "users="
+    - input: "https://httpbin.org/get\n5\n10\n10"
+      expected_output: "users="
+  constraints:
+    - "Ramp increases by 1 user per (ramp_duration/max_users) seconds"
+    - "Must report when error rate exceeds 5%"
+
+- id: "NET-129"
+  title: "API Client with Circuit Breaker"
+  description: "HTTP client wrapper that implements a circuit breaker. Opens after N consecutive failures, preventing requests for 30s, then allows one probe request."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: threshold (failures before open). Third line: request count"
+  output_format: "Per-request: status or 'Circuit OPEN - skipped'. Circuit state logged on change"
+  test_cases:
+    - input: "https://httpbin.org/get\n5\n10"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/500\n3\n10"
+      expected_output: "Circuit OPEN"
+  constraints:
+    - "Must log 'Circuit opened', 'Circuit half-open', 'Circuit closed'"
+    - "Half-open: exactly one probe request"
+
+- id: "NET-130"
+  title: "mTLS HTTP Client"
+  description: "Reads a URL, client cert path, and client key path from stdin. Makes HTTPS requests using mutual TLS authentication."
+  difficulty: 4
+  stdlib_modules: [std.http, std.crypto, std.str, std.file, std.net]
+  input_format: "First line: URL. Second line: client cert path. Third line: client key path"
+  output_format: "Status code and response body; logs TLS handshake details"
+  test_cases:
+    - input: "https://mtls.example.com\n/tmp/client.crt\n/tmp/client.key"
+      expected_output: "TLS"
+    - input: "https://localhost:8443\n/tmp/cert.pem\n/tmp/key.pem"
+      expected_output: "TLS"
+  constraints:
+    - "Must validate server certificate against system CA store"
+    - "Must log certificate subject and expiry"
+
+- id: "NET-131"
+  title: "Content-Type Negotiating Client"
+  description: "Reads a URL and preferred format (json|xml|text) from stdin. Sends the appropriate Accept header and prints the response body."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "First line: URL. Second line: preferred format"
+  output_format: "Response body; logs actual Content-Type returned"
+  test_cases:
+    - input: "https://httpbin.org/get\njson"
+      expected_output: "{"
+    - input: "https://httpbin.org/xml\nxml"
+      expected_output: "<"
+  constraints:
+    - "Must warn if returned Content-Type does not match requested format"
+
+- id: "NET-132"
+  title: "OAuth2 Client Credentials Client"
+  description: "Reads a token URL, client ID, client secret, and API URL from stdin. Obtains an OAuth2 access token using client_credentials flow, then calls the API."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.auth, std.time]
+  input_format: "First line: token URL. Second line: client ID. Third line: client secret. Fourth line: API URL"
+  output_format: "API response; logs token expiry time"
+  test_cases:
+    - input: "https://auth.example.com/token\nclient-id\nclient-secret\nhttps://api.example.com/data"
+      expected_output: "200"
+    - input: "http://localhost:8177/oauth/token\nmyclient\nmyclientsecret\nhttp://localhost:8177/api"
+      expected_output: "200"
+  constraints:
+    - "Must cache token until 60s before expiry"
+    - "Must not log client secret"
+
+- id: "NET-133"
+  title: "HTTP Link Checker Client"
+  description: "Reads a base URL from stdin. Fetches the page, extracts all <a href> links, checks each link for a 2xx response, and reports broken links."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.net, std.json]
+  input_format: "First line: base URL. Second line: max links to check"
+  output_format: "Per link: 'OK <url>' or 'BROKEN <url> (status N)'. Summary at end."
+  test_cases:
+    - input: "https://example.com\n10"
+      expected_output: "OK"
+    - input: "http://localhost:8122\n5"
+      expected_output: "OK"
+  constraints:
+    - "Must resolve relative URLs against base"
+    - "Max concurrency: 5"
+    - "Must follow at most one redirect per link"
+
+- id: "NET-134"
+  title: "HTTP Cookie Jar Client"
+  description: "Reads a series of URL requests from stdin. Maintains a cookie jar across requests (stores cookies from Set-Cookie headers and sends them on subsequent requests)."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: domain. Subsequent lines: URLs (blank to finish)"
+  output_format: "Status per URL; logs cookies set/sent"
+  test_cases:
+    - input: "httpbin.org\nhttps://httpbin.org/cookies/set/session/abc\nhttps://httpbin.org/cookies\n"
+      expected_output: "200"
+    - input: "localhost\nhttp://localhost:8089/login\nhttp://localhost:8089/profile\n"
+      expected_output: "200"
+  constraints:
+    - "Must handle Expires and Max-Age"
+    - "Must respect Domain and Path cookie attributes"
+    - "Must not send cookies cross-domain"
+
+- id: "NET-135"
+  title: "HTTP Proxy-through Client"
+  description: "Reads a proxy URL and target URL from stdin. Makes the request through the HTTP proxy (CONNECT for HTTPS, direct for HTTP). Prints response."
+  difficulty: 3
+  stdlib_modules: [std.http, std.net, std.str]
+  input_format: "First line: proxy URL. Second line: target URL"
+  output_format: "Status code and response body"
+  test_cases:
+    - input: "http://proxy.example.com:3128\nhttps://example.com"
+      expected_output: "200"
+    - input: "http://localhost:8148\nhttps://example.com"
+      expected_output: "200"
+  constraints:
+    - "Must use CONNECT method for HTTPS targets"
+    - "Must support proxy authentication if proxy URL includes credentials"
+
+- id: "NET-136"
+  title: "API Changelog Diff Client"
+  description: "Reads two versioned API base URLs from stdin. Fetches /openapi.json from each, diffs the paths and schemas, and prints a changelog of breaking vs non-breaking changes."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: old API base URL. Second line: new API base URL"
+  output_format: "Grouped diff: BREAKING CHANGES, NON-BREAKING CHANGES, REMOVED, ADDED"
+  test_cases:
+    - input: "https://api.example.com/v1\nhttps://api.example.com/v2"
+      expected_output: "BREAKING CHANGES"
+    - input: "http://localhost:8108\nhttp://localhost:8109"
+      expected_output: "BREAKING CHANGES"
+  constraints:
+    - "Removed endpoints are breaking changes"
+    - "New required request fields are breaking changes"
+    - "New optional fields are non-breaking"
+
+- id: "NET-137"
+  title: "WebSocket Chat Client"
+  description: "Reads a WebSocket URL and username from stdin. Connects to a chat room server, reads messages from stdin, sends them, and prints incoming messages."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.str, std.json, std.time]
+  input_format: "First line: WebSocket URL. Second line: username. Subsequent lines: messages to send"
+  output_format: "Incoming messages as '[username] message'. 'Connected' on join. 'Disconnected' on close."
+  test_cases:
+    - input: "ws://localhost:8102/chat\nalice\nhello\n"
+      expected_output: "Connected"
+    - input: "ws://chat.example.com\nbob\nhi there\n"
+      expected_output: "Connected"
+  constraints:
+    - "Must display messages from other users as they arrive"
+    - "Must send {action: 'join', room: 'general'} on connect"
+
+- id: "NET-138"
+  title: "HTTP Canary Test Client"
+  description: "Reads two server URLs (stable and canary) and N requests from stdin. Sends each request to both, compares responses, and reports divergences."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: stable URL. Second line: canary URL. Third line: N requests"
+  output_format: "Match rate percentage; details of diverging responses"
+  test_cases:
+    - input: "https://stable.example.com/api\nhttps://canary.example.com/api\n20"
+      expected_output: "Match rate:"
+    - input: "http://localhost:8079\nhttp://localhost:8178\n10"
+      expected_output: "Match rate:"
+  constraints:
+    - "Ignore volatile fields (timestamps, requestIds) in diff"
+    - "Must report status code divergences separately from body divergences"
+
+- id: "NET-139"
+  title: "JWT Decoder Client"
+  description: "Reads a JWT token from stdin. Decodes (without verifying signature) the header and payload and pretty-prints them as JSON. Checks expiry."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json, std.time, std.crypto]
+  input_format: "Single line: JWT token"
+  output_format: "Header JSON, Payload JSON, 'Token expired' or 'Expires in N seconds'"
+  test_cases:
+    - input: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      expected_output: "alg"
+    - input: "eyJhbGciOiJSUzI1NiJ9.eyJleHAiOjE2MDAwMDAwMDB9.signature"
+      expected_output: "Token expired"
+  constraints:
+    - "Must handle all three JWT parts (header.payload.signature)"
+    - "Must not require network access"
+
+- id: "NET-140"
+  title: "HTTP API Fuzzer Client"
+  description: "Reads a base URL and endpoint list from stdin. Sends malformed inputs to each endpoint (null bytes, overlong strings, special chars) and reports unexpected 5xx errors."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto]
+  input_format: "First line: base URL. Subsequent lines: <method> <path> (blank to finish)"
+  output_format: "Per test: endpoint, payload type, status. Flags 5xx responses as bugs."
+  test_cases:
+    - input: "http://localhost:8083\nGET /users\nPOST /users\n"
+      expected_output: "Testing"
+    - input: "http://localhost:8079\nGET /items\n"
+      expected_output: "Testing"
+  constraints:
+    - "Test at least: null, empty string, 10KB string, Unicode, SQL chars, HTML chars"
+    - "Must not crash the fuzzer on non-JSON responses"
+
+- id: "NET-141"
+  title: "HTTP Archive (HAR) Recorder Client"
+  description: "Reads a list of URLs from stdin, fetches each, and writes a HAR (HTTP Archive) JSON file capturing all request/response details."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.file]
+  input_format: "First line: output HAR file path. Subsequent lines: URLs (blank to finish)"
+  output_format: "Writes HAR file; prints 'HAR written to <path> with N entries'"
+  test_cases:
+    - input: "/tmp/trace.har\nhttps://httpbin.org/get\nhttps://httpbin.org/ip\n"
+      expected_output: "HAR written"
+    - input: "/tmp/api.har\nhttp://localhost:8080/health\n"
+      expected_output: "HAR written"
+  constraints:
+    - "HAR format version 1.2"
+    - "Must include request/response headers, body, timing"
+
+- id: "NET-142"
+  title: "DNS Lookup Client"
+  description: "Reads a hostname from stdin and performs DNS lookups for A, AAAA, MX, TXT, and CNAME records. Prints results for each record type."
+  difficulty: 2
+  stdlib_modules: [std.net, std.str, std.json]
+  input_format: "Single line: hostname"
+  output_format: "Per record type: 'A: <ips>', 'MX: <priority> <host>', 'TXT: <value>', etc."
+  test_cases:
+    - input: "example.com"
+      expected_output: "A:"
+    - input: "google.com"
+      expected_output: "A:"
+  constraints:
+    - "Must handle NXDOMAIN gracefully"
+    - "Must show TTL for each record"
+
+- id: "NET-143"
+  title: "TCP Echo Client"
+  description: "Reads a host, port, and messages from stdin. Opens a raw TCP connection, sends each message followed by newline, and prints received responses."
+  difficulty: 2
+  stdlib_modules: [std.net, std.str, std.time]
+  input_format: "First line: host. Second line: port. Subsequent lines: messages (blank to finish)"
+  output_format: "Server response per sent message; 'Connection closed' at end"
+  test_cases:
+    - input: "localhost\n7\nhello\nworld\n"
+      expected_output: "hello"
+    - input: "echo.example.com\n7\nping\n"
+      expected_output: "ping"
+  constraints:
+    - "Must timeout reads after 10 seconds"
+    - "Must close connection cleanly"
+
+- id: "NET-144"
+  title: "HTTP Status Code Checker Client"
+  description: "Reads a list of URLs from stdin and checks each one, reporting the HTTP status code, final URL after redirects, and response time."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "Lines of URLs until EOF"
+  output_format: "Tab-separated: <status> <final_url> <response_time_ms>"
+  test_cases:
+    - input: "https://example.com\nhttps://httpbin.org/status/301\n"
+      expected_output: "200"
+    - input: "https://httpbin.org/status/200\nhttps://httpbin.org/status/404\n"
+      expected_output: "200"
+  constraints:
+    - "Follow up to 10 redirects"
+    - "Timeout per URL: 10 seconds"
+
+- id: "NET-145"
+  title: "HTTP API Mock Client (Playback)"
+  description: "Reads a HAR file path and request list from stdin. Instead of making real HTTP requests, plays back responses from the HAR file that match the requested URLs."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.file, std.time]
+  input_format: "First line: HAR file path. Subsequent lines: URLs to request (blank to finish)"
+  output_format: "Replayed response per URL: status and body; 'No recording found' for unknown URLs"
+  test_cases:
+    - input: "/tmp/trace.har\nhttps://httpbin.org/get\n"
+      expected_output: "200"
+    - input: "/tmp/api.har\nhttp://localhost:8080/health\n"
+      expected_output: "200"
+  constraints:
+    - "Match on method + URL"
+    - "Must support multiple recordings of the same URL (replay in sequence)"
+
+- id: "NET-146"
+  title: "Multipart Upload Client"
+  description: "Reads a URL and file paths from stdin. Uploads the files as a multipart/form-data POST request and prints the server's response."
+  difficulty: 3
+  stdlib_modules: [std.http, std.file, std.str, std.json, std.crypto]
+  input_format: "First line: upload URL. Subsequent lines: file paths (blank to finish)"
+  output_format: "Upload status per file; server response JSON"
+  test_cases:
+    - input: "http://localhost:8104/upload\n/tmp/testfile.txt\n"
+      expected_output: "200"
+    - input: "https://httpbin.org/post\n/tmp/sample.json\n"
+      expected_output: "200"
+  constraints:
+    - "Must send correct MIME type per file"
+    - "Must display upload progress"
+
+- id: "NET-147"
+  title: "HTTP Response Caching Client"
+  description: "HTTP client that caches GET responses locally (in /tmp) respecting Cache-Control headers. Serves cached responses without network round-trips when fresh."
+  difficulty: 4
+  stdlib_modules: [std.http, std.file, std.json, std.str, std.time, std.crypto]
+  input_format: "Lines of URLs to fetch (one per line until EOF)"
+  output_format: "Per URL: 'CACHED' or 'FETCHED', status, body summary"
+  test_cases:
+    - input: "https://httpbin.org/cache/60\nhttps://httpbin.org/cache/60\n"
+      expected_output: "FETCHED"
+    - input: "https://httpbin.org/get\n"
+      expected_output: "FETCHED"
+  constraints:
+    - "Cache stored in /tmp/http-cache/<hash>.json"
+    - "Must include If-None-Match and If-Modified-Since on conditional re-fetches"
+
+- id: "NET-148"
+  title: "HTTP Keep-Alive Connection Reuse Client"
+  description: "Reads a list of URLs (all to the same host) from stdin. Fetches them over a single persistent (keep-alive) TCP connection, reporting time saved vs new connections."
+  difficulty: 4
+  stdlib_modules: [std.http, std.net, std.str, std.time]
+  input_format: "Lines of URLs (same host) until EOF"
+  output_format: "Per request: connection reused (yes/no), latency. Summary: time saved"
+  test_cases:
+    - input: "https://httpbin.org/get\nhttps://httpbin.org/ip\nhttps://httpbin.org/uuid\n"
+      expected_output: "Connection reused"
+    - input: "http://localhost:8080/a\nhttp://localhost:8080/b\n"
+      expected_output: "Connection reused"
+  constraints:
+    - "Must use HTTP/1.1 persistent connections (Connection: keep-alive)"
+    - "Must close connection on last request (Connection: close)"
+
+- id: "NET-149"
+  title: "Parallel API Aggregator Client"
+  description: "Reads multiple API endpoint URLs from stdin. Fetches all concurrently, merges the JSON responses into a single object, and prints the merged result."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Lines of: <key> <url> pairs until EOF"
+  output_format: "Merged JSON object where each top-level key maps to its API response"
+  test_cases:
+    - input: "user https://jsonplaceholder.typicode.com/users/1\npost https://jsonplaceholder.typicode.com/posts/1\n"
+      expected_output: "{"
+    - input: "health http://localhost:8106/health\nmetrics http://localhost:8107/metrics\n"
+      expected_output: "{"
+  constraints:
+    - "Must fetch all endpoints concurrently"
+    - "Failed endpoints included as {error: '...'} value"
+
+- id: "NET-150"
+  title: "Server Health Monitor Client"
+  description: "Reads a list of service URLs and check interval from stdin. Continuously polls each service and reports status changes, uptime percentage, and average response time."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: check interval seconds. Subsequent lines: service URLs (blank to finish)"
+  output_format: "Status change events; periodic summary every 60s: uptime%, avg latency"
+  test_cases:
+    - input: "5\nhttp://localhost:8106/health\nhttp://localhost:8027/health\n"
+      expected_output: "Monitoring"
+    - input: "10\nhttps://example.com\n"
+      expected_output: "Monitoring"
+  constraints:
+    - "Must run until Ctrl-C"
+    - "Must log timestamp for each status change"
+
+- id: "NET-151"
+  title: "HTTP Tunnel Client (CONNECT)"
+  description: "Reads a proxy URL, target host:port, and messages from stdin. Uses HTTP CONNECT to tunnel a TCP connection through the proxy, then sends/receives messages."
+  difficulty: 4
+  stdlib_modules: [std.http, std.net, std.str, std.time]
+  input_format: "First line: proxy URL. Second line: target host:port. Subsequent lines: messages"
+  output_format: "Tunnel established log; sent/received message log"
+  test_cases:
+    - input: "http://proxy:3128\nexample.com:80\nGET / HTTP/1.1\nHost: example.com\n\n"
+      expected_output: "Tunnel established"
+    - input: "http://localhost:8148\ngoogle.com:443\n"
+      expected_output: "Tunnel established"
+  constraints:
+    - "Must send CONNECT host:port HTTP/1.1 with appropriate headers"
+    - "Must verify '200 Connection established' before tunnelling"
+
+- id: "NET-152"
+  title: "HTTP/2 Client"
+  description: "Reads a URL from stdin and makes an HTTP/2 request, printing the protocol version used, headers, and response body."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.net]
+  input_format: "Single line: HTTPS URL"
+  output_format: "Protocol: HTTP/2 (or HTTP/1.1 fallback). Headers. Body."
+  test_cases:
+    - input: "https://www.google.com"
+      expected_output: "Protocol:"
+    - input: "https://httpbin.org/get"
+      expected_output: "Protocol:"
+  constraints:
+    - "Must negotiate HTTP/2 via ALPN"
+    - "Must fall back to HTTP/1.1 if server does not support HTTP/2"
+
+- id: "NET-153"
+  title: "REST API Client with Pagination and Filtering"
+  description: "Reads a base URL, filter params, and max pages from stdin. Fetches paginated results applying filters, and writes all matching items to stdout as NDJSON."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: base URL + path. Second line: query params. Third line: max pages"
+  output_format: "NDJSON items; final 'Total: N' line"
+  test_cases:
+    - input: "https://jsonplaceholder.typicode.com/posts\nuserId=1\n5"
+      expected_output: "{"
+    - input: "http://localhost:8079/items\npriority=high\n3"
+      expected_output: "Total:"
+  constraints:
+    - "Must handle both offset and cursor pagination"
+    - "Must apply filter server-side via query params"
+
+- id: "NET-154"
+  title: "SOAP/XML API Client"
+  description: "Reads a SOAP endpoint URL and operation name from stdin. Constructs a SOAP envelope, sends the request, and parses the XML response into a readable format."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "First line: SOAP URL. Second line: operation name. Third line: XML body fragment"
+  output_format: "Parsed response fields; raw XML if parsing fails"
+  test_cases:
+    - input: "https://www.dneonline.com/calculator.asmx\nAdd\n<intA>5</intA><intB>3</intB>"
+      expected_output: "8"
+    - input: "https://www.dneonline.com/calculator.asmx\nMultiply\n<intA>4</intB><intB>5</intB>"
+      expected_output: "20"
+  constraints:
+    - "Must set SOAPAction header"
+    - "Must handle SOAPFault responses"
+
+- id: "NET-155"
+  title: "HTTP Health Check Probe Client"
+  description: "Reads host, port, path, expected status, and timeout from stdin. Makes a single HTTP health check request and exits 0 on pass, 1 on fail."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str, std.time]
+  input_format: "First line: URL. Second line: expected status. Third line: timeout seconds"
+  output_format: "'HEALTHY' or 'UNHEALTHY: <reason>'"
+  test_cases:
+    - input: "https://httpbin.org/status/200\n200\n5"
+      expected_output: "HEALTHY"
+    - input: "https://httpbin.org/status/503\n200\n5"
+      expected_output: "UNHEALTHY"
+  constraints:
+    - "Exit code 0 on HEALTHY, 1 on UNHEALTHY"
+    - "Must include response time in output"
+
+- id: "NET-156"
+  title: "Server-Sent Events Relay Client"
+  description: "Reads a source SSE URL and target webhook URL from stdin. Subscribes to the SSE stream and POSTs each event to the webhook URL."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json, std.crypto]
+  input_format: "First line: SSE source URL. Second line: webhook target URL. Third line: secret for signing"
+  output_format: "Logs each relayed event with delivery status"
+  test_cases:
+    - input: "http://localhost:8103/events\nhttps://hook.example.com/ingest\nmysecret"
+      expected_output: "Relaying"
+    - input: "http://localhost:8142/events\nhttp://localhost:9000/ingest\nhooksecret"
+      expected_output: "Relaying"
+  constraints:
+    - "Must sign each webhook delivery with HMAC-SHA256"
+    - "Must reconnect to SSE on disconnection"
+
+- id: "NET-157"
+  title: "HTTP Trace Client"
+  description: "Reads a URL from stdin and sends an HTTP TRACE request, printing the echoed request headers as returned by the server."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str]
+  input_format: "Single line: URL"
+  output_format: "Echoed request headers from server; 'TRACE blocked' if server returns 405"
+  test_cases:
+    - input: "https://httpbin.org/trace"
+      expected_output: "TRACE"
+    - input: "https://example.com"
+      expected_output: "TRACE blocked"
+  constraints:
+    - "Must use HTTP TRACE method"
+    - "Must detect if server blocks TRACE (405) vs allows it"
+
+- id: "NET-158"
+  title: "API Endpoint Discovery Client"
+  description: "Reads a base URL from stdin. Probes common API paths (/api, /v1, /health, /openapi.json, /swagger.json, /docs) and reports which ones respond with 2xx."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Single line: base URL"
+  output_format: "Found endpoints listed as 'FOUND: <path> (<status>)'; others as 'NOT FOUND: <path>'"
+  test_cases:
+    - input: "https://httpbin.org"
+      expected_output: "FOUND"
+    - input: "http://localhost:8080"
+      expected_output: "FOUND"
+  constraints:
+    - "Must probe all paths concurrently"
+    - "Timeout per probe: 5 seconds"
+
+- id: "NET-159"
+  title: "HTTP Authentication Credential Tester Client"
+  description: "Reads a URL, auth type (basic|bearer|apikey), and credentials from stdin. Tests whether the credentials grant access and reports the result."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.auth, std.json]
+  input_format: "First line: URL. Second line: auth type. Third line: credentials"
+  output_format: "'AUTHENTICATED' with status and response summary; or 'REJECTED' with status"
+  test_cases:
+    - input: "https://httpbin.org/bearer\nbearer\nvalid-token"
+      expected_output: "AUTHENTICATED"
+    - input: "https://httpbin.org/basic-auth/user/pass\nbasic\nuser:pass"
+      expected_output: "AUTHENTICATED"
+  constraints:
+    - "Basic: base64 encode user:pass"
+    - "Bearer: Authorization: Bearer header"
+    - "API Key: X-API-Key header"
+
+- id: "NET-160"
+  title: "HTTP Mock Record-and-Replay Client"
+  description: "In 'record' mode: proxies all requests to a real server and saves request/response pairs. In 'replay' mode: serves saved responses without network access."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.file, std.str, std.time, std.crypto]
+  input_format: "First line: mode (record|replay). Second line: upstream URL (record) or HAR path (replay)"
+  output_format: "In record: saves to HAR file, prints 'Saved N recordings'. In replay: serves from file."
+  test_cases:
+    - input: "record\nhttps://httpbin.org"
+      expected_output: "Recording"
+    - input: "replay\n/tmp/recordings.har"
+      expected_output: "Replaying"
+  constraints:
+    - "Must handle all HTTP methods"
+    - "Must save response headers and body"
+
+- id: "NET-161"
+  title: "HTTP Redirect Chain Tracer Client"
+  description: "Reads a URL from stdin and traces the full redirect chain, printing each hop: URL, status, Location header, and response time."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.time]
+  input_format: "Single line: URL"
+  output_format: "One line per hop: 'Hop N: <status> <url> -> <location> (<ms>ms)'. Final: 'Resolved to: <final_url>'"
+  test_cases:
+    - input: "http://github.com"
+      expected_output: "Hop 1:"
+    - input: "https://httpbin.org/redirect/3"
+      expected_output: "Hop 1:"
+  constraints:
+    - "Must detect redirect loops (same URL visited twice)"
+    - "Max hops: 20"
+
+- id: "NET-162"
+  title: "Batch Webhook Sender Client"
+  description: "Reads a webhook URL, secret, and NDJSON file of events from stdin. Sends each event as a signed webhook POST with configurable concurrency."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.crypto, std.file, std.time]
+  input_format: "First line: webhook URL. Second line: secret. Third line: NDJSON file path. Fourth line: concurrency"
+  output_format: "Progress: 'Sent N/total'. Summary: total, succeeded, failed"
+  test_cases:
+    - input: "https://hook.example.com\nsecret\n/tmp/events.ndjson\n5"
+      expected_output: "Sent"
+    - input: "http://localhost:8110/webhook\nwebhooksecret123\n/tmp/test-events.ndjson\n3"
+      expected_output: "Sent"
+  constraints:
+    - "Must sign each event with HMAC-SHA256"
+    - "Retry failed sends up to 3 times"
+
+- id: "NET-163"
+  title: "HTTP Certificate Transparency Log Client"
+  description: "Reads a domain name from stdin. Queries the crt.sh CT log API and lists all known SSL certificates for that domain with their validity dates."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Single line: domain name"
+  output_format: "Table: issuer, common name, valid from, valid to. Sorted by expiry (newest first)."
+  test_cases:
+    - input: "example.com"
+      expected_output: "example.com"
+    - input: "github.com"
+      expected_output: "github.com"
+  constraints:
+    - "Must deduplicate identical certificates"
+    - "Must flag expired certificates"
+
+- id: "NET-164"
+  title: "TCP Port Scanner Client"
+  description: "Reads a host and port range from stdin. Attempts TCP connections to each port concurrently and reports open/closed/filtered status."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str, std.time, std.json]
+  input_format: "First line: host. Second line: port range (e.g. 1-1024)"
+  output_format: "Open ports listed as 'OPEN: <port>'. Summary: N open, N closed, N filtered"
+  test_cases:
+    - input: "localhost\n80-90"
+      expected_output: "Summary:"
+    - input: "127.0.0.1\n8080-8090"
+      expected_output: "Summary:"
+  constraints:
+    - "Max concurrency: 100"
+    - "Timeout per port: 2 seconds"
+    - "Filtered = no response within timeout"
+
+- id: "NET-165"
+  title: "HTTP Latency Baseline Client"
+  description: "Reads a list of URLs from stdin, makes N requests to each, and produces a latency baseline report: mean, stddev, p50, p95, p99 per endpoint."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: N requests per URL. Subsequent lines: URLs (blank to finish)"
+  output_format: "Table per URL: N, mean, stddev, min, p50, p95, p99, max (all in ms)"
+  test_cases:
+    - input: "10\nhttps://httpbin.org/get\n"
+      expected_output: "mean:"
+    - input: "5\nhttp://localhost:8080\nhttp://localhost:8081\n"
+      expected_output: "mean:"
+  constraints:
+    - "Sequential requests per URL (not concurrent)"
+    - "Must report error count separately"
+
+- id: "NET-166"
+  title: "gRPC Health Check Client"
+  description: "Reads a gRPC server address from stdin and calls the standard grpc.health.v1.Health/Check RPC, printing the service status."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str, std.json, std.http]
+  input_format: "Single line: host:port"
+  output_format: "'SERVING', 'NOT_SERVING', 'UNKNOWN', or 'UNAVAILABLE: <reason>'"
+  test_cases:
+    - input: "localhost:50051"
+      expected_output: "SERVING"
+    - input: "grpc.example.com:443"
+      expected_output: "SERVING"
+  constraints:
+    - "Must use HTTP/2 framing"
+    - "Must handle TLS and plaintext"
+
+- id: "NET-167"
+  title: "Streaming HTTP Response Consumer Client"
+  description: "Reads a streaming NDJSON URL from stdin. Connects and processes each JSON line as it arrives, printing a summary of each object."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: URL. Second line: max items (0 = unlimited)"
+  output_format: "Per item: 'Item N: <key fields>'. Final: 'Received N items in Xs'"
+  test_cases:
+    - input: "http://localhost:8132/stream\n10"
+      expected_output: "Item 1:"
+    - input: "https://api.example.com/stream\n5"
+      expected_output: "Item 1:"
+  constraints:
+    - "Must not buffer entire response in memory"
+    - "Must handle stream interruption gracefully"
+
+- id: "NET-168"
+  title: "Service-to-Service Auth Client"
+  description: "Reads a token URL, service ID, private key path, and target API URL from stdin. Generates a service JWT, obtains an access token, and calls the target API."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.auth, std.crypto, std.file, std.time]
+  input_format: "First line: token URL. Second line: service ID. Third line: private key path. Fourth line: API URL"
+  output_format: "API response; logs token generation and exchange steps"
+  test_cases:
+    - input: "https://auth.example.com/token\nsvc-123\n/tmp/svc.key\nhttps://api.example.com/data"
+      expected_output: "200"
+    - input: "http://localhost:8177/oauth/token\nmy-service\n/tmp/service.pem\nhttp://localhost:8080/api"
+      expected_output: "200"
+  constraints:
+    - "Service JWT signed with RS256"
+    - "Must cache access token until 60s before expiry"
+
+- id: "NET-169"
+  title: "WebSocket Binary Data Sender Client"
+  description: "Reads a WebSocket URL and binary data file path from stdin. Connects, reads the file in chunks, and sends each chunk as a binary WebSocket frame."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.file, std.str, std.time]
+  input_format: "First line: WebSocket URL. Second line: file path. Third line: chunk size in bytes"
+  output_format: "Progress: 'Sent N/total bytes'. 'Transfer complete in Xs' at end."
+  test_cases:
+    - input: "ws://localhost:8151\n/tmp/data.bin\n4096"
+      expected_output: "Transfer complete"
+    - input: "ws://echo.example.com\n/tmp/sample.bin\n1024"
+      expected_output: "Transfer complete"
+  constraints:
+    - "Must use binary frames, not text frames"
+    - "Must handle back-pressure (wait for ACK before sending next chunk)"
+
+- id: "NET-170"
+  title: "HTTP API Client Library Generator Probe"
+  description: "Reads an OpenAPI spec URL from stdin. Fetches the spec and generates a toke-style client stub (function signatures with types) for each endpoint."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.file]
+  input_format: "Single line: OpenAPI spec URL"
+  output_format: "Generated toke function stubs, one per endpoint, to stdout"
+  test_cases:
+    - input: "https://petstore.swagger.io/v2/swagger.json"
+      expected_output: "fn"
+    - input: "http://localhost:8129/openapi.json"
+      expected_output: "fn"
+  constraints:
+    - "Must handle path parameters, query params, and request body"
+    - "Must generate type annotations from schema"
+
+- id: "NET-171"
+  title: "HTTP Server-Timing Analyser Client"
+  description: "Reads a URL from stdin, makes N requests, collects Server-Timing headers, and produces a breakdown of average time spent per server-side phase."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: N requests"
+  output_format: "Table: phase name, min, mean, max (ms). Sorted by mean descending."
+  test_cases:
+    - input: "http://localhost:8131\n20"
+      expected_output: "Phase"
+    - input: "https://api.example.com\n10"
+      expected_output: "Phase"
+  constraints:
+    - "Must parse Server-Timing header format correctly"
+    - "Must handle missing Server-Timing header gracefully"
+
+- id: "NET-172"
+  title: "JSON Patch Client"
+  description: "Reads a URL and a JSON Patch document (RFC 6902) from stdin. Fetches the current resource, applies the patch locally to validate it, then sends it as HTTP PATCH."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: URL. Remaining lines: JSON Patch array"
+  output_format: "Before and after JSON; server response"
+  test_cases:
+    - input: "https://jsonplaceholder.typicode.com/posts/1\n[{\"op\":\"replace\",\"path\":\"/title\",\"value\":\"New Title\"}]"
+      expected_output: "200"
+    - input: "http://localhost:8083/users/1\n[{\"op\":\"add\",\"path\":\"/role\",\"value\":\"admin\"}]"
+      expected_output: "200"
+  constraints:
+    - "Must validate patch operations before sending"
+    - "Content-Type: application/json-patch+json"
+
+- id: "NET-173"
+  title: "API Deprecation Checker Client"
+  description: "Reads a list of API URLs from stdin. Checks each for deprecation signals: Deprecation header, Sunset header, or deprecation notice in the response body."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "Lines of URLs until EOF"
+  output_format: "Per URL: 'DEPRECATED (sunset: <date>)', 'ACTIVE', or 'UNKNOWN'"
+  test_cases:
+    - input: "https://api.example.com/v1/users\nhttps://api.example.com/v2/users\n"
+      expected_output: "ACTIVE"
+    - input: "https://httpbin.org/get\n"
+      expected_output: "ACTIVE"
+  constraints:
+    - "Check Deprecation, Sunset, and Link; rel=successor-version headers"
+    - "Must parse date in Sunset header"
+
+- id: "NET-174"
+  title: "HTTP API Chaos Client"
+  description: "Reads a base URL from stdin and runs a chaos test: randomly sends malformed headers, wrong Content-Types, and missing required fields. Reports server resilience score."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.crypto, std.time]
+  input_format: "First line: base URL. Second line: number of chaos requests"
+  output_format: "Per request: chaos type applied and server response. Summary: resilience score (0-100)"
+  test_cases:
+    - input: "http://localhost:8083\n20"
+      expected_output: "Resilience score:"
+    - input: "https://api.example.com\n10"
+      expected_output: "Resilience score:"
+  constraints:
+    - "Resilience score = % of chaos requests that return 4xx (not 5xx or crash)"
+    - "Chaos types: no Content-Type, garbage body, oversized body, invalid auth"
+
+- id: "NET-175"
+  title: "HTTP API Schema Infer Client"
+  description: "Reads a list of API URLs from stdin. Fetches each and infers a JSON Schema for the response body from the actual response structure."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "Lines of URLs until EOF"
+  output_format: "Per URL: inferred JSON Schema (type, properties, required) as pretty JSON"
+  test_cases:
+    - input: "https://jsonplaceholder.typicode.com/posts/1\n"
+      expected_output: "type"
+    - input: "https://httpbin.org/json\n"
+      expected_output: "type"
+  constraints:
+    - "Must infer types: string, number, boolean, array, object, null"
+    - "Must mark fields present in all sampled responses as required"
+
+- id: "NET-176"
+  title: "WebSocket Reconnecting Client"
+  description: "Reads a WebSocket URL from stdin. Connects, sends messages, and automatically reconnects with exponential backoff if the connection is lost."
+  difficulty: 3
+  stdlib_modules: [std.ws, std.str, std.json, std.time, std.crypto]
+  input_format: "First line: WebSocket URL. Second line: max reconnect attempts. Subsequent lines: messages"
+  output_format: "Logs connections, disconnections, and reconnect attempts; prints received messages"
+  test_cases:
+    - input: "ws://localhost:8100\n5\nhello\nworld\n"
+      expected_output: "Connected"
+    - input: "ws://echo.example.com\n3\ntest\n"
+      expected_output: "Connected"
+  constraints:
+    - "Backoff: 1s, 2s, 4s, 8s, 16s"
+    - "Must not resend messages that were already acknowledged"
+
+- id: "NET-177"
+  title: "HTTP OPTIONS Prober Client"
+  description: "Reads a URL from stdin, sends an HTTP OPTIONS request, and reports which methods are allowed and what CORS headers are present."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "Allowed methods list; CORS headers if present"
+  test_cases:
+    - input: "https://httpbin.org/get"
+      expected_output: "Allow:"
+    - input: "http://localhost:8083/users"
+      expected_output: "Allow:"
+  constraints:
+    - "Must use HTTP OPTIONS method"
+    - "Must parse and display Allow and Access-Control-* headers"
+
+- id: "NET-178"
+  title: "API Endpoint Profiler Client"
+  description: "Reads a URL from stdin and runs N sequential requests, profiling each phase: DNS, TCP connect, TLS, TTFB (Time To First Byte), and total."
+  difficulty: 4
+  stdlib_modules: [std.http, std.net, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: N requests"
+  output_format: "Per-request timing breakdown table. Summary stats per phase."
+  test_cases:
+    - input: "https://httpbin.org/get\n5"
+      expected_output: "DNS:"
+    - input: "http://localhost:8080\n3"
+      expected_output: "TCP:"
+  constraints:
+    - "DNS timing: resolver lookup"
+    - "TTFB: time from request sent to first response byte"
+
+- id: "NET-179"
+  title: "HTTP Security Header Checker Client"
+  description: "Reads a URL from stdin. Fetches it and grades the response against OWASP recommended security headers: HSTS, CSP, X-Frame-Options, etc."
+  difficulty: 2
+  stdlib_modules: [std.http, std.str, std.json]
+  input_format: "Single line: URL"
+  output_format: "Table: header name, present (yes/no), value (truncated), score impact. Total score /100."
+  test_cases:
+    - input: "https://example.com"
+      expected_output: "Score:"
+    - input: "https://github.com"
+      expected_output: "Score:"
+  constraints:
+    - "Headers checked: Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy"
+    - "HSTS and CSP worth most points"
+
+- id: "NET-180"
+  title: "HTTP API Client with Structured Logging"
+  description: "HTTP client that logs every request and response as structured JSON to stderr (with timestamp, url, method, status, latency) and prints only the response body to stdout."
+  difficulty: 2
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "Lines of: <method> <url> [<json_body>] until EOF"
+  output_format: "Response body to stdout; structured JSON log to stderr"
+  test_cases:
+    - input: "GET https://httpbin.org/get\n"
+      expected_output: "{"
+    - input: "POST https://httpbin.org/post\n{\"key\":\"value\"}"
+      expected_output: "{"
+  constraints:
+    - "Log fields: timestamp (ISO-8601), method, url, status, latencyMs, requestId"
+    - "Must not include request body in log if it contains 'password' key"
+
+- id: "NET-181"
+  title: "HTTP API Timeout Enforcer Client"
+  description: "Reads a URL and timeout in milliseconds from stdin. Fetches the URL enforcing the timeout. If exceeded, prints 'TIMEOUT' and exits non-zero."
+  difficulty: 1
+  stdlib_modules: [std.http, std.str, std.time]
+  input_format: "First line: URL. Second line: timeout ms"
+  output_format: "'200 OK: <body_preview>' or 'TIMEOUT after <ms>ms' or 'ERROR: <reason>'"
+  test_cases:
+    - input: "https://httpbin.org/get\n5000"
+      expected_output: "200"
+    - input: "https://httpbin.org/delay/10\n500"
+      expected_output: "TIMEOUT"
+  constraints:
+    - "Must enforce timeout on both connection and read"
+    - "Must exit non-zero on TIMEOUT"
+
+- id: "NET-182"
+  title: "HTTP API Client with Request Signing (AWS SigV4)"
+  description: "Reads an AWS service URL, access key, secret key, and region from stdin. Signs the request with AWS Signature Version 4 and makes the GET request."
+  difficulty: 5
+  stdlib_modules: [std.http, std.crypto, std.str, std.time, std.json]
+  input_format: "First line: URL. Second line: access key. Third line: secret key. Fourth line: region. Fifth line: service"
+  output_format: "HTTP response status and body; logs canonical request and signature"
+  test_cases:
+    - input: "https://s3.amazonaws.com/mybucket/\nAKIAIOSFODNN7EXAMPLE\nwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\nus-east-1\ns3"
+      expected_output: "200"
+    - input: "https://dynamodb.us-west-2.amazonaws.com\nAKID\nSECRET\nus-west-2\ndynamodb"
+      expected_output: "200"
+  constraints:
+    - "Must implement full SigV4: canonical request, string-to-sign, signature"
+    - "Must use current UTC timestamp"
+
+- id: "NET-183"
+  title: "HAR Replay Client"
+  description: "Reads a HAR file path from stdin. Replays all recorded requests in sequence with the original timing delays. Compares live responses to recorded ones."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.file, std.str, std.time]
+  input_format: "First line: HAR file path. Second line: speed multiplier (1.0 = real time)"
+  output_format: "Per request: 'Match' or 'Diff: <field> <expected> vs <actual>'. Summary at end."
+  test_cases:
+    - input: "/tmp/trace.har\n1.0"
+      expected_output: "Replaying"
+    - input: "/tmp/api.har\n2.0"
+      expected_output: "Replaying"
+  constraints:
+    - "Speed multiplier: 2.0 = twice as fast (halve timing delays)"
+    - "Must ignore volatile response fields (Date, ETag changes)"
+
+- id: "NET-184"
+  title: "HTTP API Integration Test Harness Client"
+  description: "Reads a YAML test suite from stdin (list of request/expected_response pairs) and runs each test, reporting PASS/FAIL with diff on failure."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.file]
+  input_format: "First line: base URL. Remaining lines: YAML test suite until EOF"
+  output_format: "Per test: 'PASS: <name>' or 'FAIL: <name>\\n  Expected: ...\\n  Got: ...'. Summary at end."
+  test_cases:
+    - input: "http://localhost:8083\n- name: create user\n  method: POST\n  path: /users\n  body: {name: Alice}\n  expect: {status: 201}\n"
+      expected_output: "PASS"
+    - input: "https://jsonplaceholder.typicode.com\n- name: get post\n  method: GET\n  path: /posts/1\n  expect: {status: 200}\n"
+      expected_output: "PASS"
+  constraints:
+    - "Must support jsonpath assertions in expected"
+    - "Must print total PASS/FAIL count"
+
+- id: "NET-185"
+  title: "HTTP Service Discovery Client"
+  description: "Reads a service registry URL from stdin. Lists all registered services, their health status, and resolves the best endpoint for a given service name."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: registry URL. Second line: service name to resolve"
+  output_format: "All services table; 'Resolved <service> to <host>:<port>'"
+  test_cases:
+    - input: "http://localhost:8147\nuser-service"
+      expected_output: "Resolved"
+    - input: "https://registry.example.com\npayment-service"
+      expected_output: "Resolved"
+  constraints:
+    - "Must prefer healthy services over unhealthy"
+    - "Must show last health check time"
+
+- id: "NET-186"
+  title: "HTTP Compression Benchmark Client"
+  description: "Reads a URL from stdin. Makes two requests (with and without Accept-Encoding: gzip) and compares response sizes and times. Reports compression ratio and speed impact."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.time]
+  input_format: "Single line: URL"
+  output_format: "Table: uncompressed size/time, compressed size/time, compression ratio, latency delta"
+  test_cases:
+    - input: "https://httpbin.org/json"
+      expected_output: "Compression ratio:"
+    - input: "http://localhost:8044/data"
+      expected_output: "Compression ratio:"
+  constraints:
+    - "Must decompress gzip response to get actual content"
+    - "Must measure only transfer size (not decompressed size) for ratio"
+
+- id: "NET-187"
+  title: "HTTP API Diff Tool Client"
+  description: "Reads two base URLs and a list of endpoint paths from stdin. Compares responses between environments (staging vs production) and highlights differences."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: env1 URL. Second line: env2 URL. Subsequent lines: paths (blank to finish)"
+  output_format: "Per path: MATCH or DIFF with JSON diff detail. Summary: N matched, N differed"
+  test_cases:
+    - input: "https://staging.api.com\nhttps://api.example.com\n/users\n/products\n"
+      expected_output: "MATCH"
+    - input: "http://localhost:8083\nhttp://localhost:8084\n/users\n"
+      expected_output: "MATCH"
+  constraints:
+    - "Ignore volatile fields (timestamps, requestId)"
+    - "Must support configuring ignored fields via env var"
+
+- id: "NET-188"
+  title: "HTTP Cache Warm Client"
+  description: "Reads a sitemap URL (XML) or plain URL list from stdin. Fetches all URLs concurrently to pre-warm a CDN or cache. Reports hit/miss counts from cache response headers."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.file, std.time, std.json]
+  input_format: "First line: source type (sitemap|list). Second line: URL or file path. Third line: concurrency"
+  output_format: "Progress bar; final stats: total URLs, warmed, already hot, errors"
+  test_cases:
+    - input: "list\n/tmp/urls.txt\n10"
+      expected_output: "Warming"
+    - input: "sitemap\nhttps://example.com/sitemap.xml\n5"
+      expected_output: "Warming"
+  constraints:
+    - "Must read X-Cache header to detect CDN hits"
+    - "Must not fail on 404s during warming"
+
+- id: "NET-189"
+  title: "SSE to WebSocket Bridge Client"
+  description: "Reads an SSE source URL and a WebSocket target URL from stdin. Bridges SSE events to WebSocket, forwarding each SSE event as a WebSocket message."
+  difficulty: 4
+  stdlib_modules: [std.http, std.ws, std.str, std.json, std.time]
+  input_format: "First line: SSE URL. Second line: WebSocket URL"
+  output_format: "Logs each bridged event: 'Bridged event N: <type> -> WS'"
+  test_cases:
+    - input: "http://localhost:8103/events\nws://localhost:8088/ingest"
+      expected_output: "Bridging"
+    - input: "https://api.example.com/stream\nwss://ws.example.com/ingest"
+      expected_output: "Bridging"
+  constraints:
+    - "Must reconnect both sides if either drops"
+    - "Must buffer up to 100 events if WS is temporarily unavailable"
+
+- id: "NET-190"
+  title: "HTTP API Key Extractor Client"
+  description: "Reads a list of web page URLs from stdin. Scrapes each page looking for API key patterns (common formats like Bearer tokens, AWS keys, etc.) and reports findings."
+  difficulty: 3
+  stdlib_modules: [std.http, std.str, std.json, std.crypto]
+  input_format: "Lines of URLs until EOF"
+  output_format: "Per URL: 'CLEAN' or 'FOUND: <pattern_type> at line N (redacted)'"
+  test_cases:
+    - input: "https://example.com\n"
+      expected_output: "CLEAN"
+    - input: "http://localhost:8080/config\n"
+      expected_output: "CLEAN"
+  constraints:
+    - "Patterns: AWS access key, generic API key, bearer token in JS"
+    - "Must redact found values in output"
+
+- id: "NET-191"
+  title: "HTTP Replay Attack Detector Client"
+  description: "Reads a webhook URL and a list of recorded requests from a HAR file. Replays each request a second time and reports whether the server correctly rejects replays."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.file, std.str, std.time]
+  input_format: "First line: HAR file path. Second line: idempotency mode (key|timestamp|both)"
+  output_format: "Per request: 'PROTECTED' if replay rejected, 'VULNERABLE' if replay accepted"
+  test_cases:
+    - input: "/tmp/webhook.har\nkey"
+      expected_output: "PROTECTED"
+    - input: "/tmp/webhook.har\ntimestamp"
+      expected_output: "PROTECTED"
+  constraints:
+    - "Must replay with same body and headers as original"
+    - "Must report overall vulnerability score"
+
+- id: "NET-192"
+  title: "REST API Pagination Stress Client"
+  description: "Reads a paginated API URL from stdin. Rapidly fetches all pages concurrently (ignoring rate limits), measures response consistency, and reports any pagination gaps or duplicates."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: base URL + paginated path. Second line: concurrency"
+  output_format: "Total items, duplicates found, gaps found, time taken. PASS if 0 duplicates, 0 gaps."
+  test_cases:
+    - input: "http://localhost:8097/items\n5"
+      expected_output: "Total items:"
+    - input: "https://api.example.com/posts\n3"
+      expected_output: "Total items:"
+  constraints:
+    - "Detect duplicates by item ID"
+    - "Detect gaps by sequence number if present"
+
+- id: "NET-193"
+  title: "API Gateway Route Tester Client"
+  description: "Reads an API gateway base URL and routing config from stdin. Tests each defined route by sending a request and verifying it reaches the correct upstream."
+  difficulty: 3
+  stdlib_modules: [std.http, std.json, std.str]
+  input_format: "First line: gateway URL. Subsequent lines: <path> <expected_upstream_response_indicator>"
+  output_format: "Per route: PASS or FAIL with actual vs expected upstream response"
+  test_cases:
+    - input: "http://localhost:8154\n/users expected:user-svc\n/products expected:product-svc\n"
+      expected_output: "PASS"
+    - input: "https://gateway.example.com\n/api/v1 expected:api-svc\n"
+      expected_output: "PASS"
+  constraints:
+    - "Must test all defined routes"
+    - "Must test that unmapped routes return 404"
+
+- id: "NET-194"
+  title: "HTTP Mock Server Client Pair (Integration Test)"
+  description: "Starts a mock HTTP server in the background, then runs a client against it. Tests the full request/response cycle for a CRUD resource."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net]
+  input_format: "Single line: port number for the mock server"
+  output_format: "Step-by-step test results: CREATE, READ, UPDATE, DELETE each marked PASS/FAIL"
+  test_cases:
+    - input: "19001"
+      expected_output: "CREATE: PASS"
+    - input: "19002"
+      expected_output: "CREATE: PASS"
+  constraints:
+    - "Mock server and client in same process"
+    - "Must clean up server on test completion"
+    - "Must test at minimum 4 HTTP verbs"
+
+- id: "NET-195"
+  title: "WebSocket Server-Client Integration Test"
+  description: "Starts a WebSocket echo server and a client in the same program. Client sends N messages, verifies all are echoed back, reports PASS/FAIL."
+  difficulty: 4
+  stdlib_modules: [std.ws, std.http, std.json, std.str, std.time]
+  input_format: "First line: port. Second line: N messages to test"
+  output_format: "Per message: 'Sent: <msg> | Received: <msg> | MATCH: yes/no'. Final: PASS/FAIL"
+  test_cases:
+    - input: "19003\n10"
+      expected_output: "PASS"
+    - input: "19004\n5"
+      expected_output: "PASS"
+  constraints:
+    - "Server and client run concurrently in same process"
+    - "Must verify all messages received in order"
+
+- id: "NET-196"
+  title: "SSE Server-Client Integration Test"
+  description: "Starts an SSE server and a client in the same program. Server pushes N events; client receives them and verifies completeness and ordering."
+  difficulty: 4
+  stdlib_modules: [std.http, std.str, std.json, std.time]
+  input_format: "First line: port. Second line: N events"
+  output_format: "Events received in order; final 'All N events received: PASS' or 'Missing events: FAIL'"
+  test_cases:
+    - input: "19005\n20"
+      expected_output: "PASS"
+    - input: "19006\n5"
+      expected_output: "PASS"
+  constraints:
+    - "Must verify event IDs are sequential"
+    - "Must detect missing events"
+
+- id: "NET-197"
+  title: "Rate Limiter Server-Client Integration Test"
+  description: "Starts a rate-limiting server and a client. Client fires requests at 2x the rate limit, verifies that approximately the right number are rejected with 429."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.time]
+  input_format: "First line: port. Second line: rate limit (req/s). Third line: total requests"
+  output_format: "Allowed count, rejected count, rejection rate. PASS if rejection rate is within 10% of expected."
+  test_cases:
+    - input: "19007\n5\n50"
+      expected_output: "PASS"
+    - input: "19008\n10\n100"
+      expected_output: "PASS"
+  constraints:
+    - "Client sends requests as fast as possible"
+    - "Expected rejection rate is approximately 50%"
+
+- id: "NET-198"
+  title: "JWT Auth Server-Client Integration Test"
+  description: "Starts a JWT auth server and a client. Client logs in, accesses protected routes with the token, tests token expiry behaviour, and reports all steps."
+  difficulty: 4
+  stdlib_modules: [std.http, std.json, std.str, std.auth, std.crypto, std.time]
+  input_format: "First line: port. Second line: short token TTL in seconds (e.g. 2)"
+  output_format: "Step results: Login, Protected Access, Expired Token Rejection. PASS/FAIL per step."
+  test_cases:
+    - input: "19009\n2"
+      expected_output: "Login: PASS"
+    - input: "19010\n1"
+      expected_output: "Login: PASS"
+  constraints:
+    - "Must actually wait for token to expire"
+    - "Must verify 401 on expired token"
+
+- id: "NET-199"
+  title: "Circuit Breaker Server-Client Integration Test"
+  description: "Starts a circuit breaker proxy server and a downstream mock. Client sends requests, downstream starts failing, and test verifies circuit opens and half-opens correctly."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net]
+  input_format: "First line: proxy port. Second line: downstream port. Third line: failure threshold"
+  output_format: "Phase results: Normal, Degraded, Open, Half-open, Closed. PASS/FAIL per phase."
+  test_cases:
+    - input: "19011\n19012\n3"
+      expected_output: "Normal: PASS"
+    - input: "19013\n19014\n5"
+      expected_output: "Normal: PASS"
+  constraints:
+    - "All three components run in same process"
+    - "Must control downstream failure programmatically"
+
+- id: "NET-200"
+  title: "Full Microservice Integration Test Suite"
+  description: "Starts a user service, product service, and API gateway. Runs an end-to-end test: register user, add product, place order, verify order appears in user's order history."
+  difficulty: 5
+  stdlib_modules: [std.http, std.json, std.str, std.time, std.net, std.auth, std.crypto]
+  input_format: "First line: base port (services use base, base+1, base+2)"
+  output_format: "Scenario steps each PASS/FAIL. Final: all-green PASS or list of failing steps."
+  test_cases:
+    - input: "20001"
+      expected_output: "Register user: PASS"
+    - input: "20010"
+      expected_output: "Register user: PASS"
+  constraints:
+    - "All services and client in same process"
+    - "Must clean up all state after test"
+    - "Must test authentication between services"

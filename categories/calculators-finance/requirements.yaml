@@ -1,0 +1,2119 @@
+# Calculator and Finance Program Requirements
+# Category: calculators-finance
+# Total: 130 requirements
+
+# === BASIC CALCULATORS ===
+
+- id: "FIN-001"
+  title: "RPN Calculator"
+  description: "Reverse Polish Notation calculator that evaluates expressions using a stack. Supports +, -, *, / operators on integers and floats."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Space-separated tokens on one line (e.g. '3 4 + 2 *')"
+  output_format: "Single numeric result on stdout"
+  test_cases:
+    - input: "3 4 + 2 *"
+      expected_output: "14"
+    - input: "5 1 2 + 4 * + 3 -"
+      expected_output: "14"
+    - input: "10 2 /"
+      expected_output: "5"
+  constraints:
+    - "Must handle division by zero with error message"
+    - "Stack underflow must produce error"
+
+- id: "FIN-002"
+  title: "Infix Expression Parser"
+  description: "Parse and evaluate infix arithmetic expressions with operator precedence and parentheses. Supports +, -, *, /, ^ operators."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Single line infix expression (e.g. '2 + 3 * 4')"
+  output_format: "Single numeric result on stdout"
+  test_cases:
+    - input: "2 + 3 * 4"
+      expected_output: "14"
+    - input: "(2 + 3) * 4"
+      expected_output: "20"
+    - input: "2 ^ 3 + 1"
+      expected_output: "9"
+  constraints:
+    - "Must respect operator precedence: ^ > * / > + -"
+    - "Must handle parentheses for grouping"
+    - "Must handle unary minus"
+
+- id: "FIN-003"
+  title: "Scientific Calculator"
+  description: "Calculator supporting trigonometric (sin, cos, tan), logarithmic (log, ln), sqrt, and power functions."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Function name followed by argument(s), e.g. 'sin 3.14159'"
+  output_format: "Result rounded to 6 decimal places"
+  test_cases:
+    - input: "sin 0"
+      expected_output: "0.000000"
+    - input: "sqrt 144"
+      expected_output: "12.000000"
+    - input: "log 100"
+      expected_output: "2.000000"
+  constraints:
+    - "Angles in radians"
+    - "Output to 6 decimal places"
+
+- id: "FIN-004"
+  title: "Big Number Addition"
+  description: "Add two arbitrarily large integers that exceed native integer limits using string-based arithmetic."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str]
+  input_format: "Two lines, each containing a large integer"
+  output_format: "Sum as a single line"
+  test_cases:
+    - input: "99999999999999999999\n1"
+      expected_output: "100000000000000000000"
+    - input: "123456789012345678901234567890\n987654321098765432109876543210"
+      expected_output: "1111111110111111111011111111100"
+  constraints:
+    - "Must handle numbers with 100+ digits"
+    - "Must handle negative numbers"
+
+- id: "FIN-005"
+  title: "Big Number Multiplication"
+  description: "Multiply two arbitrarily large integers using string-based long multiplication."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str]
+  input_format: "Two lines, each containing a large integer"
+  output_format: "Product as a single line"
+  test_cases:
+    - input: "12345678901234567890\n98765432109876543210"
+      expected_output: "1219326311370217952237463801111263526900"
+    - input: "999999999999\n999999999999"
+      expected_output: "999999999998000000000001"
+  constraints:
+    - "Must handle numbers with 50+ digits"
+    - "Must handle sign correctly"
+
+- id: "FIN-006"
+  title: "Base Converter"
+  description: "Convert a number from one base to another. Supports bases 2 through 36."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Three values: number, source_base, target_base (space-separated)"
+  output_format: "Converted number in target base (uppercase for bases > 10)"
+  test_cases:
+    - input: "FF 16 10"
+      expected_output: "255"
+    - input: "255 10 2"
+      expected_output: "11111111"
+    - input: "1010 2 16"
+      expected_output: "A"
+  constraints:
+    - "Bases must be 2-36"
+    - "Use A-Z for digits above 9"
+
+- id: "FIN-007"
+  title: "Fraction Arithmetic"
+  description: "Perform arithmetic on fractions, keeping results as reduced fractions."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Expression like '1/2 + 1/3'"
+  output_format: "Reduced fraction (e.g. '5/6') or whole number if denominator is 1"
+  test_cases:
+    - input: "1/2 + 1/3"
+      expected_output: "5/6"
+    - input: "3/4 * 2/3"
+      expected_output: "1/2"
+    - input: "7/3 - 1/3"
+      expected_output: "2"
+  constraints:
+    - "Always reduce to lowest terms"
+    - "Handle improper fractions"
+
+- id: "FIN-008"
+  title: "Complex Number Calculator"
+  description: "Perform addition, subtraction, multiplication, and division on complex numbers."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two complex numbers and operator: 'a+bi op c+di'"
+  output_format: "Result as 'a+bi' or 'a-bi'"
+  test_cases:
+    - input: "3+4i + 1+2i"
+      expected_output: "4+6i"
+    - input: "3+4i * 1+2i"
+      expected_output: "-5+10i"
+    - input: "5+0i - 2+3i"
+      expected_output: "3-3i"
+  constraints:
+    - "Handle zero imaginary/real parts cleanly"
+    - "Division must handle conjugate multiplication"
+
+- id: "FIN-009"
+  title: "Percentage Calculator"
+  description: "Calculate percentage of a number, percentage change, or what percentage one number is of another."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Mode and values: 'of 25 200' or 'change 100 150' or 'what 50 200'"
+  output_format: "Result with % symbol where appropriate"
+  test_cases:
+    - input: "of 25 200"
+      expected_output: "50"
+    - input: "change 100 150"
+      expected_output: "50%"
+    - input: "what 50 200"
+      expected_output: "25%"
+  constraints:
+    - "Round to 2 decimal places"
+
+- id: "FIN-010"
+  title: "Expression with Variables"
+  description: "Evaluate expressions where variables are defined first, then an expression uses them."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'var = value', last line is expression to evaluate"
+  output_format: "Numeric result"
+  test_cases:
+    - input: "x = 5\ny = 3\nx * y + 2"
+      expected_output: "17"
+    - input: "a = 10\nb = 20\n(a + b) / 2"
+      expected_output: "15"
+  constraints:
+    - "Variable names are single lowercase letters"
+    - "Undefined variable produces error message"
+
+# === FINANCIAL ===
+
+- id: "FIN-011"
+  title: "Compound Interest Calculator"
+  description: "Calculate compound interest given principal, annual rate, compounding frequency, and time in years."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: principal rate frequency years (space-separated)"
+  output_format: "Final amount rounded to 2 decimal places"
+  test_cases:
+    - input: "1000 0.05 12 10"
+      expected_output: "1647.01"
+    - input: "5000 0.08 4 5"
+      expected_output: "7429.74"
+  constraints:
+    - "Formula: A = P(1 + r/n)^(nt)"
+    - "Output to 2 decimal places"
+
+- id: "FIN-012"
+  title: "Mortgage Payment Calculator"
+  description: "Calculate monthly mortgage payment given loan amount, annual interest rate, and loan term in years."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: loan_amount annual_rate years"
+  output_format: "Monthly payment rounded to 2 decimal places"
+  test_cases:
+    - input: "300000 0.065 30"
+      expected_output: "1896.20"
+    - input: "500000 0.05 25"
+      expected_output: "2922.95"
+  constraints:
+    - "Use standard amortisation formula"
+    - "Rate is annual, convert to monthly"
+
+- id: "FIN-013"
+  title: "Loan Amortisation Schedule"
+  description: "Generate a full amortisation schedule showing payment number, principal, interest, and remaining balance for each period."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Three values: loan_amount annual_rate months"
+  output_format: "CSV: period,payment,principal,interest,balance"
+  test_cases:
+    - input: "1000 0.12 3"
+      expected_output: "1,340.02,330.02,10.00,669.98\n2,340.02,333.32,6.70,336.66\n3,340.02,336.66,3.37,0.00"
+    - input: "5000 0.06 2"
+      expected_output: "1,2528.13,2503.13,25.00,2496.87\n2,2528.13,2515.62,12.48,0.00"
+  constraints:
+    - "Final payment adjusts to zero balance"
+    - "All amounts to 2 decimal places"
+
+- id: "FIN-014"
+  title: "Net Present Value (NPV)"
+  description: "Calculate the net present value of a series of cash flows given a discount rate."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: discount rate. Second line: comma-separated cash flows (first is initial investment, negative)"
+  output_format: "NPV rounded to 2 decimal places"
+  test_cases:
+    - input: "0.10\n-1000,300,400,500,600"
+      expected_output: "362.74"
+    - input: "0.05\n-5000,1500,1500,1500,1500"
+      expected_output: "319.87"
+  constraints:
+    - "First cash flow at t=0, subsequent at t=1,2,..."
+    - "Formula: NPV = sum(CF_t / (1+r)^t)"
+
+- id: "FIN-015"
+  title: "Internal Rate of Return (IRR)"
+  description: "Calculate IRR using Newton's method for a series of cash flows."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated cash flows (first is negative investment)"
+  output_format: "IRR as percentage to 2 decimal places"
+  test_cases:
+    - input: "-1000,300,400,500,600"
+      expected_output: "22.38%"
+    - input: "-5000,2000,2000,2000"
+      expected_output: "9.70%"
+  constraints:
+    - "Use iterative method (Newton-Raphson or bisection)"
+    - "Converge to within 0.0001"
+
+- id: "FIN-016"
+  title: "Bond Pricing"
+  description: "Calculate the price of a bond given face value, coupon rate, yield to maturity, and periods to maturity."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: face_value coupon_rate yield periods"
+  output_format: "Bond price to 2 decimal places"
+  test_cases:
+    - input: "1000 0.05 0.06 10"
+      expected_output: "926.40"
+    - input: "1000 0.08 0.06 5"
+      expected_output: "1084.25"
+  constraints:
+    - "Price = PV of coupons + PV of face value"
+    - "Coupon paid annually"
+
+- id: "FIN-017"
+  title: "Black-Scholes Call Option Price"
+  description: "Calculate the price of a European call option using the simplified Black-Scholes formula."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math]
+  input_format: "Five values: stock_price strike_price time_years risk_free_rate volatility"
+  output_format: "Call option price to 4 decimal places"
+  test_cases:
+    - input: "100 100 1.0 0.05 0.20"
+      expected_output: "10.4506"
+    - input: "50 55 0.5 0.03 0.30"
+      expected_output: "3.5505"
+  constraints:
+    - "Use cumulative normal distribution approximation"
+    - "d1 = (ln(S/K) + (r + sigma^2/2)*T) / (sigma*sqrt(T))"
+
+- id: "FIN-018"
+  title: "Simple Interest Calculator"
+  description: "Calculate simple interest and total amount for a given principal, rate, and time."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: principal rate years"
+  output_format: "Two lines: interest amount, total amount"
+  test_cases:
+    - input: "1000 0.05 3"
+      expected_output: "150.00\n1150.00"
+    - input: "5000 0.08 2"
+      expected_output: "800.00\n5800.00"
+  constraints:
+    - "Formula: I = P * r * t"
+    - "Output to 2 decimal places"
+
+- id: "FIN-019"
+  title: "Rule of 72"
+  description: "Calculate how many years it takes for an investment to double at a given annual rate, and the exact answer."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Annual interest rate as percentage (e.g. 8 for 8%)"
+  output_format: "Two lines: rule of 72 estimate, exact years (to 2 decimals)"
+  test_cases:
+    - input: "8"
+      expected_output: "9.00\n9.01"
+    - input: "12"
+      expected_output: "6.00\n6.12"
+  constraints:
+    - "Rule of 72: years = 72 / rate_percent"
+    - "Exact: years = ln(2) / ln(1 + rate/100)"
+
+- id: "FIN-020"
+  title: "Effective Annual Rate"
+  description: "Convert nominal annual rate with compounding frequency to effective annual rate."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two values: nominal_rate compounding_periods_per_year"
+  output_format: "Effective annual rate as percentage to 4 decimal places"
+  test_cases:
+    - input: "0.12 12"
+      expected_output: "12.6825%"
+    - input: "0.06 4"
+      expected_output: "6.1364%"
+  constraints:
+    - "Formula: EAR = (1 + r/n)^n - 1"
+
+# === TAX ===
+
+- id: "FIN-021"
+  title: "Income Tax Brackets Calculator"
+  description: "Calculate income tax using progressive tax brackets. Input brackets as rates and thresholds."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: taxable income. Following lines: 'threshold rate' pairs (ascending)"
+  output_format: "Total tax to 2 decimal places"
+  test_cases:
+    - input: "80000\n18200 0\n45000 0.19\n120000 0.325"
+      expected_output: "14617.00"
+    - input: "50000\n10000 0\n40000 0.20\n100000 0.30"
+      expected_output: "9000.00"
+  constraints:
+    - "Each bracket applies only to income within that range"
+    - "Income below first threshold is tax-free"
+
+- id: "FIN-022"
+  title: "GST/VAT Calculator"
+  description: "Calculate GST/VAT inclusive or exclusive amount given a rate."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: mode(inclusive|exclusive) amount rate"
+  output_format: "Two lines: net amount, tax amount"
+  test_cases:
+    - input: "exclusive 100 0.10"
+      expected_output: "100.00\n10.00"
+    - input: "inclusive 110 0.10"
+      expected_output: "100.00\n10.00"
+  constraints:
+    - "Inclusive: net = amount / (1 + rate)"
+    - "Round to 2 decimal places"
+
+- id: "FIN-023"
+  title: "Payroll Tax Calculator"
+  description: "Calculate net pay from gross salary, given tax rate, superannuation rate, and Medicare levy."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: gross_annual tax_rate super_rate medicare_rate"
+  output_format: "Three lines: annual_tax, annual_super, annual_net"
+  test_cases:
+    - input: "80000 0.30 0.115 0.02"
+      expected_output: "24000.00\n9200.00\n54400.00"
+    - input: "100000 0.35 0.11 0.02"
+      expected_output: "35000.00\n11000.00\n52000.00"
+  constraints:
+    - "Net = Gross - Tax - Medicare (super is employer-paid on top)"
+    - "All to 2 decimal places"
+
+- id: "FIN-024"
+  title: "Capital Gains Tax"
+  description: "Calculate capital gains tax with a discount for assets held over 12 months."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: purchase_price sale_price holding_months tax_rate"
+  output_format: "Two lines: capital gain, tax payable"
+  test_cases:
+    - input: "100000 150000 18 0.30"
+      expected_output: "25000.00\n7500.00"
+    - input: "50000 80000 6 0.30"
+      expected_output: "30000.00\n9000.00"
+  constraints:
+    - "50% CGT discount if held > 12 months"
+    - "No discount for holdings <= 12 months"
+
+- id: "FIN-025"
+  title: "Depreciation - Straight Line"
+  description: "Calculate annual depreciation and book value schedule using straight-line method."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: cost salvage_value useful_life_years"
+  output_format: "CSV per year: year,depreciation,book_value"
+  test_cases:
+    - input: "10000 2000 4"
+      expected_output: "1,2000.00,8000.00\n2,2000.00,6000.00\n3,2000.00,4000.00\n4,2000.00,2000.00"
+    - input: "5000 500 3"
+      expected_output: "1,1500.00,3500.00\n2,1500.00,2000.00\n3,1500.00,500.00"
+  constraints:
+    - "Depreciation = (Cost - Salvage) / Life"
+    - "Book value cannot go below salvage"
+
+- id: "FIN-026"
+  title: "Depreciation - Declining Balance"
+  description: "Calculate depreciation schedule using the declining balance method at a given rate."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: cost rate years"
+  output_format: "CSV per year: year,depreciation,book_value"
+  test_cases:
+    - input: "10000 0.40 3"
+      expected_output: "1,4000.00,6000.00\n2,2400.00,3600.00\n3,1440.00,2160.00"
+    - input: "5000 0.25 4"
+      expected_output: "1,1250.00,3750.00\n2,937.50,2812.50\n3,703.13,2109.37\n4,527.34,1582.03"
+  constraints:
+    - "Each year: depreciation = book_value * rate"
+    - "Round to 2 decimal places"
+
+- id: "FIN-027"
+  title: "PAYG Withholding Lookup"
+  description: "Given a weekly gross income, calculate PAYG tax withholding using bracket rates."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: weekly gross. Following lines: 'weekly_threshold rate' ascending"
+  output_format: "Weekly withholding amount to 2 decimal places"
+  test_cases:
+    - input: "1500\n350 0\n865 0.19\n2307 0.325"
+      expected_output: "304.33"
+    - input: "800\n350 0\n865 0.19"
+      expected_output: "85.50"
+  constraints:
+    - "Apply progressive rates to each bracket"
+
+- id: "FIN-028"
+  title: "Sales Tax Multi-Item"
+  description: "Calculate total cost including sales tax for multiple items with different tax categories."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'item_name quantity unit_price tax_rate'"
+  output_format: "Total before tax, total tax, grand total (each on own line)"
+  test_cases:
+    - input: "widget 5 10.00 0.10\ngadget 2 25.00 0.05"
+      expected_output: "100.00\n7.50\n107.50"
+    - input: "book 3 15.00 0.00\npen 10 2.00 0.10"
+      expected_output: "65.00\n2.00\n67.00"
+  constraints:
+    - "Each item can have different tax rate"
+    - "Tax-exempt items have rate 0"
+
+# === CURRENCY ===
+
+- id: "FIN-029"
+  title: "Currency Converter"
+  description: "Convert an amount from one currency to another using provided exchange rates."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: amount source_currency target_currency. Following lines: 'CUR1 CUR2 rate' pairs"
+  output_format: "Converted amount to 2 decimal places"
+  test_cases:
+    - input: "100 USD AUD\nUSD AUD 1.55"
+      expected_output: "155.00"
+    - input: "50 EUR GBP\nEUR GBP 0.86"
+      expected_output: "43.00"
+  constraints:
+    - "Must find direct or inverse rate"
+    - "Error if no rate path exists"
+
+- id: "FIN-030"
+  title: "Triangular Arbitrage Detector"
+  description: "Given exchange rates between currencies, detect if a triangular arbitrage opportunity exists."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'CUR1 CUR2 rate'. Last line: 'CHECK CUR1 CUR2 CUR3'"
+  output_format: "'ARBITRAGE profit%' or 'NO_ARBITRAGE'"
+  test_cases:
+    - input: "USD EUR 0.90\nEUR GBP 0.85\nGBP USD 1.35\nCHECK USD EUR GBP"
+      expected_output: "ARBITRAGE 3.28%"
+    - input: "USD EUR 0.85\nEUR GBP 0.90\nGBP USD 1.30\nCHECK USD EUR GBP"
+      expected_output: "NO_ARBITRAGE"
+  constraints:
+    - "Profit = (rate1 * rate2 * rate3 - 1) * 100"
+    - "Arbitrage exists if product > 1.0"
+
+- id: "FIN-031"
+  title: "Historical Average Rate"
+  description: "Calculate the average exchange rate over a series of historical daily rates."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'date rate' (date as YYYY-MM-DD)"
+  output_format: "Average rate to 4 decimal places"
+  test_cases:
+    - input: "2024-01-01 1.50\n2024-01-02 1.52\n2024-01-03 1.48\n2024-01-04 1.51"
+      expected_output: "1.5025"
+    - input: "2024-06-01 0.90\n2024-06-02 0.92\n2024-06-03 0.91"
+      expected_output: "0.9100"
+  constraints:
+    - "Simple arithmetic mean"
+    - "Minimum 2 data points required"
+
+- id: "FIN-032"
+  title: "Multi-hop Currency Conversion"
+  description: "Convert between currencies that may require multiple hops through intermediate currencies."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: amount source target. Following lines: 'CUR1 CUR2 rate'"
+  output_format: "Converted amount to 2 decimal places and path used"
+  test_cases:
+    - input: "100 USD JPY\nUSD EUR 0.85\nEUR JPY 160.00"
+      expected_output: "13600.00\nUSD->EUR->JPY"
+    - input: "50 AUD GBP\nAUD USD 0.65\nUSD GBP 0.79"
+      expected_output: "25.68\nAUD->USD->GBP"
+  constraints:
+    - "Find shortest conversion path"
+    - "Maximum 3 hops"
+
+# === UNIT CONVERSION ===
+
+- id: "FIN-033"
+  title: "Temperature Converter"
+  description: "Convert between Celsius, Fahrenheit, and Kelvin."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Value and units: '100 C F' (from Celsius to Fahrenheit)"
+  output_format: "Converted value to 2 decimal places"
+  test_cases:
+    - input: "100 C F"
+      expected_output: "212.00"
+    - input: "32 F C"
+      expected_output: "0.00"
+    - input: "0 C K"
+      expected_output: "273.15"
+  constraints:
+    - "C to F: F = C * 9/5 + 32"
+    - "C to K: K = C + 273.15"
+
+- id: "FIN-034"
+  title: "Length Converter"
+  description: "Convert between metric (mm, cm, m, km) and imperial (in, ft, yd, mi) length units."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "1 mi km"
+      expected_output: "1.6093"
+    - input: "100 cm in"
+      expected_output: "39.3701"
+  constraints:
+    - "Use standard conversion factors"
+    - "1 inch = 2.54 cm exactly"
+
+- id: "FIN-035"
+  title: "Weight Converter"
+  description: "Convert between metric (mg, g, kg, tonne) and imperial (oz, lb, stone) weight units."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "1 kg lb"
+      expected_output: "2.2046"
+    - input: "10 stone kg"
+      expected_output: "63.5029"
+  constraints:
+    - "1 lb = 0.453592 kg"
+    - "1 stone = 14 lb"
+
+- id: "FIN-036"
+  title: "Speed Converter"
+  description: "Convert between km/h, mph, m/s, knots, and Mach."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "100 kmh mph"
+      expected_output: "62.1371"
+    - input: "1 mach kmh"
+      expected_output: "1234.8000"
+  constraints:
+    - "1 Mach = 343 m/s at sea level"
+    - "1 knot = 1.852 km/h"
+
+- id: "FIN-037"
+  title: "Pressure Converter"
+  description: "Convert between Pa, kPa, bar, atm, psi, and mmHg."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "1 atm psi"
+      expected_output: "14.6959"
+    - input: "101325 Pa atm"
+      expected_output: "1.0000"
+  constraints:
+    - "1 atm = 101325 Pa"
+    - "1 bar = 100000 Pa"
+
+- id: "FIN-038"
+  title: "Energy Converter"
+  description: "Convert between joules, calories, kWh, BTU, and electronvolts."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "1 kWh J"
+      expected_output: "3600000.0000"
+    - input: "1000 cal kJ"
+      expected_output: "4.1840"
+  constraints:
+    - "1 cal = 4.184 J"
+    - "1 BTU = 1055.06 J"
+
+- id: "FIN-039"
+  title: "Data Size Converter"
+  description: "Convert between bits, bytes, KB, MB, GB, TB using both binary (1024) and SI (1000) conventions."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit convention(binary|si)"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "1 GB MB binary"
+      expected_output: "1024.0000"
+    - input: "1 GB MB si"
+      expected_output: "1000.0000"
+    - input: "1 TB GB binary"
+      expected_output: "1024.0000"
+  constraints:
+    - "Binary: 1 KB = 1024 bytes"
+    - "SI: 1 KB = 1000 bytes"
+
+- id: "FIN-040"
+  title: "Volume Converter"
+  description: "Convert between litres, millilitres, gallons (US/UK), cups, and fluid ounces."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Value source_unit target_unit"
+  output_format: "Converted value to 4 decimal places"
+  test_cases:
+    - input: "1 gal_us L"
+      expected_output: "3.7854"
+    - input: "500 mL cup"
+      expected_output: "2.1134"
+  constraints:
+    - "1 US gallon = 3.78541 L"
+    - "1 cup = 236.588 mL"
+
+# === STATISTICS ===
+
+- id: "FIN-041"
+  title: "Mean Calculator"
+  description: "Calculate arithmetic mean of a list of numbers."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers on one line"
+  output_format: "Mean to 4 decimal places"
+  test_cases:
+    - input: "1,2,3,4,5"
+      expected_output: "3.0000"
+    - input: "10,20,30,40,50,60"
+      expected_output: "35.0000"
+  constraints:
+    - "At least 1 number required"
+
+- id: "FIN-042"
+  title: "Median Calculator"
+  description: "Calculate median of a list of numbers."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers on one line"
+  output_format: "Median to 4 decimal places"
+  test_cases:
+    - input: "1,3,5,7,9"
+      expected_output: "5.0000"
+    - input: "1,2,3,4"
+      expected_output: "2.5000"
+  constraints:
+    - "For even count, average the two middle values"
+
+- id: "FIN-043"
+  title: "Mode Calculator"
+  description: "Find the mode(s) of a list of numbers."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers on one line"
+  output_format: "Mode value(s) comma-separated in ascending order"
+  test_cases:
+    - input: "1,2,2,3,3,4"
+      expected_output: "2,3"
+    - input: "5,5,5,1,2,3"
+      expected_output: "5"
+  constraints:
+    - "If all values appear same frequency, output 'NO_MODE'"
+    - "Multiple modes listed in ascending order"
+
+- id: "FIN-044"
+  title: "Standard Deviation"
+  description: "Calculate population and sample standard deviation of a dataset."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers on one line"
+  output_format: "Two lines: population_stdev, sample_stdev (to 4 decimal places)"
+  test_cases:
+    - input: "2,4,4,4,5,5,7,9"
+      expected_output: "2.0000\n2.1381"
+    - input: "10,12,23,23,16,23,21,16"
+      expected_output: "4.8990\n5.2372"
+  constraints:
+    - "Population: divide by N"
+    - "Sample: divide by N-1"
+
+- id: "FIN-045"
+  title: "Variance Calculator"
+  description: "Calculate population and sample variance."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers on one line"
+  output_format: "Two lines: population_variance, sample_variance (to 4 decimal places)"
+  test_cases:
+    - input: "2,4,4,4,5,5,7,9"
+      expected_output: "4.0000\n4.5714"
+    - input: "600,470,170,430,300"
+      expected_output: "21704.0000\n27130.0000"
+  constraints:
+    - "Variance = stdev^2"
+
+- id: "FIN-046"
+  title: "Percentile Calculator"
+  description: "Calculate the Pth percentile of a dataset using linear interpolation."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: percentile (0-100). Second line: comma-separated numbers"
+  output_format: "Percentile value to 4 decimal places"
+  test_cases:
+    - input: "25\n1,2,3,4,5,6,7,8,9,10"
+      expected_output: "3.2500"
+    - input: "90\n15,20,35,40,50"
+      expected_output: "46.0000"
+  constraints:
+    - "Use linear interpolation between data points"
+    - "Data need not be pre-sorted"
+
+- id: "FIN-047"
+  title: "Pearson Correlation Coefficient"
+  description: "Calculate the Pearson correlation coefficient between two datasets."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two lines of comma-separated numbers (same length)"
+  output_format: "Correlation coefficient to 4 decimal places"
+  test_cases:
+    - input: "1,2,3,4,5\n2,4,6,8,10"
+      expected_output: "1.0000"
+    - input: "1,2,3,4,5\n5,4,3,2,1"
+      expected_output: "-1.0000"
+    - input: "1,2,3,4,5\n2,4,5,4,5"
+      expected_output: "0.7746"
+  constraints:
+    - "Both datasets must be same length"
+    - "Result between -1 and 1"
+
+- id: "FIN-048"
+  title: "Student's t-test (Two-Sample)"
+  description: "Perform an independent two-sample t-test and report the t-statistic."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two lines of comma-separated numbers (the two samples)"
+  output_format: "t-statistic to 4 decimal places"
+  test_cases:
+    - input: "5,7,8,9,6\n3,4,5,6,4"
+      expected_output: "3.1623"
+    - input: "12,14,16,18,20\n11,13,15,17,19"
+      expected_output: "0.4472"
+  constraints:
+    - "Use pooled variance formula"
+    - "Assume equal variances"
+
+- id: "FIN-049"
+  title: "Chi-Square Goodness of Fit"
+  description: "Calculate chi-square statistic comparing observed vs expected frequencies."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two lines: observed frequencies, expected frequencies (comma-separated)"
+  output_format: "Chi-square statistic to 4 decimal places"
+  test_cases:
+    - input: "16,18,16,14,12,12\n16,16,16,16,16,16"
+      expected_output: "3.5000"
+    - input: "90,60,104,95,51\n80,80,80,80,80"
+      expected_output: "29.5000"
+  constraints:
+    - "chi2 = sum((O-E)^2 / E)"
+    - "All expected values must be > 0"
+
+- id: "FIN-050"
+  title: "Weighted Mean"
+  description: "Calculate weighted average of values with corresponding weights."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two lines: values (comma-separated), weights (comma-separated)"
+  output_format: "Weighted mean to 4 decimal places"
+  test_cases:
+    - input: "80,90,70\n0.3,0.5,0.2"
+      expected_output: "83.0000"
+    - input: "4,3,5,2\n2,3,1,4"
+      expected_output: "3.2000"
+  constraints:
+    - "Weights need not sum to 1"
+    - "Formula: sum(v*w) / sum(w)"
+
+- id: "FIN-051"
+  title: "Z-Score Calculator"
+  description: "Calculate z-scores for each value in a dataset."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers"
+  output_format: "Comma-separated z-scores to 4 decimal places"
+  test_cases:
+    - input: "2,4,4,4,5,5,7,9"
+      expected_output: "-1.5000,-0.5000,-0.5000,-0.5000,0.0000,0.0000,1.0000,2.0000"
+    - input: "10,20,30"
+      expected_output: "-1.2247,0.0000,1.2247"
+  constraints:
+    - "z = (x - mean) / population_stdev"
+    - "Use population standard deviation"
+
+- id: "FIN-052"
+  title: "Five-Number Summary"
+  description: "Calculate the five-number summary: min, Q1, median, Q3, max."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated numbers"
+  output_format: "Five values on one line: min Q1 median Q3 max"
+  test_cases:
+    - input: "7,15,36,39,40,41"
+      expected_output: "7 15 37.5 40 41"
+    - input: "1,2,3,4,5,6,7,8,9,10"
+      expected_output: "1 3 5.5 8 10"
+  constraints:
+    - "Use exclusive method for quartiles"
+
+# === REGRESSION ===
+
+- id: "FIN-053"
+  title: "Linear Regression"
+  description: "Perform simple linear regression and output slope, intercept, and R-squared."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two lines: x values (comma-separated), y values (comma-separated)"
+  output_format: "Three lines: slope, intercept, r_squared (all to 4 decimal places)"
+  test_cases:
+    - input: "1,2,3,4,5\n2,4,5,4,5"
+      expected_output: "0.6000\n2.2000\n0.6000"
+    - input: "1,2,3,4,5\n2,4,6,8,10"
+      expected_output: "2.0000\n0.0000\n1.0000"
+  constraints:
+    - "Use least squares method"
+    - "R^2 = 1 - SS_res/SS_tot"
+
+- id: "FIN-054"
+  title: "Polynomial Fit (Degree 2)"
+  description: "Fit a quadratic polynomial y = ax^2 + bx + c to data points."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Two lines: x values, y values (comma-separated)"
+  output_format: "Three coefficients: a, b, c (to 4 decimal places)"
+  test_cases:
+    - input: "1,2,3,4,5\n1,4,9,16,25"
+      expected_output: "1.0000\n0.0000\n0.0000"
+    - input: "0,1,2,3\n1,2,5,10"
+      expected_output: "1.0000\n0.0000\n1.0000"
+  constraints:
+    - "Use normal equations or matrix method"
+    - "Minimum 3 data points"
+
+- id: "FIN-055"
+  title: "Simple Moving Average"
+  description: "Calculate the simple moving average of a time series with a given window size."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: window size. Second line: comma-separated values"
+  output_format: "Comma-separated moving averages (to 2 decimal places)"
+  test_cases:
+    - input: "3\n1,2,3,4,5,6,7"
+      expected_output: "2.00,3.00,4.00,5.00,6.00"
+    - input: "2\n10,20,30,40"
+      expected_output: "15.00,25.00,35.00"
+  constraints:
+    - "Output has N - window + 1 values"
+    - "Window must be <= data length"
+
+- id: "FIN-056"
+  title: "Exponential Moving Average"
+  description: "Calculate exponential moving average with a given smoothing factor alpha."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: alpha (0-1). Second line: comma-separated values"
+  output_format: "Comma-separated EMA values (to 2 decimal places)"
+  test_cases:
+    - input: "0.5\n1,2,3,4,5"
+      expected_output: "1.00,1.50,2.25,3.13,4.06"
+    - input: "0.3\n10,20,30,40"
+      expected_output: "10.00,13.00,18.10,24.67"
+  constraints:
+    - "EMA_0 = first value"
+    - "EMA_t = alpha * x_t + (1-alpha) * EMA_{t-1}"
+
+- id: "FIN-057"
+  title: "Exponential Smoothing Forecast"
+  description: "Apply single exponential smoothing and forecast the next N values."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: alpha forecast_periods. Second line: comma-separated historical values"
+  output_format: "Comma-separated forecast values (to 2 decimal places)"
+  test_cases:
+    - input: "0.4 3\n10,12,13,15,14"
+      expected_output: "13.37,13.37,13.37"
+    - input: "0.5 2\n100,110,120,130"
+      expected_output: "121.25,121.25"
+  constraints:
+    - "Single exponential smoothing: flat forecast"
+    - "Forecast = last smoothed value"
+
+# === BUDGETING ===
+
+- id: "FIN-058"
+  title: "Expense Tracker Summary"
+  description: "Read expense entries and produce a summary showing total spent and remaining budget."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: monthly budget. Following lines: 'date category amount'"
+  output_format: "Total spent, remaining budget, over/under status"
+  test_cases:
+    - input: "2000\n2024-01-05 food 350\n2024-01-10 transport 150\n2024-01-15 food 400"
+      expected_output: "900.00\n1100.00\nUNDER"
+    - input: "500\n2024-02-01 rent 400\n2024-02-05 food 150"
+      expected_output: "550.00\n-50.00\nOVER"
+  constraints:
+    - "Track all expenses against budget"
+    - "OVER if total exceeds budget"
+
+- id: "FIN-059"
+  title: "Category Breakdown"
+  description: "Break down expenses by category showing total and percentage for each."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'category amount'"
+  output_format: "Sorted by amount desc: 'category total percentage%'"
+  test_cases:
+    - input: "food 300\ntransport 100\nfood 200\nentertainment 150\ntransport 50"
+      expected_output: "food 500.00 62.50%\nentertainment 150.00 18.75%\ntransport 150.00 18.75%"
+    - input: "rent 1200\nfood 400\nutilities 200"
+      expected_output: "rent 1200.00 66.67%\nfood 400.00 22.22%\nutilities 200.00 11.11%"
+  constraints:
+    - "Sort by total descending"
+    - "Percentages must sum to ~100%"
+
+- id: "FIN-060"
+  title: "Savings Goal Calculator"
+  description: "Calculate monthly savings needed to reach a goal by a target date, optionally with interest."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: goal current_savings months annual_rate"
+  output_format: "Monthly deposit needed to 2 decimal places"
+  test_cases:
+    - input: "10000 2000 24 0.0"
+      expected_output: "333.33"
+    - input: "50000 10000 60 0.05"
+      expected_output: "588.32"
+  constraints:
+    - "Account for compound interest on savings"
+    - "If rate is 0, simple division"
+
+- id: "FIN-061"
+  title: "Envelope Budget Method"
+  description: "Allocate income to budget envelopes and track spending against each envelope."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: total income. Next lines: 'envelope percentage'. Then 'SPEND envelope amount' lines"
+  output_format: "Per envelope: 'envelope allocated spent remaining'"
+  test_cases:
+    - input: "3000\nrent 40\nfood 30\nsavings 30\nSPEND rent 1200\nSPEND food 500"
+      expected_output: "rent 1200.00 1200.00 0.00\nfood 900.00 500.00 400.00\nsavings 900.00 0.00 900.00"
+    - input: "2000\nbills 50\nfun 25\nsave 25\nSPEND bills 900\nSPEND fun 600"
+      expected_output: "bills 1000.00 900.00 100.00\nfun 500.00 600.00 -100.00\nsave 500.00 0.00 500.00"
+  constraints:
+    - "Percentages must sum to 100"
+    - "Negative remaining means overspent"
+
+- id: "FIN-062"
+  title: "50/30/20 Budget Analyzer"
+  description: "Categorize expenses into needs/wants/savings and check against the 50/30/20 rule."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: income. Following lines: 'category_type amount' (needs/wants/savings)"
+  output_format: "Three lines showing actual vs target percentage for each category"
+  test_cases:
+    - input: "5000\nneeds 2800\nwants 1500\nsavings 700"
+      expected_output: "needs: 56.00% (target 50%)\nwants: 30.00% (target 30%)\nsavings: 14.00% (target 20%)"
+    - input: "4000\nneeds 2000\nwants 1200\nsavings 800"
+      expected_output: "needs: 50.00% (target 50%)\nwants: 30.00% (target 30%)\nsavings: 20.00% (target 20%)"
+  constraints:
+    - "Needs = 50%, Wants = 30%, Savings = 20%"
+    - "Flag categories that exceed target"
+
+# === INVESTMENT ===
+
+- id: "FIN-063"
+  title: "Portfolio Allocation"
+  description: "Given target allocation percentages and current holdings, calculate rebalancing trades."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: total value. Following lines: 'asset current_pct target_pct'"
+  output_format: "Per asset: 'asset action amount' (BUY or SELL)"
+  test_cases:
+    - input: "100000\nstocks 70 60\nbonds 20 30\ncash 10 10"
+      expected_output: "stocks SELL 10000.00\nbonds BUY 10000.00\ncash HOLD 0.00"
+    - input: "50000\nequity 40 50\nfixed 60 50"
+      expected_output: "equity BUY 5000.00\nfixed SELL 5000.00"
+  constraints:
+    - "Trades must net to zero"
+    - "HOLD if difference < 0.01"
+
+- id: "FIN-064"
+  title: "Sharpe Ratio Calculator"
+  description: "Calculate the Sharpe ratio given portfolio returns, risk-free rate, and standard deviation."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: risk_free_rate. Second line: comma-separated periodic returns"
+  output_format: "Sharpe ratio to 4 decimal places"
+  test_cases:
+    - input: "0.02\n0.10,0.12,0.08,0.15,0.09"
+      expected_output: "3.5765"
+    - input: "0.03\n0.05,0.06,0.04,0.07,0.03"
+      expected_output: "1.5811"
+  constraints:
+    - "Sharpe = (mean_return - risk_free) / stdev_returns"
+    - "Use sample standard deviation"
+
+- id: "FIN-065"
+  title: "Dollar-Cost Averaging Simulator"
+  description: "Simulate DCA investing with fixed periodic investments at varying prices."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: investment_per_period. Second line: comma-separated prices"
+  output_format: "Three lines: total_invested, total_units, average_cost_per_unit"
+  test_cases:
+    - input: "100\n10,12,8,11,9"
+      expected_output: "500.00\n47.35\n10.56"
+    - input: "500\n50,55,45,60"
+      expected_output: "2000.00\n38.38\n52.11"
+  constraints:
+    - "Units bought each period = investment / price"
+    - "Average cost = total_invested / total_units"
+
+- id: "FIN-066"
+  title: "CAGR Calculator"
+  description: "Calculate Compound Annual Growth Rate given beginning value, ending value, and years."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: beginning_value ending_value years"
+  output_format: "CAGR as percentage to 2 decimal places"
+  test_cases:
+    - input: "10000 20000 5"
+      expected_output: "14.87%"
+    - input: "1000 5000 10"
+      expected_output: "17.46%"
+  constraints:
+    - "CAGR = (end/begin)^(1/years) - 1"
+
+- id: "FIN-067"
+  title: "Risk Parity Weights"
+  description: "Calculate risk parity portfolio weights where each asset contributes equally to total risk."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'asset volatility' (annualised)"
+  output_format: "Per asset: 'asset weight%' (to 2 decimal places)"
+  test_cases:
+    - input: "stocks 0.15\nbonds 0.05\ncommodities 0.20"
+      expected_output: "stocks 25.00%\nbonds 75.00%\ncommodities 18.75%"
+    - input: "A 0.10\nB 0.20"
+      expected_output: "A 66.67%\nB 33.33%"
+  constraints:
+    - "Weight proportional to 1/volatility"
+    - "Weights sum to 100%"
+
+- id: "FIN-068"
+  title: "Dividend Yield Calculator"
+  description: "Calculate dividend yield and projected annual income from a portfolio of dividend stocks."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'ticker shares price annual_dividend_per_share'"
+  output_format: "Per stock: 'ticker yield% annual_income'. Last line: total income"
+  test_cases:
+    - input: "AAPL 100 150 3.28\nMSFT 50 300 2.72"
+      expected_output: "AAPL 2.19% 328.00\nMSFT 0.91% 136.00\nTOTAL 464.00"
+    - input: "VAS 200 90 4.50"
+      expected_output: "VAS 5.00% 900.00\nTOTAL 900.00"
+  constraints:
+    - "Yield = dividend / price * 100"
+
+- id: "FIN-069"
+  title: "Portfolio Return Calculator"
+  description: "Calculate time-weighted portfolio return given periodic values."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Comma-separated portfolio values at end of each period (first is initial)"
+  output_format: "Total return and annualised return (assuming monthly periods) to 2 decimal places"
+  test_cases:
+    - input: "10000,10500,10200,10800,11000,11500,12000"
+      expected_output: "20.00%\n40.00%"
+    - input: "5000,5100,5300,5250"
+      expected_output: "5.00%\n20.00%"
+  constraints:
+    - "Total return = (final - initial) / initial"
+    - "Annualised = (1 + total)^(12/periods) - 1"
+
+# === ACCOUNTING ===
+
+- id: "FIN-070"
+  title: "Double-Entry Ledger"
+  description: "Process journal entries and produce account balances using double-entry bookkeeping."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'date debit_account credit_account amount'"
+  output_format: "Sorted account balances: 'account balance DR/CR'"
+  test_cases:
+    - input: "2024-01-01 cash equity 10000\n2024-01-05 inventory cash 3000"
+      expected_output: "cash 7000 DR\nequity 10000 CR\ninventory 3000 DR"
+    - input: "2024-01-01 cash loan 5000\n2024-01-02 equipment cash 2000"
+      expected_output: "cash 3000 DR\nequipment 2000 DR\nloan 5000 CR"
+  constraints:
+    - "Debits must equal credits for each entry"
+    - "Assets/Expenses are DR normal, Liabilities/Equity/Revenue are CR normal"
+
+- id: "FIN-071"
+  title: "Trial Balance"
+  description: "Generate a trial balance from a set of account balances, verifying debits equal credits."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'account amount DR/CR'"
+  output_format: "Trial balance with totals. Last line: 'BALANCED' or 'UNBALANCED diff'"
+  test_cases:
+    - input: "cash 5000 DR\nequipment 3000 DR\nloan 2000 CR\nequity 6000 CR"
+      expected_output: "cash 5000 DR\nequipment 3000 DR\nloan 2000 CR\nequity 6000 CR\nTOTAL DR: 8000 CR: 8000\nBALANCED"
+    - input: "cash 5000 DR\nequity 4000 CR"
+      expected_output: "cash 5000 DR\nequity 4000 CR\nTOTAL DR: 5000 CR: 4000\nUNBALANCED 1000"
+  constraints:
+    - "Sum of DR must equal sum of CR"
+
+- id: "FIN-072"
+  title: "Profit and Loss Statement"
+  description: "Generate a simple P&L from revenue and expense entries."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'type category amount' where type is REVENUE or EXPENSE"
+  output_format: "Revenue total, expense total, net profit/loss"
+  test_cases:
+    - input: "REVENUE sales 50000\nREVENUE services 10000\nEXPENSE wages 30000\nEXPENSE rent 5000"
+      expected_output: "REVENUE: 60000.00\nEXPENSES: 35000.00\nNET PROFIT: 25000.00"
+    - input: "REVENUE sales 20000\nEXPENSE wages 15000\nEXPENSE materials 8000"
+      expected_output: "REVENUE: 20000.00\nEXPENSES: 23000.00\nNET LOSS: 3000.00"
+  constraints:
+    - "PROFIT if revenue > expenses, LOSS otherwise"
+
+- id: "FIN-073"
+  title: "Balance Sheet"
+  description: "Generate a balance sheet from assets, liabilities, and equity entries."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'type account amount' (ASSET, LIABILITY, EQUITY)"
+  output_format: "Assets total, liabilities total, equity total, and balance check"
+  test_cases:
+    - input: "ASSET cash 10000\nASSET equipment 5000\nLIABILITY loan 3000\nEQUITY capital 12000"
+      expected_output: "ASSETS: 15000.00\nLIABILITIES: 3000.00\nEQUITY: 12000.00\nBALANCED"
+    - input: "ASSET cash 5000\nLIABILITY debt 2000\nEQUITY capital 3000"
+      expected_output: "ASSETS: 5000.00\nLIABILITIES: 2000.00\nEQUITY: 3000.00\nBALANCED"
+  constraints:
+    - "Assets = Liabilities + Equity"
+    - "Report UNBALANCED if equation fails"
+
+- id: "FIN-074"
+  title: "Invoice Total Calculator"
+  description: "Calculate invoice totals from line items with quantities, prices, and discounts."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'item qty unit_price discount_pct'. Last line: 'TAX rate'"
+  output_format: "Subtotal, discount total, tax, grand total"
+  test_cases:
+    - input: "Widget 10 25.00 10\nGadget 5 50.00 0\nTAX 0.10"
+      expected_output: "475.00\n25.00\n47.50\n497.50"
+    - input: "Service 1 1000.00 20\nTAX 0.05"
+      expected_output: "800.00\n200.00\n40.00\n840.00"
+  constraints:
+    - "Discount applied before tax"
+    - "Tax applied to discounted subtotal"
+
+# === INSURANCE ===
+
+- id: "FIN-075"
+  title: "Insurance Premium Calculator"
+  description: "Calculate insurance premium based on base rate, age factor, and risk multipliers."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "base_rate age risk_factors(comma-separated multipliers)"
+  output_format: "Annual premium to 2 decimal places"
+  test_cases:
+    - input: "1000 35 1.0,1.2,0.9"
+      expected_output: "1080.00"
+    - input: "500 55 1.5,1.1"
+      expected_output: "825.00"
+  constraints:
+    - "Premium = base * product(risk_factors)"
+    - "Age factor: 1.0 for 25-40, 1.2 for 41-60, 1.5 for 60+"
+
+- id: "FIN-076"
+  title: "Risk Score Calculator"
+  description: "Calculate a composite risk score from multiple weighted risk factors on a 1-100 scale."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'factor_name score weight'"
+  output_format: "Composite risk score to 1 decimal place and risk category"
+  test_cases:
+    - input: "age 60 0.3\nhealth 40 0.4\noccupation 70 0.3"
+      expected_output: "55.0\nMEDIUM"
+    - input: "driving 80 0.5\nlocation 30 0.3\nvehicle 50 0.2"
+      expected_output: "59.0\nMEDIUM"
+  constraints:
+    - "LOW: 0-33, MEDIUM: 34-66, HIGH: 67-100"
+    - "Weighted average of factor scores"
+
+- id: "FIN-077"
+  title: "Claims Estimator"
+  description: "Estimate insurance claim payout based on damage assessment and policy limits."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: assessed_damage deductible coverage_limit copay_pct"
+  output_format: "Two lines: claimant_pays, insurer_pays"
+  test_cases:
+    - input: "5000 500 10000 0.20"
+      expected_output: "1400.00\n3600.00"
+    - input: "15000 1000 10000 0.10"
+      expected_output: "5900.00\n9100.00"
+  constraints:
+    - "Claimant pays deductible + copay% of remainder"
+    - "Insurer pays min(remainder * (1-copay), coverage_limit)"
+
+# === REAL ESTATE ===
+
+- id: "FIN-078"
+  title: "Rental Yield Calculator"
+  description: "Calculate gross and net rental yield for an investment property."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: property_value annual_rent annual_expenses purchase_costs"
+  output_format: "Two lines: gross_yield%, net_yield%"
+  test_cases:
+    - input: "500000 26000 6000 25000"
+      expected_output: "5.20%\n3.81%"
+    - input: "300000 18000 4000 15000"
+      expected_output: "6.00%\n4.44%"
+  constraints:
+    - "Gross yield = rent / property_value * 100"
+    - "Net yield = (rent - expenses) / (value + costs) * 100"
+
+- id: "FIN-079"
+  title: "Capitalisation Rate"
+  description: "Calculate the cap rate for a commercial property."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two values: net_operating_income property_value"
+  output_format: "Cap rate as percentage to 2 decimal places"
+  test_cases:
+    - input: "50000 800000"
+      expected_output: "6.25%"
+    - input: "120000 1500000"
+      expected_output: "8.00%"
+  constraints:
+    - "Cap rate = NOI / value * 100"
+
+- id: "FIN-080"
+  title: "Mortgage Comparison"
+  description: "Compare two mortgage options and recommend the cheaper one based on total cost."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two lines: 'amount rate years' for each option"
+  output_format: "Monthly payment and total cost for each, then recommendation"
+  test_cases:
+    - input: "400000 0.055 30\n400000 0.045 25"
+      expected_output: "Option1: 2271.16/month, 817617.60 total\nOption2: 2225.93/month, 667778.40 total\nRECOMMEND: Option2"
+    - input: "300000 0.06 30\n300000 0.065 20"
+      expected_output: "Option1: 1798.65/month, 647514.00 total\nOption2: 2235.98/month, 536634.60 total\nRECOMMEND: Option2"
+  constraints:
+    - "Total cost = monthly_payment * total_months"
+    - "Recommend option with lower total cost"
+
+- id: "FIN-081"
+  title: "Stamp Duty Calculator"
+  description: "Calculate property stamp duty using progressive rate brackets."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: property_price. Following lines: 'threshold rate' brackets"
+  output_format: "Stamp duty to 2 decimal places"
+  test_cases:
+    - input: "600000\n25000 0.014\n130000 0.024\n960000 0.06"
+      expected_output: "21270.00"
+    - input: "300000\n100000 0.01\n300000 0.02\n500000 0.03"
+      expected_output: "5000.00"
+  constraints:
+    - "Progressive: each bracket applies to amount within that range"
+
+- id: "FIN-082"
+  title: "Property Cash Flow Analysis"
+  description: "Calculate monthly cash flow for a rental property accounting for all expenses."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines: rent, mortgage_payment, insurance, maintenance, property_tax, vacancy_rate"
+  output_format: "Monthly cash flow and annual cash-on-cash return"
+  test_cases:
+    - input: "2500\n1800\n100\n150\n200\n0.05"
+      expected_output: "125.00/month\n5.00% cash-on-cash"
+    - input: "3000\n2200\n150\n200\n250\n0.08"
+      expected_output: "160.00/month\n6.40% cash-on-cash"
+  constraints:
+    - "Effective rent = rent * (1 - vacancy_rate)"
+    - "Cash flow = effective_rent - all_expenses"
+
+# === TIME VALUE OF MONEY ===
+
+- id: "FIN-083"
+  title: "Present Value Calculator"
+  description: "Calculate the present value of a future sum."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: future_value rate periods"
+  output_format: "Present value to 2 decimal places"
+  test_cases:
+    - input: "10000 0.08 5"
+      expected_output: "6805.83"
+    - input: "50000 0.05 10"
+      expected_output: "30695.66"
+  constraints:
+    - "PV = FV / (1 + r)^n"
+
+- id: "FIN-084"
+  title: "Future Value Calculator"
+  description: "Calculate the future value of a present sum."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: present_value rate periods"
+  output_format: "Future value to 2 decimal places"
+  test_cases:
+    - input: "1000 0.05 10"
+      expected_output: "1628.89"
+    - input: "5000 0.08 20"
+      expected_output: "23304.79"
+  constraints:
+    - "FV = PV * (1 + r)^n"
+
+- id: "FIN-085"
+  title: "Annuity Present Value"
+  description: "Calculate the present value of an ordinary annuity."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: payment rate periods"
+  output_format: "Present value to 2 decimal places"
+  test_cases:
+    - input: "1000 0.05 10"
+      expected_output: "7721.73"
+    - input: "500 0.08 20"
+      expected_output: "4909.07"
+  constraints:
+    - "PV = PMT * [(1 - (1+r)^-n) / r]"
+
+- id: "FIN-086"
+  title: "Annuity Future Value"
+  description: "Calculate the future value of an ordinary annuity."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: payment rate periods"
+  output_format: "Future value to 2 decimal places"
+  test_cases:
+    - input: "1000 0.05 10"
+      expected_output: "12577.89"
+    - input: "200 0.06 30"
+      expected_output: "15811.37"
+  constraints:
+    - "FV = PMT * [((1+r)^n - 1) / r]"
+
+- id: "FIN-087"
+  title: "Perpetuity Value"
+  description: "Calculate the present value of a perpetuity and a growing perpetuity."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: payment discount_rate growth_rate"
+  output_format: "Two lines: perpetuity_value, growing_perpetuity_value"
+  test_cases:
+    - input: "1000 0.05 0.02"
+      expected_output: "20000.00\n33333.33"
+    - input: "500 0.08 0.03"
+      expected_output: "6250.00\n10000.00"
+  constraints:
+    - "Perpetuity PV = PMT / r"
+    - "Growing perpetuity PV = PMT / (r - g)"
+
+- id: "FIN-088"
+  title: "Sinking Fund Payment"
+  description: "Calculate the periodic payment needed to accumulate a target amount via a sinking fund."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: target_amount rate periods"
+  output_format: "Periodic payment to 2 decimal places"
+  test_cases:
+    - input: "100000 0.06 10"
+      expected_output: "7586.80"
+    - input: "50000 0.04 5"
+      expected_output: "9231.36"
+  constraints:
+    - "PMT = FV * r / ((1+r)^n - 1)"
+
+- id: "FIN-089"
+  title: "Loan Payment with Balloon"
+  description: "Calculate periodic payments for a loan with a balloon payment at the end."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: loan_amount rate periods balloon_amount"
+  output_format: "Periodic payment to 2 decimal places"
+  test_cases:
+    - input: "100000 0.06 10 20000"
+      expected_output: "12264.45"
+    - input: "50000 0.05 5 10000"
+      expected_output: "9237.65"
+  constraints:
+    - "Payment covers amortisation of (loan - PV_of_balloon) over n periods"
+
+# === MATRIX OPERATIONS ===
+
+- id: "FIN-090"
+  title: "Matrix Multiplication"
+  description: "Multiply two matrices and output the result."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Matrix A rows (space-separated values), blank line, Matrix B rows"
+  output_format: "Result matrix rows (space-separated values)"
+  test_cases:
+    - input: "1 2\n3 4\n\n5 6\n7 8"
+      expected_output: "19 22\n43 50"
+    - input: "1 0\n0 1\n\n5 6\n7 8"
+      expected_output: "5 6\n7 8"
+  constraints:
+    - "A columns must equal B rows"
+    - "Error message if dimensions incompatible"
+
+- id: "FIN-091"
+  title: "Matrix Determinant"
+  description: "Calculate the determinant of a square matrix (up to 4x4)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Matrix rows (space-separated values)"
+  output_format: "Determinant value"
+  test_cases:
+    - input: "1 2\n3 4"
+      expected_output: "-2"
+    - input: "1 2 3\n4 5 6\n7 8 9"
+      expected_output: "0"
+  constraints:
+    - "Support 2x2, 3x3, and 4x4"
+    - "Use cofactor expansion or LU decomposition"
+
+- id: "FIN-092"
+  title: "Matrix Inverse"
+  description: "Calculate the inverse of a square matrix."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Matrix rows (space-separated values)"
+  output_format: "Inverse matrix (values to 4 decimal places)"
+  test_cases:
+    - input: "4 7\n2 6"
+      expected_output: "0.6000 -0.7000\n-0.2000 0.4000"
+    - input: "1 2\n3 4"
+      expected_output: "-2.0000 1.0000\n1.5000 -0.5000"
+  constraints:
+    - "Error if determinant is 0 (singular)"
+    - "Support 2x2 and 3x3"
+
+- id: "FIN-093"
+  title: "Eigenvalue Power Method"
+  description: "Find the dominant eigenvalue and eigenvector using the power method."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Matrix rows (space-separated). Last line: max_iterations tolerance"
+  output_format: "Dominant eigenvalue (to 4 decimals) and eigenvector"
+  test_cases:
+    - input: "2 1\n1 3\n100 0.0001"
+      expected_output: "3.6180\n0.5257 0.8507"
+    - input: "4 1\n2 3\n50 0.001"
+      expected_output: "5.0000\n0.7071 0.7071"
+  constraints:
+    - "Start with initial vector of ones"
+    - "Normalize at each step"
+
+- id: "FIN-094"
+  title: "Matrix Transpose"
+  description: "Calculate the transpose of a matrix."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Matrix rows (space-separated values)"
+  output_format: "Transposed matrix rows"
+  test_cases:
+    - input: "1 2 3\n4 5 6"
+      expected_output: "1 4\n2 5\n3 6"
+    - input: "1 2\n3 4\n5 6"
+      expected_output: "1 3 5\n2 4 6"
+  constraints:
+    - "Rows become columns"
+
+- id: "FIN-095"
+  title: "System of Linear Equations"
+  description: "Solve a system of linear equations using Gaussian elimination."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Augmented matrix rows (coefficients and constant, space-separated)"
+  output_format: "Solution values (to 4 decimal places)"
+  test_cases:
+    - input: "2 1 -1 8\n-3 -1 2 -11\n-2 1 2 -3"
+      expected_output: "x1=2.0000\nx2=3.0000\nx3=-1.0000"
+    - input: "1 1 4\n2 -1 2"
+      expected_output: "x1=2.0000\nx2=2.0000"
+  constraints:
+    - "Handle singular systems with error"
+    - "Use partial pivoting"
+
+# === NUMBER THEORY ===
+
+- id: "FIN-096"
+  title: "GCD Calculator"
+  description: "Calculate the greatest common divisor of two or more integers using Euclidean algorithm."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Comma-separated integers"
+  output_format: "GCD value"
+  test_cases:
+    - input: "48,18"
+      expected_output: "6"
+    - input: "12,18,24"
+      expected_output: "6"
+    - input: "7,13"
+      expected_output: "1"
+  constraints:
+    - "Use Euclidean algorithm"
+    - "Handle more than 2 numbers"
+
+- id: "FIN-097"
+  title: "LCM Calculator"
+  description: "Calculate the least common multiple of two or more integers."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Comma-separated integers"
+  output_format: "LCM value"
+  test_cases:
+    - input: "4,6"
+      expected_output: "12"
+    - input: "3,4,5"
+      expected_output: "60"
+  constraints:
+    - "LCM(a,b) = |a*b| / GCD(a,b)"
+    - "Handle more than 2 numbers"
+
+- id: "FIN-098"
+  title: "Prime Factorisation"
+  description: "Find the prime factorisation of a positive integer."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Single positive integer"
+  output_format: "Prime factors with exponents (e.g. '2^3 * 3^2 * 5')"
+  test_cases:
+    - input: "360"
+      expected_output: "2^3 * 3^2 * 5"
+    - input: "97"
+      expected_output: "97"
+    - input: "1000000"
+      expected_output: "2^6 * 5^6"
+  constraints:
+    - "Factors in ascending order"
+    - "Omit exponent if 1"
+
+- id: "FIN-099"
+  title: "Modular Exponentiation"
+  description: "Calculate (base^exp) mod modulus efficiently using fast exponentiation."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: base exponent modulus"
+  output_format: "Result"
+  test_cases:
+    - input: "2 10 1000"
+      expected_output: "24"
+    - input: "3 13 50"
+      expected_output: "7"
+  constraints:
+    - "Use binary exponentiation for efficiency"
+    - "Handle large exponents"
+
+- id: "FIN-100"
+  title: "Chinese Remainder Theorem"
+  description: "Solve a system of simultaneous congruences using CRT."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'remainder modulus' pairs"
+  output_format: "Smallest non-negative solution"
+  test_cases:
+    - input: "2 3\n3 5\n2 7"
+      expected_output: "23"
+    - input: "1 2\n2 3\n3 5"
+      expected_output: "23"
+  constraints:
+    - "All moduli must be pairwise coprime"
+    - "Error if moduli not coprime"
+
+- id: "FIN-101"
+  title: "Extended Euclidean Algorithm"
+  description: "Find GCD and Bezout coefficients: ax + by = gcd(a,b)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two integers a b"
+  output_format: "Three values: gcd x y"
+  test_cases:
+    - input: "35 15"
+      expected_output: "5 1 -2"
+    - input: "56 15"
+      expected_output: "1 -4 15"
+  constraints:
+    - "Verify: a*x + b*y = gcd"
+
+- id: "FIN-102"
+  title: "Modular Inverse"
+  description: "Find the modular multiplicative inverse of a number modulo m."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two values: a modulus"
+  output_format: "Inverse value, or 'NO_INVERSE' if gcd(a,m) != 1"
+  test_cases:
+    - input: "3 7"
+      expected_output: "5"
+    - input: "4 6"
+      expected_output: "NO_INVERSE"
+  constraints:
+    - "Inverse exists only if gcd(a,m) = 1"
+    - "Result in range [0, m-1]"
+
+- id: "FIN-103"
+  title: "Primality Test"
+  description: "Determine if a number is prime using trial division up to sqrt(n)."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Single positive integer"
+  output_format: "PRIME or COMPOSITE"
+  test_cases:
+    - input: "97"
+      expected_output: "PRIME"
+    - input: "100"
+      expected_output: "COMPOSITE"
+    - input: "2"
+      expected_output: "PRIME"
+  constraints:
+    - "Handle edge cases: 1 is neither prime nor composite"
+    - "Efficient for numbers up to 10^9"
+
+- id: "FIN-104"
+  title: "Sieve of Eratosthenes"
+  description: "Generate all prime numbers up to N using the Sieve of Eratosthenes."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Single integer N"
+  output_format: "Comma-separated primes up to N"
+  test_cases:
+    - input: "20"
+      expected_output: "2,3,5,7,11,13,17,19"
+    - input: "10"
+      expected_output: "2,3,5,7"
+  constraints:
+    - "N >= 2"
+    - "Use sieve algorithm, not trial division"
+
+- id: "FIN-105"
+  title: "Euler's Totient Function"
+  description: "Calculate Euler's totient (phi) for a given integer n."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Single positive integer"
+  output_format: "phi(n) value"
+  test_cases:
+    - input: "12"
+      expected_output: "4"
+    - input: "36"
+      expected_output: "12"
+    - input: "7"
+      expected_output: "6"
+  constraints:
+    - "phi(n) = n * product(1 - 1/p) for prime factors p"
+
+# === ADDITIONAL CALCULATORS ===
+
+- id: "FIN-106"
+  title: "Tip Calculator"
+  description: "Calculate tip amount and split bill among multiple people."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: bill_amount tip_percentage num_people"
+  output_format: "Three lines: tip_amount, total, per_person"
+  test_cases:
+    - input: "85.50 18 4"
+      expected_output: "15.39\n100.89\n25.22"
+    - input: "120.00 20 2"
+      expected_output: "24.00\n144.00\n72.00"
+  constraints:
+    - "Round to 2 decimal places"
+
+- id: "FIN-107"
+  title: "Break-Even Analysis"
+  description: "Calculate break-even point in units and revenue."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: fixed_costs variable_cost_per_unit selling_price_per_unit"
+  output_format: "Two lines: break_even_units, break_even_revenue"
+  test_cases:
+    - input: "10000 5 25"
+      expected_output: "500\n12500.00"
+    - input: "50000 30 80"
+      expected_output: "1000\n80000.00"
+  constraints:
+    - "BEP_units = fixed / (price - variable)"
+    - "BEP_revenue = BEP_units * price"
+
+- id: "FIN-108"
+  title: "Payback Period Calculator"
+  description: "Calculate simple and discounted payback period for an investment."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: initial_investment discount_rate. Second line: comma-separated annual cash flows"
+  output_format: "Two lines: simple_payback_years, discounted_payback_years (to 2 decimals)"
+  test_cases:
+    - input: "10000 0.10\n3000,4000,5000,6000"
+      expected_output: "2.60\n3.15"
+    - input: "5000 0.05\n2000,2000,2000,2000"
+      expected_output: "2.50\n2.72"
+  constraints:
+    - "Interpolate within the year payback occurs"
+    - "NEVER_RECOVERED if cash flows insufficient"
+
+- id: "FIN-109"
+  title: "Weighted Average Cost of Capital (WACC)"
+  description: "Calculate WACC given equity and debt proportions, costs, and tax rate."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Five values: equity_weight debt_weight cost_equity cost_debt tax_rate"
+  output_format: "WACC as percentage to 2 decimal places"
+  test_cases:
+    - input: "0.60 0.40 0.12 0.06 0.30"
+      expected_output: "8.88%"
+    - input: "0.70 0.30 0.10 0.05 0.25"
+      expected_output: "8.13%"
+  constraints:
+    - "WACC = E/V*Re + D/V*Rd*(1-T)"
+
+- id: "FIN-110"
+  title: "Depreciation - Sum of Years Digits"
+  description: "Calculate depreciation using the sum-of-years-digits method."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: cost salvage useful_life"
+  output_format: "CSV per year: year,depreciation,book_value"
+  test_cases:
+    - input: "10000 1000 4"
+      expected_output: "1,3600.00,6400.00\n2,2700.00,3700.00\n3,1800.00,1900.00\n4,900.00,1000.00"
+    - input: "5000 500 3"
+      expected_output: "1,2250.00,2750.00\n2,1500.00,1250.00\n3,750.00,500.00"
+  constraints:
+    - "SYD = n*(n+1)/2"
+    - "Year k factor = (n-k+1)/SYD"
+
+- id: "FIN-111"
+  title: "Fibonacci Calculator"
+  description: "Calculate the Nth Fibonacci number efficiently."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Single integer N (0-indexed)"
+  output_format: "Nth Fibonacci number"
+  test_cases:
+    - input: "10"
+      expected_output: "55"
+    - input: "50"
+      expected_output: "12586269025"
+    - input: "0"
+      expected_output: "0"
+  constraints:
+    - "F(0)=0, F(1)=1"
+    - "Must handle N up to 90 without overflow concern (use big integers if needed)"
+
+- id: "FIN-112"
+  title: "Combination and Permutation"
+  description: "Calculate nCr and nPr for given n and r."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two values: n r"
+  output_format: "Two lines: nCr, nPr"
+  test_cases:
+    - input: "10 3"
+      expected_output: "120\n720"
+    - input: "5 2"
+      expected_output: "10\n20"
+  constraints:
+    - "nCr = n! / (r! * (n-r)!)"
+    - "nPr = n! / (n-r)!"
+
+- id: "FIN-113"
+  title: "Binomial Probability"
+  description: "Calculate binomial probability P(X=k) given n trials and probability p."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: n k p"
+  output_format: "Probability to 6 decimal places"
+  test_cases:
+    - input: "10 3 0.5"
+      expected_output: "0.117188"
+    - input: "20 5 0.3"
+      expected_output: "0.178863"
+  constraints:
+    - "P(X=k) = C(n,k) * p^k * (1-p)^(n-k)"
+
+- id: "FIN-114"
+  title: "Geometric Series Sum"
+  description: "Calculate the sum of a geometric series given first term, ratio, and number of terms."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: first_term ratio num_terms"
+  output_format: "Sum to 4 decimal places"
+  test_cases:
+    - input: "1 2 10"
+      expected_output: "1023.0000"
+    - input: "3 0.5 5"
+      expected_output: "5.8125"
+  constraints:
+    - "S = a * (1 - r^n) / (1 - r) when r != 1"
+    - "S = a * n when r == 1"
+
+- id: "FIN-115"
+  title: "Numerical Integration (Trapezoidal)"
+  description: "Numerically integrate a polynomial function over an interval using the trapezoidal rule."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: lower upper num_trapezoids. Second line: polynomial coefficients (highest degree first)"
+  output_format: "Integral value to 4 decimal places"
+  test_cases:
+    - input: "0 1 1000\n1 0 0"
+      expected_output: "0.3333"
+    - input: "0 3.14159 1000\n0 0 1"
+      expected_output: "3.1416"
+  constraints:
+    - "Polynomial evaluated as sum(coeff[i] * x^(n-i))"
+    - "More trapezoids = more accurate"
+
+- id: "FIN-116"
+  title: "Newton's Method Root Finder"
+  description: "Find a root of a polynomial using Newton's method."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: initial_guess tolerance max_iterations. Second line: polynomial coefficients"
+  output_format: "Root to 6 decimal places and iterations taken"
+  test_cases:
+    - input: "2 0.000001 100\n1 0 -4"
+      expected_output: "2.000000\n1 iterations"
+    - input: "1 0.000001 100\n1 0 -2"
+      expected_output: "1.414214\n4 iterations"
+  constraints:
+    - "Derivative computed analytically from coefficients"
+    - "Report DIVERGED if max iterations exceeded"
+
+- id: "FIN-117"
+  title: "Loan Comparison Table"
+  description: "Compare multiple loan offers side by side showing key metrics."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'name amount rate years'"
+  output_format: "Table: name monthly_payment total_interest total_cost"
+  test_cases:
+    - input: "BankA 100000 0.05 20\nBankB 100000 0.045 25"
+      expected_output: "BankA 659.96 58389.45 158389.45\nBankB 556.30 66889.52 166889.52"
+    - input: "Fixed 50000 0.06 10\nVariable 50000 0.055 10"
+      expected_output: "Fixed 555.10 16612.18 66612.18\nVariable 542.64 15116.47 65116.47"
+  constraints:
+    - "All monetary values to 2 decimal places"
+
+- id: "FIN-118"
+  title: "Retirement Savings Calculator"
+  description: "Calculate retirement corpus needed and monthly savings required."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Five values: current_age retire_age monthly_expense inflation_rate return_rate"
+  output_format: "Three lines: corpus_needed, monthly_savings, total_invested"
+  test_cases:
+    - input: "30 60 50000 0.06 0.10"
+      expected_output: "17159154.97\n9937.47\n3577488.35"
+    - input: "25 55 30000 0.05 0.12"
+      expected_output: "6488096.21\n2190.72\n788658.69"
+  constraints:
+    - "Assume 25 years of retirement spending"
+    - "Adjust expenses for inflation"
+
+- id: "FIN-119"
+  title: "EMI Calculator"
+  description: "Calculate Equated Monthly Instalment for a loan."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: principal annual_rate months"
+  output_format: "Three lines: EMI, total_payment, total_interest"
+  test_cases:
+    - input: "100000 0.12 12"
+      expected_output: "8884.88\n106618.55\n6618.55"
+    - input: "500000 0.09 60"
+      expected_output: "10379.16\n622749.45\n122749.45"
+  constraints:
+    - "EMI = P * r * (1+r)^n / ((1+r)^n - 1)"
+    - "r is monthly rate"
+
+- id: "FIN-120"
+  title: "Inflation Adjusted Returns"
+  description: "Calculate real return rate given nominal return and inflation rate."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Two values: nominal_rate inflation_rate"
+  output_format: "Real return rate to 4 decimal places"
+  test_cases:
+    - input: "0.10 0.03"
+      expected_output: "6.7961%"
+    - input: "0.08 0.05"
+      expected_output: "2.8571%"
+  constraints:
+    - "Real = (1 + nominal) / (1 + inflation) - 1"
+
+- id: "FIN-121"
+  title: "Debt Snowball Calculator"
+  description: "Calculate payoff order and timeline using the debt snowball method (smallest balance first)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: extra_monthly_payment. Following lines: 'name balance rate min_payment'"
+  output_format: "Payoff order with months to pay each"
+  test_cases:
+    - input: "200\ncardA 5000 0.18 100\ncardB 2000 0.22 50\ncar 10000 0.06 200"
+      expected_output: "cardB: 7 months\ncardA: 15 months\ncar: 26 months"
+    - input: "100\nloan1 1000 0.10 50\nloan2 3000 0.15 75"
+      expected_output: "loan1: 7 months\nloan2: 18 months"
+  constraints:
+    - "Pay minimums on all, extra goes to smallest"
+    - "Freed payment rolls to next debt"
+
+- id: "FIN-122"
+  title: "Crypto Profit Calculator"
+  description: "Calculate profit/loss for a series of crypto buy/sell transactions using FIFO."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'BUY qty price' or 'SELL qty price'"
+  output_format: "Total realised profit/loss to 2 decimal places"
+  test_cases:
+    - input: "BUY 1.0 30000\nBUY 0.5 35000\nSELL 1.2 40000"
+      expected_output: "11500.00"
+    - input: "BUY 2.0 50000\nSELL 1.0 45000"
+      expected_output: "-5000.00"
+  constraints:
+    - "FIFO: first bought, first sold"
+    - "Cannot sell more than owned"
+
+- id: "FIN-123"
+  title: "Moving Average Crossover Detector"
+  description: "Detect golden cross and death cross events in a price series using two moving averages."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: short_period long_period. Second line: comma-separated prices"
+  output_format: "Lines of 'index GOLDEN_CROSS' or 'index DEATH_CROSS'"
+  test_cases:
+    - input: "3 5\n10,11,12,13,14,13,12,11,10,9"
+      expected_output: "6 DEATH_CROSS"
+    - input: "2 4\n5,6,7,8,9,10,11,12"
+      expected_output: "3 GOLDEN_CROSS"
+  constraints:
+    - "Golden cross: short MA crosses above long MA"
+    - "Death cross: short MA crosses below long MA"
+
+- id: "FIN-124"
+  title: "Compound Interest with Regular Deposits"
+  description: "Calculate final balance with compound interest and regular periodic deposits."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: initial_deposit monthly_deposit annual_rate years"
+  output_format: "Final balance to 2 decimal places"
+  test_cases:
+    - input: "10000 500 0.07 10"
+      expected_output: "106552.39"
+    - input: "0 1000 0.05 20"
+      expected_output: "407052.80"
+  constraints:
+    - "Interest compounds monthly"
+    - "Deposits at end of each month"
+
+- id: "FIN-125"
+  title: "Tax Loss Harvesting"
+  description: "Identify positions with unrealised losses for tax loss harvesting, respecting wash sale rules."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of 'ticker buy_date buy_price current_price qty'"
+  output_format: "Harvestable losses sorted by loss size: 'ticker loss_amount'"
+  test_cases:
+    - input: "AAPL 2024-01-15 180 150 10\nGOOG 2024-03-01 140 145 5\nTSLA 2024-02-10 250 200 8"
+      expected_output: "TSLA -400.00\nAAPL -300.00"
+    - input: "AMD 2024-06-01 160 140 20\nNVDA 2024-06-15 800 850 5"
+      expected_output: "AMD -400.00"
+  constraints:
+    - "Only show positions with unrealised loss"
+    - "Loss = (current - buy) * qty"
+
+- id: "FIN-126"
+  title: "Bond Duration Calculator"
+  description: "Calculate Macaulay duration and modified duration of a bond."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: face_value coupon_rate yield periods"
+  output_format: "Two lines: macaulay_duration, modified_duration (to 4 decimal places)"
+  test_cases:
+    - input: "1000 0.05 0.06 5"
+      expected_output: "4.4651\n4.2124"
+    - input: "1000 0.08 0.10 10"
+      expected_output: "7.0436\n6.4033"
+  constraints:
+    - "Mac duration = sum(t * PV(CF_t)) / bond_price"
+    - "Mod duration = Mac duration / (1 + yield)"
+
+- id: "FIN-127"
+  title: "Covariance Matrix"
+  description: "Calculate the covariance matrix for multiple asset return series."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "Lines of comma-separated returns (one line per asset)"
+  output_format: "Covariance matrix (values to 6 decimal places)"
+  test_cases:
+    - input: "0.05,0.02,-0.01,0.03\n0.02,0.01,0.03,-0.01"
+      expected_output: "0.000492 -0.000108\n-0.000108 0.000292"
+    - input: "1,2,3\n4,5,6"
+      expected_output: "0.666667 0.666667\n0.666667 0.666667"
+  constraints:
+    - "Use sample covariance (divide by n-1)"
+    - "Matrix is symmetric"
+
+- id: "FIN-128"
+  title: "Continuous Compounding"
+  description: "Calculate continuously compounded return and final value."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Three values: principal rate time"
+  output_format: "Final value to 2 decimal places"
+  test_cases:
+    - input: "1000 0.05 10"
+      expected_output: "1648.72"
+    - input: "5000 0.08 5"
+      expected_output: "7459.12"
+  constraints:
+    - "A = P * e^(rt)"
+
+- id: "FIN-129"
+  title: "Profit Margin Calculator"
+  description: "Calculate gross margin, operating margin, and net margin from financial data."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Four values: revenue cogs operating_expenses taxes"
+  output_format: "Three lines: gross_margin%, operating_margin%, net_margin%"
+  test_cases:
+    - input: "100000 60000 20000 5000"
+      expected_output: "40.00%\n20.00%\n15.00%"
+    - input: "500000 350000 80000 21000"
+      expected_output: "30.00%\n14.00%\n9.80%"
+  constraints:
+    - "Gross = (rev - cogs) / rev"
+    - "Operating = (rev - cogs - opex) / rev"
+    - "Net = (rev - cogs - opex - tax) / rev"
+
+- id: "FIN-130"
+  title: "Weighted Portfolio Variance"
+  description: "Calculate portfolio variance given asset weights, individual variances, and correlations."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "First line: comma-separated weights. Second line: comma-separated variances. Following: correlation matrix rows"
+  output_format: "Portfolio variance and standard deviation (to 6 decimal places)"
+  test_cases:
+    - input: "0.6,0.4\n0.04,0.09\n1.0 0.5\n0.5 1.0"
+      expected_output: "0.036000\n0.189737"
+    - input: "0.5,0.5\n0.01,0.04\n1.0 0.3\n0.3 1.0"
+      expected_output: "0.015500\n0.124499"
+  constraints:
+    - "Var_p = sum_i sum_j (w_i * w_j * sigma_i * sigma_j * rho_ij)"
+    - "Weights must sum to 1"

@@ -1,0 +1,2079 @@
+- id: "SCI-001"
+  title: "Prime Sieve of Eratosthenes"
+  description: "Find all primes up to N using the Sieve of Eratosthenes."
+  difficulty: 1
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Single integer N on stdin"
+  output_format: "Space-separated list of primes up to N, then count: N primes"
+  test_cases:
+    - input: "30"
+      expected_output: "2 3 5 7 11 13 17 19 23 29\ncount: 10 primes"
+    - input: "2"
+      expected_output: "2\ncount: 1 primes"
+  constraints:
+    - "N up to 10,000,000"
+    - "O(N log log N) time complexity"
+
+- id: "SCI-002"
+  title: "Prime Sieve of Atkin"
+  description: "Find all primes up to N using the Sieve of Atkin."
+  difficulty: 3
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Single integer N on stdin"
+  output_format: "Space-separated list of primes up to N, then count: N primes"
+  test_cases:
+    - input: "50"
+      expected_output: "2 3 5 7 11 13 17 19 23 29 31 37 41 43 47\ncount: 15 primes"
+    - input: "10"
+      expected_output: "2 3 5 7\ncount: 4 primes"
+  constraints:
+    - "Must implement Atkin's three quadratic forms"
+    - "N up to 10,000,000"
+
+- id: "SCI-003"
+  title: "Fast Fourier Transform (FFT)"
+  description: "Compute the discrete Fourier transform of a sequence of real numbers using the Cooley-Tukey FFT algorithm."
+  difficulty: 5
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N (power of 2). Line 2: N space-separated real numbers."
+  output_format: "N lines of: real imag (complex DFT coefficients)"
+  test_cases:
+    - input: "4\n1 1 1 1"
+      expected_output: "4.0 0.0\n0.0 0.0\n0.0 0.0\n0.0 0.0"
+    - input: "4\n1 0 0 0"
+      expected_output: "1.0 0.0\n1.0 0.0\n1.0 0.0\n1.0 0.0"
+  constraints:
+    - "N must be a power of 2"
+    - "Output values rounded to 6 decimal places"
+
+- id: "SCI-004"
+  title: "Simpson's Rule Integration"
+  description: "Numerically integrate a polynomial function using Simpson's rule."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: a (lower bound). Line 2: b (upper bound). Line 3: n (even number of intervals). Line 4: coefficients c0 c1 c2 ... (polynomial c0 + c1*x + c2*x^2 + ...)"
+  output_format: "Integral: X.XXXXXX"
+  test_cases:
+    - input: "0\n1\n100\n0 1"
+      expected_output: "Integral: 0.500000"
+    - input: "0\n3.14159265\n100\n0 1 0"
+      expected_output: "Integral: 4.934802"
+  constraints:
+    - "n must be even and >= 2"
+    - "Result to 6 decimal places"
+
+- id: "SCI-005"
+  title: "Trapezoidal Rule Integration"
+  description: "Numerically integrate a function using the trapezoidal rule."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: a. Line 2: b. Line 3: n (number of intervals). Line 4: polynomial coefficients."
+  output_format: "Integral: X.XXXXXX"
+  test_cases:
+    - input: "0\n1\n1000\n0 1"
+      expected_output: "Integral: 0.500001"
+    - input: "0\n1\n1000\n1"
+      expected_output: "Integral: 1.000000"
+  constraints:
+    - "n >= 1"
+    - "Result to 6 decimal places"
+
+- id: "SCI-006"
+  title: "Gaussian Quadrature Integration"
+  description: "Numerically integrate a function using Gaussian quadrature with N-point Gauss-Legendre nodes."
+  difficulty: 5
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: a. Line 2: b. Line 3: n_points (2-20). Line 4: polynomial coefficients."
+  output_format: "Integral: X.XXXXXX"
+  test_cases:
+    - input: "0\n1\n5\n0 1"
+      expected_output: "Integral: 0.500000"
+    - input: "-1\n1\n5\n1 0 1"
+      expected_output: "Integral: 2.666667"
+  constraints:
+    - "Use precomputed Gauss-Legendre nodes for n=2..20"
+    - "Transform integration interval to [-1,1]"
+
+- id: "SCI-007"
+  title: "Euler Method ODE Solver"
+  description: "Solve a first-order ODE dy/dx = f(x,y) using the explicit Euler method."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: x0 y0 (initial condition). Line 2: x_end. Line 3: h (step size). Line 4: expression for dy/dx in terms of x and y (e.g. x+y)."
+  output_format: "x y (one per step, space-separated, 6 decimal places)"
+  test_cases:
+    - input: "0 1\n0.3\n0.1\ny"
+      expected_output: "0.000000 1.000000\n0.100000 1.100000\n0.200000 1.210000\n0.300000 1.331000"
+    - input: "0 0\n0.2\n0.1\nx"
+      expected_output: "0.000000 0.000000\n0.100000 0.000000\n0.200000 0.010000"
+  constraints:
+    - "Support basic expressions: x, y, x+y, x*y, x^2, etc."
+    - "Step size h > 0"
+
+- id: "SCI-008"
+  title: "Runge-Kutta 4th Order ODE Solver"
+  description: "Solve a first-order ODE dy/dx = f(x,y) using the classical 4th-order Runge-Kutta method."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: x0 y0. Line 2: x_end. Line 3: h. Line 4: dy/dx expression."
+  output_format: "x y (one per step, 6 decimal places)"
+  test_cases:
+    - input: "0 1\n0.4\n0.1\ny"
+      expected_output: "0.000000 1.000000\n0.100000 1.105171\n0.200000 1.221403\n0.300000 1.349859\n0.400000 1.491825"
+    - input: "0 0\n0.2\n0.1\n2*x"
+      expected_output: "0.000000 0.000000\n0.100000 0.010000\n0.200000 0.040000"
+  constraints:
+    - "Must compute all 4 RK stages"
+    - "Output at each step including initial"
+
+- id: "SCI-009"
+  title: "Matrix Multiplication"
+  description: "Multiply two matrices A (m×k) and B (k×n) and output the resulting matrix."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: m k. Lines 2..m+1: rows of A. Line m+2: k n. Lines m+3...: rows of B."
+  output_format: "Rows of result matrix C=A*B, space-separated, 4 decimal places"
+  test_cases:
+    - input: "2 3\n1 2 3\n4 5 6\n3 2\n7 8\n9 10\n11 12"
+      expected_output: "58.0000 64.0000\n139.0000 154.0000"
+    - input: "1 2\n1 2\n2 1\n3\n4"
+      expected_output: "11.0000"
+  constraints:
+    - "Dimensions must be compatible"
+    - "Support integer and float elements"
+
+- id: "SCI-010"
+  title: "Matrix Inverse (Gauss-Jordan)"
+  description: "Compute the inverse of a square matrix using Gauss-Jordan elimination."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: rows of n×n matrix."
+  output_format: "Rows of inverse matrix, 6 decimal places. ERROR if singular."
+  test_cases:
+    - input: "2\n4 7\n2 6"
+      expected_output: "0.600000 -0.700000\n-0.200000 0.400000"
+    - input: "2\n1 2\n2 4"
+      expected_output: "ERROR: matrix is singular"
+  constraints:
+    - "Use partial pivoting"
+    - "Detect singularity when pivot < 1e-10"
+
+- id: "SCI-011"
+  title: "Matrix Determinant"
+  description: "Compute the determinant of a square matrix using LU decomposition."
+  difficulty: 3
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: rows of n×n matrix."
+  output_format: "Determinant: X.XXXXXX"
+  test_cases:
+    - input: "2\n3 8\n4 6"
+      expected_output: "Determinant: -14.000000"
+    - input: "3\n6 1 1\n4 -2 5\n2 8 7"
+      expected_output: "Determinant: -306.000000"
+  constraints:
+    - "Use LU decomposition with partial pivoting"
+    - "Track sign from row swaps"
+
+- id: "SCI-012"
+  title: "LU Decomposition"
+  description: "Perform LU decomposition with partial pivoting on a square matrix. Output L, U, and permutation P."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: rows of n×n matrix."
+  output_format: "L matrix rows, blank line, U matrix rows, blank line, P (permutation row indices)"
+  test_cases:
+    - input: "2\n2 1\n1 3"
+      expected_output: "1.000000 0.000000\n0.500000 1.000000\n\n2.000000 1.000000\n0.000000 2.500000\n\n0 1"
+    - input: "1\n5"
+      expected_output: "1.000000\n\n5.000000\n\n0"
+  constraints:
+    - "L is lower triangular with unit diagonal"
+    - "U is upper triangular"
+
+- id: "SCI-013"
+  title: "QR Decomposition (Gram-Schmidt)"
+  description: "Compute QR decomposition of a matrix using classical Gram-Schmidt orthogonalisation."
+  difficulty: 5
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: m n. Lines 2..m+1: rows of m×n matrix (m>=n)."
+  output_format: "Q matrix rows, blank line, R matrix rows (6 decimal places)"
+  test_cases:
+    - input: "2 2\n12 -51\n6 167"
+      expected_output: "(Q rows)\n\n(R rows with R upper triangular)"
+    - input: "3 2\n1 0\n0 1\n0 0"
+      expected_output: "1.000000 0.000000\n0.000000 1.000000\n0.000000 0.000000\n\n1.000000 0.000000\n0.000000 1.000000"
+  constraints:
+    - "Q must be orthonormal (Q^T Q = I)"
+    - "R must be upper triangular with positive diagonal"
+
+- id: "SCI-014"
+  title: "BFS (Graph Traversal)"
+  description: "Perform breadth-first search on an unweighted graph from a given start node."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io, std.str]
+  input_format: "Line 1: V E (vertices, edges). Lines 2..E+1: u v (edges). Line E+2: start node."
+  output_format: "Visit order: v1 v2 ... (space-separated). Distances: node=dist (one per line)"
+  test_cases:
+    - input: "5 4\n0 1\n0 2\n1 3\n2 4\n0"
+      expected_output: "Visit order: 0 1 2 3 4\nDistances: 0=0 1=1 2=1 3=2 4=2"
+    - input: "3 2\n0 1\n1 2\n0"
+      expected_output: "Visit order: 0 1 2\nDistances: 0=0 1=1 2=2"
+  constraints:
+    - "0-indexed nodes"
+    - "Report unreachable nodes with distance -1"
+
+- id: "SCI-015"
+  title: "DFS (Graph Traversal)"
+  description: "Perform depth-first search on a graph from a given start node, recording discovery and finish times."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io, std.str]
+  input_format: "Line 1: V E. Lines 2..E+1: u v. Line E+2: start node."
+  output_format: "Visit order: v1 v2 ... Discovery/finish: node d=D f=F (one per line)"
+  test_cases:
+    - input: "4 4\n0 1\n0 2\n1 3\n2 3\n0"
+      expected_output: "Visit order: 0 1 3 2\nDiscovery/finish: 0 d=1 f=8\n1 d=2 f=5\n3 d=3 f=4\n2 d=6 f=7"
+    - input: "2 1\n0 1\n0"
+      expected_output: "Visit order: 0 1\n..."
+  constraints:
+    - "Directed graph"
+    - "Times 1-indexed"
+
+- id: "SCI-016"
+  title: "Dijkstra's Shortest Path"
+  description: "Find shortest paths from a source node to all other nodes in a weighted graph."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v w (weighted edge). Line E+2: source."
+  output_format: "node: dist path (one per node). INF for unreachable."
+  test_cases:
+    - input: "5 6\n0 1 4\n0 2 1\n2 1 2\n1 3 1\n2 3 5\n3 4 3\n0"
+      expected_output: "0: 0 [0]\n1: 3 [0,2,1]\n2: 1 [0,2]\n3: 4 [0,2,1,3]\n4: 7 [0,2,1,3,4]"
+    - input: "2 1\n0 1 5\n0"
+      expected_output: "0: 0 [0]\n1: 5 [0,1]"
+  constraints:
+    - "Non-negative edge weights only"
+    - "Use binary heap priority queue"
+
+- id: "SCI-017"
+  title: "A* Pathfinding"
+  description: "Find the shortest path on a 2D grid using A* with Manhattan distance heuristic."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: rows cols. Lines 2..rows+1: grid rows (. = open, # = wall). Line rows+2: start_row start_col. Line rows+3: end_row end_col."
+  output_format: "Path: (r,c) (r,c) ... Cost: N (or NO PATH if blocked)"
+  test_cases:
+    - input: "3 3\n...\n.#.\n...\n0 0\n2 2"
+      expected_output: "Path: (0,0) (0,1) (0,2) (1,2) (2,2) Cost: 4"
+    - input: "2 2\n.#\n#.\n0 0\n1 1"
+      expected_output: "NO PATH"
+  constraints:
+    - "4-directional movement (no diagonals)"
+    - "Cost is number of steps"
+
+- id: "SCI-018"
+  title: "Bellman-Ford Shortest Paths"
+  description: "Find shortest paths from a source using Bellman-Ford. Detect negative weight cycles."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v w (directed edges, w may be negative). Line E+2: source."
+  output_format: "node: dist (one per node). NEGATIVE CYCLE if detected."
+  test_cases:
+    - input: "4 5\n0 1 1\n1 2 3\n2 3 2\n3 1 -8\n0 3 10\n0"
+      expected_output: "NEGATIVE CYCLE"
+    - input: "3 3\n0 1 4\n1 2 2\n0 2 9\n0"
+      expected_output: "0: 0\n1: 4\n2: 6"
+  constraints:
+    - "V-1 relaxation iterations"
+    - "Report cycle if any edge can still be relaxed"
+
+- id: "SCI-019"
+  title: "Floyd-Warshall All-Pairs Shortest Paths"
+  description: "Compute shortest paths between all pairs of vertices using Floyd-Warshall."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: V. Lines 2..V+1: V space-separated weights (INF for no edge, 0 on diagonal)."
+  output_format: "Distance matrix (rows of space-separated values, INF for unreachable)"
+  test_cases:
+    - input: "3\n0 3 INF\n2 0 1\nINF 7 0"
+      expected_output: "0 3 4\n2 0 1\n9 7 0"
+    - input: "2\n0 5\n3 0"
+      expected_output: "0 5\n3 0"
+  constraints:
+    - "Handle INF as a sentinel (not actual infinity)"
+    - "Detect negative cycles (diagonal < 0)"
+
+- id: "SCI-020"
+  title: "Kruskal's Minimum Spanning Tree"
+  description: "Find the minimum spanning tree of a weighted undirected graph using Kruskal's algorithm."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v w."
+  output_format: "MST edges: u-v w (one per edge, sorted by w). Total weight: W"
+  test_cases:
+    - input: "4 5\n0 1 10\n0 2 6\n0 3 5\n1 3 15\n2 3 4"
+      expected_output: "MST edges: 2-3 4\n0-3 5\n0-1 10\nTotal weight: 19"
+    - input: "3 3\n0 1 1\n1 2 2\n0 2 3"
+      expected_output: "MST edges: 0-1 1\n1-2 2\nTotal weight: 3"
+  constraints:
+    - "Use Union-Find with path compression"
+    - "Disconnected graph: report forest total weight"
+
+- id: "SCI-021"
+  title: "Prim's Minimum Spanning Tree"
+  description: "Find the minimum spanning tree using Prim's algorithm with a priority queue."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v w. Line E+2: start node."
+  output_format: "MST edges: u-v w (added in order). Total weight: W"
+  test_cases:
+    - input: "4 5\n0 1 10\n0 2 6\n0 3 5\n1 3 15\n2 3 4\n0"
+      expected_output: "MST edges: 0-3 5\n2-3 4\n0-1 10\nTotal weight: 19"
+    - input: "2 1\n0 1 7\n0"
+      expected_output: "MST edges: 0-1 7\nTotal weight: 7"
+  constraints:
+    - "Start from given start node"
+    - "Use binary min-heap"
+
+- id: "SCI-022"
+  title: "Topological Sort (Kahn's Algorithm)"
+  description: "Perform topological sort on a DAG using Kahn's algorithm (BFS-based)."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v (directed edge u->v)."
+  output_format: "Topological order: v1 v2 ... (space-separated). CYCLE if not a DAG."
+  test_cases:
+    - input: "6 6\n5 2\n5 0\n4 0\n4 1\n2 3\n3 1"
+      expected_output: "Topological order: 4 5 0 2 3 1"
+    - input: "3 3\n0 1\n1 2\n2 0"
+      expected_output: "CYCLE"
+  constraints:
+    - "If multiple valid orderings exist, output lexicographically smallest"
+    - "Detect cycles via remaining nodes after sort"
+
+- id: "SCI-023"
+  title: "Topological Sort (DFS-based)"
+  description: "Perform topological sort using DFS with post-order stack reversal."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v."
+  output_format: "Topological order: v1 v2 ... CYCLE if detected."
+  test_cases:
+    - input: "4 3\n0 2\n1 2\n2 3"
+      expected_output: "Topological order: 0 1 2 3"
+    - input: "2 2\n0 1\n1 0"
+      expected_output: "CYCLE"
+  constraints:
+    - "White/grey/black node colouring for cycle detection"
+    - "Deterministic ordering for ties"
+
+- id: "SCI-024"
+  title: "Bubble Sort"
+  description: "Sort a list of numbers using bubble sort. Count comparisons and swaps."
+  difficulty: 1
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated integers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nComparisons: N\\nSwaps: N"
+  test_cases:
+    - input: "5 3 1 4 2"
+      expected_output: "Sorted: 1 2 3 4 5\nComparisons: 10\nSwaps: 6"
+    - input: "1 2 3"
+      expected_output: "Sorted: 1 2 3\nComparisons: 3\nSwaps: 0"
+  constraints:
+    - "Optimised bubble sort (early exit on no swaps)"
+    - "Integers only"
+
+- id: "SCI-025"
+  title: "Insertion Sort"
+  description: "Sort a list using insertion sort. Count comparisons and shifts."
+  difficulty: 1
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nComparisons: N\\nShifts: N"
+  test_cases:
+    - input: "5 3 1 4 2"
+      expected_output: "Sorted: 1 2 3 4 5\nComparisons: 8\nShifts: 6"
+    - input: "1"
+      expected_output: "Sorted: 1\nComparisons: 0\nShifts: 0"
+  constraints:
+    - "In-place sort"
+    - "Stable sort"
+
+- id: "SCI-026"
+  title: "Selection Sort"
+  description: "Sort a list using selection sort. Count comparisons and swaps."
+  difficulty: 1
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nComparisons: N\\nSwaps: N"
+  test_cases:
+    - input: "64 25 12 22 11"
+      expected_output: "Sorted: 11 12 22 25 64\nComparisons: 10\nSwaps: 4"
+    - input: "3 2 1"
+      expected_output: "Sorted: 1 2 3\nComparisons: 3\nSwaps: 2"
+  constraints:
+    - "O(n^2) comparisons regardless of input"
+    - "In-place"
+
+- id: "SCI-027"
+  title: "Merge Sort"
+  description: "Sort a list using merge sort and show the merge tree depth."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nMerge depth: N\\nComparisons: N"
+  test_cases:
+    - input: "5 3 8 1 9 2"
+      expected_output: "Sorted: 1 2 3 5 8 9\nMerge depth: 3\nComparisons: N"
+    - input: "2 1"
+      expected_output: "Sorted: 1 2\nMerge depth: 1\nComparisons: 1"
+  constraints:
+    - "Top-down recursive merge sort"
+    - "Stable sort"
+
+- id: "SCI-028"
+  title: "Quicksort (Lomuto partition)"
+  description: "Sort a list using quicksort with Lomuto partition scheme. Report pivot choices."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nPivots chosen: p1 p2 ...\\nComparisons: N"
+  test_cases:
+    - input: "3 6 8 10 1 2 1"
+      expected_output: "Sorted: 1 1 2 3 6 8 10\nPivots chosen: ...\nComparisons: N"
+    - input: "1"
+      expected_output: "Sorted: 1\nPivots chosen: \nComparisons: 0"
+  constraints:
+    - "Pivot is last element of partition"
+    - "In-place"
+
+- id: "SCI-029"
+  title: "Heapsort"
+  description: "Sort a list using heapsort. Show the max-heap state after build phase."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Heap after build: h1 h2 ...\\nSorted: n1 n2 ...\\nComparisons: N"
+  test_cases:
+    - input: "5 3 8 1 9 2"
+      expected_output: "Heap after build: 9 5 8 1 3 2\nSorted: 1 2 3 5 8 9\nComparisons: N"
+    - input: "1 2"
+      expected_output: "Heap after build: 2 1\nSorted: 1 2\nComparisons: N"
+  constraints:
+    - "Max-heap"
+    - "In-place O(n log n)"
+
+- id: "SCI-030"
+  title: "Radix Sort (LSD)"
+  description: "Sort non-negative integers using LSD (least significant digit) radix sort in base 10."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated non-negative integers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nPasses: N"
+  test_cases:
+    - input: "170 45 75 90 802 24 2 66"
+      expected_output: "Sorted: 2 24 45 66 75 90 170 802\nPasses: 3"
+    - input: "5 0 3"
+      expected_output: "Sorted: 0 3 5\nPasses: 1"
+  constraints:
+    - "Passes = number of digits in largest number"
+    - "Stable"
+
+- id: "SCI-031"
+  title: "Counting Sort"
+  description: "Sort integers using counting sort. Report the count array."
+  difficulty: 1
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: min_val max_val. Line 2: space-separated integers."
+  output_format: "Sorted: n1 n2 ...\\nCount array: c0 c1 c2 ..."
+  test_cases:
+    - input: "0 5\n4 2 2 8 3 3 1"
+      expected_output: "Sorted: 1 2 2 3 3 4 8\nCount array: 0 1 2 2 1 0"
+    - input: "1 3\n3 1 2 1"
+      expected_output: "Sorted: 1 1 2 3\nCount array: 2 1 1"
+  constraints:
+    - "All values within [min_val, max_val]"
+    - "O(n+k) time"
+
+- id: "SCI-032"
+  title: "Bucket Sort"
+  description: "Sort floating-point numbers in [0,1) using bucket sort with N equal-sized buckets."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: N (number of buckets). Line 2: space-separated floats in [0,1)."
+  output_format: "Sorted: f1 f2 ... (4 decimal places)\\nBucket sizes: b1 b2 ..."
+  test_cases:
+    - input: "5\n0.78 0.17 0.39 0.26 0.72"
+      expected_output: "Sorted: 0.1700 0.2600 0.3900 0.7200 0.7800\nBucket sizes: 0 1 1 1 2"
+    - input: "3\n0.5 0.1 0.9"
+      expected_output: "Sorted: 0.1000 0.5000 0.9000\nBucket sizes: 1 1 1"
+  constraints:
+    - "Each bucket sorted with insertion sort"
+    - "All values in [0, 1)"
+
+- id: "SCI-033"
+  title: "Shell Sort"
+  description: "Sort a list using Shell sort with Knuth's gap sequence (1, 4, 13, 40, ...)."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Sorted: n1 n2 ...\\nGaps used: g1 g2 ...\\nComparisons: N"
+  test_cases:
+    - input: "5 3 1 4 2"
+      expected_output: "Sorted: 1 2 3 4 5\nGaps used: 4 1\nComparisons: N"
+    - input: "10 9 8 7 6 5 4 3 2 1"
+      expected_output: "Sorted: 1 2 3 4 5 6 7 8 9 10\nGaps used: 4 1\nComparisons: N"
+  constraints:
+    - "Knuth sequence: h = 3h+1 up to n/3"
+    - "Gaps listed in decreasing order used"
+
+- id: "SCI-034"
+  title: "KMP String Search"
+  description: "Find all occurrences of a pattern in a text using the Knuth-Morris-Pratt algorithm."
+  difficulty: 3
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: pattern. Line 2: text."
+  output_format: "Found at positions: p1 p2 ... (0-indexed) or NOT FOUND. Comparisons: N"
+  test_cases:
+    - input: "ABC\nAABCAABCABC"
+      expected_output: "Found at positions: 1 4 7\nComparisons: N"
+    - input: "XY\nABC"
+      expected_output: "NOT FOUND\nComparisons: N"
+  constraints:
+    - "Report failure function (LPS array) to stderr"
+    - "O(n+m) time"
+
+- id: "SCI-035"
+  title: "Rabin-Karp String Search"
+  description: "Find all occurrences of a pattern using the Rabin-Karp rolling hash algorithm."
+  difficulty: 3
+  stdlib_modules: [std.str, std.math, std.io]
+  input_format: "Line 1: pattern. Line 2: text. Line 3: base and mod (e.g. 31 1000000007)."
+  output_format: "Found at positions: p1 p2 ... Spurious hits: N. Comparisons: N"
+  test_cases:
+    - input: "test\nthistestisatest\n31 1000000007"
+      expected_output: "Found at positions: 4 10\nSpurious hits: 0\nComparisons: N"
+    - input: "aa\naaa\n31 1000000007"
+      expected_output: "Found at positions: 0 1\nSpurious hits: 0\nComparisons: N"
+  constraints:
+    - "Count and report spurious hash collisions"
+    - "Rolling hash update in O(1)"
+
+- id: "SCI-036"
+  title: "Levenshtein Edit Distance"
+  description: "Compute the Levenshtein (edit) distance between two strings and output the alignment."
+  difficulty: 3
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: string s. Line 2: string t."
+  output_format: "Distance: N\\nAlignment:\\n(s with gap chars)\\n(t with gap chars)"
+  test_cases:
+    - input: "kitten\nsitting"
+      expected_output: "Distance: 3\nAlignment:\nkitten-\nsitten g->sitting..."
+    - input: "abc\nabc"
+      expected_output: "Distance: 0\nAlignment:\nabc\nabc"
+  constraints:
+    - "Operations: insert, delete, substitute (cost 1 each)"
+    - "Show one valid alignment"
+
+- id: "SCI-037"
+  title: "Longest Common Subsequence"
+  description: "Find the LCS of two strings and output its length and one such subsequence."
+  difficulty: 2
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: string A. Line 2: string B."
+  output_format: "LCS length: N\\nLCS: subsequence_string"
+  test_cases:
+    - input: "ABCBDAB\nBDCABA"
+      expected_output: "LCS length: 4\nLCS: BCBA"
+    - input: "AGGTAB\nGXTXAYB"
+      expected_output: "LCS length: 4\nLCS: GTAB"
+  constraints:
+    - "DP solution O(mn)"
+    - "If multiple LCS exist, output lexicographically smallest"
+
+- id: "SCI-038"
+  title: "Suffix Array Builder"
+  description: "Build a suffix array for a string and use it to find all occurrences of a pattern."
+  difficulty: 5
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: text. Line 2: pattern to search."
+  output_format: "Suffix array: i1 i2 i3 ...\\nPattern found at: p1 p2 ... (sorted) or NOT FOUND"
+  test_cases:
+    - input: "banana\nana"
+      expected_output: "Suffix array: 5 3 1 0 4 2\nPattern found at: 1 3"
+    - input: "abcabc\nbc"
+      expected_output: "Suffix array: 0 3 1 4 2 5\nPattern found at: 1 4"
+  constraints:
+    - "O(n log n) suffix array construction"
+    - "Binary search for pattern lookup"
+
+- id: "SCI-039"
+  title: "Permutations Generator"
+  description: "Generate all permutations of a sequence of elements using Heap's algorithm."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: space-separated elements (up to 8)."
+  output_format: "One permutation per line, elements space-separated. Last line: Total: N"
+  test_cases:
+    - input: "1 2 3"
+      expected_output: "1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1\nTotal: 6"
+    - input: "a b"
+      expected_output: "a b\nb a\nTotal: 2"
+  constraints:
+    - "Use Heap's algorithm for efficiency"
+    - "Max 8 elements (8! = 40320)"
+
+- id: "SCI-040"
+  title: "Combinations Generator"
+  description: "Generate all combinations C(n,k) from a list of elements."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: space-separated elements. Line 2: k."
+  output_format: "One combination per line. Total: N"
+  test_cases:
+    - input: "1 2 3 4\n2"
+      expected_output: "1 2\n1 3\n1 4\n2 3\n2 4\n3 4\nTotal: 6"
+    - input: "a b c\n3"
+      expected_output: "a b c\nTotal: 1"
+  constraints:
+    - "Lexicographic order"
+    - "k must be <= n"
+
+- id: "SCI-041"
+  title: "Catalan Numbers"
+  description: "Compute the first N Catalan numbers using the recurrence formula."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Single integer N on stdin"
+  output_format: "C(0)=1 C(1)=1 C(2)=2 ... (one per line)"
+  test_cases:
+    - input: "5"
+      expected_output: "C(0)=1\nC(1)=1\nC(2)=2\nC(3)=5\nC(4)=14"
+    - input: "1"
+      expected_output: "C(0)=1"
+  constraints:
+    - "Use exact integer arithmetic"
+    - "N up to 30"
+
+- id: "SCI-042"
+  title: "Fibonacci Sequence"
+  description: "Compute Fibonacci numbers using multiple methods: recursive (with memoisation), iterative, matrix exponentiation."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Line 2: method (recursive|iterative|matrix)."
+  output_format: "F(0) F(1) ... F(N) (space-separated)"
+  test_cases:
+    - input: "10\niterative"
+      expected_output: "0 1 1 2 3 5 8 13 21 34 55"
+    - input: "6\nmatrix"
+      expected_output: "0 1 1 2 3 5 8"
+  constraints:
+    - "N up to 70 (use 64-bit integers)"
+    - "Matrix method must use fast exponentiation"
+
+- id: "SCI-043"
+  title: "Newton-Raphson Root Finder"
+  description: "Find a root of a polynomial using Newton-Raphson iteration."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: polynomial coefficients (ascending: c0 c1 c2... for c0+c1x+c2x^2+...). Line 2: initial guess x0. Line 3: tolerance. Line 4: max iterations."
+  output_format: "Iteration N: x=X.XXXXXX f(x)=X.XXXXXX\\n...\\nRoot: X.XXXXXX (N iterations)"
+  test_cases:
+    - input: "-2 0 1\n1.0\n1e-6\n50"
+      expected_output: "(iterations converging to 1.414214)\nRoot: 1.414214 (N iterations)"
+    - input: "-1 0 0 1\n1.5\n1e-6\n50"
+      expected_output: "(converging to 1.0)\nRoot: 1.000000 (N iterations)"
+  constraints:
+    - "Derivative computed analytically from coefficients"
+    - "Report DIVERGED if not converged in max iterations"
+
+- id: "SCI-044"
+  title: "Bisection Root Finder"
+  description: "Find a root of a polynomial in interval [a,b] using bisection."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: polynomial coefficients. Line 2: a b. Line 3: tolerance. Line 4: max iterations."
+  output_format: "Iteration N: [a,b] midpoint=X f(mid)=X\\n...\\nRoot: X.XXXXXX (N iterations)"
+  test_cases:
+    - input: "-2 0 1\n1 2\n1e-6\n100"
+      expected_output: "(iterations converging to 1.414214)\nRoot: 1.414214 (N iterations)"
+    - input: "1\n0 1\n1e-6\n10"
+      expected_output: "ERROR: f(a) and f(b) must have opposite signs"
+  constraints:
+    - "f(a) and f(b) must have opposite signs"
+    - "Guaranteed convergence within tolerance"
+
+- id: "SCI-045"
+  title: "Birthday Paradox Simulator"
+  description: "Simulate and analytically compute the probability that at least two people in a group of N share a birthday."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: max_group_size. Line 2: simulations (for Monte Carlo estimate)."
+  output_format: "N: analytical=X.XXXX simulated=X.XXXX (one line per group size 1..max)"
+  test_cases:
+    - input: "5\n10000"
+      expected_output: "1: analytical=0.0000 simulated=~0.0000\n...\n5: analytical=0.0271 simulated=~0.027"
+    - input: "23\n10000"
+      expected_output: "(... 23: analytical=0.5073 simulated=~0.507)"
+  constraints:
+    - "365 days per year"
+    - "Analytical uses exact formula"
+
+- id: "SCI-046"
+  title: "Monty Hall Problem Simulator"
+  description: "Simulate the Monty Hall problem for N trials under both strategies (switch/stay) and report win rates."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Single integer N (trials)"
+  output_format: "Stay wins: N (X.XX%)\\nSwitch wins: N (X.XX%)"
+  test_cases:
+    - input: "100000"
+      expected_output: "Stay wins: ~33333 (~33.33%)\nSwitch wins: ~66667 (~66.67%)"
+    - input: "3"
+      expected_output: "Stay wins: N (X.XX%)\nSwitch wins: N (X.XX%)"
+  constraints:
+    - "Use seeded random for reproducibility? No -- just run with system random"
+    - "Result should converge to 1/3 and 2/3 for large N"
+
+- id: "SCI-047"
+  title: "Random Walk Simulator (1D)"
+  description: "Simulate a 1D random walk for N steps and compute statistics: final position, max displacement, return-to-origin count."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: steps. Line 2: trials."
+  output_format: "Mean final position: X.XX\\nMean max displacement: X.XX\\nMean returns to 0: X.XX\\nExpected RMS: X.XX (=sqrt(N))"
+  test_cases:
+    - input: "100\n1000"
+      expected_output: "Mean final position: ~0.0\nMean max displacement: ~X.XX\nMean returns to 0: ~X.XX\nExpected RMS: 10.00"
+    - input: "4\n2"
+      expected_output: "(statistics for 2 trials of 4 steps)"
+  constraints:
+    - "Each step: +1 or -1 with equal probability"
+    - "RMS = sqrt(steps)"
+
+- id: "SCI-048"
+  title: "Random Walk Simulator (2D)"
+  description: "Simulate a 2D random walk on a grid for N steps, tracking position and distance from origin."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: steps. Line 2: trials."
+  output_format: "Mean final distance: X.XX\\nMean max distance: X.XX\\nExpected RMS: X.XX"
+  test_cases:
+    - input: "100\n1000"
+      expected_output: "Mean final distance: ~X.XX\nMean max distance: ~X.XX\nExpected RMS: 10.00"
+    - input: "1\n4"
+      expected_output: "Mean final distance: 1.00\nMean max distance: 1.00\nExpected RMS: 1.00"
+  constraints:
+    - "4 directions: N/S/E/W with equal probability"
+    - "Distance = Euclidean from origin"
+
+- id: "SCI-049"
+  title: "Markov Chain Simulator"
+  description: "Simulate a Markov chain from a transition matrix and compute steady-state distribution."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n_states. Lines 2..n+1: transition matrix rows (rows sum to 1). Line n+2: initial_state. Line n+3: steps."
+  output_format: "Simulated visit counts: s0=N s1=N ...\\nSteady state: s0=X.XXXX s1=X.XXXX ..."
+  test_cases:
+    - input: "2\n0.7 0.3\n0.4 0.6\n0\n10000"
+      expected_output: "Simulated visit counts: ~5714 ~4286\nSteady state: s0=0.5714 s1=0.4286"
+    - input: "3\n0.5 0.25 0.25\n0.25 0.5 0.25\n0.25 0.25 0.5\n0\n10000"
+      expected_output: "Steady state: s0=0.3333 s1=0.3333 s2=0.3333"
+  constraints:
+    - "Compute steady state by power iteration (multiply by large power)"
+    - "Rows of transition matrix must sum to 1 (±1e-6)"
+
+- id: "SCI-050"
+  title: "Convex Hull (Graham Scan)"
+  description: "Compute the convex hull of a set of 2D points using Graham scan."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: x y (one point per line)."
+  output_format: "Hull points (in counter-clockwise order): (x,y) (x,y) ...\\nHull area: X.XXXXXX"
+  test_cases:
+    - input: "6\n0 3\n1 1\n2 2\n4 4\n0 0\n1 2"
+      expected_output: "Hull points: (0,0) (1,1) (4,4) (0,3)\nHull area: X.XXXXXX"
+    - input: "3\n0 0\n1 0\n0 1"
+      expected_output: "Hull points: (0,0) (1,0) (0,1)\nHull area: 0.500000"
+  constraints:
+    - "Handle collinear points correctly (exclude interior)"
+    - "Area via shoelace formula"
+
+- id: "SCI-051"
+  title: "Convex Hull (Jarvis March)"
+  description: "Compute the convex hull using the Jarvis march (gift wrapping) algorithm."
+  difficulty: 3
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: x y."
+  output_format: "Hull points (counter-clockwise): (x,y) (x,y) ...\\nHull size: N points"
+  test_cases:
+    - input: "5\n0 0\n1 1\n2 0\n1 -1\n0.5 0"
+      expected_output: "Hull points: (0,0) (2,0) (1,1)\nHull size: 3 points"
+    - input: "4\n0 0\n4 0\n0 4\n4 4"
+      expected_output: "Hull points: (0,0) (4,0) (4,4) (0,4)\nHull size: 4 points"
+  constraints:
+    - "O(nh) where h is hull size"
+    - "Start from lowest-leftmost point"
+
+- id: "SCI-052"
+  title: "Line Segment Intersection"
+  description: "Determine whether two line segments intersect and compute the intersection point if they do."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: x1 y1 x2 y2 (segment 1). Line 2: x3 y3 x4 y4 (segment 2)."
+  output_format: "INTERSECT at (X.XXXXXX, Y.XXXXXX) | PARALLEL | COLLINEAR | NO INTERSECT"
+  test_cases:
+    - input: "0 0 1 1\n0 1 1 0"
+      expected_output: "INTERSECT at (0.500000, 0.500000)"
+    - input: "0 0 1 0\n0 1 1 1"
+      expected_output: "PARALLEL"
+  constraints:
+    - "Use cross-product method"
+    - "Treat collinear overlapping as COLLINEAR"
+
+- id: "SCI-053"
+  title: "Polygon Area and Perimeter"
+  description: "Compute the area (via shoelace) and perimeter of a simple polygon."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: x y vertices in order."
+  output_format: "Area: X.XXXXXX\\nPerimeter: X.XXXXXX\\nWinding: CW | CCW"
+  test_cases:
+    - input: "4\n0 0\n1 0\n1 1\n0 1"
+      expected_output: "Area: 1.000000\nPerimeter: 4.000000\nWinding: CCW"
+    - input: "3\n0 0\n3 0\n1.5 2"
+      expected_output: "Area: 3.000000\nPerimeter: ...\nWinding: CCW"
+  constraints:
+    - "No self-intersecting polygons required"
+    - "Area always positive regardless of winding"
+
+- id: "SCI-054"
+  title: "Closest Pair of Points"
+  description: "Find the closest pair of 2D points using divide-and-conquer algorithm."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: x y."
+  output_format: "Closest pair: (x1,y1) and (x2,y2)\\nDistance: X.XXXXXX"
+  test_cases:
+    - input: "4\n0 0\n1 1\n3 3\n6 6"
+      expected_output: "Closest pair: (0,0) and (1,1)\nDistance: 1.414214"
+    - input: "2\n0 0\n3 4"
+      expected_output: "Closest pair: (0,0) and (3,4)\nDistance: 5.000000"
+  constraints:
+    - "O(n log n) divide-and-conquer"
+    - "N >= 2"
+
+- id: "SCI-055"
+  title: "Point in Polygon Test"
+  description: "Determine whether a set of query points are inside, on the boundary of, or outside a polygon."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: N (vertices). Lines 2..N+1: x y. Line N+2: Q (queries). Lines N+3..N+Q+2: x y."
+  output_format: "INSIDE | BOUNDARY | OUTSIDE (one per query point)"
+  test_cases:
+    - input: "4\n0 0\n4 0\n4 4\n0 4\n3\n2 2\n0 0\n5 5"
+      expected_output: "INSIDE\nBOUNDARY\nOUTSIDE"
+    - input: "3\n0 0\n2 0\n1 2\n1\n1 0.5"
+      expected_output: "INSIDE"
+  constraints:
+    - "Ray casting for INSIDE/OUTSIDE"
+    - "Handle edge and vertex cases for BOUNDARY"
+
+- id: "SCI-056"
+  title: "GCD and LCM Calculator"
+  description: "Compute GCD and LCM of two or more integers. Support Euclidean algorithm and show steps."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: mode (gcd|lcm|both). Line 2: space-separated integers."
+  output_format: "GCD: N | LCM: N | GCD: N LCM: N. Steps: (Euclidean steps for 2 numbers)"
+  test_cases:
+    - input: "both\n12 18"
+      expected_output: "GCD: 6 LCM: 36\nSteps: gcd(18,12) gcd(12,6) gcd(6,0)=6"
+    - input: "gcd\n4 8 12"
+      expected_output: "GCD: 4"
+  constraints:
+    - "For >2 numbers: GCD/LCM is associative"
+    - "Show steps only for exactly 2 inputs"
+
+- id: "SCI-057"
+  title: "Prime Factorisation"
+  description: "Find the prime factorisation of a number using trial division and Pollard's rho."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of integers to factorise"
+  output_format: "N = p1^e1 * p2^e2 * ... (sorted by prime)"
+  test_cases:
+    - input: "360\n1\n2"
+      expected_output: "360 = 2^3 * 3^2 * 5\n1 = 1\n2 = 2"
+    - input: "999983"
+      expected_output: "999983 = 999983 (prime)"
+  constraints:
+    - "Trial division up to sqrt(n)"
+    - "N up to 10^12"
+
+- id: "SCI-058"
+  title: "Modular Arithmetic"
+  description: "Compute modular exponentiation, modular inverse, and solve linear congruences."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of: powmod a b m | invmod a m | congr a b m (solve ax ≡ b (mod m))"
+  output_format: "Result per line (or NO SOLUTION)"
+  test_cases:
+    - input: "powmod 2 10 1000"
+      expected_output: "24"
+    - input: "invmod 3 7"
+      expected_output: "5"
+  constraints:
+    - "powmod uses fast exponentiation"
+    - "invmod uses extended Euclidean"
+
+- id: "SCI-059"
+  title: "Chinese Remainder Theorem"
+  description: "Solve a system of congruences x ≡ a_i (mod n_i) using CRT."
+  difficulty: 4
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: k (number of congruences). Lines 2..k+1: a_i n_i."
+  output_format: "x = N (mod M) where M = LCM of moduli"
+  test_cases:
+    - input: "3\n2 3\n3 5\n2 7"
+      expected_output: "x = 23 (mod 105)"
+    - input: "2\n1 4\n3 6"
+      expected_output: "NO SOLUTION (moduli not coprime with inconsistent remainders)"
+  constraints:
+    - "Use generalised CRT for non-coprime moduli"
+    - "Report NO SOLUTION if inconsistent"
+
+- id: "SCI-060"
+  title: "Discrete Fourier Transform (naive)"
+  description: "Compute the DFT of a sequence using the O(n^2) direct formula."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: N. Line 2: N space-separated real numbers."
+  output_format: "Magnitudes: |X_0| |X_1| ... (space-separated, 4 decimal places)"
+  test_cases:
+    - input: "4\n0 1 0 0"
+      expected_output: "Magnitudes: 1.0000 1.0000 1.0000 1.0000"
+    - input: "4\n1 1 1 1"
+      expected_output: "Magnitudes: 4.0000 0.0000 0.0000 0.0000"
+  constraints:
+    - "X_k = sum_{n=0}^{N-1} x_n * e^{-2*pi*i*k*n/N}"
+    - "Output only magnitudes"
+
+- id: "SCI-061"
+  title: "Statistics Calculator"
+  description: "Compute descriptive statistics: mean, median, mode, variance, std deviation, skewness, kurtosis."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Space-separated numbers on stdin"
+  output_format: "Mean: X.XXXX\\nMedian: X.XXXX\\nMode: X (or MULTIMODAL)\\nVariance: X.XXXX\\nStdDev: X.XXXX\\nSkewness: X.XXXX\\nKurtosis: X.XXXX"
+  test_cases:
+    - input: "2 4 4 4 5 5 7 9"
+      expected_output: "Mean: 5.0000\nMedian: 4.5000\nMode: 4\nVariance: 4.0000\nStdDev: 2.0000\nSkewness: ...\nKurtosis: ..."
+    - input: "1 2 3 4 5"
+      expected_output: "Mean: 3.0000\nMedian: 3.0000\nMode: MULTIMODAL\n..."
+  constraints:
+    - "Population variance (divide by N)"
+    - "At least 3 values for skewness/kurtosis"
+
+- id: "SCI-062"
+  title: "Histogram Builder"
+  description: "Build a text histogram of a dataset with configurable number of bins."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io, std.str]
+  input_format: "Line 1: bins. Line 2: space-separated numbers."
+  output_format: "Bin [lo,hi): count bar (bar = # chars proportional to count)"
+  test_cases:
+    - input: "5\n1 2 3 4 5 6 7 8 9 10"
+      expected_output: "[1,3): 2 ##\n[3,5): 2 ##\n[5,7): 2 ##\n[7,9): 2 ##\n[9,11): 2 ##"
+    - input: "3\n0 0 0 5 5 10"
+      expected_output: "[0,3.33): 3 ###\n[3.33,6.67): 2 ##\n[6.67,10]: 1 #"
+  constraints:
+    - "Equal-width bins"
+    - "Max bar width 40 characters"
+
+- id: "SCI-063"
+  title: "Linear Regression"
+  description: "Fit a least-squares linear regression y = mx + b to a set of (x,y) points."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of: x y pairs"
+  output_format: "y = Mx + B (4 decimal places)\\nR^2: X.XXXX\\nRMSE: X.XXXX"
+  test_cases:
+    - input: "1 2\n2 4\n3 5\n4 4\n5 5"
+      expected_output: "y = 0.6000x + 2.2000\nR^2: 0.5657\nRMSE: 0.6928"
+    - input: "0 0\n1 1\n2 2"
+      expected_output: "y = 1.0000x + 0.0000\nR^2: 1.0000\nRMSE: 0.0000"
+  constraints:
+    - "At least 2 points"
+    - "Use closed-form normal equations"
+
+- id: "SCI-064"
+  title: "Polynomial Evaluator"
+  description: "Evaluate a polynomial at multiple x values using Horner's method."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: coefficients c0 c1 c2 ... (c0 + c1*x + ...). Remaining: x values (one per line)."
+  output_format: "p(X) = Y (one per x value, 6 decimal places)"
+  test_cases:
+    - input: "1 0 1\n0\n1\n2"
+      expected_output: "p(0) = 1.000000\np(1) = 2.000000\np(2) = 5.000000"
+    - input: "-6 11 -6 1\n1\n2\n3"
+      expected_output: "p(1) = 0.000000\np(2) = 0.000000\np(3) = 0.000000"
+  constraints:
+    - "Use Horner's method O(n)"
+    - "Support floating-point coefficients"
+
+- id: "SCI-065"
+  title: "Polynomial Roots (Durand-Kerner)"
+  description: "Find all complex roots of a polynomial using the Durand-Kerner method."
+  difficulty: 5
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: coefficients (highest degree first: a_n ... a_1 a_0). Line 2: max_iterations. Line 3: tolerance."
+  output_format: "Root N: RE+IMi (one per root, sorted by real part, 6 decimal places)"
+  test_cases:
+    - input: "1 -6 11 -6\n100\n1e-8"
+      expected_output: "Root 1: 1.000000+0.000000i\nRoot 2: 2.000000+0.000000i\nRoot 3: 3.000000+0.000000i"
+    - input: "1 0 1\n100\n1e-8"
+      expected_output: "Root 1: 0.000000-1.000000i\nRoot 2: 0.000000+1.000000i"
+  constraints:
+    - "Simultaneous iteration of all roots"
+    - "Report convergence within tolerance"
+
+- id: "SCI-066"
+  title: "Interpolation (Lagrange)"
+  description: "Interpolate a function from a set of (x,y) data points using Lagrange interpolation."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: n (number of data points). Lines 2..n+1: x y. Remaining: query x values."
+  output_format: "p(X) = Y (6 decimal places per query)"
+  test_cases:
+    - input: "3\n0 1\n1 2\n2 5\n1.5"
+      expected_output: "p(1.5) = 3.125000"
+    - input: "2\n0 0\n1 1\n0.5"
+      expected_output: "p(0.5) = 0.500000"
+  constraints:
+    - "Beware of Runge's phenomenon for large n"
+    - "n up to 20"
+
+- id: "SCI-067"
+  title: "Newton's Interpolation"
+  description: "Interpolate using Newton's divided differences method."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: x y. Remaining: query x values."
+  output_format: "Divided difference table then p(X) = Y per query"
+  test_cases:
+    - input: "3\n1 1\n2 8\n4 64\n3"
+      expected_output: "(divided diff table)\np(3) = 27.000000"
+    - input: "2\n0 1\n2 9\n1"
+      expected_output: "(table)\np(1) = 5.000000"
+  constraints:
+    - "Show divided difference table"
+    - "Same polynomial as Lagrange for same data"
+
+- id: "SCI-068"
+  title: "Spline Interpolation (cubic)"
+  description: "Fit a natural cubic spline to data points and evaluate at query x values."
+  difficulty: 5
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: x y. Remaining: query x values."
+  output_format: "S(X) = Y (6 decimal places per query)"
+  test_cases:
+    - input: "4\n0 0\n1 1\n2 0\n3 1\n1.5"
+      expected_output: "S(1.5) = X.XXXXXX"
+    - input: "3\n0 0\n1 1\n2 0\n0.5"
+      expected_output: "S(0.5) = X.XXXXXX"
+  constraints:
+    - "Natural boundary conditions (second derivative = 0 at endpoints)"
+    - "Solve tridiagonal system for spline coefficients"
+
+- id: "SCI-069"
+  title: "Gradient Descent (1D)"
+  description: "Minimise a polynomial function using gradient descent. Report each iteration."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: polynomial coefficients. Line 2: initial x0. Line 3: learning rate. Line 4: tolerance. Line 5: max_iters."
+  output_format: "Iter N: x=X.XXXXXX f(x)=X.XXXXXX grad=X.XXXXXX\\n...\\nMinimum: x=X.XXXXXX f(x)=X.XXXXXX"
+  test_cases:
+    - input: "4 -4 1\n0\n0.1\n1e-6\n1000"
+      expected_output: "(iterations)\nMinimum: x=2.000000 f(x)=0.000000"
+    - input: "0 0 1\n1\n0.1\n1e-6\n1000"
+      expected_output: "(iterations converging to 0)\nMinimum: x=0.000000 f(x)=0.000000"
+  constraints:
+    - "Derivative computed analytically"
+    - "Report DIVERGED if learning rate too large"
+
+- id: "SCI-070"
+  title: "Monte Carlo Pi Estimator"
+  description: "Estimate π using the Monte Carlo method (random points in unit square)."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Single integer N (number of points)"
+  output_format: "Points inside circle: N\\nEstimate of pi: X.XXXXXX\\nError: X.XXXXXX%"
+  test_cases:
+    - input: "1000000"
+      expected_output: "Points inside circle: ~785398\nEstimate of pi: ~3.14\nError: <1%"
+    - input: "4"
+      expected_output: "Points inside circle: N\nEstimate of pi: X.XXXXXX\nError: X.XXXXXX%"
+  constraints:
+    - "Use uniform random in [0,1)x[0,1)"
+    - "Error relative to math.Pi"
+
+- id: "SCI-071"
+  title: "Monte Carlo Integration"
+  description: "Estimate a definite integral using Monte Carlo sampling."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: a b. Line 2: N (samples). Line 3: polynomial coefficients."
+  output_format: "Estimate: X.XXXXXX\\nVariance: X.XXXXXX\\n95% CI: [X.XXXXXX, X.XXXXXX]"
+  test_cases:
+    - input: "0 1\n100000\n0 1"
+      expected_output: "Estimate: ~0.5000\nVariance: ~0.08\n95% CI: [~0.499, ~0.501]"
+    - input: "0 1\n1000\n1"
+      expected_output: "Estimate: ~1.0000\n..."
+  constraints:
+    - "95% CI using ±1.96 * std error"
+    - "Variance of sample estimator"
+
+- id: "SCI-072"
+  title: "Matrix Eigenvalue Power Method"
+  description: "Estimate the dominant eigenvalue and eigenvector of a matrix using the power iteration method."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: matrix rows. Line n+2: max_iterations. Line n+3: tolerance."
+  output_format: "Iteration N: eigenvalue=X.XXXXXX\\n...\\nDominant eigenvalue: X.XXXXXX\\nEigenvector: v1 v2 ..."
+  test_cases:
+    - input: "2\n2 1\n1 3\n100\n1e-8"
+      expected_output: "(iterations)\nDominant eigenvalue: 3.618034\nEigenvector: ..."
+    - input: "2\n4 0\n0 2\n100\n1e-8"
+      expected_output: "(iterations)\nDominant eigenvalue: 4.000000\nEigenvector: 1.0 0.0"
+  constraints:
+    - "Normalise eigenvector at each step"
+    - "Convergence when |eigenvalue change| < tolerance"
+
+- id: "SCI-073"
+  title: "Knapsack Problem (0/1)"
+  description: "Solve the 0/1 knapsack problem using dynamic programming."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: capacity. Line 2: N. Lines 3..N+2: weight value name."
+  output_format: "Max value: N\\nItems: name1 name2 ...\\nTotal weight: N"
+  test_cases:
+    - input: "50\n3\n10 60 A\n20 100 B\n30 120 C"
+      expected_output: "Max value: 220\nItems: B C\nTotal weight: 50"
+    - input: "10\n2\n5 10 X\n8 15 Y"
+      expected_output: "Max value: 10\nItems: X\nTotal weight: 5"
+  constraints:
+    - "O(N*capacity) DP"
+    - "Report items selected (backtrack DP table)"
+
+- id: "SCI-074"
+  title: "Longest Increasing Subsequence"
+  description: "Find the length and content of the longest strictly increasing subsequence."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated integers on stdin"
+  output_format: "LIS length: N\\nLIS: n1 n2 ..."
+  test_cases:
+    - input: "3 10 2 1 20"
+      expected_output: "LIS length: 3\nLIS: 3 10 20"
+    - input: "50 3 10 7 40 80"
+      expected_output: "LIS length: 4\nLIS: 3 7 40 80"
+  constraints:
+    - "O(n log n) patience sorting algorithm"
+    - "If multiple LIS, output lexicographically smallest"
+
+- id: "SCI-075"
+  title: "Coin Change (minimum coins)"
+  description: "Find the minimum number of coins to make a target amount using DP."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: coin denominations (space-separated). Line 2: target amount."
+  output_format: "Minimum coins: N\\nCoins used: c1 c2 ... (sorted)"
+  test_cases:
+    - input: "1 5 6 9\n11"
+      expected_output: "Minimum coins: 2\nCoins used: 2x1 1x9"
+    - input: "2\n3"
+      expected_output: "Impossible"
+  constraints:
+    - "Unbounded coins of each denomination"
+    - "Report Impossible if target unreachable"
+
+- id: "SCI-076"
+  title: "Edit Distance with Operations"
+  description: "Compute edit distance and show the sequence of edit operations."
+  difficulty: 3
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: source string. Line 2: target string."
+  output_format: "Distance: N\\nOperations: INS(pos,char) | DEL(pos,char) | SUB(pos,old,new) (one per line)"
+  test_cases:
+    - input: "abc\nyabd"
+      expected_output: "Distance: 2\nOperations:\nINS(0,y)\nSUB(3,c,d)"
+    - input: "same\nsame"
+      expected_output: "Distance: 0\nOperations: (none)"
+  constraints:
+    - "Traceback through DP table"
+    - "Use standard Levenshtein operations"
+
+- id: "SCI-077"
+  title: "Josephus Problem"
+  description: "Solve the Josephus problem: N people in a circle, eliminate every K-th. Report elimination order."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: N (number of people). Line 2: K (every K-th)."
+  output_format: "Elimination order: p1 p2 ...\\nSurvivor: N"
+  test_cases:
+    - input: "7\n3"
+      expected_output: "Elimination order: 3 6 2 7 5 1 4\nSurvivor: 4"
+    - input: "5\n2"
+      expected_output: "Elimination order: 2 4 1 5 3\nSurvivor: 3"
+  constraints:
+    - "1-indexed people"
+    - "Efficient simulation using circular linked list or modular arithmetic"
+
+- id: "SCI-078"
+  title: "N-Queens Problem"
+  description: "Find all solutions to the N-queens problem using backtracking."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Single integer N"
+  output_format: "Solution N: q1 q2 ... (column of queen in each row)\\n...\\nTotal solutions: N"
+  test_cases:
+    - input: "4"
+      expected_output: "Solution 1: 2 4 1 3\nSolution 2: 3 1 4 2\nTotal solutions: 2"
+    - input: "1"
+      expected_output: "Solution 1: 1\nTotal solutions: 1"
+  constraints:
+    - "Backtracking with constraint propagation"
+    - "N up to 12 (practical)"
+
+- id: "SCI-079"
+  title: "Sudoku Solver"
+  description: "Solve a 9x9 Sudoku puzzle using backtracking with constraint propagation."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.io]
+  input_format: "9 lines of 9 digits (0 for empty)"
+  output_format: "Solved 9x9 grid (space-separated digits) or NO SOLUTION"
+  test_cases:
+    - input: "530070000\n600195000\n098000060\n800060003\n400803001\n700020006\n060000280\n000419005\n000080079"
+      expected_output: "(solved grid)"
+    - input: "000000000\n000000000\n000000000\n000000000\n000000000\n000000000\n000000000\n000000000\n000000001"
+      expected_output: "(a valid completion)"
+  constraints:
+    - "Arc consistency (AC-3) for pruning"
+    - "Report number of backtracks to stderr"
+
+- id: "SCI-080"
+  title: "Travelling Salesman (brute force)"
+  description: "Solve TSP for small N (<=12) by trying all permutations."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: city coordinates x y."
+  output_format: "Optimal route: c1 c2 ... c1 (0-indexed)\\nTotal distance: X.XXXX"
+  test_cases:
+    - input: "4\n0 0\n1 0\n1 1\n0 1"
+      expected_output: "Optimal route: 0 1 2 3 0\nTotal distance: 4.0000"
+    - input: "3\n0 0\n3 0\n0 4"
+      expected_output: "Optimal route: 0 1 2 0\nTotal distance: 12.0000"
+  constraints:
+    - "Euclidean distances"
+    - "N <= 12 (12! computations)"
+
+- id: "SCI-081"
+  title: "Travelling Salesman (nearest neighbour)"
+  description: "Approximate TSP solution using the greedy nearest-neighbour heuristic."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: x y. Line N+2: start node."
+  output_format: "Route: c1 c2 ... c1\\nTotal distance: X.XXXX\\nApproximation ratio vs lower bound: X.XX"
+  test_cases:
+    - input: "5\n0 0\n2 0\n2 2\n0 2\n1 1\n0"
+      expected_output: "Route: 0 1 2 3 4 0\nTotal distance: X.XXXX\nApproximation ratio: X.XX"
+    - input: "3\n0 0\n1 0\n0 1\n0"
+      expected_output: "Route: 0 1 2 0\nTotal distance: ..."
+  constraints:
+    - "Lower bound from minimum spanning tree"
+    - "Try all start nodes, report best"
+
+- id: "SCI-082"
+  title: "Huffman Coding"
+  description: "Build a Huffman code for a set of symbols with given frequencies and encode/decode messages."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: mode (build|encode|decode). build: lines of symbol freq. encode: lines of symbol freq then --- then message. decode: lines of symbol freq then --- then bitstring."
+  output_format: "build: symbol code (one per symbol). encode: bitstring. decode: original message."
+  test_cases:
+    - input: "build\na 5\nb 2\nc 1\nd 3"
+      expected_output: "a 0\nd 10\nb 110\nc 111"
+    - input: "encode\na 5\nb 2\nc 1\nd 3\n---\nabd"
+      expected_output: "0 110 10"
+  constraints:
+    - "Use min-heap priority queue"
+    - "Canonical codes: lower freq = longer code"
+
+- id: "SCI-083"
+  title: "Run-Length Encoding"
+  description: "Compress and decompress strings using run-length encoding."
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Line 1: mode (encode|decode). Line 2: string."
+  output_format: "Encoded string (e.g. AAABBC -> 3A2B1C) or decoded string."
+  test_cases:
+    - input: "encode\nAAABBC"
+      expected_output: "3A2B1C"
+    - input: "decode\n3A2B1C"
+      expected_output: "AAABBC"
+  constraints:
+    - "Counts only emitted when > 1? No -- always emit count"
+    - "Handle single characters (count=1)"
+
+- id: "SCI-084"
+  title: "Lempel-Ziv-Welch (LZW) Compression"
+  description: "Implement LZW compression and decompression."
+  difficulty: 5
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: mode (compress|decompress). Line 2: string (compress) or space-separated codes (decompress)."
+  output_format: "compress: space-separated integer codes. decompress: original string."
+  test_cases:
+    - input: "compress\nABABCBBABC"
+      expected_output: "65 66 65 66 67 66 66 65 66 67"
+    - input: "decompress\n65 66 65 66 67 66 66 65 66 67"
+      expected_output: "ABABCBBABC"
+  constraints:
+    - "Initial dictionary: ASCII characters 0-255"
+    - "Output codes as decimal integers"
+
+- id: "SCI-085"
+  title: "Fast Exponentiation"
+  description: "Compute a^b using fast (binary) exponentiation for both integer and matrix cases."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: type (int|matrix|modint). For int: a b. For modint: a b m. For matrix: n then n rows then b."
+  output_format: "Result: N (integer or matrix rows)"
+  test_cases:
+    - input: "int\n2 10"
+      expected_output: "Result: 1024"
+    - input: "modint\n2 100 1000000007"
+      expected_output: "Result: 976371285"
+  constraints:
+    - "int: 64-bit integer, b up to 63"
+    - "matrix: n up to 10, b up to 10^9"
+
+- id: "SCI-086"
+  title: "Pascal's Triangle"
+  description: "Generate the first N rows of Pascal's triangle and compute binomial coefficients."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: N (rows). Optional: Line 2: n k (query C(n,k))."
+  output_format: "Rows of Pascal's triangle. If query: C(n,k) = VALUE"
+  test_cases:
+    - input: "5\n4 2"
+      expected_output: "1\n1 1\n1 2 1\n1 3 3 1\n1 4 6 4 1\nC(4,2) = 6"
+    - input: "3"
+      expected_output: "1\n1 1\n1 2 1"
+  constraints:
+    - "Use exact integers"
+    - "N up to 30"
+
+- id: "SCI-087"
+  title: "Tower of Hanoi"
+  description: "Solve the Tower of Hanoi for N discs and print each move."
+  difficulty: 1
+  stdlib_modules: [std.io]
+  input_format: "Line 1: N (discs). Line 2: from to aux (peg names)"
+  output_format: "Move disc N from X to Y (one per move). Total moves: N"
+  test_cases:
+    - input: "3\nA C B"
+      expected_output: "Move disc 1 from A to C\nMove disc 2 from A to B\nMove disc 1 from C to B\nMove disc 3 from A to C\nMove disc 1 from B to A\nMove disc 2 from B to C\nMove disc 1 from A to C\nTotal moves: 7"
+    - input: "1\nA C B"
+      expected_output: "Move disc 1 from A to C\nTotal moves: 1"
+  constraints:
+    - "2^N - 1 total moves"
+    - "N up to 20"
+
+- id: "SCI-088"
+  title: "Collatz Conjecture"
+  description: "For each input number, compute the Collatz sequence length (steps to reach 1)."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of positive integers"
+  output_format: "N: steps=S max=M (steps to reach 1, maximum value in sequence)"
+  test_cases:
+    - input: "6\n27"
+      expected_output: "6: steps=8 max=16\n27: steps=111 max=9232"
+    - input: "1"
+      expected_output: "1: steps=0 max=1"
+  constraints:
+    - "N up to 10^15"
+    - "Cache intermediate results for efficiency"
+
+- id: "SCI-089"
+  title: "Caesar Cipher"
+  description: "Encrypt and decrypt text using Caesar cipher with configurable shift."
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Line 1: mode (encrypt|decrypt). Line 2: shift (integer). Line 3: text."
+  output_format: "Encrypted/decrypted text"
+  test_cases:
+    - input: "encrypt\n13\nHello World"
+      expected_output: "Uryyb Jbeyq"
+    - input: "decrypt\n13\nUryyb Jbeyq"
+      expected_output: "Hello World"
+  constraints:
+    - "Preserve non-alphabetic characters"
+    - "Case-preserving"
+
+- id: "SCI-090"
+  title: "Vigenère Cipher"
+  description: "Encrypt and decrypt text using the Vigenère cipher."
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Line 1: mode (encrypt|decrypt). Line 2: key. Line 3: text."
+  output_format: "Encrypted/decrypted text"
+  test_cases:
+    - input: "encrypt\nKEY\nHELLOWORLD"
+      expected_output: "RIJVSUYVJN"
+    - input: "decrypt\nKEY\nRIJVSUYVJN"
+      expected_output: "HELLOWORLD"
+  constraints:
+    - "Uppercase only (convert input to upper)"
+    - "Key repeats cyclically"
+
+- id: "SCI-091"
+  title: "Number Base Converter"
+  description: "Convert integers between arbitrary bases (2 to 36)."
+  difficulty: 1
+  stdlib_modules: [std.math, std.str, std.io]
+  input_format: "Lines of: NUMBER FROM_BASE TO_BASE"
+  output_format: "Result (uppercase letters for digits > 9)"
+  test_cases:
+    - input: "255 10 16\n1010 2 10\nFF 16 2"
+      expected_output: "FF\n10\n11111111"
+    - input: "Z 36 10"
+      expected_output: "35"
+  constraints:
+    - "Digits: 0-9, A-Z"
+    - "Validate input digits for given base"
+
+- id: "SCI-092"
+  title: "Roman Numeral Converter"
+  description: "Convert between Roman numerals and integers (both directions)."
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Lines of numbers or Roman numerals to convert"
+  output_format: "Converted value per line"
+  test_cases:
+    - input: "2024\nXIV\n3999"
+      expected_output: "MMXXIV\n14\nMMMCMXCIX"
+    - input: "MCMXCIX"
+      expected_output: "1999"
+  constraints:
+    - "Range 1-3999"
+    - "Use standard subtractive notation"
+
+- id: "SCI-093"
+  title: "Amicable Numbers Finder"
+  description: "Find all amicable number pairs up to N."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Single integer N"
+  output_format: "Pairs: (a,b) (one per line). Count: N pairs."
+  test_cases:
+    - input: "1000"
+      expected_output: "Pairs: (220,284)\nCount: 1 pairs."
+    - input: "10000"
+      expected_output: "(multiple pairs)\nCount: N pairs."
+  constraints:
+    - "a < b for each pair"
+    - "Exclude perfect numbers (where a == sum_divisors(a))"
+
+- id: "SCI-094"
+  title: "Perfect Number Checker"
+  description: "Find all perfect numbers up to N and verify each is perfect."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Single integer N"
+  output_format: "N: perfect (divisors: 1+...) (one per perfect number)"
+  test_cases:
+    - input: "10000"
+      expected_output: "6: perfect (divisors: 1+2+3=6)\n28: perfect (divisors: 1+2+4+7+14=28)"
+    - input: "5"
+      expected_output: "(none in range)"
+  constraints:
+    - "Include all proper divisors (exclude the number itself)"
+    - "Show divisor sum"
+
+- id: "SCI-095"
+  title: "Armstrong Numbers"
+  description: "Find all Armstrong (narcissistic) numbers with at most D digits."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io]
+  input_format: "Single integer D (max digits)"
+  output_format: "Armstrong numbers (one per line)"
+  test_cases:
+    - input: "3"
+      expected_output: "1\n2\n3\n4\n5\n6\n7\n8\n9\n153\n370\n371\n407"
+    - input: "1"
+      expected_output: "1\n2\n3\n4\n5\n6\n7\n8\n9"
+  constraints:
+    - "n-digit Armstrong: sum of digits each raised to n-th power equals n"
+    - "D up to 7 (practical)"
+
+- id: "SCI-096"
+  title: "Kaprekar's Routine"
+  description: "Apply Kaprekar's routine to 4-digit numbers and show the steps to reach 6174."
+  difficulty: 1
+  stdlib_modules: [std.math, std.str, std.io]
+  input_format: "Lines of 4-digit integers"
+  output_format: "N: step1 step2 ... 6174 (K steps) or REPUNIT if all digits same"
+  test_cases:
+    - input: "1234"
+      expected_output: "1234: 3087 8352 6174 (3 steps)"
+    - input: "3524"
+      expected_output: "3524: 3087 8352 6174 (3 steps)"
+  constraints:
+    - "Pad to 4 digits with leading zeros as needed"
+    - "Report REPUNIT for inputs like 1111"
+
+- id: "SCI-097"
+  title: "Sieve of Sundaram"
+  description: "Find all primes up to N using the Sieve of Sundaram."
+  difficulty: 3
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Single integer N"
+  output_format: "Space-separated primes. count: N primes"
+  test_cases:
+    - input: "50"
+      expected_output: "2 3 5 7 11 13 17 19 23 29 31 37 41 43 47\ncount: 15 primes"
+    - input: "20"
+      expected_output: "2 3 5 7 11 13 17 19\ncount: 8 primes"
+  constraints:
+    - "Eliminate numbers of the form i + j + 2ij"
+    - "Remaining numbers k -> prime 2k+1"
+
+- id: "SCI-098"
+  title: "Goldbach Conjecture Verifier"
+  description: "Verify Goldbach's conjecture for even numbers up to N: each is sum of two primes."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Single integer N (even, up to 10000)"
+  output_format: "n = p + q (smallest p, one per even n >= 4)"
+  test_cases:
+    - input: "20"
+      expected_output: "4 = 2 + 2\n6 = 3 + 3\n8 = 3 + 5\n10 = 3 + 7\n12 = 5 + 7\n14 = 3 + 11\n16 = 3 + 13\n18 = 5 + 13\n20 = 3 + 17"
+    - input: "4"
+      expected_output: "4 = 2 + 2"
+  constraints:
+    - "Use prime sieve for efficiency"
+    - "Choose smallest prime p"
+
+- id: "SCI-099"
+  title: "Twin Prime Finder"
+  description: "Find all twin prime pairs (p, p+2) up to N."
+  difficulty: 1
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Single integer N"
+  output_format: "(p, p+2) per pair. count: N pairs."
+  test_cases:
+    - input: "50"
+      expected_output: "(3,5)\n(5,7)\n(11,13)\n(17,19)\n(29,31)\n(41,43)\ncount: 6 pairs."
+    - input: "10"
+      expected_output: "(3,5)\n(5,7)\ncount: 2 pairs."
+  constraints:
+    - "Use sieve for prime generation"
+    - "p <= N"
+
+- id: "SCI-100"
+  title: "Euler's Totient Function"
+  description: "Compute Euler's totient φ(n) for a range of integers."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of integers n"
+  output_format: "phi(n) = N (one per input)"
+  test_cases:
+    - input: "1\n6\n12\n36"
+      expected_output: "phi(1) = 1\nphi(6) = 2\nphi(12) = 4\nphi(36) = 12"
+    - input: "7"
+      expected_output: "phi(7) = 6"
+  constraints:
+    - "Use Euler's product formula"
+    - "n up to 10^6"
+
+- id: "SCI-101"
+  title: "Möbius Function"
+  description: "Compute the Möbius function μ(n) for a range and use it for inclusion-exclusion."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of integers n"
+  output_format: "mu(n) = N (one per input: 1, -1, or 0)"
+  test_cases:
+    - input: "1\n2\n4\n6\n30"
+      expected_output: "mu(1) = 1\nmu(2) = -1\nmu(4) = 0\nmu(6) = 1\nmu(30) = -1"
+    - input: "12"
+      expected_output: "mu(12) = 0"
+  constraints:
+    - "μ(1)=1, μ(n)=(-1)^k if n is product of k distinct primes, μ(n)=0 if n has squared prime factor"
+    - "n up to 10^7"
+
+- id: "SCI-102"
+  title: "Bit Manipulation Toolkit"
+  description: "Perform bit operations: count set bits, find lowest/highest set bit, reverse bits, check power of 2."
+  difficulty: 1
+  stdlib_modules: [std.math, std.io, std.str]
+  input_format: "Lines of: popcount N | lowest_bit N | highest_bit N | reverse_bits N | is_pow2 N | parity N"
+  output_format: "Result per operation"
+  test_cases:
+    - input: "popcount 255\nlowest_bit 12\nhighest_bit 12\nis_pow2 16\nis_pow2 15"
+      expected_output: "8\n4\n8\ntrue\nfalse"
+    - input: "parity 7\nparity 3"
+      expected_output: "odd\neven"
+  constraints:
+    - "N is 64-bit unsigned"
+    - "reverse_bits: for 32-bit integer"
+
+- id: "SCI-103"
+  title: "Segment Tree"
+  description: "Build a segment tree for range-minimum and range-sum queries with point updates."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N. Line 2: N space-separated integers. Lines of: QUERY_SUM l r | QUERY_MIN l r | UPDATE i val"
+  output_format: "Result per query"
+  test_cases:
+    - input: "5\n1 3 2 7 9\nQUERY_SUM 1 3\nQUERY_MIN 0 4\nUPDATE 2 0\nQUERY_SUM 1 3"
+      expected_output: "12\n1\n10"
+    - input: "3\n5 1 3\nQUERY_MIN 0 2"
+      expected_output: "1"
+  constraints:
+    - "0-indexed, inclusive ranges"
+    - "O(log n) queries and updates"
+
+- id: "SCI-104"
+  title: "Fenwick Tree (Binary Indexed Tree)"
+  description: "Implement a Fenwick tree for prefix sums with point updates."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N. Line 2: N space-separated integers. Lines of: UPDATE i delta | PREFIX i | RANGE l r"
+  output_format: "Result per query"
+  test_cases:
+    - input: "5\n1 2 3 4 5\nPREFIX 3\nUPDATE 2 3\nPREFIX 3"
+      expected_output: "10\n13"
+    - input: "4\n0 0 0 0\nUPDATE 0 5\nRANGE 0 3"
+      expected_output: "5"
+  constraints:
+    - "0-indexed"
+    - "O(log n) per operation"
+
+- id: "SCI-105"
+  title: "Trie (Prefix Tree)"
+  description: "Implement a trie supporting insert, search, prefix count, and all words with prefix."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.str, std.io]
+  input_format: "Lines of: INSERT word | SEARCH word | PREFIX prefix | WORDS_WITH prefix"
+  output_format: "SEARCH: true/false. PREFIX: count. WORDS_WITH: word list."
+  test_cases:
+    - input: "INSERT apple\nINSERT app\nINSERT application\nSEARCH app\nPREFIX app\nWORDS_WITH app"
+      expected_output: "true\n3\napp apple application"
+    - input: "INSERT hello\nSEARCH hell"
+      expected_output: "false"
+  constraints:
+    - "SEARCH matches whole words only"
+    - "WORDS_WITH: lexicographic order"
+
+- id: "SCI-106"
+  title: "Union-Find Data Structure"
+  description: "Implement Union-Find with path compression and union by rank. Answer connectivity queries."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N. Lines of: UNION a b | FIND a | CONNECTED a b | COMPONENTS"
+  output_format: "FIND: root. CONNECTED: true/false. COMPONENTS: count."
+  test_cases:
+    - input: "5\nUNION 0 1\nUNION 2 3\nCONNECTED 0 1\nCONNECTED 0 2\nCOMPONENTS"
+      expected_output: "true\nfalse\n3"
+    - input: "3\nFIND 0\nUNION 0 1\nFIND 0"
+      expected_output: "0\n(root of 0 and 1)"
+  constraints:
+    - "Path compression on FIND"
+    - "Union by rank"
+
+- id: "SCI-107"
+  title: "Priority Queue (min-heap)"
+  description: "Implement a min-heap priority queue supporting insert, extract-min, decrease-key, and delete."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Lines of: INSERT key value | EXTRACT_MIN | PEEK | DECREASE_KEY key new_value | SIZE"
+  output_format: "EXTRACT_MIN/PEEK: key=K value=V. SIZE: N."
+  test_cases:
+    - input: "INSERT 5 foo\nINSERT 3 bar\nINSERT 7 baz\nEXTRACT_MIN\nPEEK"
+      expected_output: "key=3 value=bar\nkey=5 value=foo"
+    - input: "SIZE\nINSERT 1 a\nSIZE"
+      expected_output: "0\n1"
+  constraints:
+    - "Binary min-heap"
+    - "O(log n) insert and extract"
+
+- id: "SCI-108"
+  title: "Bloom Filter"
+  description: "Implement a Bloom filter for approximate set membership with configurable false-positive rate."
+  difficulty: 4
+  stdlib_modules: [std.math, std.collections, std.io, std.str]
+  input_format: "Line 1: capacity n, false_positive_rate p. Lines of: ADD item | CONTAINS item | STATS"
+  output_format: "CONTAINS: PROBABLY_IN | NOT_IN. STATS: bits=N k=N fill=X.XX%"
+  test_cases:
+    - input: "100 0.01\nADD hello\nCONTAINS hello\nCONTAINS world\nSTATS"
+      expected_output: "PROBABLY_IN\nNOT_IN\nbits=... k=... fill=..."
+    - input: "10 0.1\nADD a\nCONTAINS a"
+      expected_output: "PROBABLY_IN"
+  constraints:
+    - "k = ceil(ln(2) * m/n) hash functions"
+    - "m = -n*ln(p) / (ln(2))^2 bits"
+
+- id: "SCI-109"
+  title: "Skip List"
+  description: "Implement a skip list supporting insert, delete, search, and range queries."
+  difficulty: 5
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Lines of: INSERT key | DELETE key | SEARCH key | RANGE lo hi | PRINT"
+  output_format: "SEARCH: FOUND key | NOT FOUND. RANGE: key1 key2 ... PRINT: level-by-level."
+  test_cases:
+    - input: "INSERT 3\nINSERT 1\nINSERT 4\nINSERT 2\nSEARCH 3\nRANGE 1 3"
+      expected_output: "FOUND 3\n1 2 3"
+    - input: "INSERT 5\nDELETE 5\nSEARCH 5"
+      expected_output: "NOT FOUND"
+  constraints:
+    - "Max level: ceil(log2(N)) + 1"
+    - "Probabilistic level assignment (p=0.5)"
+
+- id: "SCI-110"
+  title: "Suffix Tree Builder"
+  description: "Build a suffix tree for a string using Ukkonen's algorithm and answer substring queries."
+  difficulty: 5
+  stdlib_modules: [std.str, std.collections, std.io]
+  input_format: "Line 1: text. Lines of: SEARCH pattern | COUNT pattern | LRS (longest repeated substring)"
+  output_format: "SEARCH: FOUND count | NOT FOUND. COUNT: N. LRS: substring"
+  test_cases:
+    - input: "banana\nSEARCH ana\nLRS"
+      expected_output: "FOUND 2\nana"
+    - input: "abcabc\nCOUNT abc"
+      expected_output: "2"
+  constraints:
+    - "Ukkonen's O(n) construction"
+    - "Append $ terminator to text"
+
+- id: "SCI-111"
+  title: "Rabin-Karp 2D Pattern Matching"
+  description: "Find all occurrences of a 2D pattern matrix in a 2D text matrix using 2D Rabin-Karp."
+  difficulty: 5
+  stdlib_modules: [std.str, std.math, std.collections, std.io]
+  input_format: "Line 1: text rows cols. Lines 2..rows+1: text rows. Line rows+2: pattern rows cols. Lines rows+3...: pattern rows."
+  output_format: "Found at: (row,col) per occurrence (0-indexed). Count: N"
+  test_cases:
+    - input: "4 4\nABCD\nEFGH\nIJKL\nMNOP\n2 2\nEF\nIJ"
+      expected_output: "Found at: (1,0)\nCount: 1"
+    - input: "3 3\nAAA\nAAA\nAAA\n2 2\nAA\nAA"
+      expected_output: "Found at: (0,0) (0,1) (1,0) (1,1)\nCount: 4"
+  constraints:
+    - "Hash each row then hash column of row-hashes"
+    - "Verify matches to rule out hash collisions"
+
+- id: "SCI-112"
+  title: "Matrix Chain Multiplication"
+  description: "Find the optimal parenthesisation for matrix chain multiplication using DP."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: N matrices. Line 2: N+1 dimensions d0 d1 ... dN (matrix i is d_i x d_{i+1})."
+  output_format: "Minimum multiplications: N\\nParenthesisation: expression"
+  test_cases:
+    - input: "3\n10 30 5 60"
+      expected_output: "Minimum multiplications: 4500\nParenthesisation: ((A0 x A1) x A2)"
+    - input: "4\n40 20 30 10 30"
+      expected_output: "Minimum multiplications: 26000\nParenthesisation: (A0 x (A1 x (A2 x A3)))"
+  constraints:
+    - "O(n^3) DP"
+    - "Reconstruct parenthesisation via s-table"
+
+- id: "SCI-113"
+  title: "Interval Scheduling (Greedy)"
+  description: "Select the maximum number of non-overlapping intervals using a greedy algorithm."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: start end label."
+  output_format: "Selected intervals: label1 label2 ...\\nCount: N"
+  test_cases:
+    - input: "4\n1 4 A\n3 5 B\n0 6 C\n5 7 D"
+      expected_output: "Selected intervals: A D\nCount: 2"
+    - input: "3\n0 2 X\n1 3 Y\n2 4 Z"
+      expected_output: "Selected intervals: X Z\nCount: 2"
+  constraints:
+    - "Sort by end time (greedy)"
+    - "Non-overlapping: end of one <= start of next"
+
+- id: "SCI-114"
+  title: "Activity Selection Problem"
+  description: "Maximise activities in a time range where activities cannot overlap."
+  difficulty: 2
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N activities. Lines 2..N+1: name start_time end_time."
+  output_format: "Activities: name1 name2 ... (in order). Total: N"
+  test_cases:
+    - input: "6\nA 1 4\nB 3 5\nC 0 6\nD 5 7\nE 3 9\nF 5 9"
+      expected_output: "Activities: A D\nTotal: 2"
+    - input: "3\nX 0 3\nY 3 6\nZ 6 9"
+      expected_output: "Activities: X Y Z\nTotal: 3"
+  constraints:
+    - "Sort by finish time"
+    - "Include activity if start >= last finish"
+
+- id: "SCI-115"
+  title: "Fractional Knapsack"
+  description: "Maximise value in a fractional knapsack (items can be split)."
+  difficulty: 2
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: capacity. Line 2: N. Lines 3..N+2: name weight value."
+  output_format: "Items: name x.xx% (fraction taken per item). Max value: X.XXXX"
+  test_cases:
+    - input: "50\n3\nA 10 60\nB 20 100\nC 30 120"
+      expected_output: "Items: A 100.00% B 100.00% C 66.67%\nMax value: 240.0000"
+    - input: "10\n2\nX 5 10\nY 8 15"
+      expected_output: "Items: X 100.00% Y 62.50%\nMax value: 19.3750"
+  constraints:
+    - "Sort by value/weight ratio"
+    - "Take entire item if fits, else take fraction"
+
+- id: "SCI-116"
+  title: "Job Scheduling (weighted)"
+  description: "Schedule jobs with weights and deadlines to maximise total weight of completed jobs."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: name deadline weight."
+  output_format: "Schedule: name1 name2 ... (slot order). Total weight: N"
+  test_cases:
+    - input: "4\nA 4 20\nB 1 10\nC 1 40\nD 1 30"
+      expected_output: "Schedule: C A\nTotal weight: 60"
+    - input: "3\nX 2 50\nY 1 10\nZ 2 40"
+      expected_output: "Schedule: Y X\nTotal weight: 90"
+  constraints:
+    - "Greedy: sort by weight descending"
+    - "Each job takes 1 time unit"
+
+- id: "SCI-117"
+  title: "Maximum Subarray (Kadane's)"
+  description: "Find the maximum sum contiguous subarray using Kadane's algorithm."
+  difficulty: 1
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Space-separated integers on stdin"
+  output_format: "Max sum: N\\nSubarray: n1 n2 ... (elements)\\nIndices: lo hi"
+  test_cases:
+    - input: "-2 1 -3 4 -1 2 1 -5 4"
+      expected_output: "Max sum: 6\nSubarray: 4 -1 2 1\nIndices: 3 6"
+    - input: "1 2 3 4 5"
+      expected_output: "Max sum: 15\nSubarray: 1 2 3 4 5\nIndices: 0 4"
+  constraints:
+    - "O(n) Kadane's algorithm"
+    - "All-negative array: return maximum element"
+
+- id: "SCI-118"
+  title: "Maximum Sum Rectangle (2D)"
+  description: "Find the maximum sum rectangle in a 2D matrix."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: rows cols. Lines 2..rows+1: row of integers."
+  output_format: "Max sum: N\\nRectangle: top_left=(r,c) bottom_right=(r,c)"
+  test_cases:
+    - input: "4 4\n1 2 -1 -4\n-8 -3 4 2\n3 8 10 1\n-4 -1 1 7"
+      expected_output: "Max sum: 29\nRectangle: top_left=(1,1) bottom_right=(3,3)"
+    - input: "2 2\n1 2\n3 4"
+      expected_output: "Max sum: 10\nRectangle: top_left=(0,0) bottom_right=(1,1)"
+  constraints:
+    - "O(cols^2 * rows) via Kadane's on column sums"
+    - "Can be a 1x1 rectangle"
+
+- id: "SCI-119"
+  title: "Stable Marriage Problem (Gale-Shapley)"
+  description: "Find a stable matching between two groups using the Gale-Shapley algorithm."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: proposer preferences (space-separated). Lines N+2..2N+1: acceptor preferences."
+  output_format: "Matching: proposer-acceptor (one per pair). Stable: true."
+  test_cases:
+    - input: "3\n0 1 2\n0 2 1\n1 0 2\n1 0 2\n0 1 2\n0 1 2"
+      expected_output: "Matching: 0-0 1-1 2-2\nStable: true"
+    - input: "2\n0 1\n1 0\n0 1\n1 0"
+      expected_output: "Matching: 0-0 1-1\nStable: true"
+  constraints:
+    - "0-indexed proposers and acceptors"
+    - "Proposer-optimal stable matching"
+
+- id: "SCI-120"
+  title: "Hamiltonian Path Finder"
+  description: "Find a Hamiltonian path in a graph (visiting every vertex exactly once) using backtracking."
+  difficulty: 5
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v. Line E+2: start."
+  output_format: "Path: v1 v2 ... vV or NO HAMILTONIAN PATH"
+  test_cases:
+    - input: "5 8\n0 1\n0 3\n1 2\n1 3\n1 4\n2 4\n3 4\n0 4\n0"
+      expected_output: "Path: 0 1 2 4 3"
+    - input: "4 4\n0 1\n1 2\n2 3\n0 3\n0"
+      expected_output: "Path: 0 1 2 3"
+  constraints:
+    - "Undirected graph"
+    - "Report first path found"
+
+- id: "SCI-121"
+  title: "Graph Colouring (greedy)"
+  description: "Colour a graph with minimum colours using a greedy algorithm."
+  difficulty: 3
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v."
+  output_format: "Colouring: node=colour (one per node). Colours used: N"
+  test_cases:
+    - input: "4 5\n0 1\n0 2\n1 2\n1 3\n2 3"
+      expected_output: "Colouring: 0=0 1=1 2=2 3=0\nColours used: 3"
+    - input: "3 3\n0 1\n1 2\n2 0"
+      expected_output: "Colouring: 0=0 1=1 2=2\nColours used: 3"
+  constraints:
+    - "Welsh-Powell: sort by degree descending"
+    - "Greedy: assign smallest available colour"
+
+- id: "SCI-122"
+  title: "Maximum Bipartite Matching"
+  description: "Find maximum matching in a bipartite graph using the Hopcroft-Karp algorithm."
+  difficulty: 5
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: U V E (left vertices, right vertices, edges). Lines 2..E+1: u v."
+  output_format: "Matching: u-v pairs. Size: N"
+  test_cases:
+    - input: "3 3 4\n0 0\n0 1\n1 2\n2 2"
+      expected_output: "Matching: 0-1 1-2 2-0\nSize: 3"
+    - input: "2 2 3\n0 0\n0 1\n1 1"
+      expected_output: "Matching: 0-0 1-1\nSize: 2"
+  constraints:
+    - "Hopcroft-Karp O(E*sqrt(V))"
+    - "Maximum cardinality matching"
+
+- id: "SCI-123"
+  title: "Flow Network (Ford-Fulkerson)"
+  description: "Find maximum flow in a flow network using Ford-Fulkerson with BFS augmenting paths."
+  difficulty: 5
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v capacity. Line E+2: source. Line E+3: sink."
+  output_format: "Max flow: N\\nFlow on edges: u->v: f/c (flow/capacity per edge)"
+  test_cases:
+    - input: "6 9\n0 1 16\n0 2 13\n1 2 10\n1 3 12\n2 1 4\n2 4 14\n3 2 9\n3 5 20\n4 5 4\n0\n5"
+      expected_output: "Max flow: 23\nFlow on edges: ..."
+    - input: "4 5\n0 1 10\n0 2 10\n1 3 10\n2 3 10\n1 2 1\n0\n3"
+      expected_output: "Max flow: 20\n..."
+  constraints:
+    - "Edmonds-Karp (BFS-based Ford-Fulkerson)"
+    - "Report residual graph after max flow"
+
+- id: "SCI-124"
+  title: "Minimum Cut (Max-Flow Min-Cut)"
+  description: "Find the minimum cut in a flow network after computing max flow."
+  difficulty: 5
+  stdlib_modules: [std.collections, std.io]
+  input_format: "Line 1: V E. Lines 2..E+1: u v capacity. Line E+2: source. Line E+3: sink."
+  output_format: "Min cut value: N\\nCut edges: u->v capacity (one per cut edge)"
+  test_cases:
+    - input: "4 4\n0 1 3\n0 2 2\n1 3 3\n2 3 2\n0\n3"
+      expected_output: "Min cut value: 5\nCut edges: 0->1 3\n0->2 2"
+    - input: "3 3\n0 1 5\n0 2 3\n1 2 2\n0\n2"
+      expected_output: "Min cut value: 5\n..."
+  constraints:
+    - "Reachable set from source in residual graph = S-side of cut"
+    - "Same code as SCI-123 extended"
+
+- id: "SCI-125"
+  title: "Disjoint Set Applications (Percolation)"
+  description: "Simulate percolation: open random sites in an N×N grid and report when it percolates (top-to-bottom path)."
+  difficulty: 4
+  stdlib_modules: [std.collections, std.math, std.io]
+  input_format: "Line 1: N (grid size). Line 2: seed (for reproducibility). Line 3: trials."
+  output_format: "Mean percolation threshold: X.XXXX\\nStd dev: X.XXXX\\n95% CI: [X.XXXX, X.XXXX]"
+  test_cases:
+    - input: "20\n42\n100"
+      expected_output: "Mean percolation threshold: ~0.593\nStd dev: ~0.01\n95% CI: ..."
+    - input: "5\n1\n10"
+      expected_output: "Mean percolation threshold: X.XXXX\n..."
+  constraints:
+    - "Virtual top/bottom nodes for O(1) percolation check"
+    - "Use Union-Find with Weighted Union"
+
+- id: "SCI-126"
+  title: "Discrete Wavelet Transform (Haar)"
+  description: "Apply the Haar wavelet transform and its inverse to a 1D signal."
+  difficulty: 4
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: mode (forward|inverse). Line 2: N (power of 2). Line 3: N space-separated values."
+  output_format: "Transformed values (space-separated, 6 decimal places)"
+  test_cases:
+    - input: "forward\n4\n1 1 1 1"
+      expected_output: "2.000000 0.000000 0.000000 0.000000"
+    - input: "forward\n4\n1 2 3 4"
+      expected_output: "5.000000 -2.000000 -0.707107 -0.707107"
+  constraints:
+    - "N must be a power of 2"
+    - "Normalised Haar: multiply by 1/sqrt(2) at each level"
+
+- id: "SCI-127"
+  title: "Bezier Curve Evaluator"
+  description: "Evaluate a Bezier curve at N uniformly spaced parameter values using de Casteljau's algorithm."
+  difficulty: 3
+  stdlib_modules: [std.math, std.io]
+  input_format: "Line 1: degree D (number of control points = D+1). Lines 2..D+2: x y control points. Line D+3: N (sample points)."
+  output_format: "N lines of x y (curve points, 4 decimal places)"
+  test_cases:
+    - input: "2\n0 0\n1 2\n2 0\n5"
+      expected_output: "0.0000 0.0000\n0.5000 0.7500\n1.0000 1.0000\n1.5000 0.7500\n2.0000 0.0000"
+    - input: "1\n0 0\n1 1\n3"
+      expected_output: "0.0000 0.0000\n0.5000 0.5000\n1.0000 1.0000"
+  constraints:
+    - "De Casteljau's recursive algorithm"
+    - "t ranges from 0 to 1 inclusive"
+
+- id: "SCI-128"
+  title: "Gaussian Elimination"
+  description: "Solve a system of linear equations Ax=b using Gaussian elimination with partial pivoting."
+  difficulty: 3
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: n. Lines 2..n+1: augmented matrix row [a_i1 ... a_in b_i]."
+  output_format: "x1=X.XXXXXX x2=X.XXXXXX ... (solution, 6 dp) or NO UNIQUE SOLUTION"
+  test_cases:
+    - input: "2\n2 1 5\n4 3 11"
+      expected_output: "x1=2.000000 x2=1.000000"
+    - input: "3\n2 1 -1 8\n-3 -1 2 -11\n-2 1 2 -3"
+      expected_output: "x1=2.000000 x2=3.000000 x3=-1.000000"
+  constraints:
+    - "Partial pivoting required"
+    - "Detect singular or underdetermined systems"
+
+- id: "SCI-129"
+  title: "Voronoi Diagram (Fortune's Algorithm)"
+  description: "Compute the Voronoi diagram of 2D points using Fortune's sweep line algorithm."
+  difficulty: 5
+  stdlib_modules: [std.math, std.collections, std.io]
+  input_format: "Line 1: N. Lines 2..N+1: x y (sites)."
+  output_format: "Voronoi edges: (x1,y1)-(x2,y2) (one per finite edge). Num edges: N"
+  test_cases:
+    - input: "3\n0 0\n3 0\n1.5 3"
+      expected_output: "(3 Voronoi edges defining the 3 regions)\nNum edges: N"
+    - input: "4\n0 0\n2 0\n0 2\n2 2"
+      expected_output: "(4 Voronoi edges for square arrangement)\nNum edges: N"
+  constraints:
+    - "Fortune's O(n log n) algorithm"
+    - "Clip to bounding box"
+
+- id: "SCI-130"
+  title: "Fast Inverse Square Root"
+  description: "Implement the famous fast inverse square root approximation (Quake III algorithm) and compare to exact value."
+  difficulty: 2
+  stdlib_modules: [std.math, std.io]
+  input_format: "Lines of positive floats"
+  output_format: "x: fast=X.XXXXXX exact=X.XXXXXX error=X.XX%"
+  test_cases:
+    - input: "4.0\n2.0\n0.25"
+      expected_output: "4.0: fast=0.499985 exact=0.500000 error=0.00%\n2.0: fast=0.706825 exact=0.707107 error=0.04%\n0.25: fast=1.999395 exact=2.000000 error=0.03%"
+    - input: "1.0"
+      expected_output: "1.0: fast=~1.0 exact=1.000000 error=~0%"
+  constraints:
+    - "Use 0x5F3759DF magic constant"
+    - "One Newton-Raphson refinement step"

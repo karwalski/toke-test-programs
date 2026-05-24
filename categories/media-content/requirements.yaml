@@ -1,0 +1,1819 @@
+- id: "MED-001"
+  title: "Markdown to Plain Text"
+  description: "Strips all Markdown syntax and returns clean plain text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Plain text on stdout with Markdown syntax removed"
+  test_cases:
+    - input: "# Hello\n**world**"
+      expected_output: "Hello\nworld"
+    - input: "_italic_ and `code`"
+      expected_output: "italic and code"
+  constraints: ["Must handle headings, bold, italic, code, links"]
+
+- id: "MED-002"
+  title: "Markdown Heading Extractor"
+  description: "Extracts all headings from Markdown and prints them with their level"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Lines of 'H<level>: <text>' for each heading"
+  test_cases:
+    - input: "# Title\n## Subtitle\n### Section"
+      expected_output: "H1: Title\nH2: Subtitle\nH3: Section"
+    - input: "No headings here"
+      expected_output: ""
+  constraints: ["Must support H1 through H6"]
+
+- id: "MED-003"
+  title: "Table of Contents Generator"
+  description: "Generates a Markdown TOC with anchor links from heading structure"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown document on stdin"
+  output_format: "Markdown unordered list with anchor links"
+  test_cases:
+    - input: "# Intro\n## Setup\n## Usage"
+      expected_output: "- [Intro](#intro)\n  - [Setup](#setup)\n  - [Usage](#usage)"
+    - input: "# One"
+      expected_output: "- [One](#one)"
+  constraints: ["Anchor slugs must be lowercase with hyphens"]
+
+- id: "MED-004"
+  title: "HTML Tag Stripper"
+  description: "Removes all HTML tags from input and returns plain text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML string on stdin"
+  output_format: "Text with all tags removed"
+  test_cases:
+    - input: "<p>Hello <b>world</b></p>"
+      expected_output: "Hello world"
+    - input: "<h1>Title</h1><p>Body</p>"
+      expected_output: "TitleBody"
+  constraints: ["Must handle nested tags", "Must not decode entities"]
+
+- id: "MED-005"
+  title: "HTML Entity Encoder"
+  description: "Encodes special characters as HTML entities"
+  difficulty: 1
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "Plain text on stdin"
+  output_format: "Text with <, >, &, \", ' encoded as HTML entities"
+  test_cases:
+    - input: "<script>alert('xss')</script>"
+      expected_output: "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
+    - input: "AT&T"
+      expected_output: "AT&amp;T"
+  constraints: ["Must encode all five standard HTML entities"]
+
+- id: "MED-006"
+  title: "Simple HTML Generator"
+  description: "Wraps each input line in an HTML paragraph tag"
+  difficulty: 1
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "Plain text lines on stdin"
+  output_format: "HTML document with each line wrapped in <p> tags"
+  test_cases:
+    - input: "Hello\nWorld"
+      expected_output: "<p>Hello</p>\n<p>World</p>"
+    - input: "One line"
+      expected_output: "<p>One line</p>"
+  constraints: ["Must produce valid HTML5 paragraphs"]
+
+- id: "MED-007"
+  title: "Word Counter"
+  description: "Counts words, lines, and characters in input text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Three lines: 'words: N', 'lines: N', 'chars: N'"
+  test_cases:
+    - input: "hello world\nfoo bar"
+      expected_output: "words: 4\nlines: 2\nchars: 19"
+    - input: "one"
+      expected_output: "words: 1\nlines: 1\nchars: 3"
+  constraints: ["Words delimited by whitespace", "Chars includes newlines"]
+
+- id: "MED-008"
+  title: "Readability Score (Flesch-Kincaid)"
+  description: "Computes the Flesch-Kincaid Reading Ease score for text"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.math]
+  input_format: "English prose on stdin"
+  output_format: "Single line 'score: N.N' where N.N is the FK score"
+  test_cases:
+    - input: "The cat sat on the mat."
+      expected_output: "score: 116.1"
+    - input: "The acquisition of multisyllabic vocabulary constitutes a formidable intellectual undertaking."
+      expected_output: "score: 10.2"
+  constraints: ["Score = 206.835 - 1.015*(words/sentences) - 84.6*(syllables/words)", "Round to one decimal place"]
+
+- id: "MED-009"
+  title: "Readability Score (Gunning Fog)"
+  description: "Computes the Gunning Fog Index for text complexity"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.math]
+  input_format: "English prose on stdin"
+  output_format: "Single line 'fog: N.N'"
+  test_cases:
+    - input: "The cat sat on the mat. It was a nice day."
+      expected_output: "fog: 1.6"
+    - input: "The obfuscation of parliamentary procedures represents a significant challenge."
+      expected_output: "fog: 17.0"
+  constraints: ["Fog = 0.4 * ((words/sentences) + 100*(complex_words/words))", "Complex words have 3+ syllables"]
+
+- id: "MED-010"
+  title: "Spell Checker"
+  description: "Detects words not found in a built-in dictionary list provided on first stdin line"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: comma-separated dictionary words. Remaining lines: text to check"
+  output_format: "One misspelled word per line, in order of appearance, deduplicated"
+  test_cases:
+    - input: "cat,dog,the\nthe cat sat on a mat"
+      expected_output: "sat\non\na\nmat"
+    - input: "hello,world\nhello world"
+      expected_output: ""
+  constraints: ["Case-insensitive matching", "Ignore punctuation attached to words"]
+
+- id: "MED-011"
+  title: "Slug Generator"
+  description: "Converts a title string into a URL-safe slug"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "One title per line on stdin"
+  output_format: "One slug per line"
+  test_cases:
+    - input: "Hello World!\nMy Blog Post"
+      expected_output: "hello-world\nmy-blog-post"
+    - input: "  Spaces & Special--Chars  "
+      expected_output: "spaces-special-chars"
+  constraints: ["Lowercase", "Replace non-alphanumeric with hyphens", "Collapse multiple hyphens", "Trim leading/trailing hyphens"]
+
+- id: "MED-012"
+  title: "RSS Feed Parser"
+  description: "Parses an RSS 2.0 XML feed and lists item titles with publication dates"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.time]
+  input_format: "RSS 2.0 XML on stdin"
+  output_format: "Lines of 'YYYY-MM-DD | <title>' sorted newest first"
+  test_cases:
+    - input: "<rss><channel><item><title>Post A</title><pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate></item></channel></rss>"
+      expected_output: "2024-01-01 | Post A"
+    - input: "<rss><channel><item><title>B</title><pubDate>Tue, 02 Jan 2024 00:00:00 +0000</pubDate></item><item><title>A</title><pubDate>Mon, 01 Jan 2024 00:00:00 +0000</pubDate></item></channel></rss>"
+      expected_output: "2024-01-02 | B\n2024-01-01 | A"
+  constraints: ["Parse pubDate in RFC 822 format", "Sort descending by date"]
+
+- id: "MED-013"
+  title: "Sitemap Generator"
+  description: "Generates an XML sitemap from a list of URLs"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.time]
+  input_format: "One URL per line on stdin"
+  output_format: "XML sitemap conforming to sitemaps.org schema"
+  test_cases:
+    - input: "https://example.com/\nhttps://example.com/about"
+      expected_output: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://example.com/</loc></url>\n  <url><loc>https://example.com/about</loc></url>\n</urlset>"
+    - input: "https://site.com/page"
+      expected_output: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://site.com/page</loc></url>\n</urlset>"
+  constraints: ["Valid XML", "One <url> per input line"]
+
+- id: "MED-014"
+  title: "SEO Analyser"
+  description: "Analyses an HTML page for basic SEO signals"
+  difficulty: 3
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML document on stdin"
+  output_format: "Key: value lines for title length, meta description presence, H1 count, image alt coverage"
+  test_cases:
+    - input: "<html><head><title>Hi</title><meta name=\"description\" content=\"ok\"></head><body><h1>Hello</h1><img src=\"x\" alt=\"y\"></body></html>"
+      expected_output: "title_length: 2\nmeta_description: yes\nh1_count: 1\nimg_alt_coverage: 100%"
+    - input: "<html><head></head><body><img src=\"x\"></body></html>"
+      expected_output: "title_length: 0\nmeta_description: no\nh1_count: 0\nimg_alt_coverage: 0%"
+  constraints: ["Title length in characters", "Alt coverage = images with alt / total images * 100"]
+
+- id: "MED-015"
+  title: "Tag Cloud Generator"
+  description: "Counts word frequency and outputs a weighted tag cloud as text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Words sorted by frequency descending, format 'word(N)' space-separated, top 10 words"
+  test_cases:
+    - input: "the cat sat the cat"
+      expected_output: "the(2) cat(2) sat(1)"
+    - input: "a b a b a"
+      expected_output: "a(3) b(2)"
+  constraints: ["Case-insensitive", "Skip stopwords: the, a, an, is, it, in, on, at, to, of", "Top 10 only"]
+
+- id: "MED-016"
+  title: "Link Extractor"
+  description: "Extracts all hyperlinks from an HTML document"
+  difficulty: 2
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML on stdin"
+  output_format: "One URL per line from href attributes of <a> tags"
+  test_cases:
+    - input: "<a href=\"https://example.com\">Link</a><a href=\"/about\">About</a>"
+      expected_output: "https://example.com\n/about"
+    - input: "<p>No links here</p>"
+      expected_output: ""
+  constraints: ["Only <a> href attributes", "Preserve order of appearance"]
+
+- id: "MED-017"
+  title: "Heading Hierarchy Validator"
+  description: "Validates that Markdown headings never skip a level"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "'PASS' or lines describing each hierarchy violation"
+  test_cases:
+    - input: "# H1\n## H2\n### H3"
+      expected_output: "PASS"
+    - input: "# H1\n### H3"
+      expected_output: "Line 2: jumped from H1 to H3"
+  constraints: ["First heading can be any level", "Detect forward skips only"]
+
+- id: "MED-018"
+  title: "Footnote Processor"
+  description: "Converts inline footnote markers to a numbered reference list"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with [^N] markers and footnote definitions on stdin"
+  output_format: "Body text with [N] superscripts followed by numbered reference list"
+  test_cases:
+    - input: "Hello world[^1].\n\n[^1]: A note."
+      expected_output: "Hello world[1].\n\nReferences:\n1. A note."
+    - input: "Text[^1] and[^2].\n\n[^1]: First.\n[^2]: Second."
+      expected_output: "Text[1] and[2].\n\nReferences:\n1. First.\n2. Second."
+  constraints: ["References section added at end", "Markers renumbered sequentially"]
+
+- id: "MED-019"
+  title: "APA Citation Formatter"
+  description: "Formats bibliography entries in APA 7th edition style"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "JSON lines on stdin, each with fields: author_last, author_first, year, title, journal, volume, issue, pages"
+  output_format: "One APA citation per line"
+  test_cases:
+    - input: "{\"author_last\":\"Smith\",\"author_first\":\"J.\",\"year\":2020,\"title\":\"A study\",\"journal\":\"Journal of Things\",\"volume\":5,\"issue\":2,\"pages\":\"10-20\"}"
+      expected_output: "Smith, J. (2020). A study. Journal of Things, 5(2), 10-20."
+    - input: "{\"author_last\":\"Doe\",\"author_first\":\"A. B.\",\"year\":2021,\"title\":\"Another\",\"journal\":\"Science\",\"volume\":1,\"issue\":1,\"pages\":\"1-5\"}"
+      expected_output: "Doe, A. B. (2021). Another. Science, 1(1), 1-5."
+  constraints: ["Period after title", "Volume in italics represented as-is in plain text"]
+
+- id: "MED-020"
+  title: "MLA Citation Formatter"
+  description: "Formats bibliography entries in MLA 9th edition style"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "JSON lines on stdin with fields: author_last, author_first, title, container, volume, issue, year, pages"
+  output_format: "One MLA citation per line"
+  test_cases:
+    - input: "{\"author_last\":\"Smith\",\"author_first\":\"John\",\"title\":\"A Study\",\"container\":\"Good Journal\",\"volume\":\"3\",\"issue\":\"1\",\"year\":\"2020\",\"pages\":\"5-10\"}"
+      expected_output: "Smith, John. \"A Study.\" Good Journal, vol. 3, no. 1, 2020, pp. 5-10."
+    - input: "{\"author_last\":\"Lee\",\"author_first\":\"A.\",\"title\":\"Research\",\"container\":\"Science\",\"volume\":\"10\",\"issue\":\"2\",\"year\":\"2022\",\"pages\":\"100-110\"}"
+      expected_output: "Lee, A. \"Research.\" Science, vol. 10, no. 2, 2022, pp. 100-110."
+  constraints: ["Title in quotes", "Container italicised represented as plain text", "Periods between major elements"]
+
+- id: "MED-021"
+  title: "Bibliography Sorter"
+  description: "Sorts bibliography entries alphabetically by author last name"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "One citation per line on stdin"
+  output_format: "Citations sorted A-Z by first word"
+  test_cases:
+    - input: "Smith, J. (2020). Title.\nDoe, A. (2019). Other."
+      expected_output: "Doe, A. (2019). Other.\nSmith, J. (2020). Title."
+    - input: "Zebra, Z.\nAlpha, A."
+      expected_output: "Alpha, A.\nZebra, Z."
+  constraints: ["Stable sort", "Case-insensitive comparison"]
+
+- id: "MED-022"
+  title: "Inline Diff Viewer"
+  description: "Shows an inline diff between two texts passed as stdin blocks"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io]
+  input_format: "Two text blocks separated by a line containing '---'"
+  output_format: "Lines prefixed with ' ' (same), '-' (removed), '+' (added)"
+  test_cases:
+    - input: "hello\nworld\n---\nhello\nearth"
+      expected_output: " hello\n-world\n+earth"
+    - input: "a\nb\n---\na\nb"
+      expected_output: " a\n b"
+  constraints: ["Line-level diff only", "No context limit"]
+
+- id: "MED-023"
+  title: "Word Frequency Analyser"
+  description: "Counts and ranks word frequency in a text corpus"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Lines of 'word: N' sorted by frequency descending then alphabetically"
+  test_cases:
+    - input: "cat bat cat rat bat cat"
+      expected_output: "cat: 3\nbat: 2\nrat: 1"
+    - input: "one one two"
+      expected_output: "one: 2\ntwo: 1"
+  constraints: ["Case-insensitive", "Strip punctuation", "All words, no stopword filtering"]
+
+- id: "MED-024"
+  title: "Bigram Extractor"
+  description: "Extracts all word bigrams (2-grams) from text and counts frequency"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Lines of '\"w1 w2\": N' sorted by count descending"
+  test_cases:
+    - input: "the cat sat the cat"
+      expected_output: "\"the cat\": 2\n\"cat sat\": 1\n\"sat the\": 1"
+    - input: "a b c"
+      expected_output: "\"a b\": 1\n\"b c\": 1"
+  constraints: ["Case-insensitive", "Consecutive word pairs only"]
+
+- id: "MED-025"
+  title: "Trigram Extractor"
+  description: "Extracts all word trigrams (3-grams) from text and counts frequency"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Lines of '\"w1 w2 w3\": N' sorted by count descending"
+  test_cases:
+    - input: "a b c a b c"
+      expected_output: "\"a b c\": 2"
+    - input: "one two three four"
+      expected_output: "\"one two three\": 1\n\"two three four\": 1"
+  constraints: ["Case-insensitive", "Consecutive triplets only"]
+
+- id: "MED-026"
+  title: "Sentence Splitter"
+  description: "Splits text into individual sentences"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Paragraph text on stdin"
+  output_format: "One sentence per line, trimmed"
+  test_cases:
+    - input: "Hello world. How are you? I am fine!"
+      expected_output: "Hello world.\nHow are you?\nI am fine!"
+    - input: "Dr. Smith went home. He was tired."
+      expected_output: "Dr. Smith went home.\nHe was tired."
+  constraints: ["Split on '. ', '? ', '! '", "Handle common abbreviations: Dr., Mr., Mrs., etc."]
+
+- id: "MED-027"
+  title: "Paragraph Formatter"
+  description: "Re-wraps text to a specified column width preserving paragraph breaks"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: integer column width. Remaining lines: text (blank line = paragraph break)"
+  output_format: "Re-wrapped text with paragraph breaks preserved"
+  test_cases:
+    - input: "20\nThis is a long line that should be wrapped."
+      expected_output: "This is a long line\nthat should be\nwrapped."
+    - input: "40\nShort line."
+      expected_output: "Short line."
+  constraints: ["Do not break words", "Paragraph break = blank line in input/output"]
+
+- id: "MED-028"
+  title: "Line Wrapper"
+  description: "Hard-wraps lines at a given column width"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: column width integer. Remaining lines: text"
+  output_format: "Text hard-wrapped at exactly the given column width"
+  test_cases:
+    - input: "10\nHelloWorld12345"
+      expected_output: "HelloWorld\n12345"
+    - input: "5\nABCDE"
+      expected_output: "ABCDE"
+  constraints: ["Character-level wrap, not word-level", "No partial line at end if exact fit"]
+
+- id: "MED-029"
+  title: "Indent Normaliser"
+  description: "Normalises mixed tab/space indentation to spaces"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: integer spaces-per-tab. Remaining lines: indented text"
+  output_format: "Text with tabs replaced by given number of spaces"
+  test_cases:
+    - input: "4\n\thello\n\t\tworld"
+      expected_output: "    hello\n        world"
+    - input: "2\n\tA"
+      expected_output: "  A"
+  constraints: ["Replace only leading tabs", "Mixed leading spaces preserved as-is"]
+
+- id: "MED-030"
+  title: "ANSI Colour Stripper"
+  description: "Removes ANSI escape codes from terminal output"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with ANSI escape sequences on stdin"
+  output_format: "Plain text with all ANSI sequences removed"
+  test_cases:
+    - input: "\u001b[31mRed text\u001b[0m"
+      expected_output: "Red text"
+    - input: "\u001b[1;32mBold green\u001b[0m normal"
+      expected_output: "Bold green normal"
+  constraints: ["Remove ESC[ sequences", "Handle multi-parameter sequences"]
+
+- id: "MED-031"
+  title: "ANSI Colour Injector"
+  description: "Wraps words matching a pattern with ANSI colour codes"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: regex pattern. Second line: ANSI colour code number (e.g. 31). Remaining: text"
+  output_format: "Text with matching words wrapped in ESC[<code>m...ESC[0m"
+  test_cases:
+    - input: "error\n31\nThis is an error message"
+      expected_output: "This is an \u001b[31merror\u001b[0m message"
+    - input: "ok\n32\nAll ok here"
+      expected_output: "All \u001b[32mok\u001b[0m here"
+  constraints: ["Word-boundary matching", "Only wrap exact matches"]
+
+- id: "MED-032"
+  title: "CSV Table Formatter"
+  description: "Formats a CSV file as a fixed-width plain-text table"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "CSV with header on stdin"
+  output_format: "Plain-text table with aligned columns and separator rows"
+  test_cases:
+    - input: "name,age\nAlice,30\nBob,25"
+      expected_output: "+-------+-----+\n| name  | age |\n+-------+-----+\n| Alice | 30  |\n| Bob   | 25  |\n+-------+-----+"
+    - input: "x,y\n1,2"
+      expected_output: "+---+---+\n| x | y |\n+---+---+\n| 1 | 2 |\n+---+---+"
+  constraints: ["Column width = max(header, data) + 2 padding", "Header separator row"]
+
+- id: "MED-033"
+  title: "Email Template Renderer"
+  description: "Renders a plain-text email template with variable substitution"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First block: template with {{var}} placeholders. '---' separator. Second block: KEY=VALUE pairs"
+  output_format: "Rendered template with all placeholders replaced"
+  test_cases:
+    - input: "Hello {{name}},\nWelcome to {{service}}.\n---\nname=Alice\nservice=Toke"
+      expected_output: "Hello Alice,\nWelcome to Toke."
+    - input: "Hi {{user}}!\n---\nuser=Bob"
+      expected_output: "Hi Bob!"
+  constraints: ["Unknown variables left as-is", "KEY=VALUE one per line"]
+
+- id: "MED-034"
+  title: "Markdown Bold/Italic Toggler"
+  description: "Converts **bold** to _bold_ style and vice versa given a mode flag"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: 'to-underscore' or 'to-asterisk'. Remaining: Markdown text"
+  output_format: "Markdown text with bold/italic markers converted"
+  test_cases:
+    - input: "to-underscore\n**bold** and *italic*"
+      expected_output: "__bold__ and _italic_"
+    - input: "to-asterisk\n__bold__ and _italic_"
+      expected_output: "**bold** and *italic*"
+  constraints: ["Only convert top-level markers", "No nested conversion"]
+
+- id: "MED-035"
+  title: "Image Tag Extractor"
+  description: "Extracts all image sources and alt text from HTML"
+  difficulty: 2
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML on stdin"
+  output_format: "Lines of 'src | alt' for each <img>"
+  test_cases:
+    - input: "<img src=\"a.png\" alt=\"A\"><img src=\"b.jpg\" alt=\"\">"
+      expected_output: "a.png | A\nb.jpg | "
+    - input: "<p>No images</p>"
+      expected_output: ""
+  constraints: ["Empty alt string if attribute missing", "Preserve order"]
+
+- id: "MED-036"
+  title: "Markdown Code Block Extractor"
+  description: "Extracts all fenced code blocks from a Markdown document"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Each code block separated by '---', prefixed by 'lang: <language>'"
+  test_cases:
+    - input: "Text\n```python\nprint('hi')\n```"
+      expected_output: "lang: python\nprint('hi')"
+    - input: "```\nno lang\n```\n```js\nconsole.log()\n```"
+      expected_output: "lang: \nno lang\n---\nlang: js\nconsole.log()"
+  constraints: ["Preserve internal whitespace", "Support triple backtick fences only"]
+
+- id: "MED-037"
+  title: "Markdown Link Checker Formatter"
+  description: "Extracts all Markdown links and formats them as a numbered list"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Numbered list: 'N. [text](url)'"
+  test_cases:
+    - input: "[Google](https://google.com) and [GitHub](https://github.com)"
+      expected_output: "1. [Google](https://google.com)\n2. [GitHub](https://github.com)"
+    - input: "No links here"
+      expected_output: ""
+  constraints: ["Inline links only, not reference-style", "Preserve link text exactly"]
+
+- id: "MED-038"
+  title: "JSON Pretty Printer"
+  description: "Pretty-prints compact JSON with 2-space indentation"
+  difficulty: 1
+  stdlib_modules: [std.json, std.io]
+  input_format: "Compact JSON on stdin"
+  output_format: "Pretty-printed JSON with 2-space indentation"
+  test_cases:
+    - input: "{\"a\":1,\"b\":[1,2]}"
+      expected_output: "{\n  \"a\": 1,\n  \"b\": [\n    1,\n    2\n  ]\n}"
+    - input: "[1,2,3]"
+      expected_output: "[\n  1,\n  2,\n  3\n]"
+  constraints: ["2-space indent", "Keys sorted alphabetically"]
+
+- id: "MED-039"
+  title: "JSON Minifier"
+  description: "Removes all insignificant whitespace from JSON"
+  difficulty: 1
+  stdlib_modules: [std.json, std.io]
+  input_format: "Formatted JSON on stdin"
+  output_format: "Compact JSON with no extra whitespace"
+  test_cases:
+    - input: "{\n  \"a\": 1,\n  \"b\": 2\n}"
+      expected_output: "{\"a\":1,\"b\":2}"
+    - input: "[ 1 , 2 , 3 ]"
+      expected_output: "[1,2,3]"
+  constraints: ["Preserve string whitespace", "Single output line"]
+
+- id: "MED-040"
+  title: "Markdown Table Formatter"
+  description: "Aligns columns in a Markdown pipe table"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown pipe table on stdin"
+  output_format: "Pipe table with padded, aligned columns"
+  test_cases:
+    - input: "| a | b |\n| --- | --- |\n| hello | world |"
+      expected_output: "| a     | b     |\n| ----- | ----- |\n| hello | world |"
+    - input: "| x | yy |\n| - | -- |\n| 1 | 22 |"
+      expected_output: "| x | yy |\n| - | -- |\n| 1 | 22 |"
+  constraints: ["Left-aligned by default", "Separator row dashes match column width"]
+
+- id: "MED-041"
+  title: "Text Truncator with Ellipsis"
+  description: "Truncates text to a max length, appending ellipsis"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: max character length. Remaining lines: text to truncate"
+  output_format: "Each line truncated to max length with '...' suffix if truncated"
+  test_cases:
+    - input: "10\nHello world!"
+      expected_output: "Hello w..."
+    - input: "20\nShort"
+      expected_output: "Short"
+  constraints: ["Ellipsis counts toward max length", "Do not truncate if within limit"]
+
+- id: "MED-042"
+  title: "Camel Case to Snake Case Converter"
+  description: "Converts camelCase identifiers to snake_case"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "One camelCase identifier per line"
+  output_format: "One snake_case identifier per line"
+  test_cases:
+    - input: "myVariableName\nhelloWorld"
+      expected_output: "my_variable_name\nhello_world"
+    - input: "alreadyLower"
+      expected_output: "already_lower"
+  constraints: ["Handle consecutive capitals: XMLParser -> xml_parser", "Lowercase output"]
+
+- id: "MED-043"
+  title: "Snake Case to Camel Case Converter"
+  description: "Converts snake_case identifiers to camelCase"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "One snake_case identifier per line"
+  output_format: "One camelCase identifier per line"
+  test_cases:
+    - input: "my_variable_name\nhello_world"
+      expected_output: "myVariableName\nhelloWorld"
+    - input: "already_fine"
+      expected_output: "alreadyFine"
+  constraints: ["First word stays lowercase", "Underscores removed"]
+
+- id: "MED-044"
+  title: "Title Case Converter"
+  description: "Converts text to title case following AP style rules"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "One line of text per stdin line"
+  output_format: "Title-cased text"
+  test_cases:
+    - input: "the quick brown fox"
+      expected_output: "The Quick Brown Fox"
+    - input: "a tale of two cities"
+      expected_output: "A Tale of Two Cities"
+  constraints: ["Lowercase: a, an, the, and, but, or, for, nor, on, at, to, by, in", "First and last word always capitalised"]
+
+- id: "MED-045"
+  title: "Sentence Case Converter"
+  description: "Converts text to sentence case (first letter of sentence capitalised)"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Text in sentence case"
+  test_cases:
+    - input: "hello world. another sentence."
+      expected_output: "Hello world. Another sentence."
+    - input: "THIS IS LOUD."
+      expected_output: "This is loud."
+  constraints: ["Lowercase all, then capitalise after sentence-ending punctuation"]
+
+- id: "MED-046"
+  title: "Duplicate Line Remover"
+  description: "Removes duplicate lines, preserving first occurrence and order"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Lines of text on stdin"
+  output_format: "Deduplicated lines in original order"
+  test_cases:
+    - input: "apple\nbanana\napple\ncherry"
+      expected_output: "apple\nbanana\ncherry"
+    - input: "x\nx\nx"
+      expected_output: "x"
+  constraints: ["Case-sensitive deduplication", "Preserve original order"]
+
+- id: "MED-047"
+  title: "Line Sorter"
+  description: "Sorts lines of text alphabetically"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Lines of text on stdin"
+  output_format: "Lines sorted A-Z"
+  test_cases:
+    - input: "banana\napple\ncherry"
+      expected_output: "apple\nbanana\ncherry"
+    - input: "z\na\nm"
+      expected_output: "a\nm\nz"
+  constraints: ["Case-insensitive sort", "Stable"]
+
+- id: "MED-048"
+  title: "Reverse Line Order"
+  description: "Reverses the order of lines in a text file"
+  difficulty: 1
+  stdlib_modules: [std.io]
+  input_format: "Lines of text on stdin"
+  output_format: "Lines in reversed order"
+  test_cases:
+    - input: "first\nsecond\nthird"
+      expected_output: "third\nsecond\nfirst"
+    - input: "only"
+      expected_output: "only"
+  constraints: ["No sorting, purely reverse order"]
+
+- id: "MED-049"
+  title: "Text Statistics Reporter"
+  description: "Reports comprehensive statistics about a text document"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text document on stdin"
+  output_format: "Key: value pairs for chars, words, sentences, paragraphs, avg_word_length"
+  test_cases:
+    - input: "Hello world.\n\nFoo bar."
+      expected_output: "chars: 21\nwords: 4\nsentences: 2\nparagraphs: 2\navg_word_length: 4.0"
+    - input: "One."
+      expected_output: "chars: 4\nwords: 1\nsentences: 1\nparagraphs: 1\navg_word_length: 3.0"
+  constraints: ["Paragraph = block separated by blank line", "avg_word_length rounded to 1 decimal"]
+
+- id: "MED-050"
+  title: "Markdown Front Matter Parser"
+  description: "Parses YAML front matter from a Markdown file and outputs as JSON"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "Markdown file with --- delimited front matter on stdin"
+  output_format: "JSON object of front matter fields, then a blank line, then the body"
+  test_cases:
+    - input: "---\ntitle: Hello\ndate: 2024-01-01\n---\nBody text"
+      expected_output: "{\"title\":\"Hello\",\"date\":\"2024-01-01\"}\n\nBody text"
+    - input: "---\ntag: test\n---\n"
+      expected_output: "{\"tag\":\"test\"}\n\n"
+  constraints: ["Only string values from YAML", "Body output verbatim"]
+
+- id: "MED-051"
+  title: "HTML to Markdown Converter"
+  description: "Converts basic HTML elements to Markdown equivalents"
+  difficulty: 4
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML on stdin"
+  output_format: "Markdown equivalent text"
+  test_cases:
+    - input: "<h1>Title</h1><p>Hello <b>world</b></p>"
+      expected_output: "# Title\n\nHello **world**"
+    - input: "<ul><li>A</li><li>B</li></ul>"
+      expected_output: "- A\n- B"
+  constraints: ["Support h1-h6, p, b, strong, i, em, a, ul, ol, li, code, pre"]
+
+- id: "MED-052"
+  title: "Character Frequency Counter"
+  description: "Counts frequency of each character in text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Lines of 'char: N' sorted by frequency descending, then by character ascending"
+  test_cases:
+    - input: "aab"
+      expected_output: "a: 2\nb: 1"
+    - input: "abba"
+      expected_output: "a: 2\nb: 2"
+  constraints: ["Include spaces and punctuation", "Show printable chars only"]
+
+- id: "MED-053"
+  title: "Palindrome Detector"
+  description: "Detects whether each input line is a palindrome"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "One string per line on stdin"
+  output_format: "Lines of '<input>: YES' or '<input>: NO'"
+  test_cases:
+    - input: "racecar\nhello"
+      expected_output: "racecar: YES\nhello: NO"
+    - input: "A man a plan a canal Panama"
+      expected_output: "A man a plan a canal Panama: YES"
+  constraints: ["Case-insensitive", "Ignore spaces and punctuation for detection"]
+
+- id: "MED-054"
+  title: "Anagram Detector"
+  description: "Groups input words into anagram sets"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Space-separated words on stdin"
+  output_format: "One group per line, words sorted, groups sorted by first word"
+  test_cases:
+    - input: "eat tea tan ate nat bat"
+      expected_output: "ate eat tea\nbat\nnat tan"
+    - input: "dog god"
+      expected_output: "dog god"
+  constraints: ["Case-insensitive", "Single-word groups still printed"]
+
+- id: "MED-055"
+  title: "Text Alignment Formatter"
+  description: "Aligns text left, right, or centre within a given width"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: 'left', 'right', or 'center' and width (e.g. 'center 20'). Remaining: text lines"
+  output_format: "Aligned text lines padded to width"
+  test_cases:
+    - input: "center 10\nHello"
+      expected_output: "  Hello   "
+    - input: "right 10\nHi"
+      expected_output: "        Hi"
+  constraints: ["Pad with spaces", "Truncate if line exceeds width"]
+
+- id: "MED-056"
+  title: "Roman Numeral Converter"
+  description: "Converts between Arabic and Roman numerals"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Lines of either an integer (1-3999) or a Roman numeral"
+  output_format: "Lines of converted value"
+  test_cases:
+    - input: "42\nXIV"
+      expected_output: "XLII\n14"
+    - input: "2024"
+      expected_output: "MMXXIV"
+  constraints: ["Standard Roman numeral rules", "Input auto-detected by format"]
+
+- id: "MED-057"
+  title: "Morse Code Encoder"
+  description: "Encodes ASCII text to Morse code"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Morse code with letters separated by spaces, words by /"
+  test_cases:
+    - input: "SOS"
+      expected_output: "... --- ..."
+    - input: "HELLO WORLD"
+      expected_output: ".... . .-.. .-.. --- / .-- --- .-. .-.. -.."
+  constraints: ["Uppercase only", "Letters A-Z and digits 0-9"]
+
+- id: "MED-058"
+  title: "Morse Code Decoder"
+  description: "Decodes Morse code to ASCII text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Morse code on stdin with spaces between letters and / between words"
+  output_format: "Decoded uppercase ASCII text"
+  test_cases:
+    - input: "... --- ..."
+      expected_output: "SOS"
+    - input: ".... . .-.. .-.. --- / .-- --- .-. .-.. -.."
+      expected_output: "HELLO WORLD"
+  constraints: ["Letters A-Z and digits 0-9 only", "Unknown sequences output as ?"]
+
+- id: "MED-059"
+  title: "Base64 Encoder"
+  description: "Encodes stdin text as Base64"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Base64-encoded string"
+  test_cases:
+    - input: "Hello"
+      expected_output: "SGVsbG8="
+    - input: "Man"
+      expected_output: "TWFu"
+  constraints: ["Standard Base64 alphabet", "Padding with = as required"]
+
+- id: "MED-060"
+  title: "Base64 Decoder"
+  description: "Decodes a Base64-encoded string from stdin"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Base64-encoded string on stdin"
+  output_format: "Decoded text"
+  test_cases:
+    - input: "SGVsbG8="
+      expected_output: "Hello"
+    - input: "TWFu"
+      expected_output: "Man"
+  constraints: ["Standard Base64 alphabet", "Handle padding"]
+
+- id: "MED-061"
+  title: "URL Encoder"
+  description: "Percent-encodes a URL string for safe HTTP transmission"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "URL or text on stdin"
+  output_format: "Percent-encoded string"
+  test_cases:
+    - input: "hello world"
+      expected_output: "hello%20world"
+    - input: "foo=bar&baz=1"
+      expected_output: "foo%3Dbar%26baz%3D1"
+  constraints: ["Encode all characters except A-Z a-z 0-9 - _ . ~"]
+
+- id: "MED-062"
+  title: "URL Decoder"
+  description: "Decodes percent-encoded URL strings"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Percent-encoded string on stdin"
+  output_format: "Decoded string"
+  test_cases:
+    - input: "hello%20world"
+      expected_output: "hello world"
+    - input: "foo%3Dbar%26baz%3D1"
+      expected_output: "foo=bar&baz=1"
+  constraints: ["Handle uppercase and lowercase hex digits", "Pass-through non-encoded characters"]
+
+- id: "MED-063"
+  title: "Markdown List Normaliser"
+  description: "Normalises unordered Markdown list markers to a consistent style"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: target marker ('- ', '* ', or '+ '). Remaining: Markdown text"
+  output_format: "Markdown with all list item markers replaced by target"
+  test_cases:
+    - input: "- \n* item A\n+ item B"
+      expected_output: "- \n- item A\n- item B"
+    - input: "* \n* one\n* two"
+      expected_output: "* \n* one\n* two"
+  constraints: ["Handles -, *, + markers", "Preserves indentation level"]
+
+- id: "MED-064"
+  title: "Ordered List Renumberer"
+  description: "Renumbers an ordered Markdown list so numbers are sequential"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown ordered list on stdin"
+  output_format: "List renumbered 1, 2, 3..."
+  test_cases:
+    - input: "3. First\n1. Second\n7. Third"
+      expected_output: "1. First\n2. Second\n3. Third"
+    - input: "1. A\n1. B"
+      expected_output: "1. A\n2. B"
+  constraints: ["Preserve list item text", "Reset numbering at blank lines"]
+
+- id: "MED-065"
+  title: "Blockquote Formatter"
+  description: "Wraps text in Markdown blockquote syntax"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Each line prefixed with '> '"
+  test_cases:
+    - input: "Hello\nWorld"
+      expected_output: "> Hello\n> World"
+    - input: "Single line"
+      expected_output: "> Single line"
+  constraints: ["Empty lines become '> '", "No double-quoting if already quoted"]
+
+- id: "MED-066"
+  title: "Comment Stripper"
+  description: "Strips single-line and block comments from source code"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: language ('c', 'python', 'html'). Remaining: source code"
+  output_format: "Source code with comments removed"
+  test_cases:
+    - input: "python\nx = 1  # comment\ny = 2"
+      expected_output: "x = 1\ny = 2"
+    - input: "c\nint x; /* note */ int y;"
+      expected_output: "int x;  int y;"
+  constraints: ["C: // and /* */ comments", "Python: # comments", "HTML: <!-- --> comments"]
+
+- id: "MED-067"
+  title: "String Interpolation Detector"
+  description: "Finds all template variables in a string and lists them"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Template string on stdin with {{var}} or ${var} placeholders"
+  output_format: "One variable name per line, deduplicated, sorted alphabetically"
+  test_cases:
+    - input: "Hello {{name}}, your {{role}} is active."
+      expected_output: "name\nrole"
+    - input: "${foo} and ${bar} and ${foo}"
+      expected_output: "bar\nfoo"
+  constraints: ["Support both {{var}} and ${var} styles", "Dedup, sort alphabetically"]
+
+- id: "MED-068"
+  title: "Homoglyph Detector"
+  description: "Detects characters that look like ASCII but are Unicode lookalikes"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Lines of 'U+XXXX <char> looks like <ascii_char> at position N'"
+  test_cases:
+    - input: "Hеllo"
+      expected_output: "U+0435 е looks like e at position 1"
+    - input: "Hello"
+      expected_output: ""
+  constraints: ["Check Cyrillic, Greek lookalikes for a-z A-Z 0-9", "Position is 0-indexed"]
+
+- id: "MED-069"
+  title: "Text Summariser (Extractive)"
+  description: "Returns the top N sentences by TF-IDF-like scoring as a summary"
+  difficulty: 5
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: integer N (number of sentences). Remaining: text"
+  output_format: "Top N sentences in original document order"
+  test_cases:
+    - input: "3\nThe cat sat on the mat. The dog barked loudly. The cat ran away. The dog was happy."
+      expected_output: "The cat sat on the mat.\nThe cat ran away.\nThe dog was happy."
+    - input: "1\nOnly one sentence."
+      expected_output: "Only one sentence."
+  constraints: ["Score by word frequency", "Return in document order not score order"]
+
+- id: "MED-070"
+  title: "Passive Voice Detector"
+  description: "Detects sentences that use passive voice construction"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Lines of 'Line N: <sentence>' for each passive voice sentence found"
+  test_cases:
+    - input: "The ball was kicked by John.\nShe ran fast."
+      expected_output: "Line 1: The ball was kicked by John."
+    - input: "Mistakes were made."
+      expected_output: "Line 1: Mistakes were made."
+  constraints: ["Detect 'was/were/been/is/are + past participle' pattern", "False positives acceptable"]
+
+- id: "MED-071"
+  title: "Markdown Strikethrough Processor"
+  description: "Converts ~~text~~ Markdown strikethrough to HTML <del> tags"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Text with ~~..~~ converted to <del>...</del>"
+  test_cases:
+    - input: "This is ~~deleted~~ text."
+      expected_output: "This is <del>deleted</del> text."
+    - input: "No strikethrough here."
+      expected_output: "No strikethrough here."
+  constraints: ["Only ~~ double tilde", "Handle multiple on same line"]
+
+- id: "MED-072"
+  title: "Definition List Parser"
+  description: "Parses a definition list (term: definition) and formats as HTML <dl>"
+  difficulty: 2
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "Lines of 'term: definition' on stdin"
+  output_format: "HTML <dl> with <dt> and <dd> elements"
+  test_cases:
+    - input: "Cat: A furry animal\nDog: A loyal pet"
+      expected_output: "<dl>\n  <dt>Cat</dt>\n  <dd>A furry animal</dd>\n  <dt>Dog</dt>\n  <dd>A loyal pet</dd>\n</dl>"
+    - input: "X: Y"
+      expected_output: "<dl>\n  <dt>X</dt>\n  <dd>Y</dd>\n</dl>"
+  constraints: ["Split on first colon only", "Trim whitespace from term and definition"]
+
+- id: "MED-073"
+  title: "Breadcrumb Generator"
+  description: "Generates an HTML breadcrumb trail from a URL path"
+  difficulty: 2
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "URL path on stdin (e.g. /blog/2024/post-title)"
+  output_format: "HTML breadcrumb as <nav> with <a> links"
+  test_cases:
+    - input: "/blog/2024/post-title"
+      expected_output: "<nav><a href=\"/\">Home</a> / <a href=\"/blog\">blog</a> / <a href=\"/blog/2024\">2024</a> / post-title</nav>"
+    - input: "/about"
+      expected_output: "<nav><a href=\"/\">Home</a> / about</nav>"
+  constraints: ["Last segment not linked", "Each intermediate segment linked"]
+
+- id: "MED-074"
+  title: "Keyword Density Analyser"
+  description: "Calculates keyword density percentage for given keywords in text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: comma-separated keywords. Remaining lines: text"
+  output_format: "Lines of 'keyword: N%' sorted by density descending"
+  test_cases:
+    - input: "cat,dog\nthe cat sat next to the cat and dog"
+      expected_output: "cat: 25.0%\ndog: 12.5%"
+    - input: "foo\nfoo foo foo bar"
+      expected_output: "foo: 75.0%"
+  constraints: ["Density = keyword_count / total_words * 100", "Case-insensitive", "Round to 1 decimal"]
+
+- id: "MED-075"
+  title: "HTML Attribute Extractor"
+  description: "Extracts all attributes from a specific HTML tag"
+  difficulty: 3
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "First line: tag name. Remaining: HTML"
+  output_format: "For each matching tag, one line per attribute as 'attr=value'"
+  test_cases:
+    - input: "a\n<a href=\"/go\" class=\"btn\">Click</a>"
+      expected_output: "href=/go\nclass=btn"
+    - input: "img\n<img src=\"x.png\" alt=\"\" width=\"100\">"
+      expected_output: "src=x.png\nalt=\nwidth=100"
+  constraints: ["One tag's attributes per group", "Preserve attribute order"]
+
+- id: "MED-076"
+  title: "Text Rot13 Cipher"
+  description: "Applies ROT13 substitution cipher to text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "ROT13-encoded/decoded text"
+  test_cases:
+    - input: "Hello World"
+      expected_output: "Uryyb Jbeyq"
+    - input: "Uryyb Jbeyq"
+      expected_output: "Hello World"
+  constraints: ["Letters only rotated", "Case preserved"]
+
+- id: "MED-077"
+  title: "Caesar Cipher"
+  description: "Applies a Caesar shift cipher to text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: integer shift (can be negative). Remaining: text"
+  output_format: "Shifted text"
+  test_cases:
+    - input: "3\nABC"
+      expected_output: "DEF"
+    - input: "-3\nDEF"
+      expected_output: "ABC"
+  constraints: ["Wrap around Z->A", "Non-letters unchanged", "Case preserved"]
+
+- id: "MED-078"
+  title: "Markdown Emphasis Remover"
+  description: "Removes all bold and italic emphasis from Markdown, keeping text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Text with all ***, **, *, ___, __, _ markers removed"
+  test_cases:
+    - input: "**bold** and *italic* and ***both***"
+      expected_output: "bold and italic and both"
+    - input: "plain text"
+      expected_output: "plain text"
+  constraints: ["Handle triple, double, single markers", "Preserve inner text"]
+
+- id: "MED-079"
+  title: "HTML Minifier"
+  description: "Removes unnecessary whitespace from HTML while preserving semantics"
+  difficulty: 3
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML on stdin"
+  output_format: "Minified HTML with collapsed whitespace between tags"
+  test_cases:
+    - input: "<p>  Hello   World  </p>"
+      expected_output: "<p>Hello World</p>"
+    - input: "<ul>\n  <li>A</li>\n  <li>B</li>\n</ul>"
+      expected_output: "<ul><li>A</li><li>B</li></ul>"
+  constraints: ["Collapse whitespace nodes between tags", "Preserve whitespace in <pre> and <script>"]
+
+- id: "MED-080"
+  title: "Markdown Emoji Shortcode Expander"
+  description: "Expands :shortcode: emoji shortcodes to Unicode emoji characters"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with :shortcode: patterns on stdin"
+  output_format: "Text with shortcodes replaced by Unicode emoji"
+  test_cases:
+    - input: "Hello :smile: world :thumbsup:"
+      expected_output: "Hello 😄 world 👍"
+    - input: "No emoji here"
+      expected_output: "No emoji here"
+  constraints: ["Support at least: smile, thumbsup, heart, star, fire, check, x, wave, rocket, tada"]
+
+- id: "MED-081"
+  title: "Sentence Length Analyser"
+  description: "Reports min, max, and average sentence length in words"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Prose text on stdin"
+  output_format: "Three lines: 'min: N', 'max: N', 'avg: N.N'"
+  test_cases:
+    - input: "Hi. Hello world. One two three four."
+      expected_output: "min: 1\nmax: 4\navg: 2.3"
+    - input: "Just one sentence here with five words."
+      expected_output: "min: 7\nmax: 7\navg: 7.0"
+  constraints: ["avg rounded to 1 decimal", "Sentences split by . ? !"]
+
+- id: "MED-082"
+  title: "Vocabulary Richness Calculator"
+  description: "Calculates type-token ratio (unique words / total words)"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Single line 'ttr: N.NNN' (3 decimal places)"
+  test_cases:
+    - input: "cat cat cat cat"
+      expected_output: "ttr: 0.250"
+    - input: "the quick brown fox"
+      expected_output: "ttr: 1.000"
+  constraints: ["TTR = unique_words / total_words", "Case-insensitive", "Strip punctuation"]
+
+- id: "MED-083"
+  title: "Long Sentence Detector"
+  description: "Flags sentences exceeding a word-count threshold"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: integer threshold. Remaining: text"
+  output_format: "Lines of 'Sentence N (W words): <sentence>' for flagged sentences"
+  test_cases:
+    - input: "5\nShort sentence. This one is much much longer than allowed by the threshold."
+      expected_output: "Sentence 2 (14 words): This one is much much longer than allowed by the threshold."
+    - input: "3\nHi. Bye."
+      expected_output: ""
+  constraints: ["Sentences split by . ? !", "Count by whitespace-delimited words"]
+
+- id: "MED-084"
+  title: "Repeated Word Detector"
+  description: "Detects consecutive repeated words in text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Lines of 'Line N: repeated word \"<word>\"' for each occurrence"
+  test_cases:
+    - input: "the the cat\nfoo bar bar"
+      expected_output: "Line 1: repeated word \"the\"\nLine 2: repeated word \"bar\""
+    - input: "Hello world"
+      expected_output: ""
+  constraints: ["Case-insensitive", "Only immediately consecutive repeats"]
+
+- id: "MED-085"
+  title: "Text Diff Word-Level"
+  description: "Shows word-level diff between two text blocks"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io]
+  input_format: "Two text lines separated by '---'"
+  output_format: "Inline diff with [-removed-] and {+added+} markers"
+  test_cases:
+    - input: "the quick brown fox\n---\nthe slow brown fox"
+      expected_output: "the [-quick-] {+slow+} brown fox"
+    - input: "hello world\n---\nhello world"
+      expected_output: "hello world"
+  constraints: ["Word-level granularity", "Unchanged words have no marker"]
+
+- id: "MED-086"
+  title: "Longest Word Finder"
+  description: "Finds the longest word(s) in a text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "One word per line for all words sharing the maximum length, sorted alphabetically"
+  test_cases:
+    - input: "the hippopotamus sat"
+      expected_output: "hippopotamus"
+    - input: "cat bat rat hat"
+      expected_output: "bat\ncat\nhat\nrat"
+  constraints: ["Strip punctuation from words", "Alphabetical tie-break"]
+
+- id: "MED-087"
+  title: "Acronym Generator"
+  description: "Generates an acronym from a phrase"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "One phrase per line on stdin"
+  output_format: "Uppercase acronym for each phrase"
+  test_cases:
+    - input: "as soon as possible\nGraphics Processing Unit"
+      expected_output: "ASAP\nGPU"
+    - input: "American Standard Code for Information Interchange"
+      expected_output: "ASCII"
+  constraints: ["First letter of each word", "Uppercase output", "Skip words of fewer than 2 chars? No — include all first letters"]
+
+- id: "MED-088"
+  title: "Pig Latin Translator"
+  description: "Translates English words to Pig Latin"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Pig Latin translation"
+  test_cases:
+    - input: "hello world"
+      expected_output: "ellohay orldway"
+    - input: "apple orange"
+      expected_output: "appleway orangeway"
+  constraints: ["Vowel-start words: append 'way'", "Consonant-start words: move consonant cluster to end + 'ay'", "Lowercase output"]
+
+- id: "MED-089"
+  title: "Text Columnar Formatter"
+  description: "Formats a list of items into N evenly distributed columns"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: integer N (columns). Remaining: one item per line"
+  output_format: "Items arranged in N columns, left-aligned, space-separated"
+  test_cases:
+    - input: "3\nalpha\nbeta\ngamma\ndelta\nepsilon"
+      expected_output: "alpha  beta   gamma\ndelta  epsilon"
+    - input: "2\na\nb\nc"
+      expected_output: "a  b\nc"
+  constraints: ["Column width = max item length + 2", "Row-major order"]
+
+- id: "MED-090"
+  title: "Markdown Checklist Parser"
+  description: "Parses Markdown task list checkboxes and reports completion status"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown task list on stdin"
+  output_format: "Summary: 'N/M completed' followed by incomplete item titles"
+  test_cases:
+    - input: "- [x] Done\n- [ ] Not done\n- [x] Also done"
+      expected_output: "2/3 completed\nNot done"
+    - input: "- [x] All done"
+      expected_output: "1/1 completed"
+  constraints: ["Support - [x] and - [ ] syntax", "Only list incomplete items"]
+
+- id: "MED-091"
+  title: "Sentence Complexity Scorer"
+  description: "Scores sentence complexity by counting clauses indicated by commas and conjunctions"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin, one sentence per line"
+  output_format: "Lines of 'sentence N: score M' where M = comma_count + conjunction_count"
+  test_cases:
+    - input: "The cat sat.\nAlthough tired, and hungry, she ran."
+      expected_output: "sentence 1: score 0\nsentence 2: score 3"
+    - input: "He ran and jumped."
+      expected_output: "sentence 1: score 1"
+  constraints: ["Conjunctions: and, but, or, nor, for, yet, so, although, because, if, when", "Case-insensitive"]
+
+- id: "MED-092"
+  title: "Smart Quote Replacer"
+  description: "Replaces straight quotes with typographic curly quotes"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with straight quotes on stdin"
+  output_format: "Text with typographic quotes"
+  test_cases:
+    - input: "He said \"hello\" and 'goodbye'."
+      expected_output: "He said \u201chello\u201d and \u2018goodbye\u2019."
+    - input: "\"test\""
+      expected_output: "\u201ctest\u201d"
+  constraints: ["Opening \" -> U+201C, closing \" -> U+201D", "Opening ' -> U+2018, closing ' -> U+2019"]
+
+- id: "MED-093"
+  title: "Whitespace Normaliser"
+  description: "Normalises various whitespace characters to standard spaces and newlines"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with mixed whitespace on stdin"
+  output_format: "Text with normalised whitespace"
+  test_cases:
+    - input: "hello\t\tworld"
+      expected_output: "hello  world"
+    - input: "a\r\nb"
+      expected_output: "a\nb"
+  constraints: ["Tab to single space", "CRLF to LF", "No-break space to space"]
+
+- id: "MED-094"
+  title: "Phone Number Formatter"
+  description: "Formats phone numbers to a standard international format"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "One phone number string per line (digits and common separators)"
+  output_format: "Formatted as +CC (NXX) NXX-XXXX or original if unparseable"
+  test_cases:
+    - input: "14155551234"
+      expected_output: "+1 (415) 555-1234"
+    - input: "555-1234"
+      expected_output: "555-1234"
+  constraints: ["Support 10 and 11 digit numbers", "Unparseable numbers passed through unchanged"]
+
+- id: "MED-095"
+  title: "Email Address Validator"
+  description: "Validates email addresses using RFC 5322 simplified rules"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "One email address per line"
+  output_format: "Lines of '<email>: VALID' or '<email>: INVALID'"
+  test_cases:
+    - input: "user@example.com\nbadatgmail.com\ntest+tag@sub.domain.org"
+      expected_output: "user@example.com: VALID\nbadatgmail.com: INVALID\ntest+tag@sub.domain.org: VALID"
+    - input: "@nodomain.com"
+      expected_output: "@nodomain.com: INVALID"
+  constraints: ["Require local@domain.tld format", "No spaces allowed"]
+
+- id: "MED-096"
+  title: "ISBN Validator"
+  description: "Validates ISBN-10 and ISBN-13 numbers"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "One ISBN per line (with or without hyphens)"
+  output_format: "Lines of '<isbn>: VALID' or '<isbn>: INVALID'"
+  test_cases:
+    - input: "978-3-16-148410-0\n0-306-40615-2"
+      expected_output: "978-3-16-148410-0: VALID\n0-306-40615-2: VALID"
+    - input: "978-3-16-148410-1"
+      expected_output: "978-3-16-148410-1: INVALID"
+  constraints: ["Strip hyphens before validating", "ISBN-13: mod 10 check", "ISBN-10: mod 11 check"]
+
+- id: "MED-097"
+  title: "Credit Card Number Masker"
+  description: "Masks credit card numbers leaving only last 4 digits visible"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text containing credit card numbers on stdin"
+  output_format: "Text with card numbers masked as XXXX-XXXX-XXXX-1234"
+  test_cases:
+    - input: "Card: 4111-1111-1111-1111"
+      expected_output: "Card: XXXX-XXXX-XXXX-1111"
+    - input: "No card here"
+      expected_output: "No card here"
+  constraints: ["16-digit numbers with optional hyphens or spaces", "Preserve separators"]
+
+- id: "MED-098"
+  title: "Date Format Converter"
+  description: "Converts dates between various formats"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.time]
+  input_format: "First line: target format (ISO, US, EU, LONG). Remaining: one date per line"
+  output_format: "Converted dates"
+  test_cases:
+    - input: "ISO\n01/15/2024\n15.01.2024"
+      expected_output: "2024-01-15\n2024-01-15"
+    - input: "US\n2024-03-25"
+      expected_output: "03/25/2024"
+  constraints: ["ISO=YYYY-MM-DD, US=MM/DD/YYYY, EU=DD.MM.YYYY, LONG=January 15 2024", "Auto-detect input format"]
+
+- id: "MED-099"
+  title: "Number to Words Converter"
+  description: "Converts integers to their English word representation"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "One integer per line (0 to 999,999)"
+  output_format: "English words for each number"
+  test_cases:
+    - input: "42\n1001"
+      expected_output: "forty-two\none thousand and one"
+    - input: "0\n100"
+      expected_output: "zero\none hundred"
+  constraints: ["Support 0-999999", "Use 'and' before tens in hundreds", "Hyphenate tens-units (twenty-one)"]
+
+- id: "MED-100"
+  title: "Markdown Metadata Stripper"
+  description: "Strips YAML front matter from Markdown and returns only the body"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown file with optional --- front matter on stdin"
+  output_format: "Markdown body without front matter"
+  test_cases:
+    - input: "---\ntitle: Test\n---\n# Body"
+      expected_output: "# Body"
+    - input: "# No front matter"
+      expected_output: "# No front matter"
+  constraints: ["Front matter delimited by --- on own line", "Trim leading blank line after front matter"]
+
+- id: "MED-101"
+  title: "CSV to JSON Converter"
+  description: "Converts a CSV file to a JSON array of objects"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "CSV with header row on stdin"
+  output_format: "JSON array of objects keyed by header fields"
+  test_cases:
+    - input: "name,age\nAlice,30\nBob,25"
+      expected_output: "[{\"name\":\"Alice\",\"age\":\"30\"},{\"name\":\"Bob\",\"age\":\"25\"}]"
+    - input: "x,y\n1,2"
+      expected_output: "[{\"x\":\"1\",\"y\":\"2\"}]"
+  constraints: ["All values as strings", "No type inference", "Compact JSON output"]
+
+- id: "MED-102"
+  title: "JSON to CSV Converter"
+  description: "Converts a JSON array of objects to CSV"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "JSON array of objects on stdin"
+  output_format: "CSV with header row derived from first object's keys"
+  test_cases:
+    - input: "[{\"name\":\"Alice\",\"age\":\"30\"},{\"name\":\"Bob\",\"age\":\"25\"}]"
+      expected_output: "name,age\nAlice,30\nBob,25"
+    - input: "[{\"x\":\"1\",\"y\":\"2\"}]"
+      expected_output: "x,y\n1,2"
+  constraints: ["Header order from first object", "Quote values containing commas", "All values as strings"]
+
+- id: "MED-103"
+  title: "Markdown Horizontal Rule Normaliser"
+  description: "Normalises all horizontal rule variants to a single style"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: target style ('---', '***', or '___'). Remaining: Markdown"
+  output_format: "Markdown with all HR variants replaced by target"
+  test_cases:
+    - input: "---\ntext\n***\n___"
+      expected_output: "---\ntext\n---\n---"
+    - input: "***\nsome text\n---"
+      expected_output: "***\nsome text\n***"
+  constraints: ["Detect ---, ***, ___, - - -, * * *, _ _ _", "Exact line match only"]
+
+- id: "MED-104"
+  title: "Markdown Image Extractor"
+  description: "Extracts all image references from Markdown"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "Lines of 'alt | src | title' for each image"
+  test_cases:
+    - input: "![Logo](logo.png \"Site Logo\")\n![](blank.png)"
+      expected_output: "Logo | logo.png | Site Logo\n | blank.png | "
+    - input: "No images"
+      expected_output: ""
+  constraints: ["Support optional title in quotes", "Empty alt string if omitted"]
+
+- id: "MED-105"
+  title: "Text Reverser"
+  description: "Reverses each line of text character by character"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Lines of text on stdin"
+  output_format: "Each line reversed"
+  test_cases:
+    - input: "Hello\nWorld"
+      expected_output: "olleH\ndlroW"
+    - input: "abcde"
+      expected_output: "edcba"
+  constraints: ["Line-by-line reversal", "Unicode-safe (codepoint reversal)"]
+
+- id: "MED-106"
+  title: "Quote Extractor"
+  description: "Extracts all quoted strings from text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "One quoted string per line without the quote characters"
+  test_cases:
+    - input: "She said \"hello\" and \"goodbye\"."
+      expected_output: "hello\ngoodbye"
+    - input: "No quotes here"
+      expected_output: ""
+  constraints: ["Double quotes only", "Non-greedy matching", "Preserve inner content verbatim"]
+
+- id: "MED-107"
+  title: "Paragraph Splitter"
+  description: "Splits text into paragraphs on blank line boundaries"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with blank line paragraph breaks on stdin"
+  output_format: "Paragraphs separated by '=== PARA N ===' headers"
+  test_cases:
+    - input: "Para one.\n\nPara two."
+      expected_output: "=== PARA 1 ===\nPara one.\n=== PARA 2 ===\nPara two."
+    - input: "Single paragraph."
+      expected_output: "=== PARA 1 ===\nSingle paragraph."
+  constraints: ["Consecutive blank lines count as one separator", "Number from 1"]
+
+- id: "MED-108"
+  title: "List Item Counter"
+  description: "Counts items in Markdown unordered and ordered lists"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text with lists on stdin"
+  output_format: "Lines of 'unordered: N' and 'ordered: N'"
+  test_cases:
+    - input: "- a\n- b\n1. x\n2. y\n3. z"
+      expected_output: "unordered: 2\nordered: 3"
+    - input: "No lists"
+      expected_output: "unordered: 0\nordered: 0"
+  constraints: ["Count top-level items only", "-, * and + are unordered markers"]
+
+- id: "MED-109"
+  title: "Text Sanitiser"
+  description: "Removes control characters and normalises line endings in text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text with potential control characters on stdin"
+  output_format: "Sanitised text with control chars removed, CRLF normalised to LF"
+  test_cases:
+    - input: "Hello\x00World\r\n"
+      expected_output: "HelloWorld\n"
+    - input: "Normal text\n"
+      expected_output: "Normal text\n"
+  constraints: ["Remove chars U+0000-U+001F except U+0009 tab, U+000A LF", "CRLF to LF", "Preserve tab and LF"]
+
+- id: "MED-110"
+  title: "Word Context Finder"
+  description: "Finds a word in text and returns N words of context around each occurrence"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: 'word N' (word to find and context window). Remaining: text"
+  output_format: "Lines showing context around each match: '...context [WORD] context...'"
+  test_cases:
+    - input: "cat 2\nthe cat sat on the cat"
+      expected_output: "...the [cat] sat...\n...the [cat] <END>"
+    - input: "hello 1\nhi hello world"
+      expected_output: "...hi [hello] world..."
+  constraints: ["Case-insensitive search", "N words each side", "Use <START> and <END> at boundaries"]
+
+- id: "MED-111"
+  title: "Unique Word Counter"
+  description: "Counts the number of unique words in a text"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Text on stdin"
+  output_format: "Single line 'unique_words: N'"
+  test_cases:
+    - input: "the cat sat on the mat"
+      expected_output: "unique_words: 5"
+    - input: "one"
+      expected_output: "unique_words: 1"
+  constraints: ["Case-insensitive", "Strip punctuation"]
+
+- id: "MED-112"
+  title: "Tokeniser"
+  description: "Tokenises text into words, numbers, punctuation, and whitespace tokens"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "One token per line as 'TYPE: value'"
+  test_cases:
+    - input: "Hello, 42!"
+      expected_output: "WORD: Hello\nPUNCT: ,\nSPACE:  \nNUM: 42\nPUNCT: !"
+    - input: "foo bar"
+      expected_output: "WORD: foo\nSPACE:  \nWORD: bar"
+  constraints: ["Token types: WORD, NUM, PUNCT, SPACE, NEWLINE", "Every character accounted for"]
+
+- id: "MED-113"
+  title: "Markdown Superscript Processor"
+  description: "Converts ^text^ superscript notation to HTML <sup> tags"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text with ^text^ notation on stdin"
+  output_format: "Text with ^..^ converted to <sup>...</sup>"
+  test_cases:
+    - input: "E = mc^2^"
+      expected_output: "E = mc<sup>2</sup>"
+    - input: "No superscript"
+      expected_output: "No superscript"
+  constraints: ["Single carets only", "Handle multiple on one line"]
+
+- id: "MED-114"
+  title: "Text Compressor (Run-Length Encoding)"
+  description: "Compresses text using run-length encoding"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Run-length encoded string (e.g. 'aaabbc' -> '3a2b1c')"
+  test_cases:
+    - input: "aaabbc"
+      expected_output: "3a2b1c"
+    - input: "AABBAAB"
+      expected_output: "2A2B2A1B"
+  constraints: ["Count consecutive identical characters", "Output count followed by char"]
+
+- id: "MED-115"
+  title: "Text Decompressor (Run-Length Decoding)"
+  description: "Decompresses run-length encoded text"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Run-length encoded string on stdin"
+  output_format: "Decoded original text"
+  test_cases:
+    - input: "3a2b1c"
+      expected_output: "aaabbc"
+    - input: "2A2B2A1B"
+      expected_output: "AABBAAB"
+  constraints: ["Digits immediately before char are the count", "Multi-digit counts supported"]
+
+- id: "MED-116"
+  title: "Sentence Boundary Annotator"
+  description: "Annotates text with sentence boundary markers"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Prose text on stdin"
+  output_format: "Text with <S> at start and </S> at end of each sentence"
+  test_cases:
+    - input: "Hello world. Goodbye."
+      expected_output: "<S>Hello world.</S> <S>Goodbye.</S>"
+    - input: "One sentence"
+      expected_output: "<S>One sentence</S>"
+  constraints: ["No trailing space after last sentence", "Handle ., ?, ! terminators"]
+
+- id: "MED-117"
+  title: "Word Wrap HTML to Text"
+  description: "Converts HTML email bodies to wrapped plain text"
+  difficulty: 3
+  stdlib_modules: [std.str, std.html, std.io]
+  input_format: "HTML email body on stdin"
+  output_format: "Plain text with 72-char line wrapping"
+  test_cases:
+    - input: "<p>This is a test email with some content that should be wrapped at 72 characters total.</p>"
+      expected_output: "This is a test email with some content that should be wrapped at 72\ncharacters total."
+    - input: "<p>Short.</p>"
+      expected_output: "Short."
+  constraints: ["72-char word-wrap", "Block elements get blank line spacing", "Links: text (url)"]
+
+- id: "MED-118"
+  title: "ICS Calendar Parser"
+  description: "Parses an iCalendar .ics file and lists events"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.time]
+  input_format: "iCalendar format on stdin"
+  output_format: "Lines of 'YYYY-MM-DD HH:MM | <SUMMARY>' sorted by date"
+  test_cases:
+    - input: "BEGIN:VCALENDAR\nBEGIN:VEVENT\nDTSTART:20240101T090000Z\nSUMMARY:New Year Meeting\nEND:VEVENT\nEND:VCALENDAR"
+      expected_output: "2024-01-01 09:00 | New Year Meeting"
+    - input: "BEGIN:VCALENDAR\nEND:VCALENDAR"
+      expected_output: ""
+  constraints: ["Parse DTSTART in YYYYMMDDTHHMMSSZ format", "Sort ascending by date"]
+
+- id: "MED-119"
+  title: "Plain Text to Markdown"
+  description: "Detects structure in plain text and adds basic Markdown formatting"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io]
+  input_format: "Plain text on stdin"
+  output_format: "Markdown with detected headers, lists, and paragraphs"
+  test_cases:
+    - input: "INTRODUCTION\n\nThis is a paragraph.\n\n- item one\n- item two"
+      expected_output: "# INTRODUCTION\n\nThis is a paragraph.\n\n- item one\n- item two"
+    - input: "Normal paragraph."
+      expected_output: "Normal paragraph."
+  constraints: ["ALL CAPS lines become H1", "Lines starting with - stay as list", "Other blocks become paragraphs"]
+
+- id: "MED-120"
+  title: "Abbreviation Expander"
+  description: "Expands common abbreviations to their full forms"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First line: JSON object mapping abbreviations to expansions. Remaining: text"
+  output_format: "Text with abbreviations replaced by full forms"
+  test_cases:
+    - input: "{\"etc\":\"et cetera\",\"eg\":\"for example\"}\nDo this, etc. Also, eg, try that."
+      expected_output: "Do this, et cetera. Also, for example, try that."
+    - input: "{\"asap\":\"as soon as possible\"}\nPlease reply asap."
+      expected_output: "Please reply as soon as possible."
+  constraints: ["Case-insensitive matching", "Whole-word matching only", "Preserve capitalisation of replacement based on original"]
+
+- id: "MED-121"
+  title: "Readability Level Classifier"
+  description: "Classifies text reading level based on Flesch-Kincaid grade"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Single line with grade level: 'grade: N' and label"
+  test_cases:
+    - input: "See the cat. The cat is fat."
+      expected_output: "grade: 1\nlevel: Elementary"
+    - input: "The utilisation of sophisticated grammatical constructs demonstrates significant intellectual proficiency."
+      expected_output: "grade: 16\nlevel: College Graduate"
+  constraints: ["FK Grade = 0.39*(words/sentences) + 11.8*(syllables/words) - 15.59", "Levels: Elementary(1-5), Middle(6-8), High School(9-12), College(13-15), College Graduate(16+)"]
+
+- id: "MED-122"
+  title: "Content Similarity Scorer"
+  description: "Computes Jaccard similarity between two text documents"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "Two documents separated by a line containing '---'"
+  output_format: "Single line 'similarity: N.NNN'"
+  test_cases:
+    - input: "cat dog bird\n---\ncat dog fish"
+      expected_output: "similarity: 0.500"
+    - input: "hello world\n---\nhello world"
+      expected_output: "similarity: 1.000"
+  constraints: ["Jaccard = |intersection| / |union| of word sets", "Case-insensitive", "3 decimal places"]
+
+- id: "MED-123"
+  title: "Unicode Category Counter"
+  description: "Counts characters by Unicode general category"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Text on stdin"
+  output_format: "Lines of 'Category: N' sorted by count descending"
+  test_cases:
+    - input: "Hello, World! 123"
+      expected_output: "Letter: 10\nDecimalDigit: 3\nSpace: 2\nPunctuation: 2"
+    - input: "abc"
+      expected_output: "Letter: 3"
+  constraints: ["Categories: Letter, DecimalDigit, Space, Punctuation, Symbol, Other", "Skip zero-count categories"]
+
+- id: "MED-124"
+  title: "Markdown Reference Link Resolver"
+  description: "Converts Markdown reference-style links to inline links"
+  difficulty: 3
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown with reference-style links on stdin"
+  output_format: "Markdown with all references converted to inline [text](url)"
+  test_cases:
+    - input: "[Google][1]\n\n[1]: https://google.com"
+      expected_output: "[Google](https://google.com)"
+    - input: "See [this][ref].\n\n[ref]: /page \"Title\""
+      expected_output: "See [this](/page \"Title\")."
+  constraints: ["Remove reference definitions from output", "Preserve link titles if present"]
+
+- id: "MED-125"
+  title: "Content Warning Detector"
+  description: "Scans text for a configurable list of flagged words and reports matches"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io, std.collections]
+  input_format: "First line: comma-separated flagged words. Remaining: text"
+  output_format: "Lines of 'Line N, col M: <word>' for each match, or 'CLEAN' if none"
+  test_cases:
+    - input: "spam,fraud\nThis is spam and fraud.\nNormal line."
+      expected_output: "Line 1, col 9: spam\nLine 1, col 18: fraud"
+    - input: "spam\nClean text here."
+      expected_output: "CLEAN"
+  constraints: ["Case-insensitive", "Whole-word matching", "Column is 1-indexed"]
+
+- id: "MED-126"
+  title: "Markdown Bold Extractor"
+  description: "Extracts all bold text spans from Markdown"
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text on stdin"
+  output_format: "One bold phrase per line without markers"
+  test_cases:
+    - input: "This is **bold** and **very bold** text."
+      expected_output: "bold\nvery bold"
+    - input: "No bold here"
+      expected_output: ""
+  constraints: ["** delimiters only", "Each span on its own line"]
+
+- id: "MED-127"
+  title: "Template Validator"
+  description: "Validates that all {{var}} placeholders in a template have corresponding values"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "First block: template. '---' separator. Second block: KEY=VALUE pairs"
+  output_format: "'VALID' or lines of 'MISSING: varname' for unresolved placeholders"
+  test_cases:
+    - input: "Hello {{name}} from {{place}}.\n---\nname=Alice\nplace=Earth"
+      expected_output: "VALID"
+    - input: "Hello {{name}} from {{place}}.\n---\nname=Alice"
+      expected_output: "MISSING: place"
+  constraints: ["Report all missing variables", "Extra values are not errors"]
+
+- id: "MED-128"
+  title: "XML to JSON Converter"
+  description: "Converts simple XML documents to JSON"
+  difficulty: 4
+  stdlib_modules: [std.str, std.io, std.json]
+  input_format: "Simple XML on stdin (no namespaces, no attributes)"
+  output_format: "JSON representation of XML hierarchy"
+  test_cases:
+    - input: "<root><name>Alice</name><age>30</age></root>"
+      expected_output: "{\"root\":{\"name\":\"Alice\",\"age\":\"30\"}}"
+    - input: "<items><item>A</item><item>B</item></items>"
+      expected_output: "{\"items\":{\"item\":[\"A\",\"B\"]}}"
+  constraints: ["No attribute support", "Repeated tags become arrays", "Text content as string"]
+
+- id: "MED-129"
+  title: "Markdown Admonition Formatter"
+  description: "Converts NOTE/WARNING/TIP prefixed paragraphs to styled admonition blocks"
+  difficulty: 2
+  stdlib_modules: [std.str, std.io]
+  input_format: "Markdown text where paragraphs start with 'NOTE:', 'WARNING:', or 'TIP:'"
+  output_format: "Markdown with admonitions wrapped in fenced blocks with type label"
+  test_cases:
+    - input: "NOTE: This is important."
+      expected_output: "```note\nThis is important.\n```"
+    - input: "WARNING: Be careful here."
+      expected_output: "```warning\nBe careful here.\n```"
+  constraints: ["Supported prefixes: NOTE, WARNING, TIP, INFO", "Lowercase fence type"]
+
+- id: "MED-130"
+  title: "Full Markdown to HTML Renderer"
+  description: "Renders a Markdown document to a complete HTML5 page"
+  difficulty: 5
+  stdlib_modules: [std.str, std.html, std.md, std.io]
+  input_format: "Markdown document on stdin"
+  output_format: "Complete HTML5 document with <html>, <head>, <body> structure"
+  test_cases:
+    - input: "# Hello\n\nThis is **bold** text.\n\n- item one\n- item two"
+      expected_output: "<!DOCTYPE html>\n<html>\n<head><meta charset=\"utf-8\"></head>\n<body>\n<h1>Hello</h1>\n<p>This is <strong>bold</strong> text.</p>\n<ul>\n<li>item one</li>\n<li>item two</li>\n</ul>\n</body>\n</html>"
+    - input: "## Subheading\n\n> A quote"
+      expected_output: "<!DOCTYPE html>\n<html>\n<head><meta charset=\"utf-8\"></head>\n<body>\n<h2>Subheading</h2>\n<blockquote><p>A quote</p></blockquote>\n</body>\n</html>"
+  constraints: ["Support h1-h6, p, strong, em, ul, ol, li, blockquote, code, pre, hr", "Valid HTML5"]

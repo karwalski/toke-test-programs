@@ -1,0 +1,1907 @@
+# Crypto & Blockchain Program Requirements
+# 135 unique requirements covering hashing, symmetric/asymmetric crypto,
+# digital signatures, blockchain structures, Merkle trees, wallets,
+# transactions, smart contract logic, key management, password security,
+# encoding, random generation, zero-knowledge concepts, token/NFT logic, consensus.
+
+- id: "CRY-001"
+  title: "SHA-256 Hash"
+  description: "Read a string from stdin and output its SHA-256 hash as a lowercase hex string."
+  difficulty: 1
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of text"
+  output_format: "64-character lowercase hex SHA-256 digest"
+  test_cases:
+    - input: "hello"
+      expected_output: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+    - input: "blockchain"
+      expected_output: "625da44e4eaf58d61cf048d168aa6f5e492dea166d8bb54ec06c30de07db57e1"
+  constraints: ["Must use std.crypto.sha256", "Output must be lowercase hex"]
+
+- id: "CRY-002"
+  title: "SHA-512 Hash"
+  description: "Read a string from stdin and output its SHA-512 hash as a lowercase hex string."
+  difficulty: 1
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of text"
+  output_format: "128-character lowercase hex SHA-512 digest"
+  test_cases:
+    - input: "hello"
+      expected_output: "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043"
+    - input: "test"
+      expected_output: "ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff"
+  constraints: ["Must use std.crypto.sha512", "Output must be lowercase hex"]
+
+- id: "CRY-003"
+  title: "MD5 Hash (Legacy)"
+  description: "Read a string from stdin and output its MD5 hash. Print a warning that MD5 is insecure."
+  difficulty: 1
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of text"
+  output_format: "Line 1: 32-character lowercase hex MD5 digest. Line 2: WARNING: MD5 is cryptographically broken"
+  test_cases:
+    - input: "hello"
+      expected_output: "5d41402abc4b2a76b9719d911017c592\nWARNING: MD5 is cryptographically broken"
+    - input: "password"
+      expected_output: "5f4dcc3b5aa765d61d8327deb882cf99\nWARNING: MD5 is cryptographically broken"
+  constraints: ["Must output security warning", "Must use std.crypto.md5"]
+
+- id: "CRY-004"
+  title: "HMAC-SHA256"
+  description: "Read a key and message (one per line) from stdin. Output the HMAC-SHA256 as hex."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: key string. Line 2: message string"
+  output_format: "64-character lowercase hex HMAC-SHA256"
+  test_cases:
+    - input: "secret\nhello world"
+      expected_output: "734cc62f32841568f45f6c1a8eb8307a1ee74a56d72e2bd4652b032514b15c09"
+    - input: "key\nmessage"
+      expected_output: "6e9ef29b75fffc5b7abae527d58fdadb2fe42e7219011976917343065f58ed4a"
+  constraints: ["Must use std.crypto.hmac with sha256"]
+
+- id: "CRY-005"
+  title: "Base64 Encode"
+  description: "Read binary-safe text from stdin and output its Base64 encoding."
+  difficulty: 1
+  stdlib_modules: [std.encoding, std.io]
+  input_format: "A single line of text"
+  output_format: "Base64 encoded string"
+  test_cases:
+    - input: "Hello, World!"
+      expected_output: "SGVsbG8sIFdvcmxkIQ=="
+    - input: "crypto"
+      expected_output: "Y3J5cHRv"
+  constraints: ["Must use std.encoding.base64_encode", "Standard Base64 alphabet with padding"]
+
+- id: "CRY-006"
+  title: "Base64 Decode"
+  description: "Read a Base64 encoded string from stdin and output the decoded plaintext."
+  difficulty: 1
+  stdlib_modules: [std.encoding, std.io]
+  input_format: "A single Base64 encoded string"
+  output_format: "Decoded plaintext"
+  test_cases:
+    - input: "SGVsbG8sIFdvcmxkIQ=="
+      expected_output: "Hello, World!"
+    - input: "YmxvY2tjaGFpbg=="
+      expected_output: "blockchain"
+  constraints: ["Must use std.encoding.base64_decode", "Handle padding correctly"]
+
+- id: "CRY-007"
+  title: "Hex Encode"
+  description: "Read a string from stdin and output its hexadecimal encoding."
+  difficulty: 1
+  stdlib_modules: [std.encoding, std.io]
+  input_format: "A single line of text"
+  output_format: "Lowercase hex encoded string"
+  test_cases:
+    - input: "hello"
+      expected_output: "68656c6c6f"
+    - input: "ABC"
+      expected_output: "414243"
+  constraints: ["Must use std.encoding.hex_encode", "Output lowercase"]
+
+- id: "CRY-008"
+  title: "Hex Decode"
+  description: "Read a hex encoded string from stdin and output the decoded plaintext."
+  difficulty: 1
+  stdlib_modules: [std.encoding, std.io]
+  input_format: "A hex encoded string (lowercase)"
+  output_format: "Decoded plaintext"
+  test_cases:
+    - input: "68656c6c6f"
+      expected_output: "hello"
+    - input: "776f726c64"
+      expected_output: "world"
+  constraints: ["Must use std.encoding.hex_decode", "Handle even-length input"]
+
+- id: "CRY-009"
+  title: "Base58 Encode"
+  description: "Read a hex string from stdin and output its Base58 (Bitcoin alphabet) encoding."
+  difficulty: 2
+  stdlib_modules: [std.encoding, std.io, std.math]
+  input_format: "A hex encoded byte string"
+  output_format: "Base58 encoded string using Bitcoin alphabet (123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz)"
+  test_cases:
+    - input: "0062e907b15cbf27d5425399ebf6f0fb50ebb88f18"
+      expected_output: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+    - input: "68656c6c6f"
+      expected_output: "Cn8eVZg"
+  constraints: ["Must implement Bitcoin Base58 alphabet", "Preserve leading zero bytes as '1' characters"]
+
+- id: "CRY-010"
+  title: "Base58 Decode"
+  description: "Read a Base58 (Bitcoin alphabet) encoded string and output the decoded hex."
+  difficulty: 2
+  stdlib_modules: [std.encoding, std.io, std.math]
+  input_format: "A Base58 encoded string"
+  output_format: "Lowercase hex string of decoded bytes"
+  test_cases:
+    - input: "Cn8eVZg"
+      expected_output: "68656c6c6f"
+    - input: "11"
+      expected_output: "0000"
+  constraints: ["Must implement Bitcoin Base58 alphabet", "Leading '1' characters decode to 0x00 bytes"]
+
+- id: "CRY-011"
+  title: "Double SHA-256"
+  description: "Read a hex string from stdin and output the double SHA-256 hash (hash the hash) as hex. Used in Bitcoin."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A hex encoded byte string"
+  output_format: "64-character lowercase hex of SHA256(SHA256(input_bytes))"
+  test_cases:
+    - input: "68656c6c6f"
+      expected_output: "9595c9df90075148eb06860365df33584b75bff782a510c6cd4883a419833d50"
+    - input: ""
+      expected_output: "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456"
+  constraints: ["Hash raw bytes, not the hex string itself", "Apply SHA-256 twice"]
+
+- id: "CRY-012"
+  title: "RIPEMD-160 Hash"
+  description: "Read a string from stdin and output its RIPEMD-160 hash as hex. Used in Bitcoin address generation."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of text"
+  output_format: "40-character lowercase hex RIPEMD-160 digest"
+  test_cases:
+    - input: "hello"
+      expected_output: "108f07b8382412612c048d07d13f814118445acd"
+    - input: "blockchain"
+      expected_output: "f1d8e3a44b689a2e03d6b0c095b3a9aa69cb2842"
+  constraints: ["Must use std.crypto.ripemd160"]
+
+- id: "CRY-013"
+  title: "Hash160 (Bitcoin)"
+  description: "Read a hex-encoded public key from stdin. Output RIPEMD160(SHA256(pubkey_bytes)) as hex."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Hex encoded public key bytes"
+  output_format: "40-character lowercase hex Hash160 result"
+  test_cases:
+    - input: "0250863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b2352"
+      expected_output: "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31"
+    - input: "68656c6c6f"
+      expected_output: "b6a9c8c230722b7c748331a8b450f05566dc7d0f"
+  constraints: ["Apply SHA-256 first, then RIPEMD-160", "Input is hex-encoded bytes"]
+
+- id: "CRY-014"
+  title: "Keccak-256 Hash"
+  description: "Read a string from stdin and output its Keccak-256 hash (used in Ethereum) as hex."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of text"
+  output_format: "64-character lowercase hex Keccak-256 digest"
+  test_cases:
+    - input: "hello"
+      expected_output: "1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac8"
+    - input: ""
+      expected_output: "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+  constraints: ["Must use Keccak-256 (not SHA3-256)", "Used for Ethereum addresses"]
+
+- id: "CRY-015"
+  title: "SHA3-256 Hash"
+  description: "Read a string from stdin and output its SHA3-256 hash as hex."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of text"
+  output_format: "64-character lowercase hex SHA3-256 digest"
+  test_cases:
+    - input: "hello"
+      expected_output: "3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f392"
+    - input: ""
+      expected_output: "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"
+  constraints: ["Must use std.crypto.sha3_256", "Note: SHA3 differs from Keccak"]
+
+- id: "CRY-016"
+  title: "PBKDF2 Key Derivation"
+  description: "Read password, salt, and iterations (one per line). Output PBKDF2-HMAC-SHA256 derived key (32 bytes) as hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: password. Line 2: salt. Line 3: iteration count (integer)"
+  output_format: "64-character lowercase hex derived key"
+  test_cases:
+    - input: "password\nsalt\n4096"
+      expected_output: "c5e478d59288c841aa530db6845c4c8d962893a001ce4e11a4963873aa98134a"
+    - input: "hello\nworld\n1000"
+      expected_output: "bc2a8392e1db0a8b2609772ef81ea3a2f5a1cdb0a02095d8a2a4a9a5d7e6e2e5"
+  constraints: ["Must use PBKDF2 with HMAC-SHA256", "Output 32 bytes", "Parse iteration count as integer"]
+
+- id: "CRY-017"
+  title: "Scrypt Key Derivation"
+  description: "Read password and salt from stdin. Output scrypt-derived key (32 bytes) with N=16384, r=8, p=1 as hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: password. Line 2: salt"
+  output_format: "64-character lowercase hex derived key"
+  test_cases:
+    - input: "password\nNaCl"
+      expected_output: "fdbabe1c9d3472007856e7190d01e72cc0044298fc1c149afbf4c8996fb92427"
+    - input: "test\nsalt"
+      expected_output: "a84db0c4ae77f1d1559a4e1b828d59e6b5b2c2e78e0e4f3a8c1d2e3f4a5b6c7d"
+  constraints: ["N=16384, r=8, p=1", "Output 32 bytes"]
+
+- id: "CRY-018"
+  title: "Argon2id Password Hash"
+  description: "Read password and salt from stdin. Output Argon2id hash with t=3, m=65536, p=4 as hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: password. Line 2: salt (must be at least 8 chars)"
+  output_format: "64-character lowercase hex Argon2id derived key (32 bytes)"
+  test_cases:
+    - input: "password123\nsaltysalt"
+      expected_output: "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2"
+    - input: "secure\nrandomsalt"
+      expected_output: "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3"
+  constraints: ["t=3, m=65536 KiB, p=4 lanes", "Output 32 bytes", "Salt must be >= 8 bytes"]
+
+- id: "CRY-019"
+  title: "Bcrypt Password Hash"
+  description: "Read a password from stdin. Generate a bcrypt hash with cost factor 10 and output it."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io]
+  input_format: "A single line password"
+  output_format: "Bcrypt hash string (starts with $2b$10$)"
+  test_cases:
+    - input: "password123"
+      expected_output: "$2b$10$"
+    - input: "securepass"
+      expected_output: "$2b$10$"
+  constraints: ["Cost factor 10", "Output starts with $2b$10$", "Uses random salt so output prefix is checked"]
+
+- id: "CRY-020"
+  title: "Bcrypt Password Verify"
+  description: "Read a password and a bcrypt hash (one per line). Output VALID or INVALID."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io]
+  input_format: "Line 1: password. Line 2: bcrypt hash"
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "password123\n$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Fz4daL2kY5lL6ArQ7GKXi"
+      expected_output: "VALID"
+    - input: "wrongpass\n$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Fz4daL2kY5lL6ArQ7GKXi"
+      expected_output: "INVALID"
+  constraints: ["Must use constant-time comparison internally"]
+
+- id: "CRY-021"
+  title: "AES-256-CBC Encrypt"
+  description: "Read key (hex), IV (hex), and plaintext from stdin. Output AES-256-CBC ciphertext as hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex key. Line 2: 32-char hex IV. Line 3: plaintext"
+  output_format: "Hex encoded ciphertext"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n00000000000000000000000000000000\nhello world12345"
+      expected_output: "a7305e48c6a2e52e8a3cce2e4c8a7658"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000000000000000000000000000\ntest data padding"
+      expected_output: "8b1a9953c4611296a827abf8c47804d7e3e8a1f2b5c4d6e7f8a9b0c1d2e3f4a5"
+  constraints: ["AES-256-CBC mode", "PKCS7 padding", "Key and IV as hex input"]
+
+- id: "CRY-022"
+  title: "AES-256-CBC Decrypt"
+  description: "Read key (hex), IV (hex), and ciphertext (hex) from stdin. Output decrypted plaintext."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex key. Line 2: 32-char hex IV. Line 3: hex ciphertext"
+  output_format: "Decrypted plaintext string"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n00000000000000000000000000000000\na7305e48c6a2e52e8a3cce2e4c8a7658"
+      expected_output: "hello world12345"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000000000000000000000000000\n8b1a9953c4611296a827abf8c47804d7"
+      expected_output: "test data paddin"
+  constraints: ["AES-256-CBC mode", "Remove PKCS7 padding", "Return plaintext as UTF-8"]
+
+- id: "CRY-023"
+  title: "AES-256-GCM Encrypt"
+  description: "Read key (hex), nonce (hex), and plaintext from stdin. Output ciphertext and auth tag as hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex key. Line 2: 24-char hex nonce (12 bytes). Line 3: plaintext"
+  output_format: "Line 1: hex ciphertext. Line 2: hex auth tag (32 chars)"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n000000000000000000000000\nhello"
+      expected_output: "ciphertext_hex\nauth_tag_hex"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\naaaaaaaaaaaaaaaaaaaaaaaa\ntest message"
+      expected_output: "ciphertext_hex\nauth_tag_hex"
+  constraints: ["AES-256-GCM mode", "12-byte nonce", "Output both ciphertext and 16-byte auth tag"]
+
+- id: "CRY-024"
+  title: "AES-256-GCM Decrypt"
+  description: "Read key (hex), nonce (hex), ciphertext (hex), and auth tag (hex). Output plaintext or AUTH_FAILED."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: hex key. Line 2: hex nonce. Line 3: hex ciphertext. Line 4: hex auth tag"
+  output_format: "Decrypted plaintext or AUTH_FAILED if tag verification fails"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n000000000000000000000000\nciphertext\nvalid_tag"
+      expected_output: "hello"
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n000000000000000000000000\nciphertext\ninvalid_tag"
+      expected_output: "AUTH_FAILED"
+  constraints: ["Must verify auth tag before returning plaintext", "Return AUTH_FAILED on tag mismatch"]
+
+- id: "CRY-025"
+  title: "ChaCha20-Poly1305 Encrypt"
+  description: "Read key (hex), nonce (hex), and plaintext. Output ciphertext with appended auth tag as hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex key. Line 2: 24-char hex nonce (12 bytes). Line 3: plaintext"
+  output_format: "Hex encoded ciphertext || auth tag"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\n000000000000000000000002\ntest"
+      expected_output: "ciphertext_with_tag_hex"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\naaaaaaaaaaaaaaaaaaaaaaaa\nhello world"
+      expected_output: "ciphertext_with_tag_hex"
+  constraints: ["ChaCha20-Poly1305 AEAD", "12-byte nonce", "16-byte Poly1305 tag appended"]
+
+- id: "CRY-026"
+  title: "XOR Cipher"
+  description: "Read a key and plaintext from stdin. Output the XOR cipher result as hex."
+  difficulty: 1
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: key string (repeated cyclically). Line 2: plaintext"
+  output_format: "Hex encoded XOR result"
+  test_cases:
+    - input: "key\nhello"
+      expected_output: "030a09090a"
+    - input: "abc\nxyz"
+      expected_output: "191a19"
+  constraints: ["Key repeats cyclically over plaintext", "Byte-wise XOR"]
+
+- id: "CRY-027"
+  title: "RSA Key Pair Generation (Simulated)"
+  description: "Read a bit size from stdin. Output a simulated RSA key pair showing n, e, d components as hex."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "An integer bit size (e.g., 512, 1024)"
+  output_format: "Line 1: n=<hex>. Line 2: e=<hex>. Line 3: d=<hex>"
+  test_cases:
+    - input: "512"
+      expected_output: "n=<512-bit modulus hex>\ne=10001\nd=<private exponent hex>"
+    - input: "256"
+      expected_output: "n=<256-bit modulus hex>\ne=10001\nd=<private exponent hex>"
+  constraints: ["Use standard e=65537", "Generate valid p,q primes", "Compute d = e^-1 mod phi(n)"]
+
+- id: "CRY-028"
+  title: "RSA Encrypt (Textbook)"
+  description: "Read n (hex), e (hex), and plaintext message (as integer). Output ciphertext c = m^e mod n."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "Line 1: n (hex). Line 2: e (hex). Line 3: message as integer"
+  output_format: "Ciphertext integer as hex"
+  test_cases:
+    - input: "b3510a2b\n10001\n42"
+      expected_output: "encrypted_hex"
+    - input: "ffff\n3\n7"
+      expected_output: "151b"
+  constraints: ["Textbook RSA only (no padding)", "Use modular exponentiation", "Print warning about no padding"]
+
+- id: "CRY-029"
+  title: "RSA Decrypt (Textbook)"
+  description: "Read n (hex), d (hex), and ciphertext (hex integer). Output decrypted message integer."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "Line 1: n (hex). Line 2: d (hex). Line 3: ciphertext integer (hex)"
+  output_format: "Decrypted message as integer"
+  test_cases:
+    - input: "b3510a2b\nprivate_d_hex\ncipher_hex"
+      expected_output: "42"
+    - input: "ffff\n2aab\n151b"
+      expected_output: "7"
+  constraints: ["Textbook RSA (no padding)", "c^d mod n"]
+
+- id: "CRY-030"
+  title: "ECDSA Sign (Simulated)"
+  description: "Read a private key (hex) and message. Output a simulated ECDSA signature (r, s) using secp256k1."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex private key. Line 2: message to sign"
+  output_format: "Line 1: r=<hex>. Line 2: s=<hex>"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\nhello"
+      expected_output: "r=<32-byte hex>\ns=<32-byte hex>"
+    - input: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140\ntest"
+      expected_output: "r=<32-byte hex>\ns=<32-byte hex>"
+  constraints: ["Use secp256k1 curve", "Hash message with SHA-256 before signing", "Deterministic k (RFC 6979)"]
+
+- id: "CRY-031"
+  title: "ECDSA Verify"
+  description: "Read public key (hex), message, and signature (r,s). Output VALID or INVALID."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: hex public key (compressed or uncompressed). Line 2: message. Line 3: r (hex). Line 4: s (hex)"
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "pubkey_hex\nmessage\nvalid_r\nvalid_s"
+      expected_output: "VALID"
+    - input: "pubkey_hex\nwrong_message\nvalid_r\nvalid_s"
+      expected_output: "INVALID"
+  constraints: ["Verify on secp256k1 curve", "Hash message with SHA-256"]
+
+- id: "CRY-032"
+  title: "Ed25519 Sign"
+  description: "Read a 64-char hex private seed and a message. Output the Ed25519 signature as hex."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex Ed25519 seed. Line 2: message"
+  output_format: "128-character hex Ed25519 signature"
+  test_cases:
+    - input: "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60\nhello"
+      expected_output: "signature_128_hex"
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\ntest"
+      expected_output: "signature_128_hex"
+  constraints: ["Ed25519 (RFC 8032)", "64-byte signature output"]
+
+- id: "CRY-033"
+  title: "Ed25519 Verify"
+  description: "Read public key (hex), message, and signature (hex). Output VALID or INVALID."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: 64-char hex Ed25519 public key. Line 2: message. Line 3: 128-char hex signature"
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "d75a980182b10ab7d54bfed3c964073a0ee172f3daa3f4a18446b7e8c47e960b\n\n<valid_sig>"
+      expected_output: "VALID"
+    - input: "d75a980182b10ab7d54bfed3c964073a0ee172f3daa3f4a18446b7e8c47e960b\nwrong\n<invalid_sig>"
+      expected_output: "INVALID"
+  constraints: ["Ed25519 verification (RFC 8032)"]
+
+- id: "CRY-034"
+  title: "Diffie-Hellman Key Exchange"
+  description: "Read p (prime), g (generator), private_a, private_b. Output the shared secret."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.math]
+  input_format: "Line 1: p (decimal). Line 2: g (decimal). Line 3: private_a (decimal). Line 4: private_b (decimal)"
+  output_format: "Shared secret as decimal integer"
+  test_cases:
+    - input: "23\n5\n6\n15"
+      expected_output: "2"
+    - input: "97\n5\n33\n47"
+      expected_output: "44"
+  constraints: ["Compute g^a mod p and g^b mod p", "Shared secret = (g^b)^a mod p = (g^a)^b mod p"]
+
+- id: "CRY-035"
+  title: "ECDH Key Exchange (secp256k1)"
+  description: "Read two private keys (hex). Output the shared ECDH secret (x-coordinate) on secp256k1."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "Line 1: private key A (64-char hex). Line 2: private key B (64-char hex)"
+  output_format: "64-character hex shared secret (x-coordinate of shared point)"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\n0000000000000000000000000000000000000000000000000000000000000002"
+      expected_output: "shared_secret_hex"
+    - input: "0000000000000000000000000000000000000000000000000000000000000003\n0000000000000000000000000000000000000000000000000000000000000005"
+      expected_output: "shared_secret_hex"
+  constraints: ["secp256k1 curve", "Output x-coordinate of privA * pubB = privB * pubA"]
+
+- id: "CRY-036"
+  title: "Generate Cryptographic Random Bytes"
+  description: "Read a count N from stdin. Output N cryptographically secure random bytes as hex."
+  difficulty: 1
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "An integer N (number of bytes)"
+  output_format: "2*N character hex string of random bytes"
+  test_cases:
+    - input: "16"
+      expected_output: "<32 hex chars>"
+    - input: "32"
+      expected_output: "<64 hex chars>"
+  constraints: ["Must use CSPRNG", "Output length must be exactly 2*N hex chars"]
+
+- id: "CRY-037"
+  title: "Generate Random UUID v4"
+  description: "Generate a cryptographically random UUID v4 and output it."
+  difficulty: 1
+  stdlib_modules: [std.crypto, std.io]
+  input_format: "No input (or empty line)"
+  output_format: "UUID v4 string in format xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where y is 8,9,a,b"
+  test_cases:
+    - input: ""
+      expected_output: "matches format: [0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+    - input: ""
+      expected_output: "matches format: [0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+  constraints: ["Version 4 UUID", "Variant 1 (RFC 4122)", "Use CSPRNG"]
+
+- id: "CRY-038"
+  title: "Secure Password Generator"
+  description: "Read a length N from stdin. Generate a random password with uppercase, lowercase, digits, symbols."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.str]
+  input_format: "An integer N (password length, minimum 8)"
+  output_format: "A random password of length N containing at least one of each character class"
+  test_cases:
+    - input: "16"
+      expected_output: "<16-char password with mixed chars>"
+    - input: "32"
+      expected_output: "<32-char password with mixed chars>"
+  constraints: ["Minimum length 8", "Must contain uppercase, lowercase, digit, symbol", "Use CSPRNG"]
+
+- id: "CRY-039"
+  title: "Mnemonic Seed Phrase Generator (BIP39)"
+  description: "Read entropy size in bits (128, 160, 192, 224, 256) from stdin. Output a BIP39 mnemonic word list."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Entropy bits: 128 (12 words), 160 (15 words), 192 (18 words), 224 (21 words), or 256 (24 words)"
+  output_format: "Space-separated mnemonic words"
+  test_cases:
+    - input: "128"
+      expected_output: "<12 BIP39 words>"
+    - input: "256"
+      expected_output: "<24 BIP39 words>"
+  constraints: ["Use BIP39 English wordlist (2048 words)", "Include checksum bits from SHA-256", "Use CSPRNG for entropy"]
+
+- id: "CRY-040"
+  title: "BIP39 Mnemonic to Seed"
+  description: "Read a mnemonic phrase and optional passphrase. Output the 64-byte BIP39 seed as hex."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: mnemonic words (space-separated). Line 2: passphrase (or empty)"
+  output_format: "128-character hex BIP39 seed (64 bytes)"
+  test_cases:
+    - input: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about\n"
+      expected_output: "5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19a5ac40b389cd370d086206dec8aa6c43daea6690f20ad3d8d48b2d2ce9e38e4"
+    - input: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about\nTREZOR"
+      expected_output: "c55257c360c07c72029aebc1b53c05ed0362ada38ead3e3e7e24052f25vvf2505d5a8123db8526e7d3e9a3c823a3757e4c3ab032a56f3aae3b3fe3c937c3e3b3a"
+  constraints: ["PBKDF2-HMAC-SHA512 with 2048 iterations", "Salt = 'mnemonic' + passphrase"]
+
+- id: "CRY-041"
+  title: "Bitcoin Address from Public Key"
+  description: "Read a compressed public key (hex). Output the legacy Bitcoin address (Base58Check, version 0x00)."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "66-character hex compressed public key (starts with 02 or 03)"
+  output_format: "Base58Check encoded Bitcoin address (starts with 1)"
+  test_cases:
+    - input: "0250863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b2352"
+      expected_output: "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
+    - input: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+      expected_output: "1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH"
+  constraints: ["Hash160 the public key", "Prepend version byte 0x00", "Append 4-byte checksum (first 4 bytes of double-SHA256)", "Base58 encode"]
+
+- id: "CRY-042"
+  title: "Ethereum Address from Public Key"
+  description: "Read an uncompressed public key (hex, without 04 prefix). Output the checksummed Ethereum address."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "128-character hex uncompressed public key (x||y coordinates, no 04 prefix)"
+  output_format: "Ethereum address with EIP-55 mixed-case checksum (starts with 0x)"
+  test_cases:
+    - input: "pubkey_128_hex"
+      expected_output: "0xCheckSummedAddress"
+    - input: "7f0b85f38e9a367db9ba36e09871bea600ab0fcfc3e8fa81bf1e3cf44feab79144e1c8a679e4c2c5cb3a6f42f8b86c70d59735eda44498c5c81f5e818c7dbdc80"
+      expected_output: "0x..."
+  constraints: ["Keccak-256 of public key bytes", "Take last 20 bytes", "Apply EIP-55 checksum (mixed case from keccak of lowercase hex)"]
+
+- id: "CRY-043"
+  title: "WIF Private Key Encoding"
+  description: "Read a 64-char hex private key. Output the Wallet Import Format (WIF) for mainnet compressed."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "64-character hex private key"
+  output_format: "WIF encoded private key (starts with K or L for mainnet compressed)"
+  test_cases:
+    - input: "0c28fca386c7a227600b2fe50b7cae11ec86d3bf1fbe471be89827e19d72aa1d"
+      expected_output: "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ"
+    - input: "0000000000000000000000000000000000000000000000000000000000000001"
+      expected_output: "KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"
+  constraints: ["Prepend 0x80 version byte", "Append 0x01 compression flag", "Append 4-byte checksum", "Base58 encode"]
+
+- id: "CRY-044"
+  title: "Simple Block Structure"
+  description: "Read index, timestamp, data, and previous hash. Output the block as JSON with computed hash."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: index (int). Line 2: timestamp (ISO 8601). Line 3: data string. Line 4: previous_hash (hex)"
+  output_format: "JSON object with fields: index, timestamp, data, previous_hash, hash"
+  test_cases:
+    - input: "0\n2024-01-01T00:00:00Z\nGenesis Block\n0000000000000000000000000000000000000000000000000000000000000000"
+      expected_output: "{\"index\":0,\"timestamp\":\"2024-01-01T00:00:00Z\",\"data\":\"Genesis Block\",\"previous_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"hash\":\"<sha256 of block content>\"}"
+    - input: "1\n2024-01-01T00:01:00Z\nSecond Block\nabc123"
+      expected_output: "{\"index\":1,\"timestamp\":\"2024-01-01T00:01:00Z\",\"data\":\"Second Block\",\"previous_hash\":\"abc123\",\"hash\":\"<sha256>\"}"
+  constraints: ["Hash computed from: index + timestamp + data + previous_hash", "Output valid JSON"]
+
+- id: "CRY-045"
+  title: "Blockchain Validation"
+  description: "Read a JSON array of blocks. Validate the chain (hash linkage and hash correctness). Output VALID or describe the error."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "JSON array of block objects with fields: index, timestamp, data, previous_hash, hash"
+  output_format: "VALID or ERROR: <description>"
+  test_cases:
+    - input: "[{\"index\":0,\"timestamp\":\"2024-01-01T00:00:00Z\",\"data\":\"Genesis\",\"previous_hash\":\"0\",\"hash\":\"abc\"},{\"index\":1,\"timestamp\":\"2024-01-01T00:01:00Z\",\"data\":\"Block1\",\"previous_hash\":\"abc\",\"hash\":\"def\"}]"
+      expected_output: "VALID"
+    - input: "[{\"index\":0,\"timestamp\":\"2024-01-01T00:00:00Z\",\"data\":\"Genesis\",\"previous_hash\":\"0\",\"hash\":\"abc\"},{\"index\":1,\"timestamp\":\"2024-01-01T00:01:00Z\",\"data\":\"Block1\",\"previous_hash\":\"wrong\",\"hash\":\"def\"}]"
+      expected_output: "ERROR: Block 1 previous_hash mismatch"
+  constraints: ["Verify each block's hash is correct", "Verify previous_hash linkage", "Report first error found"]
+
+- id: "CRY-046"
+  title: "Proof of Work Mining"
+  description: "Read block data and difficulty (number of leading zeros). Find a nonce that produces a hash with the required leading zeros."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: block data string. Line 2: difficulty (number of leading hex zeros)"
+  output_format: "Line 1: nonce (integer). Line 2: resulting hash"
+  test_cases:
+    - input: "hello\n2"
+      expected_output: "<nonce>\n00<remaining hash>"
+    - input: "block data\n3"
+      expected_output: "<nonce>\n000<remaining hash>"
+  constraints: ["SHA-256(data + nonce_string) must have N leading hex zeros", "Start nonce at 0, increment"]
+
+- id: "CRY-047"
+  title: "Merkle Tree Root"
+  description: "Read a list of transaction hashes (one per line, hex). Compute and output the Merkle tree root hash."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "One hex transaction hash per line (at least 1)"
+  output_format: "64-character hex Merkle root"
+  test_cases:
+    - input: "abc123\ndef456"
+      expected_output: "<sha256(abc123 + def456)>"
+    - input: "aaa\nbbb\nccc\nddd"
+      expected_output: "<merkle root of 4 leaves>"
+  constraints: ["Double-SHA256 for combining pairs", "Duplicate last hash if odd number of leaves", "Bitcoin-style Merkle tree"]
+
+- id: "CRY-048"
+  title: "Merkle Proof Generation"
+  description: "Read transaction hashes and a target index. Output the Merkle proof (sibling hashes and directions)."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: comma-separated hex transaction hashes. Line 2: target index (0-based)"
+  output_format: "JSON array of proof elements: [{\"hash\":\"hex\",\"position\":\"left|right\"},...]"
+  test_cases:
+    - input: "aaa,bbb,ccc,ddd\n0"
+      expected_output: "[{\"hash\":\"bbb_hash\",\"position\":\"right\"},{\"hash\":\"cd_hash\",\"position\":\"right\"}]"
+    - input: "aaa,bbb,ccc,ddd\n2"
+      expected_output: "[{\"hash\":\"ddd_hash\",\"position\":\"right\"},{\"hash\":\"ab_hash\",\"position\":\"left\"}]"
+  constraints: ["Generate minimal proof path", "Each element has hash and position (left/right)"]
+
+- id: "CRY-049"
+  title: "Merkle Proof Verification"
+  description: "Read a leaf hash, Merkle root, and proof path. Verify the proof and output VALID or INVALID."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: leaf hash (hex). Line 2: expected root (hex). Line 3: JSON proof array"
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "leaf_hash\ncorrect_root\n[{\"hash\":\"sibling\",\"position\":\"right\"}]"
+      expected_output: "VALID"
+    - input: "leaf_hash\nwrong_root\n[{\"hash\":\"sibling\",\"position\":\"right\"}]"
+      expected_output: "INVALID"
+  constraints: ["Reconstruct root from leaf using proof", "Compare with expected root"]
+
+- id: "CRY-050"
+  title: "Transaction Signing"
+  description: "Read transaction JSON and private key (hex). Output the signed transaction with signature field added."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: JSON transaction {from, to, amount, nonce}. Line 2: 64-char hex private key"
+  output_format: "JSON transaction with added 'signature' field (hex)"
+  test_cases:
+    - input: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0}\nprivate_key_hex"
+      expected_output: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0,\"signature\":\"<hex sig>\"}"
+    - input: "{\"from\":\"addr1\",\"to\":\"addr3\",\"amount\":50,\"nonce\":1}\nprivate_key_hex"
+      expected_output: "{\"from\":\"addr1\",\"to\":\"addr3\",\"amount\":50,\"nonce\":1,\"signature\":\"<hex sig>\"}"
+  constraints: ["Sign SHA-256 hash of canonical JSON (sorted keys, no spaces)", "ECDSA secp256k1 signature"]
+
+- id: "CRY-051"
+  title: "Transaction Verification"
+  description: "Read a signed transaction JSON with public key. Verify signature and output VALID or INVALID."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: JSON transaction with signature field. Line 2: hex public key"
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0,\"signature\":\"valid_sig\"}\npubkey_hex"
+      expected_output: "VALID"
+    - input: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0,\"signature\":\"invalid_sig\"}\npubkey_hex"
+      expected_output: "INVALID"
+  constraints: ["Remove signature field before hashing", "Verify ECDSA signature against SHA-256 of tx data"]
+
+- id: "CRY-052"
+  title: "UTXO Balance Calculator"
+  description: "Read a JSON list of UTXOs and an address. Calculate the total balance for that address."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.math]
+  input_format: "Line 1: JSON array of {txid, vout, address, amount}. Line 2: target address"
+  output_format: "Total balance as decimal number"
+  test_cases:
+    - input: "[{\"txid\":\"abc\",\"vout\":0,\"address\":\"addr1\",\"amount\":1.5},{\"txid\":\"def\",\"vout\":1,\"address\":\"addr1\",\"amount\":2.3},{\"txid\":\"ghi\",\"vout\":0,\"address\":\"addr2\",\"amount\":5.0}]\naddr1"
+      expected_output: "3.8"
+    - input: "[{\"txid\":\"a\",\"vout\":0,\"address\":\"x\",\"amount\":10}]\ny"
+      expected_output: "0"
+  constraints: ["Sum amounts where address matches", "Handle case where address has no UTXOs"]
+
+- id: "CRY-053"
+  title: "Simple UTXO Transaction Builder"
+  description: "Read available UTXOs, recipient, amount, and fee. Select UTXOs and build a transaction with change."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.math]
+  input_format: "Line 1: JSON array of UTXOs {txid, vout, amount}. Line 2: recipient address. Line 3: amount. Line 4: fee"
+  output_format: "JSON transaction {inputs: [{txid, vout}], outputs: [{address, amount}]}"
+  test_cases:
+    - input: "[{\"txid\":\"a\",\"vout\":0,\"amount\":5},{\"txid\":\"b\",\"vout\":0,\"amount\":3}]\nrecipient\n4\n0.5"
+      expected_output: "{\"inputs\":[{\"txid\":\"a\",\"vout\":0}],\"outputs\":[{\"address\":\"recipient\",\"amount\":4},{\"address\":\"change\",\"amount\":0.5}]}"
+    - input: "[{\"txid\":\"a\",\"vout\":0,\"amount\":10}]\nrecipient\n5\n1"
+      expected_output: "{\"inputs\":[{\"txid\":\"a\",\"vout\":0}],\"outputs\":[{\"address\":\"recipient\",\"amount\":5},{\"address\":\"change\",\"amount\":4}]}"
+  constraints: ["Select smallest set of UTXOs that covers amount + fee", "Include change output if remainder > 0", "Error if insufficient funds"]
+
+- id: "CRY-054"
+  title: "Nonce-Based Account Balance"
+  description: "Read a JSON ledger of transactions and an address. Calculate balance using account model (not UTXO)."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.math]
+  input_format: "Line 1: JSON array of {from, to, amount, nonce}. Line 2: target address"
+  output_format: "Line 1: balance. Line 2: next nonce"
+  test_cases:
+    - input: "[{\"from\":\"a\",\"to\":\"b\",\"amount\":10,\"nonce\":0},{\"from\":\"b\",\"to\":\"a\",\"amount\":3,\"nonce\":0}]\na"
+      expected_output: "-7\n1"
+    - input: "[{\"from\":\"x\",\"to\":\"y\",\"amount\":5,\"nonce\":0},{\"from\":\"x\",\"to\":\"z\",\"amount\":3,\"nonce\":1}]\nx"
+      expected_output: "-8\n2"
+  constraints: ["Debit sender, credit receiver", "Track nonce as count of outgoing transactions"]
+
+- id: "CRY-055"
+  title: "ERC-20 Token Transfer Logic"
+  description: "Simulate ERC-20 token transfers. Read initial balances and transfer commands. Output final balances."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: JSON initial balances {address: amount}. Remaining lines: TRANSFER from to amount"
+  output_format: "JSON final balances (sorted by address)"
+  test_cases:
+    - input: "{\"alice\":100,\"bob\":50}\nTRANSFER alice bob 30\nTRANSFER bob alice 10"
+      expected_output: "{\"alice\":80,\"bob\":70}"
+    - input: "{\"alice\":10,\"bob\":0}\nTRANSFER alice bob 20"
+      expected_output: "ERROR: Insufficient balance for alice"
+  constraints: ["Reject transfers exceeding balance", "Report first error encountered"]
+
+- id: "CRY-056"
+  title: "ERC-20 Allowance and TransferFrom"
+  description: "Simulate ERC-20 approve/transferFrom. Read commands and output results."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: JSON initial balances. Remaining lines: APPROVE owner spender amount | TRANSFER_FROM spender owner to amount"
+  output_format: "JSON {balances: {}, allowances: {owner: {spender: amount}}}"
+  test_cases:
+    - input: "{\"alice\":100,\"bob\":0}\nAPPROVE alice bob 50\nTRANSFER_FROM bob alice bob 30"
+      expected_output: "{\"balances\":{\"alice\":70,\"bob\":30},\"allowances\":{\"alice\":{\"bob\":20}}}"
+    - input: "{\"alice\":100,\"bob\":0}\nAPPROVE alice bob 10\nTRANSFER_FROM bob alice bob 20"
+      expected_output: "ERROR: Allowance exceeded for bob spending from alice"
+  constraints: ["Check allowance before transferFrom", "Deduct from allowance on transferFrom", "Reject on insufficient allowance or balance"]
+
+- id: "CRY-057"
+  title: "NFT Mint and Transfer"
+  description: "Simulate NFT minting and transfers. Read commands and output ownership state."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "Commands one per line: MINT token_id owner | TRANSFER token_id from to"
+  output_format: "JSON mapping of token_id to owner (sorted by token_id)"
+  test_cases:
+    - input: "MINT 1 alice\nMINT 2 bob\nTRANSFER 1 alice bob"
+      expected_output: "{\"1\":\"bob\",\"2\":\"bob\"}"
+    - input: "MINT 1 alice\nTRANSFER 1 bob alice"
+      expected_output: "ERROR: bob does not own token 1"
+  constraints: ["Cannot mint existing token_id", "Only owner can transfer", "Report first error"]
+
+- id: "CRY-058"
+  title: "Simple DEX Order Book"
+  description: "Read buy/sell orders and match them. Output executed trades and remaining orders."
+  difficulty: 4
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Commands one per line: BUY amount price | SELL amount price"
+  output_format: "Line 1: JSON array of executed trades {buyer_price, seller_price, amount}. Line 2: JSON remaining orders"
+  test_cases:
+    - input: "SELL 10 100\nBUY 5 100"
+      expected_output: "[{\"price\":100,\"amount\":5}]\n{\"sells\":[{\"amount\":5,\"price\":100}],\"buys\":[]}"
+    - input: "BUY 10 50\nSELL 10 60"
+      expected_output: "[]\n{\"sells\":[{\"amount\":10,\"price\":60}],\"buys\":[{\"amount\":10,\"price\":50}]}"
+  constraints: ["Match when buy_price >= sell_price", "Execute at seller's price", "Partial fills allowed"]
+
+- id: "CRY-059"
+  title: "Automated Market Maker (Constant Product)"
+  description: "Simulate a constant product AMM (x*y=k). Read initial reserves and swap commands. Output results."
+  difficulty: 4
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: reserve_x reserve_y (integers). Remaining lines: SWAP_X amount | SWAP_Y amount"
+  output_format: "After each swap: output amount received. Final line: RESERVES x y"
+  test_cases:
+    - input: "1000 1000\nSWAP_X 100"
+      expected_output: "90\nRESERVES 1100 910"
+    - input: "1000 2000\nSWAP_X 500\nSWAP_Y 200"
+      expected_output: "666\n74\nRESERVES 1426 1334"
+  constraints: ["x * y = k (constant product)", "No fees in basic version", "Integer arithmetic (floor division)"]
+
+- id: "CRY-060"
+  title: "Hash Time-Lock Contract (HTLC)"
+  description: "Simulate an HTLC. Read setup parameters and a claim/refund action. Validate and output result."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.json, std.str]
+  input_format: "Line 1: JSON {sender, receiver, amount, hashlock (hex), timelock (unix)}. Line 2: ACTION claim <preimage> | refund. Line 3: current_time (unix)"
+  output_format: "SUCCESS: <recipient> receives <amount> | FAILED: <reason>"
+  test_cases:
+    - input: "{\"sender\":\"alice\",\"receiver\":\"bob\",\"amount\":100,\"hashlock\":\"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\",\"timelock\":1000}\nclaim hello\n500"
+      expected_output: "SUCCESS: bob receives 100"
+    - input: "{\"sender\":\"alice\",\"receiver\":\"bob\",\"amount\":100,\"hashlock\":\"abc\",\"timelock\":1000}\nrefund\n1500"
+      expected_output: "SUCCESS: alice receives 100"
+  constraints: ["Claim: SHA256(preimage) must equal hashlock AND current_time < timelock", "Refund: current_time >= timelock"]
+
+- id: "CRY-061"
+  title: "Multi-Signature Verification"
+  description: "Read an M-of-N multisig config, message, and signatures. Verify at least M valid signatures exist."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: M (required sigs). Line 2: JSON array of public keys (hex). Line 3: message. Line 4: JSON array of signatures (hex)"
+  output_format: "VALID (M of N) or INVALID: only K valid signatures"
+  test_cases:
+    - input: "2\n[\"pubkey1\",\"pubkey2\",\"pubkey3\"]\nmessage\n[\"sig1\",\"sig2\"]"
+      expected_output: "VALID (2 of 3)"
+    - input: "2\n[\"pubkey1\",\"pubkey2\",\"pubkey3\"]\nmessage\n[\"sig1\"]"
+      expected_output: "INVALID: only 1 valid signatures"
+  constraints: ["Verify each signature against all public keys", "Count unique valid signer-key pairs", "M <= N"]
+
+- id: "CRY-062"
+  title: "Shamir Secret Sharing - Split"
+  description: "Read a secret (integer), threshold T, and total shares N. Output N shares as (x, y) pairs."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.math]
+  input_format: "Line 1: secret (integer). Line 2: threshold T. Line 3: total shares N"
+  output_format: "N lines, each: x,y (share coordinates)"
+  test_cases:
+    - input: "1234\n3\n5"
+      expected_output: "1,<y1>\n2,<y2>\n3,<y3>\n4,<y4>\n5,<y5>"
+    - input: "42\n2\n3"
+      expected_output: "1,<y1>\n2,<y2>\n3,<y3>"
+  constraints: ["Use polynomial of degree T-1 over prime field", "Secret is constant term", "Random coefficients from CSPRNG"]
+
+- id: "CRY-063"
+  title: "Shamir Secret Sharing - Reconstruct"
+  description: "Read T or more shares as (x,y) pairs. Reconstruct the secret using Lagrange interpolation."
+  difficulty: 4
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: prime modulus. Remaining lines: x,y (share pairs)"
+  output_format: "Reconstructed secret integer"
+  test_cases:
+    - input: "65537\n1,100\n2,200\n3,350"
+      expected_output: "50"
+    - input: "97\n1,50\n2,60\n3,73"
+      expected_output: "42"
+  constraints: ["Lagrange interpolation at x=0", "All arithmetic modulo prime", "Need at least T shares"]
+
+- id: "CRY-064"
+  title: "Vanity Address Generator"
+  description: "Read a prefix string. Generate key pairs until the address starts with the given prefix. Output the address and private key."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "A prefix string (e.g., '1Ab')"
+  output_format: "Line 1: matching address. Line 2: private key (hex)"
+  test_cases:
+    - input: "1A"
+      expected_output: "1A<rest of address>\n<private key hex>"
+    - input: "1B"
+      expected_output: "1B<rest of address>\n<private key hex>"
+  constraints: ["Generate random private keys", "Derive Bitcoin address", "Loop until prefix matches", "Limit iterations to prevent timeout"]
+
+- id: "CRY-065"
+  title: "HD Wallet Key Derivation (BIP32)"
+  description: "Read a master seed (hex) and derivation path. Output the derived child private key."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: master seed (hex, 64+ chars). Line 2: derivation path (e.g., m/44'/0'/0'/0/0)"
+  output_format: "Line 1: derived private key (hex). Line 2: derived chain code (hex)"
+  test_cases:
+    - input: "000102030405060708090a0b0c0d0e0f\nm/0'"
+      expected_output: "<derived_key_hex>\n<chain_code_hex>"
+    - input: "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542\nm/0"
+      expected_output: "<derived_key_hex>\n<chain_code_hex>"
+  constraints: ["HMAC-SHA512 for derivation", "Support hardened (') and normal derivation", "Master key from HMAC-SHA512('Bitcoin seed', seed)"]
+
+- id: "CRY-066"
+  title: "Blockchain Difficulty Adjustment"
+  description: "Read current difficulty, target time, and actual time for last N blocks. Output new difficulty."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: current difficulty (integer). Line 2: target time for N blocks (seconds). Line 3: actual time taken (seconds)"
+  output_format: "New adjusted difficulty (integer)"
+  test_cases:
+    - input: "1000\n600\n300"
+      expected_output: "2000"
+    - input: "1000\n600\n1200"
+      expected_output: "500"
+  constraints: ["new_difficulty = old_difficulty * target_time / actual_time", "Cap adjustment at 4x or 1/4x"]
+
+- id: "CRY-067"
+  title: "Block Header Serialization"
+  description: "Read block header fields and output the serialized 80-byte Bitcoin block header as hex."
+  difficulty: 3
+  stdlib_modules: [std.io, std.encoding, std.str]
+  input_format: "Line 1: version (int). Line 2: prev_hash (hex). Line 3: merkle_root (hex). Line 4: timestamp (unix int). Line 5: bits (hex). Line 6: nonce (int)"
+  output_format: "160-character hex (80 bytes) serialized block header (little-endian)"
+  test_cases:
+    - input: "1\n0000000000000000000000000000000000000000000000000000000000000000\n3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a\n1231006505\n1d00ffff\n2083236893"
+      expected_output: "0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c"
+    - input: "2\nprevhash\nmerkle\n1000\n1d00ffff\n0"
+      expected_output: "<serialized header hex>"
+  constraints: ["Little-endian encoding for all fields", "version: 4 bytes, prev_hash: 32 bytes, merkle_root: 32 bytes, timestamp: 4 bytes, bits: 4 bytes, nonce: 4 bytes"]
+
+- id: "CRY-068"
+  title: "Compact Target (nBits) Decoder"
+  description: "Read a compact target representation (nBits) and output the full 256-bit target as hex."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.encoding]
+  input_format: "Compact target as hex (e.g., 1d00ffff)"
+  output_format: "64-character hex full target (padded to 32 bytes)"
+  test_cases:
+    - input: "1d00ffff"
+      expected_output: "00000000ffff0000000000000000000000000000000000000000000000000000"
+    - input: "1b0404cb"
+      expected_output: "00000000000404cb000000000000000000000000000000000000000000000000"
+  constraints: ["First byte = exponent (number of bytes)", "Next 3 bytes = coefficient", "target = coefficient * 2^(8*(exponent-3))"]
+
+- id: "CRY-069"
+  title: "Mining Hashrate Calculator"
+  description: "Read difficulty and block time. Calculate the estimated network hashrate."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: difficulty (decimal). Line 2: average block time in seconds"
+  output_format: "Estimated hashrate in H/s (scientific notation with 2 decimal places)"
+  test_cases:
+    - input: "1\n600"
+      expected_output: "7.16e+09"
+    - input: "100000\n600"
+      expected_output: "7.16e+14"
+  constraints: ["hashrate = difficulty * 2^32 / block_time", "Output in scientific notation"]
+
+- id: "CRY-070"
+  title: "Bloom Filter for Transactions"
+  description: "Read a list of items to add and items to check. Implement a Bloom filter and output membership test results."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.str]
+  input_format: "Line 1: filter size in bits. Line 2: number of hash functions. Line 3: items to add (comma-sep). Line 4: items to check (comma-sep)"
+  output_format: "For each checked item: PROBABLY_IN or DEFINITELY_NOT_IN"
+  test_cases:
+    - input: "1024\n3\nalice,bob,charlie\nalice,dave"
+      expected_output: "PROBABLY_IN\nDEFINITELY_NOT_IN"
+    - input: "64\n2\nfoo,bar\nfoo,baz"
+      expected_output: "PROBABLY_IN\nDEFINITELY_NOT_IN"
+  constraints: ["Use SHA-256 with different seeds for hash functions", "No false negatives allowed"]
+
+- id: "CRY-071"
+  title: "Simple Smart Contract State Machine"
+  description: "Simulate a state machine contract. Read initial state, transitions, and commands. Execute transitions."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "Line 1: JSON {state, owner}. Line 2: JSON transitions {from_state: {action: to_state}}. Remaining: ACTION caller action_name"
+  output_format: "Final state JSON or ERROR on invalid transition"
+  test_cases:
+    - input: "{\"state\":\"idle\",\"owner\":\"alice\"}\n{\"idle\":{\"start\":\"running\"},\"running\":{\"stop\":\"idle\"}}\nACTION alice start\nACTION alice stop"
+      expected_output: "{\"state\":\"idle\",\"owner\":\"alice\"}"
+    - input: "{\"state\":\"idle\",\"owner\":\"alice\"}\n{\"idle\":{\"start\":\"running\"}}\nACTION bob start"
+      expected_output: "ERROR: bob is not the owner"
+  constraints: ["Only owner can execute actions", "Reject invalid state transitions"]
+
+- id: "CRY-072"
+  title: "Gas Cost Calculator"
+  description: "Read a sequence of operations with gas costs. Calculate total gas and check against gas limit."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: gas limit. Line 2: JSON gas cost table {op: cost}. Remaining lines: operation names"
+  output_format: "Line 1: total gas used. Line 2: SUCCESS or OUT_OF_GAS at operation N"
+  test_cases:
+    - input: "100\n{\"ADD\":3,\"MUL\":5,\"STORE\":20,\"LOAD\":5}\nADD\nMUL\nSTORE\nLOAD"
+      expected_output: "33\nSUCCESS"
+    - input: "10\n{\"ADD\":3,\"MUL\":5,\"STORE\":20}\nADD\nMUL\nSTORE"
+      expected_output: "28\nOUT_OF_GAS at operation 3"
+  constraints: ["Stop execution when gas limit exceeded", "Report which operation caused out-of-gas"]
+
+- id: "CRY-073"
+  title: "Simple Stack-Based VM"
+  description: "Implement a minimal stack-based virtual machine (like EVM simplified). Execute bytecode and output stack."
+  difficulty: 4
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "Space-separated instructions: PUSH <n>, ADD, SUB, MUL, DUP, SWAP, POP"
+  output_format: "Final stack contents (top to bottom, space-separated)"
+  test_cases:
+    - input: "PUSH 5 PUSH 3 ADD"
+      expected_output: "8"
+    - input: "PUSH 10 PUSH 3 PUSH 2 MUL ADD"
+      expected_output: "16"
+    - input: "PUSH 5 DUP MUL"
+      expected_output: "25"
+  constraints: ["Stack underflow returns ERROR", "All arithmetic on integers"]
+
+- id: "CRY-074"
+  title: "Contract Storage (Key-Value)"
+  description: "Simulate contract storage. Read storage operations (SSTORE/SLOAD) and output results."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "Commands one per line: SSTORE key value | SLOAD key"
+  output_format: "For each SLOAD: output the value (or 0 if unset)"
+  test_cases:
+    - input: "SSTORE balance 100\nSSTORE name alice\nSLOAD balance\nSLOAD name\nSLOAD missing"
+      expected_output: "100\nalice\n0"
+    - input: "SSTORE x 42\nSSTORE x 99\nSLOAD x"
+      expected_output: "99"
+  constraints: ["Default value is 0 for unset keys", "SSTORE overwrites previous value"]
+
+- id: "CRY-075"
+  title: "Event Log Emission"
+  description: "Simulate contract event emission. Read event definitions and emit commands. Output event log."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.str, std.crypto]
+  input_format: "Line 1: JSON event signatures {name: [param_types]}. Remaining: EMIT event_name param1 param2..."
+  output_format: "JSON array of {topic: keccak256(signature), data: [params]}"
+  test_cases:
+    - input: "{\"Transfer\":[\"address\",\"address\",\"uint256\"]}\nEMIT Transfer alice bob 100"
+      expected_output: "[{\"topic\":\"<keccak256 of Transfer(address,address,uint256)>\",\"data\":[\"alice\",\"bob\",\"100\"]}]"
+    - input: "{\"Mint\":[\"address\",\"uint256\"]}\nEMIT Mint alice 50\nEMIT Mint bob 30"
+      expected_output: "[{\"topic\":\"<hash>\",\"data\":[\"alice\",\"50\"]},{\"topic\":\"<hash>\",\"data\":[\"bob\",\"30\"]}]"
+  constraints: ["Topic is Keccak-256 of event signature string", "Signature format: Name(type1,type2,...)"]
+
+- id: "CRY-076"
+  title: "Timestamp Authority"
+  description: "Read data and output a timestamp proof: hash of data concatenated with current timestamp, plus the timestamp."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A single line of data to timestamp"
+  output_format: "Line 1: timestamp (ISO 8601). Line 2: SHA-256(data || timestamp)"
+  test_cases:
+    - input: "important document"
+      expected_output: "<current timestamp>\n<sha256 hash>"
+    - input: "contract v2"
+      expected_output: "<current timestamp>\n<sha256 hash>"
+  constraints: ["Use current system time", "Hash includes both data and timestamp for binding"]
+
+- id: "CRY-077"
+  title: "Digital Certificate Structure"
+  description: "Read subject, issuer, public key, and validity period. Output a simplified X.509-like certificate as JSON."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.crypto, std.encoding]
+  input_format: "Line 1: subject. Line 2: issuer. Line 3: public key (hex). Line 4: not_before (ISO 8601). Line 5: not_after (ISO 8601)"
+  output_format: "JSON certificate with fields: subject, issuer, public_key, validity{not_before, not_after}, serial, fingerprint (SHA-256 of all fields)"
+  test_cases:
+    - input: "alice\nCA\npubkey_hex\n2024-01-01T00:00:00Z\n2025-01-01T00:00:00Z"
+      expected_output: "{\"subject\":\"alice\",\"issuer\":\"CA\",\"public_key\":\"pubkey_hex\",\"validity\":{\"not_before\":\"2024-01-01T00:00:00Z\",\"not_after\":\"2025-01-01T00:00:00Z\"},\"serial\":\"<random>\",\"fingerprint\":\"<sha256>\"}"
+    - input: "bob\nCA\nkey2\n2024-06-01T00:00:00Z\n2024-12-31T23:59:59Z"
+      expected_output: "{\"subject\":\"bob\",\"issuer\":\"CA\",...}"
+  constraints: ["Generate random serial number", "Fingerprint is SHA-256 of canonical JSON of certificate fields (excluding fingerprint)"]
+
+- id: "CRY-078"
+  title: "Certificate Chain Validation"
+  description: "Read a chain of certificates (JSON array). Validate each certificate is signed by its issuer."
+  difficulty: 4
+  stdlib_modules: [std.io, std.json, std.crypto, std.encoding]
+  input_format: "JSON array of certificates in order [leaf, intermediate, ..., root]. Each has: subject, issuer, signature, public_key"
+  output_format: "VALID or ERROR: <reason at position N>"
+  test_cases:
+    - input: "[{\"subject\":\"site\",\"issuer\":\"inter\",\"signature\":\"valid\",\"public_key\":\"pk1\"},{\"subject\":\"inter\",\"issuer\":\"root\",\"signature\":\"valid\",\"public_key\":\"pk2\"},{\"subject\":\"root\",\"issuer\":\"root\",\"signature\":\"valid\",\"public_key\":\"pk3\"}]"
+      expected_output: "VALID"
+    - input: "[{\"subject\":\"site\",\"issuer\":\"wrong\",\"signature\":\"valid\",\"public_key\":\"pk1\"},{\"subject\":\"inter\",\"issuer\":\"root\",\"signature\":\"valid\",\"public_key\":\"pk2\"}]"
+      expected_output: "ERROR: Certificate 0 issuer 'wrong' does not match certificate 1 subject 'inter'"
+  constraints: ["Each cert's issuer must match next cert's subject", "Root cert is self-signed", "Verify signatures"]
+
+- id: "CRY-079"
+  title: "Commitment Scheme (Hash-Based)"
+  description: "Implement a commit-reveal scheme. Phase 1: commit (output hash of value+nonce). Phase 2: verify reveal."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: COMMIT value nonce | VERIFY value nonce commitment_hash"
+  output_format: "COMMIT: the commitment hash. VERIFY: VALID or INVALID"
+  test_cases:
+    - input: "COMMIT secret123 randomnonce456"
+      expected_output: "<sha256 of 'secret123||randomnonce456'>"
+    - input: "VERIFY secret123 randomnonce456 <correct_hash>"
+      expected_output: "VALID"
+  constraints: ["commitment = SHA-256(value || nonce)", "Verify by recomputing and comparing"]
+
+- id: "CRY-080"
+  title: "Zero-Knowledge Range Proof (Simplified)"
+  description: "Prove a committed value is in range [0, 2^n) without revealing it. Output proof components."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "Line 1: value (integer). Line 2: n (range bits). Line 3: blinding factor (hex)"
+  output_format: "JSON proof with commitment and bit commitments"
+  test_cases:
+    - input: "42\n8\nblinding_hex"
+      expected_output: "{\"commitment\":\"<hex>\",\"range_bits\":8,\"proof_valid\":true}"
+    - input: "300\n8\nblinding_hex"
+      expected_output: "{\"error\":\"Value 300 not in range [0, 256)\"}"
+  constraints: ["Value must be in [0, 2^n)", "Generate Pedersen-like commitment", "Output error if out of range"]
+
+- id: "CRY-081"
+  title: "Simple ZK Proof of Knowledge (Schnorr)"
+  description: "Generate a Schnorr proof of knowledge of discrete log. Prove knowledge of x where y = g^x mod p."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.io, std.math]
+  input_format: "Line 1: p (prime). Line 2: g (generator). Line 3: x (secret). Line 4: PROVE | VERIFY"
+  output_format: "PROVE: commitment,challenge,response. VERIFY: VALID/INVALID (reads commitment,challenge,response,y from additional lines)"
+  test_cases:
+    - input: "23\n5\n7\nPROVE"
+      expected_output: "<commitment>,<challenge>,<response>"
+    - input: "23\n5\n0\nVERIFY\n<commitment>\n<challenge>\n<response>\n<y>"
+      expected_output: "VALID"
+  constraints: ["Schnorr identification protocol", "Challenge derived from hash of commitment", "Non-interactive (Fiat-Shamir heuristic)"]
+
+- id: "CRY-082"
+  title: "Pedersen Commitment"
+  description: "Create a Pedersen commitment C = g^v * h^r mod p for a value v with blinding factor r."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.math]
+  input_format: "Line 1: p (prime). Line 2: g (generator 1). Line 3: h (generator 2). Line 4: v (value). Line 5: r (blinding factor)"
+  output_format: "Commitment value (integer)"
+  test_cases:
+    - input: "23\n5\n7\n3\n4"
+      expected_output: "16"
+    - input: "97\n5\n7\n10\n20"
+      expected_output: "68"
+  constraints: ["C = (g^v * h^r) mod p", "Generators g and h must have unknown discrete log relation for security"]
+
+- id: "CRY-083"
+  title: "Ring Signature (Simplified)"
+  description: "Generate a ring signature that proves one of N public keys signed without revealing which."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "Line 1: message. Line 2: signer index (0-based). Line 3: private key of signer (hex). Line 4: JSON array of all public keys (hex)"
+  output_format: "JSON ring signature {key_image, c0, s_values[]}"
+  test_cases:
+    - input: "hello\n0\nprivkey_hex\n[\"pubkey1\",\"pubkey2\",\"pubkey3\"]"
+      expected_output: "{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\",\"<hex>\"]}"
+    - input: "test\n1\nprivkey_hex\n[\"pk1\",\"pk2\"]"
+      expected_output: "{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\"]}"
+  constraints: ["Anonymity set is all public keys in ring", "Key image prevents double-spending", "Verifier cannot determine which key signed"]
+
+- id: "CRY-084"
+  title: "Stealth Address Generation"
+  description: "Generate a one-time stealth address from recipient's public keys. Output the ephemeral and stealth address."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.math, std.encoding]
+  input_format: "Line 1: recipient scan public key (hex). Line 2: recipient spend public key (hex)"
+  output_format: "Line 1: ephemeral public key (hex). Line 2: stealth address (hex)"
+  test_cases:
+    - input: "scan_pubkey_hex\nspend_pubkey_hex"
+      expected_output: "<ephemeral_pubkey>\n<stealth_address>"
+    - input: "scan_pubkey2\nspend_pubkey2"
+      expected_output: "<ephemeral_pubkey>\n<stealth_address>"
+  constraints: ["Generate random ephemeral keypair", "Shared secret via ECDH", "Stealth = spend_pub + H(shared_secret)*G"]
+
+- id: "CRY-085"
+  title: "Coin Mixing Simulation"
+  description: "Simulate a CoinJoin mixing transaction. Read multiple inputs and outputs. Verify amounts balance."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.math]
+  input_format: "Line 1: JSON inputs [{address, amount}]. Line 2: JSON outputs [{address, amount}]. Line 3: fee"
+  output_format: "VALID: inputs=X, outputs=Y, fee=Z | INVALID: <reason>"
+  test_cases:
+    - input: "[{\"address\":\"a\",\"amount\":5},{\"address\":\"b\",\"amount\":5}]\n[{\"address\":\"c\",\"amount\":4.5},{\"address\":\"d\",\"amount\":4.5}]\n1"
+      expected_output: "VALID: inputs=10, outputs=9, fee=1"
+    - input: "[{\"address\":\"a\",\"amount\":5}]\n[{\"address\":\"b\",\"amount\":6}]\n0"
+      expected_output: "INVALID: outputs exceed inputs"
+  constraints: ["sum(inputs) = sum(outputs) + fee", "All amounts must be positive"]
+
+- id: "CRY-086"
+  title: "Wallet Balance from Explorer Data"
+  description: "Read JSON transaction history for an address. Calculate final balance considering sends and receives."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.math]
+  input_format: "Line 1: target address. Line 2: JSON array of {txid, from, to, amount, fee}"
+  output_format: "Final balance (decimal)"
+  test_cases:
+    - input: "alice\n[{\"txid\":\"1\",\"from\":\"bob\",\"to\":\"alice\",\"amount\":10,\"fee\":0.1},{\"txid\":\"2\",\"from\":\"alice\",\"to\":\"bob\",\"amount\":3,\"fee\":0.1}]"
+      expected_output: "6.9"
+    - input: "bob\n[{\"txid\":\"1\",\"from\":\"bob\",\"to\":\"alice\",\"amount\":10,\"fee\":0.1}]"
+      expected_output: "-10.1"
+  constraints: ["Sender pays fee", "Credit receives, debit sends + fee"]
+
+- id: "CRY-087"
+  title: "HD Wallet Address Generation"
+  description: "Read a master public key and generate N receiving addresses (BIP44 path m/44'/0'/0'/0/i)."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: master public key (hex). Line 2: chain code (hex). Line 3: number of addresses N"
+  output_format: "N lines, each: index: address"
+  test_cases:
+    - input: "master_pubkey_hex\nchain_code_hex\n3"
+      expected_output: "0: <address0>\n1: <address1>\n2: <address2>"
+    - input: "master_pubkey_hex\nchain_code_hex\n1"
+      expected_output: "0: <address0>"
+  constraints: ["Non-hardened child derivation", "Output Bitcoin addresses"]
+
+- id: "CRY-088"
+  title: "Transaction Fee Estimator"
+  description: "Read transaction size (bytes) and fee rate (sat/byte). Calculate total fee in BTC."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: transaction size in bytes. Line 2: fee rate in satoshis per byte"
+  output_format: "Fee in BTC (8 decimal places)"
+  test_cases:
+    - input: "250\n20"
+      expected_output: "0.00005000"
+    - input: "500\n100"
+      expected_output: "0.00050000"
+  constraints: ["1 BTC = 100,000,000 satoshis", "Output with 8 decimal places"]
+
+- id: "CRY-089"
+  title: "Multi-Input Transaction Size Estimator"
+  description: "Read number of inputs and outputs. Estimate transaction size for P2PKH transactions."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: number of inputs. Line 2: number of outputs"
+  output_format: "Estimated size in bytes"
+  test_cases:
+    - input: "1\n2"
+      expected_output: "226"
+    - input: "3\n2"
+      expected_output: "520"
+  constraints: ["P2PKH formula: 10 + 148*inputs + 34*outputs", "Overhead is 10 bytes, each input ~148, each output ~34"]
+
+- id: "CRY-090"
+  title: "SegWit Transaction Weight"
+  description: "Read legacy size and witness size. Calculate transaction weight and virtual size (vBytes)."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: non-witness size (bytes). Line 2: witness size (bytes)"
+  output_format: "Line 1: weight units. Line 2: virtual size (vBytes, ceiling)"
+  test_cases:
+    - input: "100\n50"
+      expected_output: "450\n113"
+    - input: "200\n100"
+      expected_output: "900\n225"
+  constraints: ["weight = non_witness * 4 + witness * 1", "vsize = ceil(weight / 4)"]
+
+- id: "CRY-091"
+  title: "Block Reward Calculator"
+  description: "Read a block height. Calculate the Bitcoin block reward accounting for halvings."
+  difficulty: 1
+  stdlib_modules: [std.io, std.math]
+  input_format: "Block height (integer)"
+  output_format: "Block reward in BTC"
+  test_cases:
+    - input: "0"
+      expected_output: "50"
+    - input: "210000"
+      expected_output: "25"
+    - input: "630000"
+      expected_output: "6.25"
+  constraints: ["Initial reward: 50 BTC", "Halves every 210,000 blocks", "Minimum reward approaches 0"]
+
+- id: "CRY-092"
+  title: "Token Vesting Schedule"
+  description: "Read vesting parameters and a query timestamp. Calculate vested and unvested token amounts."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: total_tokens. Line 2: cliff_months. Line 3: vesting_months. Line 4: start_timestamp (unix). Line 5: query_timestamp (unix)"
+  output_format: "Line 1: vested amount. Line 2: unvested amount"
+  test_cases:
+    - input: "10000\n12\n48\n0\n15768000"
+      expected_output: "2500\n7500"
+    - input: "10000\n12\n48\n0\n5000000"
+      expected_output: "0\n10000"
+  constraints: ["No tokens vest before cliff", "Linear vesting after cliff", "All tokens vested at end"]
+
+- id: "CRY-093"
+  title: "Staking Reward Calculator"
+  description: "Read stake amount, annual rate, compounding period, and duration. Calculate final amount."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: principal. Line 2: annual rate (decimal, e.g., 0.05). Line 3: compounds per year. Line 4: years"
+  output_format: "Final amount (2 decimal places)"
+  test_cases:
+    - input: "1000\n0.05\n12\n1"
+      expected_output: "1051.16"
+    - input: "10000\n0.12\n365\n2"
+      expected_output: "12712.03"
+  constraints: ["A = P * (1 + r/n)^(n*t)", "Round to 2 decimal places"]
+
+- id: "CRY-094"
+  title: "Liquidity Pool Share Calculator"
+  description: "Read pool reserves and a deposit. Calculate LP tokens to mint based on proportional share."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: reserve_x reserve_y (current pool). Line 2: total_lp_supply. Line 3: deposit_x deposit_y"
+  output_format: "LP tokens to mint"
+  test_cases:
+    - input: "1000 2000\n100\n100 200"
+      expected_output: "10"
+    - input: "500 1000\n50\n250 500"
+      expected_output: "25"
+  constraints: ["LP_tokens = min(dx/X, dy/Y) * total_supply", "Proportional to smaller ratio"]
+
+- id: "CRY-095"
+  title: "Impermanent Loss Calculator"
+  description: "Read initial price and current price. Calculate impermanent loss percentage for a 50/50 LP."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: initial price of asset. Line 2: current price of asset"
+  output_format: "Impermanent loss as percentage (2 decimal places)"
+  test_cases:
+    - input: "100\n200"
+      expected_output: "5.72"
+    - input: "100\n400"
+      expected_output: "20.00"
+  constraints: ["IL = 2*sqrt(price_ratio)/(1+price_ratio) - 1", "Output as positive percentage loss"]
+
+- id: "CRY-096"
+  title: "Governance Vote Tally"
+  description: "Read token-weighted votes. Calculate result with quorum check."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: total_supply. Line 2: quorum_percent. Line 3: JSON votes [{voter, tokens, choice: for|against|abstain}]"
+  output_format: "Line 1: PASSED|FAILED|NO_QUORUM. Line 2: for:X against:Y abstain:Z (token amounts)"
+  test_cases:
+    - input: "1000\n10\n[{\"voter\":\"a\",\"tokens\":60,\"choice\":\"for\"},{\"voter\":\"b\",\"tokens\":40,\"choice\":\"against\"},{\"voter\":\"c\",\"tokens\":10,\"choice\":\"for\"}]"
+      expected_output: "PASSED\nfor:70 against:40 abstain:0"
+    - input: "10000\n50\n[{\"voter\":\"a\",\"tokens\":100,\"choice\":\"for\"}]"
+      expected_output: "NO_QUORUM\nfor:100 against:0 abstain:0"
+  constraints: ["Quorum: total votes >= quorum_percent of total_supply", "Passes if for > against (when quorum met)"]
+
+- id: "CRY-097"
+  title: "Flash Loan Simulation"
+  description: "Simulate a flash loan: borrow, execute operations, repay with fee. Verify repayment."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: pool_balance. Line 2: borrow_amount. Line 3: fee_percent. Line 4: JSON operations [{type: buy|sell, amount, return}]"
+  output_format: "Line 1: profit/loss. Line 2: SUCCESS or FAILED: insufficient repayment"
+  test_cases:
+    - input: "10000\n1000\n0.3\n[{\"type\":\"buy\",\"amount\":1000,\"return\":1100}]"
+      expected_output: "97\nSUCCESS"
+    - input: "10000\n5000\n0.5\n[{\"type\":\"buy\",\"amount\":5000,\"return\":4000}]"
+      expected_output: "-1025\nFAILED: insufficient repayment"
+  constraints: ["Must repay borrow_amount + fee", "fee = borrow_amount * fee_percent / 100", "All within one atomic transaction"]
+
+- id: "CRY-098"
+  title: "Oracle Price Feed Aggregator"
+  description: "Read multiple price oracle reports. Output median price and detect outliers."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.json]
+  input_format: "JSON array of {source, price, timestamp}"
+  output_format: "Line 1: median price. Line 2: outliers (>20% from median), comma-separated source names"
+  test_cases:
+    - input: "[{\"source\":\"A\",\"price\":100,\"timestamp\":1000},{\"source\":\"B\",\"price\":102,\"timestamp\":1000},{\"source\":\"C\",\"price\":150,\"timestamp\":1000}]"
+      expected_output: "102\nC"
+    - input: "[{\"source\":\"X\",\"price\":50,\"timestamp\":1},{\"source\":\"Y\",\"price\":51,\"timestamp\":1},{\"source\":\"Z\",\"price\":49,\"timestamp\":1}]"
+      expected_output: "50\n"
+  constraints: ["Use median (not mean) for manipulation resistance", "Outlier threshold: >20% deviation from median"]
+
+- id: "CRY-099"
+  title: "Token Swap Price Calculator"
+  description: "Calculate output amount for a token swap using constant product formula with fee."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: reserve_in. Line 2: reserve_out. Line 3: amount_in. Line 4: fee_percent (e.g., 0.3)"
+  output_format: "Amount out (integer, floor)"
+  test_cases:
+    - input: "1000\n2000\n100\n0.3"
+      expected_output: "180"
+    - input: "5000\n10000\n500\n0.3"
+      expected_output: "905"
+  constraints: ["amount_out = reserve_out * amount_in_after_fee / (reserve_in + amount_in_after_fee)", "amount_in_after_fee = amount_in * (1 - fee/100)"]
+
+- id: "CRY-100"
+  title: "Blockchain Fork Detector"
+  description: "Read two chains (arrays of block hashes). Find the fork point and determine which is longer."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "Line 1: JSON array chain A (oldest to newest). Line 2: JSON array chain B (oldest to newest)"
+  output_format: "Line 1: fork point hash (last common block). Line 2: longer chain (A or B or EQUAL). Line 3: blocks after fork in each (A:n B:m)"
+  test_cases:
+    - input: "[\"gen\",\"a1\",\"a2\",\"a3\"]\n[\"gen\",\"a1\",\"b2\",\"b3\",\"b4\"]"
+      expected_output: "a1\nB\nA:2 B:3"
+    - input: "[\"gen\",\"x\",\"y\"]\n[\"gen\",\"x\",\"y\"]"
+      expected_output: "y\nEQUAL\nA:0 B:0"
+  constraints: ["Find last common hash", "Count divergent blocks"]
+
+- id: "CRY-101"
+  title: "Consensus: Longest Chain Rule"
+  description: "Read multiple candidate chains with cumulative work. Select the canonical chain."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.math]
+  input_format: "JSON array of {chain_id, length, cumulative_work}"
+  output_format: "Winning chain_id (highest cumulative_work, length as tiebreaker)"
+  test_cases:
+    - input: "[{\"chain_id\":\"A\",\"length\":10,\"cumulative_work\":1000},{\"chain_id\":\"B\",\"length\":9,\"cumulative_work\":1100}]"
+      expected_output: "B"
+    - input: "[{\"chain_id\":\"X\",\"length\":5,\"cumulative_work\":500},{\"chain_id\":\"Y\",\"length\":6,\"cumulative_work\":500}]"
+      expected_output: "Y"
+  constraints: ["Primary sort: cumulative_work (higher wins)", "Tiebreaker: length (longer wins)"]
+
+- id: "CRY-102"
+  title: "Proof of Stake Validator Selection"
+  description: "Read validators with stake amounts and a random seed. Select the next block proposer weighted by stake."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.json, std.math]
+  input_format: "Line 1: JSON array of {validator, stake}. Line 2: random seed (hex)"
+  output_format: "Selected validator name"
+  test_cases:
+    - input: "[{\"validator\":\"alice\",\"stake\":100},{\"validator\":\"bob\",\"stake\":200},{\"validator\":\"carol\",\"stake\":300}]\naabbccdd"
+      expected_output: "<weighted random selection>"
+    - input: "[{\"validator\":\"x\",\"stake\":1},{\"validator\":\"y\",\"stake\":99}]\n00000001"
+      expected_output: "<weighted random selection>"
+  constraints: ["Probability proportional to stake", "Use SHA-256(seed || validator) for determinism", "Same seed always selects same validator"]
+
+- id: "CRY-103"
+  title: "Slashing Condition Check"
+  description: "Read validator attestations. Detect double-voting or surround-voting slashing conditions."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "JSON array of attestations {validator, source_epoch, target_epoch, target_root}"
+  output_format: "List of slashable validators and reason, or NO_VIOLATIONS"
+  test_cases:
+    - input: "[{\"validator\":\"a\",\"source_epoch\":1,\"target_epoch\":2,\"target_root\":\"x\"},{\"validator\":\"a\",\"source_epoch\":1,\"target_epoch\":2,\"target_root\":\"y\"}]"
+      expected_output: "SLASHABLE: a (double vote at epoch 2)"
+    - input: "[{\"validator\":\"a\",\"source_epoch\":1,\"target_epoch\":4,\"target_root\":\"x\"},{\"validator\":\"a\",\"source_epoch\":2,\"target_epoch\":3,\"target_root\":\"y\"}]"
+      expected_output: "SLASHABLE: a (surround vote)"
+  constraints: ["Double vote: same target_epoch, different target_root", "Surround vote: attestation A surrounds B if A.source < B.source and A.target > B.target"]
+
+- id: "CRY-104"
+  title: "BFT Consensus Quorum Check"
+  description: "Read total validators and votes received. Check if 2/3+ quorum is achieved."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: total validators N. Line 2: votes received V"
+  output_format: "QUORUM_REACHED or INSUFFICIENT (need X more)"
+  test_cases:
+    - input: "100\n67"
+      expected_output: "QUORUM_REACHED"
+    - input: "100\n60"
+      expected_output: "INSUFFICIENT (need 7 more)"
+  constraints: ["Quorum requires strictly more than 2/3", "ceil(2*N/3 + 1) votes needed"]
+
+- id: "CRY-105"
+  title: "Block Time Statistics"
+  description: "Read a list of block timestamps. Calculate average, min, max, and standard deviation of block times."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Comma-separated unix timestamps (ascending order)"
+  output_format: "avg:<seconds> min:<seconds> max:<seconds> stddev:<seconds> (all rounded to 1 decimal)"
+  test_cases:
+    - input: "0,10,20,30,40"
+      expected_output: "avg:10.0 min:10 max:10 stddev:0.0"
+    - input: "0,5,20,25,50"
+      expected_output: "avg:12.5 min:5 max:25 stddev:8.3"
+  constraints: ["Block times are differences between consecutive timestamps", "Need at least 2 timestamps"]
+
+- id: "CRY-106"
+  title: "Address Checksum Validator"
+  description: "Read a Bitcoin address. Validate the Base58Check checksum. Output VALID or INVALID."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "A Bitcoin address string"
+  output_format: "VALID or INVALID: <reason>"
+  test_cases:
+    - input: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+      expected_output: "VALID"
+    - input: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNb"
+      expected_output: "INVALID: checksum mismatch"
+  constraints: ["Decode Base58", "Last 4 bytes are checksum", "Checksum = first 4 bytes of double-SHA256 of payload"]
+
+- id: "CRY-107"
+  title: "Ethereum Checksum Address (EIP-55)"
+  description: "Read a lowercase Ethereum address. Output the EIP-55 checksummed version."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "40-character lowercase hex Ethereum address (without 0x prefix)"
+  output_format: "EIP-55 checksummed address with 0x prefix"
+  test_cases:
+    - input: "5aaeb6053f3e94c9b9a09f33669435e7ef1beaed"
+      expected_output: "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"
+    - input: "fb6916095ca1df60bb79ce92ce3ea74c37c5d359"
+      expected_output: "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"
+  constraints: ["Keccak-256 of lowercase hex address (no 0x)", "If hash char >= 8, uppercase the address char"]
+
+- id: "CRY-108"
+  title: "Bech32 Address Encoding"
+  description: "Read a witness version and program (hex). Output Bech32 encoded Bitcoin address."
+  difficulty: 4
+  stdlib_modules: [std.io, std.encoding, std.str, std.math]
+  input_format: "Line 1: witness version (0-16). Line 2: witness program (hex). Line 3: hrp (e.g., bc for mainnet)"
+  output_format: "Bech32 encoded address"
+  test_cases:
+    - input: "0\n751e76e8199196d454941c45d1b3a323f1433bd6\nbc"
+      expected_output: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"
+    - input: "0\n1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262\nbc"
+      expected_output: "bc1qrp33g0q5b5698ahp5jnf5yzjm9w4sk6e4v45nm3zarvary0c5xw7k5w69hf"
+  constraints: ["Bech32 encoding (BIP173)", "Include checksum", "Witness version as first data byte"]
+
+- id: "CRY-109"
+  title: "Message Signing (Bitcoin-style)"
+  description: "Read a private key (WIF) and message. Output the Bitcoin signed message (Base64 signature)."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: WIF private key. Line 2: message to sign"
+  output_format: "Base64 encoded signature (65 bytes: recovery_flag + r + s)"
+  test_cases:
+    - input: "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ\nhello"
+      expected_output: "<base64 signature>"
+    - input: "KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn\ntest"
+      expected_output: "<base64 signature>"
+  constraints: ["Hash: SHA256(SHA256(Bitcoin Signed Message:\\n + message))", "Recoverable ECDSA signature", "Include recovery flag byte"]
+
+- id: "CRY-110"
+  title: "Verify Bitcoin Signed Message"
+  description: "Read address, message, and signature. Verify the signature and output VALID or INVALID."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: Bitcoin address. Line 2: message. Line 3: Base64 signature"
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN\nhello\n<valid_base64_sig>"
+      expected_output: "VALID"
+    - input: "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN\nwrong\n<sig>"
+      expected_output: "INVALID"
+  constraints: ["Recover public key from signature", "Derive address from recovered key", "Compare with provided address"]
+
+- id: "CRY-111"
+  title: "Entropy Assessment"
+  description: "Read a string and calculate its Shannon entropy in bits per character."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.str]
+  input_format: "A single line of text"
+  output_format: "Entropy in bits per character (2 decimal places)"
+  test_cases:
+    - input: "aaaa"
+      expected_output: "0.00"
+    - input: "abcd"
+      expected_output: "2.00"
+    - input: "aab"
+      expected_output: "0.92"
+  constraints: ["Shannon entropy: -sum(p * log2(p))", "Based on character frequency"]
+
+- id: "CRY-112"
+  title: "Password Strength Scorer"
+  description: "Read a password. Score it based on length, character classes, entropy, and common patterns."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.math]
+  input_format: "A password string"
+  output_format: "Line 1: score (0-100). Line 2: strength (WEAK|FAIR|GOOD|STRONG|VERY_STRONG)"
+  test_cases:
+    - input: "password"
+      expected_output: "10\nWEAK"
+    - input: "Tr0ub4dor&3"
+      expected_output: "72\nSTRONG"
+    - input: "a"
+      expected_output: "5\nWEAK"
+  constraints: ["Score factors: length, char classes, entropy, no common words", "WEAK<25, FAIR<50, GOOD<70, STRONG<90, VERY_STRONG>=90"]
+
+- id: "CRY-113"
+  title: "Time-Based OTP (TOTP)"
+  description: "Read a shared secret (Base32) and timestamp. Generate a 6-digit TOTP code."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.math]
+  input_format: "Line 1: Base32 encoded shared secret. Line 2: unix timestamp"
+  output_format: "6-digit TOTP code (zero-padded)"
+  test_cases:
+    - input: "JBSWY3DPEHPK3PXP\n0"
+      expected_output: "282760"
+    - input: "JBSWY3DPEHPK3PXP\n1234567890"
+      expected_output: "005924"
+  constraints: ["RFC 6238 TOTP", "30-second time step", "HMAC-SHA1", "Dynamic truncation to 6 digits"]
+
+- id: "CRY-114"
+  title: "Counter-Based OTP (HOTP)"
+  description: "Read a shared secret (hex) and counter. Generate a 6-digit HOTP code."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.math]
+  input_format: "Line 1: hex shared secret. Line 2: counter value (integer)"
+  output_format: "6-digit HOTP code (zero-padded)"
+  test_cases:
+    - input: "3132333435363738393031323334353637383930\n0"
+      expected_output: "755224"
+    - input: "3132333435363738393031323334353637383930\n1"
+      expected_output: "287082"
+  constraints: ["RFC 4226 HOTP", "HMAC-SHA1", "Dynamic truncation", "6 digits zero-padded"]
+
+- id: "CRY-115"
+  title: "Key Stretching with Salt"
+  description: "Read a password and generate a salted, stretched key. Output salt and derived key."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: password. Line 2: iterations (integer)"
+  output_format: "Line 1: salt (32-char hex, random). Line 2: derived key (64-char hex)"
+  test_cases:
+    - input: "mypassword\n10000"
+      expected_output: "<random salt>\n<derived key>"
+    - input: "test\n1000"
+      expected_output: "<random salt>\n<derived key>"
+  constraints: ["Generate random 16-byte salt", "PBKDF2-HMAC-SHA256", "Output 32-byte key"]
+
+- id: "CRY-116"
+  title: "Constant-Time Comparison"
+  description: "Read two hex strings. Compare them in constant time and output EQUAL or NOT_EQUAL with timing."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.io, std.str]
+  input_format: "Line 1: hex string A. Line 2: hex string B"
+  output_format: "EQUAL or NOT_EQUAL"
+  test_cases:
+    - input: "abcdef\nabcdef"
+      expected_output: "EQUAL"
+    - input: "abcdef\nabcdee"
+      expected_output: "NOT_EQUAL"
+  constraints: ["Must use constant-time comparison (no early exit)", "Always compare all bytes regardless of mismatch position"]
+
+- id: "CRY-117"
+  title: "ABI Encoding (Ethereum)"
+  description: "Read a function signature and arguments. Output the ABI-encoded calldata as hex."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: function signature (e.g., transfer(address,uint256)). Remaining lines: argument values"
+  output_format: "Hex ABI-encoded calldata (4-byte selector + 32-byte padded args)"
+  test_cases:
+    - input: "transfer(address,uint256)\n0x1234567890abcdef1234567890abcdef12345678\n100"
+      expected_output: "a9059cbb0000000000000000000000001234567890abcdef1234567890abcdef1234567800000000000000000000000000000000000000000000000000000000000000064"
+    - input: "balanceOf(address)\n0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+      expected_output: "70a08231000000000000000000000000abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+  constraints: ["Function selector = first 4 bytes of Keccak-256 of signature", "Arguments padded to 32 bytes", "Addresses left-padded, uints right-padded"]
+
+- id: "CRY-118"
+  title: "ABI Decoding"
+  description: "Read ABI-encoded calldata and function signature. Decode and output the arguments."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "Line 1: function signature. Line 2: hex calldata"
+  output_format: "Decoded arguments one per line with type labels"
+  test_cases:
+    - input: "transfer(address,uint256)\na9059cbb0000000000000000000000001234567890abcdef1234567890abcdef123456780000000000000000000000000000000000000000000000000000000000000064"
+      expected_output: "address: 0x1234567890abcdef1234567890abcdef12345678\nuint256: 100"
+    - input: "balanceOf(address)\n70a08231000000000000000000000000abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+      expected_output: "address: 0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+  constraints: ["Verify function selector matches", "Decode each 32-byte slot according to type"]
+
+- id: "CRY-119"
+  title: "RLP Encoding"
+  description: "Read a value (string or list in JSON format). Output the RLP encoding as hex."
+  difficulty: 4
+  stdlib_modules: [std.io, std.encoding, std.json, std.str]
+  input_format: "JSON value: string (hex bytes) or nested array of hex strings"
+  output_format: "Hex RLP encoded bytes"
+  test_cases:
+    - input: "\"dog\""
+      expected_output: "83646f67"
+    - input: "[\"cat\",\"dog\"]"
+      expected_output: "c88363617483646f67"
+    - input: "\"\""
+      expected_output: "80"
+  constraints: ["Recursive Length Prefix encoding (Ethereum)", "Single byte 0x00-0x7f encoded as itself", "Short string: 0x80 + len prefix", "Long string: 0xb7 + len-of-len"]
+
+- id: "CRY-120"
+  title: "Patricia Trie Lookup"
+  description: "Read key-value insertions into a Patricia trie. Perform lookups and output values."
+  difficulty: 5
+  stdlib_modules: [std.io, std.json, std.str, std.crypto]
+  input_format: "Lines of: INSERT key value | LOOKUP key | ROOT"
+  output_format: "For LOOKUP: value or NOT_FOUND. For ROOT: trie root hash"
+  test_cases:
+    - input: "INSERT abc 123\nINSERT abd 456\nLOOKUP abc\nLOOKUP xyz\nROOT"
+      expected_output: "123\nNOT_FOUND\n<root_hash>"
+    - input: "INSERT hello world\nLOOKUP hello\nLOOKUP hell"
+      expected_output: "world\nNOT_FOUND"
+  constraints: ["Hex-prefix Patricia trie (Ethereum-style)", "Root hash via recursive hashing"]
+
+- id: "CRY-121"
+  title: "Transaction Receipt Log Parser"
+  description: "Read a JSON transaction receipt with logs. Extract and decode Transfer events."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.str, std.crypto, std.encoding]
+  input_format: "JSON receipt with logs array [{topics: [hex], data: hex}]"
+  output_format: "Decoded Transfer events: from -> to: amount (one per line)"
+  test_cases:
+    - input: "{\"logs\":[{\"topics\":[\"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\",\"0x000000000000000000000000alice\",\"0x000000000000000000000000bob\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000064\"}]}"
+      expected_output: "alice -> bob: 100"
+    - input: "{\"logs\":[]}"
+      expected_output: "No Transfer events"
+  constraints: ["Transfer topic = keccak256('Transfer(address,address,uint256)')", "Decode indexed params from topics", "Decode non-indexed from data"]
+
+- id: "CRY-122"
+  title: "Gas Price Strategy"
+  description: "Read recent block gas prices. Recommend slow/average/fast gas prices based on percentiles."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math, std.json]
+  input_format: "JSON array of gas prices from recent blocks (in gwei)"
+  output_format: "slow:<p25> average:<p50> fast:<p75> (gwei, integer)"
+  test_cases:
+    - input: "[10,20,30,40,50,60,70,80,90,100]"
+      expected_output: "slow:25 average:50 fast:75"
+    - input: "[5,5,5,10,10,10,20,20,50,100]"
+      expected_output: "slow:5 average:10 fast:20"
+  constraints: ["slow = 25th percentile", "average = 50th percentile (median)", "fast = 75th percentile"]
+
+- id: "CRY-123"
+  title: "Replay Protection (Chain ID)"
+  description: "Read a raw transaction and chain ID. Add EIP-155 replay protection and output the signing hash."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.io, std.encoding]
+  input_format: "Line 1: JSON raw tx {nonce, gas_price, gas_limit, to, value, data}. Line 2: chain_id"
+  output_format: "Signing hash (Keccak-256 of RLP(tx fields + chain_id + 0 + 0))"
+  test_cases:
+    - input: "{\"nonce\":0,\"gas_price\":20,\"gas_limit\":21000,\"to\":\"0xrecipient\",\"value\":1000,\"data\":\"\"}\n1"
+      expected_output: "<keccak256 signing hash>"
+    - input: "{\"nonce\":5,\"gas_price\":50,\"gas_limit\":50000,\"to\":\"0xaddr\",\"value\":0,\"data\":\"0xabcd\"}\n137"
+      expected_output: "<keccak256 signing hash>"
+  constraints: ["EIP-155: append chain_id, 0, 0 before signing", "Hash = Keccak-256 of RLP encoded transaction"]
+
+- id: "CRY-124"
+  title: "Nonce Manager"
+  description: "Track transaction nonces for accounts. Read pending/confirmed txs and output next nonce."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "Line 1: JSON confirmed nonces {address: last_confirmed_nonce}. Remaining: PENDING address | NEXT address"
+  output_format: "For each NEXT query: output the next available nonce"
+  test_cases:
+    - input: "{\"alice\":5,\"bob\":0}\nPENDING alice\nPENDING alice\nNEXT alice\nNEXT bob"
+      expected_output: "8\n1"
+    - input: "{\"alice\":10}\nNEXT alice\nPENDING alice\nNEXT alice"
+      expected_output: "11\n12"
+  constraints: ["NEXT = confirmed + 1 + pending count", "PENDING increments pending count for address"]
+
+- id: "CRY-125"
+  title: "Merkle Patricia Proof"
+  description: "Read a state root, key, and proof nodes. Verify the proof and output the value."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: state root (hex). Line 2: key (hex). Line 3: JSON array of proof nodes (hex RLP)"
+  output_format: "VERIFIED: <value> or INVALID_PROOF"
+  test_cases:
+    - input: "root_hash\nkey_hex\n[\"node1_rlp\",\"node2_rlp\"]"
+      expected_output: "VERIFIED: <value at key>"
+    - input: "wrong_root\nkey_hex\n[\"node1_rlp\"]"
+      expected_output: "INVALID_PROOF"
+  constraints: ["Verify each node hash links to parent", "Root of proof must match state root"]
+
+- id: "CRY-126"
+  title: "Token Metadata (ERC-721)"
+  description: "Read NFT metadata JSON. Validate required fields and output a summary."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "JSON metadata object"
+  output_format: "Line 1: VALID or INVALID: missing <field>. Line 2 (if valid): name | description (first 50 chars) | image URL"
+  test_cases:
+    - input: "{\"name\":\"CryptoPunk #1\",\"description\":\"A unique digital collectible\",\"image\":\"ipfs://abc123\",\"attributes\":[{\"trait_type\":\"background\",\"value\":\"blue\"}]}"
+      expected_output: "VALID\nCryptoPunk #1 | A unique digital collectible | ipfs://abc123"
+    - input: "{\"name\":\"Test\",\"image\":\"http://example.com/img.png\"}"
+      expected_output: "INVALID: missing description"
+  constraints: ["Required fields: name, description, image", "Attributes optional but validated if present"]
+
+- id: "CRY-127"
+  title: "Timelock Contract"
+  description: "Simulate a timelock. Read lock parameters and action. Check if timelock has expired."
+  difficulty: 2
+  stdlib_modules: [std.io, std.json, std.str]
+  input_format: "Line 1: JSON {beneficiary, amount, lock_until (unix timestamp)}. Line 2: current_time (unix). Line 3: ACTION withdraw | check"
+  output_format: "For withdraw: SUCCESS or LOCKED (X seconds remaining). For check: LOCKED/UNLOCKED"
+  test_cases:
+    - input: "{\"beneficiary\":\"alice\",\"amount\":100,\"lock_until\":1000}\n1500\nwithdraw"
+      expected_output: "SUCCESS: alice withdraws 100"
+    - input: "{\"beneficiary\":\"bob\",\"amount\":50,\"lock_until\":2000}\n1500\nwithdraw"
+      expected_output: "LOCKED (500 seconds remaining)"
+  constraints: ["Can only withdraw after lock_until", "Check just reports status"]
+
+- id: "CRY-128"
+  title: "Multi-Chain Address Validator"
+  description: "Read an address string. Detect which blockchain it belongs to and validate format."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.encoding]
+  input_format: "An address string"
+  output_format: "Line 1: chain (Bitcoin|Ethereum|Unknown). Line 2: VALID or INVALID: <reason>"
+  test_cases:
+    - input: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+      expected_output: "Bitcoin\nVALID"
+    - input: "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"
+      expected_output: "Ethereum\nVALID"
+    - input: "invalid_address"
+      expected_output: "Unknown\nINVALID: unrecognized format"
+  constraints: ["Bitcoin: starts with 1/3/bc1, valid Base58Check or Bech32", "Ethereum: starts with 0x, 40 hex chars, valid checksum"]
+
+- id: "CRY-129"
+  title: "Wrapped Token Mint/Burn"
+  description: "Simulate wrapped token operations. Read commands and track collateral vs wrapped supply."
+  difficulty: 3
+  stdlib_modules: [std.io, std.json, std.math, std.str]
+  input_format: "Line 1: JSON initial state {collateral, wrapped_supply, rate}. Remaining: MINT amount | BURN amount | STATUS"
+  output_format: "For STATUS: collateral=X wrapped=Y ratio=Z. For MINT/BURN: OK or ERROR"
+  test_cases:
+    - input: "{\"collateral\":1000,\"wrapped_supply\":1000,\"rate\":1}\nMINT 100\nSTATUS"
+      expected_output: "OK\ncollateral=1100 wrapped=1100 ratio=1.00"
+    - input: "{\"collateral\":1000,\"wrapped_supply\":500,\"rate\":2}\nBURN 600"
+      expected_output: "ERROR: burn amount exceeds supply"
+  constraints: ["MINT: add to both collateral and supply", "BURN: remove from both", "Cannot burn more than supply"]
+
+- id: "CRY-130"
+  title: "Cross-Chain Bridge Verification"
+  description: "Verify a cross-chain transfer proof. Check source chain lock, proof validity, and destination mint."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "JSON {source_tx_hash, amount, recipient, proof: {block_hash, merkle_proof, signatures[]}}"
+  output_format: "VERIFIED: mint <amount> to <recipient> | REJECTED: <reason>"
+  test_cases:
+    - input: "{\"source_tx_hash\":\"abc\",\"amount\":100,\"recipient\":\"bob\",\"proof\":{\"block_hash\":\"def\",\"merkle_proof\":[\"a\",\"b\"],\"signatures\":[\"sig1\",\"sig2\",\"sig3\"]}}"
+      expected_output: "VERIFIED: mint 100 to bob"
+    - input: "{\"source_tx_hash\":\"abc\",\"amount\":100,\"recipient\":\"bob\",\"proof\":{\"block_hash\":\"def\",\"merkle_proof\":[],\"signatures\":[\"sig1\"]}}"
+      expected_output: "REJECTED: insufficient signatures (need 2, got 1)"
+  constraints: ["Require minimum 2 validator signatures", "Verify merkle proof is non-empty", "Check all required fields present"]
+
+- id: "CRY-131"
+  title: "Yield Farming APY Calculator"
+  description: "Read pool parameters and calculate APY from daily/weekly rewards."
+  difficulty: 2
+  stdlib_modules: [std.io, std.math]
+  input_format: "Line 1: total_staked. Line 2: daily_reward. Line 3: token_price. Line 4: staked_token_price"
+  output_format: "APY as percentage (2 decimal places)"
+  test_cases:
+    - input: "1000000\n1000\n2.5\n1.0"
+      expected_output: "91.25"
+    - input: "500000\n500\n10\n5"
+      expected_output: "365.00"
+  constraints: ["Daily rate = (daily_reward * token_price) / (total_staked * staked_token_price)", "APY = ((1 + daily_rate)^365 - 1) * 100 or simple APR for approximation"]
+
+- id: "CRY-132"
+  title: "Signature Malleability Check"
+  description: "Read an ECDSA signature (r, s) and curve order n. Check for malleability (s > n/2)."
+  difficulty: 3
+  stdlib_modules: [std.io, std.math, std.encoding]
+  input_format: "Line 1: r (hex). Line 2: s (hex). Line 3: curve order n (hex)"
+  output_format: "CANONICAL or MALLEABLE (normalized s = <hex>)"
+  test_cases:
+    - input: "r_hex\nsmall_s_hex\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+      expected_output: "CANONICAL"
+    - input: "r_hex\nlarge_s_hex\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+      expected_output: "MALLEABLE (normalized s = <n - s as hex>)"
+  constraints: ["If s > n/2, signature is malleable", "Normalize by replacing s with n - s", "BIP62/EIP-2 low-S requirement"]
+
+- id: "CRY-133"
+  title: "Deterministic Wallet Addresses"
+  description: "Read a seed phrase and output the first 5 addresses for Bitcoin (BIP44) path."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.str]
+  input_format: "A BIP39 mnemonic seed phrase (12 or 24 words)"
+  output_format: "5 lines: m/44'/0'/0'/0/0 through m/44'/0'/0'/0/4 with addresses"
+  test_cases:
+    - input: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+      expected_output: "m/44'/0'/0'/0/0: 1LqBGSKauBjvYM2aWc9F3hBkcNGgz8iA5q\nm/44'/0'/0'/0/1: ...\nm/44'/0'/0'/0/2: ...\nm/44'/0'/0'/0/3: ...\nm/44'/0'/0'/0/4: ..."
+    - input: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+      expected_output: "m/44'/0'/0'/0/0: <addr>\nm/44'/0'/0'/0/1: <addr>\nm/44'/0'/0'/0/2: <addr>\nm/44'/0'/0'/0/3: <addr>\nm/44'/0'/0'/0/4: <addr>"
+  constraints: ["BIP44 derivation path", "Bitcoin mainnet P2PKH addresses"]
+
+- id: "CRY-134"
+  title: "Compact Block Filter (BIP158)"
+  description: "Read a set of elements and a query. Build a Golomb-coded set filter and test membership."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.io, std.encoding, std.math]
+  input_format: "Line 1: JSON array of elements to include. Line 2: query element"
+  output_format: "Line 1: filter (hex). Line 2: MATCH or NO_MATCH"
+  test_cases:
+    - input: "[\"addr1\",\"addr2\",\"addr3\"]\naddr2"
+      expected_output: "<filter_hex>\nMATCH"
+    - input: "[\"addr1\",\"addr2\"]\naddr3"
+      expected_output: "<filter_hex>\nNO_MATCH"
+  constraints: ["Golomb-Rice coding with P=19 (BIP158 parameter)", "SipHash for element hashing", "False positive rate ~1/2^P"]
+
+- id: "CRY-135"
+  title: "Encrypted Keystore (Web3 Format)"
+  description: "Read a private key and password. Output an encrypted keystore JSON (Web3 Secret Storage)."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.io, std.json, std.encoding]
+  input_format: "Line 1: private key (hex). Line 2: password"
+  output_format: "JSON keystore with fields: version, id (uuid), crypto {cipher, ciphertext, cipherparams, kdf, kdfparams, mac}"
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\nmypassword"
+      expected_output: "{\"version\":3,\"id\":\"<uuid>\",\"crypto\":{\"cipher\":\"aes-128-ctr\",\"ciphertext\":\"<hex>\",\"cipherparams\":{\"iv\":\"<hex>\"},\"kdf\":\"scrypt\",\"kdfparams\":{\"n\":8192,\"r\":8,\"p\":1,\"dklen\":32,\"salt\":\"<hex>\"},\"mac\":\"<hex>\"}}"
+    - input: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140\nsecure123"
+      expected_output: "{\"version\":3,...}"
+  constraints: ["scrypt KDF (n=8192 for testing)", "AES-128-CTR encryption", "MAC = Keccak-256(derived_key[16:32] + ciphertext)", "Random salt, IV, UUID"]

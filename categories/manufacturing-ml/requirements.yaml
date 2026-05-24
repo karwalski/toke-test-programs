@@ -1,0 +1,1622 @@
+# Manufacturing & ML Program Requirements
+# 135 unique requirements covering quality control, SPC, ML, predictive maintenance, and more
+
+- id: "MFG-001"
+  title: "Basic Mean Calculator"
+  description: "Calculate the arithmetic mean of measurement data from a CSV input."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of numeric measurements"
+  output_format: "stdout: JSON with mean value"
+  test_cases:
+    - input: "10.2,10.1,10.3,9.8,10.0"
+      expected_output: '{"mean":10.08}'
+  constraints: ["handle empty input gracefully", "round to 2 decimal places"]
+
+- id: "MFG-002"
+  title: "Standard Deviation Calculator"
+  description: "Compute sample standard deviation for a set of measurements."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of numeric measurements"
+  output_format: "stdout: JSON with std_dev value"
+  test_cases:
+    - input: "10.2,10.1,10.3,9.8,10.0"
+      expected_output: '{"std_dev":0.19}'
+  constraints: ["use sample standard deviation (n-1)", "round to 2 decimal places"]
+
+- id: "MFG-003"
+  title: "Specification Limit Check"
+  description: "Determine if all measurements fall within given upper and lower specification limits."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with header row (measurement,lsl,usl) and data rows"
+  output_format: "stdout: JSON with in_spec boolean and out_of_spec_count"
+  test_cases:
+    - input: "measurement,lsl,usl\n10.2,9.5,10.5\n10.1,9.5,10.5\n10.3,9.5,10.5"
+      expected_output: '{"in_spec":true,"out_of_spec_count":0}'
+  constraints: ["LSL and USL inclusive", "report count of violations"]
+
+- id: "MFG-004"
+  title: "Cp Capability Index"
+  description: "Calculate the process capability index Cp given specification limits and process data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with header (value,lsl,usl) and measurement rows"
+  output_format: "stdout: JSON with cp value"
+  test_cases:
+    - input: "value,lsl,usl\n10.0,9.0,11.0\n10.1,9.0,11.0\n9.9,9.0,11.0\n10.2,9.0,11.0\n9.8,9.0,11.0"
+      expected_output: '{"cp":2.63}'
+  constraints: ["Cp = (USL - LSL) / (6 * sigma)", "round to 2 decimal places"]
+
+- id: "MFG-005"
+  title: "Cpk Capability Index"
+  description: "Calculate the process capability index Cpk accounting for process centering."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with header (value,lsl,usl) and measurement rows"
+  output_format: "stdout: JSON with cpk value"
+  test_cases:
+    - input: "value,lsl,usl\n10.1,9.0,11.0\n10.2,9.0,11.0\n10.0,9.0,11.0\n10.3,9.0,11.0\n10.1,9.0,11.0"
+      expected_output: '{"cpk":2.41}'
+  constraints: ["Cpk = min((USL-mean)/(3*sigma), (mean-LSL)/(3*sigma))", "round to 2 decimal places"]
+
+- id: "MFG-006"
+  title: "X-bar Chart Values"
+  description: "Calculate X-bar (mean of subgroup means) and control limits for an X-bar chart."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with subgroup measurements, one subgroup per row"
+  output_format: "stdout: JSON with x_bar, ucl, lcl"
+  test_cases:
+    - input: "10.0,10.1,10.2\n9.9,10.0,10.1\n10.1,10.0,9.9\n10.0,10.2,10.1"
+      expected_output: '{"x_bar":10.05,"ucl":10.21,"lcl":9.89}'
+  constraints: ["use A2 constant for subgroup size", "round to 2 decimal places"]
+
+- id: "MFG-007"
+  title: "R Chart Values"
+  description: "Calculate range chart center line and control limits."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with subgroup measurements, one subgroup per row"
+  output_format: "stdout: JSON with r_bar, ucl, lcl"
+  test_cases:
+    - input: "10.0,10.1,10.2\n9.9,10.0,10.1\n10.1,10.0,9.9\n10.0,10.2,10.1"
+      expected_output: '{"r_bar":0.2,"ucl":0.51,"lcl":0.0}'
+  constraints: ["use D3 and D4 constants", "LCL cannot be negative"]
+
+- id: "MFG-008"
+  title: "Moving Range Chart"
+  description: "Calculate individual/moving range chart for individual measurements."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of sequential individual measurements"
+  output_format: "stdout: JSON with mr_bar, ucl, lcl"
+  test_cases:
+    - input: "10.0,10.1,9.9,10.2,10.0,9.8,10.1"
+      expected_output: '{"mr_bar":0.2,"ucl":0.65,"lcl":0.0}'
+  constraints: ["moving range of consecutive pairs", "round to 2 decimal places"]
+
+- id: "MFG-009"
+  title: "CUSUM Chart"
+  description: "Calculate cumulative sum control chart values to detect small shifts in mean."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with target,slack,measurements on separate rows"
+  output_format: "stdout: JSON with cusum_pos array, cusum_neg array, signal boolean"
+  test_cases:
+    - input: "target,10.0\nslack,0.5\n10.1,10.2,10.3,10.1,10.0,10.4,10.5"
+      expected_output: '{"cusum_pos":[0.0,0.0,0.0,0.0,0.0,0.0,0.0],"cusum_neg":[0.0,0.0,0.0,0.0,0.0,0.0,0.0],"signal":false}'
+  constraints: ["use tabular CUSUM method", "threshold h = 5*sigma"]
+
+- id: "MFG-010"
+  title: "EWMA Chart"
+  description: "Calculate exponentially weighted moving average control chart values."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with lambda,target on first row, measurements on second row"
+  output_format: "stdout: JSON with ewma array, ucl, lcl"
+  test_cases:
+    - input: "0.2,10.0\n10.1,10.2,9.9,10.3,10.0"
+      expected_output: '{"ewma":[10.02,10.06,10.03,10.08,10.06],"ucl":10.27,"lcl":9.73}'
+  constraints: ["lambda between 0 and 1", "round to 2 decimal places"]
+
+- id: "MFG-011"
+  title: "Gauge R&R Study"
+  description: "Perform a basic gauge repeatability and reproducibility analysis."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns operator,part,trial,measurement"
+  output_format: "stdout: JSON with repeatability, reproducibility, grr_percent"
+  test_cases:
+    - input: "operator,part,trial,measurement\nA,1,1,10.1\nA,1,2,10.2\nB,1,1,10.0\nB,1,2,10.1"
+      expected_output: '{"repeatability":0.07,"reproducibility":0.07,"grr_percent":14.14}'
+  constraints: ["ANOVA method", "round to 2 decimal places"]
+
+- id: "MFG-012"
+  title: "Measurement Bias Detection"
+  description: "Detect systematic bias in a measurement system by comparing to reference values."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns reference,measured"
+  output_format: "stdout: JSON with bias, bias_percent, significant boolean"
+  test_cases:
+    - input: "reference,measured\n10.0,10.05\n10.0,10.03\n10.0,10.04\n10.0,10.06\n10.0,10.02"
+      expected_output: '{"bias":0.04,"bias_percent":0.4,"significant":false}'
+  constraints: ["t-test at 95% confidence", "round to 2 decimal places"]
+
+- id: "MFG-013"
+  title: "Linearity Study"
+  description: "Assess measurement system linearity across its operating range."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns reference,measured"
+  output_format: "stdout: JSON with slope, intercept, r_squared, linear boolean"
+  test_cases:
+    - input: "reference,measured\n2.0,2.01\n4.0,4.03\n6.0,6.04\n8.0,8.06\n10.0,10.08"
+      expected_output: '{"slope":1.01,"intercept":-0.01,"r_squared":1.0,"linear":true}'
+  constraints: ["linear if slope within 0.9-1.1 and r_squared > 0.99"]
+
+- id: "MFG-014"
+  title: "Pareto Analysis of Defects"
+  description: "Generate Pareto analysis ranking defect types by frequency."
+  difficulty: 2
+  stdlib_modules: [std.csv, std.json, std.io, std.math]
+  input_format: "stdin: CSV with columns defect_type,count"
+  output_format: "stdout: JSON array sorted by count desc with cumulative_percent"
+  test_cases:
+    - input: "defect_type,count\nscratch,45\ndent,30\ncolor,15\nsize,10"
+      expected_output: '[{"defect_type":"scratch","count":45,"cumulative_percent":45.0},{"defect_type":"dent","count":30,"cumulative_percent":75.0},{"defect_type":"color","count":15,"cumulative_percent":90.0},{"defect_type":"size","count":10,"cumulative_percent":100.0}]'
+  constraints: ["sort descending by count", "cumulative percent as running total"]
+
+- id: "MFG-015"
+  title: "First Pass Yield"
+  description: "Calculate first pass yield from batch production data."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns batch_id,total,passed"
+  output_format: "stdout: JSON with overall_fpy and per_batch array"
+  test_cases:
+    - input: "batch_id,total,passed\nB001,100,95\nB002,100,98\nB003,100,92"
+      expected_output: '{"overall_fpy":0.95,"per_batch":[{"batch_id":"B001","fpy":0.95},{"batch_id":"B002","fpy":0.98},{"batch_id":"B003","fpy":0.92}]}'
+  constraints: ["FPY = passed/total", "round to 2 decimal places"]
+
+- id: "MFG-016"
+  title: "Rolled Throughput Yield"
+  description: "Calculate rolled throughput yield across multiple process steps."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns step,yield"
+  output_format: "stdout: JSON with rty value"
+  test_cases:
+    - input: "step,yield\ncut,0.98\nbend,0.97\nweld,0.99\npaint,0.95"
+      expected_output: '{"rty":0.89}'
+  constraints: ["RTY = product of all step yields", "round to 2 decimal places"]
+
+- id: "MFG-017"
+  title: "OEE Calculator"
+  description: "Calculate Overall Equipment Effectiveness from availability, performance, and quality data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns machine,planned_time,run_time,ideal_cycle,total_count,good_count"
+  output_format: "stdout: JSON with availability, performance, quality, oee per machine"
+  test_cases:
+    - input: "machine,planned_time,run_time,ideal_cycle,total_count,good_count\nM1,480,420,0.5,800,780"
+      expected_output: '{"machines":[{"machine":"M1","availability":0.88,"performance":0.95,"quality":0.98,"oee":0.82}]}'
+  constraints: ["OEE = availability * performance * quality", "round to 2 decimal places"]
+
+- id: "MFG-018"
+  title: "Defects Per Million Opportunities"
+  description: "Calculate DPMO and sigma level from defect data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns units_produced,defects,opportunities_per_unit"
+  output_format: "stdout: JSON with dpmo and sigma_level"
+  test_cases:
+    - input: "units_produced,defects,opportunities_per_unit\n1000,5,10"
+      expected_output: '{"dpmo":500,"sigma_level":4.79}'
+  constraints: ["DPMO = (defects / (units * opportunities)) * 1000000", "sigma from z-table lookup"]
+
+- id: "MFG-019"
+  title: "Control Chart Rule Violations"
+  description: "Detect Western Electric rules violations in control chart data."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with measurements, one per line"
+  output_format: "stdout: JSON with violations array listing rule and index"
+  test_cases:
+    - input: "10.0\n10.1\n10.0\n10.2\n12.5\n10.1\n10.0"
+      expected_output: '{"violations":[{"rule":"1_beyond_3sigma","index":4}]}'
+  constraints: ["implement rules 1-4 of Western Electric", "use calculated control limits"]
+
+- id: "MFG-020"
+  title: "Nelson Rules Detection"
+  description: "Detect all eight Nelson rules violations in process data."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of sequential measurements"
+  output_format: "stdout: JSON with violations array"
+  test_cases:
+    - input: "10.0,10.1,10.0,10.1,10.0,10.1,10.0,10.1,15.0"
+      expected_output: '{"violations":[{"rule":1,"index":8,"description":"point beyond 3 sigma"}]}'
+  constraints: ["implement all 8 Nelson rules", "report all violations found"]
+
+- id: "MFG-021"
+  title: "Simple Linear Regression"
+  description: "Fit a simple linear regression model to manufacturing process data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns x,y"
+  output_format: "stdout: JSON with slope, intercept, r_squared"
+  test_cases:
+    - input: "x,y\n1,2.1\n2,3.9\n3,6.1\n4,7.9\n5,10.1"
+      expected_output: '{"slope":2.0,"intercept":0.1,"r_squared":1.0}'
+  constraints: ["least squares method", "round to 2 decimal places"]
+
+- id: "MFG-022"
+  title: "Multiple Linear Regression"
+  description: "Fit a multiple linear regression model with multiple process variables."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with multiple feature columns and target column"
+  output_format: "stdout: JSON with coefficients array, intercept, r_squared"
+  test_cases:
+    - input: "temp,pressure,quality\n100,50,85\n110,55,90\n120,60,95\n130,65,100"
+      expected_output: '{"coefficients":[0.33,0.33],"intercept":35.0,"r_squared":1.0}'
+  constraints: ["ordinary least squares", "report all coefficients"]
+
+- id: "MFG-023"
+  title: "kNN Classification"
+  description: "Classify product quality using k-nearest neighbours algorithm."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with training data (features + label) followed by --- separator and test point"
+  output_format: "stdout: JSON with predicted_class and nearest_neighbors"
+  test_cases:
+    - input: "x1,x2,class\n1.0,1.0,good\n1.1,1.1,good\n5.0,5.0,bad\n5.1,5.1,bad\n---\n1.2,1.2"
+      expected_output: '{"predicted_class":"good","nearest_neighbors":["good","good","bad"]}'
+  constraints: ["k=3 default", "Euclidean distance", "majority vote"]
+
+- id: "MFG-024"
+  title: "Decision Tree Classifier"
+  description: "Build a decision tree to classify product defects based on process parameters."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with feature columns and class label column"
+  output_format: "stdout: JSON with tree structure and accuracy"
+  test_cases:
+    - input: "temp,pressure,speed,defect\nhigh,high,fast,yes\nhigh,high,slow,yes\nlow,low,fast,no\nlow,low,slow,no"
+      expected_output: '{"root":{"feature":"temp","split":"high","left":"yes","right":"no"},"accuracy":1.0}'
+  constraints: ["information gain splitting", "max depth 5", "report training accuracy"]
+
+- id: "MFG-025"
+  title: "K-Means Clustering"
+  description: "Cluster manufacturing measurements into k groups using k-means algorithm."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with k on first line, then data points (x,y per row)"
+  output_format: "stdout: JSON with centroids and cluster_assignments"
+  test_cases:
+    - input: "2\n1.0,1.0\n1.1,1.1\n5.0,5.0\n5.1,5.1"
+      expected_output: '{"centroids":[[1.05,1.05],[5.05,5.05]],"assignments":[0,0,1,1]}'
+  constraints: ["random seed 42 for reproducibility", "max 100 iterations", "convergence threshold 0.001"]
+
+- id: "MFG-026"
+  title: "Anomaly Detection - Z-Score"
+  description: "Detect anomalous measurements using z-score method."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of measurements"
+  output_format: "stdout: JSON with anomalies array (index, value, z_score)"
+  test_cases:
+    - input: "10.0,10.1,10.0,10.2,15.0,10.1,10.0"
+      expected_output: '{"anomalies":[{"index":4,"value":15.0,"z_score":2.96}]}'
+  constraints: ["threshold z > 2.5", "round z_score to 2 decimal places"]
+
+- id: "MFG-027"
+  title: "Anomaly Detection - IQR Method"
+  description: "Detect outliers using the interquartile range method."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of measurements"
+  output_format: "stdout: JSON with outliers array, q1, q3, iqr"
+  test_cases:
+    - input: "1,2,3,4,5,6,7,8,9,100"
+      expected_output: '{"q1":2.75,"q3":7.75,"iqr":5.0,"outliers":[{"index":9,"value":100}]}'
+  constraints: ["outlier if value < Q1-1.5*IQR or > Q3+1.5*IQR"]
+
+- id: "MFG-028"
+  title: "Anomaly Detection - Isolation Forest"
+  description: "Implement simplified isolation forest for sensor anomaly detection."
+  difficulty: 5
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with sensor readings (multiple columns)"
+  output_format: "stdout: JSON with anomaly_scores and anomaly_indices"
+  test_cases:
+    - input: "s1,s2\n1.0,1.0\n1.1,1.1\n0.9,0.9\n1.0,1.0\n5.0,5.0"
+      expected_output: '{"anomaly_scores":[0.45,0.45,0.45,0.45,0.85],"anomaly_indices":[4]}'
+  constraints: ["100 trees", "threshold score > 0.7", "subsample size 256"]
+
+- id: "MFG-029"
+  title: "Time Series Moving Average"
+  description: "Calculate simple and weighted moving averages for sensor time series data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with window_size on first line, then timestamp,value rows"
+  output_format: "stdout: JSON with sma and wma arrays"
+  test_cases:
+    - input: "3\n1,10.0\n2,10.5\n3,11.0\n4,10.8\n5,11.2"
+      expected_output: '{"sma":[null,null,10.5,10.77,11.0],"wma":[null,null,10.67,10.82,11.07]}'
+  constraints: ["null for incomplete windows", "round to 2 decimal places"]
+
+- id: "MFG-030"
+  title: "Exponential Smoothing Forecast"
+  description: "Apply single exponential smoothing to forecast next production value."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with alpha on first line, then values"
+  output_format: "stdout: JSON with smoothed array and forecast"
+  test_cases:
+    - input: "0.3\n10,12,11,13,12,14"
+      expected_output: '{"smoothed":[10.0,10.6,10.72,11.4,11.58,12.31],"forecast":12.31}'
+  constraints: ["alpha between 0 and 1", "initial value = first observation", "round to 2 decimal places"]
+
+- id: "MFG-031"
+  title: "Holt-Winters Forecast"
+  description: "Apply double exponential smoothing (Holt method) for trend forecasting."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with alpha,beta on first line, then values"
+  output_format: "stdout: JSON with forecast_next, level, trend"
+  test_cases:
+    - input: "0.3,0.1\n100,105,110,115,120"
+      expected_output: '{"forecast_next":124.77,"level":119.88,"trend":4.89}'
+  constraints: ["double exponential smoothing", "round to 2 decimal places"]
+
+- id: "MFG-032"
+  title: "Sensor Data Rate of Change"
+  description: "Calculate rate of change and detect rapid changes in sensor data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns timestamp,value and threshold on first line"
+  output_format: "stdout: JSON with rates array and alerts"
+  test_cases:
+    - input: "threshold,5.0\ntimestamp,value\n0,100\n1,102\n2,104\n3,110\n4,112"
+      expected_output: '{"rates":[2.0,2.0,6.0,2.0],"alerts":[{"index":3,"rate":6.0}]}'
+  constraints: ["rate = (v2-v1)/(t2-t1)", "alert when rate exceeds threshold"]
+
+- id: "MFG-033"
+  title: "Sensor Correlation Matrix"
+  description: "Calculate Pearson correlation matrix between multiple sensor readings."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with multiple sensor columns"
+  output_format: "stdout: JSON correlation matrix"
+  test_cases:
+    - input: "s1,s2,s3\n1,2,3\n2,4,6\n3,6,9\n4,8,12"
+      expected_output: '{"correlation_matrix":[[1.0,1.0,1.0],[1.0,1.0,1.0],[1.0,1.0,1.0]]}'
+  constraints: ["Pearson correlation coefficient", "round to 2 decimal places"]
+
+- id: "MFG-034"
+  title: "Predictive Maintenance - Time to Failure"
+  description: "Estimate remaining useful life based on degradation trend."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns time,degradation and failure_threshold on first line"
+  output_format: "stdout: JSON with estimated_ttf, slope, current_degradation"
+  test_cases:
+    - input: "failure_threshold,100\ntime,degradation\n0,10\n10,20\n20,30\n30,40\n40,50"
+      expected_output: '{"estimated_ttf":50,"slope":1.0,"current_degradation":50}'
+  constraints: ["linear extrapolation to threshold", "round to nearest integer"]
+
+- id: "MFG-035"
+  title: "Predictive Maintenance - Weibull Analysis"
+  description: "Fit Weibull distribution to failure time data for reliability analysis."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns time_to_failure"
+  output_format: "stdout: JSON with shape (beta), scale (eta), mean_life, reliability_at_time"
+  test_cases:
+    - input: "time_to_failure\n100\n150\n200\n120\n180\n160\n140"
+      expected_output: '{"beta":3.45,"eta":168.2,"mean_life":151.0,"reliability_at_200":0.22}'
+  constraints: ["maximum likelihood estimation", "round to 2 decimal places"]
+
+- id: "MFG-036"
+  title: "Vibration FFT Analysis"
+  description: "Perform FFT on vibration sensor data to identify dominant frequencies."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with sample_rate on first line, then amplitude values"
+  output_format: "stdout: JSON with dominant_frequencies and magnitudes"
+  test_cases:
+    - input: "sample_rate,1000\n0.0,0.59,0.95,0.95,0.59,0.0,-0.59,-0.95,-0.95,-0.59"
+      expected_output: '{"dominant_frequencies":[100.0],"magnitudes":[0.95]}'
+  constraints: ["report frequencies with magnitude > 10% of max", "round to 2 decimal places"]
+
+- id: "MFG-037"
+  title: "Batch Yield Trend Analysis"
+  description: "Analyze yield trends across production batches and detect degradation."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns batch_number,yield_percent"
+  output_format: "stdout: JSON with trend_direction, slope, alert"
+  test_cases:
+    - input: "batch_number,yield_percent\n1,98\n2,97\n3,96\n4,95\n5,94"
+      expected_output: '{"trend_direction":"decreasing","slope":-1.0,"alert":true}'
+  constraints: ["alert if slope < -0.5 per batch", "linear regression on batch data"]
+
+- id: "MFG-038"
+  title: "Scrap Rate Analysis"
+  description: "Calculate scrap rates by category and identify top contributors."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns category,scrap_count,total_produced"
+  output_format: "stdout: JSON with rates per category and overall_rate"
+  test_cases:
+    - input: "category,scrap_count,total_produced\nA,5,100\nB,10,200\nC,3,150"
+      expected_output: '{"overall_rate":0.04,"categories":[{"category":"B","rate":0.05},{"category":"A","rate":0.05},{"category":"C","rate":0.02}]}'
+  constraints: ["sort categories by scrap rate descending", "round to 2 decimal places"]
+
+- id: "MFG-039"
+  title: "Downtime Analysis"
+  description: "Analyze machine downtime events and calculate availability metrics."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns machine,start_time,end_time,reason"
+  output_format: "stdout: JSON with total_downtime, mtbf, mttr per machine"
+  test_cases:
+    - input: "machine,start_time,end_time,reason\nM1,0,30,breakdown\nM1,200,220,maintenance\nM1,500,510,breakdown"
+      expected_output: '{"machines":[{"machine":"M1","total_downtime":60,"mtbf":220,"mttr":20}]}'
+  constraints: ["MTBF = total_uptime / num_failures", "MTTR = total_downtime / num_failures"]
+
+- id: "MFG-040"
+  title: "Cycle Time Analysis"
+  description: "Analyze cycle time distribution and identify bottlenecks."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns station,cycle_time"
+  output_format: "stdout: JSON with per-station stats (mean, std, min, max) and bottleneck"
+  test_cases:
+    - input: "station,cycle_time\nA,10\nA,11\nA,12\nB,20\nB,22\nB,21\nC,15\nC,14\nC,16"
+      expected_output: '{"stations":[{"station":"A","mean":11.0,"std":1.0},{"station":"B","mean":21.0,"std":1.0},{"station":"C","mean":15.0,"std":1.0}],"bottleneck":"B"}'
+  constraints: ["bottleneck = station with highest mean cycle time"]
+
+- id: "MFG-041"
+  title: "Takt Time Calculator"
+  description: "Calculate takt time and compare against actual cycle times."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with available_time,demand on first line, then station,cycle_time rows"
+  output_format: "stdout: JSON with takt_time and station compliance"
+  test_cases:
+    - input: "available_time,480\ndemand,100\nstation,cycle_time\nA,4.5\nB,5.0\nC,4.8"
+      expected_output: '{"takt_time":4.8,"stations":[{"station":"A","meets_takt":true},{"station":"B","meets_takt":false},{"station":"C","meets_takt":true}]}'
+  constraints: ["takt = available_time / demand", "meets_takt if cycle_time <= takt_time"]
+
+- id: "MFG-042"
+  title: "Histogram Binning"
+  description: "Create histogram bins from measurement data for quality reporting."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with num_bins on first line, then measurement values"
+  output_format: "stdout: JSON with bins array (lower, upper, count)"
+  test_cases:
+    - input: "3\n1,2,3,4,5,6,7,8,9"
+      expected_output: '{"bins":[{"lower":1.0,"upper":3.67,"count":3},{"lower":3.67,"upper":6.33,"count":3},{"lower":6.33,"upper":9.0,"count":3}]}'
+  constraints: ["equal width bins", "round bounds to 2 decimal places"]
+
+- id: "MFG-043"
+  title: "Normal Distribution Fit Test"
+  description: "Test if measurement data follows a normal distribution using Shapiro-Wilk test."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of measurements"
+  output_format: "stdout: JSON with w_statistic, p_value, is_normal"
+  test_cases:
+    - input: "10.0,10.1,9.9,10.2,9.8,10.0,10.1,9.9,10.0,10.1"
+      expected_output: '{"w_statistic":0.97,"p_value":0.89,"is_normal":true}'
+  constraints: ["is_normal if p_value > 0.05", "round to 2 decimal places"]
+
+- id: "MFG-044"
+  title: "Process Sigma Level"
+  description: "Calculate process sigma level from defect data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with units,defects,opportunities"
+  output_format: "stdout: JSON with dpo, dpmo, sigma_level, yield_percent"
+  test_cases:
+    - input: "units,defects,opportunities\n10000,50,5"
+      expected_output: '{"dpo":0.001,"dpmo":1000,"sigma_level":4.59,"yield_percent":99.9}'
+  constraints: ["sigma from inverse normal CDF + 1.5 shift", "round to 2 decimal places"]
+
+- id: "MFG-045"
+  title: "Pp and Ppk Indices"
+  description: "Calculate process performance indices Pp and Ppk."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with header (value,lsl,usl) and measurement rows"
+  output_format: "stdout: JSON with pp, ppk values"
+  test_cases:
+    - input: "value,lsl,usl\n10.0,9.0,11.0\n10.1,9.0,11.0\n9.9,9.0,11.0\n10.2,9.0,11.0\n9.8,9.0,11.0"
+      expected_output: '{"pp":2.63,"ppk":2.41}'
+  constraints: ["Pp uses overall sigma (n denominator)", "Ppk considers centering"]
+
+- id: "MFG-046"
+  title: "Attribute Control Chart (p-chart)"
+  description: "Generate p-chart for proportion defective data."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns sample_size,defectives"
+  output_format: "stdout: JSON with p_bar, ucl, lcl, out_of_control indices"
+  test_cases:
+    - input: "sample_size,defectives\n100,5\n100,3\n100,4\n100,6\n100,15"
+      expected_output: '{"p_bar":0.066,"ucl":0.14,"lcl":0.0,"out_of_control":[4]}'
+  constraints: ["p_bar = total defectives / total inspected", "3-sigma limits"]
+
+- id: "MFG-047"
+  title: "Attribute Control Chart (c-chart)"
+  description: "Generate c-chart for count of defects per unit data."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with defect counts per sample"
+  output_format: "stdout: JSON with c_bar, ucl, lcl, out_of_control indices"
+  test_cases:
+    - input: "3,4,5,3,4,2,3,4,15,3"
+      expected_output: '{"c_bar":4.6,"ucl":11.03,"lcl":0.0,"out_of_control":[8]}'
+  constraints: ["c_bar = mean of counts", "UCL = c_bar + 3*sqrt(c_bar)", "LCL >= 0"]
+
+- id: "MFG-048"
+  title: "Gage Linearity and Bias"
+  description: "Perform gage linearity and bias study across measurement range."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns reference,measurement"
+  output_format: "stdout: JSON with bias_at_each_reference, linearity_percent, acceptable"
+  test_cases:
+    - input: "reference,measurement\n2,2.1\n2,2.0\n4,4.1\n4,4.2\n6,6.0\n6,6.1"
+      expected_output: '{"biases":[{"reference":2,"bias":0.05},{"reference":4,"bias":0.15},{"reference":6,"bias":0.05}],"linearity_percent":1.25,"acceptable":true}'
+  constraints: ["acceptable if linearity < 5%", "bias = mean(measured) - reference"]
+
+- id: "MFG-049"
+  title: "Tolerance Stack-Up Analysis"
+  description: "Perform worst-case and RSS tolerance stack-up calculation."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns dimension,nominal,tolerance"
+  output_format: "stdout: JSON with worst_case_min, worst_case_max, rss_tolerance"
+  test_cases:
+    - input: "dimension,nominal,tolerance\nA,10.0,0.1\nB,20.0,0.2\nC,5.0,0.05"
+      expected_output: '{"total_nominal":35.0,"worst_case_min":34.65,"worst_case_max":35.35,"rss_tolerance":0.23}'
+  constraints: ["RSS = sqrt(sum of squares of individual tolerances)", "round to 2 decimal places"]
+
+- id: "MFG-050"
+  title: "Batch Comparison T-Test"
+  description: "Perform two-sample t-test to compare two production batches."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with two rows of measurements (batch A and batch B)"
+  output_format: "stdout: JSON with t_statistic, p_value, significant, means"
+  test_cases:
+    - input: "10.0,10.1,10.2,9.9,10.0\n10.5,10.4,10.6,10.3,10.5"
+      expected_output: '{"mean_a":10.04,"mean_b":10.46,"t_statistic":-5.69,"p_value":0.0,"significant":true}'
+  constraints: ["two-tailed test at alpha=0.05", "Welch t-test"]
+
+- id: "MFG-051"
+  title: "ANOVA - Multi-Batch Comparison"
+  description: "Perform one-way ANOVA to compare means across multiple batches."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns batch,value"
+  output_format: "stdout: JSON with f_statistic, p_value, significant, group_means"
+  test_cases:
+    - input: "batch,value\nA,10.0\nA,10.1\nA,10.2\nB,10.5\nB,10.6\nB,10.4\nC,10.0\nC,10.1\nC,10.0"
+      expected_output: '{"f_statistic":30.0,"p_value":0.0,"significant":true,"group_means":{"A":10.1,"B":10.5,"C":10.03}}'
+  constraints: ["alpha = 0.05", "report between-group and within-group variance"]
+
+- id: "MFG-052"
+  title: "Sensor Drift Detection"
+  description: "Detect gradual drift in sensor readings over time."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns timestamp,reading"
+  output_format: "stdout: JSON with drift_detected, drift_rate, direction"
+  test_cases:
+    - input: "timestamp,reading\n0,10.0\n1,10.01\n2,10.02\n3,10.03\n4,10.04\n5,10.05"
+      expected_output: '{"drift_detected":true,"drift_rate":0.01,"direction":"increasing"}'
+  constraints: ["drift if slope significantly non-zero (p < 0.05)", "report per unit time"]
+
+- id: "MFG-053"
+  title: "Multi-Sensor Fusion"
+  description: "Combine multiple redundant sensor readings using weighted average."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with sensor readings and reliability weights"
+  output_format: "stdout: JSON with fused_value, confidence"
+  test_cases:
+    - input: "sensor,value,weight\nS1,10.0,0.8\nS2,10.2,0.6\nS3,9.9,0.9"
+      expected_output: '{"fused_value":10.02,"confidence":0.87}'
+  constraints: ["weighted average by reliability", "confidence = max weight normalized"]
+
+- id: "MFG-054"
+  title: "Recipe Optimisation - Grid Search"
+  description: "Find optimal process recipe parameters using grid search over discrete values."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with parameter ranges and historical quality data"
+  output_format: "stdout: JSON with optimal_params and predicted_quality"
+  test_cases:
+    - input: "temp,pressure,quality\n100,50,85\n100,60,88\n110,50,90\n110,60,92\n120,50,89\n120,60,91"
+      expected_output: '{"optimal_params":{"temp":110,"pressure":60},"predicted_quality":92}'
+  constraints: ["exhaustive search of all combinations", "select max quality"]
+
+- id: "MFG-055"
+  title: "Gradient Descent Optimiser"
+  description: "Optimise a process parameter using gradient descent on a quality function."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with x,y pairs representing parameter vs quality"
+  output_format: "stdout: JSON with optimal_x, optimal_y, iterations"
+  test_cases:
+    - input: "x,y\n0,0\n1,3\n2,4\n3,3\n4,0"
+      expected_output: '{"optimal_x":2.0,"optimal_y":4.0,"iterations":15}'
+  constraints: ["learning rate 0.01", "convergence threshold 0.001", "max 1000 iterations"]
+
+- id: "MFG-056"
+  title: "Min-Max Normalisation"
+  description: "Normalise sensor data to 0-1 range for ML preprocessing."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with multiple feature columns"
+  output_format: "stdout: JSON with normalised data and scaling parameters"
+  test_cases:
+    - input: "temp,pressure\n100,50\n150,75\n200,100"
+      expected_output: '{"normalised":[[0.0,0.0],[0.5,0.5],[1.0,1.0]],"min":[100,50],"max":[200,100]}'
+  constraints: ["normalised = (x - min) / (max - min)", "handle zero range"]
+
+- id: "MFG-057"
+  title: "Z-Score Standardisation"
+  description: "Standardise features to zero mean and unit variance."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with multiple feature columns"
+  output_format: "stdout: JSON with standardised data, means, stds"
+  test_cases:
+    - input: "temp,pressure\n100,50\n110,60\n120,70"
+      expected_output: '{"standardised":[[-1.22,-1.22],[0.0,0.0],[1.22,1.22]],"means":[110,60],"stds":[10,10]}'
+  constraints: ["z = (x - mean) / std", "round to 2 decimal places"]
+
+- id: "MFG-058"
+  title: "PCA Dimensionality Reduction"
+  description: "Apply Principal Component Analysis to reduce high-dimensional sensor data."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with multiple sensor columns and n_components on first line"
+  output_format: "stdout: JSON with transformed data, explained_variance_ratio"
+  test_cases:
+    - input: "n_components,1\ns1,s2,s3\n1,2,3\n2,4,6\n3,6,9\n4,8,12"
+      expected_output: '{"transformed":[[-2.67],[-0.89],[0.89],[2.67]],"explained_variance_ratio":[1.0]}'
+  constraints: ["center data before PCA", "report cumulative variance explained"]
+
+- id: "MFG-059"
+  title: "Feature Importance Ranking"
+  description: "Rank process parameters by their correlation to quality outcome."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with feature columns and target column (last)"
+  output_format: "stdout: JSON with ranked features and correlation values"
+  test_cases:
+    - input: "temp,pressure,speed,quality\n100,50,10,85\n110,55,10,90\n120,60,10,95\n130,65,10,100"
+      expected_output: '{"rankings":[{"feature":"temp","correlation":1.0},{"feature":"pressure","correlation":1.0},{"feature":"speed","correlation":0.0}]}'
+  constraints: ["absolute Pearson correlation", "sort descending"]
+
+- id: "MFG-060"
+  title: "Train/Test Split"
+  description: "Split manufacturing dataset into training and test sets."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with split_ratio on first line, then data with header"
+  output_format: "stdout: JSON with train_count, test_count, split_ratio"
+  test_cases:
+    - input: "0.8\nx,y\n1,2\n3,4\n5,6\n7,8\n9,10"
+      expected_output: '{"train_count":4,"test_count":1,"split_ratio":0.8}'
+  constraints: ["deterministic split (first N for train)", "round counts"]
+
+- id: "MFG-061"
+  title: "Confusion Matrix Calculator"
+  description: "Generate confusion matrix from predicted vs actual defect classifications."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns actual,predicted"
+  output_format: "stdout: JSON with tp, fp, tn, fn, accuracy, precision, recall, f1"
+  test_cases:
+    - input: "actual,predicted\ndefect,defect\ndefect,ok\nok,ok\nok,ok\ndefect,defect"
+      expected_output: '{"tp":2,"fp":0,"tn":2,"fn":1,"accuracy":0.8,"precision":1.0,"recall":0.67,"f1":0.8}'
+  constraints: ["positive class = defect", "round to 2 decimal places"]
+
+- id: "MFG-062"
+  title: "ROC Curve Points"
+  description: "Calculate ROC curve points from probability predictions and actual labels."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns actual,probability"
+  output_format: "stdout: JSON with roc_points (fpr, tpr) and auc"
+  test_cases:
+    - input: "actual,probability\n1,0.9\n1,0.8\n0,0.4\n0,0.3\n1,0.7"
+      expected_output: '{"auc":1.0,"roc_points":[{"fpr":0.0,"tpr":0.0},{"fpr":0.0,"tpr":1.0},{"fpr":1.0,"tpr":1.0}]}'
+  constraints: ["vary threshold from 1 to 0", "AUC via trapezoidal rule"]
+
+- id: "MFG-063"
+  title: "Cross-Validation Score"
+  description: "Implement k-fold cross-validation for model evaluation."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with k on first line, then feature and target data"
+  output_format: "stdout: JSON with fold_scores and mean_score"
+  test_cases:
+    - input: "3\nx,y\n1,2\n2,4\n3,6\n4,8\n5,10\n6,12"
+      expected_output: '{"fold_scores":[1.0,1.0,1.0],"mean_score":1.0}'
+  constraints: ["use linear regression as base model", "score = R-squared"]
+
+- id: "MFG-064"
+  title: "Naive Bayes Classifier"
+  description: "Classify defect types using Gaussian Naive Bayes on sensor features."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with feature columns and class label, test point after ---"
+  output_format: "stdout: JSON with predicted_class and probabilities per class"
+  test_cases:
+    - input: "x1,x2,class\n1.0,1.0,A\n1.1,0.9,A\n5.0,5.0,B\n5.1,4.9,B\n---\n1.0,1.0"
+      expected_output: '{"predicted_class":"A","probabilities":{"A":0.99,"B":0.01}}'
+  constraints: ["Gaussian likelihood", "equal priors unless specified"]
+
+- id: "MFG-065"
+  title: "Logistic Regression Binary"
+  description: "Train logistic regression for pass/fail classification of products."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with feature columns and binary target (0/1)"
+  output_format: "stdout: JSON with coefficients, intercept, accuracy"
+  test_cases:
+    - input: "temp,pressure,pass\n100,50,0\n110,55,0\n120,60,1\n130,65,1\n140,70,1"
+      expected_output: '{"coefficients":[0.15,0.15],"intercept":-20.0,"accuracy":1.0}'
+  constraints: ["sigmoid activation", "gradient descent training", "max 1000 iterations"]
+
+- id: "MFG-066"
+  title: "Random Forest Feature Importance"
+  description: "Calculate feature importance scores using simplified random forest."
+  difficulty: 5
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with feature columns and target column"
+  output_format: "stdout: JSON with feature_importances array sorted descending"
+  test_cases:
+    - input: "temp,pressure,humidity,quality\n100,50,30,85\n110,55,31,90\n120,60,29,95\n130,65,30,100"
+      expected_output: '{"feature_importances":[{"feature":"temp","importance":0.5},{"feature":"pressure","importance":0.5},{"feature":"humidity","importance":0.0}]}'
+  constraints: ["10 trees", "random seed 42", "normalise importances to sum to 1"]
+
+- id: "MFG-067"
+  title: "Silhouette Score for Clustering"
+  description: "Calculate silhouette score to evaluate clustering quality."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with data points and cluster assignments"
+  output_format: "stdout: JSON with silhouette_score and per_point_scores"
+  test_cases:
+    - input: "x,y,cluster\n1.0,1.0,0\n1.1,1.1,0\n5.0,5.0,1\n5.1,5.1,1"
+      expected_output: '{"silhouette_score":0.99,"per_point_scores":[0.99,0.99,0.99,0.99]}'
+  constraints: ["score range -1 to 1", "round to 2 decimal places"]
+
+- id: "MFG-068"
+  title: "DBSCAN Clustering"
+  description: "Cluster sensor data using DBSCAN to find arbitrary-shaped clusters and noise."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with eps,min_pts on first line, then x,y data points"
+  output_format: "stdout: JSON with cluster_labels, n_clusters, noise_points"
+  test_cases:
+    - input: "0.5,2\n1.0,1.0\n1.1,1.1\n1.2,1.0\n5.0,5.0\n5.1,5.1\n10.0,10.0"
+      expected_output: '{"cluster_labels":[0,0,0,1,1,-1],"n_clusters":2,"noise_points":[5]}'
+  constraints: ["noise label = -1", "Euclidean distance"]
+
+- id: "MFG-069"
+  title: "Mahalanobis Distance Anomaly"
+  description: "Detect multivariate anomalies using Mahalanobis distance."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with multiple sensor columns"
+  output_format: "stdout: JSON with distances and anomaly_indices"
+  test_cases:
+    - input: "s1,s2\n1.0,1.0\n1.1,1.1\n0.9,0.9\n1.0,1.0\n5.0,5.0"
+      expected_output: '{"distances":[0.32,0.95,0.95,0.32,5.37],"anomaly_indices":[4]}'
+  constraints: ["anomaly if distance > chi-squared threshold at 95%", "round to 2 decimal places"]
+
+- id: "MFG-070"
+  title: "SPC Run Rules"
+  description: "Detect all standard SPC run rules (trends, oscillations, hugging)."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of sequential measurements"
+  output_format: "stdout: JSON with rule_violations array"
+  test_cases:
+    - input: "10.0,10.1,10.2,10.3,10.4,10.5,10.6,10.7"
+      expected_output: '{"rule_violations":[{"rule":"7_points_trending","start_index":0}]}'
+  constraints: ["check: 7 trending, 8 same side, 14 alternating, 2/3 in zone A"]
+
+- id: "MFG-071"
+  title: "Acceptance Sampling Plan"
+  description: "Design single sampling plan given AQL and lot size using MIL-STD-105E."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with lot_size,aql"
+  output_format: "stdout: JSON with sample_size, accept_number, reject_number"
+  test_cases:
+    - input: "lot_size,1000\naql,1.0"
+      expected_output: '{"sample_size":80,"accept_number":2,"reject_number":3}'
+  constraints: ["normal inspection level II", "single sampling"]
+
+- id: "MFG-072"
+  title: "OC Curve Calculator"
+  description: "Calculate Operating Characteristic curve points for a sampling plan."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with sample_size,accept_number on first line"
+  output_format: "stdout: JSON with oc_points array (p, pa)"
+  test_cases:
+    - input: "sample_size,50\naccept_number,2"
+      expected_output: '{"oc_points":[{"p":0.01,"pa":0.99},{"p":0.05,"pa":0.54},{"p":0.1,"pa":0.11}]}'
+  constraints: ["use binomial distribution", "calculate at p = 0.01, 0.02, ..., 0.10"]
+
+- id: "MFG-073"
+  title: "Lot Traceability Report"
+  description: "Generate traceability report linking raw material lots to finished products."
+  difficulty: 2
+  stdlib_modules: [std.csv, std.json, std.io, std.str]
+  input_format: "stdin: CSV with columns product_id,material_lot,process_date,result"
+  output_format: "stdout: JSON grouped by material_lot with product details"
+  test_cases:
+    - input: "product_id,material_lot,process_date,result\nP001,L100,2024-01-01,pass\nP002,L100,2024-01-01,pass\nP003,L200,2024-01-02,fail"
+      expected_output: '{"lots":{"L100":{"products":["P001","P002"],"pass_rate":1.0},"L200":{"products":["P003"],"pass_rate":0.0}}}'
+  constraints: ["group by material lot", "calculate pass rate per lot"]
+
+- id: "MFG-074"
+  title: "Shift Performance Comparison"
+  description: "Compare quality metrics between different production shifts."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns shift,measurement"
+  output_format: "stdout: JSON with per-shift mean, std, sample_size and best_shift"
+  test_cases:
+    - input: "shift,measurement\nday,10.0\nday,10.1\nday,10.0\nnight,10.3\nnight,10.4\nnight,10.2"
+      expected_output: '{"shifts":[{"shift":"day","mean":10.03,"std":0.06,"n":3},{"shift":"night","mean":10.3,"std":0.1,"n":3}],"best_shift":"day"}'
+  constraints: ["best shift = closest mean to nominal (assume nominal is grand mean)"]
+
+- id: "MFG-075"
+  title: "Cost of Quality Calculator"
+  description: "Calculate prevention, appraisal, internal and external failure costs."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns category,item,cost"
+  output_format: "stdout: JSON with category totals and total_coq"
+  test_cases:
+    - input: "category,item,cost\nprevention,training,5000\nappraisal,inspection,3000\ninternal_failure,rework,8000\nexternal_failure,warranty,12000"
+      expected_output: '{"prevention":5000,"appraisal":3000,"internal_failure":8000,"external_failure":12000,"total_coq":28000,"failure_ratio":0.71}'
+  constraints: ["failure_ratio = (internal + external) / total"]
+
+- id: "MFG-076"
+  title: "Batch Processing Pipeline"
+  description: "Process multiple CSV batch files and aggregate results."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.file]
+  input_format: "stdin: CSV with columns batch_file,data (inline multi-batch)"
+  output_format: "stdout: JSON with per-batch stats and aggregate summary"
+  test_cases:
+    - input: "batch,values\nB1,10.0;10.1;10.2\nB2,9.9;10.0;10.1\nB3,10.1;10.2;10.3"
+      expected_output: '{"batches":[{"batch":"B1","mean":10.1},{"batch":"B2","mean":10.0},{"batch":"B3","mean":10.2}],"aggregate_mean":10.1}'
+  constraints: ["semicolon-separated values within cell", "round to 1 decimal place"]
+
+- id: "MFG-077"
+  title: "Material Composition Verification"
+  description: "Verify material composition percentages sum to valid ranges."
+  difficulty: 1
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with element columns and percentage values"
+  output_format: "stdout: JSON with total_percent, valid boolean, out_of_spec elements"
+  test_cases:
+    - input: "element,min,max,actual\nFe,95.0,98.0,96.5\nC,0.1,0.3,0.2\nMn,1.0,2.0,1.5\nOther,0.0,5.0,1.8"
+      expected_output: '{"total_percent":100.0,"valid":true,"out_of_spec":[]}'
+  constraints: ["check each element within min/max", "total should be 99-101%"]
+
+- id: "MFG-078"
+  title: "Dimensional GD&T Position Check"
+  description: "Calculate true position from X,Y coordinates against nominal."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns nominal_x,nominal_y,actual_x,actual_y,tolerance"
+  output_format: "stdout: JSON with true_position values and pass/fail"
+  test_cases:
+    - input: "nominal_x,nominal_y,actual_x,actual_y,tolerance\n10.0,20.0,10.05,20.03,0.2"
+      expected_output: '{"features":[{"true_position":0.12,"tolerance":0.2,"pass":true}]}'
+  constraints: ["true position = 2 * sqrt(dx^2 + dy^2)", "round to 2 decimal places"]
+
+- id: "MFG-079"
+  title: "SPC Dashboard Summary"
+  description: "Generate comprehensive SPC dashboard data from measurement series."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns parameter,value,lsl,usl,timestamp"
+  output_format: "stdout: JSON with mean, std, cp, cpk, out_of_control_count per parameter"
+  test_cases:
+    - input: "parameter,value,lsl,usl\ndia,10.0,9.5,10.5\ndia,10.1,9.5,10.5\ndia,10.2,9.5,10.5\ndia,9.9,9.5,10.5"
+      expected_output: '{"parameters":[{"name":"dia","mean":10.05,"std":0.13,"cp":1.29,"cpk":1.16,"out_of_control":0}]}'
+  constraints: ["calculate all metrics per parameter", "round to 2 decimal places"]
+
+- id: "MFG-080"
+  title: "Sensor Calibration Check"
+  description: "Verify sensor calibration against known reference standards."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns reference,reading,tolerance"
+  output_format: "stdout: JSON with calibration_status, max_error, adjustment_needed"
+  test_cases:
+    - input: "reference,reading,tolerance\n0.0,0.01,0.05\n50.0,50.03,0.1\n100.0,100.08,0.1"
+      expected_output: '{"calibration_status":"pass","max_error":0.08,"adjustment_needed":false}'
+  constraints: ["pass if all readings within tolerance of reference"]
+
+- id: "MFG-081"
+  title: "Inventory Reorder Point"
+  description: "Calculate reorder points based on demand rate and lead time."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns item,daily_demand,lead_days,safety_stock_days"
+  output_format: "stdout: JSON with reorder points per item"
+  test_cases:
+    - input: "item,daily_demand,lead_days,safety_stock_days\nBolt_M8,100,5,2\nNut_M8,150,3,1"
+      expected_output: '{"items":[{"item":"Bolt_M8","reorder_point":700},{"item":"Nut_M8","reorder_point":600}]}'
+  constraints: ["reorder_point = daily_demand * (lead_days + safety_stock_days)"]
+
+- id: "MFG-082"
+  title: "Kanban Size Calculator"
+  description: "Calculate optimal kanban container quantities."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns part,demand_rate,lead_time,safety_factor,container_size"
+  output_format: "stdout: JSON with kanban_cards needed per part"
+  test_cases:
+    - input: "part,demand_rate,lead_time,safety_factor,container_size\nA,100,2,0.1,50"
+      expected_output: '{"parts":[{"part":"A","kanban_cards":5}]}'
+  constraints: ["kanbans = (demand * lead_time * (1 + safety)) / container_size", "round up"]
+
+- id: "MFG-083"
+  title: "Exponential Degradation Model"
+  description: "Fit exponential degradation curve for component wear prediction."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns time,degradation"
+  output_format: "stdout: JSON with model parameters (a, b), predicted failure time"
+  test_cases:
+    - input: "time,degradation\n0,1.0\n10,1.1\n20,1.21\n30,1.33\n40,1.46"
+      expected_output: '{"a":1.0,"b":0.01,"failure_threshold":2.0,"predicted_failure_time":69}'
+  constraints: ["model: d(t) = a * exp(b*t)", "failure at degradation = 2.0"]
+
+- id: "MFG-084"
+  title: "Seasonal Decomposition"
+  description: "Decompose production time series into trend, seasonal, and residual components."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with period on first line, then values"
+  output_format: "stdout: JSON with trend, seasonal, residual arrays"
+  test_cases:
+    - input: "4\n100,110,105,95,102,112,107,97,104,114,109,99"
+      expected_output: '{"trend":[null,null,102.5,103.0,103.5,104.0,104.5,105.0,105.5,106.0,null,null],"seasonal":[-2.75,7.25,2.25,-6.75,-2.75,7.25,2.25,-6.75,-2.75,7.25,2.25,-6.75]}'
+  constraints: ["additive model", "moving average for trend", "null where insufficient data"]
+
+- id: "MFG-085"
+  title: "Auto-Correlation Function"
+  description: "Calculate ACF for process measurements to detect periodicity."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with max_lag on first line, then values"
+  output_format: "stdout: JSON with acf values at each lag and significant_lags"
+  test_cases:
+    - input: "5\n1,0,-1,0,1,0,-1,0,1,0,-1,0"
+      expected_output: '{"acf":[1.0,-0.17,-0.67,-0.17,1.0,-0.17],"significant_lags":[0,4]}'
+  constraints: ["significance threshold = 2/sqrt(n)", "round to 2 decimal places"]
+
+- id: "MFG-086"
+  title: "Process Capability Study Report"
+  description: "Generate a full process capability study report with all standard metrics."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with lsl,usl on first line, then measurements"
+  output_format: "stdout: JSON with n, mean, std, min, max, cp, cpk, pp, ppk, ppm_above, ppm_below"
+  test_cases:
+    - input: "9.5,10.5\n10.0,10.1,10.2,9.9,10.0,10.1,9.8,10.0,10.1,10.0"
+      expected_output: '{"n":10,"mean":10.02,"std":0.11,"min":9.8,"max":10.2,"cp":1.52,"cpk":1.45,"ppm_above":0,"ppm_below":0}'
+  constraints: ["calculate all listed metrics", "round to 2 decimal places"]
+
+- id: "MFG-087"
+  title: "Multi-Variate Process Capability"
+  description: "Calculate multivariate capability index for correlated dimensions."
+  difficulty: 5
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with spec limits header, then correlated measurements"
+  output_format: "stdout: JSON with mcpk value, individual cpk values"
+  test_cases:
+    - input: "dim,lsl,usl\nX,9.5,10.5\nY,19.5,20.5\ndata\n10.0,20.0\n10.1,20.1\n9.9,19.9\n10.0,20.0"
+      expected_output: '{"mcpk":3.33,"individual":[{"dim":"X","cpk":3.33},{"dim":"Y","cpk":3.33}]}'
+  constraints: ["account for correlations between dimensions"]
+
+- id: "MFG-088"
+  title: "Regression with Confidence Intervals"
+  description: "Linear regression with confidence and prediction interval calculations."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns x,y and prediction_x on first line"
+  output_format: "stdout: JSON with prediction, confidence_interval, prediction_interval"
+  test_cases:
+    - input: "prediction_x,6\nx,y\n1,2\n2,4\n3,6\n4,8\n5,10"
+      expected_output: '{"prediction":12.0,"confidence_interval":[11.5,12.5],"prediction_interval":[10.8,13.2]}'
+  constraints: ["95% confidence level", "round to 1 decimal place"]
+
+- id: "MFG-089"
+  title: "Polynomial Regression"
+  description: "Fit polynomial regression to capture non-linear process relationships."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with degree on first line, then x,y data"
+  output_format: "stdout: JSON with coefficients, r_squared"
+  test_cases:
+    - input: "2\nx,y\n1,1\n2,4\n3,9\n4,16\n5,25"
+      expected_output: '{"coefficients":[1.0,0.0,0.0],"r_squared":1.0}'
+  constraints: ["degree from 1 to 5", "coefficients from highest to lowest degree"]
+
+- id: "MFG-090"
+  title: "Residual Analysis"
+  description: "Analyse regression residuals for model validation."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns x,y"
+  output_format: "stdout: JSON with residuals, normality_test, autocorrelation, heteroscedasticity"
+  test_cases:
+    - input: "x,y\n1,2.1\n2,3.9\n3,6.1\n4,7.9\n5,10.1"
+      expected_output: '{"residuals":[0.02,-0.02,0.02,-0.02,0.02],"normal":true,"autocorrelated":false}'
+  constraints: ["fit linear model first", "Durbin-Watson for autocorrelation"]
+
+- id: "MFG-091"
+  title: "Yield Prediction Model"
+  description: "Train a model to predict batch yield from process parameters."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with process parameter columns and yield column"
+  output_format: "stdout: JSON with model_type, coefficients, r_squared, predictions"
+  test_cases:
+    - input: "temp,time,catalyst,yield\n100,60,5,85\n110,65,6,90\n120,70,7,95\n130,75,8,100"
+      expected_output: '{"model_type":"linear","r_squared":1.0,"coefficients":[0.33,0.33,3.33],"intercept":-1.67}'
+  constraints: ["try linear first", "report training R-squared"]
+
+- id: "MFG-092"
+  title: "Classification Report Generator"
+  description: "Generate full classification report with per-class precision, recall, F1."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns actual,predicted (multi-class)"
+  output_format: "stdout: JSON with per-class metrics and weighted averages"
+  test_cases:
+    - input: "actual,predicted\nA,A\nA,A\nB,B\nB,A\nC,C"
+      expected_output: '{"classes":{"A":{"precision":0.67,"recall":1.0,"f1":0.8},"B":{"precision":1.0,"recall":0.5,"f1":0.67},"C":{"precision":1.0,"recall":1.0,"f1":1.0}},"accuracy":0.8}'
+  constraints: ["support multi-class", "round to 2 decimal places"]
+
+- id: "MFG-093"
+  title: "K-Means Elbow Method"
+  description: "Determine optimal k for k-means using elbow method (within-cluster sum of squares)."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with max_k on first line, then x,y data points"
+  output_format: "stdout: JSON with wcss per k and suggested_k"
+  test_cases:
+    - input: "5\n1,1\n1.1,1.1\n5,5\n5.1,5.1\n9,9\n9.1,9.1"
+      expected_output: '{"wcss":[64.0,21.33,0.04,0.03,0.02],"suggested_k":3}'
+  constraints: ["test k=1 to max_k", "elbow = largest decrease ratio"]
+
+- id: "MFG-094"
+  title: "Hierarchical Clustering"
+  description: "Perform agglomerative hierarchical clustering on process data."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with n_clusters on first line, then data points"
+  output_format: "stdout: JSON with cluster_labels, merge_history"
+  test_cases:
+    - input: "2\n1.0,1.0\n1.1,1.1\n5.0,5.0\n5.1,5.1"
+      expected_output: '{"cluster_labels":[0,0,1,1],"merge_history":[[0,1],[2,3],[4,5]]}'
+  constraints: ["Ward linkage", "Euclidean distance"]
+
+- id: "MFG-095"
+  title: "Time Series Trend Test"
+  description: "Apply Mann-Kendall test to detect monotonic trend in process data."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of time-ordered measurements"
+  output_format: "stdout: JSON with s_statistic, p_value, trend_present, direction"
+  test_cases:
+    - input: "10,11,12,13,14,15,16,17,18,19"
+      expected_output: '{"s_statistic":45,"p_value":0.0,"trend_present":true,"direction":"increasing"}'
+  constraints: ["two-tailed test at alpha=0.05"]
+
+- id: "MFG-096"
+  title: "Change Point Detection"
+  description: "Detect change points in a process time series using PELT algorithm."
+  difficulty: 5
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV row of sequential measurements"
+  output_format: "stdout: JSON with change_points indices and segment_means"
+  test_cases:
+    - input: "10,10,10,10,10,15,15,15,15,15"
+      expected_output: '{"change_points":[5],"segment_means":[10.0,15.0]}'
+  constraints: ["penalty parameter = log(n)", "minimum segment length 2"]
+
+- id: "MFG-097"
+  title: "Process Window Optimisation"
+  description: "Find the operating window where all quality criteria are met."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with parameter values and multiple quality responses"
+  output_format: "stdout: JSON with optimal_window (parameter ranges) and robustness"
+  test_cases:
+    - input: "temp,quality1,quality2\n90,80,70\n100,90,85\n110,95,90\n120,92,88\n130,85,80"
+      expected_output: '{"optimal_window":{"temp":{"min":100,"max":120}},"best_point":{"temp":110},"robustness":0.67}'
+  constraints: ["all qualities must meet minimum 85", "robustness = fraction of window meeting specs"]
+
+- id: "MFG-098"
+  title: "DOE Full Factorial"
+  description: "Generate and analyse a full factorial design of experiments."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with factor,low,high rows followed by response data"
+  output_format: "stdout: JSON with main_effects, interactions, significant_factors"
+  test_cases:
+    - input: "factor,low,high\nA,10,20\nB,100,200\nresponse\n50,55,60,70"
+      expected_output: '{"main_effects":{"A":7.5,"B":12.5},"interaction_AB":2.5,"significant_factors":["B","A"]}'
+  constraints: ["2-level full factorial", "rank effects by magnitude"]
+
+- id: "MFG-099"
+  title: "Response Surface Method"
+  description: "Fit quadratic response surface model to find process optimum."
+  difficulty: 5
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with factor columns and response column (CCD design)"
+  output_format: "stdout: JSON with model_coefficients, optimum_point, predicted_optimum"
+  test_cases:
+    - input: "x1,x2,y\n-1,-1,60\n1,-1,70\n-1,1,65\n1,1,80\n0,0,85\n-1.41,0,62\n1.41,0,72\n0,-1.41,63\n0,1.41,73"
+      expected_output: '{"optimum_point":{"x1":0.5,"x2":0.5},"predicted_optimum":84.5}'
+  constraints: ["fit y = b0 + b1*x1 + b2*x2 + b11*x1^2 + b22*x2^2 + b12*x1*x2"]
+
+- id: "MFG-100"
+  title: "Taguchi Signal-to-Noise Ratio"
+  description: "Calculate Taguchi S/N ratios for robust design analysis."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with quality_type on first line (nominal/smaller/larger), then factor,values rows"
+  output_format: "stdout: JSON with sn_ratios per factor level"
+  test_cases:
+    - input: "smaller\nfactor,level,values\nA,1,5;6;5\nA,2,3;4;3\nB,1,4;5;4\nB,2,4;5;4"
+      expected_output: '{"sn_ratios":{"A":{"1":-15.4,"2":-10.7},"B":{"1":-12.7,"2":-12.7}},"optimal":{"A":"2","B":"1"}}'
+  constraints: ["smaller-is-better: SN = -10*log10(mean(y^2))", "round to 1 decimal place"]
+
+- id: "MFG-101"
+  title: "Real-Time SPC Alert Engine"
+  description: "Process streaming measurements and emit alerts when control rules are violated."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with ucl,lcl,cl on first line, then streaming values"
+  output_format: "stdout: JSON array of alerts with timestamp and rule"
+  test_cases:
+    - input: "ucl,10.5\nlcl,9.5\ncl,10.0\n10.0,10.1,9.9,10.0,10.6,10.0"
+      expected_output: '{"alerts":[{"index":4,"value":10.6,"rule":"beyond_ucl"}]}'
+  constraints: ["process each point sequentially", "check against limits and run rules"]
+
+- id: "MFG-102"
+  title: "Multivariate T-squared Chart"
+  description: "Calculate Hotelling T-squared statistic for multivariate SPC."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with multiple measurement columns"
+  output_format: "stdout: JSON with t_squared values, ucl, out_of_control indices"
+  test_cases:
+    - input: "x1,x2\n10.0,20.0\n10.1,20.1\n9.9,19.9\n10.0,20.0\n12.0,22.0"
+      expected_output: '{"t_squared":[0.0,0.5,0.5,0.0,20.0],"ucl":10.65,"out_of_control":[4]}'
+  constraints: ["UCL from F-distribution", "alpha = 0.05"]
+
+- id: "MFG-103"
+  title: "Warranty Cost Prediction"
+  description: "Predict warranty costs based on field failure data and production volume."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns month,failures,units_in_field,cost_per_failure"
+  output_format: "stdout: JSON with predicted_monthly_cost, failure_rate_trend, total_exposure"
+  test_cases:
+    - input: "month,failures,units_in_field,cost_per_failure\n1,5,10000,200\n2,6,10500,200\n3,7,11000,200"
+      expected_output: '{"predicted_next_month_cost":1600,"failure_rate":0.00063,"trend":"increasing"}'
+  constraints: ["extrapolate failure rate trend", "cost = predicted_failures * cost_per_failure"]
+
+- id: "MFG-104"
+  title: "Energy Consumption Anomaly"
+  description: "Detect abnormal energy consumption patterns in manufacturing equipment."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns timestamp,kwh,production_units"
+  output_format: "stdout: JSON with efficiency, anomalies, baseline"
+  test_cases:
+    - input: "timestamp,kwh,production_units\n1,100,50\n2,105,52\n3,100,50\n4,200,51\n5,102,50"
+      expected_output: '{"baseline_kwh_per_unit":2.0,"anomalies":[{"timestamp":4,"actual":3.92,"expected":2.0}]}'
+  constraints: ["anomaly if > 2 std from baseline energy/unit ratio"]
+
+- id: "MFG-105"
+  title: "Tool Wear Monitoring"
+  description: "Track tool wear progression and predict tool replacement time."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns cycle,wear_measurement,max_wear"
+  output_format: "stdout: JSON with wear_rate, cycles_remaining, replacement_cycle"
+  test_cases:
+    - input: "cycle,wear_measurement,max_wear\n100,0.1,1.0\n200,0.2,1.0\n300,0.3,1.0\n400,0.4,1.0"
+      expected_output: '{"wear_rate":0.001,"cycles_remaining":600,"replacement_cycle":1000}'
+  constraints: ["linear wear model", "replacement when wear reaches max_wear"]
+
+- id: "MFG-106"
+  title: "Production Schedule Optimiser"
+  description: "Optimise job sequence to minimise total makespan on single machine."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns job,processing_time,due_date"
+  output_format: "stdout: JSON with optimal_sequence, makespan, jobs_late"
+  test_cases:
+    - input: "job,processing_time,due_date\nJ1,5,10\nJ2,3,6\nJ3,7,20\nJ4,2,8"
+      expected_output: '{"optimal_sequence":["J4","J2","J1","J3"],"makespan":17,"jobs_late":0}'
+  constraints: ["EDD (Earliest Due Date) rule", "report tardiness"]
+
+- id: "MFG-107"
+  title: "Multi-Machine Load Balancing"
+  description: "Balance production load across multiple machines to minimise idle time."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns job,time and num_machines on first line"
+  output_format: "stdout: JSON with machine_assignments, total_time per machine, max_time"
+  test_cases:
+    - input: "num_machines,2\njob,time\nJ1,10\nJ2,8\nJ3,6\nJ4,4"
+      expected_output: '{"assignments":{"M1":["J1","J4"],"M2":["J2","J3"]},"times":{"M1":14,"M2":14},"makespan":14}'
+  constraints: ["LPT (Longest Processing Time first) heuristic"]
+
+- id: "MFG-108"
+  title: "Supplier Quality Rating"
+  description: "Calculate composite supplier quality score from delivery and quality data."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns supplier,lots_received,lots_rejected,on_time_deliveries,total_deliveries"
+  output_format: "stdout: JSON with quality_score per supplier ranked"
+  test_cases:
+    - input: "supplier,lots_received,lots_rejected,on_time_deliveries,total_deliveries\nS1,100,2,95,100\nS2,80,1,78,80"
+      expected_output: '{"suppliers":[{"supplier":"S2","quality_pct":98.75,"delivery_pct":97.5,"composite":98.13},{"supplier":"S1","quality_pct":98.0,"delivery_pct":95.0,"composite":96.5}]}'
+  constraints: ["composite = 0.5*quality + 0.5*delivery", "sort descending"]
+
+- id: "MFG-109"
+  title: "Incoming Inspection Results"
+  description: "Process incoming material inspection results and determine lot disposition."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns lot_id,sample_size,defects_found,accept_number"
+  output_format: "stdout: JSON with disposition per lot (accept/reject)"
+  test_cases:
+    - input: "lot_id,sample_size,defects_found,accept_number\nL001,50,1,2\nL002,50,3,2\nL003,50,0,2"
+      expected_output: '{"lots":[{"lot_id":"L001","disposition":"accept"},{"lot_id":"L002","disposition":"reject"},{"lot_id":"L003","disposition":"accept"}]}'
+  constraints: ["accept if defects <= accept_number"]
+
+- id: "MFG-110"
+  title: "Process FMEA Risk Priority"
+  description: "Calculate Risk Priority Numbers for process FMEA items."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns failure_mode,severity,occurrence,detection"
+  output_format: "stdout: JSON with RPN values sorted descending"
+  test_cases:
+    - input: "failure_mode,severity,occurrence,detection\ncrack,8,3,5\ncorrosion,6,4,3\nmisalign,9,2,7"
+      expected_output: '{"fmea":[{"failure_mode":"misalign","rpn":126},{"failure_mode":"crack","rpn":120},{"failure_mode":"corrosion","rpn":72}]}'
+  constraints: ["RPN = severity * occurrence * detection", "range 1-1000"]
+
+- id: "MFG-111"
+  title: "SPC Phase Analysis"
+  description: "Analyse SPC data across two phases (before and after process change)."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with phase,value columns"
+  output_format: "stdout: JSON with per-phase stats and improvement metrics"
+  test_cases:
+    - input: "phase,value\n1,10.0\n1,10.2\n1,10.1\n1,10.3\n2,10.0\n2,10.0\n2,10.1\n2,10.0"
+      expected_output: '{"phase1":{"mean":10.15,"std":0.13},"phase2":{"mean":10.03,"std":0.05},"improvement":{"mean_shift":-0.12,"variability_reduction":0.62}}'
+  constraints: ["variability_reduction = 1 - (std2/std1)", "round to 2 decimal places"]
+
+- id: "MFG-112"
+  title: "Measurement Uncertainty Budget"
+  description: "Calculate combined measurement uncertainty from multiple sources."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns source,type(A/B),value,distribution"
+  output_format: "stdout: JSON with combined_uncertainty, expanded_uncertainty_k2"
+  test_cases:
+    - input: "source,type,value,distribution\nrepeatability,A,0.01,normal\nresolution,B,0.005,rectangular\ncalibration,B,0.02,normal"
+      expected_output: '{"combined_uncertainty":0.023,"expanded_uncertainty_k2":0.046}'
+  constraints: ["Type A: use directly, Type B: divide by sqrt(3) for rectangular", "k=2 for 95%"]
+
+- id: "MFG-113"
+  title: "Cpk Trend Over Time"
+  description: "Track Cpk values over rolling time windows and detect capability degradation."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with lsl,usl,window_size on first line, then values"
+  output_format: "stdout: JSON with cpk_trend array and degradation_alert"
+  test_cases:
+    - input: "lsl,9.0\nusl,11.0\nwindow,5\n10.0,10.1,10.0,10.1,10.0,10.2,10.3,10.4,10.5,10.6"
+      expected_output: '{"cpk_trend":[6.67,5.0,3.33,2.5,2.0,1.67],"degradation_alert":true}'
+  constraints: ["rolling window Cpk", "alert if Cpk drops below 1.33"]
+
+- id: "MFG-114"
+  title: "Batch Genealogy Tracker"
+  description: "Track parent-child relationships between material batches through process steps."
+  difficulty: 2
+  stdlib_modules: [std.csv, std.json, std.io, std.str]
+  input_format: "stdin: CSV with columns child_batch,parent_batch,step,timestamp"
+  output_format: "stdout: JSON tree structure showing full genealogy"
+  test_cases:
+    - input: "child_batch,parent_batch,step,timestamp\nB002,B001,mix,2024-01-01\nB003,B001,mix,2024-01-01\nB004,B002,cure,2024-01-02"
+      expected_output: '{"B001":{"children":[{"batch":"B002","step":"mix","children":[{"batch":"B004","step":"cure","children":[]}]},{"batch":"B003","step":"mix","children":[]}]}}'
+  constraints: ["build complete tree from root", "handle multiple levels"]
+
+- id: "MFG-115"
+  title: "Statistical Process Adjustment"
+  description: "Calculate optimal process adjustment to re-centre a drifting process."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with target,deadband on first line, then recent measurements"
+  output_format: "stdout: JSON with current_mean, offset, adjustment_needed, adjustment_amount"
+  test_cases:
+    - input: "target,10.0\ndeadband,0.1\n10.15,10.18,10.12,10.20,10.16"
+      expected_output: '{"current_mean":10.16,"offset":0.16,"adjustment_needed":true,"adjustment_amount":-0.16}'
+  constraints: ["adjust only if offset > deadband", "adjustment = -(mean - target)"]
+
+- id: "MFG-116"
+  title: "Sensor Health Score"
+  description: "Calculate health scores for sensors based on noise, drift, and dropout metrics."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns sensor_id,noise_level,drift_rate,dropout_pct"
+  output_format: "stdout: JSON with health_score per sensor and maintenance priority"
+  test_cases:
+    - input: "sensor_id,noise_level,drift_rate,dropout_pct\nS1,0.01,0.001,0.1\nS2,0.05,0.01,2.0\nS3,0.1,0.02,5.0"
+      expected_output: '{"sensors":[{"sensor_id":"S1","health_score":98},{"sensor_id":"S2","health_score":85},{"sensor_id":"S3","health_score":65}],"priority":["S3","S2","S1"]}'
+  constraints: ["weighted scoring: noise 30%, drift 40%, dropout 30%", "scale 0-100"]
+
+- id: "MFG-117"
+  title: "Alarm Rationalisation"
+  description: "Analyse alarm frequency and duration to identify nuisance alarms."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns alarm_id,timestamp,duration_sec,acknowledged"
+  output_format: "stdout: JSON with alarm stats and nuisance_alarms list"
+  test_cases:
+    - input: "alarm_id,timestamp,duration_sec,acknowledged\nA1,1,5,true\nA1,10,3,true\nA1,20,4,true\nA2,5,60,true\nA1,30,2,false"
+      expected_output: '{"alarms":[{"alarm_id":"A1","count":4,"avg_duration":3.5,"nuisance":true},{"alarm_id":"A2","count":1,"avg_duration":60.0,"nuisance":false}]}'
+  constraints: ["nuisance if count > 3 and avg_duration < 10 sec"]
+
+- id: "MFG-118"
+  title: "Correlation-Based Root Cause"
+  description: "Identify most correlated process variable to a quality issue."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with multiple process columns and defect_rate column"
+  output_format: "stdout: JSON with correlations ranked and likely_root_cause"
+  test_cases:
+    - input: "temp,humidity,speed,defect_rate\n100,50,10,2\n105,51,10,4\n110,50,11,6\n115,52,10,8"
+      expected_output: '{"correlations":[{"variable":"temp","r":0.99},{"variable":"speed","r":0.45},{"variable":"humidity","r":0.63}],"likely_root_cause":"temp"}'
+  constraints: ["absolute correlation", "root cause = highest |r|"]
+
+- id: "MFG-119"
+  title: "Process Stability Index"
+  description: "Calculate overall process stability index combining multiple metrics."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns parameter,mean,std,target,lsl,usl"
+  output_format: "stdout: JSON with stability_index per parameter and overall"
+  test_cases:
+    - input: "parameter,mean,std,target,lsl,usl\ndia,10.0,0.1,10.0,9.5,10.5\nlength,50.0,0.3,50.0,49.0,51.0"
+      expected_output: '{"parameters":[{"parameter":"dia","stability":0.95},{"parameter":"length","stability":0.92}],"overall_stability":0.94}'
+  constraints: ["stability = function of centering and spread relative to specs"]
+
+- id: "MFG-120"
+  title: "Adaptive Sampling Rate"
+  description: "Determine optimal inspection sampling rate based on recent quality history."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns batch,defect_rate"
+  output_format: "stdout: JSON with recommended_rate, confidence, reason"
+  test_cases:
+    - input: "batch,defect_rate\n1,0.01\n2,0.01\n3,0.02\n4,0.01\n5,0.01"
+      expected_output: '{"current_rate":0.012,"recommended_sampling":"reduced","sample_pct":5,"reason":"stable_process"}'
+  constraints: ["reduced if defect_rate < 0.02 for 5 batches", "tightened if > 0.05"]
+
+- id: "MFG-121"
+  title: "Pairwise Distance Matrix"
+  description: "Calculate pairwise Euclidean distance matrix for product feature vectors."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with multiple feature columns, one row per sample"
+  output_format: "stdout: JSON with distance_matrix"
+  test_cases:
+    - input: "x,y\n0,0\n3,4\n1,0"
+      expected_output: '{"distance_matrix":[[0.0,5.0,1.0],[5.0,0.0,4.47],[1.0,4.47,0.0]]}'
+  constraints: ["Euclidean distance", "round to 2 decimal places"]
+
+- id: "MFG-122"
+  title: "Cosine Similarity Matcher"
+  description: "Find most similar historical batch to a new batch using cosine similarity."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with historical batches, test batch after ---"
+  output_format: "stdout: JSON with similarities and best_match"
+  test_cases:
+    - input: "batch,f1,f2,f3\nH1,1,0,1\nH2,0,1,0\nH3,1,1,0\n---\n1,0,1"
+      expected_output: '{"similarities":[{"batch":"H1","similarity":0.71},{"batch":"H2","similarity":0.0},{"batch":"H3","similarity":0.71}],"best_match":"H1"}'
+  constraints: ["cosine similarity", "round to 2 decimal places", "break ties by first match"]
+
+- id: "MFG-123"
+  title: "Mixture Experiment Analysis"
+  description: "Analyse mixture experiment results where components sum to a constant."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with component proportions and response"
+  output_format: "stdout: JSON with model_coefficients, optimal_mixture, predicted_response"
+  test_cases:
+    - input: "A,B,C,strength\n0.5,0.3,0.2,80\n0.4,0.4,0.2,85\n0.3,0.3,0.4,75\n0.6,0.2,0.2,78"
+      expected_output: '{"model":"linear","coefficients":{"A":76.0,"B":95.0,"C":60.0},"optimal_mixture":{"A":0.0,"B":1.0,"C":0.0}}'
+  constraints: ["components must sum to 1.0", "Scheffe model"]
+
+- id: "MFG-124"
+  title: "Multi-Stage Process Yield"
+  description: "Calculate yield propagation through a multi-stage manufacturing process."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns stage,input_qty,output_qty"
+  output_format: "stdout: JSON with stage_yields, cumulative_yield, bottleneck_stage"
+  test_cases:
+    - input: "stage,input_qty,output_qty\ncut,1000,980\nassemble,980,950\ntest,950,940\npack,940,935"
+      expected_output: '{"stage_yields":[0.98,0.97,0.99,1.0],"cumulative_yield":0.94,"bottleneck_stage":"assemble"}'
+  constraints: ["cumulative = product of stage yields", "bottleneck = lowest yield stage"]
+
+- id: "MFG-125"
+  title: "Thermal Profile Analysis"
+  description: "Analyse reflow oven thermal profile for PCB manufacturing compliance."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with time,temperature data and spec limits for zones"
+  output_format: "stdout: JSON with zone_times, peak_temp, cooling_rate, compliant"
+  test_cases:
+    - input: "zone,min_time,max_time,min_temp,max_temp\npreheat,60,120,150,200\nreflow,30,60,230,250\nspec_data\ntime,temp\n0,25\n30,100\n60,150\n90,180\n120,200\n150,240\n170,245\n200,200\n240,100"
+      expected_output: '{"peak_temp":245,"time_above_230":20,"cooling_rate":3.5,"compliant":true}'
+  constraints: ["check all zone requirements", "cooling rate in deg/sec"]
+
+- id: "MFG-126"
+  title: "Normality Test Battery"
+  description: "Run multiple normality tests on measurement data and report consensus."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV row of measurements"
+  output_format: "stdout: JSON with skewness, kurtosis, anderson_darling, conclusion"
+  test_cases:
+    - input: "10.0,10.1,9.9,10.2,9.8,10.0,10.1,9.9,10.0,10.1,9.9,10.0"
+      expected_output: '{"skewness":0.0,"kurtosis":-0.5,"conclusion":"normal"}'
+  constraints: ["normal if skewness < 1 and kurtosis < 3", "round to 1 decimal place"]
+
+- id: "MFG-127"
+  title: "Multivariate Regression"
+  description: "Predict quality from multiple interacting process variables with interaction terms."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with feature columns and response, include_interactions flag"
+  output_format: "stdout: JSON with coefficients including interaction terms, r_squared"
+  test_cases:
+    - input: "include_interactions,true\nx1,x2,y\n1,1,5\n1,2,7\n2,1,7\n2,2,11"
+      expected_output: '{"coefficients":{"x1":2.0,"x2":2.0,"x1:x2":1.0},"intercept":0.0,"r_squared":1.0}'
+  constraints: ["include pairwise interactions if flagged", "report all significant terms"]
+
+- id: "MFG-128"
+  title: "Survival Analysis - Kaplan-Meier"
+  description: "Calculate Kaplan-Meier survival curve for component lifetime analysis."
+  difficulty: 4
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with columns time,event (1=failure, 0=censored)"
+  output_format: "stdout: JSON with survival_curve points, median_survival"
+  test_cases:
+    - input: "time,event\n10,1\n20,0\n30,1\n40,1\n50,0"
+      expected_output: '{"survival_curve":[{"time":0,"survival":1.0},{"time":10,"survival":0.8},{"time":30,"survival":0.6},{"time":40,"survival":0.3}],"median_survival":35}'
+  constraints: ["handle censored observations", "round survival to 1 decimal place"]
+
+- id: "MFG-129"
+  title: "Process Entropy Calculation"
+  description: "Calculate Shannon entropy of defect type distribution as a disorder metric."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns defect_type,count"
+  output_format: "stdout: JSON with entropy, max_entropy, normalised_entropy"
+  test_cases:
+    - input: "defect_type,count\nA,25\nB,25\nC,25\nD,25"
+      expected_output: '{"entropy":2.0,"max_entropy":2.0,"normalised_entropy":1.0}'
+  constraints: ["H = -sum(p * log2(p))", "normalised = H / log2(n_categories)"]
+
+- id: "MFG-130"
+  title: "Data Imputation for Missing Sensors"
+  description: "Impute missing sensor values using mean/median/interpolation strategies."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with method on first line, then sensor data with NaN for missing"
+  output_format: "stdout: JSON with imputed_data, imputed_count, method_used"
+  test_cases:
+    - input: "method,linear\ntimestamp,value\n1,10.0\n2,NaN\n3,NaN\n4,16.0\n5,18.0"
+      expected_output: '{"imputed_data":[10.0,12.0,14.0,16.0,18.0],"imputed_count":2,"method_used":"linear"}'
+  constraints: ["support mean, median, linear interpolation", "report number of imputed values"]
+
+- id: "MFG-131"
+  title: "Process Map Flow Time"
+  description: "Calculate total flow time and identify critical path through process steps."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns step,duration,predecessors"
+  output_format: "stdout: JSON with critical_path, total_time, slack per step"
+  test_cases:
+    - input: "step,duration,predecessors\nA,5,\nB,3,A\nC,4,A\nD,2,B;C"
+      expected_output: '{"critical_path":["A","C","D"],"total_time":11,"slack":{"A":0,"B":1,"C":0,"D":0}}'
+  constraints: ["forward/backward pass", "critical path = zero slack"]
+
+- id: "MFG-132"
+  title: "Exponential Reliability"
+  description: "Calculate reliability metrics assuming exponential failure distribution."
+  difficulty: 2
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns total_hours,num_failures,mission_time"
+  output_format: "stdout: JSON with failure_rate, mtbf, reliability_at_mission"
+  test_cases:
+    - input: "total_hours,num_failures,mission_time\n10000,5,500"
+      expected_output: '{"failure_rate":0.0005,"mtbf":2000,"reliability_at_mission":0.78}'
+  constraints: ["R(t) = exp(-lambda*t)", "lambda = failures/hours", "round to 2 decimal places"]
+
+- id: "MFG-133"
+  title: "Multi-Response Optimisation"
+  description: "Optimise multiple responses simultaneously using desirability function."
+  difficulty: 5
+  stdlib_modules: [std.math, std.csv, std.json, std.io, std.ml]
+  input_format: "stdin: CSV with parameter values and multiple response columns with targets"
+  output_format: "stdout: JSON with desirability scores and optimal_point"
+  test_cases:
+    - input: "target_type,maximize,minimize\ntarget_value,100,0\nx,resp1,resp2\n1,80,5\n2,90,3\n3,95,4\n4,92,6"
+      expected_output: '{"desirabilities":[0.63,0.9,0.87,0.72],"optimal_x":2,"overall_desirability":0.9}'
+  constraints: ["geometric mean of individual desirabilities", "Derringer-Suich method"]
+
+- id: "MFG-134"
+  title: "Benford Law Fraud Detection"
+  description: "Apply Benford's law to production data to detect potential data manipulation."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV column of numeric values"
+  output_format: "stdout: JSON with observed_distribution, expected_distribution, chi_squared, suspicious"
+  test_cases:
+    - input: "value\n123\n234\n145\n167\n189\n201\n312\n145\n178\n199"
+      expected_output: '{"observed":{"1":0.6,"2":0.2,"3":0.1},"chi_squared":5.2,"suspicious":false}'
+  constraints: ["Benford expected: P(d) = log10(1 + 1/d)", "suspicious if chi_squared > critical"]
+
+- id: "MFG-135"
+  title: "Digital Twin Deviation Score"
+  description: "Calculate deviation between physical measurements and digital twin predictions."
+  difficulty: 3
+  stdlib_modules: [std.math, std.csv, std.json, std.io]
+  input_format: "stdin: CSV with columns parameter,predicted,actual,tolerance"
+  output_format: "stdout: JSON with deviation_scores, overall_health, alerts"
+  test_cases:
+    - input: "parameter,predicted,actual,tolerance\ntemp,100.0,101.5,2.0\npressure,50.0,50.2,1.0\nvibration,0.5,0.8,0.3"
+      expected_output: '{"deviations":[{"parameter":"temp","deviation":1.5,"score":0.75},{"parameter":"pressure","deviation":0.2,"score":0.2},{"parameter":"vibration","deviation":0.3,"score":1.0}],"overall_health":0.65,"alerts":["vibration"]}'
+  constraints: ["score = |actual-predicted|/tolerance", "alert if score >= 1.0"]

@@ -1,0 +1,1889 @@
+- id: "MSG-001"
+  title: "AES-256 message encryption"
+  description: "Encrypt a plaintext message using AES-256-CBC with a provided key and IV, outputting the ciphertext as base64."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: hex-encoded 256-bit key. Line 2: hex-encoded 128-bit IV. Line 3: plaintext message."
+  output_format: "Base64-encoded ciphertext on stdout."
+  test_cases:
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n00112233445566778899aabbccddeeff\nHello, World!"
+      expected_output: "encrypted_base64_ciphertext"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000000000000000000000000000\nTest message"
+      expected_output: "encrypted_base64_ciphertext"
+  constraints: ["Key must be exactly 256 bits", "IV must be exactly 128 bits", "Use PKCS7 padding"]
+
+- id: "MSG-002"
+  title: "AES-256 message decryption"
+  description: "Decrypt a base64-encoded AES-256-CBC ciphertext using a provided key and IV, outputting the original plaintext."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: hex-encoded 256-bit key. Line 2: hex-encoded 128-bit IV. Line 3: base64-encoded ciphertext."
+  output_format: "Decrypted plaintext on stdout."
+  test_cases:
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n00112233445566778899aabbccddeeff\nU2FsdGVkX1..."
+      expected_output: "Hello, World!"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000000000000000000000000000\nbase64_ciphertext"
+      expected_output: "Test message"
+  constraints: ["Validate padding before output", "Return error on invalid padding", "Handle empty plaintext"]
+
+- id: "MSG-003"
+  title: "RSA key pair generation"
+  description: "Generate an RSA-2048 key pair and output the public and private keys in PEM format."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: key size in bits (2048 or 4096)."
+  output_format: "PEM-encoded private key followed by a blank line, then PEM-encoded public key."
+  test_cases:
+    - input: "2048"
+      expected_output: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----\n\n-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
+    - input: "4096"
+      expected_output: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----\n\n-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
+  constraints: ["Support 2048 and 4096 bit keys", "Output valid PEM format", "Use secure random number generation"]
+
+- id: "MSG-004"
+  title: "RSA message encryption"
+  description: "Encrypt a short message using RSA-OAEP with a provided public key."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: PEM-encoded public key (single line, escaped newlines). Line 2: plaintext message."
+  output_format: "Base64-encoded RSA ciphertext."
+  test_cases:
+    - input: "-----BEGIN PUBLIC KEY-----\\nMIIBI...\\n-----END PUBLIC KEY-----\nSecret"
+      expected_output: "base64_rsa_ciphertext"
+    - input: "-----BEGIN PUBLIC KEY-----\\nMIIBI...\\n-----END PUBLIC KEY-----\nHello"
+      expected_output: "base64_rsa_ciphertext"
+  constraints: ["Use OAEP padding with SHA-256", "Message must be shorter than key size minus padding", "Reject oversized messages with error"]
+
+- id: "MSG-005"
+  title: "Diffie-Hellman key exchange simulation"
+  description: "Simulate a Diffie-Hellman key exchange between two parties, outputting the shared secret."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: prime p (decimal). Line 2: generator g (decimal). Line 3: Alice's private key a (decimal). Line 4: Bob's private key b (decimal)."
+  output_format: "Line 1: Alice's public key. Line 2: Bob's public key. Line 3: shared secret."
+  test_cases:
+    - input: "23\n5\n6\n15"
+      expected_output: "8\n19\n2"
+    - input: "97\n5\n36\n58"
+      expected_output: "50\n44\n75"
+  constraints: ["Validate that p is prime", "Validate that g is a primitive root mod p", "Use modular exponentiation"]
+
+- id: "MSG-006"
+  title: "ECDH key exchange"
+  description: "Perform an Elliptic Curve Diffie-Hellman key exchange using P-256, deriving a shared AES key."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: Alice's private key (hex). Line 2: Bob's private key (hex)."
+  output_format: "Line 1: Alice's public key (hex, uncompressed). Line 2: Bob's public key (hex, uncompressed). Line 3: derived shared secret (hex). Line 4: derived AES-256 key (hex, SHA-256 of shared secret)."
+  test_cases:
+    - input: "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721\n60fc7b12d663b64c1d62de0e2b263b34892a416b3697bd0a96c4e7ad4e6c821a"
+      expected_output: "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex"
+    - input: "ab12cd34ef56789012345678901234567890123456789012345678901234abcd\ndeadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234"
+      expected_output: "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex"
+  constraints: ["Use NIST P-256 curve", "Validate private keys are in valid range", "Derive AES key using SHA-256 of x-coordinate"]
+
+- id: "MSG-007"
+  title: "Digital signature creation"
+  description: "Sign a message using Ed25519, outputting the signature in hex."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: hex-encoded Ed25519 private key (64 hex chars). Line 2: message to sign."
+  output_format: "Hex-encoded 64-byte Ed25519 signature."
+  test_cases:
+    - input: "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60\nHello"
+      expected_output: "signature_hex_128_chars"
+    - input: "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb\nTest message"
+      expected_output: "signature_hex_128_chars"
+  constraints: ["Use Ed25519 algorithm", "Signature must be exactly 64 bytes", "Deterministic signatures"]
+
+- id: "MSG-008"
+  title: "Digital signature verification"
+  description: "Verify an Ed25519 signature on a message, outputting whether the signature is valid."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: hex-encoded Ed25519 public key (64 hex chars). Line 2: message. Line 3: hex-encoded signature (128 hex chars)."
+  output_format: "VALID or INVALID"
+  test_cases:
+    - input: "d75a980182b10ab7d54bfed3c964073a0ee172f3daa3f4a18446b7e21c7e3ba8\nHello\nvalid_signature_hex"
+      expected_output: "VALID"
+    - input: "d75a980182b10ab7d54bfed3c964073a0ee172f3daa3f4a18446b7e21c7e3ba8\nTampered\noriginal_signature_hex"
+      expected_output: "INVALID"
+  constraints: ["Reject malformed public keys", "Reject malformed signatures", "Constant-time comparison"]
+
+- id: "MSG-009"
+  title: "Message authentication code (HMAC-SHA256)"
+  description: "Compute HMAC-SHA256 for a message with a given key, providing message integrity verification."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: hex-encoded HMAC key. Line 2: message."
+  output_format: "Hex-encoded HMAC-SHA256 digest."
+  test_cases:
+    - input: "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b\nHi There"
+      expected_output: "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7"
+    - input: "4a656665\nwhat do ya want for nothing?"
+      expected_output: "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"
+  constraints: ["Support arbitrary key lengths", "Use RFC 2104 HMAC construction", "Handle keys longer than block size"]
+
+- id: "MSG-010"
+  title: "Message framing with length prefix"
+  description: "Frame messages using a 4-byte big-endian length prefix protocol for stream-based transport."
+  difficulty: 2
+  stdlib_modules: [std.net, std.str]
+  input_format: "Multiple lines, each line is a message to frame."
+  output_format: "For each message: hex-encoded 4-byte length prefix followed by the message bytes in hex."
+  test_cases:
+    - input: "Hello\nWorld"
+      expected_output: "00000005:48656c6c6f\n00000005:576f726c64"
+    - input: "A\nTest message here"
+      expected_output: "00000001:41\n00000011:54657374206d6573736167652068657265"
+  constraints: ["Length prefix is 4 bytes big-endian", "Length does not include the prefix itself", "Maximum message size is 16MB"]
+
+- id: "MSG-011"
+  title: "Message deframing from byte stream"
+  description: "Parse length-prefixed messages from a hex-encoded byte stream, extracting individual messages."
+  difficulty: 2
+  stdlib_modules: [std.net, std.str]
+  input_format: "Single line: hex-encoded byte stream containing multiple length-prefixed messages."
+  output_format: "One decoded message per line."
+  test_cases:
+    - input: "0000000548656c6c6f00000005576f726c64"
+      expected_output: "Hello\nWorld"
+    - input: "00000003466f6f00000003426172"
+      expected_output: "Foo\nBar"
+  constraints: ["Handle incomplete frames gracefully", "Report error on truncated stream", "Validate length prefix against remaining bytes"]
+
+- id: "MSG-012"
+  title: "JSON message envelope construction"
+  description: "Construct a JSON message envelope with standard fields: id, timestamp, sender, recipient, type, and payload."
+  difficulty: 1
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Line 1: sender. Line 2: recipient. Line 3: message type. Line 4: payload text."
+  output_format: "JSON object with fields: id (UUID), timestamp (ISO 8601), sender, recipient, type, payload."
+  test_cases:
+    - input: "alice\nbob\ntext\nHello Bob!"
+      expected_output: "{\"id\":\"uuid\",\"timestamp\":\"2024-01-01T00:00:00Z\",\"sender\":\"alice\",\"recipient\":\"bob\",\"type\":\"text\",\"payload\":\"Hello Bob!\"}"
+    - input: "charlie\ngroup:devs\nimage\n/path/to/image.png"
+      expected_output: "{\"id\":\"uuid\",\"timestamp\":\"2024-01-01T00:00:00Z\",\"sender\":\"charlie\",\"recipient\":\"group:devs\",\"type\":\"image\",\"payload\":\"/path/to/image.png\"}"
+  constraints: ["ID must be a valid UUID v4", "Timestamp must be ISO 8601 UTC", "Validate message type is one of: text, image, file, audio, video, system"]
+
+- id: "MSG-013"
+  title: "Message envelope parsing and validation"
+  description: "Parse a JSON message envelope and validate all required fields are present and correctly formatted."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Single line: JSON message envelope string."
+  output_format: "VALID followed by extracted fields on separate lines, or INVALID followed by list of validation errors."
+  test_cases:
+    - input: "{\"id\":\"550e8400-e29b-41d4-a716-446655440000\",\"timestamp\":\"2024-01-15T10:30:00Z\",\"sender\":\"alice\",\"recipient\":\"bob\",\"type\":\"text\",\"payload\":\"Hi\"}"
+      expected_output: "VALID\nsender=alice\nrecipient=bob\ntype=text\npayload=Hi"
+    - input: "{\"id\":\"invalid\",\"sender\":\"alice\"}"
+      expected_output: "INVALID\nmissing: timestamp, recipient, type, payload\ninvalid: id (not a valid UUID)"
+  constraints: ["All six fields are required", "UUID must match UUID v4 format", "Timestamp must parse as valid ISO 8601"]
+
+- id: "MSG-014"
+  title: "Protocol version negotiation"
+  description: "Implement protocol version negotiation where client sends supported versions and server responds with the highest mutually supported version."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON array of client-supported versions (e.g., [\"1.0\",\"1.1\",\"2.0\"]). Line 2: JSON array of server-supported versions."
+  output_format: "Line 1: negotiated version or INCOMPATIBLE. Line 2: if compatible, the full handshake JSON response."
+  test_cases:
+    - input: "[\"1.0\",\"1.1\",\"2.0\"]\n[\"1.1\",\"2.0\",\"3.0\"]"
+      expected_output: "2.0\n{\"status\":\"ok\",\"version\":\"2.0\"}"
+    - input: "[\"1.0\",\"1.1\"]\n[\"2.0\",\"3.0\"]"
+      expected_output: "INCOMPATIBLE\n{\"status\":\"error\",\"reason\":\"no common version\"}"
+  constraints: ["Use semantic versioning comparison", "Choose highest mutually supported version", "Return structured error on incompatibility"]
+
+- id: "MSG-015"
+  title: "Heartbeat protocol implementation"
+  description: "Simulate a heartbeat protocol that sends periodic pings and detects connection timeout based on missed responses."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: heartbeat interval in ms. Line 2: timeout threshold (number of missed beats). Line 3: sequence of events as JSON array (e.g., [{\"time\":0,\"type\":\"pong\"},{\"time\":5000,\"type\":\"pong\"}])."
+  output_format: "For each heartbeat interval: ALIVE or TIMEOUT with timestamp."
+  test_cases:
+    - input: "1000\n3\n[{\"time\":0,\"type\":\"pong\"},{\"time\":1000,\"type\":\"pong\"},{\"time\":2000,\"type\":\"pong\"}]"
+      expected_output: "0ms: ALIVE\n1000ms: ALIVE\n2000ms: ALIVE"
+    - input: "1000\n3\n[{\"time\":0,\"type\":\"pong\"}]"
+      expected_output: "0ms: ALIVE\n1000ms: MISSED(1)\n2000ms: MISSED(2)\n3000ms: TIMEOUT"
+  constraints: ["Timeout after N consecutive missed heartbeats", "Reset miss counter on successful pong", "Report exact timeout timestamp"]
+
+- id: "MSG-016"
+  title: "Chat message formatting with timestamps"
+  description: "Format raw chat messages into a display-friendly format with relative timestamps and sender alignment."
+  difficulty: 1
+  stdlib_modules: [std.time, std.str]
+  input_format: "Line 1: current username. Following lines: JSON messages with sender, timestamp, and text fields."
+  output_format: "Formatted chat display with timestamps and alignment indicators (> for sent, < for received)."
+  test_cases:
+    - input: "alice\n{\"sender\":\"alice\",\"timestamp\":\"2024-01-15T10:30:00Z\",\"text\":\"Hello\"}\n{\"sender\":\"bob\",\"timestamp\":\"2024-01-15T10:30:05Z\",\"text\":\"Hi there\"}"
+      expected_output: "> [10:30] alice: Hello\n< [10:30] bob: Hi there"
+    - input: "bob\n{\"sender\":\"alice\",\"timestamp\":\"2024-01-15T10:30:00Z\",\"text\":\"Hey\"}"
+      expected_output: "< [10:30] alice: Hey"
+  constraints: ["Use 24-hour time format", "Align sent messages right (>), received left (<)", "Truncate messages longer than 80 chars with ellipsis"]
+
+- id: "MSG-017"
+  title: "Chat room user roster management"
+  description: "Manage a chat room user roster processing join/leave/kick events and outputting current members."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str, std.time]
+  input_format: "Line 1: room name. Following lines: JSON events with type (join/leave/kick), user, and timestamp."
+  output_format: "Final roster as sorted list of usernames, one per line. Then a blank line and event summary."
+  test_cases:
+    - input: "general\n{\"type\":\"join\",\"user\":\"alice\",\"time\":\"10:00\"}\n{\"type\":\"join\",\"user\":\"bob\",\"time\":\"10:01\"}\n{\"type\":\"leave\",\"user\":\"alice\",\"time\":\"10:05\"}"
+      expected_output: "bob\n\njoins: 2, leaves: 1, kicks: 0"
+    - input: "dev\n{\"type\":\"join\",\"user\":\"alice\",\"time\":\"10:00\"}\n{\"type\":\"join\",\"user\":\"bob\",\"time\":\"10:01\"}\n{\"type\":\"kick\",\"user\":\"bob\",\"time\":\"10:02\"}"
+      expected_output: "alice\n\njoins: 2, leaves: 0, kicks: 1"
+  constraints: ["Ignore leave/kick for users not in room", "Prevent duplicate joins", "Sort roster alphabetically"]
+
+- id: "MSG-018"
+  title: "Publish-subscribe topic matching"
+  description: "Match messages against subscriber topic patterns supporting wildcards (* for single level, # for multi-level)."
+  difficulty: 3
+  stdlib_modules: [std.str]
+  input_format: "Line 1: number of subscriptions. Next N lines: subscription patterns. Then a blank line. Following lines: topic/message pairs separated by |."
+  output_format: "For each message: the topic, then indented list of matching subscription patterns."
+  test_cases:
+    - input: "3\nchat/*\nchat/general\nchat/#\n\nchat/general|Hello\nchat/random|World"
+      expected_output: "chat/general:\n  chat/*\n  chat/general\n  chat/#\nchat/random:\n  chat/*\n  chat/#"
+    - input: "2\nsensor/+/temperature\nsensor/#\n\nsensor/room1/temperature|22.5\nsensor/room1/humidity|45"
+      expected_output: "sensor/room1/temperature:\n  sensor/+/temperature\n  sensor/#\nsensor/room1/humidity:\n  sensor/#"
+  constraints: ["* matches exactly one level", "# matches zero or more levels", "# must be last character in pattern", "/ is level separator"]
+
+- id: "MSG-019"
+  title: "Publish-subscribe message broker simulation"
+  description: "Simulate a pub/sub message broker that routes messages to subscribers based on their topic subscriptions."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of operations: {\"op\":\"subscribe\",\"client\":\"c1\",\"topic\":\"t\"}, {\"op\":\"publish\",\"topic\":\"t\",\"message\":\"m\"}, {\"op\":\"unsubscribe\",\"client\":\"c1\",\"topic\":\"t\"}."
+  output_format: "For each publish operation: the message and list of clients that received it."
+  test_cases:
+    - input: "[{\"op\":\"subscribe\",\"client\":\"alice\",\"topic\":\"news\"},{\"op\":\"subscribe\",\"client\":\"bob\",\"topic\":\"news\"},{\"op\":\"publish\",\"topic\":\"news\",\"message\":\"Breaking!\"}]"
+      expected_output: "publish news \"Breaking!\": alice, bob"
+    - input: "[{\"op\":\"subscribe\",\"client\":\"alice\",\"topic\":\"news\"},{\"op\":\"unsubscribe\",\"client\":\"alice\",\"topic\":\"news\"},{\"op\":\"publish\",\"topic\":\"news\",\"message\":\"Hello\"}]"
+      expected_output: "publish news \"Hello\": (none)"
+  constraints: ["Maintain subscription state across operations", "Handle unsubscribe for non-existent subscriptions gracefully", "Sort client names alphabetically in output"]
+
+- id: "MSG-020"
+  title: "Group message fan-out"
+  description: "Fan out a single group message to all group members, generating individual delivery records."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str, std.time]
+  input_format: "Line 1: JSON group definition {\"name\":\"g\",\"members\":[\"a\",\"b\",\"c\"]}. Line 2: sender. Line 3: message text."
+  output_format: "JSON array of delivery records, one per member (excluding sender), with fields: recipient, message, group, sender, timestamp."
+  test_cases:
+    - input: "{\"name\":\"team\",\"members\":[\"alice\",\"bob\",\"charlie\"]}\nalice\nHey team!"
+      expected_output: "[{\"recipient\":\"bob\",\"message\":\"Hey team!\",\"group\":\"team\",\"sender\":\"alice\"},{\"recipient\":\"charlie\",\"message\":\"Hey team!\",\"group\":\"team\",\"sender\":\"alice\"}]"
+    - input: "{\"name\":\"devs\",\"members\":[\"x\",\"y\"]}\nx\nDeploy done"
+      expected_output: "[{\"recipient\":\"y\",\"message\":\"Deploy done\",\"group\":\"devs\",\"sender\":\"x\"}]"
+  constraints: ["Sender does not receive their own message", "Preserve member order excluding sender", "Include group name in each delivery record"]
+
+- id: "MSG-021"
+  title: "Group creation and membership management"
+  description: "Process group management commands (create, add, remove, list) and output resulting group state."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Lines of commands: CREATE group_name, ADD group_name user, REMOVE group_name user, LIST group_name."
+  output_format: "For each LIST command: group name followed by sorted member list. For errors: ERROR message."
+  test_cases:
+    - input: "CREATE devs\nADD devs alice\nADD devs bob\nLIST devs"
+      expected_output: "devs: alice, bob"
+    - input: "CREATE team\nADD team alice\nREMOVE team alice\nLIST team"
+      expected_output: "team: (empty)"
+  constraints: ["Cannot create duplicate groups", "Cannot add duplicate members", "Cannot remove non-members", "Error on operations on non-existent groups"]
+
+- id: "MSG-022"
+  title: "Message delivery acknowledgement tracking"
+  description: "Track message delivery states (sent, delivered, read) and report delivery statistics."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "JSON array of events: {\"msg_id\":\"m1\",\"event\":\"sent|delivered|read\",\"time\":\"ISO\"}."
+  output_format: "Per-message status report: msg_id, current state, time in each state."
+  test_cases:
+    - input: "[{\"msg_id\":\"m1\",\"event\":\"sent\",\"time\":\"2024-01-15T10:00:00Z\"},{\"msg_id\":\"m1\",\"event\":\"delivered\",\"time\":\"2024-01-15T10:00:02Z\"},{\"msg_id\":\"m1\",\"event\":\"read\",\"time\":\"2024-01-15T10:00:05Z\"}]"
+      expected_output: "m1: read (sent->delivered: 2s, delivered->read: 3s, total: 5s)"
+    - input: "[{\"msg_id\":\"m1\",\"event\":\"sent\",\"time\":\"2024-01-15T10:00:00Z\"},{\"msg_id\":\"m2\",\"event\":\"sent\",\"time\":\"2024-01-15T10:00:01Z\"},{\"msg_id\":\"m1\",\"event\":\"delivered\",\"time\":\"2024-01-15T10:00:03Z\"}]"
+      expected_output: "m1: delivered (sent->delivered: 3s)\nm2: sent"
+  constraints: ["States must transition in order: sent->delivered->read", "Reject invalid state transitions", "Track timing between each state"]
+
+- id: "MSG-023"
+  title: "Message retry with exponential backoff"
+  description: "Simulate message delivery retry logic with exponential backoff, outputting retry schedule and final outcome."
+  difficulty: 2
+  stdlib_modules: [std.time, std.str]
+  input_format: "Line 1: max retries. Line 2: initial backoff in ms. Line 3: backoff multiplier. Line 4: JSON array of attempt outcomes (true=success, false=failure)."
+  output_format: "Per-attempt log with timestamp offset and outcome. Final line: SUCCESS or FAILED after N attempts."
+  test_cases:
+    - input: "5\n100\n2\n[false,false,true]"
+      expected_output: "attempt 1 at 0ms: FAILED\nattempt 2 at 100ms: FAILED\nattempt 3 at 300ms: SUCCESS"
+    - input: "3\n1000\n2\n[false,false,false]"
+      expected_output: "attempt 1 at 0ms: FAILED\nattempt 2 at 1000ms: FAILED\nattempt 3 at 3000ms: FAILED\nFAILED after 3 attempts"
+  constraints: ["Backoff doubles each retry", "Cumulative time shown", "Stop on success or max retries reached", "Add jitter option"]
+
+- id: "MSG-024"
+  title: "Message deduplication"
+  description: "Detect and remove duplicate messages based on message ID, keeping only the first occurrence."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of messages with id and text fields."
+  output_format: "JSON array of deduplicated messages (first occurrence kept). Last line: removed N duplicates."
+  test_cases:
+    - input: "[{\"id\":\"1\",\"text\":\"Hello\"},{\"id\":\"2\",\"text\":\"World\"},{\"id\":\"1\",\"text\":\"Hello\"}]"
+      expected_output: "[{\"id\":\"1\",\"text\":\"Hello\"},{\"id\":\"2\",\"text\":\"World\"}]\nremoved 1 duplicates"
+    - input: "[{\"id\":\"a\",\"text\":\"X\"},{\"id\":\"a\",\"text\":\"X\"},{\"id\":\"a\",\"text\":\"X\"}]"
+      expected_output: "[{\"id\":\"a\",\"text\":\"X\"}]\nremoved 2 duplicates"
+  constraints: ["Preserve original order", "Keep first occurrence", "Deduplication based solely on ID field"]
+
+- id: "MSG-025"
+  title: "Message ordering by sequence number"
+  description: "Reorder out-of-sequence messages using sequence numbers and detect gaps."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of messages with seq (integer) and text fields, potentially out of order."
+  output_format: "Messages in sequence order, one per line. Then: gaps found at sequences N, M, ..."
+  test_cases:
+    - input: "[{\"seq\":3,\"text\":\"C\"},{\"seq\":1,\"text\":\"A\"},{\"seq\":2,\"text\":\"B\"}]"
+      expected_output: "1: A\n2: B\n3: C\ngaps: none"
+    - input: "[{\"seq\":1,\"text\":\"A\"},{\"seq\":4,\"text\":\"D\"},{\"seq\":2,\"text\":\"B\"}]"
+      expected_output: "1: A\n2: B\n4: D\ngaps: 3"
+  constraints: ["Handle arbitrary ordering", "Detect all gaps in sequence", "Sequence numbers start at 1"]
+
+- id: "MSG-026"
+  title: "Rate limiter - token bucket"
+  description: "Implement a token bucket rate limiter for message sending, determining which messages are allowed or rejected."
+  difficulty: 3
+  stdlib_modules: [std.time, std.str]
+  input_format: "Line 1: bucket capacity. Line 2: refill rate (tokens per second). Line 3: JSON array of send events with timestamp_ms."
+  output_format: "For each event: ALLOWED or REJECTED with current token count."
+  test_cases:
+    - input: "5\n1\n[{\"time\":0},{\"time\":0},{\"time\":0},{\"time\":0},{\"time\":0},{\"time\":0}]"
+      expected_output: "0ms: ALLOWED (4 tokens)\n0ms: ALLOWED (3 tokens)\n0ms: ALLOWED (2 tokens)\n0ms: ALLOWED (1 tokens)\n0ms: ALLOWED (0 tokens)\n0ms: REJECTED (0 tokens)"
+    - input: "2\n1\n[{\"time\":0},{\"time\":0},{\"time\":1000},{\"time\":1000}]"
+      expected_output: "0ms: ALLOWED (1 tokens)\n0ms: ALLOWED (0 tokens)\n1000ms: ALLOWED (0 tokens)\n1000ms: REJECTED (0 tokens)"
+  constraints: ["Tokens refill continuously", "Cannot exceed bucket capacity", "Fractional tokens tracked internally"]
+
+- id: "MSG-027"
+  title: "Rate limiter - sliding window"
+  description: "Implement a sliding window rate limiter that limits messages per time window per user."
+  difficulty: 3
+  stdlib_modules: [std.time, std.str, std.json]
+  input_format: "Line 1: window size in ms. Line 2: max messages per window. Line 3: JSON array of events with user and timestamp_ms."
+  output_format: "For each event: user, timestamp, ALLOWED or REJECTED."
+  test_cases:
+    - input: "1000\n2\n[{\"user\":\"alice\",\"time\":0},{\"user\":\"alice\",\"time\":500},{\"user\":\"alice\",\"time\":800},{\"user\":\"alice\",\"time\":1100}]"
+      expected_output: "alice@0ms: ALLOWED\nalice@500ms: ALLOWED\nalice@800ms: REJECTED\nalice@1100ms: ALLOWED"
+    - input: "1000\n1\n[{\"user\":\"a\",\"time\":0},{\"user\":\"b\",\"time\":0},{\"user\":\"a\",\"time\":500}]"
+      expected_output: "a@0ms: ALLOWED\nb@0ms: ALLOWED\na@500ms: REJECTED"
+  constraints: ["Per-user tracking", "Sliding window not fixed window", "Clean up expired entries"]
+
+- id: "MSG-028"
+  title: "Spam detection - keyword filter"
+  description: "Detect spam messages by checking against a configurable list of banned keywords and patterns."
+  difficulty: 2
+  stdlib_modules: [std.str]
+  input_format: "Line 1: JSON array of banned keywords/patterns. Following lines: messages to check."
+  output_format: "For each message: SPAM or HAM followed by matched keywords if spam."
+  test_cases:
+    - input: "[\"buy now\",\"free money\",\"click here\"]\nHello how are you?\nBUY NOW for free money!!!\nNice day today"
+      expected_output: "HAM\nSPAM [buy now, free money]\nHAM"
+    - input: "[\"viagra\",\"casino\"]\nLet us meet at the casino\nNormal message"
+      expected_output: "SPAM [casino]\nHAM"
+  constraints: ["Case-insensitive matching", "Report all matched keywords", "Support multi-word phrases"]
+
+- id: "MSG-029"
+  title: "Spam detection - frequency analysis"
+  description: "Detect spam based on message frequency patterns: too many messages in short time from same sender."
+  difficulty: 3
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: max messages per minute threshold. Line 2: JSON array of messages with sender and timestamp."
+  output_format: "List of flagged senders with their message count in the window that triggered detection."
+  test_cases:
+    - input: "5\n[{\"sender\":\"alice\",\"time\":\"10:00:00\"},{\"sender\":\"alice\",\"time\":\"10:00:10\"},{\"sender\":\"alice\",\"time\":\"10:00:20\"},{\"sender\":\"alice\",\"time\":\"10:00:30\"},{\"sender\":\"alice\",\"time\":\"10:00:40\"},{\"sender\":\"alice\",\"time\":\"10:00:50\"}]"
+      expected_output: "FLAGGED: alice (6 messages in 60s, threshold: 5)"
+    - input: "3\n[{\"sender\":\"a\",\"time\":\"10:00:00\"},{\"sender\":\"b\",\"time\":\"10:00:01\"},{\"sender\":\"a\",\"time\":\"10:00:02\"},{\"sender\":\"a\",\"time\":\"10:00:03\"},{\"sender\":\"a\",\"time\":\"10:00:04\"}]"
+      expected_output: "FLAGGED: a (4 messages in 60s, threshold: 3)\nCLEAR: b (1 messages)"
+  constraints: ["Use sliding 60-second window", "Track per-sender independently", "Report all senders' status"]
+
+- id: "MSG-030"
+  title: "Spam score calculation"
+  description: "Calculate a composite spam score (0-100) for a message based on multiple heuristics."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON configuration of scoring weights. Line 2: message to score."
+  output_format: "Line 1: total score. Line 2+: breakdown of each heuristic's contribution."
+  test_cases:
+    - input: "{\"caps_ratio\":30,\"link_count\":20,\"keyword_match\":50}\nBUY NOW!!! Visit http://spam.com http://more.com FREE MONEY"
+      expected_output: "score: 85\ncaps_ratio: 25/30 (83% caps)\nlink_count: 20/20 (2 links)\nkeyword_match: 40/50 (2 matches)"
+    - input: "{\"caps_ratio\":30,\"link_count\":20,\"keyword_match\":50}\nHey, how are you doing today?"
+      expected_output: "score: 3\ncaps_ratio: 3/30 (10% caps)\nlink_count: 0/20 (0 links)\nkeyword_match: 0/50 (0 matches)"
+  constraints: ["Score clamped to 0-100", "Each heuristic contributes proportionally to its weight", "Configurable thresholds"]
+
+- id: "MSG-031"
+  title: "End-to-end encryption session setup"
+  description: "Simulate the setup of an end-to-end encrypted messaging session using X3DH key agreement."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: Alice's identity key (hex). Line 2: Bob's identity key (hex). Line 3: Bob's signed pre-key (hex). Line 4: Bob's one-time pre-key (hex)."
+  output_format: "JSON object with: shared_secret (hex), session_key (hex, derived via HKDF), associated_data (hex)."
+  test_cases:
+    - input: "alice_identity_key_hex\nbob_identity_key_hex\nbob_signed_prekey_hex\nbob_onetime_prekey_hex"
+      expected_output: "{\"shared_secret\":\"hex\",\"session_key\":\"hex\",\"associated_data\":\"hex\"}"
+    - input: "key1_hex\nkey2_hex\nprekey_hex\notp_hex"
+      expected_output: "{\"shared_secret\":\"hex\",\"session_key\":\"hex\",\"associated_data\":\"hex\"}"
+  constraints: ["Implement X3DH protocol steps", "Use HKDF-SHA256 for key derivation", "Include identity keys in associated data"]
+
+- id: "MSG-032"
+  title: "Double ratchet message key derivation"
+  description: "Implement the symmetric ratchet step of the Double Ratchet algorithm, deriving message keys from a chain key."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: initial chain key (hex). Line 2: number of message keys to derive."
+  output_format: "For each step: chain_key_N (hex) and message_key_N (hex)."
+  test_cases:
+    - input: "ab01cd23ef45678901234567890abcde01234567890abcdef01234567890abcde\n3"
+      expected_output: "step 1: ck=new_chain_key_hex mk=message_key_hex\nstep 2: ck=new_chain_key_hex mk=message_key_hex\nstep 3: ck=new_chain_key_hex mk=message_key_hex"
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n2"
+      expected_output: "step 1: ck=chain_key_hex mk=message_key_hex\nstep 2: ck=chain_key_hex mk=message_key_hex"
+  constraints: ["Chain key derived via HMAC-SHA256 with constant 0x01", "Message key derived via HMAC-SHA256 with constant 0x02", "Previous chain keys must not be recoverable from later keys"]
+
+- id: "MSG-033"
+  title: "Message encryption with forward secrecy"
+  description: "Encrypt a message using a derived message key with associated data, ensuring forward secrecy properties."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: message key (hex). Line 2: associated data (hex). Line 3: plaintext message."
+  output_format: "JSON with: ciphertext (base64), nonce (hex), tag (hex)."
+  test_cases:
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\naabbccdd\nSecret message"
+      expected_output: "{\"ciphertext\":\"base64\",\"nonce\":\"hex\",\"tag\":\"hex\"}"
+    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000\nAnother secret"
+      expected_output: "{\"ciphertext\":\"base64\",\"nonce\":\"hex\",\"tag\":\"hex\"}"
+  constraints: ["Use AES-256-GCM", "Random nonce for each message", "Include associated data in authentication", "Message key used exactly once then deleted"]
+
+- id: "MSG-034"
+  title: "Contact fingerprint generation"
+  description: "Generate a human-readable safety number for verifying end-to-end encryption between two contacts."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: user A identity key (hex). Line 2: user A identifier. Line 3: user B identity key (hex). Line 4: user B identifier."
+  output_format: "60-digit safety number displayed in groups of 5."
+  test_cases:
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nalice@example.com\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\nbob@example.com"
+      expected_output: "12345 67890 12345 67890 12345 67890 12345 67890 12345 67890 12345 67890"
+    - input: "aaaa...key_hex\nuser1\nbbbb...key_hex\nuser2"
+      expected_output: "xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx"
+  constraints: ["Deterministic for same inputs regardless of order", "Use iterated SHA-512 hashing", "Combine both fingerprints into single number"]
+
+- id: "MSG-035"
+  title: "Message priority queue"
+  description: "Implement a priority queue for message delivery where higher-priority messages are delivered first."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of operations: {\"op\":\"enqueue\",\"msg\":\"text\",\"priority\":1-5} or {\"op\":\"dequeue\"}."
+  output_format: "For each dequeue: the message text and its priority. EMPTY if queue is empty."
+  test_cases:
+    - input: "[{\"op\":\"enqueue\",\"msg\":\"low\",\"priority\":1},{\"op\":\"enqueue\",\"msg\":\"high\",\"priority\":5},{\"op\":\"enqueue\",\"msg\":\"med\",\"priority\":3},{\"op\":\"dequeue\"},{\"op\":\"dequeue\"},{\"op\":\"dequeue\"}]"
+      expected_output: "dequeue: high (priority 5)\ndequeue: med (priority 3)\ndequeue: low (priority 1)"
+    - input: "[{\"op\":\"dequeue\"},{\"op\":\"enqueue\",\"msg\":\"only\",\"priority\":2},{\"op\":\"dequeue\"}]"
+      expected_output: "dequeue: EMPTY\ndequeue: only (priority 2)"
+  constraints: ["Higher number = higher priority", "FIFO within same priority level", "Handle dequeue from empty queue"]
+
+- id: "MSG-036"
+  title: "Message TTL expiration"
+  description: "Process messages with Time-To-Live values, filtering out expired messages based on current time."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: current time (ISO 8601). Line 2: JSON array of messages with text, sent_time, and ttl_seconds."
+  output_format: "Active messages with remaining TTL. Then expired messages."
+  test_cases:
+    - input: "2024-01-15T10:00:30Z\n[{\"text\":\"Hello\",\"sent_time\":\"2024-01-15T10:00:00Z\",\"ttl_seconds\":60},{\"text\":\"Old\",\"sent_time\":\"2024-01-15T09:00:00Z\",\"ttl_seconds\":60}]"
+      expected_output: "ACTIVE:\n  Hello (30s remaining)\nEXPIRED:\n  Old (expired 3570s ago)"
+    - input: "2024-01-15T12:00:00Z\n[{\"text\":\"A\",\"sent_time\":\"2024-01-15T11:59:50Z\",\"ttl_seconds\":30},{\"text\":\"B\",\"sent_time\":\"2024-01-15T11:59:50Z\",\"ttl_seconds\":5}]"
+      expected_output: "ACTIVE:\n  A (20s remaining)\nEXPIRED:\n  B (expired 5s ago)"
+  constraints: ["Precision to the second", "Sort active by remaining TTL ascending", "Sort expired by expiration time descending"]
+
+- id: "MSG-037"
+  title: "Message search with keyword highlighting"
+  description: "Search through message history for keywords and output matching messages with highlights."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: search query (space-separated keywords). Line 2: JSON array of messages with id, sender, text, time."
+  output_format: "Matching messages with keywords wrapped in ** markers. Count of matches."
+  test_cases:
+    - input: "hello world\n[{\"id\":\"1\",\"sender\":\"alice\",\"text\":\"Hello World!\",\"time\":\"10:00\"},{\"id\":\"2\",\"sender\":\"bob\",\"text\":\"Goodbye\",\"time\":\"10:01\"},{\"id\":\"3\",\"sender\":\"charlie\",\"text\":\"Hello there\",\"time\":\"10:02\"}]"
+      expected_output: "[1] alice (10:00): **Hello** **World**!\n[3] charlie (10:02): **Hello** there\n2 matches found"
+    - input: "test\n[{\"id\":\"1\",\"sender\":\"a\",\"text\":\"Testing 123\",\"time\":\"09:00\"}]"
+      expected_output: "[1] a (09:00): **Test**ing 123\n1 matches found"
+  constraints: ["Case-insensitive search", "Highlight partial word matches", "Return messages in chronological order"]
+
+- id: "MSG-038"
+  title: "Message search with boolean operators"
+  description: "Implement message search supporting AND, OR, NOT boolean operators with parentheses."
+  difficulty: 3
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: boolean search query (e.g., 'hello AND world NOT spam'). Line 2: JSON array of messages."
+  output_format: "IDs of matching messages, one per line."
+  test_cases:
+    - input: "hello AND world\n[{\"id\":\"1\",\"text\":\"hello world\"},{\"id\":\"2\",\"text\":\"hello\"},{\"id\":\"3\",\"text\":\"world\"}]"
+      expected_output: "1"
+    - input: "hello OR world NOT spam\n[{\"id\":\"1\",\"text\":\"hello spam\"},{\"id\":\"2\",\"text\":\"world\"},{\"id\":\"3\",\"text\":\"hello world\"}]"
+      expected_output: "2\n3"
+  constraints: ["Support AND, OR, NOT operators", "NOT has highest precedence, then AND, then OR", "Case-insensitive matching"]
+
+- id: "MSG-039"
+  title: "Conversation thread tree builder"
+  description: "Build a tree structure from messages with reply-to references, outputting an indented thread view."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of messages with id, reply_to (null for root), sender, and text."
+  output_format: "Indented thread view using 2-space indentation per level."
+  test_cases:
+    - input: "[{\"id\":\"1\",\"reply_to\":null,\"sender\":\"alice\",\"text\":\"Thread start\"},{\"id\":\"2\",\"reply_to\":\"1\",\"sender\":\"bob\",\"text\":\"Reply\"},{\"id\":\"3\",\"reply_to\":\"2\",\"sender\":\"alice\",\"text\":\"Nested reply\"},{\"id\":\"4\",\"reply_to\":\"1\",\"sender\":\"charlie\",\"text\":\"Another reply\"}]"
+      expected_output: "alice: Thread start\n  bob: Reply\n    alice: Nested reply\n  charlie: Another reply"
+    - input: "[{\"id\":\"a\",\"reply_to\":null,\"sender\":\"x\",\"text\":\"Root\"},{\"id\":\"b\",\"reply_to\":null,\"sender\":\"y\",\"text\":\"Root2\"}]"
+      expected_output: "x: Root\ny: Root2"
+  constraints: ["Handle multiple root messages", "Preserve chronological order within same parent", "Handle orphaned replies gracefully"]
+
+- id: "MSG-040"
+  title: "Message notification routing"
+  description: "Route message notifications to appropriate channels (push, email, SMS) based on user preferences and message priority."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON user preferences {\"user\":\"a\",\"channels\":{\"push\":true,\"email\":true,\"sms\":false},\"quiet_hours\":\"22:00-08:00\",\"priority_override\":3}. Line 2: JSON message with priority and time."
+  output_format: "List of notification channels to use, or SUPPRESSED with reason."
+  test_cases:
+    - input: "{\"user\":\"alice\",\"channels\":{\"push\":true,\"email\":true,\"sms\":false},\"quiet_hours\":\"22:00-08:00\",\"priority_override\":4}\n{\"priority\":2,\"time\":\"23:00\",\"text\":\"Hello\"}"
+      expected_output: "SUPPRESSED (quiet hours, priority 2 < override 4)"
+    - input: "{\"user\":\"bob\",\"channels\":{\"push\":true,\"email\":false,\"sms\":true},\"quiet_hours\":\"22:00-08:00\",\"priority_override\":3}\n{\"priority\":5,\"time\":\"23:00\",\"text\":\"Urgent!\"}"
+      expected_output: "push, sms (priority override: 5 >= 3)"
+  constraints: ["Respect quiet hours unless priority exceeds override threshold", "Only route to enabled channels", "Priority 5 always delivers regardless of settings"]
+
+- id: "MSG-041"
+  title: "Push notification payload construction"
+  description: "Construct platform-specific push notification payloads for iOS (APNs) and Android (FCM) from a generic message."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: platform (ios/android). Line 2: JSON message with sender, text, badge_count, sound."
+  output_format: "Platform-specific JSON payload."
+  test_cases:
+    - input: "ios\n{\"sender\":\"alice\",\"text\":\"Hello!\",\"badge_count\":3,\"sound\":\"default\"}"
+      expected_output: "{\"aps\":{\"alert\":{\"title\":\"alice\",\"body\":\"Hello!\"},\"badge\":3,\"sound\":\"default\"}}"
+    - input: "android\n{\"sender\":\"bob\",\"text\":\"Hey\",\"badge_count\":1,\"sound\":\"notification\"}"
+      expected_output: "{\"notification\":{\"title\":\"bob\",\"body\":\"Hey\"},\"data\":{\"badge\":\"1\",\"sound\":\"notification\"}}"
+  constraints: ["iOS uses APNs format", "Android uses FCM format", "Truncate body to 100 chars for iOS, 200 for Android"]
+
+- id: "MSG-042"
+  title: "Chat export to plain text"
+  description: "Export a chat conversation to a formatted plain text file with headers and message formatting."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str, std.time]
+  input_format: "Line 1: JSON chat metadata {\"room\":\"name\",\"exported_at\":\"ISO\"}. Following: JSON messages with sender, time, text."
+  output_format: "Formatted plain text export with header, separator, and messages."
+  test_cases:
+    - input: "{\"room\":\"general\",\"exported_at\":\"2024-01-15T12:00:00Z\"}\n{\"sender\":\"alice\",\"time\":\"2024-01-15T10:00:00Z\",\"text\":\"Hello\"}\n{\"sender\":\"bob\",\"time\":\"2024-01-15T10:01:00Z\",\"text\":\"Hi\"}"
+      expected_output: "Chat Export: general\nExported: 2024-01-15 12:00:00 UTC\n================================\n[2024-01-15 10:00:00] alice: Hello\n[2024-01-15 10:01:00] bob: Hi\n================================\n2 messages exported"
+    - input: "{\"room\":\"dev\",\"exported_at\":\"2024-06-01T00:00:00Z\"}\n{\"sender\":\"x\",\"time\":\"2024-06-01T00:00:00Z\",\"text\":\"Test\"}"
+      expected_output: "Chat Export: dev\nExported: 2024-06-01 00:00:00 UTC\n================================\n[2024-06-01 00:00:00] x: Test\n================================\n1 messages exported"
+  constraints: ["Include message count in footer", "Sort messages by timestamp", "Use UTC for all timestamps"]
+
+- id: "MSG-043"
+  title: "Chat export to CSV"
+  description: "Export chat messages to CSV format with proper escaping of special characters."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of messages with id, sender, time, and text fields."
+  output_format: "CSV with header row: id,sender,time,text. Properly escaped."
+  test_cases:
+    - input: "[{\"id\":\"1\",\"sender\":\"alice\",\"time\":\"2024-01-15T10:00:00Z\",\"text\":\"Hello, world\"},{\"id\":\"2\",\"sender\":\"bob\",\"time\":\"2024-01-15T10:01:00Z\",\"text\":\"She said \\\"hi\\\"\"}]"
+      expected_output: "id,sender,time,text\n1,alice,2024-01-15T10:00:00Z,\"Hello, world\"\n2,bob,2024-01-15T10:01:00Z,\"She said \"\"hi\"\"\""
+    - input: "[{\"id\":\"1\",\"sender\":\"a\",\"time\":\"2024-01-01T00:00:00Z\",\"text\":\"simple\"}]"
+      expected_output: "id,sender,time,text\n1,a,2024-01-01T00:00:00Z,simple"
+  constraints: ["Quote fields containing commas or quotes", "Escape quotes by doubling", "Include header row"]
+
+- id: "MSG-044"
+  title: "Message backup encryption"
+  description: "Encrypt an entire message backup archive using a password-derived key with Argon2id."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.json, std.str]
+  input_format: "Line 1: password. Line 2: JSON array of messages to backup."
+  output_format: "JSON with: salt (hex), nonce (hex), encrypted_data (base64), key_params (argon2id parameters)."
+  test_cases:
+    - input: "MySecurePassword123!\n[{\"id\":\"1\",\"text\":\"Secret message\"}]"
+      expected_output: "{\"salt\":\"hex\",\"nonce\":\"hex\",\"encrypted_data\":\"base64\",\"key_params\":{\"algorithm\":\"argon2id\",\"memory\":65536,\"iterations\":3,\"parallelism\":4}}"
+    - input: "short\n[{\"id\":\"1\",\"text\":\"data\"}]"
+      expected_output: "{\"salt\":\"hex\",\"nonce\":\"hex\",\"encrypted_data\":\"base64\",\"key_params\":{\"algorithm\":\"argon2id\",\"memory\":65536,\"iterations\":3,\"parallelism\":4}}"
+  constraints: ["Use Argon2id for key derivation", "Random 16-byte salt", "AES-256-GCM for encryption", "Minimum password length of 8 chars"]
+
+- id: "MSG-045"
+  title: "Message backup restore and decryption"
+  description: "Decrypt and restore a message backup archive using the correct password."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.json, std.str]
+  input_format: "Line 1: password. Line 2: JSON encrypted backup (output of MSG-044)."
+  output_format: "Decrypted JSON array of messages, or ERROR with reason."
+  test_cases:
+    - input: "MySecurePassword123!\n{\"salt\":\"hex\",\"nonce\":\"hex\",\"encrypted_data\":\"base64\",\"key_params\":{\"algorithm\":\"argon2id\",\"memory\":65536,\"iterations\":3,\"parallelism\":4}}"
+      expected_output: "[{\"id\":\"1\",\"text\":\"Secret message\"}]"
+    - input: "WrongPassword\n{\"salt\":\"hex\",\"nonce\":\"hex\",\"encrypted_data\":\"base64\",\"key_params\":{\"algorithm\":\"argon2id\",\"memory\":65536,\"iterations\":3,\"parallelism\":4}}"
+      expected_output: "ERROR: decryption failed (authentication tag mismatch)"
+  constraints: ["Verify authentication tag before returning data", "Use same Argon2id parameters from backup", "Clear sensitive data from memory after use"]
+
+- id: "MSG-046"
+  title: "Typing indicator protocol"
+  description: "Implement typing indicator logic with start/stop/timeout states for multiple users in a chat."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: timeout in ms. Line 2: JSON array of events {user, type: start|stop|keystroke, time_ms}."
+  output_format: "At each event time: list of currently-typing users."
+  test_cases:
+    - input: "3000\n[{\"user\":\"alice\",\"type\":\"start\",\"time\":0},{\"user\":\"bob\",\"type\":\"start\",\"time\":1000},{\"user\":\"alice\",\"type\":\"stop\",\"time\":2000}]"
+      expected_output: "0ms: [alice]\n1000ms: [alice, bob]\n2000ms: [bob]"
+    - input: "2000\n[{\"user\":\"alice\",\"type\":\"start\",\"time\":0},{\"user\":\"alice\",\"type\":\"keystroke\",\"time\":1500},{\"user\":\"alice\",\"type\":\"keystroke\",\"time\":3000}]"
+      expected_output: "0ms: [alice]\n1500ms: [alice]\n3000ms: [alice]"
+  constraints: ["Typing expires after timeout with no keystroke", "Stop event immediately removes user", "Keystroke resets timeout"]
+
+- id: "MSG-047"
+  title: "Read receipt aggregation"
+  description: "Aggregate read receipts for group messages, showing who has read each message."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Line 1: JSON group members array. Line 2: JSON array of read receipt events {msg_id, user, time}."
+  output_format: "Per-message summary: msg_id, readers count/total, list of readers, list of non-readers."
+  test_cases:
+    - input: "[\"alice\",\"bob\",\"charlie\"]\n[{\"msg_id\":\"m1\",\"user\":\"bob\",\"time\":\"10:00\"},{\"msg_id\":\"m1\",\"user\":\"charlie\",\"time\":\"10:01\"}]"
+      expected_output: "m1: 2/3 read\n  read: bob, charlie\n  unread: alice"
+    - input: "[\"a\",\"b\"]\n[{\"msg_id\":\"m1\",\"user\":\"a\",\"time\":\"10:00\"},{\"msg_id\":\"m1\",\"user\":\"b\",\"time\":\"10:01\"}]"
+      expected_output: "m1: 2/2 read\n  read: a, b\n  unread: (none)"
+  constraints: ["Ignore receipts from non-members", "Ignore duplicate receipts", "Sort readers by read time"]
+
+- id: "MSG-048"
+  title: "Message reactions aggregation"
+  description: "Aggregate emoji reactions on messages, showing counts and who reacted with what."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of reaction events: {msg_id, user, emoji, action: add|remove}."
+  output_format: "Per-message reaction summary with emoji counts and user lists."
+  test_cases:
+    - input: "[{\"msg_id\":\"m1\",\"user\":\"alice\",\"emoji\":\"thumbsup\",\"action\":\"add\"},{\"msg_id\":\"m1\",\"user\":\"bob\",\"emoji\":\"thumbsup\",\"action\":\"add\"},{\"msg_id\":\"m1\",\"user\":\"alice\",\"emoji\":\"heart\",\"action\":\"add\"}]"
+      expected_output: "m1:\n  thumbsup (2): alice, bob\n  heart (1): alice"
+    - input: "[{\"msg_id\":\"m1\",\"user\":\"alice\",\"emoji\":\"thumbsup\",\"action\":\"add\"},{\"msg_id\":\"m1\",\"user\":\"alice\",\"emoji\":\"thumbsup\",\"action\":\"remove\"}]"
+      expected_output: "m1:\n  (no reactions)"
+  constraints: ["Handle add and remove actions", "User can only react once per emoji per message", "Sort emojis by count descending"]
+
+- id: "MSG-049"
+  title: "Online presence tracking"
+  description: "Track user online/offline/away presence states and compute presence duration statistics."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: report time (ISO). Line 2: JSON array of presence events {user, status: online|offline|away, time}."
+  output_format: "Per-user: current status, time in each state, last state change."
+  test_cases:
+    - input: "2024-01-15T11:00:00Z\n[{\"user\":\"alice\",\"status\":\"online\",\"time\":\"2024-01-15T10:00:00Z\"},{\"user\":\"alice\",\"status\":\"away\",\"time\":\"2024-01-15T10:30:00Z\"},{\"user\":\"bob\",\"status\":\"online\",\"time\":\"2024-01-15T10:15:00Z\"}]"
+      expected_output: "alice: away (since 10:30, online: 30m, away: 30m)\nbob: online (since 10:15, online: 45m)"
+    - input: "2024-01-15T10:10:00Z\n[{\"user\":\"x\",\"status\":\"online\",\"time\":\"2024-01-15T10:00:00Z\"},{\"user\":\"x\",\"status\":\"offline\",\"time\":\"2024-01-15T10:05:00Z\"}]"
+      expected_output: "x: offline (since 10:05, online: 5m, offline: 5m)"
+  constraints: ["Track cumulative time per state", "Handle users with no events as offline", "Sort by username"]
+
+- id: "MSG-050"
+  title: "Message content type detection"
+  description: "Detect the content type of a message (text, URL, code, emoji-only, etc.) and apply appropriate formatting metadata."
+  difficulty: 1
+  stdlib_modules: [std.str, std.json]
+  input_format: "Lines of messages, one per line."
+  output_format: "For each message: detected type and any extracted metadata."
+  test_cases:
+    - input: "Hello world\nhttps://example.com/page\nfunction foo() { return 1; }\n:):):)"
+      expected_output: "text: Hello world\nurl: https://example.com/page [domain=example.com]\ncode: function foo() { return 1; } [lang=javascript]\nemoji: :):):) [count=3]"
+    - input: "Check this: https://github.com/repo\nJust text here"
+      expected_output: "mixed: Check this: https://github.com/repo [urls=1]\ntext: Just text here"
+  constraints: ["Detect: text, url, code, emoji, mixed", "Extract URLs from mixed content", "Detect code by common patterns"]
+
+- id: "MSG-051"
+  title: "URL preview metadata extraction"
+  description: "Parse URL preview metadata (title, description, image) from a simulated HTML response for link previews in chat."
+  difficulty: 2
+  stdlib_modules: [std.str, std.http, std.json]
+  input_format: "Line 1: URL. Line 2+: simulated HTML content with Open Graph meta tags."
+  output_format: "JSON with: url, title, description, image, site_name."
+  test_cases:
+    - input: "https://example.com\n<html><head><meta property=\"og:title\" content=\"Example\"><meta property=\"og:description\" content=\"An example page\"><meta property=\"og:image\" content=\"https://example.com/img.png\"></head></html>"
+      expected_output: "{\"url\":\"https://example.com\",\"title\":\"Example\",\"description\":\"An example page\",\"image\":\"https://example.com/img.png\",\"site_name\":\"\"}"
+    - input: "https://test.org\n<html><head><title>Fallback Title</title></head></html>"
+      expected_output: "{\"url\":\"https://test.org\",\"title\":\"Fallback Title\",\"description\":\"\",\"image\":\"\",\"site_name\":\"\"}"
+  constraints: ["Prefer og: meta tags", "Fall back to <title> tag", "Truncate description to 200 chars", "Validate image URL format"]
+
+- id: "MSG-052"
+  title: "Message mention parsing"
+  description: "Parse @mentions from message text, resolving them against a user directory."
+  difficulty: 1
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON user directory [{\"username\":\"alice\",\"display\":\"Alice Smith\"},...]. Line 2: message text with @mentions."
+  output_format: "Resolved mentions with positions, and the message with mentions replaced by display names."
+  test_cases:
+    - input: "[{\"username\":\"alice\",\"display\":\"Alice Smith\"},{\"username\":\"bob\",\"display\":\"Bob Jones\"}]\nHey @alice and @bob, check this out @unknown"
+      expected_output: "mentions: alice (pos 4), bob (pos 15)\nunresolved: unknown (pos 36)\nformatted: Hey Alice Smith and Bob Jones, check this out @unknown"
+    - input: "[{\"username\":\"dev\",\"display\":\"Dev Team\"}]\n@dev please review"
+      expected_output: "mentions: dev (pos 0)\nformatted: Dev Team please review"
+  constraints: ["Case-insensitive mention matching", "Report unresolved mentions", "Handle @all and @here as special mentions"]
+
+- id: "MSG-053"
+  title: "Message markdown to plain text conversion"
+  description: "Convert markdown-formatted messages to plain text while preserving structure with indentation."
+  difficulty: 2
+  stdlib_modules: [std.str]
+  input_format: "Multi-line markdown message."
+  output_format: "Plain text equivalent with formatting stripped but structure preserved."
+  test_cases:
+    - input: "# Hello\n\nThis is **bold** and *italic* text.\n\n- Item 1\n- Item 2\n\n```code block```"
+      expected_output: "HELLO\n\nThis is bold and italic text.\n\n* Item 1\n* Item 2\n\n| code block"
+    - input: "Check [this link](https://example.com) and `inline code`."
+      expected_output: "Check this link (https://example.com) and inline code."
+  constraints: ["Strip bold/italic markers", "Convert links to text (url) format", "Prefix code blocks with |", "Convert headers to uppercase"]
+
+- id: "MSG-054"
+  title: "Channel-based message routing"
+  description: "Route messages to appropriate channels based on content rules (keywords, sender, type)."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON routing rules [{\"channel\":\"c\",\"rules\":{\"keywords\":[...],\"senders\":[...],\"types\":[...]}},...]. Following: JSON messages."
+  output_format: "For each message: list of channels it was routed to."
+  test_cases:
+    - input: "[{\"channel\":\"alerts\",\"rules\":{\"keywords\":[\"error\",\"critical\"],\"senders\":[],\"types\":[]}},{\"channel\":\"general\",\"rules\":{\"keywords\":[],\"senders\":[],\"types\":[\"text\"]}}]\n{\"sender\":\"system\",\"type\":\"text\",\"text\":\"Critical error occurred\"}"
+      expected_output: "routed to: alerts, general"
+    - input: "[{\"channel\":\"images\",\"rules\":{\"keywords\":[],\"senders\":[],\"types\":[\"image\"]}}]\n{\"sender\":\"alice\",\"type\":\"text\",\"text\":\"Hello\"}"
+      expected_output: "routed to: (none)"
+  constraints: ["Message can match multiple channels", "Empty rule array means 'match all'", "All non-empty rule arrays must match (AND logic)"]
+
+- id: "MSG-055"
+  title: "Message flood protection"
+  description: "Detect and mitigate message flooding by identifying users sending identical or near-identical messages rapidly."
+  difficulty: 3
+  stdlib_modules: [std.str, std.time, std.json]
+  input_format: "Line 1: similarity threshold (0-1). Line 2: time window in seconds. Line 3: max similar messages. Line 4: JSON array of messages with sender, text, time."
+  output_format: "Flagged flood events with sender, message count, and time span."
+  test_cases:
+    - input: "0.8\n10\n3\n[{\"sender\":\"spammer\",\"text\":\"Buy now!\",\"time\":\"10:00:00\"},{\"sender\":\"spammer\",\"text\":\"Buy now!!\",\"time\":\"10:00:01\"},{\"sender\":\"spammer\",\"text\":\"Buy now!!!\",\"time\":\"10:00:02\"},{\"sender\":\"spammer\",\"text\":\"BUY NOW!\",\"time\":\"10:00:03\"}]"
+      expected_output: "FLOOD: spammer sent 4 similar messages in 3s (threshold: 3 in 10s)"
+    - input: "0.9\n5\n2\n[{\"sender\":\"alice\",\"text\":\"Hello\",\"time\":\"10:00:00\"},{\"sender\":\"alice\",\"text\":\"World\",\"time\":\"10:00:01\"}]"
+      expected_output: "NO FLOOD DETECTED"
+  constraints: ["Use Levenshtein distance for similarity", "Normalize case before comparison", "Per-sender tracking"]
+
+- id: "MSG-056"
+  title: "Message compression for bandwidth optimization"
+  description: "Implement dictionary-based message compression for repeated phrases in a conversation stream."
+  difficulty: 3
+  stdlib_modules: [std.str]
+  input_format: "Line 1: minimum phrase length for dictionary entry. Following lines: messages to compress."
+  output_format: "Dictionary entries and compressed messages with dictionary references."
+  test_cases:
+    - input: "5\nHello, how are you doing today?\nHello, how are you feeling today?\nI am doing great, how are you?"
+      expected_output: "DICT:\n  D1=Hello, how are you\n  D2=today?\nCOMPRESSED:\n  {D1} doing {D2}\n  {D1} feeling {D2}\n  I am doing great, how are you?\nSavings: 23%"
+    - input: "3\nabc abc abc\ndef def def"
+      expected_output: "DICT:\n  D1=abc\n  D2=def\nCOMPRESSED:\n  {D1} {D1} {D1}\n  {D2} {D2} {D2}\nSavings: 25%"
+  constraints: ["Only create dictionary entries for phrases appearing 2+ times", "Calculate compression ratio", "Minimum phrase length configurable"]
+
+- id: "MSG-057"
+  title: "End-to-end encrypted group key distribution"
+  description: "Implement sender-key based group encryption where the sender distributes a group key to each member individually."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.json, std.str]
+  input_format: "Line 1: sender identity. Line 2: JSON array of recipient public keys (hex). Line 3: message to encrypt."
+  output_format: "JSON with: sender_key (encrypted per recipient), group_ciphertext, per-recipient key packages."
+  test_cases:
+    - input: "alice\n[{\"user\":\"bob\",\"pub_key\":\"hex1\"},{\"user\":\"charlie\",\"pub_key\":\"hex2\"}]\nSecret group message"
+      expected_output: "{\"sender_key_packages\":[{\"recipient\":\"bob\",\"encrypted_key\":\"hex\"},{\"recipient\":\"charlie\",\"encrypted_key\":\"hex\"}],\"ciphertext\":\"base64\"}"
+    - input: "sender\n[{\"user\":\"r1\",\"pub_key\":\"hex\"}]\nHello group"
+      expected_output: "{\"sender_key_packages\":[{\"recipient\":\"r1\",\"encrypted_key\":\"hex\"}],\"ciphertext\":\"base64\"}"
+  constraints: ["Generate random sender key", "Encrypt sender key to each recipient's public key", "Use sender key to encrypt actual message", "AES-256-GCM for message encryption"]
+
+- id: "MSG-058"
+  title: "Message queue persistence simulation"
+  description: "Simulate a persistent message queue with enqueue, dequeue, peek, and crash recovery operations."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "JSON array of operations: enqueue, dequeue, peek, ack, crash, recover."
+  output_format: "For each operation: result. After recover: state of queue showing unacked messages re-queued."
+  test_cases:
+    - input: "[{\"op\":\"enqueue\",\"msg\":\"A\"},{\"op\":\"enqueue\",\"msg\":\"B\"},{\"op\":\"dequeue\"},{\"op\":\"crash\"},{\"op\":\"recover\"},{\"op\":\"dequeue\"}]"
+      expected_output: "enqueue A: ok (size=1)\nenqueue B: ok (size=2)\ndequeue: A (unacked)\ncrash: lost in-flight messages\nrecover: requeued 1 unacked\ndequeue: A (unacked)"
+    - input: "[{\"op\":\"enqueue\",\"msg\":\"X\"},{\"op\":\"dequeue\"},{\"op\":\"ack\",\"msg\":\"X\"},{\"op\":\"crash\"},{\"op\":\"recover\"},{\"op\":\"dequeue\"}]"
+      expected_output: "enqueue X: ok (size=1)\ndequeue: X (unacked)\nack X: confirmed\ncrash: no in-flight messages\nrecover: nothing to requeue\ndequeue: EMPTY"
+  constraints: ["Unacked messages survive crash", "Acked messages are permanently removed", "FIFO ordering maintained", "Dequeue returns oldest unacked"]
+
+- id: "MSG-059"
+  title: "WebSocket frame encoding"
+  description: "Encode messages into WebSocket frame format with proper opcode, masking, and length encoding."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str, std.crypto]
+  input_format: "Line 1: direction (client/server). Line 2: frame type (text/binary/ping/pong/close). Line 3: payload."
+  output_format: "Hex-encoded WebSocket frame bytes with explanation of each field."
+  test_cases:
+    - input: "client\ntext\nHello"
+      expected_output: "81 85 [mask4] [masked_payload]\nFIN=1, opcode=0x1 (text), MASK=1, len=5"
+    - input: "server\ntext\nHi"
+      expected_output: "81 02 48 69\nFIN=1, opcode=0x1 (text), MASK=0, len=2"
+  constraints: ["Client frames must be masked", "Server frames must not be masked", "Support 7-bit, 16-bit, and 64-bit length encoding", "Generate random 4-byte mask for client"]
+
+- id: "MSG-060"
+  title: "WebSocket frame decoding"
+  description: "Decode WebSocket frame bytes back into readable message content."
+  difficulty: 3
+  stdlib_modules: [std.net, std.str]
+  input_format: "Line 1: hex-encoded frame bytes."
+  output_format: "Decoded frame: FIN, opcode, masked, payload length, and decoded payload text."
+  test_cases:
+    - input: "81 02 48 69"
+      expected_output: "FIN=1, RSV=000, opcode=text(0x1), mask=no, length=2, payload=\"Hi\""
+    - input: "81 85 37 fa 21 3d 7f 9f 4d 51 58"
+      expected_output: "FIN=1, RSV=000, opcode=text(0x1), mask=yes, mask_key=37fa213d, length=5, payload=\"Hello\""
+  constraints: ["Handle masked and unmasked frames", "Support all opcodes (text, binary, close, ping, pong)", "Validate frame structure"]
+
+- id: "MSG-061"
+  title: "Message batching for network efficiency"
+  description: "Batch multiple small messages into larger network packets respecting maximum packet size."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: max batch size in bytes. Line 2: JSON array of messages with text field."
+  output_format: "Batched groups showing which messages go in each batch and total bytes."
+  test_cases:
+    - input: "50\n[{\"text\":\"Hello\"},{\"text\":\"World\"},{\"text\":\"This is a longer message\"},{\"text\":\"Short\"}]"
+      expected_output: "batch 1 (10 bytes): [Hello, World]\nbatch 2 (24 bytes): [This is a longer message]\nbatch 3 (5 bytes): [Short]"
+    - input: "100\n[{\"text\":\"A\"},{\"text\":\"B\"},{\"text\":\"C\"}]"
+      expected_output: "batch 1 (3 bytes): [A, B, C]"
+  constraints: ["Never exceed max batch size", "Single messages larger than max get their own batch", "Minimize number of batches"]
+
+- id: "MSG-062"
+  title: "Protocol buffer-style message serialization"
+  description: "Serialize structured messages into a compact binary format with field tags and wire types."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON schema {\"fields\":[{\"tag\":1,\"name\":\"n\",\"type\":\"string|int|bool\"},...]}. Line 2: JSON data to serialize."
+  output_format: "Hex-encoded serialized bytes with annotated field breakdown."
+  test_cases:
+    - input: "{\"fields\":[{\"tag\":1,\"name\":\"sender\",\"type\":\"string\"},{\"tag\":2,\"name\":\"seq\",\"type\":\"int\"},{\"tag\":3,\"name\":\"urgent\",\"type\":\"bool\"}]}\n{\"sender\":\"alice\",\"seq\":42,\"urgent\":true}"
+      expected_output: "0a 05 616c696365 10 2a 18 01\nfield 1 (string): alice\nfield 2 (varint): 42\nfield 3 (varint): 1"
+    - input: "{\"fields\":[{\"tag\":1,\"name\":\"text\",\"type\":\"string\"}]}\n{\"text\":\"Hi\"}"
+      expected_output: "0a 02 4869\nfield 1 (string): Hi"
+  constraints: ["Use varint encoding for integers", "Use length-delimited encoding for strings", "Field tag encoding: (tag << 3) | wire_type", "Support wire types: 0=varint, 2=length-delimited"]
+
+- id: "MSG-063"
+  title: "Protocol buffer-style message deserialization"
+  description: "Deserialize compact binary format back into structured JSON using a schema definition."
+  difficulty: 4
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON schema (same as MSG-062). Line 2: hex-encoded serialized bytes."
+  output_format: "Deserialized JSON object with all fields."
+  test_cases:
+    - input: "{\"fields\":[{\"tag\":1,\"name\":\"sender\",\"type\":\"string\"},{\"tag\":2,\"name\":\"seq\",\"type\":\"int\"}]}\n0a 05 616c696365 10 2a"
+      expected_output: "{\"sender\":\"alice\",\"seq\":42}"
+    - input: "{\"fields\":[{\"tag\":1,\"name\":\"msg\",\"type\":\"string\"},{\"tag\":2,\"name\":\"ok\",\"type\":\"bool\"}]}\n0a 02 4869 10 01"
+      expected_output: "{\"msg\":\"Hi\",\"ok\":true}"
+  constraints: ["Handle unknown fields gracefully (skip)", "Validate wire type matches schema", "Support missing optional fields"]
+
+- id: "MSG-064"
+  title: "Sealed sender message construction"
+  description: "Construct a sealed sender message where the recipient cannot determine the sender without decryption."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.json, std.str]
+  input_format: "Line 1: sender identity key (hex). Line 2: recipient identity key (hex). Line 3: plaintext message."
+  output_format: "JSON sealed message: ephemeral_key, encrypted_sender_cert, encrypted_payload (all hex/base64)."
+  test_cases:
+    - input: "sender_identity_hex\nrecipient_identity_hex\nSecret message"
+      expected_output: "{\"ephemeral_key\":\"hex\",\"encrypted_sender_cert\":\"base64\",\"encrypted_payload\":\"base64\"}"
+    - input: "key1_hex\nkey2_hex\nAnother secret"
+      expected_output: "{\"ephemeral_key\":\"hex\",\"encrypted_sender_cert\":\"base64\",\"encrypted_payload\":\"base64\"}"
+  constraints: ["Generate ephemeral key pair", "Encrypt sender certificate to recipient", "Recipient learns sender only after successful decryption", "Use ECDH + HKDF for key derivation"]
+
+- id: "MSG-065"
+  title: "Message queue dead letter handling"
+  description: "Implement dead letter queue logic: messages that fail delivery N times are moved to DLQ with metadata."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Line 1: max retry count. Line 2: JSON array of delivery attempts {msg_id, attempt, success, time}."
+  output_format: "Messages in DLQ with failure count and last error time. Messages still active."
+  test_cases:
+    - input: "3\n[{\"msg_id\":\"m1\",\"attempt\":1,\"success\":false,\"time\":\"10:00\"},{\"msg_id\":\"m1\",\"attempt\":2,\"success\":false,\"time\":\"10:01\"},{\"msg_id\":\"m1\",\"attempt\":3,\"success\":false,\"time\":\"10:02\"},{\"msg_id\":\"m2\",\"attempt\":1,\"success\":true,\"time\":\"10:00\"}]"
+      expected_output: "DLQ:\n  m1 (3 failures, last: 10:02)\nDELIVERED:\n  m2 (1 attempt)"
+    - input: "2\n[{\"msg_id\":\"a\",\"attempt\":1,\"success\":false,\"time\":\"09:00\"},{\"msg_id\":\"a\",\"attempt\":2,\"success\":true,\"time\":\"09:01\"}]"
+      expected_output: "DLQ:\n  (empty)\nDELIVERED:\n  a (2 attempts)"
+  constraints: ["Move to DLQ only after max retries exhausted", "Success at any attempt removes from retry queue", "Track all attempt timestamps"]
+
+- id: "MSG-066"
+  title: "Message idempotency key generation and validation"
+  description: "Generate and validate idempotency keys for message operations to prevent duplicate processing."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.time, std.str, std.json]
+  input_format: "Line 1: operation (generate/validate). For generate: sender, recipient, content, timestamp. For validate: key and stored keys list."
+  output_format: "For generate: idempotency key. For validate: DUPLICATE or UNIQUE."
+  test_cases:
+    - input: "generate\nalice\nbob\nHello\n2024-01-15T10:00:00Z"
+      expected_output: "key: sha256(alice|bob|Hello|2024-01-15T10:00:00Z) = hex_hash"
+    - input: "validate\nabc123\n[\"abc123\",\"def456\"]"
+      expected_output: "DUPLICATE (matches existing key)"
+  constraints: ["Key derived from deterministic hash of inputs", "Include timestamp to allow same content at different times", "Keys expire after 24 hours"]
+
+- id: "MSG-067"
+  title: "Conversation summarization metadata"
+  description: "Generate conversation summary metadata: message count, active participants, time span, message type distribution."
+  difficulty: 1
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "JSON array of messages with sender, type, time fields."
+  output_format: "Summary statistics in structured format."
+  test_cases:
+    - input: "[{\"sender\":\"alice\",\"type\":\"text\",\"time\":\"2024-01-15T10:00:00Z\"},{\"sender\":\"bob\",\"type\":\"text\",\"time\":\"2024-01-15T10:05:00Z\"},{\"sender\":\"alice\",\"type\":\"image\",\"time\":\"2024-01-15T10:10:00Z\"}]"
+      expected_output: "messages: 3\nparticipants: 2 (alice: 2, bob: 1)\nduration: 10m\ntypes: text=2, image=1\nfirst: 2024-01-15T10:00:00Z\nlast: 2024-01-15T10:10:00Z"
+    - input: "[{\"sender\":\"x\",\"type\":\"text\",\"time\":\"2024-01-01T00:00:00Z\"}]"
+      expected_output: "messages: 1\nparticipants: 1 (x: 1)\nduration: 0s\ntypes: text=1\nfirst: 2024-01-01T00:00:00Z\nlast: 2024-01-01T00:00:00Z"
+  constraints: ["Handle empty conversation", "Sort participants by message count descending", "Duration in human-readable format"]
+
+- id: "MSG-068"
+  title: "Message archive pagination"
+  description: "Implement cursor-based pagination for message archive retrieval."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: page size. Line 2: cursor (empty for first page). Line 3: JSON array of all messages (id, time, text)."
+  output_format: "Page of messages with next/prev cursors."
+  test_cases:
+    - input: "2\n\n[{\"id\":\"1\",\"time\":\"10:00\",\"text\":\"A\"},{\"id\":\"2\",\"time\":\"10:01\",\"text\":\"B\"},{\"id\":\"3\",\"time\":\"10:02\",\"text\":\"C\"},{\"id\":\"4\",\"time\":\"10:03\",\"text\":\"D\"}]"
+      expected_output: "messages: [{\"id\":\"1\",\"text\":\"A\"},{\"id\":\"2\",\"text\":\"B\"}]\nnext_cursor: \"after:2\"\nprev_cursor: null"
+    - input: "2\nafter:2\n[{\"id\":\"1\",\"time\":\"10:00\",\"text\":\"A\"},{\"id\":\"2\",\"time\":\"10:01\",\"text\":\"B\"},{\"id\":\"3\",\"time\":\"10:02\",\"text\":\"C\"},{\"id\":\"4\",\"time\":\"10:03\",\"text\":\"D\"}]"
+      expected_output: "messages: [{\"id\":\"3\",\"text\":\"C\"},{\"id\":\"4\",\"text\":\"D\"}]\nnext_cursor: null\nprev_cursor: \"before:3\""
+  constraints: ["Cursor encodes position opaquely", "Support forward and backward pagination", "Return null cursor when no more pages"]
+
+- id: "MSG-069"
+  title: "User blocking and message filtering"
+  description: "Filter messages based on a user's block list, suppressing messages from blocked users."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON block list [\"user1\",\"user2\"]. Line 2: JSON array of messages with sender and text."
+  output_format: "Filtered messages (blocked removed) with count of blocked messages."
+  test_cases:
+    - input: "[\"spammer\",\"troll\"]\n[{\"sender\":\"alice\",\"text\":\"Hi\"},{\"sender\":\"spammer\",\"text\":\"Buy stuff\"},{\"sender\":\"bob\",\"text\":\"Hello\"},{\"sender\":\"troll\",\"text\":\"Bad\"}]"
+      expected_output: "alice: Hi\nbob: Hello\n---\n2 messages blocked from 2 users"
+    - input: "[]\n[{\"sender\":\"a\",\"text\":\"X\"}]"
+      expected_output: "a: X\n---\n0 messages blocked"
+  constraints: ["Case-insensitive username matching", "Preserve message order", "Report per-user block counts"]
+
+- id: "MSG-070"
+  title: "Message content encryption with key rotation"
+  description: "Encrypt messages using rotating keys, including key version in ciphertext for correct decryption."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: JSON key ring [{\"version\":1,\"key\":\"hex\"},{\"version\":2,\"key\":\"hex\"}]. Line 2: active version. Line 3: operation (encrypt/decrypt). Line 4: message or ciphertext."
+  output_format: "For encrypt: versioned ciphertext. For decrypt: plaintext with key version used."
+  test_cases:
+    - input: "[{\"version\":1,\"key\":\"aabb...\"},{\"version\":2,\"key\":\"ccdd...\"}]\n2\nencrypt\nHello World"
+      expected_output: "v2:base64_ciphertext"
+    - input: "[{\"version\":1,\"key\":\"aabb...\"},{\"version\":2,\"key\":\"ccdd...\"}]\n2\ndecrypt\nv1:base64_ciphertext"
+      expected_output: "Hello World (decrypted with key v1)"
+  constraints: ["Prefix ciphertext with key version", "Support decryption with any key in ring", "Error on unknown key version", "Active version used for new encryptions only"]
+
+- id: "MSG-071"
+  title: "Message queue topic partitioning"
+  description: "Partition messages across multiple queue partitions based on a consistent hashing scheme."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: number of partitions. Line 2: JSON array of messages with partition_key and text."
+  output_format: "Per-partition message assignment with hash values."
+  test_cases:
+    - input: "4\n[{\"partition_key\":\"user:alice\",\"text\":\"msg1\"},{\"partition_key\":\"user:bob\",\"text\":\"msg2\"},{\"partition_key\":\"user:alice\",\"text\":\"msg3\"}]"
+      expected_output: "partition 0: []\npartition 1: [msg2 (user:bob)]\npartition 2: [msg1 (user:alice), msg3 (user:alice)]\npartition 3: []"
+    - input: "2\n[{\"partition_key\":\"a\",\"text\":\"X\"},{\"partition_key\":\"b\",\"text\":\"Y\"}]"
+      expected_output: "partition 0: [X (a)]\npartition 1: [Y (b)]"
+  constraints: ["Same partition key always maps to same partition", "Use consistent hashing (murmur3 or SHA-256 mod N)", "Distribute evenly across partitions"]
+
+- id: "MSG-072"
+  title: "Message schema migration"
+  description: "Migrate messages from an old schema version to a new one, applying transformation rules."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON migration rules {\"rename\":{\"old\":\"new\"},\"add\":{\"field\":\"default\"},\"remove\":[\"field\"]}. Line 2: JSON array of messages in old schema."
+  output_format: "JSON array of migrated messages in new schema."
+  test_cases:
+    - input: "{\"rename\":{\"msg\":\"text\",\"from\":\"sender\"},\"add\":{\"version\":2},\"remove\":[\"legacy_id\"]}\n[{\"msg\":\"Hello\",\"from\":\"alice\",\"legacy_id\":\"x\"}]"
+      expected_output: "[{\"text\":\"Hello\",\"sender\":\"alice\",\"version\":2}]"
+    - input: "{\"rename\":{},\"add\":{\"type\":\"text\"},\"remove\":[]}\n[{\"content\":\"Hi\"}]"
+      expected_output: "[{\"content\":\"Hi\",\"type\":\"text\"}]"
+  constraints: ["Apply renames before adds and removes", "Preserve fields not mentioned in rules", "Handle missing source fields for renames gracefully"]
+
+- id: "MSG-073"
+  title: "Conversation state machine"
+  description: "Implement a conversation state machine tracking states like: idle, composing, sent, delivered, read."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON state machine definition {\"states\":[...],\"transitions\":[{\"from\":\"s\",\"to\":\"s\",\"event\":\"e\"},...]}. Line 2: initial state. Following lines: events."
+  output_format: "State after each event, or INVALID TRANSITION if not allowed."
+  test_cases:
+    - input: "{\"states\":[\"idle\",\"composing\",\"sent\",\"delivered\",\"read\"],\"transitions\":[{\"from\":\"idle\",\"to\":\"composing\",\"event\":\"keystroke\"},{\"from\":\"composing\",\"to\":\"sent\",\"event\":\"send\"},{\"from\":\"sent\",\"to\":\"delivered\",\"event\":\"ack\"},{\"from\":\"delivered\",\"to\":\"read\",\"event\":\"read_receipt\"}]}\nidle\nkeystroke\nsend\nack\nread_receipt"
+      expected_output: "idle -> composing (keystroke)\ncomposing -> sent (send)\nsent -> delivered (ack)\ndelivered -> read (read_receipt)"
+    - input: "{\"states\":[\"idle\",\"composing\",\"sent\"],\"transitions\":[{\"from\":\"idle\",\"to\":\"composing\",\"event\":\"keystroke\"},{\"from\":\"composing\",\"to\":\"sent\",\"event\":\"send\"}]}\nidle\nsend"
+      expected_output: "INVALID TRANSITION: idle + send (no valid transition)"
+  constraints: ["Reject undefined transitions", "Support self-transitions", "Track transition history"]
+
+- id: "MSG-074"
+  title: "Multi-device message sync"
+  description: "Synchronize message state across multiple devices using vector clocks for conflict resolution."
+  difficulty: 4
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Line 1: JSON array of device IDs. Line 2: JSON array of sync events {device, msg_id, action, vector_clock}."
+  output_format: "Final synchronized state per device and any detected conflicts."
+  test_cases:
+    - input: "[\"phone\",\"laptop\"]\n[{\"device\":\"phone\",\"msg_id\":\"m1\",\"action\":\"read\",\"clock\":{\"phone\":1}},{\"device\":\"laptop\",\"msg_id\":\"m1\",\"action\":\"delete\",\"clock\":{\"laptop\":1}}]"
+      expected_output: "CONFLICT on m1:\n  phone: read {phone:1}\n  laptop: delete {laptop:1}\nresolution: keep both (concurrent)"
+    - input: "[\"a\",\"b\"]\n[{\"device\":\"a\",\"msg_id\":\"m1\",\"action\":\"read\",\"clock\":{\"a\":1}},{\"device\":\"b\",\"msg_id\":\"m1\",\"action\":\"read\",\"clock\":{\"a\":1,\"b\":1}}]"
+      expected_output: "NO CONFLICT on m1:\n  b supersedes a (causally ordered)\nfinal state: read"
+  constraints: ["Use vector clocks for causality", "Detect concurrent modifications as conflicts", "Causally ordered events: later supersedes earlier"]
+
+- id: "MSG-075"
+  title: "Certificate pinning validation"
+  description: "Validate a server certificate against pinned public key hashes for secure messaging connections."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: JSON array of pinned key hashes (SHA-256, base64). Line 2: JSON certificate chain (array of base64 DER certs)."
+  output_format: "VALID (matched pin) or INVALID (no pin match) with details."
+  test_cases:
+    - input: "[\"sha256/base64hash1\",\"sha256/base64hash2\"]\n[\"base64_leaf_cert\",\"base64_intermediate_cert\"]"
+      expected_output: "VALID: pin matched at position 0 (leaf certificate)"
+    - input: "[\"sha256/unknownhash\"]\n[\"base64_leaf_cert\"]"
+      expected_output: "INVALID: no pin matched\nchecked: leaf (sha256/actualhash)"
+  constraints: ["Check all certs in chain against pins", "Pin is SHA-256 of SubjectPublicKeyInfo", "Support backup pins", "Report which cert matched"]
+
+- id: "MSG-076"
+  title: "Message queue consumer group balancing"
+  description: "Implement consumer group partition rebalancing when consumers join or leave."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: number of partitions. Line 2: JSON array of events {type: join|leave, consumer: name}."
+  output_format: "After each event: partition assignment for all active consumers."
+  test_cases:
+    - input: "6\n[{\"type\":\"join\",\"consumer\":\"c1\"},{\"type\":\"join\",\"consumer\":\"c2\"},{\"type\":\"join\",\"consumer\":\"c3\"}]"
+      expected_output: "after c1 joins: c1=[0,1,2,3,4,5]\nafter c2 joins: c1=[0,1,2], c2=[3,4,5]\nafter c3 joins: c1=[0,1], c2=[2,3], c3=[4,5]"
+    - input: "4\n[{\"type\":\"join\",\"consumer\":\"a\"},{\"type\":\"join\",\"consumer\":\"b\"},{\"type\":\"leave\",\"consumer\":\"a\"}]"
+      expected_output: "after a joins: a=[0,1,2,3]\nafter b joins: a=[0,1], b=[2,3]\nafter a leaves: b=[0,1,2,3]"
+  constraints: ["Use range assignment strategy", "Rebalance on every join/leave", "Even distribution (differ by at most 1)"]
+
+- id: "MSG-077"
+  title: "Message encryption with perfect forward secrecy rotation"
+  description: "Implement ephemeral key rotation for perfect forward secrecy, rotating keys every N messages."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: rotation interval (messages). Line 2: initial shared secret (hex). Line 3: number of messages to process."
+  output_format: "Per-message: key epoch, derived message key (hex, first 16 chars), and rotation events."
+  test_cases:
+    - input: "3\nab01cd23ef45678901234567890abcde01234567890abcdef01234567890abcde\n5"
+      expected_output: "msg 1: epoch=0, key=abcdef...\nmsg 2: epoch=0, key=123456...\nmsg 3: epoch=0, key=789abc...\n[KEY ROTATION: epoch 0 -> 1]\nmsg 4: epoch=1, key=defabc...\nmsg 5: epoch=1, key=456789..."
+    - input: "2\n0000000000000000000000000000000000000000000000000000000000000000\n4"
+      expected_output: "msg 1: epoch=0, key=hash1...\nmsg 2: epoch=0, key=hash2...\n[KEY ROTATION: epoch 0 -> 1]\nmsg 3: epoch=1, key=hash3...\nmsg 4: epoch=1, key=hash4...\n[KEY ROTATION: epoch 1 -> 2]"
+  constraints: ["Old epoch keys must be securely deleted", "New epoch key derived from previous via HKDF", "Each message gets unique key via chain ratchet"]
+
+- id: "MSG-078"
+  title: "Message size calculator with overhead"
+  description: "Calculate total message size including protocol overhead (headers, encryption padding, framing)."
+  difficulty: 1
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON overhead config {\"header_bytes\":N,\"encryption_block\":N,\"frame_overhead\":N}. Line 2: message text."
+  output_format: "Breakdown: payload size, padding needed, total wire size, overhead percentage."
+  test_cases:
+    - input: "{\"header_bytes\":12,\"encryption_block\":16,\"frame_overhead\":4}\nHello World"
+      expected_output: "payload: 11 bytes\npadding: 5 bytes (to align to 16-byte block)\nheader: 12 bytes\nframe: 4 bytes\ntotal: 32 bytes\noverhead: 65.6%"
+    - input: "{\"header_bytes\":8,\"encryption_block\":16,\"frame_overhead\":2}\nA"
+      expected_output: "payload: 1 bytes\npadding: 15 bytes (to align to 16-byte block)\nheader: 8 bytes\nframe: 2 bytes\ntotal: 26 bytes\noverhead: 96.2%"
+  constraints: ["Padding rounds up to next block boundary", "Show each component separately", "Calculate overhead as (total - payload) / total * 100"]
+
+- id: "MSG-079"
+  title: "Contact discovery via hashed identifiers"
+  description: "Implement privacy-preserving contact discovery by comparing hashed phone numbers/emails."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: JSON array of user's contacts (phone/email). Line 2: JSON array of registered user hashes on server."
+  output_format: "Matched contacts (found on platform) without revealing unmatched contacts to server."
+  test_cases:
+    - input: "[\"+1234567890\",\"+0987654321\",\"alice@example.com\"]\n[\"sha256_of_+1234567890\",\"sha256_of_alice@example.com\",\"sha256_of_unknown\"]"
+      expected_output: "matched: +1234567890, alice@example.com\nunmatched: +0987654321\nhashes_sent: 3\nhashes_compared: 3"
+    - input: "[\"bob@test.com\"]\n[\"sha256_of_other\"]"
+      expected_output: "matched: (none)\nunmatched: bob@test.com\nhashes_sent: 1\nhashes_compared: 1"
+  constraints: ["Use SHA-256 for hashing", "Normalize phone numbers before hashing", "Normalize emails (lowercase, trim)", "Never send raw contacts"]
+
+- id: "MSG-080"
+  title: "Message forwarding chain tracking"
+  description: "Track message forwarding chains and detect forwarding loops or excessive forwarding depth."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: max forward depth. Line 2: JSON array of forward events {msg_id, from, to, original_msg_id, depth}."
+  output_format: "Forward chains visualization and any depth violations or loops."
+  test_cases:
+    - input: "3\n[{\"msg_id\":\"m1\",\"from\":\"alice\",\"to\":\"bob\",\"original_msg_id\":\"m0\",\"depth\":1},{\"msg_id\":\"m2\",\"from\":\"bob\",\"to\":\"charlie\",\"original_msg_id\":\"m0\",\"depth\":2},{\"msg_id\":\"m3\",\"from\":\"charlie\",\"to\":\"alice\",\"original_msg_id\":\"m0\",\"depth\":3}]"
+      expected_output: "chain m0: alice -> bob -> charlie -> alice\nWARNING: max depth reached (3)\nWARNING: loop detected (alice appears twice)"
+    - input: "5\n[{\"msg_id\":\"m1\",\"from\":\"a\",\"to\":\"b\",\"original_msg_id\":\"m0\",\"depth\":1}]"
+      expected_output: "chain m0: a -> b\nstatus: ok (depth 1/5)"
+  constraints: ["Detect forwarding loops", "Enforce maximum depth", "Track per-original-message chains"]
+
+- id: "MSG-081"
+  title: "Emoji reaction encoding"
+  description: "Encode emoji reactions efficiently using Unicode code point representation and frequency-based compression."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "JSON array of reaction events with emoji field (Unicode characters or shortcodes)."
+  output_format: "Compressed reaction summary with code points and counts, sorted by frequency."
+  test_cases:
+    - input: "[{\"emoji\":\"thumbsup\"},{\"emoji\":\"thumbsup\"},{\"emoji\":\"heart\"},{\"emoji\":\"thumbsup\"},{\"emoji\":\"fire\"}]"
+      expected_output: "thumbsup (U+1F44D): 3\nheart (U+2764): 1\nfire (U+1F525): 1\ntotal: 5, unique: 3"
+    - input: "[{\"emoji\":\"smile\"},{\"emoji\":\"smile\"}]"
+      expected_output: "smile (U+1F604): 2\ntotal: 2, unique: 1"
+  constraints: ["Map shortcodes to Unicode code points", "Sort by count descending", "Handle unknown shortcodes gracefully"]
+
+- id: "MSG-082"
+  title: "Message scheduling and delayed delivery"
+  description: "Schedule messages for future delivery, managing a queue sorted by delivery time."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: current time (ISO). Line 2: JSON array of scheduled messages {text, deliver_at, sender, recipient}."
+  output_format: "Messages ready for delivery now. Messages still pending with time remaining."
+  test_cases:
+    - input: "2024-01-15T10:00:00Z\n[{\"text\":\"Morning!\",\"deliver_at\":\"2024-01-15T09:00:00Z\",\"sender\":\"alice\",\"recipient\":\"bob\"},{\"text\":\"Lunch?\",\"deliver_at\":\"2024-01-15T12:00:00Z\",\"sender\":\"alice\",\"recipient\":\"bob\"},{\"text\":\"Meeting\",\"deliver_at\":\"2024-01-15T10:00:00Z\",\"sender\":\"charlie\",\"recipient\":\"bob\"}]"
+      expected_output: "READY:\n  alice->bob: Morning! (was due 1h ago)\n  charlie->bob: Meeting (due now)\nPENDING:\n  alice->bob: Lunch? (in 2h)"
+    - input: "2024-06-01T00:00:00Z\n[{\"text\":\"Hi\",\"deliver_at\":\"2024-06-01T01:00:00Z\",\"sender\":\"a\",\"recipient\":\"b\"}]"
+      expected_output: "READY:\n  (none)\nPENDING:\n  a->b: Hi (in 1h)"
+  constraints: ["Sort ready messages by delivery time", "Sort pending by soonest first", "Handle messages past due"]
+
+- id: "MSG-083"
+  title: "Message encryption key escrow split"
+  description: "Split an encryption key into N shares using Shamir's Secret Sharing, requiring K shares to reconstruct."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: secret key (hex). Line 2: total shares N. Line 3: threshold K."
+  output_format: "N shares in hex format, each labeled with share index."
+  test_cases:
+    - input: "deadbeefcafebabe1234567890abcdef\n5\n3"
+      expected_output: "share 1: hex_share_1\nshare 2: hex_share_2\nshare 3: hex_share_3\nshare 4: hex_share_4\nshare 5: hex_share_5\nreconstruction requires any 3 of 5 shares"
+    - input: "0123456789abcdef\n3\n2"
+      expected_output: "share 1: hex_share_1\nshare 2: hex_share_2\nshare 3: hex_share_3\nreconstruction requires any 2 of 3 shares"
+  constraints: ["K <= N", "Any K shares can reconstruct", "Fewer than K shares reveal nothing", "Use GF(256) arithmetic"]
+
+- id: "MSG-084"
+  title: "Shamir secret reconstruction"
+  description: "Reconstruct a secret key from K or more Shamir's Secret Sharing shares."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str]
+  input_format: "Line 1: threshold K. Following K+ lines: share_index hex_share_value."
+  output_format: "Reconstructed secret in hex, or ERROR if insufficient shares."
+  test_cases:
+    - input: "3\n1 hex_share_1\n3 hex_share_3\n5 hex_share_5"
+      expected_output: "reconstructed: deadbeefcafebabe1234567890abcdef"
+    - input: "3\n1 hex_share_1\n2 hex_share_2"
+      expected_output: "ERROR: insufficient shares (have 2, need 3)"
+  constraints: ["Use Lagrange interpolation", "Validate share count >= threshold", "Work in GF(256)", "Detect corrupted shares if possible"]
+
+- id: "MSG-085"
+  title: "Message content policy enforcement"
+  description: "Enforce content policies on messages: max length, allowed content types, prohibited patterns."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON policy {\"max_length\":N,\"allowed_types\":[...],\"prohibited_patterns\":[...]}. Line 2: message type. Line 3: message content."
+  output_format: "ALLOWED or REJECTED with list of violated policies."
+  test_cases:
+    - input: "{\"max_length\":100,\"allowed_types\":[\"text\",\"image\"],\"prohibited_patterns\":[\"\\\\b(password|secret)\\\\b\"]}\ntext\nHere is my password: abc123"
+      expected_output: "REJECTED\n- prohibited pattern match: password"
+    - input: "{\"max_length\":10,\"allowed_types\":[\"text\"],\"prohibited_patterns\":[]}\ntext\nShort"
+      expected_output: "ALLOWED"
+  constraints: ["Check all policies, report all violations", "Pattern matching is case-insensitive", "Type check before content check"]
+
+- id: "MSG-086"
+  title: "Encrypted message metadata stripping"
+  description: "Strip identifying metadata from encrypted messages while preserving routing information."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.crypto]
+  input_format: "Line 1: JSON list of fields to strip. Line 2: JSON message with metadata and encrypted payload."
+  output_format: "Stripped message with only routing and encrypted fields remaining. Removed fields listed."
+  test_cases:
+    - input: "[\"ip_address\",\"user_agent\",\"device_id\"]\n{\"to\":\"bob\",\"from\":\"alice\",\"ip_address\":\"1.2.3.4\",\"user_agent\":\"App/1.0\",\"device_id\":\"xyz\",\"encrypted_payload\":\"base64data\"}"
+      expected_output: "{\"to\":\"bob\",\"from\":\"alice\",\"encrypted_payload\":\"base64data\"}\nstripped: ip_address, user_agent, device_id"
+    - input: "[\"timestamp_ms\"]\n{\"to\":\"x\",\"timestamp_ms\":12345,\"payload\":\"data\"}"
+      expected_output: "{\"to\":\"x\",\"payload\":\"data\"}\nstripped: timestamp_ms"
+  constraints: ["Never strip routing fields (to, from)", "Never strip encrypted payload", "Log all stripped fields", "Preserve field order for remaining"]
+
+- id: "MSG-087"
+  title: "Chat bot command parser"
+  description: "Parse chat bot commands with slash syntax, arguments, and flags."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON command registry [{\"name\":\"cmd\",\"args\":[{\"name\":\"n\",\"required\":bool}],\"flags\":[\"--f\"]},...]. Following lines: user input messages."
+  output_format: "For each message: parsed command with args/flags, or NOT_A_COMMAND, or ERROR."
+  test_cases:
+    - input: "[{\"name\":\"remind\",\"args\":[{\"name\":\"time\",\"required\":true},{\"name\":\"message\",\"required\":true}],\"flags\":[\"--repeat\"]}]\n/remind 10m Take a break --repeat\nHello everyone\n/unknown arg"
+      expected_output: "COMMAND: remind, args: {time: \"10m\", message: \"Take a break\"}, flags: [--repeat]\nNOT_A_COMMAND\nERROR: unknown command \"unknown\""
+    - input: "[{\"name\":\"help\",\"args\":[],\"flags\":[]}]\n/help\n/help extra"
+      expected_output: "COMMAND: help, args: {}, flags: []\nERROR: \"help\" takes 0 arguments, got 1"
+  constraints: ["Commands start with /", "Validate required arguments", "Report unknown commands", "Support quoted multi-word arguments"]
+
+- id: "MSG-088"
+  title: "Message encryption audit log"
+  description: "Generate an audit log of encryption operations without exposing key material."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str, std.crypto]
+  input_format: "JSON array of encryption events {operation, key_id, msg_id, timestamp, success}."
+  output_format: "Formatted audit log with statistics: operations per type, success rate, key usage frequency."
+  test_cases:
+    - input: "[{\"operation\":\"encrypt\",\"key_id\":\"k1\",\"msg_id\":\"m1\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"success\":true},{\"operation\":\"decrypt\",\"key_id\":\"k1\",\"msg_id\":\"m1\",\"timestamp\":\"2024-01-15T10:00:01Z\",\"success\":true},{\"operation\":\"decrypt\",\"key_id\":\"k2\",\"msg_id\":\"m2\",\"timestamp\":\"2024-01-15T10:00:02Z\",\"success\":false}]"
+      expected_output: "AUDIT LOG:\n[10:00:00] encrypt m1 with k1: OK\n[10:00:01] decrypt m1 with k1: OK\n[10:00:02] decrypt m2 with k2: FAILED\n---\noperations: encrypt=1, decrypt=2\nsuccess rate: 66.7% (2/3)\nkeys used: k1=2, k2=1"
+    - input: "[{\"operation\":\"encrypt\",\"key_id\":\"k1\",\"msg_id\":\"m1\",\"timestamp\":\"2024-01-01T00:00:00Z\",\"success\":true}]"
+      expected_output: "AUDIT LOG:\n[00:00:00] encrypt m1 with k1: OK\n---\noperations: encrypt=1\nsuccess rate: 100.0% (1/1)\nkeys used: k1=1"
+  constraints: ["Never log actual key values", "Only log key IDs", "Calculate per-operation-type statistics", "Sort by timestamp"]
+
+- id: "MSG-089"
+  title: "Conversation encryption renegotiation"
+  description: "Handle encryption renegotiation when one party's keys change, establishing a new session."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.json, std.str]
+  input_format: "Line 1: old session key (hex). Line 2: renegotiation reason. Line 3: new identity key (hex). Line 4: pending messages count."
+  output_format: "Renegotiation protocol steps and new session parameters."
+  test_cases:
+    - input: "old_session_key_hex\nkey_compromised\nnew_identity_key_hex\n5"
+      expected_output: "RENEGOTIATION:\n1. Suspend message delivery (5 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. Re-encrypt 5 pending messages\n7. Resume delivery\nnew_session: {key_hex, established_at}"
+    - input: "key_hex\ndevice_added\nnew_key_hex\n0"
+      expected_output: "RENEGOTIATION:\n1. Suspend message delivery (0 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. No pending messages to re-encrypt\n7. Resume delivery\nnew_session: {key_hex, established_at}"
+  constraints: ["Buffer pending messages during renegotiation", "Re-encrypt pending messages with new key", "Log reason for audit", "Timeout renegotiation after 30s"]
+
+- id: "MSG-090"
+  title: "Message delivery receipt proof"
+  description: "Generate cryptographic proof of message delivery using hash chains for non-repudiation."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: message hash (hex). Line 2: recipient private key (hex). Line 3: timestamp."
+  output_format: "JSON delivery receipt with: msg_hash, recipient_sig, timestamp, receipt_hash (chained)."
+  test_cases:
+    - input: "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\nrecipient_private_key_hex\n2024-01-15T10:00:00Z"
+      expected_output: "{\"msg_hash\":\"abcdef...\",\"recipient_sig\":\"hex_sig\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"receipt_hash\":\"hex_hash\"}"
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\nkey_hex\n2024-06-01T12:00:00Z"
+      expected_output: "{\"msg_hash\":\"0000...\",\"recipient_sig\":\"hex_sig\",\"timestamp\":\"2024-06-01T12:00:00Z\",\"receipt_hash\":\"hex_hash\"}"
+  constraints: ["Receipt hash chains previous receipt", "Signature covers msg_hash + timestamp", "Verifiable by sender using recipient's public key"]
+
+- id: "MSG-091"
+  title: "Message priority classification"
+  description: "Classify message priority based on content analysis: keywords, sender role, time sensitivity indicators."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: JSON priority rules {\"urgent_keywords\":[...],\"high_priority_senders\":[...],\"time_patterns\":[...]}. Line 2: JSON message."
+  output_format: "Priority level (critical/high/normal/low) with reasoning."
+  test_cases:
+    - input: "{\"urgent_keywords\":[\"emergency\",\"critical\",\"ASAP\"],\"high_priority_senders\":[\"ceo\",\"oncall\"],\"time_patterns\":[\"today\",\"now\",\"immediately\"]}\n{\"sender\":\"ceo\",\"text\":\"Need this ASAP, it is critical\"}"
+      expected_output: "CRITICAL\nreasons: high_priority_sender(ceo), urgent_keyword(ASAP), urgent_keyword(critical)"
+    - input: "{\"urgent_keywords\":[\"urgent\"],\"high_priority_senders\":[\"boss\"],\"time_patterns\":[\"today\"]}\n{\"sender\":\"alice\",\"text\":\"Hello, how are you?\"}"
+      expected_output: "LOW\nreasons: no priority indicators found"
+  constraints: ["Multiple indicators increase priority", "Sender role overrides content analysis", "Case-insensitive keyword matching"]
+
+- id: "MSG-092"
+  title: "Message threading by subject"
+  description: "Group messages into conversation threads based on subject line matching (including Re: and Fwd: prefixes)."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "JSON array of messages with id, subject, sender, time."
+  output_format: "Thread groups with messages listed chronologically under their base subject."
+  test_cases:
+    - input: "[{\"id\":\"1\",\"subject\":\"Project update\",\"sender\":\"alice\",\"time\":\"10:00\"},{\"id\":\"2\",\"subject\":\"Re: Project update\",\"sender\":\"bob\",\"time\":\"10:05\"},{\"id\":\"3\",\"subject\":\"New topic\",\"sender\":\"charlie\",\"time\":\"10:10\"},{\"id\":\"4\",\"subject\":\"Re: Re: Project update\",\"sender\":\"alice\",\"time\":\"10:15\"}]"
+      expected_output: "Thread: Project update (3 messages)\n  [10:00] alice: Project update\n  [10:05] bob: Re: Project update\n  [10:15] alice: Re: Re: Project update\nThread: New topic (1 message)\n  [10:10] charlie: New topic"
+    - input: "[{\"id\":\"1\",\"subject\":\"Fwd: Info\",\"sender\":\"a\",\"time\":\"09:00\"},{\"id\":\"2\",\"subject\":\"Re: Fwd: Info\",\"sender\":\"b\",\"time\":\"09:05\"}]"
+      expected_output: "Thread: Info (2 messages)\n  [09:00] a: Fwd: Info\n  [09:05] b: Re: Fwd: Info"
+  constraints: ["Strip Re: and Fwd: prefixes for grouping", "Handle nested Re: Re: Re:", "Case-insensitive prefix matching", "Sort threads by first message time"]
+
+- id: "MSG-093"
+  title: "Vanishing message timer"
+  description: "Implement disappearing/vanishing messages with configurable self-destruct timers that start on read."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: current time (ISO). Line 2: JSON array of messages with text, ttl_after_read_seconds, read_at (null if unread)."
+  output_format: "Status of each message: visible, expired (with when), or unread (timer not started)."
+  test_cases:
+    - input: "2024-01-15T10:00:30Z\n[{\"text\":\"Secret\",\"ttl_after_read_seconds\":30,\"read_at\":\"2024-01-15T10:00:00Z\"},{\"text\":\"Also secret\",\"ttl_after_read_seconds\":60,\"read_at\":\"2024-01-15T10:00:00Z\"},{\"text\":\"Unread\",\"ttl_after_read_seconds\":10,\"read_at\":null}]"
+      expected_output: "Secret: EXPIRED (expired at 10:00:30, 0s ago)\nAlso secret: VISIBLE (expires in 30s)\nUnread: VISIBLE (timer not started)"
+    - input: "2024-01-15T12:00:00Z\n[{\"text\":\"Hi\",\"ttl_after_read_seconds\":5,\"read_at\":\"2024-01-15T11:00:00Z\"}]"
+      expected_output: "Hi: EXPIRED (expired at 11:00:05, 3595s ago)"
+  constraints: ["Timer starts only on read", "Unread messages never expire", "Precision to the second", "Show time since expiration for expired messages"]
+
+- id: "MSG-094"
+  title: "Multi-recipient message encryption (MLS-style)"
+  description: "Encrypt a message for multiple recipients using a tree-based key structure inspired by MLS."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: JSON array of recipient public keys. Line 2: plaintext message."
+  output_format: "JSON with tree structure, per-leaf encrypted keys, and final encrypted message."
+  test_cases:
+    - input: "[\"pub_key_1_hex\",\"pub_key_2_hex\",\"pub_key_3_hex\",\"pub_key_4_hex\"]\nGroup secret message"
+      expected_output: "{\"tree_nodes\":[{\"level\":0,\"keys\":[\"k1\",\"k2\",\"k3\",\"k4\"]},{\"level\":1,\"keys\":[\"k12\",\"k34\"]},{\"level\":2,\"keys\":[\"root\"]}],\"ciphertext\":\"base64\"}"
+    - input: "[\"key_a\",\"key_b\"]\nHello"
+      expected_output: "{\"tree_nodes\":[{\"level\":0,\"keys\":[\"ka\",\"kb\"]},{\"level\":1,\"keys\":[\"root\"]}],\"ciphertext\":\"base64\"}"
+  constraints: ["Build binary tree over group members", "Each node key derived from children", "Root key encrypts message", "Adding/removing member updates path only"]
+
+- id: "MSG-095"
+  title: "Message bus event ordering guarantee"
+  description: "Ensure causal ordering of events in a distributed message bus using Lamport timestamps."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.time]
+  input_format: "JSON array of events from multiple nodes: {node, event, lamport_ts, dependencies:[event_ids]}."
+  output_format: "Causally ordered event sequence, flagging any violations."
+  test_cases:
+    - input: "[{\"node\":\"A\",\"event\":\"e1\",\"lamport_ts\":1,\"dependencies\":[]},{\"node\":\"B\",\"event\":\"e2\",\"lamport_ts\":2,\"dependencies\":[\"e1\"]},{\"node\":\"A\",\"event\":\"e3\",\"lamport_ts\":3,\"dependencies\":[\"e2\"]}]"
+      expected_output: "ordered: e1(ts=1) -> e2(ts=2) -> e3(ts=3)\nviolations: none"
+    - input: "[{\"node\":\"A\",\"event\":\"e1\",\"lamport_ts\":1,\"dependencies\":[]},{\"node\":\"B\",\"event\":\"e2\",\"lamport_ts\":1,\"dependencies\":[\"e1\"]}]"
+      expected_output: "ordered: e1(ts=1) -> e2(ts=1)\nviolations: e2 has ts=1 but depends on e1(ts=1), should be > 1"
+  constraints: ["Lamport timestamp must be > all dependency timestamps", "Flag violations where ts <= dependency ts", "Topological sort for output ordering"]
+
+- id: "MSG-096"
+  title: "Encrypted file attachment metadata"
+  description: "Generate encrypted file attachment metadata including content hash, size, MIME type, and encrypted thumbnail."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: file name. Line 2: file size in bytes. Line 3: MIME type. Line 4: content hash (hex). Line 5: encryption key (hex)."
+  output_format: "JSON attachment metadata with encrypted fields and plaintext routing info."
+  test_cases:
+    - input: "photo.jpg\n245760\nimage/jpeg\nabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      expected_output: "{\"encrypted_metadata\":\"base64\",\"content_hash\":\"abcdef...\",\"size\":245760,\"key_hash\":\"sha256_of_key\"}"
+    - input: "doc.pdf\n1024\napplication/pdf\nhash_hex\nkey_hex"
+      expected_output: "{\"encrypted_metadata\":\"base64\",\"content_hash\":\"hash_hex\",\"size\":1024,\"key_hash\":\"sha256_of_key\"}"
+  constraints: ["Encrypt filename and MIME type", "Content hash remains in plaintext for dedup", "Include key hash for key verification", "Size remains in plaintext for quota"]
+
+- id: "MSG-097"
+  title: "Chat room access control list"
+  description: "Evaluate chat room permissions based on role-based access control with inheritance."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON role hierarchy {\"admin\":{\"inherits\":null,\"perms\":[\"all\"]},\"mod\":{\"inherits\":\"admin\",\"perms\":[\"kick\",\"mute\"]},\"user\":{\"inherits\":null,\"perms\":[\"read\",\"write\"]}}. Line 2: JSON user-role assignments. Line 3: JSON permission checks [{user, action}]."
+  output_format: "For each check: ALLOWED or DENIED with effective role and permission source."
+  test_cases:
+    - input: "{\"admin\":{\"inherits\":null,\"perms\":[\"all\"]},\"mod\":{\"inherits\":\"admin\",\"perms\":[\"kick\",\"mute\"]},\"user\":{\"inherits\":null,\"perms\":[\"read\",\"write\"]}}\n{\"alice\":\"admin\",\"bob\":\"mod\",\"charlie\":\"user\"}\n[{\"user\":\"bob\",\"action\":\"kick\"},{\"user\":\"charlie\",\"action\":\"kick\"}]"
+      expected_output: "bob kick: ALLOWED (role: mod, perm: kick)\ncharlie kick: DENIED (role: user, no matching perm)"
+    - input: "{\"owner\":{\"inherits\":null,\"perms\":[\"all\"]},\"member\":{\"inherits\":null,\"perms\":[\"read\"]}}\n{\"x\":\"owner\",\"y\":\"member\"}\n[{\"user\":\"x\",\"action\":\"delete\"},{\"user\":\"y\",\"action\":\"write\"}]"
+      expected_output: "x delete: ALLOWED (role: owner, perm: all)\ny write: DENIED (role: member, no matching perm)"
+  constraints: ["'all' permission grants everything", "Inheritance means role has parent's perms too", "Unknown users are denied", "Check inheritance chain"]
+
+- id: "MSG-098"
+  title: "Message queue backpressure calculation"
+  description: "Calculate backpressure signals based on queue depth, consumer lag, and processing rate."
+  difficulty: 3
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Line 1: JSON config {\"max_depth\":N,\"warn_threshold\":0.7,\"critical_threshold\":0.9}. Line 2: JSON queue stats {\"depth\":N,\"rate_in\":N,\"rate_out\":N,\"consumer_lag_ms\":N}."
+  output_format: "Backpressure signal: NONE/WARN/CRITICAL/FULL with recommended action."
+  test_cases:
+    - input: "{\"max_depth\":1000,\"warn_threshold\":0.7,\"critical_threshold\":0.9}\n{\"depth\":750,\"rate_in\":100,\"rate_out\":80,\"consumer_lag_ms\":5000}"
+      expected_output: "WARN (75% full)\nrate: in=100/s, out=80/s (deficit: 20/s)\nlag: 5000ms\ntime to full: 12.5s\naction: reduce producer rate by 20%"
+    - input: "{\"max_depth\":100,\"warn_threshold\":0.7,\"critical_threshold\":0.9}\n{\"depth\":95,\"rate_in\":50,\"rate_out\":10,\"consumer_lag_ms\":30000}"
+      expected_output: "CRITICAL (95% full)\nrate: in=50/s, out=10/s (deficit: 40/s)\nlag: 30000ms\ntime to full: 0.1s\naction: pause producers, scale consumers"
+  constraints: ["Calculate time to full based on rate differential", "Recommend specific actions per level", "FULL when depth >= max_depth"]
+
+- id: "MSG-099"
+  title: "Unread message counter with mentions"
+  description: "Calculate unread message counts per channel, distinguishing between regular unreads and mentions."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: current user. Line 2: JSON read positions {\"channel\":\"last_read_id\"}. Line 3: JSON array of messages {id, channel, sender, text, mentions:[]}."
+  output_format: "Per-channel: total unread count and mention count."
+  test_cases:
+    - input: "alice\n{\"general\":\"3\",\"dev\":\"1\"}\n[{\"id\":\"4\",\"channel\":\"general\",\"sender\":\"bob\",\"text\":\"Hello @alice\",\"mentions\":[\"alice\"]},{\"id\":\"5\",\"channel\":\"general\",\"sender\":\"charlie\",\"text\":\"Hi all\",\"mentions\":[]},{\"id\":\"2\",\"channel\":\"dev\",\"sender\":\"bob\",\"text\":\"@alice review this\",\"mentions\":[\"alice\"]}]"
+      expected_output: "general: 2 unread (1 mention)\ndev: 1 unread (1 mention)\ntotal: 3 unread (2 mentions)"
+    - input: "bob\n{\"chat\":\"5\"}\n[{\"id\":\"6\",\"channel\":\"chat\",\"sender\":\"alice\",\"text\":\"Hey\",\"mentions\":[]}]"
+      expected_output: "chat: 1 unread (0 mentions)\ntotal: 1 unread (0 mentions)"
+  constraints: ["Only count messages with id > last_read_id", "Mentions of current user only", "Ignore messages from self"]
+
+- id: "MSG-100"
+  title: "Cryptographic session ratchet state serialization"
+  description: "Serialize and deserialize the state of a Double Ratchet session for persistent storage."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.json, std.str]
+  input_format: "Line 1: operation (serialize/deserialize). Line 2: JSON session state {dh_pair, root_key, chain_key_send, chain_key_recv, msg_number, prev_chain_length}."
+  output_format: "For serialize: compact binary representation (hex). For deserialize: reconstructed JSON state."
+  test_cases:
+    - input: "serialize\n{\"dh_pair\":{\"public\":\"pub_hex\",\"private\":\"priv_hex\"},\"root_key\":\"rk_hex\",\"chain_key_send\":\"cks_hex\",\"chain_key_recv\":\"ckr_hex\",\"msg_number\":42,\"prev_chain_length\":10}"
+      expected_output: "serialized: hex_encoded_state (N bytes)\nfields: dh_pair(64B), root_key(32B), chains(64B), counters(8B)"
+    - input: "deserialize\nhex_encoded_state"
+      expected_output: "{\"dh_pair\":{\"public\":\"pub_hex\",\"private\":\"priv_hex\"},\"root_key\":\"rk_hex\",\"chain_key_send\":\"cks_hex\",\"chain_key_recv\":\"ckr_hex\",\"msg_number\":42,\"prev_chain_length\":10}"
+  constraints: ["Encrypt private key material at rest", "Include version byte for format upgrades", "Validate integrity with HMAC on deserialize"]
+
+- id: "MSG-101"
+  title: "Message transport layer security handshake"
+  description: "Simulate a TLS 1.3-style handshake for messaging transport, outputting each step."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.net, std.str, std.json]
+  input_format: "Line 1: client supported ciphers (comma-separated). Line 2: server certificate info. Line 3: client key share (hex)."
+  output_format: "Step-by-step handshake transcript with keys derived at each stage."
+  test_cases:
+    - input: "TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256\nCN=messaging.example.com,issued_by=CA\nclient_key_share_hex"
+      expected_output: "1. ClientHello (ciphers: 2, key_share: x25519)\n2. ServerHello (selected: TLS_AES_256_GCM_SHA384)\n3. Server Certificate\n4. Server CertificateVerify\n5. Server Finished (verify_data: hex)\n6. Client Finished (verify_data: hex)\nhandshake_secret: hex\nmaster_secret: hex"
+    - input: "TLS_AES_128_GCM_SHA256\nCN=test.com,issued_by=TestCA\nkey_hex"
+      expected_output: "1. ClientHello (ciphers: 1, key_share: x25519)\n2. ServerHello (selected: TLS_AES_128_GCM_SHA256)\n3. Server Certificate\n4. Server CertificateVerify\n5. Server Finished (verify_data: hex)\n6. Client Finished (verify_data: hex)\nhandshake_secret: hex\nmaster_secret: hex"
+  constraints: ["Follow TLS 1.3 message flow", "Derive handshake keys via HKDF", "Verify certificate chain", "0-RTT not supported"]
+
+- id: "MSG-102"
+  title: "Message notification sound selection"
+  description: "Select appropriate notification sounds based on message type, sender relationship, and user preferences."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON user prefs {\"default\":\"sound\",\"contacts\":{\"name\":\"sound\"},\"types\":{\"type\":\"sound\"},\"muted\":[\"channel\"]}. Line 2: JSON message with sender, type, channel."
+  output_format: "Selected sound or SILENT with selection reason."
+  test_cases:
+    - input: "{\"default\":\"ding\",\"contacts\":{\"alice\":\"chime\"},\"types\":{\"urgent\":\"alarm\"},\"muted\":[\"random\"]}\n{\"sender\":\"alice\",\"type\":\"urgent\",\"channel\":\"general\"}"
+      expected_output: "alarm (reason: type 'urgent' overrides contact sound)"
+    - input: "{\"default\":\"ding\",\"contacts\":{},\"types\":{},\"muted\":[\"random\"]}\n{\"sender\":\"bob\",\"type\":\"text\",\"channel\":\"random\"}"
+      expected_output: "SILENT (reason: channel 'random' is muted)"
+  constraints: ["Priority: muted > type > contact > default", "Muted channels always silent", "Type rules override contact rules"]
+
+- id: "MSG-103"
+  title: "Conversation encryption key verification QR code data"
+  description: "Generate QR code data for verifying encryption keys between two users in person."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: version byte. Line 2: user A public key (hex). Line 3: user B public key (hex)."
+  output_format: "QR code payload: version + combined key fingerprint data in base64. Plus human-readable numeric comparison."
+  test_cases:
+    - input: "1\nalice_public_key_hex_64chars_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nbob_public_key_hex_64chars_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      expected_output: "qr_payload: base64_data\nnumeric_code: 12345 67890 12345 67890 12345 67890\nversion: 1\nfingerprint: sha256(sorted_keys)"
+    - input: "2\nkey_a_hex\nkey_b_hex"
+      expected_output: "qr_payload: base64_data\nnumeric_code: xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx\nversion: 2\nfingerprint: sha256(sorted_keys)"
+  constraints: ["Sort keys lexicographically before combining", "Result must be same regardless of who scans", "Include version for forward compatibility", "Numeric code is first 30 digits of fingerprint decimal"]
+
+- id: "MSG-104"
+  title: "Message relay node selection"
+  description: "Select optimal relay nodes for message delivery based on latency, capacity, and geographic proximity."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON sender location {lat, lng}. Line 2: JSON recipient location. Line 3: JSON array of relay nodes {id, lat, lng, latency_ms, capacity_pct, region}."
+  output_format: "Ranked relay nodes with composite score and recommended path."
+  test_cases:
+    - input: "{\"lat\":40.7,\"lng\":-74.0}\n{\"lat\":51.5,\"lng\":-0.1}\n[{\"id\":\"r1\",\"lat\":45.0,\"lng\":-40.0,\"latency_ms\":50,\"capacity_pct\":30,\"region\":\"atlantic\"},{\"id\":\"r2\",\"lat\":48.8,\"lng\":2.3,\"latency_ms\":30,\"capacity_pct\":80,\"region\":\"eu-west\"},{\"id\":\"r3\",\"lat\":40.0,\"lng\":-75.0,\"latency_ms\":10,\"capacity_pct\":90,\"region\":\"us-east\"}]"
+      expected_output: "1. r1 (score: 85) - atlantic, 50ms, 30% cap\n2. r2 (score: 70) - eu-west, 30ms, 80% cap\n3. r3 (score: 45) - us-east, 10ms, 90% cap\nrecommended path: sender -> r1 -> recipient"
+    - input: "{\"lat\":0,\"lng\":0}\n{\"lat\":0,\"lng\":1}\n[{\"id\":\"n1\",\"lat\":0,\"lng\":0.5,\"latency_ms\":5,\"capacity_pct\":10,\"region\":\"local\"}]"
+      expected_output: "1. n1 (score: 95) - local, 5ms, 10% cap\nrecommended path: sender -> n1 -> recipient"
+  constraints: ["Score based on: proximity to path (40%), latency (30%), available capacity (30%)", "Reject nodes above 95% capacity", "Prefer geographically intermediate nodes"]
+
+- id: "MSG-105"
+  title: "Chat message edit history tracking"
+  description: "Track edit history for messages, showing diffs between versions."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json, std.time]
+  input_format: "JSON array of edit events: {msg_id, version, text, edited_at}."
+  output_format: "Per-message: version history with character-level diffs."
+  test_cases:
+    - input: "[{\"msg_id\":\"m1\",\"version\":1,\"text\":\"Hello world\",\"edited_at\":\"10:00\"},{\"msg_id\":\"m1\",\"version\":2,\"text\":\"Hello World!\",\"edited_at\":\"10:01\"},{\"msg_id\":\"m1\",\"version\":3,\"text\":\"Hello World! How are you?\",\"edited_at\":\"10:02\"}]"
+      expected_output: "m1 history:\n  v1 (10:00): Hello world\n  v2 (10:01): Hello World! [changed: 'w'->'W', added '!']\n  v3 (10:02): Hello World! How are you? [added ' How are you?']"
+    - input: "[{\"msg_id\":\"a\",\"version\":1,\"text\":\"test\",\"edited_at\":\"09:00\"},{\"msg_id\":\"a\",\"version\":2,\"text\":\"testing\",\"edited_at\":\"09:01\"}]"
+      expected_output: "a history:\n  v1 (09:00): test\n  v2 (09:01): testing [added 'ing']"
+  constraints: ["Compute minimal diff between versions", "Show additions, deletions, and changes", "Preserve all versions", "Sort by version number"]
+
+- id: "MSG-106"
+  title: "Message delivery path tracing"
+  description: "Trace the path a message takes through relay infrastructure, computing total latency and hop details."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "JSON array of hop events: {node, arrived_at, departed_at, action}."
+  output_format: "Trace visualization with per-hop latency and total end-to-end time."
+  test_cases:
+    - input: "[{\"node\":\"client\",\"arrived_at\":\"10:00:00.000\",\"departed_at\":\"10:00:00.010\",\"action\":\"encrypt\"},{\"node\":\"relay-1\",\"arrived_at\":\"10:00:00.050\",\"departed_at\":\"10:00:00.055\",\"action\":\"forward\"},{\"node\":\"server\",\"arrived_at\":\"10:00:00.100\",\"departed_at\":\"10:00:00.105\",\"action\":\"store\"},{\"node\":\"recipient\",\"arrived_at\":\"10:00:00.200\",\"departed_at\":null,\"action\":\"decrypt\"}]"
+      expected_output: "client --[40ms]--> relay-1 --[45ms]--> server --[95ms]--> recipient\nhop 1: client (10ms processing, encrypt)\nhop 2: relay-1 (5ms processing, forward)\nhop 3: server (5ms processing, store)\nhop 4: recipient (decrypt)\ntotal: 200ms end-to-end"
+    - input: "[{\"node\":\"A\",\"arrived_at\":\"00:00:00.000\",\"departed_at\":\"00:00:00.001\",\"action\":\"send\"},{\"node\":\"B\",\"arrived_at\":\"00:00:00.010\",\"departed_at\":null,\"action\":\"receive\"}]"
+      expected_output: "A --[9ms]--> B\nhop 1: A (1ms processing, send)\nhop 2: B (receive)\ntotal: 10ms end-to-end"
+  constraints: ["Calculate network time between hops", "Calculate processing time per hop", "Last hop has no departure time", "Show total end-to-end latency"]
+
+- id: "MSG-107"
+  title: "Secure deletion with overwrite verification"
+  description: "Implement secure message deletion by overwriting content with random data and verifying the overwrite."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: number of overwrite passes. Line 2: JSON message to securely delete."
+  output_format: "Per-pass: overwrite pattern used and verification hash. Final: deletion certificate with proof."
+  test_cases:
+    - input: "3\n{\"id\":\"m1\",\"text\":\"Top secret message\",\"key\":\"encryption_key_hex\"}"
+      expected_output: "pass 1: random overwrite, hash=sha256_of_overwritten\npass 2: zero overwrite, hash=sha256_of_zeroed\npass 3: random overwrite, hash=sha256_of_final\ndeletion certificate: {id: m1, passes: 3, final_hash: hex, timestamp: ISO}"
+    - input: "1\n{\"id\":\"m2\",\"text\":\"Delete me\"}"
+      expected_output: "pass 1: random overwrite, hash=sha256_of_overwritten\ndeletion certificate: {id: m2, passes: 1, final_hash: hex, timestamp: ISO}"
+  constraints: ["Alternate between random and zero patterns", "Verify each pass overwrote correctly", "Generate unforgeable deletion certificate", "Overwrite all sensitive fields"]
+
+- id: "MSG-108"
+  title: "Message queue consumer heartbeat monitoring"
+  description: "Monitor consumer heartbeats and trigger rebalancing when consumers are detected as dead."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: heartbeat timeout in ms. Line 2: JSON array of heartbeat events {consumer, time_ms}. Line 3: check time in ms."
+  output_format: "Per-consumer: alive or dead. If any dead: trigger rebalance."
+  test_cases:
+    - input: "5000\n[{\"consumer\":\"c1\",\"time\":1000},{\"consumer\":\"c2\",\"time\":2000},{\"consumer\":\"c1\",\"time\":4000},{\"consumer\":\"c2\",\"time\":4500}]\n8000"
+      expected_output: "c1: DEAD (last heartbeat 4000ms ago at t=4000)\nc2: DEAD (last heartbeat 3500ms ago at t=4500)\nACTION: rebalance triggered (2 dead consumers)"
+    - input: "3000\n[{\"consumer\":\"a\",\"time\":5000},{\"consumer\":\"b\",\"time\":6000}]\n7000"
+      expected_output: "a: DEAD (last heartbeat 2000ms ago at t=5000)\nb: ALIVE (last heartbeat 1000ms ago at t=6000)\nACTION: rebalance triggered (1 dead consumer)"
+  constraints: ["Dead if no heartbeat within timeout", "Track last heartbeat per consumer", "Trigger rebalance only if at least one dead"]
+
+- id: "MSG-109"
+  title: "Cross-platform message format normalization"
+  description: "Normalize message formats from different platforms (Slack, Discord, Teams) into a unified format."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: source platform. Line 2: JSON message in platform-specific format."
+  output_format: "Unified JSON message format with normalized fields."
+  test_cases:
+    - input: "slack\n{\"ts\":\"1705312800.000100\",\"user\":\"U123\",\"text\":\"Hello <@U456> check <https://example.com|this link>\",\"channel\":\"C789\"}"
+      expected_output: "{\"timestamp\":\"2024-01-15T10:00:00Z\",\"sender\":\"U123\",\"text\":\"Hello @U456 check this link\",\"channel\":\"C789\",\"links\":[\"https://example.com\"],\"mentions\":[\"U456\"],\"source\":\"slack\"}"
+    - input: "discord\n{\"id\":\"123\",\"author\":{\"id\":\"456\",\"username\":\"alice\"},\"content\":\"Hey <@789> look at this\",\"timestamp\":\"2024-01-15T10:00:00.000000+00:00\",\"channel_id\":\"012\"}"
+      expected_output: "{\"timestamp\":\"2024-01-15T10:00:00Z\",\"sender\":\"alice\",\"text\":\"Hey @789 look at this\",\"channel\":\"012\",\"links\":[],\"mentions\":[\"789\"],\"source\":\"discord\"}"
+  constraints: ["Parse platform-specific mention formats", "Normalize timestamps to ISO 8601 UTC", "Extract links from markup", "Preserve raw content in metadata"]
+
+- id: "MSG-110"
+  title: "Message encryption performance benchmark simulation"
+  description: "Simulate and report encryption performance metrics for different algorithms and message sizes."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.time, std.str, std.json]
+  input_format: "Line 1: JSON array of algorithms to test. Line 2: JSON array of message sizes in bytes. Line 3: iterations per test."
+  output_format: "Performance matrix: algorithm x size with throughput in MB/s and latency in microseconds."
+  test_cases:
+    - input: "[\"AES-256-GCM\",\"ChaCha20-Poly1305\"]\n[64,1024,65536]\n1000"
+      expected_output: "| Algorithm          |  64B    |  1KB    |  64KB   |\n| AES-256-GCM        | 500MB/s | 2GB/s   | 4GB/s   |\n| ChaCha20-Poly1305  | 450MB/s | 1.8GB/s | 3.5GB/s |\nlatency (p50/p99):\n  AES-256-GCM: 0.1/0.5us (64B), 0.5/2us (1KB), 16/50us (64KB)\n  ChaCha20-Poly1305: 0.1/0.6us (64B), 0.6/2.5us (1KB), 18/55us (64KB)"
+    - input: "[\"AES-128-CBC\"]\n[256]\n100"
+      expected_output: "| Algorithm  | 256B    |\n| AES-128-CBC| 1.5GB/s |\nlatency (p50/p99):\n  AES-128-CBC: 0.2/1us (256B)"
+  constraints: ["Calculate throughput as size * iterations / time", "Report p50 and p99 latency", "Format as aligned table", "Include overhead of auth tag in AEAD modes"]
+
+- id: "MSG-111"
+  title: "Emoji shortcode to Unicode resolver"
+  description: "Resolve emoji shortcodes (e.g., :thumbsup:) to Unicode characters and vice versa."
+  difficulty: 1
+  stdlib_modules: [std.str, std.json]
+  input_format: "Line 1: direction (encode/decode). Line 2: text containing emojis or shortcodes."
+  output_format: "Converted text with shortcodes resolved to Unicode or Unicode to shortcodes."
+  test_cases:
+    - input: "decode\nHey :thumbsup: great work :fire: :heart:"
+      expected_output: "Hey \ud83d\udc4d great work \ud83d\udd25 \u2764\ufe0f"
+    - input: "encode\nHey \ud83d\udc4d great work \ud83d\udd25"
+      expected_output: "Hey :thumbsup: great work :fire:"
+  constraints: ["Support common emoji shortcodes (50+)", "Handle unknown shortcodes by leaving them unchanged", "Handle multi-codepoint emojis"]
+
+- id: "MSG-112"
+  title: "Message queue exactly-once delivery tracking"
+  description: "Implement exactly-once message delivery semantics using transaction IDs and idempotent processing."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.crypto]
+  input_format: "JSON array of delivery events: {msg_id, txn_id, attempt, consumer}."
+  output_format: "Per-message: delivery status (delivered-once, duplicate-suppressed, not-delivered). Overall stats."
+  test_cases:
+    - input: "[{\"msg_id\":\"m1\",\"txn_id\":\"t1\",\"attempt\":1,\"consumer\":\"c1\"},{\"msg_id\":\"m1\",\"txn_id\":\"t1\",\"attempt\":2,\"consumer\":\"c1\"},{\"msg_id\":\"m2\",\"txn_id\":\"t2\",\"attempt\":1,\"consumer\":\"c2\"}]"
+      expected_output: "m1: delivered-once (attempt 1, duplicate suppressed at attempt 2)\nm2: delivered-once (attempt 1)\n---\ntotal: 2 messages, 3 events, 1 duplicate suppressed"
+    - input: "[{\"msg_id\":\"a\",\"txn_id\":\"x\",\"attempt\":1,\"consumer\":\"c1\"},{\"msg_id\":\"a\",\"txn_id\":\"y\",\"attempt\":1,\"consumer\":\"c2\"}]"
+      expected_output: "a: delivered-once (txn x to c1, txn y suppressed - different consumer)\n---\ntotal: 1 messages, 2 events, 1 duplicate suppressed"
+  constraints: ["First successful delivery wins", "Same txn_id retries are suppressed", "Different txn_id for same msg treated as duplicate", "Track suppression reason"]
+
+- id: "MSG-113"
+  title: "Conversation mute schedule"
+  description: "Evaluate mute schedules to determine if notifications should be suppressed at a given time."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: current time (ISO with timezone). Line 2: JSON mute schedule [{\"days\":[\"mon\",\"tue\",...],\"start\":\"HH:MM\",\"end\":\"HH:MM\",\"channels\":[...]}]."
+  output_format: "Per-channel: MUTED or UNMUTED with active rule if muted."
+  test_cases:
+    - input: "2024-01-15T22:30:00+10:00\n[{\"days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"],\"start\":\"22:00\",\"end\":\"07:00\",\"channels\":[\"all\"]},{\"days\":[\"sat\",\"sun\"],\"start\":\"00:00\",\"end\":\"23:59\",\"channels\":[\"work\"]}]"
+      expected_output: "all: MUTED (weekday night rule: 22:00-07:00)\nwork: UNMUTED (weekend rule not active on Monday)"
+    - input: "2024-01-14T15:00:00+10:00\n[{\"days\":[\"sun\"],\"start\":\"00:00\",\"end\":\"23:59\",\"channels\":[\"work\"]}]"
+      expected_output: "work: MUTED (sunday all-day rule)\nother: UNMUTED"
+  constraints: ["Handle overnight ranges (start > end means wraps midnight)", "Support 'all' as wildcard channel", "Timezone-aware evaluation", "Multiple rules can apply"]
+
+- id: "MSG-114"
+  title: "Message attachment virus scan simulation"
+  description: "Simulate virus scanning of message attachments using signature matching against a threat database."
+  difficulty: 2
+  stdlib_modules: [std.str, std.crypto, std.json]
+  input_format: "Line 1: JSON threat signatures [{\"name\":\"malware\",\"hash\":\"sha256\",\"pattern\":\"hex_bytes\"},...]. Line 2: JSON attachments [{\"filename\":\"f\",\"hash\":\"sha256\",\"first_bytes\":\"hex\"}]."
+  output_format: "Per-attachment: CLEAN or THREAT with matched signature name."
+  test_cases:
+    - input: "[{\"name\":\"EICAR\",\"hash\":\"275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f\",\"pattern\":\"5849434152\"}]\n[{\"filename\":\"test.exe\",\"hash\":\"275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f\",\"first_bytes\":\"5849434152\"},{\"filename\":\"safe.txt\",\"hash\":\"abc123\",\"first_bytes\":\"48656c6c6f\"}]"
+      expected_output: "test.exe: THREAT (matched: EICAR, method: hash+pattern)\nsafe.txt: CLEAN"
+    - input: "[{\"name\":\"BadMacro\",\"hash\":\"\",\"pattern\":\"4d5a\"}]\n[{\"filename\":\"doc.docm\",\"hash\":\"xyz\",\"first_bytes\":\"4d5a9000\"}]"
+      expected_output: "doc.docm: THREAT (matched: BadMacro, method: pattern)"
+  constraints: ["Match by hash first (exact), then pattern (prefix)", "Report match method", "Empty hash means pattern-only matching", "Scan all attachments"]
+
+- id: "MSG-115"
+  title: "Message encryption key backup to cloud"
+  description: "Prepare encryption keys for secure cloud backup by wrapping them with a master key derived from user password."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: user password. Line 2: JSON array of keys to backup [{\"key_id\":\"id\",\"key\":\"hex\",\"type\":\"identity|session|prekey\"}]."
+  output_format: "JSON backup bundle: master_key_salt, wrapped_keys array, integrity_hash."
+  test_cases:
+    - input: "StrongP@ssw0rd!\n[{\"key_id\":\"ik1\",\"key\":\"aabb...\",\"type\":\"identity\"},{\"key_id\":\"sk1\",\"key\":\"ccdd...\",\"type\":\"session\"}]"
+      expected_output: "{\"salt\":\"hex\",\"kdf\":\"argon2id\",\"wrapped_keys\":[{\"key_id\":\"ik1\",\"type\":\"identity\",\"wrapped\":\"base64\"},{\"key_id\":\"sk1\",\"type\":\"session\",\"wrapped\":\"base64\"}],\"integrity_hash\":\"hex\"}"
+    - input: "MyPass123\n[{\"key_id\":\"k1\",\"key\":\"dead...\",\"type\":\"prekey\"}]"
+      expected_output: "{\"salt\":\"hex\",\"kdf\":\"argon2id\",\"wrapped_keys\":[{\"key_id\":\"k1\",\"type\":\"prekey\",\"wrapped\":\"base64\"}],\"integrity_hash\":\"hex\"}"
+  constraints: ["Derive master key from password via Argon2id", "Wrap each key individually with AES-KWP", "Integrity hash covers all wrapped keys", "Salt must be random and stored"]
+
+- id: "MSG-116"
+  title: "Conversation participant limit enforcement"
+  description: "Enforce conversation participant limits based on conversation type and plan tier."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON tier limits {\"free\":{\"dm\":2,\"group\":10,\"channel\":100},\"pro\":{\"dm\":2,\"group\":50,\"channel\":1000}}. Line 2: JSON conversation {type, current_members, tier}. Line 3: JSON add requests [usernames]."
+  output_format: "Per add request: ALLOWED or REJECTED with reason. Final member count."
+  test_cases:
+    - input: "{\"free\":{\"dm\":2,\"group\":10,\"channel\":100},\"pro\":{\"dm\":2,\"group\":50,\"channel\":1000}}\n{\"type\":\"group\",\"current_members\":9,\"tier\":\"free\"}\n[\"alice\",\"bob\"]"
+      expected_output: "alice: ALLOWED (10/10)\nbob: REJECTED (would exceed limit: 10 for free/group)\nfinal members: 10"
+    - input: "{\"free\":{\"dm\":2,\"group\":10,\"channel\":100},\"pro\":{\"dm\":2,\"group\":50,\"channel\":1000}}\n{\"type\":\"group\",\"current_members\":5,\"tier\":\"pro\"}\n[\"x\",\"y\",\"z\"]"
+      expected_output: "x: ALLOWED (6/50)\ny: ALLOWED (7/50)\nz: ALLOWED (8/50)\nfinal members: 8"
+  constraints: ["DM always exactly 2 participants", "Check limit sequentially (each add affects next)", "Report remaining capacity"]
+
+- id: "MSG-117"
+  title: "Message text direction detection"
+  description: "Detect text direction (LTR/RTL) for proper message rendering in multilingual chats."
+  difficulty: 2
+  stdlib_modules: [std.str, std.json]
+  input_format: "Lines of messages in various scripts."
+  output_format: "Per-message: detected direction (LTR/RTL/MIXED) with script information."
+  test_cases:
+    - input: "Hello World\n\u0645\u0631\u062d\u0628\u0627 \u0628\u0627\u0644\u0639\u0627\u0644\u0645\nHello \u0645\u0631\u062d\u0628\u0627"
+      expected_output: "LTR (Latin)\nRTL (Arabic)\nMIXED (Latin+Arabic, primary: LTR)"
+    - input: "\u05e9\u05dc\u05d5\u05dd\nBonjour"
+      expected_output: "RTL (Hebrew)\nLTR (Latin)"
+  constraints: ["Detect by Unicode character ranges", "MIXED when both RTL and LTR scripts present", "Primary direction is whichever has more characters", "Support Arabic, Hebrew, Latin, CJK"]
+
+- id: "MSG-118"
+  title: "Message delivery guarantee levels"
+  description: "Implement different delivery guarantee levels (at-most-once, at-least-once, exactly-once) and trace behavior."
+  difficulty: 3
+  stdlib_modules: [std.json, std.str, std.time]
+  input_format: "Line 1: guarantee level. Line 2: JSON array of delivery events {msg_id, event: send|ack|timeout|retry}."
+  output_format: "Per-message: delivery trace and final outcome based on guarantee semantics."
+  test_cases:
+    - input: "at-most-once\n[{\"msg_id\":\"m1\",\"event\":\"send\"},{\"msg_id\":\"m1\",\"event\":\"timeout\"}]"
+      expected_output: "m1: send -> timeout -> LOST (at-most-once: no retry)\ndelivered: 0, lost: 1"
+    - input: "at-least-once\n[{\"msg_id\":\"m1\",\"event\":\"send\"},{\"msg_id\":\"m1\",\"event\":\"timeout\"},{\"msg_id\":\"m1\",\"event\":\"retry\"},{\"msg_id\":\"m1\",\"event\":\"ack\"}]"
+      expected_output: "m1: send -> timeout -> retry -> ack -> DELIVERED (2 attempts)\ndelivered: 1, lost: 0, duplicates_possible: yes"
+  constraints: ["at-most-once: never retry", "at-least-once: retry until ack", "exactly-once: retry + dedup", "Track attempt count"]
+
+- id: "MSG-119"
+  title: "Encrypted group membership proof"
+  description: "Generate zero-knowledge proof that a user is a member of an encrypted group without revealing which group."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: user identity key (hex). Line 2: JSON array of group commitment hashes. Line 3: target group index."
+  output_format: "Zero-knowledge proof components: commitment, challenge, response."
+  test_cases:
+    - input: "user_key_hex\n[\"group1_hash\",\"group2_hash\",\"group3_hash\"]\n1"
+      expected_output: "{\"proof\":{\"commitment\":\"hex\",\"challenge\":\"hex\",\"response\":\"hex\"},\"verification\":\"VALID\",\"revealed_group\":\"none\"}"
+    - input: "key_hex\n[\"hash_a\",\"hash_b\"]\n0"
+      expected_output: "{\"proof\":{\"commitment\":\"hex\",\"challenge\":\"hex\",\"response\":\"hex\"},\"verification\":\"VALID\",\"revealed_group\":\"none\"}"
+  constraints: ["Proof reveals nothing about which group", "Verifier can confirm membership without learning group", "Use Schnorr-like proof structure", "Non-interactive via Fiat-Shamir heuristic"]
+
+- id: "MSG-120"
+  title: "Chat message pagination with gap detection"
+  description: "Paginate message history detecting and reporting gaps where messages may be missing."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: page size. Line 2: JSON array of messages with sequential IDs (some may be missing)."
+  output_format: "Paginated output with gap indicators showing where messages are missing."
+  test_cases:
+    - input: "3\n[{\"id\":1,\"text\":\"A\"},{\"id\":2,\"text\":\"B\"},{\"id\":5,\"text\":\"E\"},{\"id\":6,\"text\":\"F\"},{\"id\":10,\"text\":\"J\"}]"
+      expected_output: "page 1:\n  1: A\n  2: B\n  --- gap: 2 messages missing (3-4) ---\n  5: E\npage 2:\n  6: F\n  --- gap: 3 messages missing (7-9) ---\n  10: J"
+    - input: "2\n[{\"id\":1,\"text\":\"X\"},{\"id\":2,\"text\":\"Y\"},{\"id\":3,\"text\":\"Z\"}]"
+      expected_output: "page 1:\n  1: X\n  2: Y\npage 2:\n  3: Z"
+  constraints: ["Detect non-sequential IDs as gaps", "Gaps count toward page size", "Report number of missing messages per gap"]
+
+- id: "MSG-121"
+  title: "Message signing with timestamp authority"
+  description: "Sign a message and include a trusted timestamp from a simulated timestamp authority for non-repudiation."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.time, std.str, std.json]
+  input_format: "Line 1: signer private key (hex). Line 2: message. Line 3: timestamp authority response (JSON with time and ta_signature)."
+  output_format: "JSON signed message bundle: content, signer_sig, timestamp, ta_sig, combined_hash."
+  test_cases:
+    - input: "signer_private_key_hex\nImportant agreement text\n{\"time\":\"2024-01-15T10:00:00Z\",\"ta_signature\":\"ta_sig_hex\"}"
+      expected_output: "{\"content\":\"Important agreement text\",\"signer_sig\":\"hex\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"ta_sig\":\"ta_sig_hex\",\"combined_hash\":\"hex\"}"
+    - input: "key_hex\nShort msg\n{\"time\":\"2024-06-01T00:00:00Z\",\"ta_signature\":\"sig_hex\"}"
+      expected_output: "{\"content\":\"Short msg\",\"signer_sig\":\"hex\",\"timestamp\":\"2024-06-01T00:00:00Z\",\"ta_sig\":\"sig_hex\",\"combined_hash\":\"hex\"}"
+  constraints: ["Signer signs content + timestamp", "TA signs hash of content", "Combined hash binds all components", "Proves message existed at timestamp"]
+
+- id: "MSG-122"
+  title: "Message storage quota management"
+  description: "Track and enforce message storage quotas per user, calculating usage from message sizes."
+  difficulty: 1
+  stdlib_modules: [std.json, std.str]
+  input_format: "Line 1: JSON quota config {\"user\":\"name\",\"quota_bytes\":N,\"used_bytes\":N}. Line 2: JSON array of new messages with size_bytes."
+  output_format: "Per-message: accepted or rejected. Final usage report with percentage."
+  test_cases:
+    - input: "{\"user\":\"alice\",\"quota_bytes\":1000,\"used_bytes\":800}\n[{\"id\":\"m1\",\"size_bytes\":100},{\"id\":\"m2\",\"size_bytes\":150}]"
+      expected_output: "m1: ACCEPTED (900/1000 = 90%)\nm2: REJECTED (would exceed quota: 1050 > 1000)\nfinal: 900/1000 bytes (90%)"
+    - input: "{\"user\":\"bob\",\"quota_bytes\":5000,\"used_bytes\":0}\n[{\"id\":\"a\",\"size_bytes\":1000},{\"id\":\"b\",\"size_bytes\":2000}]"
+      expected_output: "a: ACCEPTED (1000/5000 = 20%)\nb: ACCEPTED (3000/5000 = 60%)\nfinal: 3000/5000 bytes (60%)"
+  constraints: ["Process messages sequentially", "Once rejected, subsequent messages still evaluated", "Show cumulative usage after each message"]
+
+- id: "MSG-123"
+  title: "Message encryption algorithm negotiation"
+  description: "Negotiate encryption algorithms between two clients with different capability sets, selecting the strongest mutual algorithm."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str, std.crypto]
+  input_format: "Line 1: JSON client A capabilities {\"ciphers\":[...],\"key_exchange\":[...],\"hash\":[...]}. Line 2: JSON client B capabilities."
+  output_format: "Negotiated suite or INCOMPATIBLE. Strength ranking of chosen algorithms."
+  test_cases:
+    - input: "{\"ciphers\":[\"AES-256-GCM\",\"AES-128-GCM\",\"ChaCha20\"],\"key_exchange\":[\"X25519\",\"P-256\"],\"hash\":[\"SHA-384\",\"SHA-256\"]}\n{\"ciphers\":[\"ChaCha20\",\"AES-256-GCM\"],\"key_exchange\":[\"X25519\",\"P-384\"],\"hash\":[\"SHA-256\",\"SHA-512\"]}"
+      expected_output: "negotiated:\n  cipher: AES-256-GCM (256-bit, AEAD)\n  key_exchange: X25519 (128-bit equivalent)\n  hash: SHA-256 (256-bit)\noverall strength: 256-bit equivalent"
+    - input: "{\"ciphers\":[\"RC4\"],\"key_exchange\":[\"DH-1024\"],\"hash\":[\"MD5\"]}\n{\"ciphers\":[\"AES-256-GCM\"],\"key_exchange\":[\"X25519\"],\"hash\":[\"SHA-256\"]}"
+      expected_output: "INCOMPATIBLE: no common algorithms\n  ciphers: no overlap\n  key_exchange: no overlap\n  hash: no overlap"
+  constraints: ["Prefer strongest mutual algorithm", "Strength ordering must be predefined", "All three categories must have a match", "Report individual failures on incompatibility"]
+
+- id: "MSG-124"
+  title: "Message history GDPR export"
+  description: "Generate a GDPR-compliant data export of all messages and metadata for a specific user."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "Line 1: target user. Line 2: JSON array of all messages in system. Line 3: JSON user metadata {profile, sessions, etc.}."
+  output_format: "Structured export with: user's messages (sent and received), metadata, data categories, and generation timestamp."
+  test_cases:
+    - input: "alice\n[{\"id\":\"1\",\"sender\":\"alice\",\"recipient\":\"bob\",\"text\":\"Hi\",\"time\":\"2024-01-15T10:00:00Z\"},{\"id\":\"2\",\"sender\":\"bob\",\"recipient\":\"alice\",\"text\":\"Hey\",\"time\":\"2024-01-15T10:01:00Z\"},{\"id\":\"3\",\"sender\":\"charlie\",\"recipient\":\"bob\",\"text\":\"Hello\",\"time\":\"2024-01-15T10:02:00Z\"}]\n{\"profile\":{\"name\":\"Alice\",\"email\":\"alice@test.com\"},\"joined\":\"2023-01-01\"}"
+      expected_output: "GDPR DATA EXPORT: alice\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Alice\n  email: alice@test.com\n  joined: 2023-01-01\nMESSAGES SENT (1):\n  [2024-01-15T10:00:00Z] to bob: Hi\nMESSAGES RECEIVED (1):\n  [2024-01-15T10:01:00Z] from bob: Hey\nDATA CATEGORIES: profile, messages, metadata"
+    - input: "bob\n[{\"id\":\"1\",\"sender\":\"alice\",\"recipient\":\"bob\",\"text\":\"Test\",\"time\":\"2024-01-01T00:00:00Z\"}]\n{\"profile\":{\"name\":\"Bob\"},\"joined\":\"2024-01-01\"}"
+      expected_output: "GDPR DATA EXPORT: bob\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Bob\n  joined: 2024-01-01\nMESSAGES SENT (0):\n  (none)\nMESSAGES RECEIVED (1):\n  [2024-01-01T00:00:00Z] from alice: Test\nDATA CATEGORIES: profile, messages, metadata"
+  constraints: ["Include only messages where user is sender or recipient", "Exclude other users' private conversations", "List all data categories included", "Chronological ordering"]
+
+- id: "MSG-125"
+  title: "Noise Protocol Framework handshake"
+  description: "Implement a Noise IK handshake pattern for establishing encrypted messaging sessions."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: initiator static key (hex). Line 2: responder static key (hex). Line 3: pre-shared payload."
+  output_format: "Handshake transcript: each message's encrypted content and derived keys at each stage."
+  test_cases:
+    - input: "initiator_static_hex\nresponder_static_hex\nInitial payload"
+      expected_output: "-> e, es, s, ss (message 1)\n  ephemeral: hex\n  encrypted_static: hex\n  encrypted_payload: hex\n<- e, ee, se (message 2)\n  ephemeral: hex\n  encrypted_payload: hex\nsession keys:\n  initiator_send: hex\n  initiator_recv: hex"
+    - input: "key_i_hex\nkey_r_hex\nHello"
+      expected_output: "-> e, es, s, ss (message 1)\n  ephemeral: hex\n  encrypted_static: hex\n  encrypted_payload: hex\n<- e, ee, se (message 2)\n  ephemeral: hex\n  encrypted_payload: hex\nsession keys:\n  initiator_send: hex\n  initiator_recv: hex"
+  constraints: ["Follow Noise IK pattern exactly", "Use X25519 for DH", "Use ChaChaPoly for AEAD", "Use SHA-256 for hashing", "Derive split keys after handshake"]
+
+- id: "MSG-126"
+  title: "Message content hash chain"
+  description: "Build a hash chain over messages for tamper detection, where each message includes the hash of the previous."
+  difficulty: 2
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: genesis hash (hex). Line 2: JSON array of messages with text field."
+  output_format: "Chain with per-message hash, and verification result."
+  test_cases:
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n[{\"text\":\"First message\"},{\"text\":\"Second message\"},{\"text\":\"Third message\"}]"
+      expected_output: "chain:\n  [0] genesis: 0000...0000\n  [1] First message -> hash: sha256(0000...0000 || msg1)\n  [2] Second message -> hash: sha256(hash1 || msg2)\n  [3] Third message -> hash: sha256(hash2 || msg3)\nverification: INTACT (3 messages, no breaks)"
+    - input: "abcdef\n[{\"text\":\"Only message\"}]"
+      expected_output: "chain:\n  [0] genesis: abcdef\n  [1] Only message -> hash: sha256(abcdef || msg1)\nverification: INTACT (1 message, no breaks)"
+  constraints: ["Each hash = SHA-256(previous_hash || message_content)", "Genesis hash is the initial previous hash", "Verify chain integrity by recomputing all hashes"]
+
+- id: "MSG-127"
+  title: "Anonymous message routing (onion-style)"
+  description: "Construct a multi-layer encrypted message for anonymous routing through relay nodes (onion routing)."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: JSON array of relay node public keys (hex), in order. Line 2: final recipient public key. Line 3: plaintext message."
+  output_format: "Layered encryption: outermost to innermost layer details, with per-layer encrypted content."
+  test_cases:
+    - input: "[\"relay1_pub_hex\",\"relay2_pub_hex\",\"relay3_pub_hex\"]\nrecipient_pub_hex\nAnonymous message"
+      expected_output: "layer 3 (outermost, for relay1):\n  next_hop: relay2\n  encrypted: base64\nlayer 2 (for relay2):\n  next_hop: relay3\n  encrypted: base64\nlayer 1 (for relay3):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Anonymous message"
+    - input: "[\"r1_key\"]\nrecip_key\nHello"
+      expected_output: "layer 1 (outermost, for r1):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Hello"
+  constraints: ["Each relay can only decrypt its layer", "Each layer reveals only next hop", "Use ephemeral keys per layer", "Final layer contains plaintext for recipient"]
+
+- id: "MSG-128"
+  title: "Message archival with retention policy"
+  description: "Apply retention policies to message archives, identifying messages to retain, archive, or purge."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: JSON retention policy {\"hot_days\":30,\"warm_days\":90,\"cold_days\":365}. Line 2: reference date (ISO). Line 3: JSON array of messages with id and timestamp."
+  output_format: "Classification of each message: HOT (keep), WARM (archive), COLD (deep archive), PURGE (delete)."
+  test_cases:
+    - input: "{\"hot_days\":30,\"warm_days\":90,\"cold_days\":365}\n2024-06-01T00:00:00Z\n[{\"id\":\"m1\",\"timestamp\":\"2024-05-15T00:00:00Z\"},{\"id\":\"m2\",\"timestamp\":\"2024-03-01T00:00:00Z\"},{\"id\":\"m3\",\"timestamp\":\"2023-01-01T00:00:00Z\"},{\"id\":\"m4\",\"timestamp\":\"2022-01-01T00:00:00Z\"}]"
+      expected_output: "m1: HOT (17 days old, < 30 days)\nm2: WARM (92 days old, 30-90 days)\nm3: COLD (517 days old, 90-365 days... exceeds, PURGE)\nm4: PURGE (882 days old, > 365 days)"
+    - input: "{\"hot_days\":7,\"warm_days\":30,\"cold_days\":60}\n2024-01-15T00:00:00Z\n[{\"id\":\"a\",\"timestamp\":\"2024-01-10T00:00:00Z\"},{\"id\":\"b\",\"timestamp\":\"2023-12-01T00:00:00Z\"}]"
+      expected_output: "a: HOT (5 days old, < 7 days)\nb: WARM (45 days old, 7-30 days... exceeds, COLD)"
+  constraints: ["Categories are exclusive based on age", "Beyond cold_days = PURGE", "Calculate exact age in days", "Sort output by age ascending"]
+
+- id: "MSG-129"
+  title: "Secure channel binding"
+  description: "Implement channel binding to tie an encrypted messaging session to its underlying transport connection."
+  difficulty: 4
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: TLS session ID (hex). Line 2: TLS finished message (hex). Line 3: application session key (hex)."
+  output_format: "Channel binding token (hex), binding verification result, and bound session parameters."
+  test_cases:
+    - input: "tls_session_id_hex\ntls_finished_hex\napplication_session_key_hex"
+      expected_output: "binding_type: tls-unique\nbinding_data: tls_finished_hex\nchannel_binding_token: HMAC(app_key, binding_data) = hex\nverification: session bound to transport"
+    - input: "session_hex\nfinished_hex\napp_key_hex"
+      expected_output: "binding_type: tls-unique\nbinding_data: finished_hex\nchannel_binding_token: HMAC(app_key, binding_data) = hex\nverification: session bound to transport"
+  constraints: ["Use tls-unique binding type (RFC 5929)", "Token is HMAC of binding data with session key", "Prevents session export attacks", "Include in authentication exchange"]
+
+- id: "MSG-130"
+  title: "Message fan-in aggregation"
+  description: "Aggregate messages from multiple sources/channels into a single unified inbox with source tracking."
+  difficulty: 2
+  stdlib_modules: [std.json, std.time, std.str]
+  input_format: "JSON object with channel names as keys and arrays of messages as values. Each message has sender, text, time."
+  output_format: "Unified inbox sorted by time, with channel tags. Per-channel message counts."
+  test_cases:
+    - input: "{\"email\":[{\"sender\":\"alice\",\"text\":\"Email msg\",\"time\":\"2024-01-15T10:00:00Z\"}],\"slack\":[{\"sender\":\"bob\",\"text\":\"Slack msg\",\"time\":\"2024-01-15T09:55:00Z\"},{\"sender\":\"charlie\",\"text\":\"Another\",\"time\":\"2024-01-15T10:05:00Z\"}],\"sms\":[{\"sender\":\"dave\",\"text\":\"Text msg\",\"time\":\"2024-01-15T10:02:00Z\"}]}"
+      expected_output: "[09:55] [slack] bob: Slack msg\n[10:00] [email] alice: Email msg\n[10:02] [sms] dave: Text msg\n[10:05] [slack] charlie: Another\n---\nemail: 1, slack: 2, sms: 1, total: 4"
+    - input: "{\"chat\":[{\"sender\":\"x\",\"text\":\"Hi\",\"time\":\"2024-01-01T00:00:00Z\"}]}"
+      expected_output: "[00:00] [chat] x: Hi\n---\nchat: 1, total: 1"
+  constraints: ["Sort all messages by time regardless of source", "Tag each message with source channel", "Count messages per source", "Handle empty channels"]
+
+- id: "MSG-131"
+  title: "Post-quantum key encapsulation for messaging"
+  description: "Simulate a post-quantum key encapsulation mechanism (Kyber-style) for future-proof messaging key exchange."
+  difficulty: 5
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: security level (512/768/1024). Line 2: operation (keygen/encaps/decaps). Line 3: relevant keys or ciphertext (hex)."
+  output_format: "For keygen: public and secret key (hex). For encaps: ciphertext and shared secret. For decaps: shared secret."
+  test_cases:
+    - input: "768\nkeygen\n"
+      expected_output: "public_key: hex (1184 bytes)\nsecret_key: hex (2400 bytes)\nsecurity: NIST Level 3 (AES-192 equivalent)"
+    - input: "768\nencaps\npublic_key_hex"
+      expected_output: "ciphertext: hex (1088 bytes)\nshared_secret: hex (32 bytes)\nalgorithm: Kyber-768"
+  constraints: ["Simulate Kyber parameter sets", "Report key and ciphertext sizes", "Include security level classification", "Shared secret is 32 bytes regardless of level"]
+
+- id: "MSG-132"
+  title: "Message delivery SLA monitoring"
+  description: "Monitor message delivery against SLA targets, flagging violations and computing compliance percentage."
+  difficulty: 2
+  stdlib_modules: [std.time, std.json, std.str]
+  input_format: "Line 1: JSON SLA {\"p50_ms\":100,\"p95_ms\":500,\"p99_ms\":2000}. Line 2: JSON array of delivery events {msg_id, sent_at, delivered_at}."
+  output_format: "Percentile latencies, SLA compliance per target, and individual violations."
+  test_cases:
+    - input: "{\"p50_ms\":100,\"p95_ms\":500,\"p99_ms\":2000}\n[{\"msg_id\":\"m1\",\"sent_at\":\"10:00:00.000\",\"delivered_at\":\"10:00:00.050\"},{\"msg_id\":\"m2\",\"sent_at\":\"10:00:01.000\",\"delivered_at\":\"10:00:01.080\"},{\"msg_id\":\"m3\",\"sent_at\":\"10:00:02.000\",\"delivered_at\":\"10:00:02.200\"},{\"msg_id\":\"m4\",\"sent_at\":\"10:00:03.000\",\"delivered_at\":\"10:00:03.600\"}]"
+      expected_output: "latencies: [50ms, 80ms, 200ms, 600ms]\np50: 140ms (target: 100ms) BREACH\np95: 500ms (target: 500ms) OK\np99: 580ms (target: 2000ms) OK\nSLA compliance: 2/3 targets met (66.7%)"
+    - input: "{\"p50_ms\":50,\"p95_ms\":200,\"p99_ms\":1000}\n[{\"msg_id\":\"a\",\"sent_at\":\"00:00:00.000\",\"delivered_at\":\"00:00:00.030\"},{\"msg_id\":\"b\",\"sent_at\":\"00:00:01.000\",\"delivered_at\":\"00:00:01.040\"}]"
+      expected_output: "latencies: [30ms, 40ms]\np50: 35ms (target: 50ms) OK\np95: 39ms (target: 200ms) OK\np99: 40ms (target: 1000ms) OK\nSLA compliance: 3/3 targets met (100.0%)"
+  constraints: ["Calculate actual percentiles from data", "Compare against each SLA target", "Flag individual breaches", "Compute overall compliance ratio"]
+
+- id: "MSG-133"
+  title: "Disappearing media message lifecycle"
+  description: "Manage the lifecycle of disappearing media messages: upload, view-once, screenshot detection, and deletion."
+  difficulty: 3
+  stdlib_modules: [std.json, std.time, std.str, std.crypto]
+  input_format: "JSON array of lifecycle events: {msg_id, event: upload|view|screenshot|expire|delete, time, user}."
+  output_format: "Per-message lifecycle report: current state, view count, screenshot alerts, expiry status."
+  test_cases:
+    - input: "[{\"msg_id\":\"m1\",\"event\":\"upload\",\"time\":\"10:00\",\"user\":\"alice\"},{\"msg_id\":\"m1\",\"event\":\"view\",\"time\":\"10:01\",\"user\":\"bob\"},{\"msg_id\":\"m1\",\"event\":\"screenshot\",\"time\":\"10:01\",\"user\":\"bob\"},{\"msg_id\":\"m1\",\"event\":\"expire\",\"time\":\"10:02\",\"user\":\"system\"}]"
+      expected_output: "m1:\n  state: EXPIRED\n  uploaded: 10:00 by alice\n  views: 1 (bob at 10:01)\n  ALERT: screenshot by bob at 10:01\n  expired: 10:02"
+    - input: "[{\"msg_id\":\"m1\",\"event\":\"upload\",\"time\":\"09:00\",\"user\":\"x\"},{\"msg_id\":\"m1\",\"event\":\"delete\",\"time\":\"09:05\",\"user\":\"x\"}]"
+      expected_output: "m1:\n  state: DELETED\n  uploaded: 09:00 by x\n  views: 0\n  deleted by sender: 09:05"
+  constraints: ["View-once: only first view counts", "Screenshot triggers alert to sender", "Sender can delete before viewing", "Track full event timeline"]
+
+- id: "MSG-134"
+  title: "Message protocol state reconciliation"
+  description: "Reconcile diverged message protocol states between two peers, identifying and resolving inconsistencies."
+  difficulty: 4
+  stdlib_modules: [std.json, std.str, std.crypto]
+  input_format: "Line 1: JSON peer A state {msg_counters, ack_list, pending}. Line 2: JSON peer B state."
+  output_format: "Differences found, reconciliation actions needed, and resulting consistent state."
+  test_cases:
+    - input: "{\"sent_counter\":5,\"recv_counter\":3,\"acked\":[1,2,3],\"pending\":[4,5]}\n{\"sent_counter\":3,\"recv_counter\":5,\"acked\":[1,2,3,4,5],\"pending\":[]}"
+      expected_output: "INCONSISTENCY:\n  A thinks 4,5 unacked; B has acked 4,5\n  A.recv_counter(3) != B.sent_counter(3) OK\nACTIONS:\n  A: mark 4,5 as acked\n  B: no action needed\nRECONCILED: counters aligned"
+    - input: "{\"sent_counter\":2,\"recv_counter\":2,\"acked\":[1,2],\"pending\":[]}\n{\"sent_counter\":2,\"recv_counter\":2,\"acked\":[1,2],\"pending\":[]}"
+      expected_output: "NO INCONSISTENCY: states are synchronized\nA: sent=2, recv=2, pending=0\nB: sent=2, recv=2, pending=0"
+  constraints: ["Compare counters bidirectionally", "Identify messages acked by one but not other", "Generate minimal reconciliation actions", "Verify consistency after reconciliation"]
+
+- id: "MSG-135"
+  title: "Hybrid encryption envelope (RSA + AES)"
+  description: "Implement hybrid encryption: generate random AES key, encrypt message with AES, encrypt AES key with RSA."
+  difficulty: 3
+  stdlib_modules: [std.crypto, std.str, std.json]
+  input_format: "Line 1: recipient RSA public key (PEM, escaped newlines). Line 2: plaintext message."
+  output_format: "JSON envelope: encrypted_key (base64, RSA-encrypted AES key), iv (hex), ciphertext (base64), tag (hex)."
+  test_cases:
+    - input: "-----BEGIN PUBLIC KEY-----\\nMIIBI...\\n-----END PUBLIC KEY-----\nThis is a secret message that is too long for RSA alone"
+      expected_output: "{\"encrypted_key\":\"base64\",\"iv\":\"hex\",\"ciphertext\":\"base64\",\"tag\":\"hex\",\"algorithm\":\"RSA-OAEP+AES-256-GCM\"}"
+    - input: "-----BEGIN PUBLIC KEY-----\\nMIIBI...\\n-----END PUBLIC KEY-----\nShort"
+      expected_output: "{\"encrypted_key\":\"base64\",\"iv\":\"hex\",\"ciphertext\":\"base64\",\"tag\":\"hex\",\"algorithm\":\"RSA-OAEP+AES-256-GCM\"}"
+  constraints: ["Generate random 256-bit AES key", "Generate random 96-bit IV for GCM", "Encrypt AES key with RSA-OAEP SHA-256", "Include auth tag from GCM"]

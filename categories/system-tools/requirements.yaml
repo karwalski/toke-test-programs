@@ -1,0 +1,2079 @@
+- id: "SYS-001"
+  title: "File Watcher"
+  description: "Watch a directory for file creation, modification, and deletion events and print each event with a timestamp."
+  difficulty: 3
+  stdlib_modules: [std.file, std.time, std.io, std.path]
+  input_format: "Single line: path to directory to watch, then optional duration in seconds (default 5)"
+  output_format: "Lines of: TIMESTAMP EVENT filepath (e.g. 2026-01-01T00:00:00 CREATED /tmp/foo.txt)"
+  test_cases:
+    - input: "/tmp 0"
+      expected_output: "(no events printed when duration is 0)"
+    - input: "/nonexistent 0"
+      expected_output: "ERROR: directory not found: /nonexistent"
+  constraints:
+    - "Must poll at least once per second"
+    - "Must handle non-existent directories gracefully"
+
+- id: "SYS-002"
+  title: "Process Manager"
+  description: "List all running processes with PID, name, CPU%, and memory usage. Filter by name prefix if provided."
+  difficulty: 3
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "Optional name prefix on stdin (empty = list all)"
+  output_format: "Table: PID NAME CPU% MEM_MB, one process per line, sorted by CPU% descending"
+  test_cases:
+    - input: ""
+      expected_output: "PID NAME CPU% MEM_MB\n(at least one process row)"
+    - input: "nonexistentxyz"
+      expected_output: "PID NAME CPU% MEM_MB\n(empty)"
+  constraints:
+    - "Header row always printed"
+    - "Must not crash if process list is empty"
+
+- id: "SYS-003"
+  title: "Cron Scheduler"
+  description: "Parse a crontab-style schedule file from stdin and print the next N scheduled times for each entry."
+  difficulty: 4
+  stdlib_modules: [std.time, std.io, std.str]
+  input_format: "Lines of: CRON_EXPR label\\nN (integer, number of next times to show)"
+  output_format: "For each entry: label: DATETIME1, DATETIME2, ... (ISO 8601)"
+  test_cases:
+    - input: "0 * * * * hourly\n3"
+      expected_output: "hourly: (3 upcoming top-of-hour timestamps)"
+    - input: "*/15 * * * * quarter\n2"
+      expected_output: "quarter: (2 upcoming 15-minute timestamps)"
+  constraints:
+    - "Support standard 5-field cron expressions"
+    - "Times relative to current system time"
+
+- id: "SYS-004"
+  title: "Disk Usage Analyser"
+  description: "Report disk usage for a given path, listing top N subdirectories by size."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: directory path. Line 2: N (top N entries to show)"
+  output_format: "Lines of: SIZE_HUMAN PATH sorted by size descending, then total line"
+  test_cases:
+    - input: "/tmp\n3"
+      expected_output: "(top 3 subdirectory sizes then total)"
+    - input: "/nonexistent\n5"
+      expected_output: "ERROR: path not found: /nonexistent"
+  constraints:
+    - "Human-readable sizes (B, KB, MB, GB)"
+    - "Recurse into subdirectories for totals"
+
+- id: "SYS-005"
+  title: "Log Rotator"
+  description: "Rotate a log file: rename current log with a timestamp suffix and create a new empty log file. Optionally compress old logs."
+  difficulty: 3
+  stdlib_modules: [std.file, std.time, std.path, std.io]
+  input_format: "Line 1: log file path. Line 2: compress (yes/no)"
+  output_format: "Rotated to: NEW_PATH\\nNew log created: ORIGINAL_PATH"
+  test_cases:
+    - input: "/tmp/test.log\nno"
+      expected_output: "Rotated to: /tmp/test.log.2026-...\nNew log created: /tmp/test.log"
+    - input: "/tmp/missing.log\nno"
+      expected_output: "ERROR: log file not found: /tmp/missing.log"
+  constraints:
+    - "Timestamp suffix format: YYYY-MM-DDTHH-MM-SS"
+    - "Do not rotate if file is empty"
+
+- id: "SYS-006"
+  title: "Config Manager"
+  description: "Read, write, and delete keys in a simple INI-style config file. Support sections."
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io]
+  input_format: "Line 1: config file path. Subsequent lines: GET section.key | SET section.key value | DEL section.key"
+  output_format: "For GET: value or KEY_NOT_FOUND. For SET/DEL: OK"
+  test_cases:
+    - input: "/tmp/cfg.ini\nSET server.host localhost\nGET server.host"
+      expected_output: "OK\nlocalhost"
+    - input: "/tmp/cfg.ini\nGET missing.key"
+      expected_output: "KEY_NOT_FOUND"
+  constraints:
+    - "Create config file if it does not exist"
+    - "Preserve comments and formatting of unmodified sections"
+
+- id: "SYS-007"
+  title: "Backup Script"
+  description: "Copy a source directory to a destination, skipping files that have not changed (by mtime and size). Print a summary."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.time, std.io]
+  input_format: "Line 1: source path. Line 2: destination path"
+  output_format: "Copied: N files\\nSkipped: N files\\nErrors: N files"
+  test_cases:
+    - input: "/tmp/src\n/tmp/dst"
+      expected_output: "Copied: N files\nSkipped: N files\nErrors: 0 files"
+    - input: "/nonexistent\n/tmp/dst"
+      expected_output: "ERROR: source not found: /nonexistent"
+  constraints:
+    - "Create destination directory if missing"
+    - "Preserve directory structure"
+
+- id: "SYS-008"
+  title: "Service Monitor"
+  description: "Check whether a list of system services (process names) are running. Print status for each."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "Lines of service/process names (one per line)"
+  output_format: "service_name: RUNNING | STOPPED"
+  test_cases:
+    - input: "init\nnonexistentservice123"
+      expected_output: "init: RUNNING\nnonexistentservice123: STOPPED"
+    - input: ""
+      expected_output: "(empty output)"
+  constraints:
+    - "Match process names exactly (not substrings)"
+    - "Exit code 0 even if services are stopped"
+
+- id: "SYS-009"
+  title: "Environment Manager"
+  description: "Read environment variables, set new ones for a child process, and print the child's output."
+  difficulty: 2
+  stdlib_modules: [std.env, std.process, std.io, std.str]
+  input_format: "Line 1: command to run. Subsequent lines: KEY=VALUE pairs to inject"
+  output_format: "Child process stdout verbatim"
+  test_cases:
+    - input: "env\nMY_VAR=hello"
+      expected_output: "(output of env containing MY_VAR=hello)"
+    - input: "printenv MY_VAR\nMY_VAR=world"
+      expected_output: "world"
+  constraints:
+    - "Must not modify parent process environment"
+    - "Merge injected vars with existing environment"
+
+- id: "SYS-010"
+  title: "Path Utilities"
+  description: "Perform path operations: normalise, join, get basename, dirname, extension, and check existence."
+  difficulty: 1
+  stdlib_modules: [std.path, std.file, std.io]
+  input_format: "Lines of: OPERATION arg1 [arg2] where OPERATION in {normalize, join, basename, dirname, ext, exists}"
+  output_format: "Result of each operation, one per line"
+  test_cases:
+    - input: "normalize /tmp/../etc\nbasename /tmp/foo.txt\next /tmp/foo.txt"
+      expected_output: "/etc\nfoo.txt\n.txt"
+    - input: "join /tmp subdir file.log\nexists /tmp"
+      expected_output: "/tmp/subdir/file.log\ntrue"
+  constraints:
+    - "Handle trailing slashes consistently"
+    - "Return empty string for missing extension"
+
+- id: "SYS-011"
+  title: "Tar Archive Creator"
+  description: "Create a tar archive of a directory, listing all files added."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: source directory. Line 2: output archive path (.tar)"
+  output_format: "added: filepath (one per file) then: Archive created: OUTPUT_PATH (N files)"
+  test_cases:
+    - input: "/tmp/srcdir\n/tmp/out.tar"
+      expected_output: "added: ... (file list)\nArchive created: /tmp/out.tar (N files)"
+    - input: "/nonexistent\n/tmp/out.tar"
+      expected_output: "ERROR: source not found: /nonexistent"
+  constraints:
+    - "Preserve relative paths inside archive"
+    - "Do not follow symlinks by default"
+
+- id: "SYS-012"
+  title: "Zip Archive Creator"
+  description: "Create a zip archive from a list of files and/or directories."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: output zip path. Subsequent lines: file or directory paths to include"
+  output_format: "deflating: filepath (one per entry) then: Archive: OUTPUT_PATH (N entries)"
+  test_cases:
+    - input: "/tmp/out.zip\n/tmp/file1.txt\n/tmp/file2.txt"
+      expected_output: "deflating: /tmp/file1.txt\ndeflating: /tmp/file2.txt\nArchive: /tmp/out.zip (2 entries)"
+    - input: "/tmp/out.zip\n/nonexistent"
+      expected_output: "ERROR: not found: /nonexistent"
+  constraints:
+    - "Support both files and directories"
+    - "Recursively include directory contents"
+
+- id: "SYS-013"
+  title: "Checksum Verifier"
+  description: "Compute and verify SHA-256 checksums for files. In verify mode, compare against a checksum manifest file."
+  difficulty: 2
+  stdlib_modules: [std.file, std.io, std.str]
+  input_format: "Line 1: mode (compute|verify). For compute: file paths (one per line). For verify: manifest path then file paths."
+  output_format: "compute: SHA256 filepath. verify: OK filepath | FAIL filepath"
+  test_cases:
+    - input: "compute\n/tmp/test.txt"
+      expected_output: "(sha256hex)  /tmp/test.txt"
+    - input: "verify\n/tmp/manifest.sha256\n/tmp/test.txt"
+      expected_output: "OK /tmp/test.txt"
+  constraints:
+    - "Use standard hex-encoded SHA-256"
+    - "Manifest format: hash  filepath (two spaces)"
+
+- id: "SYS-014"
+  title: "Temp File Manager"
+  description: "Create, list, and clean up temporary files in a managed temp directory. Track creation times."
+  difficulty: 2
+  stdlib_modules: [std.file, std.time, std.path, std.io]
+  input_format: "Lines of: CREATE name | LIST | CLEANUP age_seconds"
+  output_format: "CREATE: /tmp/managed/name. LIST: path mtime (one per line). CLEANUP: Removed N files."
+  test_cases:
+    - input: "CREATE foo.tmp\nLIST\nCLEANUP 0"
+      expected_output: "/tmp/managed/foo.tmp\n/tmp/managed/foo.tmp ...\nRemoved 1 files."
+    - input: "LIST"
+      expected_output: "(empty or file list)"
+  constraints:
+    - "All temp files created in a single managed directory"
+    - "CLEANUP removes files older than age_seconds"
+
+- id: "SYS-015"
+  title: "Lock File Manager"
+  description: "Acquire, release, and check a file-based lock. Detect stale locks by checking if the owning PID is still alive."
+  difficulty: 3
+  stdlib_modules: [std.file, std.process, std.io]
+  input_format: "Line 1: lock file path. Line 2: command (acquire|release|check)"
+  output_format: "ACQUIRED | LOCKED_BY pid | RELEASED | STALE_REMOVED | NOT_LOCKED"
+  test_cases:
+    - input: "/tmp/my.lock\nacquire"
+      expected_output: "ACQUIRED"
+    - input: "/tmp/my.lock\ncheck"
+      expected_output: "LOCKED_BY (pid) | NOT_LOCKED"
+  constraints:
+    - "Lock file contains PID of owner"
+    - "Stale lock: PID in file no longer exists"
+
+- id: "SYS-016"
+  title: "Daemon Skeleton"
+  description: "Implement a minimal daemon: fork to background, write PID file, handle SIGTERM for clean shutdown, log to file."
+  difficulty: 5
+  stdlib_modules: [std.process, std.file, std.time, std.io]
+  input_format: "Line 1: pid file path. Line 2: log file path. Line 3: duration (seconds to run before self-exit)"
+  output_format: "Daemon started: pid=N\\n(daemon runs in background, log written to log file)"
+  test_cases:
+    - input: "/tmp/d.pid\n/tmp/d.log\n1"
+      expected_output: "Daemon started: pid=N"
+    - input: "/tmp/d2.pid\n/tmp/d2.log\n0"
+      expected_output: "Daemon started: pid=N"
+  constraints:
+    - "Must detach from terminal"
+    - "PID file removed on clean exit"
+
+- id: "SYS-017"
+  title: "PID File Management"
+  description: "Write a PID file on start, verify it on check, and remove it on stop."
+  difficulty: 1
+  stdlib_modules: [std.process, std.file, std.io]
+  input_format: "Line 1: pid file path. Line 2: command (start|check|stop)"
+  output_format: "start: PID written: N. check: RUNNING pid=N | NOT_RUNNING. stop: PID file removed."
+  test_cases:
+    - input: "/tmp/test.pid\nstart"
+      expected_output: "PID written: N"
+    - input: "/tmp/test.pid\ncheck"
+      expected_output: "RUNNING pid=N | NOT_RUNNING"
+  constraints:
+    - "start writes current process PID"
+    - "check reads PID from file and validates process exists"
+
+- id: "SYS-018"
+  title: "Resource Monitor"
+  description: "Sample CPU and memory usage every N seconds for a given duration and print statistics (min, max, avg)."
+  difficulty: 3
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "Line 1: interval_seconds. Line 2: total_duration_seconds"
+  output_format: "CPU%: min=X max=Y avg=Z\\nMEM_MB: min=X max=Y avg=Z"
+  test_cases:
+    - input: "1\n2"
+      expected_output: "CPU%: min=... max=... avg=...\nMEM_MB: min=... max=... avg=..."
+    - input: "0\n0"
+      expected_output: "ERROR: interval must be > 0"
+  constraints:
+    - "At least one sample taken"
+    - "Values rounded to 2 decimal places"
+
+- id: "SYS-019"
+  title: "Uptime Tracker"
+  description: "Report system uptime and the uptime of a given process (by PID or name)."
+  difficulty: 2
+  stdlib_modules: [std.process, std.time, std.io, std.str]
+  input_format: "Optional line: PID or process name to report uptime for"
+  output_format: "System uptime: Xd Xh Xm Xs\\n[Process NAME (PID): Xd Xh Xm Xs | NOT FOUND]"
+  test_cases:
+    - input: ""
+      expected_output: "System uptime: (non-zero value)"
+    - input: "nonexistentxyz"
+      expected_output: "System uptime: ...\nProcess nonexistentxyz: NOT FOUND"
+  constraints:
+    - "System uptime from OS, not calculated from start time"
+    - "Process uptime from process start time"
+
+- id: "SYS-020"
+  title: "OS Info Reporter"
+  description: "Report OS name, version, kernel version, hostname, CPU count, and total RAM."
+  difficulty: 1
+  stdlib_modules: [std.process, std.env, std.io]
+  input_format: "No input (read from stdin: empty or ignored)"
+  output_format: "OS: name version\\nKernel: version\\nHostname: name\\nCPUs: N\\nRAM: N GB"
+  test_cases:
+    - input: ""
+      expected_output: "OS: (name and version)\nKernel: (version)\nHostname: (name)\nCPUs: (N)\nRAM: (N) GB"
+    - input: "ignored"
+      expected_output: "(same as above)"
+  constraints:
+    - "All values from system, not hardcoded"
+    - "RAM rounded to nearest GB"
+
+- id: "SYS-021"
+  title: "Process Tree Printer"
+  description: "Print the process tree rooted at a given PID (or all processes if PID=1), showing parent-child relationships."
+  difficulty: 4
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "Line 1: root PID (integer)"
+  output_format: "Indented tree: PID NAME, children indented 2 spaces"
+  test_cases:
+    - input: "1"
+      expected_output: "1 init\n  (children indented)"
+    - input: "99999"
+      expected_output: "ERROR: PID not found: 99999"
+  constraints:
+    - "Must handle deep trees without stack overflow"
+    - "Cycle detection required"
+
+- id: "SYS-022"
+  title: "File Permissions Reporter"
+  description: "Report permissions (octal and symbolic), owner, group, and ACLs for given file paths."
+  difficulty: 2
+  stdlib_modules: [std.file, std.io, std.str]
+  input_format: "Lines of file paths"
+  output_format: "filepath: OCTAL SYMBOLIC owner:group (e.g. /tmp/f: 0644 -rw-r--r-- root:root)"
+  test_cases:
+    - input: "/tmp"
+      expected_output: "/tmp: 1777 drwxrwxrwt root:root"
+    - input: "/nonexistent"
+      expected_output: "/nonexistent: NOT FOUND"
+  constraints:
+    - "Report both octal and symbolic modes"
+    - "Handle symlinks: report permissions of target"
+
+- id: "SYS-023"
+  title: "Symlink Resolver"
+  description: "Resolve symlinks to their final target, printing each step in the chain."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.io]
+  input_format: "Lines of file paths"
+  output_format: "path -> intermediate -> ... -> final_target (NOTFOUND if broken)"
+  test_cases:
+    - input: "/etc/localtime"
+      expected_output: "/etc/localtime -> ... -> (real path)"
+    - input: "/tmp"
+      expected_output: "/tmp (not a symlink)"
+  constraints:
+    - "Detect and report circular symlinks"
+    - "Max resolution depth: 40 steps"
+
+- id: "SYS-024"
+  title: "Directory Sync"
+  description: "Synchronise two directories: copy new/changed files from source to dest, optionally delete files in dest not in source."
+  difficulty: 4
+  stdlib_modules: [std.file, std.path, std.time, std.io]
+  input_format: "Line 1: source path. Line 2: dest path. Line 3: delete (yes/no)"
+  output_format: "COPY filepath\\nSKIP filepath\\nDELETE filepath\\nDone: C copied, S skipped, D deleted"
+  test_cases:
+    - input: "/tmp/src\n/tmp/dst\nno"
+      expected_output: "(COPY/SKIP lines)\nDone: N copied, N skipped, 0 deleted"
+    - input: "/tmp/src\n/tmp/dst\nyes"
+      expected_output: "(COPY/SKIP/DELETE lines)\nDone: N copied, N skipped, N deleted"
+  constraints:
+    - "Compare by mtime and size"
+    - "Preserve directory structure"
+
+- id: "SYS-025"
+  title: "File Deduplicator"
+  description: "Find and report duplicate files in a directory tree (same content via hash). Optionally delete duplicates."
+  difficulty: 4
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: directory to scan. Line 2: action (report|delete)"
+  output_format: "Group of duplicates: DUPLICATE filepath (keeping first). Summary: N duplicate groups, N files removed."
+  test_cases:
+    - input: "/tmp/dedup_test\nreport"
+      expected_output: "DUPLICATE ... (or 'No duplicates found')"
+    - input: "/tmp/dedup_test\ndelete"
+      expected_output: "(duplicate groups then summary)"
+  constraints:
+    - "Use SHA-256 for content comparison"
+    - "Keep first (alphabetically) copy when deleting"
+
+- id: "SYS-026"
+  title: "Batch File Renamer"
+  description: "Rename files in a directory matching a pattern using a replacement rule (e.g. regex substitution or prefix/suffix add)."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.str, std.io]
+  input_format: "Line 1: directory. Line 2: pattern (regex). Line 3: replacement. Line 4: dry-run (yes/no)"
+  output_format: "RENAME old -> new (one per file). Summary: N files renamed."
+  test_cases:
+    - input: "/tmp/renames\n\\.txt$\n.log\nyes"
+      expected_output: "RENAME foo.txt -> foo.log\nSummary: N files renamed."
+    - input: "/tmp/renames\n\\.txt$\n.log\nno"
+      expected_output: "(same but actually renames files)"
+  constraints:
+    - "Dry-run must not modify filesystem"
+    - "Skip files where rename would cause collision"
+
+- id: "SYS-027"
+  title: "Bulk File Mover"
+  description: "Move files matching a glob pattern from one directory to another, with optional conflict resolution."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.str, std.io]
+  input_format: "Line 1: source directory. Line 2: destination directory. Line 3: glob pattern. Line 4: conflict (skip|overwrite|rename)"
+  output_format: "MOVED src -> dst (one per file). Summary: N files moved, N skipped, N errors."
+  test_cases:
+    - input: "/tmp/src\n/tmp/dst\n*.log\nskip"
+      expected_output: "MOVED ... (or no matches)\nSummary: N files moved, N skipped, 0 errors."
+    - input: "/tmp/src\n/tmp/dst\n*.log\noverwrite"
+      expected_output: "(overwrites existing files)"
+  constraints:
+    - "Rename conflict: append _1, _2, etc."
+    - "Create destination if missing"
+
+- id: "SYS-028"
+  title: "Trash System"
+  description: "Move files to a trash directory with metadata (original path, deletion time). Support list, restore, and empty operations."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.time, std.io, std.json]
+  input_format: "Lines of: TRASH filepath | LIST | RESTORE name | EMPTY"
+  output_format: "TRASH: Moved to trash: name. LIST: name original_path deleted_at. RESTORE: Restored to path. EMPTY: Emptied N items."
+  test_cases:
+    - input: "TRASH /tmp/deleteme.txt\nLIST\nRESTORE deleteme.txt"
+      expected_output: "Moved to trash: deleteme.txt\ndeleteme.txt ... (list)\nRestored to /tmp/deleteme.txt"
+    - input: "EMPTY"
+      expected_output: "Emptied N items."
+  constraints:
+    - "Metadata stored as JSON alongside trashed file"
+    - "Trash dir: ~/.local/share/Trash/files (or equivalent)"
+
+- id: "SYS-029"
+  title: "Signal Handler"
+  description: "Run a child process and intercept SIGINT/SIGTERM/SIGHUP. Log each signal received and forward to child or handle gracefully."
+  difficulty: 4
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "Line 1: command to run as child"
+  output_format: "Child started: PID\\n[Signal SIGXXX received at TIMESTAMP]\\nChild exited: code=N"
+  test_cases:
+    - input: "sleep 1"
+      expected_output: "Child started: N\nChild exited: code=0"
+    - input: "nonexistentcmd"
+      expected_output: "ERROR: command not found: nonexistentcmd"
+  constraints:
+    - "Must forward signals to child"
+    - "Clean up child process on SIGTERM to parent"
+
+- id: "SYS-030"
+  title: "File Change Detector"
+  description: "Compute a snapshot of file hashes in a directory, then compare to a previous snapshot to detect changes."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.io, std.json]
+  input_format: "Line 1: directory. Line 2: command (snapshot|diff). For diff: Line 3: previous snapshot file."
+  output_format: "snapshot: Snapshot saved to FILE (N files). diff: ADDED/MODIFIED/DELETED filepath per change."
+  test_cases:
+    - input: "/tmp/watched\nsnapshot"
+      expected_output: "Snapshot saved to ... (N files)"
+    - input: "/tmp/watched\ndiff\n/tmp/snap1.json"
+      expected_output: "(ADDED/MODIFIED/DELETED lines or 'No changes')"
+  constraints:
+    - "Snapshot stored as JSON"
+    - "Hash each file with SHA-256"
+
+- id: "SYS-031"
+  title: "Log Parser"
+  description: "Parse common log formats (Apache/Nginx combined, syslog) and extract fields into structured output."
+  difficulty: 3
+  stdlib_modules: [std.io, std.str, std.json]
+  input_format: "Line 1: format (apache|syslog). Remaining lines: log entries."
+  output_format: "JSON object per line with extracted fields"
+  test_cases:
+    - input: "apache\n127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] \"GET /index.html HTTP/1.0\" 200 2326"
+      expected_output: "{\"host\":\"127.0.0.1\",\"user\":\"frank\",\"method\":\"GET\",\"path\":\"/index.html\",\"status\":200,\"bytes\":2326}"
+    - input: "syslog\nJan  1 00:00:00 host kernel: message here"
+      expected_output: "{\"month\":\"Jan\",\"day\":1,\"time\":\"00:00:00\",\"host\":\"host\",\"program\":\"kernel\",\"message\":\"message here\"}"
+  constraints:
+    - "Skip malformed lines with a warning to stderr"
+    - "Output valid JSON per line"
+
+- id: "SYS-032"
+  title: "Log Filter"
+  description: "Filter log lines by log level (ERROR, WARN, INFO, DEBUG), time range, and keyword."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "Line 1: min_level (DEBUG|INFO|WARN|ERROR). Line 2: keyword (or empty). Remaining: log lines."
+  output_format: "Matching log lines verbatim"
+  test_cases:
+    - input: "ERROR\n\n2026-01-01 INFO msg\n2026-01-01 ERROR boom"
+      expected_output: "2026-01-01 ERROR boom"
+    - input: "INFO\nfoo\n2026-01-01 INFO foo bar\n2026-01-01 INFO baz"
+      expected_output: "2026-01-01 INFO foo bar"
+  constraints:
+    - "Level hierarchy: DEBUG < INFO < WARN < ERROR"
+    - "Keyword match is case-insensitive substring"
+
+- id: "SYS-033"
+  title: "JSON Config Validator"
+  description: "Validate a JSON config file against a set of required keys and value type constraints."
+  difficulty: 2
+  stdlib_modules: [std.file, std.json, std.io, std.str]
+  input_format: "Line 1: JSON file path. Subsequent lines: KEY TYPE (string|int|bool|array|object)"
+  output_format: "OK key | MISSING key | WRONG_TYPE key (expected TYPE got TYPE)"
+  test_cases:
+    - input: "/tmp/config.json\nhost string\nport int"
+      expected_output: "OK host\nOK port"
+    - input: "/tmp/config.json\nmissing_key string"
+      expected_output: "MISSING missing_key"
+  constraints:
+    - "Report all errors, not just first"
+    - "Nested keys with dot notation (e.g. server.port)"
+
+- id: "SYS-034"
+  title: "Environment Variable Expander"
+  description: "Expand environment variable references (${VAR} or $VAR) in a template file and write to output."
+  difficulty: 2
+  stdlib_modules: [std.env, std.file, std.str, std.io]
+  input_format: "Line 1: template file path (or - for stdin). Line 2: output file path (or - for stdout)"
+  output_format: "Template with all ${VAR}/$VAR replaced by their values (or empty string if unset)"
+  test_cases:
+    - input: "-\n-\nHello ${USER}"
+      expected_output: "Hello (current username)"
+    - input: "-\n-\nPath is $PATH"
+      expected_output: "Path is (current PATH value)"
+  constraints:
+    - "Unset variables expand to empty string"
+    - "Support both ${VAR} and $VAR syntax"
+
+- id: "SYS-035"
+  title: "Directory Tree Printer"
+  description: "Print a directory tree in the style of the Unix `tree` command, with file counts and sizes."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: directory path. Line 2: max_depth (integer, 0=unlimited)"
+  output_format: "tree-style indented output with file sizes, followed by: N directories, N files"
+  test_cases:
+    - input: "/tmp\n1"
+      expected_output: "/tmp\n├── (entries)\nN directories, N files"
+    - input: "/nonexistent\n0"
+      expected_output: "ERROR: directory not found: /nonexistent"
+  constraints:
+    - "Use box-drawing characters (├── └── │)"
+    - "Show file sizes in human-readable form"
+
+- id: "SYS-036"
+  title: "File Search (find replacement)"
+  description: "Search for files matching name pattern, min/max size, and modified within N days."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.time, std.io, std.str]
+  input_format: "Line 1: root directory. Lines of: name PATTERN | size_min BYTES | size_max BYTES | mtime_days N"
+  output_format: "Matching file paths, one per line. Summary: N files found."
+  test_cases:
+    - input: "/tmp\nname *.log\nmtime_days 1"
+      expected_output: "(matching .log files modified in last day)\nN files found."
+    - input: "/tmp\nsize_min 1024"
+      expected_output: "(files >= 1KB)\nN files found."
+  constraints:
+    - "All filters ANDed"
+    - "Recurse into subdirectories"
+
+- id: "SYS-037"
+  title: "File Content Searcher (grep replacement)"
+  description: "Search file contents for a regex pattern, print matching lines with filename and line number."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.str, std.io]
+  input_format: "Line 1: pattern (regex). Line 2: directory or file path. Line 3: recursive (yes/no)"
+  output_format: "filepath:linenum:matching line"
+  test_cases:
+    - input: "error\n/tmp/test.log\nno"
+      expected_output: "/tmp/test.log:N:... (matching lines)"
+    - input: "TODO\n/tmp/src\nyes"
+      expected_output: "(matching lines across all files)"
+  constraints:
+    - "Case-sensitive by default"
+    - "Binary files skipped with a warning"
+
+- id: "SYS-038"
+  title: "Inotify-style File Event Logger"
+  description: "Log file system events (create, delete, modify, move) in a directory for a given duration."
+  difficulty: 4
+  stdlib_modules: [std.file, std.time, std.io, std.path]
+  input_format: "Line 1: directory to watch. Line 2: duration_seconds"
+  output_format: "TIMESTAMP EVENT filepath (ISO 8601, one per event)"
+  test_cases:
+    - input: "/tmp 0"
+      expected_output: "(no events for 0 seconds)"
+    - input: "/nonexistent 0"
+      expected_output: "ERROR: directory not found: /nonexistent"
+  constraints:
+    - "Poll at 100ms intervals"
+    - "Report each event exactly once"
+
+- id: "SYS-039"
+  title: "Process CPU Profiler"
+  description: "Sample a running process's CPU usage at regular intervals and print a histogram of CPU% buckets."
+  difficulty: 4
+  stdlib_modules: [std.process, std.time, std.io, std.str]
+  input_format: "Line 1: PID. Line 2: interval_ms. Line 3: samples"
+  output_format: "CPU% histogram: 0-10%: N, 10-20%: N, ..., 90-100%: N"
+  test_cases:
+    - input: "1\n100\n5"
+      expected_output: "CPU% histogram: 0-10%: N, ..."
+    - input: "99999\n100\n5"
+      expected_output: "ERROR: PID not found: 99999"
+  constraints:
+    - "Bucket boundaries: 0,10,20,...,100"
+    - "Total samples must equal requested count"
+
+- id: "SYS-040"
+  title: "Memory Usage Reporter"
+  description: "Report memory usage for the system and for a given PID: RSS, VSZ, shared, private."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io]
+  input_format: "Optional line: PID to report (if empty, system-wide only)"
+  output_format: "System: total=N free=N used=N\\n[PID N: rss=N vsz=N shared=N private=N] (all in MB)"
+  test_cases:
+    - input: ""
+      expected_output: "System: total=N free=N used=N"
+    - input: "1"
+      expected_output: "System: ...\nPID 1: rss=N vsz=N shared=N private=N"
+  constraints:
+    - "Values in MB, rounded to 2dp"
+    - "Report NOT FOUND for invalid PID"
+
+- id: "SYS-041"
+  title: "Network Interface Lister"
+  description: "List all network interfaces with IP addresses, MAC address, MTU, and up/down status."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "No input (or optional interface name to filter)"
+  output_format: "iface: IP/prefix MAC mtu=N UP|DOWN"
+  test_cases:
+    - input: ""
+      expected_output: "(at least loopback: 127.0.0.1/8 ...)"
+    - input: "lo"
+      expected_output: "lo: 127.0.0.1/8 ..."
+  constraints:
+    - "Include both IPv4 and IPv6 where available"
+    - "Print DOWN for inactive interfaces"
+
+- id: "SYS-042"
+  title: "Port Scanner (local)"
+  description: "Scan a localhost port range and report which ports are open (TCP)."
+  difficulty: 3
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "Line 1: start_port. Line 2: end_port. Line 3: timeout_ms per port"
+  output_format: "OPEN port/tcp service (one per open port). Summary: N open ports."
+  test_cases:
+    - input: "22\n22\n100"
+      expected_output: "OPEN 22/tcp ssh (or closed)\nN open ports."
+    - input: "1\n1\n10"
+      expected_output: "N open ports."
+  constraints:
+    - "TCP connect only, no raw sockets"
+    - "Range max 1024 ports"
+
+- id: "SYS-043"
+  title: "Crontab File Parser"
+  description: "Parse a crontab file and display each entry's schedule in human-readable form."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str, std.time]
+  input_format: "Lines of crontab entries (5-field cron + command)"
+  output_format: "command: HUMAN_DESCRIPTION (e.g. 'every hour at :00')"
+  test_cases:
+    - input: "0 * * * * /bin/cleanup"
+      expected_output: "/bin/cleanup: every hour at :00"
+    - input: "*/5 * * * * /bin/check"
+      expected_output: "/bin/check: every 5 minutes"
+  constraints:
+    - "Handle @reboot, @daily, @weekly, @monthly, @yearly"
+    - "Skip comment lines (#)"
+
+- id: "SYS-044"
+  title: "File Age Reporter"
+  description: "Report the age (since last modification) of files in a directory, marking stale files beyond a threshold."
+  difficulty: 1
+  stdlib_modules: [std.file, std.path, std.time, std.io]
+  input_format: "Line 1: directory. Line 2: stale_threshold_hours"
+  output_format: "filepath: AGE [STALE] (age in human-readable form)"
+  test_cases:
+    - input: "/tmp\n24"
+      expected_output: "(files with ages, STALE if > 24h)"
+    - input: "/nonexistent\n1"
+      expected_output: "ERROR: directory not found: /nonexistent"
+  constraints:
+    - "Non-recursive (top level only)"
+    - "Age format: Xd Xh Xm"
+
+- id: "SYS-045"
+  title: "Archive Extractor"
+  description: "Extract .tar, .tar.gz, .tar.bz2, or .zip archives to a destination directory, listing extracted files."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: archive path. Line 2: destination directory"
+  output_format: "extracted: filepath (one per file). Done: N files extracted to DEST."
+  test_cases:
+    - input: "/tmp/test.tar.gz\n/tmp/extract"
+      expected_output: "extracted: ... \nDone: N files extracted to /tmp/extract."
+    - input: "/tmp/none.tar\n/tmp/x"
+      expected_output: "ERROR: archive not found: /tmp/none.tar"
+  constraints:
+    - "Detect format from file extension"
+    - "Create destination if missing"
+
+- id: "SYS-046"
+  title: "Disk Partition Reporter"
+  description: "Report all mounted disk partitions with device, mount point, filesystem type, total/used/free space."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "No input"
+  output_format: "device mountpoint fstype total_GB used_GB free_GB use%"
+  test_cases:
+    - input: ""
+      expected_output: "(at least one partition, e.g. / entry)"
+    - input: "ignored"
+      expected_output: "(same as above)"
+  constraints:
+    - "Sizes in GB, 2 decimal places"
+    - "Include pseudo-filesystems only if they have non-zero size"
+
+- id: "SYS-047"
+  title: "User Session Reporter"
+  description: "Report currently logged-in users, their TTY, login time, and source IP/host."
+  difficulty: 1
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "No input"
+  output_format: "username tty login_time from_host (one per session)"
+  test_cases:
+    - input: ""
+      expected_output: "(at least current user session)"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Use who/w command or equivalent"
+    - "Format login_time as YYYY-MM-DD HH:MM"
+
+- id: "SYS-048"
+  title: "SSH Config Manager"
+  description: "Parse ~/.ssh/config and list hosts, or add a new host entry."
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io, std.path]
+  input_format: "Line 1: command (list|add). For add: subsequent lines KEY=VALUE pairs for the host block."
+  output_format: "list: host_alias hostname user port (per entry). add: Added host HOST to config."
+  test_cases:
+    - input: "list"
+      expected_output: "(list of hosts or 'No hosts configured')"
+    - input: "add\nHost=myserver\nHostName=192.168.1.1\nUser=admin\nPort=22"
+      expected_output: "Added host myserver to config."
+  constraints:
+    - "Preserve existing config entries when adding"
+    - "Warn if host alias already exists"
+
+- id: "SYS-049"
+  title: "Stdin Line Counter"
+  description: "Count lines, words, bytes, and longest line in stdin input (like wc)."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Any text on stdin"
+  output_format: "lines: N  words: N  bytes: N  max_line: N"
+  test_cases:
+    - input: "hello world\nfoo"
+      expected_output: "lines: 2  words: 3  bytes: 16  max_line: 11"
+    - input: ""
+      expected_output: "lines: 0  words: 0  bytes: 0  max_line: 0"
+  constraints:
+    - "Words split by whitespace"
+    - "Bytes is raw byte count (UTF-8)"
+
+- id: "SYS-050"
+  title: "Text Column Formatter"
+  description: "Format stdin into fixed-width columns, with configurable separator and alignment."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: separator_in. Line 2: separator_out. Line 3: alignment (left|right|center). Remaining: data lines."
+  output_format: "Formatted table with equal-width columns"
+  test_cases:
+    - input: "|\t|\tleft\nfoo|bar|baz\na|bb|ccc"
+      expected_output: "foo  bar  baz\na    bb   ccc"
+    - input: ",\t,\tright\n1,22,333"
+      expected_output: "  1  22 333"
+  constraints:
+    - "Column widths determined by widest entry in each column"
+    - "Pad with spaces"
+
+- id: "SYS-051"
+  title: "Command Output Differ"
+  description: "Run two commands and diff their stdout outputs, showing added/removed/changed lines."
+  difficulty: 3
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "Line 1: command1. Line 2: command2"
+  output_format: "Unified diff format: -removed lines, +added lines, context"
+  test_cases:
+    - input: "echo hello\necho world"
+      expected_output: "-hello\n+world"
+    - input: "echo same\necho same"
+      expected_output: "(no differences)"
+  constraints:
+    - "3 lines of context around changes"
+    - "Exit code 1 if differences exist, 0 if identical"
+
+- id: "SYS-052"
+  title: "File Splitter"
+  description: "Split a large file into N equal-sized chunks or chunks of at most M bytes."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.io]
+  input_format: "Line 1: input file. Line 2: mode (count N | size BYTES)"
+  output_format: "Created: chunkfile (one per chunk). Done: N chunks created."
+  test_cases:
+    - input: "/tmp/big.bin\ncount 3"
+      expected_output: "Created: /tmp/big.bin.001\n...\nDone: 3 chunks created."
+    - input: "/tmp/big.bin\nsize 1024"
+      expected_output: "(chunks of up to 1024 bytes)\nDone: N chunks created."
+  constraints:
+    - "Chunk names zero-padded to 3 digits"
+    - "Last chunk may be smaller"
+
+- id: "SYS-053"
+  title: "File Merger"
+  description: "Concatenate multiple files in order into a single output file."
+  difficulty: 1
+  stdlib_modules: [std.file, std.path, std.io]
+  input_format: "Line 1: output file path. Subsequent lines: input file paths in order"
+  output_format: "Merged: N files into OUTPUT. Total: N bytes."
+  test_cases:
+    - input: "/tmp/merged.txt\n/tmp/a.txt\n/tmp/b.txt"
+      expected_output: "Merged: 2 files into /tmp/merged.txt. Total: N bytes."
+    - input: "/tmp/out.txt\n/nonexistent"
+      expected_output: "ERROR: not found: /nonexistent"
+  constraints:
+    - "No separator between file contents"
+    - "Create output file (overwrite if exists)"
+
+- id: "SYS-054"
+  title: "Clipboard Manager (stdout)"
+  description: "Read clipboard content, print it, or set clipboard from stdin."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io]
+  input_format: "Line 1: command (read|write). For write: remaining stdin is content."
+  output_format: "read: clipboard contents. write: OK"
+  test_cases:
+    - input: "write\nhello clipboard"
+      expected_output: "OK"
+    - input: "read"
+      expected_output: "hello clipboard"
+  constraints:
+    - "Use pbcopy/pbpaste (macOS) or xclip/xsel (Linux)"
+    - "Handle empty clipboard gracefully"
+
+- id: "SYS-055"
+  title: "Terminal Color Test"
+  description: "Print a grid of all 256 terminal colors with their indices, suitable for testing terminal color support."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Optional: mode (256|16|truecolor)"
+  output_format: "Color grid with ANSI escape codes showing each color's index"
+  test_cases:
+    - input: "16"
+      expected_output: "(16 colored blocks with indices 0-15)"
+    - input: "256"
+      expected_output: "(256 colored blocks with indices 0-255)"
+  constraints:
+    - "Default mode: 256"
+    - "Each cell shows index in contrasting foreground"
+
+- id: "SYS-056"
+  title: "Timer and Stopwatch"
+  description: "Countdown timer or stopwatch. Countdown prints remaining time and exits. Stopwatch reads ENTER presses as laps."
+  difficulty: 2
+  stdlib_modules: [std.time, std.io]
+  input_format: "Line 1: mode (countdown|stopwatch). For countdown: Line 2: seconds"
+  output_format: "countdown: prints Xs remaining each second then DONE. stopwatch: lap times on each ENTER."
+  test_cases:
+    - input: "countdown\n2"
+      expected_output: "2s remaining\n1s remaining\nDONE"
+    - input: "stopwatch"
+      expected_output: "(lap times on ENTER)"
+  constraints:
+    - "Countdown accurate to nearest second"
+    - "Stopwatch lap times in mm:ss.mmm"
+
+- id: "SYS-057"
+  title: "Date/Time Converter"
+  description: "Convert between timezones and date formats. Parse various input formats."
+  difficulty: 2
+  stdlib_modules: [std.time, std.str, std.io]
+  input_format: "Line 1: datetime string. Line 2: source timezone (or 'local'). Line 3: target timezone"
+  output_format: "Converted: DATETIME_IN_TARGET_TZ (ISO 8601)"
+  test_cases:
+    - input: "2026-01-01 12:00:00\nUTC\nAustralia/Sydney"
+      expected_output: "Converted: 2026-01-01T23:00:00+11:00"
+    - input: "2026-06-01 12:00:00\nUTC\nAmerica/New_York"
+      expected_output: "Converted: 2026-06-01T08:00:00-04:00"
+  constraints:
+    - "Support IANA timezone names"
+    - "Handle DST correctly"
+
+- id: "SYS-058"
+  title: "Hex/Binary Dumper"
+  description: "Display file contents as hex dump (like xxd) with offset, hex bytes, and ASCII representation."
+  difficulty: 2
+  stdlib_modules: [std.file, std.io, std.str]
+  input_format: "Line 1: file path (or - for stdin). Line 2: max_bytes (0=all)"
+  output_format: "00000000: 4865 6c6c 6f0a  Hello."
+  test_cases:
+    - input: "-\n6\nhello\n"
+      expected_output: "00000000: 6865 6c6c 6f0a  hello."
+    - input: "/tmp/empty\n0"
+      expected_output: "(empty)"
+  constraints:
+    - "16 bytes per row"
+    - "Non-printable bytes shown as dot in ASCII column"
+
+- id: "SYS-059"
+  title: "Base64 Encoder/Decoder"
+  description: "Encode or decode Base64 from stdin. Support URL-safe variant."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: mode (encode|decode|encode-url|decode-url). Remaining: data"
+  output_format: "Encoded or decoded result"
+  test_cases:
+    - input: "encode\nhello"
+      expected_output: "aGVsbG8="
+    - input: "decode\naGVsbG8="
+      expected_output: "hello"
+  constraints:
+    - "Handle padding correctly"
+    - "URL-safe: replace + with - and / with _"
+
+- id: "SYS-060"
+  title: "URL Encoder/Decoder"
+  description: "Percent-encode or decode URL components from stdin."
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Line 1: mode (encode|decode). Remaining: text"
+  output_format: "Encoded or decoded URL string"
+  test_cases:
+    - input: "encode\nhello world"
+      expected_output: "hello%20world"
+    - input: "decode\nhello%20world"
+      expected_output: "hello world"
+  constraints:
+    - "Encode all non-unreserved characters"
+    - "Handle malformed percent-sequences gracefully"
+
+- id: "SYS-061"
+  title: "UUID Generator"
+  description: "Generate UUIDs (v4 random). Print N UUIDs, one per line."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: N (number of UUIDs, default 1)"
+  output_format: "N UUIDs in standard 8-4-4-4-12 hex format"
+  test_cases:
+    - input: "1"
+      expected_output: "(one UUID like xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx)"
+    - input: "3"
+      expected_output: "(three UUIDs, one per line)"
+  constraints:
+    - "Must be v4 (random) format"
+    - "Lowercase hex digits"
+
+- id: "SYS-062"
+  title: "Hash Generator"
+  description: "Compute MD5, SHA-1, SHA-256, SHA-512 hashes of stdin input."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: algorithm (md5|sha1|sha256|sha512). Remaining: data (binary safe)"
+  output_format: "Hex-encoded hash"
+  test_cases:
+    - input: "sha256\nhello"
+      expected_output: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+    - input: "md5\nhello"
+      expected_output: "5d41402abc4b2a76b9719d911017c592"
+  constraints:
+    - "Read binary data correctly (no newline stripping)"
+    - "Output lowercase hex"
+
+- id: "SYS-063"
+  title: "Random Data Generator"
+  description: "Generate random bytes, random integers, random floats, or random strings of given length."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: type (bytes|int|float|string). Line 2: count/length. Line 3: range (min max for int/float)"
+  output_format: "Generated values, one per line"
+  test_cases:
+    - input: "int\n5\n1 100"
+      expected_output: "(5 integers between 1 and 100)"
+    - input: "string\n3\n8"
+      expected_output: "(3 random alphanumeric strings of length 8)"
+  constraints:
+    - "Use cryptographically secure randomness for bytes"
+    - "String charset: a-zA-Z0-9"
+
+- id: "SYS-064"
+  title: "JSON Pretty Printer"
+  description: "Parse JSON from stdin and output it formatted with 2-space indentation."
+  difficulty: 1
+  stdlib_modules: [std.json, std.io]
+  input_format: "JSON text on stdin"
+  output_format: "Pretty-printed JSON"
+  test_cases:
+    - input: "{\"a\":1,\"b\":2}"
+      expected_output: "{\n  \"a\": 1,\n  \"b\": 2\n}"
+    - input: "invalid json"
+      expected_output: "ERROR: invalid JSON: ..."
+  constraints:
+    - "Keys in alphabetical order"
+    - "Handle deeply nested structures"
+
+- id: "SYS-065"
+  title: "YAML to JSON Converter"
+  description: "Convert YAML from stdin to JSON on stdout."
+  difficulty: 2
+  stdlib_modules: [std.json, std.io, std.str]
+  input_format: "YAML text on stdin"
+  output_format: "Equivalent JSON (pretty-printed)"
+  test_cases:
+    - input: "name: alice\nage: 30"
+      expected_output: "{\n  \"age\": 30,\n  \"name\": \"alice\"\n}"
+    - input: "list:\n  - a\n  - b"
+      expected_output: "{\n  \"list\": [\"a\", \"b\"]\n}"
+  constraints:
+    - "Support YAML anchors and aliases"
+    - "Preserve numeric types (int vs float)"
+
+- id: "SYS-066"
+  title: "CSV to JSON Converter"
+  description: "Convert CSV from stdin to a JSON array of objects using the header row as keys."
+  difficulty: 2
+  stdlib_modules: [std.json, std.str, std.io]
+  input_format: "CSV text (first line is header)"
+  output_format: "JSON array of objects"
+  test_cases:
+    - input: "name,age\nalice,30\nbob,25"
+      expected_output: "[{\"age\":\"30\",\"name\":\"alice\"},{\"age\":\"25\",\"name\":\"bob\"}]"
+    - input: "col\nonly one"
+      expected_output: "[{\"col\":\"only one\"}]"
+  constraints:
+    - "Handle quoted CSV fields with commas"
+    - "Keys in same order as header"
+
+- id: "SYS-067"
+  title: "Line Deduplicator"
+  description: "Remove duplicate lines from stdin, preserving first occurrence. Optionally sort before dedup."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: sort (yes/no). Remaining: text lines."
+  output_format: "Deduplicated lines"
+  test_cases:
+    - input: "no\nfoo\nbar\nfoo\nbaz"
+      expected_output: "foo\nbar\nbaz"
+    - input: "yes\nfoo\nbar\nfoo"
+      expected_output: "bar\nfoo"
+  constraints:
+    - "Preserve order when sort=no"
+    - "Case-sensitive comparison"
+
+- id: "SYS-068"
+  title: "Line Sorter"
+  description: "Sort lines from stdin. Support numeric sort, reverse, case-insensitive, and sort by field N."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: options (comma-separated: numeric, reverse, ignore-case, field=N). Remaining: lines."
+  output_format: "Sorted lines"
+  test_cases:
+    - input: "numeric\n10\n2\n30"
+      expected_output: "2\n10\n30"
+    - input: "reverse\nbanana\napple\ncherry"
+      expected_output: "cherry\nbanana\napple"
+  constraints:
+    - "Stable sort"
+    - "field=N uses whitespace as delimiter"
+
+- id: "SYS-069"
+  title: "Text Statistics Reporter"
+  description: "Compute statistics on text: character frequency, top N words, average line length, sentence count."
+  difficulty: 2
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: top_n (integer). Remaining: text."
+  output_format: "Lines: N, Words: N, Chars: N, Avg line: N.N, Top words: word:count,..."
+  test_cases:
+    - input: "3\nhello world hello foo"
+      expected_output: "Lines: 1, Words: 4, Chars: 20, Avg line: 20.0, Top words: hello:2,world:1,foo:1"
+    - input: "2\n"
+      expected_output: "Lines: 0, Words: 0, Chars: 0, Avg line: 0.0, Top words: (none)"
+  constraints:
+    - "Case-insensitive word counting"
+    - "Punctuation stripped from words"
+
+- id: "SYS-070"
+  title: "Regex Extractor"
+  description: "Extract all non-overlapping matches of a regex from stdin, one match per line."
+  difficulty: 1
+  stdlib_modules: [std.str, std.io]
+  input_format: "Line 1: regex pattern. Remaining: text to search."
+  output_format: "Each match on its own line"
+  test_cases:
+    - input: "\\d+"
+      expected_output: "(all numbers found)"
+    - input: "[a-z]+@[a-z]+\\.[a-z]+"
+      expected_output: "(all email-like patterns)"
+  constraints:
+    - "Support capture groups (output group 1 if present)"
+    - "No duplicates unless pattern repeats"
+
+- id: "SYS-071"
+  title: "File Integrity Monitor"
+  description: "Build a manifest of file hashes and sizes, then check for modifications against it."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.json, std.io]
+  input_format: "Line 1: directory. Line 2: command (build|check). Line 3 (check): manifest path"
+  output_format: "build: Manifest saved: PATH (N files). check: OK N | MODIFIED filepath | MISSING filepath | NEW filepath"
+  test_cases:
+    - input: "/tmp/monitored\nbuild"
+      expected_output: "Manifest saved: ... (N files)"
+    - input: "/tmp/monitored\ncheck\n/tmp/manifest.json"
+      expected_output: "(OK N | MODIFIED/MISSING/NEW lines)"
+  constraints:
+    - "SHA-256 hashes"
+    - "Include file size and mtime in manifest"
+
+- id: "SYS-072"
+  title: "Stdin Multiplexer (tee)"
+  description: "Read stdin and write it to stdout and to one or more files simultaneously."
+  difficulty: 1
+  stdlib_modules: [std.file, std.io]
+  input_format: "Line 1: output file paths (comma-separated, or empty for stdout-only). Remaining: data."
+  output_format: "Data echoed to stdout (and written to files)"
+  test_cases:
+    - input: "/tmp/tee1.txt,/tmp/tee2.txt\nhello"
+      expected_output: "hello"
+    - input: "\nhello world"
+      expected_output: "hello world"
+  constraints:
+    - "Write to all outputs; failure in one does not stop others"
+    - "Append mode if file exists"
+
+- id: "SYS-073"
+  title: "Process Output Timestamper"
+  description: "Run a command and prepend each output line with a timestamp (ms since start)."
+  difficulty: 2
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "Line 1: command to run"
+  output_format: "[T+NNNms] output line"
+  test_cases:
+    - input: "echo hello"
+      expected_output: "[T+0ms] hello"
+    - input: "nonexistentcmd"
+      expected_output: "ERROR: command not found: nonexistentcmd"
+  constraints:
+    - "Timestamp relative to process start time"
+    - "Prefix both stdout and stderr lines"
+
+- id: "SYS-074"
+  title: "Job Queue (file-based)"
+  description: "Enqueue, dequeue, and list jobs stored in a JSON file. Jobs have id, command, status, and created_at."
+  difficulty: 3
+  stdlib_modules: [std.file, std.json, std.time, std.io]
+  input_format: "Line 1: queue file path. Line 2: command (enqueue CMD | dequeue | list | status ID)"
+  output_format: "enqueue: Job ID queued. dequeue: Running job ID: CMD. list: id status cmd (per job). status: ID status"
+  test_cases:
+    - input: "/tmp/queue.json\nenqueue echo hello\n"
+      expected_output: "Job 1 queued."
+    - input: "/tmp/queue.json\nlist"
+      expected_output: "(job list or 'Queue empty')"
+  constraints:
+    - "IDs are sequential integers"
+    - "Create queue file if missing"
+
+- id: "SYS-075"
+  title: "Config Differ"
+  description: "Compare two INI or JSON config files and report added, removed, and changed keys."
+  difficulty: 2
+  stdlib_modules: [std.file, std.json, std.str, std.io]
+  input_format: "Line 1: file1 path. Line 2: file2 path"
+  output_format: "+ key: value (added in file2). - key: value (removed). ~ key: old -> new (changed)"
+  test_cases:
+    - input: "/tmp/c1.json\n/tmp/c2.json"
+      expected_output: "(diff lines or 'No differences')"
+    - input: "/tmp/same.json\n/tmp/same.json"
+      expected_output: "No differences"
+  constraints:
+    - "Support nested keys with dot notation"
+    - "Auto-detect format (json vs ini) by extension"
+
+- id: "SYS-076"
+  title: "Batch Command Runner"
+  description: "Run a list of shell commands sequentially or in parallel, collecting exit codes and timing."
+  difficulty: 3
+  stdlib_modules: [std.process, std.time, std.io, std.str]
+  input_format: "Line 1: mode (sequential|parallel). Remaining: commands (one per line)"
+  output_format: "CMD: exit=N time=Xms (one per command). Summary: N ok, N failed."
+  test_cases:
+    - input: "sequential\necho a\necho b"
+      expected_output: "echo a: exit=0 time=Nms\necho b: exit=0 time=Nms\nSummary: 2 ok, 0 failed."
+    - input: "parallel\necho x\necho y"
+      expected_output: "(similar, order may vary)\nSummary: 2 ok, 0 failed."
+  constraints:
+    - "Parallel max concurrency: number of CPUs"
+    - "Collect both stdout and stderr per command"
+
+- id: "SYS-077"
+  title: "Script Runner with Timeout"
+  description: "Run a script with a timeout. Kill it if it exceeds the limit and report timeout."
+  difficulty: 3
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "Line 1: timeout_seconds. Line 2: command"
+  output_format: "Output from command, then: exit=N time=Xms [TIMEOUT if killed]"
+  test_cases:
+    - input: "5\necho done"
+      expected_output: "done\nexit=0 time=Nms"
+    - input: "1\nsleep 10"
+      expected_output: "exit=124 time=~1000ms TIMEOUT"
+  constraints:
+    - "Exit code 124 for timeout (like timeout(1))"
+    - "Clean up child process tree on timeout"
+
+- id: "SYS-078"
+  title: "Dependency Checker"
+  description: "Check whether required executables, environment variables, and files are present and report any missing."
+  difficulty: 1
+  stdlib_modules: [std.process, std.env, std.file, std.io, std.str]
+  input_format: "Lines of: cmd NAME | env NAME | file PATH"
+  output_format: "OK type name | MISSING type name"
+  test_cases:
+    - input: "cmd sh\ncmd nonexistentbin\nenv PATH"
+      expected_output: "OK cmd sh\nMISSING cmd nonexistentbin\nOK env PATH"
+    - input: "file /etc/hosts\nfile /nofile"
+      expected_output: "OK file /etc/hosts\nMISSING file /nofile"
+  constraints:
+    - "cmd check: search PATH"
+    - "Report all, not just first missing"
+
+- id: "SYS-079"
+  title: "Secrets Scanner"
+  description: "Scan files for potential secrets (API keys, passwords, tokens) using regex heuristics."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.str, std.io]
+  input_format: "Line 1: directory or file path"
+  output_format: "filepath:linenum: TYPE matched_pattern (e.g. /src/app.py:12: AWS_KEY AKIA...)"
+  test_cases:
+    - input: "/tmp/clean_dir"
+      expected_output: "(no secrets found)"
+    - input: "/tmp/secrets_test"
+      expected_output: "(filepath:line: TYPE pattern)"
+  constraints:
+    - "Detect: AWS keys, GitHub tokens, generic API_KEY=, password=, secret= patterns"
+    - "Skip binary files"
+
+- id: "SYS-080"
+  title: "Health Check Runner"
+  description: "Run a set of health checks (file exists, process running, port open, env set) and report overall status."
+  difficulty: 2
+  stdlib_modules: [std.file, std.process, std.env, std.io, std.str]
+  input_format: "Lines of: file PATH | proc NAME | port N | env NAME"
+  output_format: "PASS type name | FAIL type name. Final: HEALTHY | UNHEALTHY (N/N checks passed)"
+  test_cases:
+    - input: "file /etc/hosts\nproc init"
+      expected_output: "PASS file /etc/hosts\nPASS proc init\nHEALTHY (2/2 checks passed)"
+    - input: "file /nope\nenv NOVAR"
+      expected_output: "FAIL file /nope\nFAIL env NOVAR\nUNHEALTHY (0/2 checks passed)"
+  constraints:
+    - "Continue checks even after failures"
+    - "Exit code: 0=healthy, 1=unhealthy"
+
+- id: "SYS-081"
+  title: "Tail Follower"
+  description: "Print the last N lines of a file, then optionally follow it (printing new lines as they appear)."
+  difficulty: 2
+  stdlib_modules: [std.file, std.time, std.io]
+  input_format: "Line 1: file path. Line 2: N lines. Line 3: follow_duration_seconds (0=no follow)"
+  output_format: "Last N lines of file, then new lines as appended."
+  test_cases:
+    - input: "/tmp/test.log\n3\n0"
+      expected_output: "(last 3 lines of file)"
+    - input: "/nonexistent\n5\n0"
+      expected_output: "ERROR: file not found: /nonexistent"
+  constraints:
+    - "Handle files shorter than N lines"
+    - "Follow polls at 250ms intervals"
+
+- id: "SYS-082"
+  title: "Log Aggregator"
+  description: "Merge multiple log files sorted by timestamp, removing duplicates."
+  difficulty: 3
+  stdlib_modules: [std.file, std.time, std.str, std.io]
+  input_format: "Line 1: timestamp_pattern (regex). Remaining lines: log file paths."
+  output_format: "Merged log lines in chronological order"
+  test_cases:
+    - input: "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\n/tmp/log1.txt\n/tmp/log2.txt"
+      expected_output: "(merged chronological lines)"
+    - input: "\\d{4}-\\d{2}-\\d{2}\n/tmp/only.log"
+      expected_output: "(lines from single file)"
+  constraints:
+    - "Lines without matching timestamp treated as continuation of previous"
+    - "Stable sort on equal timestamps"
+
+- id: "SYS-083"
+  title: "INI File Editor"
+  description: "Read, write, and delete key-value pairs in an INI file while preserving formatting and comments."
+  difficulty: 2
+  stdlib_modules: [std.file, std.str, std.io]
+  input_format: "Line 1: file path. Lines of: GET section key | SET section key value | DEL section key | SECTIONS"
+  output_format: "GET: value | KEY_NOT_FOUND. SET/DEL: OK. SECTIONS: section list."
+  test_cases:
+    - input: "/tmp/test.ini\nSET app version 1.0\nGET app version"
+      expected_output: "OK\n1.0"
+    - input: "/tmp/test.ini\nSECTIONS"
+      expected_output: "(section names)"
+  constraints:
+    - "Preserve whitespace and comments around modified lines"
+    - "Create file if it does not exist"
+
+- id: "SYS-084"
+  title: "Network Ping Monitor"
+  description: "Ping a list of hosts and report round-trip time, packet loss, and availability."
+  difficulty: 2
+  stdlib_modules: [std.process, std.time, std.io, std.str]
+  input_format: "Line 1: count (pings per host). Remaining: hostnames/IPs."
+  output_format: "host: min=Xms avg=Xms max=Xms loss=N%"
+  test_cases:
+    - input: "3\n127.0.0.1"
+      expected_output: "127.0.0.1: min=Nms avg=Nms max=Nms loss=0%"
+    - input: "3\n192.0.2.255"
+      expected_output: "192.0.2.255: min=- avg=- max=- loss=100%"
+  constraints:
+    - "Use system ping command"
+    - "Timeout per ping: 1 second"
+
+- id: "SYS-085"
+  title: "File Watcher Trigger"
+  description: "Watch a file or directory for changes and run a specified command when a change is detected."
+  difficulty: 3
+  stdlib_modules: [std.file, std.time, std.process, std.io]
+  input_format: "Line 1: path to watch. Line 2: command to run. Line 3: max_triggers (0=unlimited, use N for testing)"
+  output_format: "Change detected: TIMESTAMP\\nRunning: command\\nOutput: ...(command output)..."
+  test_cases:
+    - input: "/tmp/watchme\necho triggered\n1"
+      expected_output: "(after a change) Change detected: ...\nRunning: echo triggered\nOutput: triggered"
+    - input: "/nonexistent\necho x\n1"
+      expected_output: "ERROR: path not found: /nonexistent"
+  constraints:
+    - "Poll at 500ms intervals"
+    - "Detect change by mtime"
+
+- id: "SYS-086"
+  title: "Audit Log Writer"
+  description: "Append structured audit log entries (JSON) with timestamp, user, action, and resource to a log file."
+  difficulty: 2
+  stdlib_modules: [std.file, std.json, std.time, std.env, std.io]
+  input_format: "Line 1: log file path. Lines of: action resource (e.g. DELETE /etc/passwd)"
+  output_format: "Logged: action resource at TIMESTAMP (one per entry)"
+  test_cases:
+    - input: "/tmp/audit.log\nREAD /etc/hosts\nWRITE /tmp/file"
+      expected_output: "Logged: READ /etc/hosts at ...\nLogged: WRITE /tmp/file at ..."
+    - input: "/tmp/audit.log\nDELETE /var/x"
+      expected_output: "Logged: DELETE /var/x at ..."
+  constraints:
+    - "Each entry: {timestamp, user, action, resource} as JSON line"
+    - "User taken from $USER env var"
+
+- id: "SYS-087"
+  title: "File Permission Fixer"
+  description: "Recursively fix file permissions: set files to 644 and directories to 755 (or custom values)."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.io]
+  input_format: "Line 1: directory. Line 2: file_mode (octal, default 644). Line 3: dir_mode (octal, default 755). Line 4: dry-run (yes/no)"
+  output_format: "chmod MODE path (one per changed file). Summary: N files changed."
+  test_cases:
+    - input: "/tmp/fixperms\n644\n755\nyes"
+      expected_output: "(chmod lines for files with wrong perms)\nSummary: N files changed."
+    - input: "/tmp/fixperms\n644\n755\nno"
+      expected_output: "(actually changes permissions)"
+  constraints:
+    - "Skip symlinks"
+    - "Only report files whose permissions actually differ"
+
+- id: "SYS-088"
+  title: "Background Task Runner"
+  description: "Run multiple background tasks, collect their outputs, and print a summary when all complete."
+  difficulty: 4
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "Lines of commands to run in background (one per line)"
+  output_format: "All tasks complete.\nCMD: exit=N time=Xms\\nOutput: ..."
+  test_cases:
+    - input: "echo hello\necho world"
+      expected_output: "All tasks complete.\necho hello: exit=0 time=Nms\nOutput: hello\necho world: exit=0 time=Nms\nOutput: world"
+    - input: "sleep 0.1\necho fast"
+      expected_output: "(both tasks complete, order of summary may vary)"
+  constraints:
+    - "Run all tasks concurrently"
+    - "Print summary only after all finish"
+
+- id: "SYS-089"
+  title: "Environment Snapshot"
+  description: "Capture all environment variables to a file, then restore them in a new process."
+  difficulty: 2
+  stdlib_modules: [std.env, std.file, std.json, std.io]
+  input_format: "Line 1: command (snapshot|restore). Line 2: snapshot file path. For restore: Line 3: command to run."
+  output_format: "snapshot: Saved N variables to PATH. restore: Running CMD with restored environment."
+  test_cases:
+    - input: "snapshot\n/tmp/env.json"
+      expected_output: "Saved N variables to /tmp/env.json"
+    - input: "restore\n/tmp/env.json\nprintenv MY_VAR"
+      expected_output: "(value of MY_VAR from snapshot)"
+  constraints:
+    - "Snapshot as JSON object"
+    - "Merge restored vars with current environment"
+
+- id: "SYS-090"
+  title: "Recursive File Counter"
+  description: "Count files in a directory tree, grouped by extension, with totals."
+  difficulty: 1
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: directory path"
+  output_format: "ext: N (sorted by count descending). Total: N files."
+  test_cases:
+    - input: "/tmp"
+      expected_output: "(extension counts)\nTotal: N files."
+    - input: "/nonexistent"
+      expected_output: "ERROR: directory not found: /nonexistent"
+  constraints:
+    - "No extension: show as (none)"
+    - "Case-insensitive extension grouping"
+
+- id: "SYS-091"
+  title: "Stdin Rate Limiter"
+  description: "Pass stdin to stdout but throttle output to N bytes per second."
+  difficulty: 3
+  stdlib_modules: [std.io, std.time]
+  input_format: "Line 1: rate_bytes_per_second. Remaining: data."
+  output_format: "Input data passed through at throttled rate"
+  test_cases:
+    - input: "10\nhello"
+      expected_output: "hello (output at ≤10 B/s)"
+    - input: "0\ntest"
+      expected_output: "ERROR: rate must be > 0"
+  constraints:
+    - "Buffer in chunks, sleep between chunks as needed"
+    - "Accuracy within 10%"
+
+- id: "SYS-092"
+  title: "Named Pipe Bridge"
+  description: "Create a named pipe, write provided data to it, and read back from it to stdout."
+  difficulty: 3
+  stdlib_modules: [std.process, std.file, std.io]
+  input_format: "Line 1: named pipe path. Line 2: command (create|write|read|bridge DATA)"
+  output_format: "create: Pipe created: PATH. write: Written N bytes. read: (pipe contents). bridge: DATA echoed back."
+  test_cases:
+    - input: "/tmp/mypipe\ncreate"
+      expected_output: "Pipe created: /tmp/mypipe"
+    - input: "/tmp/mypipe\nbridge hello"
+      expected_output: "hello"
+  constraints:
+    - "Clean up pipe on exit"
+    - "Handle pipe-full and pipe-empty conditions"
+
+- id: "SYS-093"
+  title: "System Load Averager"
+  description: "Read system load averages (1, 5, 15 minutes) and CPU count. Report as raw values and per-CPU."
+  difficulty: 1
+  stdlib_modules: [std.process, std.io]
+  input_format: "No input"
+  output_format: "Load avg: 1m=X.XX 5m=X.XX 15m=X.XX\\nPer-CPU: 1m=X.XX 5m=X.XX 15m=X.XX\\nCPUs: N"
+  test_cases:
+    - input: ""
+      expected_output: "Load avg: 1m=... 5m=... 15m=...\nPer-CPU: ...\nCPUs: N"
+    - input: "ignored"
+      expected_output: "(same as above)"
+  constraints:
+    - "Read from /proc/loadavg or equivalent"
+    - "Values to 2 decimal places"
+
+- id: "SYS-094"
+  title: "Swap Usage Reporter"
+  description: "Report swap space total, used, free, and the top N processes using swap."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "Line 1: top_n (integer)"
+  output_format: "Swap total=N free=N used=N MB\\nTop N processes:\nPID NAME SWAP_MB"
+  test_cases:
+    - input: "3"
+      expected_output: "Swap total=... free=... used=... MB\nTop 3 processes:\n..."
+    - input: "0"
+      expected_output: "Swap total=... free=... used=... MB\n(no process list)"
+  constraints:
+    - "Values in MB"
+    - "Sort by swap usage descending"
+
+- id: "SYS-095"
+  title: "Core Dump Finder"
+  description: "Search common locations for core dump files, report path, size, and associated binary."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.process, std.io, std.str]
+  input_format: "Optional: directory to search (default: current dir, /tmp, /var/crash)"
+  output_format: "path size_MB binary_guess (one per core dump)"
+  test_cases:
+    - input: "/tmp"
+      expected_output: "(core dumps found or 'No core dumps found')"
+    - input: ""
+      expected_output: "(searches default locations)"
+  constraints:
+    - "Match files named core, core.N, or *.core"
+    - "Use file command to identify binary if possible"
+
+- id: "SYS-096"
+  title: "Zombie Process Finder"
+  description: "List all zombie (defunct) processes, showing PID, parent PID, and command name."
+  difficulty: 2
+  stdlib_modules: [std.process, std.io, std.str]
+  input_format: "No input"
+  output_format: "PID PPID NAME (one per zombie). Summary: N zombie processes."
+  test_cases:
+    - input: ""
+      expected_output: "(zombie list or 'No zombie processes found')\nSummary: N zombie processes."
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Read process state from /proc or ps output"
+    - "State Z indicates zombie"
+
+- id: "SYS-097"
+  title: "Open File Descriptor Lister"
+  description: "List open file descriptors for a given PID, showing fd number, type, and path/socket info."
+  difficulty: 3
+  stdlib_modules: [std.process, std.io, std.str, std.path]
+  input_format: "Line 1: PID (integer)"
+  output_format: "fd type path_or_description (one per fd)"
+  test_cases:
+    - input: "1"
+      expected_output: "0 stdin ...\n1 stdout ...\n2 stderr ..."
+    - input: "99999"
+      expected_output: "ERROR: PID not found: 99999"
+  constraints:
+    - "Use /proc/PID/fd (Linux) or lsof (macOS)"
+    - "Handle permission denied gracefully"
+
+- id: "SYS-098"
+  title: "Namespace Lister (Linux)"
+  description: "List all Linux namespaces (pid, net, mnt, uts, ipc, user) for a given PID."
+  difficulty: 4
+  stdlib_modules: [std.process, std.path, std.io, std.str]
+  input_format: "Line 1: PID"
+  output_format: "namespace_type: inode_id (one per namespace)"
+  test_cases:
+    - input: "1"
+      expected_output: "pid: ...\nnet: ...\nmnt: ...\nuts: ...\nipc: ...\nuser: ..."
+    - input: "99999"
+      expected_output: "ERROR: PID not found: 99999"
+  constraints:
+    - "Read from /proc/PID/ns/"
+    - "Extract inode from symlink target"
+
+- id: "SYS-099"
+  title: "System Call Tracer (stub)"
+  description: "Wrap strace/dtruss to run a command and report the N most frequent syscalls with counts."
+  difficulty: 5
+  stdlib_modules: [std.process, std.str, std.io]
+  input_format: "Line 1: top_n. Line 2: command to trace"
+  output_format: "syscall count (top N, sorted descending)"
+  test_cases:
+    - input: "5\necho hello"
+      expected_output: "(top 5 syscalls by count)"
+    - input: "3\nls /tmp"
+      expected_output: "(top 3 syscalls)"
+  constraints:
+    - "Use strace (Linux) or dtruss (macOS)"
+    - "Requires appropriate permissions; warn if unavailable"
+
+- id: "SYS-100"
+  title: "CPU Frequency Reporter"
+  description: "Report current, min, and max CPU frequency for each core, and the current governor."
+  difficulty: 2
+  stdlib_modules: [std.file, std.process, std.io, std.str]
+  input_format: "No input"
+  output_format: "Core N: cur=XMHz min=XMHz max=XMHz governor=GOV"
+  test_cases:
+    - input: ""
+      expected_output: "Core 0: cur=...MHz min=...MHz max=...MHz governor=..."
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Read from /sys/devices/system/cpu/ on Linux"
+    - "Use sysctl hw.cpufrequency on macOS"
+
+- id: "SYS-101"
+  title: "Battery Status Reporter"
+  description: "Report laptop battery status: level, charging state, time remaining, and cycle count."
+  difficulty: 2
+  stdlib_modules: [std.process, std.file, std.io, std.str]
+  input_format: "No input"
+  output_format: "Battery: N% CHARGING|DISCHARGING|FULL time_remaining=Xmin cycles=N"
+  test_cases:
+    - input: ""
+      expected_output: "Battery: N% ... (or 'No battery found')"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Use /sys/class/power_supply/ on Linux or pmset on macOS"
+    - "Print 'No battery found' on desktops"
+
+- id: "SYS-102"
+  title: "File Encryption (AES)"
+  description: "Encrypt or decrypt a file using AES-256-CBC with a passphrase (via OpenSSL or equivalent)."
+  difficulty: 4
+  stdlib_modules: [std.process, std.file, std.io]
+  input_format: "Line 1: mode (encrypt|decrypt). Line 2: input file. Line 3: output file. Line 4: passphrase"
+  output_format: "Encrypted: OUTPUT | Decrypted: OUTPUT"
+  test_cases:
+    - input: "encrypt\n/tmp/plain.txt\n/tmp/enc.bin\nmypass"
+      expected_output: "Encrypted: /tmp/enc.bin"
+    - input: "decrypt\n/tmp/enc.bin\n/tmp/dec.txt\nmypass"
+      expected_output: "Decrypted: /tmp/dec.txt"
+  constraints:
+    - "Use openssl enc -aes-256-cbc or equivalent"
+    - "Use PBKDF2 for key derivation"
+
+- id: "SYS-103"
+  title: "Secure Password Generator"
+  description: "Generate cryptographically secure passwords of configurable length and character set."
+  difficulty: 1
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: length. Line 2: charset (all|alpha|numeric|alnum|symbols). Line 3: count"
+  output_format: "N passwords, one per line"
+  test_cases:
+    - input: "16\nall\n3"
+      expected_output: "(3 passwords of length 16 with mixed chars)"
+    - input: "8\nnumeric\n2"
+      expected_output: "(2 passwords of 8 digits)"
+  constraints:
+    - "Cryptographically secure random source"
+    - "all = a-zA-Z0-9 + symbols"
+
+- id: "SYS-104"
+  title: "Git Repository Stats"
+  description: "Report stats for a git repository: commit count, contributors, most changed files, branch count."
+  difficulty: 3
+  stdlib_modules: [std.process, std.str, std.io, std.path]
+  input_format: "Line 1: repository path"
+  output_format: "Commits: N\\nContributors: N\\nBranches: N\\nTop files: filepath (change_count)"
+  test_cases:
+    - input: "/tmp/testrepo"
+      expected_output: "Commits: N\nContributors: N\nBranches: N\nTop files: ..."
+    - input: "/nonexistent"
+      expected_output: "ERROR: not a git repository: /nonexistent"
+  constraints:
+    - "Use git CLI commands"
+    - "Top 5 most changed files"
+
+- id: "SYS-105"
+  title: "Docker Container Lister"
+  description: "List running Docker containers with name, image, status, ports, and resource usage."
+  difficulty: 2
+  stdlib_modules: [std.process, std.str, std.json, std.io]
+  input_format: "Line 1: filter (all|running|stopped)"
+  output_format: "NAME IMAGE STATUS PORTS CPU% MEM_MB (one per container)"
+  test_cases:
+    - input: "running"
+      expected_output: "(running containers or 'No containers found')"
+    - input: "all"
+      expected_output: "(all containers or 'No containers found')"
+  constraints:
+    - "Use docker CLI; warn if Docker not available"
+    - "Parse docker ps --format json output"
+
+- id: "SYS-106"
+  title: "Syslog Tail"
+  description: "Tail the system log (syslog/journald), optionally filtering by service name or log level."
+  difficulty: 2
+  stdlib_modules: [std.process, std.str, std.io]
+  input_format: "Line 1: lines_back (integer). Line 2: service (or empty). Line 3: min_level (or empty)"
+  output_format: "Log lines verbatim (filtered)"
+  test_cases:
+    - input: "10\n\n"
+      expected_output: "(last 10 syslog lines)"
+    - input: "5\nkernel\n"
+      expected_output: "(last 5 kernel lines)"
+  constraints:
+    - "Use journalctl (Linux) or log show (macOS)"
+    - "Graceful handling if no entries match"
+
+- id: "SYS-107"
+  title: "Boot Time Reporter"
+  description: "Report the last boot time and current uptime in multiple formats."
+  difficulty: 1
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "No input"
+  output_format: "Boot time: YYYY-MM-DD HH:MM:SS\\nUptime: Xd Xh Xm Xs\\nUptime seconds: N"
+  test_cases:
+    - input: ""
+      expected_output: "Boot time: (datetime)\nUptime: (duration)\nUptime seconds: N"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Boot time in local timezone"
+    - "Use who -b or uptime command"
+
+- id: "SYS-108"
+  title: "TCP Connection Tracker"
+  description: "List all current TCP connections with local address, remote address, state, and owning PID."
+  difficulty: 3
+  stdlib_modules: [std.process, std.str, std.io]
+  input_format: "Optional: state filter (ESTABLISHED|LISTEN|TIME_WAIT|...)"
+  output_format: "local_addr remote_addr state PID/program (one per connection)"
+  test_cases:
+    - input: "LISTEN"
+      expected_output: "(listening TCP sockets)"
+    - input: ""
+      expected_output: "(all TCP connections)"
+  constraints:
+    - "Use ss or netstat command"
+    - "Resolve PID to program name where possible"
+
+- id: "SYS-109"
+  title: "IP Route Table Reporter"
+  description: "Print the system routing table in a human-readable format."
+  difficulty: 1
+  stdlib_modules: [std.process, std.str, std.io]
+  input_format: "No input"
+  output_format: "destination gateway interface metric"
+  test_cases:
+    - input: ""
+      expected_output: "(routing table entries)"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Use ip route (Linux) or netstat -rn (macOS)"
+    - "Include default route first"
+
+- id: "SYS-110"
+  title: "DNS Resolver"
+  description: "Resolve hostnames to IP addresses (A and AAAA records) and do reverse lookups."
+  difficulty: 2
+  stdlib_modules: [std.process, std.str, std.io]
+  input_format: "Lines of: forward HOSTNAME | reverse IP"
+  output_format: "HOSTNAME: A=x.x.x.x AAAA=... | IP: hostname.example.com"
+  test_cases:
+    - input: "forward localhost"
+      expected_output: "localhost: A=127.0.0.1 ..."
+    - input: "reverse 127.0.0.1"
+      expected_output: "127.0.0.1: localhost"
+  constraints:
+    - "Use dig or host command"
+    - "NXDOMAIN reported as NOT_FOUND"
+
+- id: "SYS-111"
+  title: "File Ownership Changer"
+  description: "Change owner and group of files/directories, optionally recursively, with dry-run support."
+  difficulty: 2
+  stdlib_modules: [std.process, std.file, std.io]
+  input_format: "Line 1: owner:group. Line 2: recursive (yes/no). Line 3: dry-run (yes/no). Remaining: paths."
+  output_format: "chown OWNER:GROUP PATH (one per changed item). Summary: N items changed."
+  test_cases:
+    - input: "nobody:nobody\nno\nyes\n/tmp/testfile"
+      expected_output: "chown nobody:nobody /tmp/testfile\nSummary: 1 items changed."
+    - input: "root:root\nno\nno\n/tmp/testfile"
+      expected_output: "(actual chown or error if permission denied)"
+  constraints:
+    - "Dry-run must not modify filesystem"
+    - "Report permission denied errors without stopping"
+
+- id: "SYS-112"
+  title: "Interactive Menu Runner"
+  description: "Display a numbered menu from stdin config, accept a selection, and run the corresponding command."
+  difficulty: 2
+  stdlib_modules: [std.io, std.process, std.str]
+  input_format: "Lines of: LABEL: COMMAND (menu items). Last line: CHOICE (selected number)"
+  output_format: "Menu display then output of selected command"
+  test_cases:
+    - input: "Greet: echo hello\nList: ls /tmp\n1"
+      expected_output: "1) Greet\n2) List\nhello"
+    - input: "Greet: echo hi\n99"
+      expected_output: "1) Greet\nERROR: invalid selection: 99"
+  constraints:
+    - "1-indexed menu"
+    - "Run selected command in current environment"
+
+- id: "SYS-113"
+  title: "Recursive Directory Hash"
+  description: "Compute a single hash representing the entire contents of a directory tree."
+  difficulty: 3
+  stdlib_modules: [std.file, std.path, std.io, std.str]
+  input_format: "Line 1: directory path"
+  output_format: "Directory hash: HASH64 (hex SHA-256 of sorted file hashes)"
+  test_cases:
+    - input: "/tmp/hashme"
+      expected_output: "Directory hash: (hex)"
+    - input: "/nonexistent"
+      expected_output: "ERROR: directory not found: /nonexistent"
+  constraints:
+    - "Sort files by path before hashing"
+    - "Include filenames in hash input"
+
+- id: "SYS-114"
+  title: "Log Rate Analyser"
+  description: "Analyse a log file and compute events per second/minute/hour across the file's time span."
+  difficulty: 3
+  stdlib_modules: [std.file, std.str, std.time, std.io]
+  input_format: "Line 1: log file path. Line 2: timestamp regex. Line 3: bucket (second|minute|hour)"
+  output_format: "BUCKET_START count (one per bucket, sorted by time)"
+  test_cases:
+    - input: "/tmp/timed.log\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nminute"
+      expected_output: "(per-minute counts)"
+    - input: "/tmp/timed.log\n\\d{4}-\\d{2}-\\d{2}\nhour"
+      expected_output: "(per-hour counts)"
+  constraints:
+    - "Skip lines without matching timestamp"
+    - "Include buckets with zero events"
+
+- id: "SYS-115"
+  title: "Stdin to File with Atomic Write"
+  description: "Read stdin and write it to a file atomically (write to temp then rename)."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.io]
+  input_format: "Line 1: destination file path. Remaining: content to write."
+  output_format: "Written N bytes to PATH (atomically)"
+  test_cases:
+    - input: "/tmp/atomic.txt\nhello world"
+      expected_output: "Written 11 bytes to /tmp/atomic.txt (atomically)"
+    - input: "/no/permission/file\ndata"
+      expected_output: "ERROR: cannot write to /no/permission/file"
+  constraints:
+    - "Write to temp file in same directory, then rename"
+    - "Preserve destination file on write failure"
+
+- id: "SYS-116"
+  title: "Systemd Unit Status"
+  description: "Report the status of one or more systemd units: active state, sub-state, and main PID."
+  difficulty: 2
+  stdlib_modules: [std.process, std.str, std.io]
+  input_format: "Lines of systemd unit names"
+  output_format: "unit: ACTIVE_STATE sub=SUBSTATE pid=N (or pid=- if not running)"
+  test_cases:
+    - input: "ssh.service"
+      expected_output: "ssh.service: active sub=running pid=N (or inactive ...)"
+    - input: "nonexistent.service"
+      expected_output: "nonexistent.service: not-found sub=dead pid=-"
+  constraints:
+    - "Use systemctl show command"
+    - "Graceful on non-systemd systems (report N/A)"
+
+- id: "SYS-117"
+  title: "Executable PATH Scanner"
+  description: "List all executables in PATH directories, optionally filtering by name prefix."
+  difficulty: 2
+  stdlib_modules: [std.env, std.file, std.path, std.io, std.str]
+  input_format: "Optional: name prefix filter"
+  output_format: "path_to_executable (one per line, sorted)"
+  test_cases:
+    - input: "git"
+      expected_output: "(all git* executables in PATH)"
+    - input: ""
+      expected_output: "(all executables in PATH)"
+  constraints:
+    - "Deduplicate by filename (keep first in PATH order)"
+    - "Only include files with execute permission"
+
+- id: "SYS-118"
+  title: "Stdin JSON Streamer"
+  description: "Read newline-delimited JSON from stdin, apply a jq-style filter, and output matching results."
+  difficulty: 3
+  stdlib_modules: [std.json, std.io, std.str]
+  input_format: "Line 1: field path (e.g. .name or .user.email). Remaining: newline-delimited JSON objects."
+  output_format: "Extracted field value per line"
+  test_cases:
+    - input: ".name\n{\"name\":\"alice\",\"age\":30}\n{\"name\":\"bob\",\"age\":25}"
+      expected_output: "alice\nbob"
+    - input: ".user.email\n{\"user\":{\"email\":\"x@y.com\"}}"
+      expected_output: "x@y.com"
+  constraints:
+    - "Skip lines where field is absent (with warning)"
+    - "Support simple dot-notation paths only"
+
+- id: "SYS-119"
+  title: "Kernel Module Lister"
+  description: "List loaded kernel modules with name, size, and use count."
+  difficulty: 1
+  stdlib_modules: [std.process, std.file, std.str, std.io]
+  input_format: "Optional: name filter"
+  output_format: "name size_KB use_count (one per module)"
+  test_cases:
+    - input: ""
+      expected_output: "(list of loaded modules)"
+    - input: "ext"
+      expected_output: "(modules matching 'ext')"
+  constraints:
+    - "Read from /proc/modules on Linux"
+    - "Graceful on macOS (use kextstat)"
+
+- id: "SYS-120"
+  title: "File Decompressor"
+  description: "Detect compression format (gzip, bzip2, xz, zstd) and decompress a file."
+  difficulty: 2
+  stdlib_modules: [std.process, std.file, std.path, std.io]
+  input_format: "Line 1: compressed file path. Line 2: output file path (or - for stdout)"
+  output_format: "Decompressed: N bytes to OUTPUT"
+  test_cases:
+    - input: "/tmp/test.gz\n/tmp/out.txt"
+      expected_output: "Decompressed: N bytes to /tmp/out.txt"
+    - input: "/tmp/test.bz2\n-"
+      expected_output: "(decompressed content to stdout)"
+  constraints:
+    - "Auto-detect format by magic bytes, not extension"
+    - "Report error if format not recognised"
+
+- id: "SYS-121"
+  title: "Watch Command (repeated exec)"
+  description: "Run a command repeatedly every N seconds and display output, clearing screen between runs."
+  difficulty: 2
+  stdlib_modules: [std.process, std.time, std.io]
+  input_format: "Line 1: interval_seconds. Line 2: iterations (0=unlimited, use small N for tests). Line 3: command"
+  output_format: "--- Run N at TIMESTAMP ---\\n(command output)\\n"
+  test_cases:
+    - input: "1\n2\ndate"
+      expected_output: "--- Run 1 at ... ---\n(date output)\n--- Run 2 at ... ---\n(date output)"
+    - input: "0\n1\necho hi"
+      expected_output: "ERROR: interval must be > 0"
+  constraints:
+    - "Do not clear actual terminal; use separator instead"
+    - "Show last run's output until next run completes"
+
+- id: "SYS-122"
+  title: "Disk I/O Statistics"
+  description: "Report per-disk I/O stats: reads/s, writes/s, read_MB/s, write_MB/s, utilisation%."
+  difficulty: 3
+  stdlib_modules: [std.process, std.file, std.str, std.io, std.time]
+  input_format: "Line 1: sample_interval_seconds. Line 2: samples"
+  output_format: "disk reads/s writes/s read_MB/s write_MB/s util%"
+  test_cases:
+    - input: "1\n2"
+      expected_output: "(disk stats for each disk, N samples averaged)"
+    - input: "0\n1"
+      expected_output: "ERROR: interval must be > 0"
+  constraints:
+    - "Read from /proc/diskstats on Linux"
+    - "Use iostat if available"
+
+- id: "SYS-123"
+  title: "Network Bandwidth Monitor"
+  description: "Report per-interface bytes sent/received per second over a sampling period."
+  difficulty: 3
+  stdlib_modules: [std.process, std.file, std.str, std.io, std.time]
+  input_format: "Line 1: interval_seconds. Line 2: samples"
+  output_format: "iface: rx=X.XX MB/s tx=X.XX MB/s"
+  test_cases:
+    - input: "1\n2"
+      expected_output: "(per-interface bandwidth per sample)"
+    - input: "0\n1"
+      expected_output: "ERROR: interval must be > 0"
+  constraints:
+    - "Read from /proc/net/dev on Linux or netstat -ib on macOS"
+    - "Values to 2 decimal places"
+
+- id: "SYS-124"
+  title: "Init System Detector"
+  description: "Detect the init system in use (systemd, sysvinit, openrc, launchd, etc.) and report version."
+  difficulty: 1
+  stdlib_modules: [std.process, std.file, std.io, std.str]
+  input_format: "No input"
+  output_format: "Init system: NAME version VERSION"
+  test_cases:
+    - input: ""
+      expected_output: "Init system: systemd version ... (or launchd, etc.)"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Check PID 1 name"
+    - "Fall back to 'unknown' if undetected"
+
+- id: "SYS-125"
+  title: "File Type Identifier"
+  description: "Identify file types using magic bytes (not extension) for a list of files."
+  difficulty: 2
+  stdlib_modules: [std.file, std.io, std.str]
+  input_format: "Lines of file paths"
+  output_format: "filepath: TYPE_DESCRIPTION"
+  test_cases:
+    - input: "/tmp/test.txt"
+      expected_output: "/tmp/test.txt: ASCII text"
+    - input: "/tmp/image.png"
+      expected_output: "/tmp/image.png: PNG image"
+  constraints:
+    - "Use file command or magic byte detection"
+    - "Handle unreadable files with ERROR"
+
+- id: "SYS-126"
+  title: "Terminal Size Reporter"
+  description: "Report current terminal dimensions (rows, columns) and resize events."
+  difficulty: 1
+  stdlib_modules: [std.process, std.io]
+  input_format: "Line 1: watch_duration_seconds (0=just report once)"
+  output_format: "Rows: N Cols: N [then resize events if watching]"
+  test_cases:
+    - input: "0"
+      expected_output: "Rows: N Cols: N"
+    - input: "1"
+      expected_output: "Rows: N Cols: N (then any resize events)"
+  constraints:
+    - "Use tput or ioctl TIOCGWINSZ"
+    - "Default if not in terminal: Rows: 24 Cols: 80"
+
+- id: "SYS-127"
+  title: "Temporary Directory Manager"
+  description: "Create and track named temporary directories with automatic cleanup on exit or after a timeout."
+  difficulty: 2
+  stdlib_modules: [std.file, std.path, std.time, std.io]
+  input_format: "Lines of: CREATE name ttl_seconds | LIST | CLEANUP"
+  output_format: "CREATE: /tmp/managed/name. LIST: name path created_at ttl. CLEANUP: Removed N directories."
+  test_cases:
+    - input: "CREATE mywork 60\nLIST\nCLEANUP"
+      expected_output: "/tmp/managed/mywork\nmywork ...(list)\nRemoved 0 directories."
+    - input: "CREATE old 0\nCLEANUP"
+      expected_output: "/tmp/managed/old\nRemoved 1 directories."
+  constraints:
+    - "TTL=0 means already expired"
+    - "Persist state between invocations via JSON file"
+
+- id: "SYS-128"
+  title: "Stdin Hex Patcher"
+  description: "Apply hex patches (offset:hex_bytes) to a binary file, writing patched output."
+  difficulty: 3
+  stdlib_modules: [std.file, std.io, std.str]
+  input_format: "Line 1: input file (or - for stdin). Line 2: output file (or - for stdout). Remaining: OFFSET:HEXBYTES"
+  output_format: "Patched N bytes at M offsets. Output written to PATH."
+  test_cases:
+    - input: "/tmp/test.bin\n/tmp/patched.bin\n0:4865\n2:6c6c6f"
+      expected_output: "Patched 5 bytes at 2 offsets. Output written to /tmp/patched.bin."
+    - input: "/tmp/test.bin\n/tmp/p.bin\n9999:ff"
+      expected_output: "ERROR: offset 9999 out of range (file is N bytes)"
+  constraints:
+    - "Hex bytes as continuous string (no spaces)"
+    - "Reject patches beyond file end"
+
+- id: "SYS-129"
+  title: "Mount Point Analyser"
+  description: "List all mount points, their filesystem type, options, and read/write status."
+  difficulty: 2
+  stdlib_modules: [std.process, std.file, std.str, std.io]
+  input_format: "No input"
+  output_format: "device on mountpoint type FSTYPE (OPTIONS)"
+  test_cases:
+    - input: ""
+      expected_output: "(at least rootfs entry)"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Read from /proc/mounts on Linux or mount on macOS"
+    - "Include rw/ro status in options"
+
+- id: "SYS-130"
+  title: "System Entropy Reporter"
+  description: "Report the current entropy pool size and entropy available from /dev/random. Warn if low."
+  difficulty: 1
+  stdlib_modules: [std.file, std.process, std.io]
+  input_format: "No input"
+  output_format: "Entropy available: N bits\\nEntropy pool: N bits\\n[WARNING: low entropy if < 256 bits]"
+  test_cases:
+    - input: ""
+      expected_output: "Entropy available: N bits\nEntropy pool: N bits"
+    - input: "ignored"
+      expected_output: "(same)"
+  constraints:
+    - "Read from /proc/sys/kernel/random/entropy_avail on Linux"
+    - "Use sysctl kern.random on macOS"
