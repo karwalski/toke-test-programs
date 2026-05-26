@@ -57,34 +57,59 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- Toke system prompt for repair ---
-TOKE_SYSTEM_PROMPT = """You write toke programs. toke is a compiled language.
+TOKE_SYSTEM_PROMPT = """You write toke programs. toke is a compiled language with a 55-char alphabet.
 
 STRUCTURE: m=name; then i=alias:std.module; then f= and t= declarations.
 KEYWORDS (13): m f t i if el lp br let mut as rt mt
-CRITICAL RULES:
-- Semicolons separate ALL statements and parameters. NO COMMAS anywhere.
-- No square brackets. Arrays: @(1;2;3). Array access: arr.get(idx).
-- Functions: f=name(param:$i64;param2:$str):$i64{body}
+
+SYNTAX RULES:
+- Semicolons separate ALL statements AND function parameters. NEVER use commas.
+- No square brackets. Arrays: @(1;2;3). Access: arr.get(idx). Length: arr.len() or arr.len
+- Functions: f=name(p1:$i64;p2:$str):$i64{body}
 - Return: <expr; (preferred) or rt expr;
-- Loops: lp(let idx=0;idx<n;idx=idx+1){body}
-- Mutable: let x=mut.0; then x=x+1;
-- Types use $ prefix: $i64, $f64, $str, $bool, $void. ALL types need $.
-- Equality is = not ==. Comparison: < > !=
-- Module: m=name; (first line, always)
-- Import: i=alias:std.module; then use alias.func()
+- Loops: lp(let idx=0;idx<=n;idx=idx+1){body} or lp(condition){body}
+- MUTABLE variables: let x=mut.0; then x=x+1; — WITHOUT mut. you CANNOT reassign.
+  WRONG: let x=0; x=x+1;  — this is E4070 error
+  RIGHT: let x=mut.0; x=x+1;
+- Mutable strings: let s=mut.""; s=s+"more";
+- Mutable floats: let x=mut.0.0; x=x+1.0;
+- Types: $i64 $f64 $str $bool $void — ALL need $ prefix.
+- Comparison: = (equals) < > <= >= != — all supported.
+- Module: m=name; (FIRST line, always. Use lowercase, no special chars.)
+- Import: i=alias:std.module; then alias.func()
 - NEVER use i/f/t/m as variable names — they are keywords.
-- No 'return', 'fn', 'func', 'for', 'while', 'else', 'int', 'string' — these are NOT toke.
-- io.println(value) prints to stdout. io.readln() reads line from stdin.
-- str.toint(s) parses integer. str.fromint(n) converts int to string.
+- No 'return'/'fn'/'func'/'for'/'while'/'else'/'int'/'string' — NOT toke keywords.
+
+STDLIB FUNCTIONS (use via import alias):
+  i=io:std.io    → io.readln():$str  io.println(val)  io.eprintln(val)
+  i=s:std.str    → s.toint(str):$i64  s.fromint(n):$str  s.tofloat(str):$f64  s.fromfloat(f):$str
+                   s.len(str):$i64  s.split(str;sep):array  s.concat(a;b):$str
+                   s.trim(str):$str  s.slice(str;start;end):$str  s.contains(str;sub):$bool
+                   s.format(val;fmt):$str  (e.g. s.format(3.14;"%.2f"))
+  i=math:std.math → math.sqrt(f):$f64  math.pow(base;exp):$f64  math.abs(n):$i64
+                    math.sin(f):$f64  math.cos(f):$f64  math.ln(f):$f64  math.log10(f):$f64
+
+NULL SAFETY: Always check split results before accessing:
+  let parts=s.split(line;" ");
+  if(parts.len()>=2){let second=parts.get(1)};  — check length BEFORE get
 
 WORKING EXAMPLES:
+
+Factorial (recursion + readln + toint):
 m=fact;i=io:std.io;i=s:std.str;f=fact(n:$i64):$i64{if(n<2){<1};<n*fact(n-1)};f=main():$i64{let line=io.readln();let n=s.toint(line);io.println(s.fromint(fact(n)));<0}
 
-m=fizz;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let n=s.toint(line);if(n%15=0){io.println("fizzbuzz");<0};if(n%3=0){io.println("fizz");<0};if(n%5=0){io.println("buzz");<0};io.println(s.fromint(n));<0}
+Sum 1 to N (mutable + while loop + <=):
+m=sum;i=io:std.io;i=s:std.str;f=main():$i64{let n=s.toint(io.readln());let total=mut.0;let idx=mut.1;lp(idx<=n){total=total+idx;idx=idx+1};io.println(s.fromint(total));<0}
 
-Output ONLY toke source code. No explanation. No markdown fences unless asked."""
+Split + parse (string processing):
+m=parse;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=2){let a=s.toint(parts.get(0));let b=s.toint(parts.get(1));io.println(s.fromint(a+b))}el{io.println("error")};<0}
 
-TOKE_REPAIR_PROMPT = """Fix this toke program. The error is shown below.
+Float math:
+m=calc;i=io:std.io;i=s:std.str;i=math:std.math;f=main():$i64{let x=s.tofloat(io.readln());let result=math.sqrt(x);io.println(s.fromfloat(result));<0}
+
+Output ONLY toke source code. No explanation. No markdown."""
+
+TOKE_REPAIR_PROMPT = """Fix this toke program. Address the SPECIFIC error shown.
 
 REQUIREMENT: {description}
 INPUT: {test_input}
@@ -98,16 +123,22 @@ CURRENT SOURCE:
 ERROR:
 {error}
 
-RULES REMINDER:
-- m= module first, i= imports, f= functions. Semicolons everywhere. NO COMMAS.
-- Types: $i64, $str, $bool (always with $). Equality: = not ==.
-- io.readln() reads stdin, io.println(x) writes stdout
-- str.toint(s) parses int, str.fromint(n) int to string
-- Arrays: @(). Loop: lp(let idx=0;idx<n;idx=idx+1){{}}
-- NEVER use i/f/t/m as variable names. Use idx, k, n, x, val, acc.
-- No 'return'/'fn'/'for'/'while'/'else' — use </rt/f=/lp/el
+COMMON FIXES:
+- E4070 "cannot assign to immutable": Change `let x=0` to `let x=mut.0` for ANY variable you reassign later. EVERY variable that gets x=x+1 or x=newval MUST use mut.
+- E2002 parse error: Check for commas (use semicolons), missing semicolons between statements, wrong keywords (fn→f=, for→lp, else→el, return→<).
+- E1003 illegal char: Remove uppercase letters, underscores in identifiers, or characters outside a-z 0-9 and the 19 allowed symbols.
+- Segfault/crash: Check array bounds before .get(). Check that split result has enough elements. Avoid chaining operations on potentially null values.
+- Wrong output: Check algorithm logic. Verify integer vs float types ($i64 vs $f64). Check that io.println outputs the right format.
+- "undefined reference": Use the import alias (s.toint not str.toint). Check function exists in stdlib.
 
-Return ONLY the fixed toke source code wrapped in ```toke ... ``` markers."""
+KEY PATTERNS:
+- Mutable: let x=mut.0; let s=mut.""; let arr=mut.@();
+- Read+parse: let n=s.toint(io.readln());
+- Split safely: let parts=s.split(line;" "); if(parts.len()>=2){{let a=parts.get(0)}};
+- Float: let x=mut.0.0; x=s.tofloat(io.readln()); io.println(s.fromfloat(x));
+- Comparison: = (eq) != (neq) < > <= >=
+
+Return ONLY the complete fixed source code in ```toke ... ``` markers."""
 
 
 def load_state() -> dict:
