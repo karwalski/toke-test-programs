@@ -135,12 +135,28 @@ def save_state(state: dict):
     tmp.rename(STATE_FILE)
 
 
+# Categories ordered from simplest to most complex — AI agents last
+CATEGORY_ORDER = [
+    "calculators-finance", "education", "scientific-math", "devtools",
+    "media-content", "data-processing", "system-tools", "games",
+    "security", "messaging", "crypto-blockchain", "manufacturing-ml",
+    "networking-rest", "social-media", "ai-agents",
+]
+
+
 def load_all_requirements() -> list[dict]:
-    """Load all requirements from categories/*/requirements.yaml."""
+    """Load all requirements from categories/*/requirements.yaml, ordered simple→complex."""
     requirements = []
     categories_dir = TEST_PROGRAMS_DIR / "categories"
 
-    for category_dir in sorted(categories_dir.iterdir()):
+    # Sort by CATEGORY_ORDER, unknown categories go to end
+    def cat_sort_key(d):
+        name = d.name
+        if name in CATEGORY_ORDER:
+            return CATEGORY_ORDER.index(name)
+        return len(CATEGORY_ORDER)
+
+    for category_dir in sorted(categories_dir.iterdir(), key=cat_sort_key):
         if not category_dir.is_dir():
             continue
         req_file = category_dir / "requirements.yaml"
@@ -573,9 +589,12 @@ def main():
     all_requirements = load_all_requirements()
     log.info(f"Loaded {len(all_requirements)} total requirements")
 
-    # Filter to this worker's partition
+    # Filter to this worker's partition, then sort by category order (simple first)
     my_requirements = [r for r in all_requirements if is_my_work(r["id"])]
+    cat_order = {c: idx for idx, c in enumerate(CATEGORY_ORDER)}
+    my_requirements.sort(key=lambda r: cat_order.get(r["_category"], len(CATEGORY_ORDER)))
     log.info(f"This worker handles {len(my_requirements)} requirements")
+    log.info(f"Category order: {', '.join(dict.fromkeys(r['_category'] for r in my_requirements))}")
 
     done_ids = set(state["completed"] + [f["id"] if isinstance(f, dict) else f for f in state["failed"]] + state["skipped"])
 
