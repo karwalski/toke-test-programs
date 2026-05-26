@@ -358,11 +358,24 @@ def process_requirement(req: dict, state: dict):
     source = call_toke_api(description, req)
 
     if not source:
-        log.error(f"{req_id}: Initial generation returned nothing")
-        state["failed"].append({"id": req_id, "reason": "generation_failed"})
-        state["in_progress"] = None
-        save_state(state)
-        return
+        # Fallback: use Claude for initial generation if toke API is down
+        log.info(f"{req_id}: Toke API unavailable, using Claude for initial generation")
+        test_cases = req.get("test_cases", [])
+        tc_input = test_cases[0].get("input", "") if test_cases else ""
+        tc_output = test_cases[0].get("expected_output", "") if test_cases else ""
+        gen_prompt = "Write a complete toke program: " + description
+        if tc_input:
+            gen_prompt += ". Input: " + tc_input.strip() + " Expected output: " + tc_output.strip()
+        source = call_anthropic_repair(
+            "m=placeholder;", "Need complete implementation", gen_prompt,
+            test_input=tc_input, expected_output=tc_output, use_opus=False,
+        )
+        if not source:
+            log.error(f"{req_id}: Claude fallback also failed")
+            state["failed"].append({"id": req_id, "reason": "generation_failed"})
+            state["in_progress"] = None
+            save_state(state)
+            return
 
     toke_api_source = source  # preserve original for metadata
     source_path.write_text(source)
