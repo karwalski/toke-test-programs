@@ -36,10 +36,13 @@ LOGS_DIR = WORKER_DIR / "logs"
 SOLUTIONS_DIR = WORKER_DIR / "solutions"
 FAILED_DIR = WORKER_DIR / "failed"
 
-MAX_REPAIR_ITERATIONS = 5
+MAX_SONNET_ITERATIONS = 10
+MAX_OPUS_ITERATIONS = 5
+MAX_REPAIR_ITERATIONS = MAX_SONNET_ITERATIONS + MAX_OPUS_ITERATIONS  # 15 total
 RATE_LIMIT_DELAY = 1.0  # seconds between API calls
-TKC_TIMEOUT = 30  # seconds
+TKC_TIMEOUT = 60  # seconds (increased for tkc --out full build)
 TEST_TIMEOUT = 10  # seconds
+BUILD_COOLDOWN = 2.0  # seconds between builds to prevent OOM on small instances
 
 # --- Logging ---
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -54,18 +57,38 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- Toke system prompt for repair ---
-TOKE_REPAIR_PROMPT = """You are an expert toke language programmer. Toke is a statically-typed
-compiled language with 56-character line width (default mode). It uses @() for arrays and maps.
+TOKE_SYSTEM_PROMPT = """You write toke programs. toke is a compiled language.
 
-The following toke program failed to compile or pass tests. Fix the issue.
+STRUCTURE: m=name; then i=alias:std.module; then f= and t= declarations.
+KEYWORDS (13): m f t i if el lp br let mut as rt mt
+CRITICAL RULES:
+- Semicolons separate ALL statements and parameters. NO COMMAS anywhere.
+- No square brackets. Arrays: @(1;2;3). Array access: arr.get(idx).
+- Functions: f=name(param:$i64;param2:$str):$i64{body}
+- Return: <expr; (preferred) or rt expr;
+- Loops: lp(let idx=0;idx<n;idx=idx+1){body}
+- Mutable: let x=mut.0; then x=x+1;
+- Types use $ prefix: $i64, $f64, $str, $bool, $void. ALL types need $.
+- Equality is = not ==. Comparison: < > !=
+- Module: m=name; (first line, always)
+- Import: i=alias:std.module; then use alias.func()
+- NEVER use i/f/t/m as variable names — they are keywords.
+- No 'return', 'fn', 'func', 'for', 'while', 'else', 'int', 'string' — these are NOT toke.
+- io.println(value) prints to stdout. io.readln() reads line from stdin.
+- str.toint(s) parses integer. str.fromint(n) converts int to string.
 
-IMPORTANT RULES:
-- Lines must not exceed 56 characters
-- Use toke syntax, not C/Python/etc
-- The fix must address the specific error shown
-- Return ONLY the corrected source code, no explanation
+WORKING EXAMPLES:
+m=fact;i=io:std.io;i=s:std.str;f=fact(n:$i64):$i64{if(n<2){<1};<n*fact(n-1)};f=main():$i64{let line=io.readln();let n=s.toint(line);io.println(s.fromint(fact(n)));<0}
+
+m=fizz;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let n=s.toint(line);if(n%15=0){io.println("fizzbuzz");<0};if(n%3=0){io.println("fizz");<0};if(n%5=0){io.println("buzz");<0};io.println(s.fromint(n));<0}
+
+Output ONLY toke source code. No explanation. No markdown fences unless asked."""
+
+TOKE_REPAIR_PROMPT = """Fix this toke program. The error is shown below.
 
 REQUIREMENT: {description}
+INPUT: {test_input}
+EXPECTED OUTPUT: {expected_output}
 
 CURRENT SOURCE:
 ```toke
@@ -73,11 +96,18 @@ CURRENT SOURCE:
 ```
 
 ERROR:
-```
 {error}
-```
 
-Return the fixed source code only, wrapped in ```toke ... ``` markers."""
+RULES REMINDER:
+- m= module first, i= imports, f= functions. Semicolons everywhere. NO COMMAS.
+- Types: $i64, $str, $bool (always with $). Equality: = not ==.
+- io.readln() reads stdin, io.println(x) writes stdout
+- str.toint(s) parses int, str.fromint(n) int to string
+- Arrays: @(). Loop: lp(let idx=0;idx<n;idx=idx+1){{}}
+- NEVER use i/f/t/m as variable names. Use idx, k, n, x, val, acc.
+- No 'return'/'fn'/'for'/'while'/'else' — use </rt/f=/lp/el
+
+Return ONLY the fixed toke source code wrapped in ```toke ... ``` markers."""
 
 
 def load_state() -> dict:
@@ -151,7 +181,7 @@ def call_toke_api(description: str, req: dict) -> str | None:
         resp = requests.post(
             f"{TOKE_API_URL}/v1/generate",
             headers={
-                "Authorization": f"Bearer {TOKE_API_KEY}",
+                "X-Api-Key": TOKE_API_KEY,
                 "Content-Type": "application/json",
             },
             json={
@@ -171,8 +201,11 @@ def call_toke_api(description: str, req: dict) -> str | None:
         return None
 
 
-def call_anthropic_repair(source: str, error: str, description: str) -> str | None:
+def call_anthropic_repair(source: str, error: str, description: str,
+                          test_input: str = "", expected_output: str = "",
+                          use_opus: bool = False) -> str | None:
     """Call Anthropic API (Claude) to repair broken toke code."""
+    model = "claude-opus-4-20250514" if use_opus else "claude-sonnet-4-20250514"
     try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",
@@ -182,8 +215,9 @@ def call_anthropic_repair(source: str, error: str, description: str) -> str | No
                 "Content-Type": "application/json",
             },
             json={
-                "model": "claude-sonnet-4-20250514",
+                "model": model,
                 "max_tokens": 4096,
+                "system": TOKE_SYSTEM_PROMPT,
                 "messages": [
                     {
                         "role": "user",
@@ -191,6 +225,8 @@ def call_anthropic_repair(source: str, error: str, description: str) -> str | No
                             description=description,
                             source=source,
                             error=error,
+                            test_input=test_input[:200],
+                            expected_output=expected_output[:200],
                         ),
                     }
                 ],
@@ -236,17 +272,18 @@ def run_tests(solution_dir: Path, req: dict) -> tuple[bool, str]:
     if not test_cases:
         return True, "No test cases defined"
 
-    # Build the program first
+    # Build the program using tkc --out (v0.3.2+ conditional linking)
     source_path = solution_dir / "solution.tk"
     try:
+        time.sleep(BUILD_COOLDOWN)  # prevent OOM on small instances
         build_result = subprocess.run(
-            ["tkc", str(source_path), "-o", str(solution_dir / "solution")],
+            ["tkc", "--out", str(solution_dir / "solution"), str(source_path)],
             capture_output=True,
             text=True,
             timeout=TKC_TIMEOUT,
         )
         if build_result.returncode != 0:
-            return False, f"Build failed: {build_result.stderr}"
+            return False, f"Build failed: {build_result.stderr[:500]}"
     except subprocess.TimeoutExpired:
         return False, "Build timeout"
 
@@ -286,7 +323,7 @@ def submit_feedback(req_id: str, success: bool, iterations: int):
         requests.post(
             f"{TOKE_API_URL}/v1/feedback",
             headers={
-                "Authorization": f"Bearer {TOKE_API_KEY}",
+                "X-Api-Key": TOKE_API_KEY,
                 "Content-Type": "application/json",
             },
             json={
@@ -349,13 +386,24 @@ def process_requirement(req: dict, state: dict):
         error = f"Compile error:\n{compile_output}"
 
     # Step 4: Repair loop — capture every iteration as error→fix pair
+    # Get test case info for the repair prompt
+    test_cases = req.get("test_cases", [])
+    test_input = test_cases[0].get("input", "") if test_cases else ""
+    expected_output = test_cases[0].get("expected_output", "") if test_cases else ""
+
     repair_history = []
     for iteration in range(1, MAX_REPAIR_ITERATIONS + 1):
-        log.info(f"{req_id}: Repair iteration {iteration}/{MAX_REPAIR_ITERATIONS}")
+        use_opus = iteration > MAX_SONNET_ITERATIONS
+        model_label = "opus" if use_opus else "sonnet"
+        log.info(f"{req_id}: Repair iteration {iteration}/{MAX_REPAIR_ITERATIONS} ({model_label})")
         time.sleep(RATE_LIMIT_DELAY)
 
         broken_source = source  # save the broken version
-        fixed_source = call_anthropic_repair(source, error, description)
+        fixed_source = call_anthropic_repair(
+            source, error, description,
+            test_input=test_input, expected_output=expected_output,
+            use_opus=use_opus,
+        )
         if not fixed_source:
             log.warning(f"{req_id}: Repair returned nothing at iteration {iteration}")
             continue
@@ -496,10 +544,14 @@ def main():
     # Pull latest test programs
     try:
         subprocess.run(
-            ["git", "pull", "--ff-only"],
+            ["git", "fetch", "origin", "main"],
             cwd=TEST_PROGRAMS_DIR,
-            capture_output=True,
-            timeout=30,
+            capture_output=True, timeout=30,
+        )
+        subprocess.run(
+            ["git", "reset", "--hard", "origin/main"],
+            cwd=TEST_PROGRAMS_DIR,
+            capture_output=True, timeout=10,
         )
     except Exception:
         pass
