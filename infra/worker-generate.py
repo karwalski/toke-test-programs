@@ -217,9 +217,37 @@ def is_my_work(req_id: str) -> bool:
 
 
 def solution_exists(category: str, req_id: str) -> bool:
-    """Check if a solution already exists in the repo."""
-    solution_dir = TEST_PROGRAMS_DIR / "categories" / category / req_id
-    return (solution_dir / "solution.tk").exists()
+    """Check if a verified solution already exists (in repo OR worker output)."""
+    # Check repo (committed solutions)
+    repo_dir = TEST_PROGRAMS_DIR / "categories" / category / req_id
+    if (repo_dir / "solution.tk").exists():
+        return True
+    # Check worker solutions dir (previous run output)
+    worker_dir = SOLUTIONS_DIR / category / req_id
+    if (worker_dir / "solution.tk").exists():
+        # Verify it still compiles with current tkc
+        result = subprocess.run(
+            ["tkc", "--check", str(worker_dir / "solution.tk")],
+            capture_output=True, text=True, timeout=10,
+        )
+        if '"severity":"error"' not in (result.stdout + result.stderr):
+            return True
+    return False
+
+
+def get_last_attempt(category: str, req_id: str) -> str | None:
+    """Get the last failed attempt source to use as starting point for retry."""
+    # Check failed dir for previous attempt
+    fail_dir = FAILED_DIR / category / req_id
+    last_attempt = fail_dir / "last-attempt.tk"
+    if last_attempt.exists():
+        return last_attempt.read_text()
+    # Check solutions dir for a partially-working version
+    sol_dir = SOLUTIONS_DIR / category / req_id
+    sol_file = sol_dir / "solution.tk"
+    if sol_file.exists():
+        return sol_file.read_text()
+    return None
 
 
 def call_toke_api(description: str, req: dict) -> str | None:
@@ -400,9 +428,15 @@ def process_requirement(req: dict, state: dict):
     work_dir.mkdir(parents=True, exist_ok=True)
     source_path = work_dir / "solution.tk"
 
-    # Step 1: Initial generation via toke API
-    time.sleep(RATE_LIMIT_DELAY)
-    source = call_toke_api(description, req)
+    # Step 1: Check for previous attempt to use as starting point
+    previous = get_last_attempt(category, req_id)
+    if previous:
+        log.info(f"{req_id}: Resuming from previous attempt ({len(previous)} chars)")
+        source = previous
+    else:
+        # Fresh generation via toke API
+        time.sleep(RATE_LIMIT_DELAY)
+        source = call_toke_api(description, req)
 
     if not source:
         # Fallback: use Claude for initial generation if toke API is down
@@ -627,17 +661,30 @@ def main():
     log.info(f"This worker handles {len(my_requirements)} requirements")
     log.info(f"Category order: {', '.join(dict.fromkeys(r['_category'] for r in my_requirements))}")
 
-    done_ids = set(state["completed"] + [f["id"] if isinstance(f, dict) else f for f in state["failed"]] + state["skipped"])
+    # Only skip completed programs — retry failed ones (they may work with new compiler/prompts)
+    completed_ids = set(state["completed"] + state["skipped"])
+    failed_ids = set(f["id"] if isinstance(f, dict) else f for f in state["failed"])
 
     for req in my_requirements:
         req_id = req["id"]
 
-        # Skip already processed
-        if req_id in done_ids:
+        # Skip completed (already working)
+        if req_id in completed_ids:
             continue
 
-        # Skip if solution already exists in repo
+        # Skip if verified solution already exists on disk
         if solution_exists(req["_category"], req_id):
+            log.info(f"{req_id}: Verified solution exists, skipping")
+            if req_id not in completed_ids:
+                state["completed"].append(req_id)
+                save_state(state)
+            continue
+
+        # Remove from failed list if retrying (clean slate for this attempt)
+        if req_id in failed_ids:
+            log.info(f"{req_id}: Retrying previously failed program")
+            state["failed"] = [f for f in state["failed"] if (f.get("id") if isinstance(f, dict) else f) != req_id]
+            save_state(state)
             log.info(f"{req_id}: Solution already exists, skipping")
             state["skipped"].append(req_id)
             save_state(state)
