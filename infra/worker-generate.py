@@ -145,7 +145,11 @@ def load_state() -> dict:
     """Load worker state from disk, or initialise fresh."""
     if STATE_FILE.exists():
         with open(STATE_FILE) as f:
-            return json.load(f)
+            state = json.load(f)
+        # Ensure category_stats exists (upgrade path for existing state files)
+        if "category_stats" not in state:
+            state["category_stats"] = {}
+        return state
     return {
         "worker_id": WORKER_ID,
         "started_at": datetime.now(timezone.utc).isoformat(),
@@ -154,6 +158,7 @@ def load_state() -> dict:
         "skipped": [],
         "in_progress": None,
         "last_updated": None,
+        "category_stats": {},
     }
 
 
@@ -248,6 +253,89 @@ def get_last_attempt(category: str, req_id: str) -> str | None:
     if sol_file.exists():
         return sol_file.read_text()
     return None
+
+
+CATEGORY_HALT_CHECK_INTERVAL = 20  # Check success rate every N programs
+CATEGORY_HALT_THRESHOLD = 0.10  # Halt if success rate below 10%
+
+
+def classify_error(error: str) -> str:
+    """Classify an error string into a category for stats tracking."""
+    error_lower = error.lower()
+    # Compile errors: tkc --check failures with known error codes
+    compile_codes = ["e4070", "e2002", "e2003", "e1003", "e3001", "e3002"]
+    if any(code in error_lower for code in compile_codes):
+        return "compile_error"
+    if "compile error" in error_lower or "parse error" in error_lower:
+        return "compile_error"
+    # Build errors: link failures, codegen issues
+    if "build failed" in error_lower or "build timeout" in error_lower:
+        return "build_error"
+    if "undefined reference" in error_lower or "link" in error_lower:
+        return "build_error"
+    if "binary not produced" in error_lower or "codegen" in error_lower:
+        return "build_error"
+    # Runtime errors: crashes, wrong output, timeouts during test
+    if "timeout" in error_lower and "test" in error_lower:
+        return "runtime_error"
+    if "segfault" in error_lower or "crash" in error_lower or "signal" in error_lower:
+        return "runtime_error"
+    if "test failures" in error_lower or "expected" in error_lower:
+        return "runtime_error"
+    # Default to compile_error for unrecognised tkc output
+    return "compile_error"
+
+
+def update_category_stats(state: dict, category: str, passed: bool, error: str = ""):
+    """Update category_stats in state with the result of processing a program."""
+    if category not in state["category_stats"]:
+        state["category_stats"][category] = {
+            "attempted": 0, "passed": 0, "failed": 0, "skipped": 0,
+        }
+    stats = state["category_stats"][category]
+    stats["attempted"] += 1
+    if passed:
+        stats["passed"] += 1
+    else:
+        stats["failed"] += 1
+        # Track error type breakdown
+        if error:
+            err_type = classify_error(error)
+            err_key = f"errors_{err_type}"
+            stats[err_key] = stats.get(err_key, 0) + 1
+
+
+def should_halt_category(state: dict, category: str) -> bool:
+    """Check if a category should be halted due to low success rate.
+
+    Returns True if we've attempted >= CATEGORY_HALT_CHECK_INTERVAL programs
+    and the success rate is below CATEGORY_HALT_THRESHOLD.
+    """
+    stats = state.get("category_stats", {}).get(category)
+    if not stats:
+        return False
+    attempted = stats["attempted"]
+    if attempted < CATEGORY_HALT_CHECK_INTERVAL:
+        return False
+    # Only check at interval boundaries
+    if attempted % CATEGORY_HALT_CHECK_INTERVAL != 0:
+        return False
+    success_rate = stats["passed"] / attempted if attempted > 0 else 0
+    if success_rate < CATEGORY_HALT_THRESHOLD:
+        log.warning(
+            f"Category '{category}' halted: success rate {success_rate:.1%} "
+            f"({stats['passed']}/{attempted}) is below {CATEGORY_HALT_THRESHOLD:.0%} threshold. "
+            f"Stats: {json.dumps(stats)}"
+        )
+        return True
+    return False
+
+
+def try_compile_last_attempt(source: str, work_dir: Path) -> tuple[bool, str]:
+    """Try compiling a last-attempt source with current tkc. Returns (compiles, output)."""
+    source_path = work_dir / "solution.tk"
+    source_path.write_text(source)
+    return run_tkc_check(source_path)
 
 
 def call_toke_api(description: str, req: dict) -> str | None:
@@ -428,12 +516,24 @@ def process_requirement(req: dict, state: dict):
     work_dir.mkdir(parents=True, exist_ok=True)
     source_path = work_dir / "solution.tk"
 
-    # Step 1: Check for previous attempt to use as starting point
+    # Step 1: Check for previous attempt — try compiling before regenerating (102.34)
     previous = get_last_attempt(category, req_id)
+    skip_generation = False
     if previous:
-        log.info(f"{req_id}: Resuming from previous attempt ({len(previous)} chars)")
-        source = previous
+        log.info(f"{req_id}: Found previous attempt ({len(previous)} chars), checking if it compiles on current tkc")
+        prev_compiles, prev_compile_output = try_compile_last_attempt(previous, work_dir)
+        if prev_compiles:
+            log.info(f"{req_id}: Previous attempt compiles on current tkc — skipping generation, going to build+test")
+            source = previous
+            skip_generation = True
+        else:
+            # Previous attempt doesn't compile — feed specific error to repair (not regenerate)
+            log.info(f"{req_id}: Previous attempt has compile errors — will use as repair starting point")
+            source = previous
     else:
+        source = None
+
+    if not skip_generation and source is None:
         # Fresh generation via toke API
         time.sleep(RATE_LIMIT_DELAY)
         source = call_toke_api(description, req)
@@ -454,6 +554,7 @@ def process_requirement(req: dict, state: dict):
         if not source:
             log.error(f"{req_id}: Claude fallback also failed")
             state["failed"].append({"id": req_id, "reason": "generation_failed"})
+            update_category_stats(state, category, passed=False, error="generation_failed")
             state["in_progress"] = None
             save_state(state)
             return
@@ -472,6 +573,7 @@ def process_requirement(req: dict, state: dict):
             log.info(f"{req_id}: PASSED on first attempt (ONE-SHOT)")
             _save_success(req, work_dir, state, iterations=0,
                          toke_api_source=toke_api_source, warnings=warnings)
+            update_category_stats(state, category, passed=True)
             submit_feedback(req_id, True, 0)
             return
         else:
@@ -526,6 +628,7 @@ def process_requirement(req: dict, state: dict):
             _save_success(req, work_dir, state, iterations=iteration,
                          toke_api_source=toke_api_source,
                          repair_history=repair_history, warnings=warnings)
+            update_category_stats(state, category, passed=True)
             submit_feedback(req_id, True, iteration)
             return
         else:
@@ -534,6 +637,7 @@ def process_requirement(req: dict, state: dict):
     # Failed after all repair attempts
     log.warning(f"{req_id}: FAILED after {MAX_REPAIR_ITERATIONS} repairs")
     _save_failure(req, work_dir, error, state)
+    update_category_stats(state, category, passed=False, error=error)
     submit_feedback(req_id, False, MAX_REPAIR_ITERATIONS)
 
 
@@ -665,8 +769,23 @@ def main():
     completed_ids = set(state["completed"] + state["skipped"])
     failed_ids = set(f["id"] if isinstance(f, dict) else f for f in state["failed"])
 
+    # Track which categories have been halted due to low success rate (102.32)
+    halted_categories = set()
+
     for req in my_requirements:
         req_id = req["id"]
+        category = req["_category"]
+
+        # Skip entire category if halted due to low success rate (102.32)
+        if category in halted_categories:
+            if req_id not in completed_ids:
+                state["skipped"].append(req_id)
+                # Update category stats with skip count
+                if category in state["category_stats"]:
+                    state["category_stats"][category]["skipped"] = \
+                        state["category_stats"][category].get("skipped", 0) + 1
+                save_state(state)
+            continue
 
         # Skip completed (already working)
         if req_id in completed_ids:
@@ -691,6 +810,18 @@ def main():
             continue
 
         process_requirement(req, state)
+
+        # After processing, check if this category should be halted (102.32)
+        if should_halt_category(state, category):
+            halted_categories.add(category)
+            cat_stats = state["category_stats"].get(category, {})
+            log.info(
+                f"Moving to next category. '{category}' final stats: "
+                f"attempted={cat_stats.get('attempted', 0)}, "
+                f"passed={cat_stats.get('passed', 0)}, "
+                f"failed={cat_stats.get('failed', 0)}, "
+                f"skipped={cat_stats.get('skipped', 0)}"
+            )
 
         # Periodic S3 sync every 50 programs
         total_done = len(state["completed"]) + len(state["failed"])

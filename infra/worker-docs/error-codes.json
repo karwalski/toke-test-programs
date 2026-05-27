@@ -1,0 +1,194 @@
+{
+  "E1001": {
+    "title": "Invalid escape sequence",
+    "stage": "lexer",
+    "explanation": "A backslash in a string literal is followed by an invalid character. Valid escapes: \\\", \\\\, \\n, \\t, \\r, \\0, \\xHH.",
+    "fix": "Use a valid escape sequence. Remove or replace the bad escape."
+  },
+  "E1002": {
+    "title": "Unterminated string literal",
+    "stage": "lexer",
+    "explanation": "The lexer reached end-of-input before finding a closing double-quote.",
+    "fix": "Add the closing \" to terminate the string literal."
+  },
+  "E1003": {
+    "title": "Character outside permitted character set",
+    "stage": "lexer",
+    "explanation": "A byte that is not whitespace, alphanumeric, or a recognized symbol was found. toke is ASCII only. Uppercase letters and underscores in identifiers also trigger this.",
+    "fix": "Remove or replace non-ASCII characters. Use lowercase identifiers without underscores."
+  },
+  "E1010": {
+    "title": "Reserved literal used as identifier",
+    "stage": "lexer",
+    "explanation": "true and false cannot be used as variable or function names.",
+    "fix": "Choose a different identifier name."
+  },
+  "E2001": {
+    "title": "Declaration ordering violation",
+    "stage": "parser",
+    "explanation": "Source file must follow order: m (module), i (import), t (type), c (constant), f (function). Also fires when m= is missing.",
+    "fix": "Add m=name; as the first line. Ensure declarations appear in the required order."
+  },
+  "E2002": {
+    "title": "Unexpected token",
+    "stage": "parser",
+    "explanation": "The parser found a token it cannot consume in the current context. Common causes: commas instead of semicolons, wrong keywords (fn instead of f=, for instead of lp, else instead of el, return instead of <).",
+    "fix": "Check for commas (use semicolons instead), misplaced operators, or non-toke keywords near the reported position."
+  },
+  "E2003": {
+    "title": "Missing semicolon",
+    "stage": "parser",
+    "explanation": "A semicolon is required between consecutive statements inside a block. Semicolons may be omitted only before } or at EOF.",
+    "fix": "Add a ; between the statements."
+  },
+  "E2004": {
+    "title": "Unclosed delimiter",
+    "stage": "parser",
+    "explanation": "A ( { or [ was opened but the matching closing delimiter was not found.",
+    "fix": "Add the matching ) } or ] delimiter."
+  },
+  "E2010": {
+    "title": "Pointer type outside extern function",
+    "stage": "parser",
+    "explanation": "Pointer types (*T) are only valid in extern (bodyless) function signatures.",
+    "fix": "Remove the pointer type or make the function an extern declaration (remove the body)."
+  },
+  "E2030": {
+    "title": "Unresolved import",
+    "stage": "name_resolution",
+    "explanation": "The module path in an i= declaration does not resolve to any .tki interface file.",
+    "fix": "Check module path spelling. Common stdlib modules: std.io, std.str, std.math, std.file, std.json, std.time, std.http."
+  },
+  "E2031": {
+    "title": "Circular import detected",
+    "stage": "name_resolution",
+    "explanation": "The import graph contains a cycle.",
+    "fix": "Restructure modules to break the circular dependency."
+  },
+  "E2035": {
+    "title": "Malformed version string in import",
+    "stage": "name_resolution",
+    "explanation": "The optional version string does not match MAJOR.MINOR or MAJOR.MINOR.PATCH format.",
+    "fix": "Use a valid version string like \"1.0\" or remove the version specifier."
+  },
+  "E2036": {
+    "title": "No compatible version found",
+    "stage": "name_resolution",
+    "explanation": "Interface files were found but none match the requested version constraint.",
+    "fix": "Update the version constraint or use the available version."
+  },
+  "E2037": {
+    "title": "Version conflict between imports",
+    "stage": "name_resolution",
+    "explanation": "Two imports reference the same module with different major versions.",
+    "fix": "Align all imports of the same module to the same major version."
+  },
+  "E3011": {
+    "title": "Identifier not declared",
+    "stage": "name_resolution",
+    "explanation": "A reference to an identifier that does not exist in any enclosing scope.",
+    "fix": "Declare the identifier before use, check for typos, or check that the import alias matches (e.g. i=s:std.str then use s.len not str.len)."
+  },
+  "E3012": {
+    "title": "Identifier already declared in this scope",
+    "stage": "name_resolution",
+    "explanation": "A second declaration of the same name in the same scope. Shadowing across scope boundaries is allowed but duplicate in one scope is not.",
+    "fix": "Use a different name for the second binding, or remove the duplicate."
+  },
+  "E3020": {
+    "title": "! applied to non-error-union value",
+    "stage": "type_check",
+    "explanation": "The propagation operator ! can only be applied to a value with error union type (T!Err), inside a function that also returns an error union.",
+    "fix": "Ensure the expression has an error union type and the enclosing function returns an error union."
+  },
+  "E4010": {
+    "title": "Non-exhaustive match",
+    "stage": "type_check",
+    "explanation": "A match expression must cover all variants of the scrutinee type.",
+    "fix": "Add the missing match arm(s) to cover all cases."
+  },
+  "E4011": {
+    "title": "Match arms have inconsistent types",
+    "stage": "type_check",
+    "explanation": "All arms of a match expression must evaluate to the same type.",
+    "fix": "Ensure all arms return the same type."
+  },
+  "E4025": {
+    "title": "Struct has no field with that name",
+    "stage": "type_check",
+    "explanation": "A field access (expr.field) references a field name that does not exist in the struct.",
+    "fix": "Check the struct type declaration for correct field names."
+  },
+  "E4031": {
+    "title": "Type mismatch",
+    "stage": "type_check",
+    "explanation": "Mismatched types in binary expression, function argument, binding annotation, assignment, or return value.",
+    "fix": "Ensure both sides have matching types. Use 'as' for explicit casts (e.g. x as i64)."
+  },
+  "E4040": {
+    "title": "Map key type mismatch",
+    "stage": "type_check",
+    "explanation": "All map keys must have the same type.",
+    "fix": "Ensure all keys in the map literal have the same type."
+  },
+  "E4041": {
+    "title": "Map value type mismatch",
+    "stage": "type_check",
+    "explanation": "All map values must have the same type.",
+    "fix": "Ensure all values in the map literal have the same type."
+  },
+  "E4042": {
+    "title": "Method on non-collection type",
+    "stage": "type_check",
+    "explanation": "Collection methods (.push, .get, .len) called on a non-collection type.",
+    "fix": "Ensure the receiver is an array or map type."
+  },
+  "E4043": {
+    "title": "Inconsistent types in map literal",
+    "stage": "type_check",
+    "explanation": "All entries in a map literal must have the same key type and same value type. The first entry sets the expected types.",
+    "fix": "Ensure all map keys have the same type and all map values have the same type."
+  },
+  "E4050": {
+    "title": "spawn argument not a callable function",
+    "stage": "type_check",
+    "explanation": "spawn(f) requires its argument to be a declared function.",
+    "fix": "Pass a function name (not an expression) to spawn."
+  },
+  "E4051": {
+    "title": "await argument not a Task",
+    "stage": "type_check",
+    "explanation": "await(t) requires its argument to have type Task<T>.",
+    "fix": "Only call await on values returned by spawn."
+  },
+  "E4052": {
+    "title": "Spawned function has parameters",
+    "stage": "type_check",
+    "explanation": "spawn only accepts nullary (zero-parameter) functions.",
+    "fix": "Wrap the parameterized function in a nullary function."
+  },
+  "E4060": {
+    "title": "FFI type mismatch",
+    "stage": "type_check",
+    "explanation": "Type mismatch at FFI boundary.",
+    "fix": "Use compatible types for FFI function signatures."
+  },
+  "E4070": {
+    "title": "Assignment to immutable binding",
+    "stage": "type_check",
+    "explanation": "Attempting to reassign a variable declared with plain 'let x=val' (immutable). Only variables declared with 'let x=mut.val' can be reassigned.",
+    "fix": "Change 'let x=val' to 'let x=mut.val' for any variable that needs reassignment. EVERY variable that gets x=x+1 or x=newval MUST use mut."
+  },
+  "E5001": {
+    "title": "Value escapes arena scope",
+    "stage": "arena_check",
+    "explanation": "Inside an {arena ...} block, assigning an arena-allocated value to a variable declared in an outer scope creates a dangling reference.",
+    "fix": "Keep arena-allocated values within the arena block. Only write computed non-pointer results to outer mutable bindings."
+  },
+  "W1010": {
+    "title": "String interpolation not yet supported",
+    "stage": "lexer",
+    "explanation": "The \\( sequence inside a string literal is reserved for future string interpolation.",
+    "fix": "Use str.concat() or str.buf()/str.add()/str.done() for string composition instead."
+  }
+}

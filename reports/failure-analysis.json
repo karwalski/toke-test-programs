@@ -1,0 +1,443 @@
+{
+  "analysis_date": "2026-05-25",
+  "story": "102.11 / 4.4.1",
+  "source": "Worker 2 at 3.25.118.108 (instance shut down after completion)",
+  "methodology": "Initial SSH data capture + local compiler testing + spec/stdlib cross-reference",
+  "overview": {
+    "total_programs_generated": "~1700 across 5 workers",
+    "compile_rate": "~13%",
+    "worker_2_completed": 410,
+    "worker_2_failed": 409,
+    "failure_reason_breakdown": {
+      "max_repairs_exceeded": "~95% of failures (all repair attempts exhausted after 5 iterations)",
+      "generation_failed": "~5% (toke API returned nothing)"
+    }
+  },
+
+  "critical_infrastructure_bug": {
+    "severity": "CRITICAL",
+    "description": "worker-generate.py line 243 uses 'tkc source.tk -o output' but tkc only supports '--out' (not '-o'). This means EVERY program that passes --check still fails the test phase with 'tkc: unknown flag: -o'. Many 'failures' are build infrastructure failures, not code quality issues.",
+    "evidence": "error.log for AIA-001 says 'Build failed: tkc: unknown flag: -o'",
+    "fix": "Change line 243 in worker-generate.py from '-o' to '--out'",
+    "impact": "This alone could dramatically improve the compile+test pass rate. Programs that pass --check but fail -o are counted as failures and enter the repair loop, which then corrupts working code."
+  },
+
+  "top_10_error_codes_by_frequency": [
+    {
+      "rank": 1,
+      "code": "E2002",
+      "stage": "parse",
+      "description": "Unexpected token (expected X, got Y)",
+      "estimated_frequency": "35-40%",
+      "primary_causes": [
+        "Using 'fn' instead of 'f=' for function declarations",
+        "Using 'for' instead of 'lp' for loops",
+        "Missing parentheses in if() conditions",
+        "Using '->' for return types instead of ':'",
+        "Using curly braces without toke delimiters"
+      ]
+    },
+    {
+      "rank": 2,
+      "code": "E1003",
+      "stage": "lex",
+      "description": "Character outside Profile 1 allowed set",
+      "estimated_frequency": "25-30%",
+      "primary_causes": [
+        "Using commas ',' as separators (toke uses ';')",
+        "Using square brackets '[' ']' (toke uses '@()')",
+        "Using '|' pipe character",
+        "Using '#' for comments (toke has no comment syntax in P1)",
+        "Using '?' ternary operator"
+      ]
+    },
+    {
+      "rank": 3,
+      "code": "E2003",
+      "stage": "parse",
+      "description": "Missing semicolon",
+      "estimated_frequency": "20-25%",
+      "primary_causes": [
+        "Omitting semicolons between statements",
+        "Using 'while(cond){' instead of 'lp(;cond;){'",
+        "Cascading parse errors from other syntax mistakes",
+        "Using 'else {' instead of 'el{'"
+      ]
+    },
+    {
+      "rank": 4,
+      "code": "E3011",
+      "stage": "name_resolution",
+      "description": "Identifier not declared",
+      "estimated_frequency": "15-20%",
+      "primary_causes": [
+        "Calling stdlib functions that don't exist (e.g., math.sqrt, math.abs, math.pow)",
+        "Using variable names before declaration",
+        "Misspelling toke keywords or stdlib function names",
+        "Referencing types or modules not imported"
+      ]
+    },
+    {
+      "rank": 5,
+      "code": "E4031",
+      "stage": "type_check",
+      "description": "Type mismatch / implicit coercion",
+      "estimated_frequency": "10-15%",
+      "primary_causes": [
+        "Passing i64 where $str expected or vice versa",
+        "Missing 'as i64' or 'as u64' casts",
+        "Returning wrong type from function",
+        "Array element type inconsistencies"
+      ]
+    },
+    {
+      "rank": 6,
+      "code": "E2004",
+      "stage": "parse",
+      "description": "Unclosed delimiter",
+      "estimated_frequency": "8-12%",
+      "primary_causes": [
+        "Mismatched braces from using wrong syntax patterns",
+        "Cascading from 'for(' parse failures",
+        "Missing closing ')' on @() array literals"
+      ]
+    },
+    {
+      "rank": 7,
+      "code": "E4010",
+      "stage": "type_check",
+      "description": "Non-exhaustive match",
+      "estimated_frequency": "5-8%",
+      "primary_causes": [
+        "Missing error union variants in mt (match) expressions",
+        "Not handling $err arm in result types",
+        "Incomplete sum type matching"
+      ]
+    },
+    {
+      "rank": 8,
+      "code": "E2001",
+      "stage": "parse",
+      "description": "Declaration ordering violation",
+      "estimated_frequency": "5-7%",
+      "primary_causes": [
+        "Putting function declarations before module/import declarations",
+        "Interleaving imports with function definitions",
+        "Missing m= module declaration at top"
+      ]
+    },
+    {
+      "rank": 9,
+      "code": "E4026",
+      "stage": "type_check",
+      "description": "Wrong argument count in function call",
+      "estimated_frequency": "3-5%",
+      "primary_causes": [
+        "Passing wrong number of args to stdlib functions",
+        "Confusing ';' argument separator with statement terminator"
+      ]
+    },
+    {
+      "rank": 10,
+      "code": "E2030",
+      "stage": "name_resolution",
+      "description": "Unresolved import",
+      "estimated_frequency": "2-4%",
+      "primary_causes": [
+        "Importing non-existent modules (std.regex, std.collections, std.os, std.net, std.fmt)",
+        "Note: --check doesn't catch all unresolved imports; these surface at link time"
+      ]
+    }
+  ],
+
+  "top_10_wrong_syntax_patterns": [
+    {
+      "rank": 1,
+      "pattern": "Using commas instead of semicolons",
+      "wrong": "f=add(a:i64, b:i64):i64{",
+      "correct": "f=add(a:i64;b:i64):i64{",
+      "error": "E1003 — comma is outside allowed character set",
+      "frequency": "Very high — LLMs default to comma-separated params"
+    },
+    {
+      "rank": 2,
+      "pattern": "Using square brackets for arrays",
+      "wrong": "let arr = [1, 2, 3];",
+      "correct": "let arr=@(1;2;3);",
+      "error": "E1003 — square brackets not allowed in default mode",
+      "frequency": "Very high — universal in Python/JS/Rust/C"
+    },
+    {
+      "rank": 3,
+      "pattern": "Using 'return' instead of '<'",
+      "wrong": "return 0;",
+      "correct": "<0",
+      "error": "W1020 warning + E2003 parse error",
+      "frequency": "High — 'return' is universal in other languages"
+    },
+    {
+      "rank": 4,
+      "pattern": "Using 'fn' or 'func' instead of 'f='",
+      "wrong": "fn main() -> i64 {",
+      "correct": "f=main():i64{",
+      "error": "W1020 warning + E2002 parse error",
+      "frequency": "High — Rust/Go syntax bleeding through"
+    },
+    {
+      "rank": 5,
+      "pattern": "Using 'for' instead of 'lp'",
+      "wrong": "for(let i=0;i<n;i=i+1){",
+      "correct": "lp(let i=0;i<n;i=i+1){",
+      "error": "E2002 — 'for' parsed as function call, 'let' unexpected in expression",
+      "frequency": "High — 'for' is universal loop keyword"
+    },
+    {
+      "rank": 6,
+      "pattern": "Using 'while' instead of 'lp(;cond;)'",
+      "wrong": "while(x<10){",
+      "correct": "lp(;x<10;){",
+      "error": "W1020 warning + E2003 parse error",
+      "frequency": "High — 'while' is universal"
+    },
+    {
+      "rank": 7,
+      "pattern": "Using 'else' instead of 'el'",
+      "wrong": "if(cond){...} else {",
+      "correct": "if(cond){...}el{",
+      "error": "W1020 warning + E2003/E2002 parse errors",
+      "frequency": "High — 'else' is universal"
+    },
+    {
+      "rank": 8,
+      "pattern": "Using 'mut@()' instead of 'mut.@()'",
+      "wrong": "let x=mut@();",
+      "correct": "let x=mut.@();",
+      "error": "E2002 — expected '.', got '@'",
+      "frequency": "Medium — dot after mut is non-obvious"
+    },
+    {
+      "rank": 9,
+      "pattern": "Omitting parentheses around if condition",
+      "wrong": "if x > 0 {",
+      "correct": "if(x>0){",
+      "error": "E2002 — expected '(', got identifier",
+      "frequency": "Medium — Go/Rust don't require parens around conditions"
+    },
+    {
+      "rank": 10,
+      "pattern": "Using spaces in declarations",
+      "wrong": "let x: i64 = 5;",
+      "correct": "let x=5;",
+      "error": "Various parse errors (colon is type separator only in function params)",
+      "frequency": "Medium — most languages use colon for type annotations"
+    }
+  ],
+
+  "missing_stdlib_functions": {
+    "note": "These modules/functions are commonly called by generated programs but do NOT exist in toke stdlib. --check may pass but linking will fail, or programs use them incorrectly.",
+    "non_existent_modules": [
+      {"module": "std.math", "functions_attempted": ["sqrt", "pow", "abs", "floor", "ceil", "round", "sin", "cos", "tan", "log", "exp", "pi", "max", "min", "random"], "note": "No math module exists. Basic arithmetic via operators only."},
+      {"module": "std.regex", "functions_attempted": ["match", "replace", "find", "split", "test"], "note": "No regex support in stdlib."},
+      {"module": "std.collections", "functions_attempted": ["HashMap", "Set", "Queue", "Stack", "sort"], "note": "Only @() arrays and maps via @() syntax exist."},
+      {"module": "std.os", "functions_attempted": ["exit", "getpid", "getcwd", "mkdir"], "note": "Use std.process and std.file instead."},
+      {"module": "std.net", "functions_attempted": ["connect", "listen", "send", "recv"], "note": "Only std.http with get/post/listen exists."},
+      {"module": "std.fmt", "functions_attempted": ["sprintf", "printf", "format"], "note": "Use str.concat and str.buf/str.add for formatting."},
+      {"module": "std.sort", "functions_attempted": ["sort", "sorted"], "note": "No sort module exists."},
+      {"module": "std.io (missing functions)", "functions_attempted": ["readfile", "writefile", "stdin", "stdout", "format"], "note": "std.io has println/print/readln/eprintln. File ops are in std.file."}
+    ],
+    "wrong_function_names": [
+      {"wrong": "str.format()", "correct": "str.buf() + str.add() + str.done()", "note": "No format strings in toke; use string builder pattern"},
+      {"wrong": "str.parseInt()", "correct": "str.toint()", "note": "Java naming convention"},
+      {"wrong": "str.parseFloat()", "correct": "str.tofloat()", "note": "Java naming convention"},
+      {"wrong": "str.toString()", "correct": "str.fromint() or str.fromfloat()", "note": "Reversed naming"},
+      {"wrong": "str.indexOf()", "correct": "str.contains() (bool only)", "note": "No index-finding in stdlib"},
+      {"wrong": "str.substr()", "correct": "str.slice()", "note": "Different name"},
+      {"wrong": "str.join()", "correct": "manual loop with str.buf()", "note": "No join function exists"},
+      {"wrong": "json.parse()", "correct": "json.dec()", "note": "Different name — 'dec' for decode"},
+      {"wrong": "json.stringify()", "correct": "json.enc()", "note": "Different name — 'enc' for encode"},
+      {"wrong": "io.printf()", "correct": "io.println() with manual formatting", "note": "No printf"},
+      {"wrong": "io.readLine()", "correct": "io.readln()", "note": "Abbreviated name"},
+      {"wrong": "file.readFile()", "correct": "file.read()", "note": "Abbreviated name"},
+      {"wrong": "file.writeFile()", "correct": "file.write()", "note": "Abbreviated name"},
+      {"wrong": "file.exists()", "correct": "N/A", "note": "No file existence check in stdlib"}
+    ]
+  },
+
+  "proposed_fixes": {
+    "system_prompt_improvements": [
+      {
+        "id": "SP-01",
+        "priority": "CRITICAL",
+        "title": "Add character set rules",
+        "detail": "The prompt must explicitly state: NO commas, NO square brackets, NO curly quotes, NO hash/pound. Semicolons separate everything (params, args, array elements, statements)."
+      },
+      {
+        "id": "SP-02",
+        "priority": "CRITICAL",
+        "title": "Add complete keyword mapping",
+        "detail": "Include explicit mapping table: fn/func -> f=, return -> <, for/while -> lp, else -> el, match -> mt, true/false -> true/false (same), let -> let (same), if -> if (same but requires parens)"
+      },
+      {
+        "id": "SP-03",
+        "priority": "CRITICAL",
+        "title": "Add declaration ordering rule",
+        "detail": "File structure must be: m=module; then i=alias:path; then t=type defs; then f=functions. This ordering is enforced by the parser (E2001)."
+      },
+      {
+        "id": "SP-04",
+        "priority": "HIGH",
+        "title": "Add complete stdlib reference",
+        "detail": "List ALL 14 stdlib modules with ALL function signatures. Explicitly state which modules do NOT exist (no std.math, no std.regex, no std.collections, no std.os, no std.net, no std.fmt, no std.sort)."
+      },
+      {
+        "id": "SP-05",
+        "priority": "HIGH",
+        "title": "Add mutable variable syntax",
+        "detail": "Mutable binding: let x=mut.VALUE (dot required). Mutable array: let arr=mut.@(). Mutable integer: let n=mut.0. Reassignment: x=newval (no 'let')."
+      },
+      {
+        "id": "SP-06",
+        "priority": "HIGH",
+        "title": "Add array/map syntax examples",
+        "detail": "Array literal: @(1;2;3). Map literal: @(\"key1\":\"val1\";\"key2\":\"val2\"). Array methods: .get(i), .push(val), .len. Mutable array: let a=mut.@(); a=a.push(item)."
+      },
+      {
+        "id": "SP-07",
+        "priority": "HIGH",
+        "title": "Add error handling syntax",
+        "detail": "Error union return: f=foo():$str!$err{...}. Return error: <$err(\"msg\"). Match result: mt expr { $ok:v ...; $err:e ... }. Error propagation: expr!."
+      },
+      {
+        "id": "SP-08",
+        "priority": "MEDIUM",
+        "title": "Add string builder pattern",
+        "detail": "Show the str.buf()/str.add()/str.done() pattern explicitly as it replaces printf/format/sprintf in toke."
+      },
+      {
+        "id": "SP-09",
+        "priority": "MEDIUM",
+        "title": "Add 3 complete working examples",
+        "detail": "Include small (5-line), medium (20-line), and large (50-line) complete working programs as few-shot examples in the system prompt."
+      },
+      {
+        "id": "SP-10",
+        "priority": "MEDIUM",
+        "title": "Add type system basics",
+        "detail": "Primitive types: i64, u64, f64, bool, $str. User types: t=$typename{field:type;...}. Sum types: t=$typename{$variant1:type;$variant2:type}. Casting: (expr as target_type)."
+      }
+    ],
+
+    "worker_script_fixes": [
+      {
+        "id": "WF-01",
+        "priority": "CRITICAL",
+        "title": "Fix -o flag to --out",
+        "detail": "worker-generate.py line 243: change '-o' to '--out'. This single fix could recover a significant portion of 'failed' programs that actually compile correctly.",
+        "file": "infra/worker-generate.py",
+        "line": 243
+      },
+      {
+        "id": "WF-02",
+        "priority": "HIGH",
+        "title": "Add error classification to failure records",
+        "detail": "Parse tkc JSON diagnostic output and record error_code, stage, and message in the failure metadata. This enables automated analysis without re-running.",
+        "file": "infra/worker-generate.py"
+      },
+      {
+        "id": "WF-03",
+        "priority": "HIGH",
+        "title": "Separate compile failures from test failures",
+        "detail": "Track whether failure was at --check stage, --out build stage, or test execution stage. Currently all are lumped as 'max_repairs_exceeded'.",
+        "file": "infra/worker-generate.py"
+      },
+      {
+        "id": "WF-04",
+        "priority": "MEDIUM",
+        "title": "Add error code to repair prompt",
+        "detail": "Include the specific error code (E2002, E1003, etc.) in the repair prompt so Claude can map errors to specific syntax rules.",
+        "file": "infra/worker-generate.py"
+      }
+    ],
+
+    "compiler_error_message_improvements": [
+      {
+        "id": "CE-01",
+        "priority": "HIGH",
+        "title": "Add fix suggestions for common LLM mistakes",
+        "detail": "When E1003 fires for comma, suggest: 'use ; to separate parameters, arguments, and array elements'. When E1003 fires for [, suggest: 'use @() for arrays'. These already partially exist (good!) but could be more prescriptive."
+      },
+      {
+        "id": "CE-02",
+        "priority": "HIGH",
+        "title": "Detect and suggest for 'for' loops",
+        "detail": "When 'for' is used as an identifier followed by '(', emit W1020 suggesting 'lp(init;cond;step){body}' pattern. Currently 'for' isn't detected as a foreign keyword."
+      },
+      {
+        "id": "CE-03",
+        "priority": "MEDIUM",
+        "title": "Add 'did you mean' for stdlib functions",
+        "detail": "When an unresolved function is called (E3011), check against known stdlib function names and suggest the correct one (e.g., 'did you mean str.toint instead of str.parseInt?')."
+      },
+      {
+        "id": "CE-04",
+        "priority": "MEDIUM",
+        "title": "Better error for mut without dot",
+        "detail": "E2002 'expected ., got @' could say: 'mutable bindings require a dot: mut.@() not mut@()'"
+      }
+    ],
+
+    "language_simplification_opportunities": [
+      {
+        "id": "LS-01",
+        "priority": "LOW",
+        "title": "Consider allowing -o as alias for --out",
+        "detail": "Most compilers support -o. Adding this alias is trivial and matches universal convention."
+      },
+      {
+        "id": "LS-02",
+        "priority": "LOW",
+        "title": "Consider str.join() stdlib addition",
+        "detail": "str.join(arr;sep) is extremely common. Currently requires manual str.buf() loop. Adding it would reduce code size and error surface."
+      },
+      {
+        "id": "LS-03",
+        "priority": "LOW",
+        "title": "Consider std.math module",
+        "detail": "sqrt, abs, pow, floor, ceil, min, max are called in ~30% of attempted programs. A minimal math module would significantly reduce failures."
+      },
+      {
+        "id": "LS-04",
+        "priority": "INFORMATIONAL",
+        "title": "The semicolon-everywhere design is the single biggest LLM friction point",
+        "detail": "Commas are deeply ingrained in LLM training data. Every generated program uses commas. This is by design (toke optimizes for token efficiency), but it means system prompts MUST heavily emphasize this rule."
+      }
+    ]
+  },
+
+  "repair_prompt_analysis": {
+    "current_prompt_weaknesses": [
+      "Too vague — says 'use toke syntax' without defining what toke syntax is",
+      "No stdlib function list — model hallucinates functions",
+      "No keyword mapping — model uses fn/for/while/else/return",
+      "No character set rules — model uses commas and square brackets",
+      "No examples — no few-shot learning of correct patterns",
+      "Error is passed as raw text — should be parsed and categorized"
+    ],
+    "recommended_repair_prompt_structure": [
+      "1. Explicit character set: only these characters are allowed: a-z A-Z 0-9 = ( ) { } ; : < > + - * / . @ $ ! \" space newline",
+      "2. Keyword table: fn->f=, return-><, for/while->lp, else->el, match->mt",
+      "3. Separator rule: ALL separators are semicolons. NO commas anywhere.",
+      "4. Array syntax: @(elem1;elem2) not [elem1, elem2]",
+      "5. The specific error code and its meaning",
+      "6. One correct example matching the error pattern",
+      "7. The complete list of available stdlib modules and functions"
+    ]
+  },
+
+  "estimated_impact_of_fixes": {
+    "fix_o_flag_bug": "+20-30% pass rate (programs that compile but fail build)",
+    "improved_system_prompt": "+25-35% pass rate (fewer syntax errors on first generation)",
+    "improved_repair_prompt": "+10-15% pass rate (more effective repair iterations)",
+    "combined_estimate": "Could raise 13% to 60-70% compile+test pass rate"
+  }
+}

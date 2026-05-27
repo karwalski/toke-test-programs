@@ -1,0 +1,3973 @@
+[
+  {
+    "module": "std.analytics",
+    "function": "analytics.describe",
+    "params": [
+      "dataframe"
+    ],
+    "return_type": "[statsrow]!dferr"
+  },
+  {
+    "module": "std.analytics",
+    "function": "analytics.groupstats",
+    "params": [
+      "dataframe",
+      "str",
+      "str"
+    ],
+    "return_type": "[groupstat]!dferr"
+  },
+  {
+    "module": "std.analytics",
+    "function": "analytics.timeseries",
+    "params": [
+      "dataframe",
+      "str",
+      "str",
+      "u64"
+    ],
+    "return_type": "[tspoint]!dferr"
+  },
+  {
+    "module": "std.analytics",
+    "function": "analytics.anomalies",
+    "params": [
+      "dataframe",
+      "str",
+      "f64"
+    ],
+    "return_type": "[u64]!dferr"
+  },
+  {
+    "module": "std.analytics",
+    "function": "analytics.pivot",
+    "params": [
+      "dataframe",
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "dataframe!dferr"
+  },
+  {
+    "module": "std.analytics",
+    "function": "analytics.corr",
+    "params": [
+      "dataframe",
+      "str",
+      "str"
+    ],
+    "return_type": "f64!dferr"
+  },
+  {
+    "module": "std.args",
+    "function": "args.all",
+    "params": [],
+    "return_type": "[str]"
+  },
+  {
+    "module": "std.args",
+    "function": "args.get",
+    "params": [
+      "u64"
+    ],
+    "return_type": "str!ArgsErr"
+  },
+  {
+    "module": "std.args",
+    "function": "args.count",
+    "params": [],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.auth",
+    "function": "auth.jwtsign",
+    "params": [
+      "JwtClaims",
+      "[byte]",
+      "JwtAlg"
+    ],
+    "return_type": "str!AuthErr"
+  },
+  {
+    "module": "std.auth",
+    "function": "auth.jwtverify",
+    "params": [
+      "str",
+      "[byte]"
+    ],
+    "return_type": "JwtClaims!AuthErr"
+  },
+  {
+    "module": "std.auth",
+    "function": "auth.jwtexpired",
+    "params": [
+      "JwtClaims"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.auth",
+    "function": "auth.apikeygenerate",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.auth",
+    "function": "auth.apikeyvalidate",
+    "params": [
+      "str",
+      "Keystore"
+    ],
+    "return_type": "bool!AuthErr"
+  },
+  {
+    "module": "std.auth",
+    "function": "auth.bearerextract",
+    "params": [
+      "str"
+    ],
+    "return_type": "str!AuthErr"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.new",
+    "params": [
+      "str",
+      "u32",
+      "u32"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.fill_rect",
+    "params": [
+      "canvas",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "str"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.stroke_rect",
+    "params": [
+      "canvas",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "str",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.clear_rect",
+    "params": [
+      "canvas",
+      "f64",
+      "f64",
+      "f64",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.fill_text",
+    "params": [
+      "canvas",
+      "str",
+      "f64",
+      "f64",
+      "str",
+      "str"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.begin_path",
+    "params": [
+      "canvas"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.move_to",
+    "params": [
+      "canvas",
+      "f64",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.line_to",
+    "params": [
+      "canvas",
+      "f64",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.arc",
+    "params": [
+      "canvas",
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.close_path",
+    "params": [
+      "canvas"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.fill",
+    "params": [
+      "canvas",
+      "str"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.stroke",
+    "params": [
+      "canvas",
+      "str",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.draw_image",
+    "params": [
+      "canvas",
+      "str",
+      "f64",
+      "f64",
+      "f64",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.set_alpha",
+    "params": [
+      "canvas",
+      "f64"
+    ],
+    "return_type": "canvas"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.to_js",
+    "params": [
+      "canvas"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.canvas",
+    "function": "canvas.to_html",
+    "params": [
+      "canvas"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.chart",
+    "function": "chart.bar",
+    "params": [
+      "[str]",
+      "[f64]",
+      "str"
+    ],
+    "return_type": "chartspec"
+  },
+  {
+    "module": "std.chart",
+    "function": "chart.line",
+    "params": [
+      "[str]",
+      "[dataset]",
+      "str"
+    ],
+    "return_type": "chartspec"
+  },
+  {
+    "module": "std.chart",
+    "function": "chart.scatter",
+    "params": [
+      "[f64]",
+      "[f64]",
+      "str"
+    ],
+    "return_type": "chartspec"
+  },
+  {
+    "module": "std.chart",
+    "function": "chart.pie",
+    "params": [
+      "[str]",
+      "[f64]",
+      "str"
+    ],
+    "return_type": "chartspec"
+  },
+  {
+    "module": "std.chart",
+    "function": "chart.tojson",
+    "params": [
+      "chartspec"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.chart",
+    "function": "chart.tovega",
+    "params": [
+      "chartspec"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.sha256",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.sha512",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.hmacsha256",
+    "params": [
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.hmacsha512",
+    "params": [
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.constanteq",
+    "params": [
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.randombytes",
+    "params": [
+      "u64"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.to_hex",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.sha256file",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.crypto",
+    "function": "crypto.sha256verify",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.reader",
+    "params": [
+      "[byte]",
+      "u8"
+    ],
+    "return_type": "csvreader"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.next",
+    "params": [
+      "csvreader"
+    ],
+    "return_type": "csvrow!csverr"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.header",
+    "params": [
+      "csvreader"
+    ],
+    "return_type": "[str]!csverr"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.writer",
+    "params": [
+      "u8"
+    ],
+    "return_type": "csvwriter"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.writerow",
+    "params": [
+      "csvwriter",
+      "[str]"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.flush",
+    "params": [
+      "csvwriter"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.csv",
+    "function": "csv.parse",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "[csvrow]!csverr"
+  },
+  {
+    "module": "std.dashboard",
+    "function": "dashboard.new",
+    "params": [
+      "str",
+      "u64"
+    ],
+    "return_type": "dashboard"
+  },
+  {
+    "module": "std.dashboard",
+    "function": "dashboard.addchart",
+    "params": [
+      "dashboard",
+      "str",
+      "chart.chartspec"
+    ],
+    "return_type": "dashwidget"
+  },
+  {
+    "module": "std.dashboard",
+    "function": "dashboard.addtable",
+    "params": [
+      "dashboard",
+      "str",
+      "[str]"
+    ],
+    "return_type": "dashwidget"
+  },
+  {
+    "module": "std.dashboard",
+    "function": "dashboard.update",
+    "params": [
+      "dashboard",
+      "dashwidget",
+      "[byte]"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.dashboard",
+    "function": "dashboard.serve",
+    "params": [
+      "dashboard"
+    ],
+    "return_type": "void!dasherr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.fromcsv",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "dataframe!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.fromrows",
+    "params": [
+      "[str]",
+      "[csvrow]"
+    ],
+    "return_type": "dataframe"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.column",
+    "params": [
+      "dataframe",
+      "str"
+    ],
+    "return_type": "[f64]!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.columnstr",
+    "params": [
+      "dataframe",
+      "str"
+    ],
+    "return_type": "[str]!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.filter",
+    "params": [
+      "dataframe",
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "dataframe!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.groupby",
+    "params": [
+      "dataframe",
+      "str"
+    ],
+    "return_type": "[dataframe]!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.join",
+    "params": [
+      "dataframe",
+      "dataframe",
+      "str"
+    ],
+    "return_type": "dataframe!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.head",
+    "params": [
+      "dataframe",
+      "u64"
+    ],
+    "return_type": "dataframe"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.shape",
+    "params": [
+      "dataframe"
+    ],
+    "return_type": "dfshape"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.tojson",
+    "params": [
+      "dataframe"
+    ],
+    "return_type": "[byte]!dferr"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.tocsv",
+    "params": [
+      "dataframe"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.dataframe",
+    "function": "df.schema",
+    "params": [
+      "dataframe"
+    ],
+    "return_type": "[series]"
+  },
+  {
+    "module": "std.db",
+    "function": "db.one",
+    "params": [
+      "str",
+      "[str]"
+    ],
+    "return_type": "Row!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "db.many",
+    "params": [
+      "str",
+      "[str]"
+    ],
+    "return_type": "[Row]!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "db.exec",
+    "params": [
+      "str",
+      "[str]"
+    ],
+    "return_type": "u64!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "row.str",
+    "params": [
+      "Row",
+      "str"
+    ],
+    "return_type": "str!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "row.u64",
+    "params": [
+      "Row",
+      "str"
+    ],
+    "return_type": "u64!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "row.i64",
+    "params": [
+      "Row",
+      "str"
+    ],
+    "return_type": "i64!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "row.f64",
+    "params": [
+      "Row",
+      "str"
+    ],
+    "return_type": "f64!DbErr"
+  },
+  {
+    "module": "std.db",
+    "function": "row.bool",
+    "params": [
+      "Row",
+      "str"
+    ],
+    "return_type": "bool!DbErr"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.b64encode",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.b64urlencode",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.b64decode",
+    "params": [
+      "str"
+    ],
+    "return_type": "[byte]!EncodingErr"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.b64urldecode",
+    "params": [
+      "str"
+    ],
+    "return_type": "[byte]!EncodingErr"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.hexencode",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.hexdecode",
+    "params": [
+      "str"
+    ],
+    "return_type": "[byte]!EncodingErr"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.urlencode",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.encoding",
+    "function": "encoding.urldecode",
+    "params": [
+      "str"
+    ],
+    "return_type": "str!EncodingErr"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.aes256gcm_encrypt",
+    "params": [
+      "[byte]",
+      "[byte]",
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.aes256gcm_decrypt",
+    "params": [
+      "[byte]",
+      "[byte]",
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "DecryptResult"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.aes256gcm_keygen",
+    "params": [],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.aes256gcm_noncegen",
+    "params": [],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.x25519_keypair",
+    "params": [],
+    "return_type": "Keypair"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.x25519_dh",
+    "params": [
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.ed25519_keypair",
+    "params": [],
+    "return_type": "Keypair"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.ed25519_sign",
+    "params": [
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.ed25519_verify",
+    "params": [
+      "[byte]",
+      "[byte]",
+      "[byte]"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.hkdf_sha256",
+    "params": [
+      "[byte]",
+      "[byte]",
+      "[byte]",
+      "u64"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.encrypt",
+    "function": "encrypt.tls_cert_fingerprint",
+    "params": [
+      "str"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.env",
+    "function": "env.get",
+    "params": [
+      "str"
+    ],
+    "return_type": "str!EnvErr"
+  },
+  {
+    "module": "std.env",
+    "function": "env.get_or",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.env",
+    "function": "env.getint",
+    "params": [
+      "str",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.env",
+    "function": "env.set",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.file",
+    "function": "file.read",
+    "params": [
+      "str"
+    ],
+    "return_type": "str!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.write",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.append",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.exists",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.file",
+    "function": "file.delete",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.list",
+    "params": [
+      "str"
+    ],
+    "return_type": "[str]!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.isdir",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.file",
+    "function": "file.mkdir",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.copy",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool!FileErr"
+  },
+  {
+    "module": "std.file",
+    "function": "file.listall",
+    "params": [
+      "str"
+    ],
+    "return_type": "[str]!FileErr"
+  },
+  {
+    "module": "std.html",
+    "function": "html.doc",
+    "params": [],
+    "return_type": "htmldoc"
+  },
+  {
+    "module": "std.html",
+    "function": "html.title",
+    "params": [
+      "htmldoc",
+      "str"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.html",
+    "function": "html.style",
+    "params": [
+      "htmldoc",
+      "str"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.html",
+    "function": "html.script",
+    "params": [
+      "htmldoc",
+      "str"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.html",
+    "function": "html.div",
+    "params": [
+      "[[str]]",
+      "[htmlnode]"
+    ],
+    "return_type": "htmlnode"
+  },
+  {
+    "module": "std.html",
+    "function": "html.p",
+    "params": [
+      "str"
+    ],
+    "return_type": "htmlnode"
+  },
+  {
+    "module": "std.html",
+    "function": "html.h1",
+    "params": [
+      "str"
+    ],
+    "return_type": "htmlnode"
+  },
+  {
+    "module": "std.html",
+    "function": "html.h2",
+    "params": [
+      "str"
+    ],
+    "return_type": "htmlnode"
+  },
+  {
+    "module": "std.html",
+    "function": "html.table",
+    "params": [
+      "[str]",
+      "[[str]]"
+    ],
+    "return_type": "htmlnode"
+  },
+  {
+    "module": "std.html",
+    "function": "html.append",
+    "params": [
+      "htmldoc",
+      "htmlnode"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.html",
+    "function": "html.render",
+    "params": [
+      "htmldoc"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.html",
+    "function": "html.escape",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.http",
+    "function": "http.param",
+    "params": [
+      "req",
+      "str"
+    ],
+    "return_type": "str!httprouteerr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.header",
+    "params": [
+      "req",
+      "str"
+    ],
+    "return_type": "str!httprouteerr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.reqpath",
+    "params": [
+      "i64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.http",
+    "function": "http.reqmethod",
+    "params": [
+      "i64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.http",
+    "function": "http.reqbody",
+    "params": [
+      "i64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.http",
+    "function": "http.reqparam",
+    "params": [
+      "i64",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.http",
+    "function": "http.reqheader",
+    "params": [
+      "i64",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.http",
+    "function": "http.res.ok",
+    "params": [
+      "str"
+    ],
+    "return_type": "res"
+  },
+  {
+    "module": "std.http",
+    "function": "http.res.json",
+    "params": [
+      "u16",
+      "str"
+    ],
+    "return_type": "res"
+  },
+  {
+    "module": "std.http",
+    "function": "http.res.bad",
+    "params": [
+      "str"
+    ],
+    "return_type": "res"
+  },
+  {
+    "module": "std.http",
+    "function": "http.res.err",
+    "params": [
+      "str"
+    ],
+    "return_type": "res"
+  },
+  {
+    "module": "std.http",
+    "function": "http.resok",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.resjson",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.resbad",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.reserr",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.client",
+    "params": [
+      "str"
+    ],
+    "return_type": "httpclient"
+  },
+  {
+    "module": "std.http",
+    "function": "http.withproxy",
+    "params": [
+      "httpclient",
+      "str"
+    ],
+    "return_type": "httpclient"
+  },
+  {
+    "module": "std.http",
+    "function": "http.get",
+    "params": [
+      "httpclient",
+      "str"
+    ],
+    "return_type": "httpresp!httperr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.post",
+    "params": [
+      "httpclient",
+      "str",
+      "[byte]",
+      "str"
+    ],
+    "return_type": "httpresp!httperr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.put",
+    "params": [
+      "httpclient",
+      "str",
+      "[byte]",
+      "str"
+    ],
+    "return_type": "httpresp!httperr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.delete",
+    "params": [
+      "httpclient",
+      "str"
+    ],
+    "return_type": "httpresp!httperr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.stream",
+    "params": [
+      "httpclient",
+      "httpreq"
+    ],
+    "return_type": "httpstream!httperr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.streamnext",
+    "params": [
+      "httpstream"
+    ],
+    "return_type": "[byte]!httperr"
+  },
+  {
+    "module": "std.http",
+    "function": "http.serve",
+    "params": [
+      "u64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.serve_workers",
+    "params": [
+      "u64",
+      "u64"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.http",
+    "function": "http.serve_tls",
+    "params": [
+      "u64",
+      "str",
+      "str"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.http",
+    "function": "http.downloadfile",
+    "params": [
+      "httpclient",
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.getstaticmime",
+    "params": [
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.setcors",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.http",
+    "function": "http.servepages",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.i18n",
+    "function": "i18n.load",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "I18nBundle!I18nErr"
+  },
+  {
+    "module": "std.i18n",
+    "function": "i18n.get",
+    "params": [
+      "I18nBundle",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.i18n",
+    "function": "i18n.fmt",
+    "params": [
+      "I18nBundle",
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.i18n",
+    "function": "i18n.locale",
+    "params": [],
+    "return_type": "str"
+  },
+  {
+    "module": "std.image",
+    "function": "image.decode",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "imgbuf!str"
+  },
+  {
+    "module": "std.image",
+    "function": "image.encode",
+    "params": [
+      "imgbuf",
+      "imgfmt",
+      "u8"
+    ],
+    "return_type": "[byte]!str"
+  },
+  {
+    "module": "std.image",
+    "function": "image.resize",
+    "params": [
+      "imgbuf",
+      "u32",
+      "u32"
+    ],
+    "return_type": "imgbuf"
+  },
+  {
+    "module": "std.image",
+    "function": "image.crop",
+    "params": [
+      "imgbuf",
+      "u32",
+      "u32",
+      "u32",
+      "u32"
+    ],
+    "return_type": "imgbuf!str"
+  },
+  {
+    "module": "std.image",
+    "function": "image.to_grayscale",
+    "params": [
+      "imgbuf"
+    ],
+    "return_type": "imgbuf"
+  },
+  {
+    "module": "std.image",
+    "function": "image.flip_h",
+    "params": [
+      "imgbuf"
+    ],
+    "return_type": "imgbuf"
+  },
+  {
+    "module": "std.image",
+    "function": "image.flip_v",
+    "params": [
+      "imgbuf"
+    ],
+    "return_type": "imgbuf"
+  },
+  {
+    "module": "std.image",
+    "function": "image.pixel_at",
+    "params": [
+      "imgbuf",
+      "u32",
+      "u32"
+    ],
+    "return_type": "[byte]!str"
+  },
+  {
+    "module": "std.image",
+    "function": "image.from_raw",
+    "params": [
+      "[byte]",
+      "u32",
+      "u32",
+      "u8"
+    ],
+    "return_type": "imgbuf"
+  },
+  {
+    "module": "std.infer",
+    "function": "infer.load",
+    "params": [
+      "str",
+      "infer_opts"
+    ],
+    "return_type": "model_handle!infererr"
+  },
+  {
+    "module": "std.infer",
+    "function": "infer.unload",
+    "params": [
+      "model_handle"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.infer",
+    "function": "infer.generate",
+    "params": [
+      "model_handle",
+      "str",
+      "i32"
+    ],
+    "return_type": "str!infererr"
+  },
+  {
+    "module": "std.infer",
+    "function": "infer.embed",
+    "params": [
+      "model_handle",
+      "str"
+    ],
+    "return_type": "@(f32)!infererr"
+  },
+  {
+    "module": "std.infer",
+    "function": "infer.is_loaded",
+    "params": [
+      "model_handle"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.infer",
+    "function": "infer.load_streaming",
+    "params": [
+      "str",
+      "stream_opts"
+    ],
+    "return_type": "model_handle!infererr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.enc",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.json",
+    "function": "json.dec",
+    "params": [
+      "str"
+    ],
+    "return_type": "Json!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.str",
+    "params": [
+      "Json",
+      "str"
+    ],
+    "return_type": "str!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.u64",
+    "params": [
+      "Json",
+      "str"
+    ],
+    "return_type": "u64!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.i64",
+    "params": [
+      "Json",
+      "str"
+    ],
+    "return_type": "i64!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.f64",
+    "params": [
+      "Json",
+      "str"
+    ],
+    "return_type": "f64!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.bool",
+    "params": [
+      "Json",
+      "str"
+    ],
+    "return_type": "bool!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.arr",
+    "params": [
+      "Json",
+      "str"
+    ],
+    "return_type": "[Json]!JsonErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.streamparser",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "JsonStream"
+  },
+  {
+    "module": "std.json",
+    "function": "json.streamnext",
+    "params": [
+      "JsonStream"
+    ],
+    "return_type": "JsonToken!JsonStreamErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.streamemit",
+    "params": [
+      "JsonWriter",
+      "Json"
+    ],
+    "return_type": "void!JsonStreamErr"
+  },
+  {
+    "module": "std.json",
+    "function": "json.newwriter",
+    "params": [
+      "u64"
+    ],
+    "return_type": "JsonWriter"
+  },
+  {
+    "module": "std.json",
+    "function": "json.writerbytes",
+    "params": [
+      "JsonWriter"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.keychain",
+    "function": "keychain.set",
+    "params": [
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.keychain",
+    "function": "keychain.get",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "?(str)"
+  },
+  {
+    "module": "std.keychain",
+    "function": "keychain.delete",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.keychain",
+    "function": "keychain.exists",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.keychain",
+    "function": "keychain.is_available",
+    "params": [],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.llm",
+    "function": "llm.client",
+    "params": [
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "llmclient"
+  },
+  {
+    "module": "std.llm",
+    "function": "llm.chat",
+    "params": [
+      "llmclient",
+      "[llmmsg]"
+    ],
+    "return_type": "llmresp!llmerr"
+  },
+  {
+    "module": "std.llm",
+    "function": "llm.chatstream",
+    "params": [
+      "llmclient",
+      "[llmmsg]"
+    ],
+    "return_type": "llmstream!llmerr"
+  },
+  {
+    "module": "std.llm",
+    "function": "llm.streamnext",
+    "params": [
+      "llmstream"
+    ],
+    "return_type": "str!llmerr"
+  },
+  {
+    "module": "std.llm",
+    "function": "llm.complete",
+    "params": [
+      "llmclient",
+      "str"
+    ],
+    "return_type": "str!llmerr"
+  },
+  {
+    "module": "std.llm",
+    "function": "llm.countokens",
+    "params": [
+      "llmclient",
+      "str"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.llm.tool",
+    "function": "llm.withtools",
+    "params": [
+      "llm.llmclient",
+      "[tooldecl]"
+    ],
+    "return_type": "llm.llmclient"
+  },
+  {
+    "module": "std.llm.tool",
+    "function": "llm.chatwithtools",
+    "params": [
+      "llm.llmclient",
+      "[llm.llmmsg]"
+    ],
+    "return_type": "toolcall!llm.llmerr"
+  },
+  {
+    "module": "std.llm.tool",
+    "function": "llm.submitresult",
+    "params": [
+      "llm.llmclient",
+      "[llm.llmmsg]",
+      "toolresult"
+    ],
+    "return_type": "llm.llmresp!llm.llmerr"
+  },
+  {
+    "module": "std.llm.tool",
+    "function": "llm.parsetoolcalls",
+    "params": [
+      "str"
+    ],
+    "return_type": "toolcall!llm.llmerr"
+  },
+  {
+    "module": "std.llm.tool",
+    "function": "llm.resultmsgs",
+    "params": [
+      "[toolresult]"
+    ],
+    "return_type": "[llm.llmmsg]"
+  },
+  {
+    "module": "std.log",
+    "function": "log.info",
+    "params": [
+      "str",
+      "[[str]]"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.log",
+    "function": "log.warn",
+    "params": [
+      "str",
+      "[[str]]"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.log",
+    "function": "log.error",
+    "params": [
+      "str",
+      "[[str]]"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.log",
+    "function": "log.openerror",
+    "params": [
+      "str",
+      "i64",
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.log",
+    "function": "log.accessformat",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.sum",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.mean",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.median",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.stddev",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.variance",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.percentile",
+    "params": [
+      "[f64]",
+      "f64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.linreg",
+    "params": [
+      "[f64]",
+      "[f64]"
+    ],
+    "return_type": "linregresult"
+  },
+  {
+    "module": "std.math",
+    "function": "math.min",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.max",
+    "params": [
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.abs",
+    "params": [
+      "f64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.sqrt",
+    "params": [
+      "f64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.floor",
+    "params": [
+      "f64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.ceil",
+    "params": [
+      "f64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.math",
+    "function": "math.pow",
+    "params": [
+      "f64",
+      "f64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.md",
+    "function": "md.render",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.md",
+    "function": "md.renderfile",
+    "params": [
+      "str"
+    ],
+    "return_type": "str!MdErr"
+  },
+  {
+    "module": "std.mdns",
+    "function": "mdns.advertise",
+    "params": [
+      "$service_record"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mdns",
+    "function": "mdns.stop_advertise",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mdns",
+    "function": "mdns.browse",
+    "params": [
+      "str",
+      "fn($discovered):void"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mdns",
+    "function": "mdns.stop_browse",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mdns",
+    "function": "mdns.resolve",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "?($discovered)"
+  },
+  {
+    "module": "std.mdns",
+    "function": "mdns.is_available",
+    "params": [],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.alloc",
+    "params": [
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.free",
+    "params": [
+      "u64"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.realloc",
+    "params": [
+      "u64",
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.copy",
+    "params": [
+      "u64",
+      "u64",
+      "u64"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.set",
+    "params": [
+      "u64",
+      "u64",
+      "u64"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.cmp",
+    "params": [
+      "u64",
+      "u64",
+      "u64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.load8",
+    "params": [
+      "u64",
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.mem",
+    "function": "mem.store8",
+    "params": [
+      "u64",
+      "u64",
+      "u64"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.linregfit",
+    "params": [
+      "[row]",
+      "[f64]"
+    ],
+    "return_type": "linearmodel!mlerr"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.linregpredict",
+    "params": [
+      "linearmodel",
+      "[f64]"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.kmeanstrain",
+    "params": [
+      "[row]",
+      "u64",
+      "u64"
+    ],
+    "return_type": "kmeansmodel!mlerr"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.kmeansassign",
+    "params": [
+      "kmeansmodel",
+      "[f64]"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.dtreefit",
+    "params": [
+      "[row]",
+      "[str]",
+      "u64"
+    ],
+    "return_type": "dtreemodel!mlerr"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.dtreepredict",
+    "params": [
+      "dtreemodel",
+      "[f64]"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.ml",
+    "function": "ml.knnpredict",
+    "params": [
+      "[row]",
+      "[str]",
+      "[f64]",
+      "u64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.mlx",
+    "function": "mlx.is_available",
+    "params": [],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mlx",
+    "function": "mlx.load",
+    "params": [
+      "str"
+    ],
+    "return_type": "mlx_model!mlxerr"
+  },
+  {
+    "module": "std.mlx",
+    "function": "mlx.unload",
+    "params": [
+      "mlx_model"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.mlx",
+    "function": "mlx.generate",
+    "params": [
+      "mlx_model",
+      "str",
+      "i32"
+    ],
+    "return_type": "str!mlxerr"
+  },
+  {
+    "module": "std.mlx",
+    "function": "mlx.embed",
+    "params": [
+      "mlx_model",
+      "str"
+    ],
+    "return_type": "@(f32)!mlxerr"
+  },
+  {
+    "module": "std.net",
+    "function": "net.portavailable",
+    "params": [
+      "int"
+    ],
+    "return_type": "int"
+  },
+  {
+    "module": "std.os",
+    "function": "os.open",
+    "params": [
+      "str",
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.close",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.read",
+    "params": [
+      "i64",
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.write",
+    "params": [
+      "i64",
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.lseek",
+    "params": [
+      "i64",
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.stat",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.unlink",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.rename",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.mkdir",
+    "params": [
+      "str",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.rmdir",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.access",
+    "params": [
+      "str",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.getcwd",
+    "params": [],
+    "return_type": "str"
+  },
+  {
+    "module": "std.os",
+    "function": "os.getpid",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.exit",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.getenv",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.os",
+    "function": "os.setenv",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.errno",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.strerror",
+    "params": [
+      "i64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.os",
+    "function": "os.o_rdonly",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.o_wronly",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.o_rdwr",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.o_creat",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.o_trunc",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.o_append",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.stdin_fd",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.stdout_fd",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.os",
+    "function": "os.stderr_fd",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.path",
+    "function": "path.join",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.path",
+    "function": "path.ext",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.path",
+    "function": "path.stem",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.path",
+    "function": "path.dir",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.path",
+    "function": "path.base",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.path",
+    "function": "path.isabs",
+    "params": [
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.process",
+    "function": "process.spawn",
+    "params": [
+      "[str]"
+    ],
+    "return_type": "Handle!ProcessErr"
+  },
+  {
+    "module": "std.process",
+    "function": "process.wait",
+    "params": [
+      "Handle"
+    ],
+    "return_type": "i32!ProcessErr"
+  },
+  {
+    "module": "std.process",
+    "function": "process.stdout",
+    "params": [
+      "Handle"
+    ],
+    "return_type": "str!ProcessErr"
+  },
+  {
+    "module": "std.process",
+    "function": "process.stderr",
+    "params": [
+      "Handle"
+    ],
+    "return_type": "str!ProcessErr"
+  },
+  {
+    "module": "std.process",
+    "function": "process.kill",
+    "params": [
+      "Handle"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.queue",
+    "function": "queue.new",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.queue",
+    "function": "queue.push",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.queue",
+    "function": "queue.pop",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.queue",
+    "function": "queue.peek",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.queue",
+    "function": "queue.len",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.router",
+    "function": "router.new",
+    "params": [],
+    "return_type": "router"
+  },
+  {
+    "module": "std.router",
+    "function": "router.get",
+    "params": [
+      "router",
+      "str",
+      "handler"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.router",
+    "function": "router.post",
+    "params": [
+      "router",
+      "str",
+      "handler"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.router",
+    "function": "router.put",
+    "params": [
+      "router",
+      "str",
+      "handler"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.router",
+    "function": "router.delete",
+    "params": [
+      "router",
+      "str",
+      "handler"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.router",
+    "function": "router.use",
+    "params": [
+      "router",
+      "middleware"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.router",
+    "function": "router.serve",
+    "params": [
+      "router",
+      "str",
+      "u64"
+    ],
+    "return_type": "void!routererr"
+  },
+  {
+    "module": "std.secure_mem",
+    "function": "secure_mem.alloc",
+    "params": [
+      "i32",
+      "i32"
+    ],
+    "return_type": "SecureBuf"
+  },
+  {
+    "module": "std.secure_mem",
+    "function": "secure_mem.write",
+    "params": [
+      "SecureBuf",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.secure_mem",
+    "function": "secure_mem.read",
+    "params": [
+      "SecureBuf"
+    ],
+    "return_type": "?(str)"
+  },
+  {
+    "module": "std.secure_mem",
+    "function": "secure_mem.wipe",
+    "params": [
+      "SecureBuf"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.secure_mem",
+    "function": "secure_mem.sweep",
+    "params": [],
+    "return_type": "i32"
+  },
+  {
+    "module": "std.secure_mem",
+    "function": "secure_mem.is_available",
+    "params": [],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.set",
+    "function": "set.new",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.set",
+    "function": "set.add",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.set",
+    "function": "set.has",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.set",
+    "function": "set.remove",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.set",
+    "function": "set.len",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.sse",
+    "function": "sse.emit",
+    "params": [
+      "ssectx",
+      "sseevent"
+    ],
+    "return_type": "void!sseerr"
+  },
+  {
+    "module": "std.sse",
+    "function": "sse.emitdata",
+    "params": [
+      "ssectx",
+      "str"
+    ],
+    "return_type": "void!sseerr"
+  },
+  {
+    "module": "std.sse",
+    "function": "sse.close",
+    "params": [
+      "ssectx"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.sse",
+    "function": "sse.keepalive",
+    "params": [
+      "ssectx",
+      "u64"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.stack",
+    "function": "stack.new",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.stack",
+    "function": "stack.push",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.stack",
+    "function": "stack.pop",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.stack",
+    "function": "stack.peek",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.stack",
+    "function": "stack.len",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.stack",
+    "function": "stack.empty",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.str",
+    "function": "str.len",
+    "params": [
+      "str"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.str",
+    "function": "str.concat",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.slice",
+    "params": [
+      "str",
+      "u64",
+      "u64"
+    ],
+    "return_type": "str!SliceErr"
+  },
+  {
+    "module": "std.str",
+    "function": "str.from_int",
+    "params": [
+      "i64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.from_float",
+    "params": [
+      "f64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.to_int",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64!ParseErr"
+  },
+  {
+    "module": "std.str",
+    "function": "str.to_float",
+    "params": [
+      "str"
+    ],
+    "return_type": "f64!ParseErr"
+  },
+  {
+    "module": "std.str",
+    "function": "str.contains",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.str",
+    "function": "str.split",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "[str]"
+  },
+  {
+    "module": "std.str",
+    "function": "str.trim",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.upper",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.lower",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.bytes",
+    "params": [
+      "str"
+    ],
+    "return_type": "[byte]"
+  },
+  {
+    "module": "std.str",
+    "function": "str.from_bytes",
+    "params": [
+      "[byte]"
+    ],
+    "return_type": "str!EncodingErr"
+  },
+  {
+    "module": "std.str",
+    "function": "str.startswith",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.str",
+    "function": "str.endswith",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.str",
+    "function": "str.replace",
+    "params": [
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.indexof",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.str",
+    "function": "str.repeat",
+    "params": [
+      "str",
+      "u64"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.join",
+    "params": [
+      "str",
+      "[str]"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.buf",
+    "params": [],
+    "return_type": "StrBuf"
+  },
+  {
+    "module": "std.str",
+    "function": "str.add",
+    "params": [
+      "StrBuf",
+      "str"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.str",
+    "function": "str.addbyte",
+    "params": [
+      "StrBuf",
+      "byte"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.str",
+    "function": "str.done",
+    "params": [
+      "StrBuf"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.trimprefix",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.trimsuffix",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.str",
+    "function": "str.lastindex",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.str",
+    "function": "str.matchbracket",
+    "params": [
+      "str"
+    ],
+    "return_type": "str!BracketErr"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.doc",
+    "params": [
+      "f64",
+      "f64"
+    ],
+    "return_type": "svgdoc"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.rect",
+    "params": [
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.circle",
+    "params": [
+      "f64",
+      "f64",
+      "f64",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.line",
+    "params": [
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.path",
+    "params": [
+      "str",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.text",
+    "params": [
+      "f64",
+      "f64",
+      "str",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.group",
+    "params": [
+      "[svgelem]",
+      "str"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.polyline",
+    "params": [
+      "[[f64]]",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.polygon",
+    "params": [
+      "[[f64]]",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.append",
+    "params": [
+      "svgdoc",
+      "svgelem"
+    ],
+    "return_type": "svgdoc"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.render",
+    "params": [
+      "svgdoc"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.style",
+    "params": [
+      "str",
+      "str",
+      "f64"
+    ],
+    "return_type": "svgstyle"
+  },
+  {
+    "module": "std.svg",
+    "function": "svg.arrow",
+    "params": [
+      "f64",
+      "f64",
+      "f64",
+      "f64",
+      "svgstyle"
+    ],
+    "return_type": "svgelem"
+  },
+  {
+    "module": "std.sys",
+    "function": "sys.configdir",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.sys",
+    "function": "sys.datadir",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.task",
+    "function": "task.scope",
+    "params": [],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.task",
+    "function": "task.spawn",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.task",
+    "function": "task.awaitall",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.task",
+    "function": "task.result",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.task",
+    "function": "task.cancel",
+    "params": [
+      "i64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.template",
+    "function": "tpl.compile",
+    "params": [
+      "str"
+    ],
+    "return_type": "$tmpl!$tmplerr"
+  },
+  {
+    "module": "std.template",
+    "function": "tpl.render",
+    "params": [
+      "$tmpl",
+      "$tmplvars"
+    ],
+    "return_type": "$str!$tmplerr"
+  },
+  {
+    "module": "std.template",
+    "function": "tpl.vars",
+    "params": [
+      "@($str:$str)"
+    ],
+    "return_type": "$tmplvars"
+  },
+  {
+    "module": "std.template",
+    "function": "tpl.html",
+    "params": [
+      "$str",
+      "@($str:$str)",
+      "@$str"
+    ],
+    "return_type": "$str"
+  },
+  {
+    "module": "std.template",
+    "function": "tpl.escape",
+    "params": [
+      "$str"
+    ],
+    "return_type": "$str"
+  },
+  {
+    "module": "std.template",
+    "function": "tpl.renderfile",
+    "params": [
+      "$str",
+      "$tmplvars"
+    ],
+    "return_type": "$str!$tmplerr"
+  },
+  {
+    "module": "std.test",
+    "function": "test.assert",
+    "params": [
+      "bool",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.test",
+    "function": "test.assert_eq",
+    "params": [
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.test",
+    "function": "test.assert_ne",
+    "params": [
+      "str",
+      "str",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.time",
+    "function": "time.now",
+    "params": [],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.format",
+    "params": [
+      "u64",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.time",
+    "function": "time.since",
+    "params": [
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.parse",
+    "params": [
+      "str",
+      "str"
+    ],
+    "return_type": "u64!TimeErr"
+  },
+  {
+    "module": "std.time",
+    "function": "time.add",
+    "params": [
+      "u64",
+      "i64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.diff",
+    "params": [
+      "u64",
+      "u64"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.to_parts",
+    "params": [
+      "u64"
+    ],
+    "return_type": "TimeParts"
+  },
+  {
+    "module": "std.time",
+    "function": "time.from_parts",
+    "params": [
+      "TimeParts"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.weekday",
+    "params": [
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.is_leap_year",
+    "params": [
+      "i64"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.time",
+    "function": "time.days_in_month",
+    "params": [
+      "i64",
+      "i64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.with_tz",
+    "params": [
+      "u64",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.time",
+    "function": "time.utc_offset",
+    "params": [
+      "str"
+    ],
+    "return_type": "i64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.convert",
+    "params": [
+      "u64",
+      "str",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.time",
+    "function": "time.add_days",
+    "params": [
+      "u64",
+      "i64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.add_months",
+    "params": [
+      "u64",
+      "i64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.add_years",
+    "params": [
+      "u64",
+      "i64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.start_of_day",
+    "params": [
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.start_of_month",
+    "params": [
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.start_of_year",
+    "params": [
+      "u64"
+    ],
+    "return_type": "u64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.parse_duration",
+    "params": [
+      "str"
+    ],
+    "return_type": "Duration!TimeErr"
+  },
+  {
+    "module": "std.time",
+    "function": "time.format_duration",
+    "params": [
+      "Duration"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.time",
+    "function": "time.duration",
+    "params": [
+      "u64",
+      "u64"
+    ],
+    "return_type": "Duration"
+  },
+  {
+    "module": "std.time",
+    "function": "time.julian_date",
+    "params": [
+      "u64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.mars_sol",
+    "params": [
+      "u64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.time",
+    "function": "time.format_mars",
+    "params": [
+      "f64",
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.time",
+    "function": "time.light_delay",
+    "params": [
+      "str",
+      "str",
+      "u64"
+    ],
+    "return_type": "f64"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.gen_self_signed",
+    "params": [
+      "str",
+      "i32"
+    ],
+    "return_type": "TlsKeypair!TlsErr"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.listen",
+    "params": [
+      "i32",
+      "TlsConfig",
+      "fn"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.connect",
+    "params": [
+      "str",
+      "i32",
+      "TlsConfig"
+    ],
+    "return_type": "?(TlsConn)"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.read",
+    "params": [
+      "TlsConn"
+    ],
+    "return_type": "?(str)"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.write",
+    "params": [
+      "TlsConn",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.close",
+    "params": [
+      "TlsConn"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.peer_cert",
+    "params": [
+      "TlsConn"
+    ],
+    "return_type": "?(str)"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.fingerprint",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.tls",
+    "function": "tls.pairing_code",
+    "params": [
+      "TlsConn"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.toml",
+    "function": "toml.load",
+    "params": [
+      "str"
+    ],
+    "return_type": "tomlval!tomlerr"
+  },
+  {
+    "module": "std.toml",
+    "function": "toml.loadfile",
+    "params": [
+      "str"
+    ],
+    "return_type": "tomlval!tomlerr"
+  },
+  {
+    "module": "std.toml",
+    "function": "toml.str",
+    "params": [
+      "tomlval",
+      "str"
+    ],
+    "return_type": "str!tomlerr"
+  },
+  {
+    "module": "std.toml",
+    "function": "toml.i64",
+    "params": [
+      "tomlval",
+      "str"
+    ],
+    "return_type": "i64!tomlerr"
+  },
+  {
+    "module": "std.toml",
+    "function": "toml.bool",
+    "params": [
+      "tomlval",
+      "str"
+    ],
+    "return_type": "bool!tomlerr"
+  },
+  {
+    "module": "std.toml",
+    "function": "toml.section",
+    "params": [
+      "tomlval",
+      "str"
+    ],
+    "return_type": "tomlval!tomlerr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.enc",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.dec",
+    "params": [
+      "str"
+    ],
+    "return_type": "Toon!ToonErr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.str",
+    "params": [
+      "Toon",
+      "str"
+    ],
+    "return_type": "str!ToonErr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.i64",
+    "params": [
+      "Toon",
+      "str"
+    ],
+    "return_type": "i64!ToonErr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.f64",
+    "params": [
+      "Toon",
+      "str"
+    ],
+    "return_type": "f64!ToonErr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.bool",
+    "params": [
+      "Toon",
+      "str"
+    ],
+    "return_type": "bool!ToonErr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.arr",
+    "params": [
+      "Toon",
+      "str"
+    ],
+    "return_type": "[Toon]!ToonErr"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.from_json",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.toon",
+    "function": "toon.to_json",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.open",
+    "params": [
+      "str"
+    ],
+    "return_type": "VecStore!VecErr"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.close",
+    "params": [
+      "VecStore"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.collection",
+    "params": [
+      "VecStore",
+      "str"
+    ],
+    "return_type": "VecCollection!VecErr"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.upsert",
+    "params": [
+      "VecCollection",
+      "str",
+      "@(f32)",
+      "i32",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.search",
+    "params": [
+      "VecCollection",
+      "@(f32)",
+      "i32",
+      "i32",
+      "f64"
+    ],
+    "return_type": "[SearchResult]"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.delete",
+    "params": [
+      "VecCollection",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.delete_before",
+    "params": [
+      "VecCollection",
+      "i64"
+    ],
+    "return_type": "i32"
+  },
+  {
+    "module": "std.vecstore",
+    "function": "vecstore.count",
+    "params": [
+      "VecCollection"
+    ],
+    "return_type": "i32"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.open",
+    "params": [
+      "str",
+      "str",
+      "i32",
+      "i32"
+    ],
+    "return_type": "webview_handle"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.close",
+    "params": [
+      "webview_handle"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.set_title",
+    "params": [
+      "webview_handle",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.on_close",
+    "params": [
+      "webview_handle",
+      "fn():void"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.register_handler",
+    "params": [
+      "webview_handle",
+      "str",
+      "fn(str):str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.eval_js",
+    "params": [
+      "webview_handle",
+      "str"
+    ],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.run_event_loop",
+    "params": [],
+    "return_type": "void"
+  },
+  {
+    "module": "std.webview",
+    "function": "webview.is_available",
+    "params": [],
+    "return_type": "bool"
+  },
+  {
+    "module": "std.ws",
+    "function": "ws.connect",
+    "params": [
+      "str"
+    ],
+    "return_type": "wsconn!wserr"
+  },
+  {
+    "module": "std.ws",
+    "function": "ws.send",
+    "params": [
+      "wsconn",
+      "str"
+    ],
+    "return_type": "void!wserr"
+  },
+  {
+    "module": "std.ws",
+    "function": "ws.sendbytes",
+    "params": [
+      "wsconn",
+      "[byte]"
+    ],
+    "return_type": "void!wserr"
+  },
+  {
+    "module": "std.ws",
+    "function": "ws.recv",
+    "params": [
+      "wsconn"
+    ],
+    "return_type": "wsmsg!wserr"
+  },
+  {
+    "module": "std.ws",
+    "function": "ws.close",
+    "params": [
+      "wsconn"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.ws",
+    "function": "ws.broadcast",
+    "params": [
+      "[wsconn]",
+      "str"
+    ],
+    "return_type": "void"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.enc",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.dec",
+    "params": [
+      "str"
+    ],
+    "return_type": "Yaml!YamlErr"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.str",
+    "params": [
+      "Yaml",
+      "str"
+    ],
+    "return_type": "str!YamlErr"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.i64",
+    "params": [
+      "Yaml",
+      "str"
+    ],
+    "return_type": "i64!YamlErr"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.f64",
+    "params": [
+      "Yaml",
+      "str"
+    ],
+    "return_type": "f64!YamlErr"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.bool",
+    "params": [
+      "Yaml",
+      "str"
+    ],
+    "return_type": "bool!YamlErr"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.arr",
+    "params": [
+      "Yaml",
+      "str"
+    ],
+    "return_type": "[Yaml]!YamlErr"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.from_json",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  },
+  {
+    "module": "std.yaml",
+    "function": "yaml.to_json",
+    "params": [
+      "str"
+    ],
+    "return_type": "str"
+  }
+]
