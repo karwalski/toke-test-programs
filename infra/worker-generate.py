@@ -908,20 +908,25 @@ def main():
         log.error("API keys not configured. Edit /opt/toke-worker/.env")
         sys.exit(1)
 
-    # Pull latest test programs
-    try:
-        subprocess.run(
-            ["git", "fetch", "origin", "main"],
-            cwd=TEST_PROGRAMS_DIR,
-            capture_output=True, timeout=30,
-        )
-        subprocess.run(
-            ["git", "reset", "--hard", "origin/main"],
-            cwd=TEST_PROGRAMS_DIR,
-            capture_output=True, timeout=10,
-        )
-    except Exception:
-        pass
+    # Pull latest test programs (skipped in DRY_RUN or when WORKER_DIR is
+    # overridden — those are local-dev modes where `git reset --hard` would
+    # clobber uncommitted work in the developer's repo). 107.R4 lesson.
+    if not DRY_RUN and not WORKER_DIR_OVERRIDE:
+        try:
+            subprocess.run(
+                ["git", "fetch", "origin", "main"],
+                cwd=TEST_PROGRAMS_DIR,
+                capture_output=True, timeout=30,
+            )
+            subprocess.run(
+                ["git", "reset", "--hard", "origin/main"],
+                cwd=TEST_PROGRAMS_DIR,
+                capture_output=True, timeout=10,
+            )
+        except Exception:
+            pass
+    else:
+        log.info("local/dry-run mode: skipping git fetch+reset on test_programs_dir")
 
     state = load_state()
     all_requirements = load_all_requirements()
