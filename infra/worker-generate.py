@@ -55,10 +55,15 @@ RATE_LIMIT_DELAY = 1.0
 TKC_TIMEOUT = 60
 TEST_TIMEOUT = 10
 BUILD_COOLDOWN = 2.0
+# 107.R4.9: model IDs env-configurable so we can swap in newer releases
+# without re-deploying worker code. Defaults to current latest (Opus 4.8 / Sonnet 4.6).
+MODEL_OPUS   = os.environ.get("MODEL_OPUS",   "claude-opus-4-8")
+MODEL_SONNET = os.environ.get("MODEL_SONNET", "claude-sonnet-4-6")
 # Per-1M-token pricing for budget tracking (Anthropic public list, USD).
+# Opus 4.6+ pricing dropped 3× from Opus 4.0 ($15/$75 → $5/$25).
 PRICE_PER_MTOK = {
-    "sonnet": {"input": 3.00,  "output": 15.00},
-    "opus":   {"input": 15.00, "output": 75.00},
+    "sonnet": {"input": 3.00, "output": 15.00},
+    "opus":   {"input": 5.00, "output": 25.00},
 }
 # 107.R2: per-program override (max_sonnet/max_opus/model from manifest)
 PROGRAM_OVERRIDES: dict[str, dict] = {}
@@ -522,7 +527,7 @@ def call_anthropic_repair(source: str, error: str, description: str,
     107.R2: test_cases list preferred over single test_input/expected fields.
     107.R4.1: DRY_RUN=1 returns _dry_run_stub_source() after prompt-format
     runs (catches IndexError/format crashes without API spend)."""
-    model = "claude-opus-4-20250514" if use_opus else "claude-sonnet-4-20250514"
+    model = MODEL_OPUS if use_opus else MODEL_SONNET
     # 107.R2: prefer full test_cases list
     if test_cases:
         all_tests = _format_all_test_cases(test_cases)
