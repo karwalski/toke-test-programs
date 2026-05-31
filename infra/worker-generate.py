@@ -766,8 +766,10 @@ def process_requirement(req: dict, state: dict):
         broken_source = source  # save the broken version
         fixed_source = call_anthropic_repair(
             source, error, description,
+            test_cases=test_cases,
             test_input=test_input, expected_output=expected_output,
             use_opus=use_opus,
+            req_id=req_id,
         )
         if not fixed_source:
             log.warning(f"{req_id}: Repair returned nothing at iteration {iteration}")
@@ -781,14 +783,76 @@ def process_requirement(req: dict, state: dict):
             "fixed_source": fixed_source[:2000],
         })
 
+        # 107.R2: response-shape validation. If Opus returned a snippet
+        # (no m= prefix, no f=main), retry ONCE with a reinforced prompt.
+        if not _looks_like_complete_program(fixed_source):
+            log.warning(f"{req_id}: Opus returned non-program ({len(fixed_source)}b, starts with {fixed_source[:30]!r}) — retrying with stronger prompt")
+            reinforced = (
+                f"PREVIOUS RESPONSE WAS REJECTED: not a complete toke program "
+                f"(missing 'm=' prefix or 'f=main' definition). Re-read CRITICAL "
+                f"REQUIREMENTS. Output the WHOLE program with module, imports, "
+                f"function definitions, and main entry point.\n\nOriginal error:\n{error}"
+            )
+            retry = call_anthropic_repair(
+                source, reinforced, description,
+                test_cases=test_cases, use_opus=use_opus, req_id=req_id,
+            )
+            if retry and _looks_like_complete_program(retry):
+                log.info(f"{req_id}: shape-retry produced complete program")
+                fixed_source = retry
+
         source = fixed_source
         source_path.write_text(source)
 
         compiles, compile_output = run_tkc_check(source_path)
         warnings = [line for line in compile_output.split("\n") if "warning" in line.lower()]
 
+        # 107.R4.7: syntax-error retry. If compile fails with a SIMPLE code
+        # the model often fixes-on-retry (E1003 underscores, E2003 missing
+        # semicolon, E4070 missing mut.), retry ONCE with hyper-focused prompt.
         if not compiles:
-            error = f"Compile error:\n{compile_output}"
+            import re as _re
+            first_code_match = _re.search(r'\bE\d{4}\b', compile_output)
+            first_code = first_code_match.group(0) if first_code_match else None
+            AUTO_RETRY_CODES = {"E1003", "E2003", "E4070"}
+            if first_code in AUTO_RETRY_CODES:
+                # Pull the first diagnostic message
+                first_msg = ""
+                for line in compile_output.splitlines():
+                    if line.strip().startswith("{") and '"error_code"' in line:
+                        try:
+                            d = json.loads(line)
+                            if d.get("error_code") == first_code:
+                                first_msg = d.get("message", "")[:200]
+                                break
+                        except Exception:
+                            pass
+                log.info(f"{req_id}: auto-retry on {first_code}: {first_msg[:60]!r}")
+                focused = (
+                    f"PREVIOUS ATTEMPT had a simple fix: {first_code} — {first_msg}. "
+                    f"Apply ONLY that fix and re-emit the COMPLETE program. "
+                    f"Do not change unrelated lines."
+                )
+                retry = call_anthropic_repair(
+                    fixed_source, focused, description,
+                    test_cases=test_cases, use_opus=use_opus, req_id=req_id,
+                )
+                b = load_budget()
+                b["auto_retries_triggered"] = b.get("auto_retries_triggered", 0) + 1
+                save_budget(b)
+                if retry and _looks_like_complete_program(retry):
+                    source = retry
+                    source_path.write_text(source)
+                    compiles, compile_output = run_tkc_check(source_path)
+                    if compiles:
+                        log.info(f"{req_id}: auto-retry FIXED {first_code}")
+                        b = load_budget()
+                        b["auto_retries_fixed"] = b.get("auto_retries_fixed", 0) + 1
+                        save_budget(b)
+
+        if not compiles:
+            # 107.R2: truncate cascading diagnostics in the next-iter prompt
+            error = f"Compile error:\n{_truncate_diagnostics(compile_output, keep=5)}"
             continue
 
         passes, test_output = run_tests(work_dir, req)
@@ -946,6 +1010,16 @@ def main():
     # Track which categories have been halted due to low success rate (102.32)
     halted_categories = set()
 
+    # 107.R4.4: early-abort tracking — first-N outcomes + fingerprints
+    EARLY_ABORT_THRESHOLD = int(os.environ.get("EARLY_ABORT_THRESHOLD", "5"))
+    early_outcomes: list[tuple[str, str]] = []   # (outcome, fingerprint)
+
+    # 107.R4.5: spend-anomaly tracking — halt if zero passes after N + spend > $X
+    SPEND_ANOMALY_THRESHOLD = float(os.environ.get("SPEND_ANOMALY_THRESHOLD", "0"))
+    SPEND_ANOMALY_AFTER_N = int(os.environ.get("SPEND_ANOMALY_AFTER_N", "10"))
+    outcome_count = 0
+    completed_at_start = len(state.get("completed", []))
+
     for req in my_requirements:
         req_id = req["id"]
         category = req["_category"]
@@ -984,6 +1058,61 @@ def main():
             continue
 
         process_requirement(req, state)
+
+        # 107.R4.4 + 107.R4.5: post-program safety rails
+        outcome_count += 1
+        last_failed = state.get("failed", [])
+        last_completed = state.get("completed", [])
+        was_pass = req_id in last_completed
+        outcome_str = "pass" if was_pass else "fail"
+        fp = ""
+        if not was_pass and last_failed:
+            last_f = last_failed[-1]
+            err_text = last_f.get("error", "") if isinstance(last_f, dict) else ""
+            fp = _error_fingerprint(err_text)
+        # Update budget counters
+        b = load_budget()
+        b["passes"] = len(last_completed) - completed_at_start
+        b["fails"] = sum(1 for x in last_failed)
+        if b["passes"] > 0:
+            b["spend_per_pass"] = round(b.get("usd_spent", 0.0) / b["passes"], 4)
+        save_budget(b)
+
+        # 107.R4.4: early-abort if first N programs all failed with ≤2 unique fingerprints
+        if EARLY_ABORT_THRESHOLD > 0 and len(early_outcomes) < EARLY_ABORT_THRESHOLD:
+            early_outcomes.append((outcome_str, fp))
+            if len(early_outcomes) == EARLY_ABORT_THRESHOLD:
+                all_fail = all(o == "fail" for o, _ in early_outcomes)
+                uniq_fp = len({f for _, f in early_outcomes if f})
+                if all_fail and uniq_fp <= 2:
+                    msg = (
+                        f"EARLY ABORT: first {EARLY_ABORT_THRESHOLD} programs all FAILED "
+                        f"with {uniq_fp} unique error fingerprint(s) — likely a worker-wide "
+                        f"issue (stale tkc? bad prompt? env misconfig?). "
+                        f"Fingerprints: {sorted({f for _, f in early_outcomes if f})}. "
+                        f"Halting before burning more budget."
+                    )
+                    log.error(msg)
+                    state["aborted_early"] = {
+                        "reason": msg,
+                        "threshold": EARLY_ABORT_THRESHOLD,
+                        "fingerprints": sorted({f for _, f in early_outcomes if f}),
+                    }
+                    save_state(state)
+                    return
+
+        # 107.R4.5: spend-anomaly soft halt
+        if (SPEND_ANOMALY_THRESHOLD > 0 and outcome_count >= SPEND_ANOMALY_AFTER_N
+                and b.get("passes", 0) == 0 and b.get("usd_spent", 0.0) >= SPEND_ANOMALY_THRESHOLD):
+            msg = (
+                f"SPEND ANOMALY: after {outcome_count} programs, ZERO passes and "
+                f"${b['usd_spent']:.2f} spent (threshold ${SPEND_ANOMALY_THRESHOLD}). "
+                f"Halting for review."
+            )
+            log.error(msg)
+            state["anomaly_halt"] = {"reason": msg, "spent": b["usd_spent"], "passes": 0}
+            save_state(state)
+            return
 
         # After processing, check if this category should be halted (102.32)
         if should_halt_category(state, category):
