@@ -28,21 +28,40 @@ TOKE_API_URL = os.environ.get("TOKE_API_URL", "https://api.tokelang.dev")
 TOKE_API_KEY = os.environ.get("TOKE_API_KEY", "")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
-WORKER_DIR = Path("/opt/toke-worker")
+# 107.R4.1: DRY_RUN=1 stubs Anthropic + toke API calls + isolates state to
+# state-dryrun.json / budget-dryrun.json so we can validate the manifest +
+# prompt-format + compile/test pipeline locally without spending any API.
+DRY_RUN = os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes")
+WORKER_DIR_OVERRIDE = os.environ.get("WORKER_DIR")  # for local testing
+
+WORKER_DIR = Path(WORKER_DIR_OVERRIDE) if WORKER_DIR_OVERRIDE else Path("/opt/toke-worker")
 REPOS_DIR = WORKER_DIR / "repos"
 TEST_PROGRAMS_DIR = REPOS_DIR / "toke-test-programs"
-STATE_FILE = WORKER_DIR / "state.json"
 LOGS_DIR = WORKER_DIR / "logs"
 SOLUTIONS_DIR = WORKER_DIR / "solutions"
 FAILED_DIR = WORKER_DIR / "failed"
+# Separate state + budget files when DRY_RUN so we don't clobber real runs.
+STATE_FILE = WORKER_DIR / ("state-dryrun.json" if DRY_RUN else "state.json")
+BUDGET_FILE = WORKER_DIR / ("budget-dryrun.json" if DRY_RUN else "budget.json")
 
-MAX_SONNET_ITERATIONS = 10
-MAX_OPUS_ITERATIONS = 5
-MAX_REPAIR_ITERATIONS = MAX_SONNET_ITERATIONS + MAX_OPUS_ITERATIONS  # 15 total
-RATE_LIMIT_DELAY = 1.0  # seconds between API calls
-TKC_TIMEOUT = 60  # seconds (increased for tkc --out full build)
-TEST_TIMEOUT = 10  # seconds
-BUILD_COOLDOWN = 2.0  # seconds between builds to prevent OOM on small instances
+MAX_SONNET_ITERATIONS = int(os.environ.get("MAX_SONNET_ITERATIONS", "10"))
+MAX_OPUS_ITERATIONS = int(os.environ.get("MAX_OPUS_ITERATIONS", "5"))
+MAX_REPAIR_ITERATIONS = MAX_SONNET_ITERATIONS + MAX_OPUS_ITERATIONS
+BUDGET_USD_CAP = float(os.environ.get("BUDGET_USD_CAP", "20.0"))
+USE_TOKE_API = os.environ.get("USE_TOKE_API", "1").lower() not in ("0", "false", "no")
+RUN_MODE = os.environ.get("RUN_MODE", "baseline")
+MANIFEST_PATH = os.environ.get("MANIFEST_PATH", "")
+RATE_LIMIT_DELAY = 1.0
+TKC_TIMEOUT = 60
+TEST_TIMEOUT = 10
+BUILD_COOLDOWN = 2.0
+# Per-1M-token pricing for budget tracking (Anthropic public list, USD).
+PRICE_PER_MTOK = {
+    "sonnet": {"input": 3.00,  "output": 15.00},
+    "opus":   {"input": 15.00, "output": 75.00},
+}
+# 107.R2: per-program override (max_sonnet/max_opus/model from manifest)
+PROGRAM_OVERRIDES: dict[str, dict] = {}
 
 # --- Logging ---
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -112,9 +131,10 @@ Output ONLY toke source code. No explanation. No markdown."""
 TOKE_REPAIR_PROMPT = """Fix this toke program. Address the SPECIFIC error shown.
 
 REQUIREMENT: {description}
-INPUT: {test_input}
-EXPECTED OUTPUT: {expected_output}
 
+ALL TEST CASES (your program must pass EVERY one):
+{all_test_cases_block}
+{program_hints}
 CURRENT SOURCE:
 ```toke
 {source}
@@ -125,11 +145,13 @@ ERROR:
 
 COMMON FIXES:
 - E4070 "cannot assign to immutable": Change `let x=0` to `let x=mut.0` for ANY variable you reassign later. EVERY variable that gets x=x+1 or x=newval MUST use mut.
-- E2002 parse error: Check for commas (use semicolons), missing semicolons between statements, wrong keywords (fn→f=, for→lp, else→el, return→<).
+- E2002 parse error: Check for commas (use semicolons), missing semicolons between statements, wrong keywords (fn→f=, for→lp, else→el, return→<). If you see 10+ E2002s in a cascade, fix only the FIRST one — the rest are usually downstream noise.
 - E1003 illegal char: Remove uppercase letters, underscores in identifiers, or characters outside a-z 0-9 and the 19 allowed symbols.
+- E9003 clang link failure: Stdlib glue mismatch — function arity/types differ. Re-check signatures (e.g. s.split takes 2 args, separated by `;`).
 - Segfault/crash: Check array bounds before .get(). Check that split result has enough elements. Avoid chaining operations on potentially null values.
 - Wrong output: Check algorithm logic. Verify integer vs float types ($i64 vs $f64). Check that io.println outputs the right format.
 - "undefined reference": Use the import alias (s.toint not str.toint). Check function exists in stdlib.
+- "undefined reference to main": You forgot to define `f=main():$i64{{...<0}}`. The build step needs this entry point; library-only programs cannot link. (E9003)
 
 KEY PATTERNS:
 - Mutable: let x=mut.0; let s=mut.""; let arr=mut.@();
@@ -137,6 +159,16 @@ KEY PATTERNS:
 - Split safely: let parts=s.split(line;" "); if(parts.len()>=2){{let a=parts.get(0)}};
 - Float: let x=mut.0.0; x=s.tofloat(io.readln()); io.println(s.fromfloat(x));
 - Comparison: = (eq) != (neq) < > <= >=
+- Arrays use @() NOT [...]: let nums=@(1;2;3); — square brackets `[1,2,3]` are REJECTED by the parser.
+
+CRITICAL REQUIREMENTS — your output WILL be rejected if any of these are missing:
+1. Start with `m=<modulename>;` then your imports (i=io:std.io; etc) then function definitions
+2. Define `f=main():$i64{{...<0}}` as the program entry point
+3. Read input from stdin via `io.readln()` — do NOT hardcode test inputs
+4. **Print the expected output to stdout via `io.println(...)`** — a program that compiles and runs but prints NOTHING fails validation
+5. Return a complete program — not a snippet, fragment, or just the changed lines
+6. NEVER use underscores in identifiers — `compute_cost` is REJECTED (E1003); the toke alphabet is a-z 0-9 plus 19 symbols only. Use camelCase (`computeCost`) or run-on (`computecost`).
+7. Use toke keywords, NOT mainstream language ones: `mt` (not `match`), `lp` (not `for`/`while`), `el` (not `else`), `f=` (not `fn`/`def`), `<value` (not `return value`).
 
 Return ONLY the complete fixed source code in ```toke ... ``` markers."""
 
@@ -160,6 +192,118 @@ def load_state() -> dict:
         "last_updated": None,
         "category_stats": {},
     }
+
+
+# ---------------------------------------------------------------------------
+# 107.R2 + R4 helpers
+# ---------------------------------------------------------------------------
+def load_budget() -> dict:
+    """Load running Anthropic spend tally."""
+    if BUDGET_FILE.exists():
+        try:
+            return json.loads(BUDGET_FILE.read_text())
+        except Exception:
+            pass
+    return {"usd_spent": 0.0, "by_model": {}, "calls": 0, "passes": 0, "fails": 0}
+
+
+def save_budget(b: dict):
+    BUDGET_FILE.write_text(json.dumps(b, indent=2))
+
+
+def record_call_cost(model: str, input_tokens: int, output_tokens: int) -> float:
+    b = load_budget()
+    key = "opus" if "opus" in model.lower() else "sonnet"
+    price = PRICE_PER_MTOK[key]
+    cost = input_tokens * price["input"] / 1_000_000 + output_tokens * price["output"] / 1_000_000
+    b["calls"] = b.get("calls", 0) + 1
+    b["usd_spent"] = b.get("usd_spent", 0.0) + cost
+    by = b["by_model"].setdefault(key, {"calls": 0, "input_tokens": 0, "output_tokens": 0, "usd": 0.0})
+    by["calls"] += 1
+    by["input_tokens"] += input_tokens
+    by["output_tokens"] += output_tokens
+    by["usd"] = by.get("usd", 0.0) + cost
+    save_budget(b)
+    return b["usd_spent"]
+
+
+def budget_exceeded() -> bool:
+    return load_budget()["usd_spent"] >= BUDGET_USD_CAP
+
+
+def _dry_run_stub_source() -> str:
+    """107.R4.1: deterministic valid-toke no-op used by DRY_RUN.
+    Exercises compile + build + test paths without API spend."""
+    return 'm=dryrun;i=io:std.io;f=main():$i64{io.println("dry-run-output");<0}'
+
+
+def _looks_like_complete_program(src: str) -> bool:
+    """107.R2: response-shape validation. Snippets fail this and trigger retry."""
+    s = src.lstrip()
+    return s.startswith("m=") and "f=main" in s
+
+
+def _truncate_diagnostics(text: str, keep: int = 5) -> str:
+    """107.R2: keep only first `keep` JSON diagnostic objects from tkc output.
+    Cascading parser errors otherwise drown the prompt."""
+    lines = text.splitlines()
+    kept_diag = 0
+    out_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("{") and '"error_code"' in stripped:
+            kept_diag += 1
+            if kept_diag > keep:
+                if kept_diag == keep + 1:
+                    out_lines.append(f"... ({len(lines) - len(out_lines)} more diagnostic lines truncated; fix the first {keep} first)")
+                continue
+        out_lines.append(line)
+    return "\n".join(out_lines)
+
+
+def _format_all_test_cases(test_cases: list) -> str:
+    """107.R2: render ALL test cases as a numbered block for the repair prompt."""
+    if not test_cases:
+        return "  (no test cases defined)"
+    lines = []
+    for i, tc in enumerate(test_cases, 1):
+        stdin = (tc.get("input", "") or "")[:400]
+        expected = (tc.get("expected_output", "") or "")[:400]
+        lines.append(f"  Test {i}:")
+        lines.append(f"    stdin     = {stdin!r}")
+        lines.append(f"    expected  = {expected!r}")
+    return "\n".join(lines)
+
+
+def _error_fingerprint(error: str) -> str:
+    """107.R4.4: normalise an error string to a fingerprint for identical-fail detection."""
+    if not error:
+        return ""
+    import re as _re
+    # Primary error code
+    m = _re.search(r'\bE\d{4}\b', error)
+    code = m.group(0) if m else "noerr"
+    # First message line, lower-cased, paths stripped, first 80 chars
+    msg = error[:400]
+    msg = _re.sub(r'/[\w/.-]+', '<path>', msg)
+    msg = _re.sub(r'\s+', ' ', msg).strip().lower()[:80]
+    return f"{code}|{msg}"
+
+
+def get_repair_hint(req_id: str) -> str:
+    """Pull program-specific hint from results/repair-hints.json if present."""
+    hints_path = TEST_PROGRAMS_DIR / "results" / "repair-hints.json"
+    if not hints_path.exists():
+        return ""
+    try:
+        d = json.loads(hints_path.read_text())
+        h = d.get(req_id, {})
+        hints = h.get("hints", [])
+        if hints:
+            return "\nHINTS:\n" + "\n".join(f"  - {x}" for x in hints) + "\n"
+    except Exception:
+        pass
+    return ""
 
 
 def save_state(state: dict):
@@ -339,7 +483,11 @@ def try_compile_last_attempt(source: str, work_dir: Path) -> tuple[bool, str]:
 
 
 def call_toke_api(description: str, req: dict) -> str | None:
-    """Call api.tokelang.dev/v1/generate for initial code generation."""
+    """Call api.tokelang.dev/v1/generate for initial code generation.
+    107.R4.1: DRY_RUN=1 returns stub source without network call."""
+    if DRY_RUN:
+        log.info(f"  DRY_RUN: skipping toke API call, returning stub source")
+        return _dry_run_stub_source()
     try:
         resp = requests.post(
             f"{TOKE_API_URL}/v1/generate",
@@ -365,10 +513,34 @@ def call_toke_api(description: str, req: dict) -> str | None:
 
 
 def call_anthropic_repair(source: str, error: str, description: str,
+                          test_cases: list | None = None,
                           test_input: str = "", expected_output: str = "",
-                          use_opus: bool = False) -> str | None:
-    """Call Anthropic API (Claude) to repair broken toke code."""
+                          use_opus: bool = False,
+                          req_id: str = "") -> str | None:
+    """Call Anthropic API (Claude) to repair broken toke code.
+
+    107.R2: test_cases list preferred over single test_input/expected fields.
+    107.R4.1: DRY_RUN=1 returns _dry_run_stub_source() after prompt-format
+    runs (catches IndexError/format crashes without API spend)."""
     model = "claude-opus-4-20250514" if use_opus else "claude-sonnet-4-20250514"
+    # 107.R2: prefer full test_cases list
+    if test_cases:
+        all_tests = _format_all_test_cases(test_cases)
+    elif test_input or expected_output:
+        all_tests = _format_all_test_cases([{"input": test_input, "expected_output": expected_output}])
+    else:
+        all_tests = "  (no test cases provided)"
+    user_content = TOKE_REPAIR_PROMPT.format(
+        description=description,
+        source=source,
+        error=error,
+        all_test_cases_block=all_tests,
+        program_hints=get_repair_hint(req_id) if req_id else "",
+    )
+    # 107.R4.1: DRY_RUN short-circuit AFTER prompt-format so format crashes surface
+    if DRY_RUN:
+        log.info(f"  DRY_RUN: skipping Anthropic call ({req_id or 'noid'}), returning stub source")
+        return _dry_run_stub_source()
     try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",
@@ -381,24 +553,20 @@ def call_anthropic_repair(source: str, error: str, description: str,
                 "model": model,
                 "max_tokens": 4096,
                 "system": TOKE_SYSTEM_PROMPT,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": TOKE_REPAIR_PROMPT.format(
-                            description=description,
-                            source=source,
-                            error=error,
-                            test_input=test_input[:200],
-                            expected_output=expected_output[:200],
-                        ),
-                    }
-                ],
+                "messages": [{"role": "user", "content": user_content}],
             },
             timeout=120,
         )
         resp.raise_for_status()
         data = resp.json()
         text = data["content"][0]["text"]
+
+        # 107.R2: persist call cost from Anthropic usage block
+        usage = data.get("usage", {}) or {}
+        in_tok = int(usage.get("input_tokens", 0))
+        out_tok = int(usage.get("output_tokens", 0))
+        spent = record_call_cost(model, in_tok, out_tok)
+        log.info(f"  spend ${spent:.4f}/{BUDGET_USD_CAP:.2f} ({model.split('-')[1]} in={in_tok} out={out_tok})")
 
         # Extract code from markdown fence if present
         if "```toke" in text:
@@ -463,6 +631,7 @@ def run_tests(solution_dir: Path, req: dict) -> tuple[bool, str]:
                 capture_output=True,
                 text=True,
                 timeout=TEST_TIMEOUT,
+                errors="replace",  # 107.R3: cipher-style binary output shouldn't crash
             )
             actual = result.stdout.strip()
             expected = tc["expected_output"].strip()
