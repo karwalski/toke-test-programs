@@ -964,6 +964,106 @@ def _save_failure(req: dict, work_dir: Path, last_error: str, state: dict):
     save_state(state)
 
 
+def manifest_iteration(manifest: dict, all_requirements: list[dict], state: dict) -> None:
+    """107.R2: process programs strictly in manifest order (no hash-partition).
+
+    Records per-program overrides (max_sonnet/max_opus/model) so the repair
+    loop respects them. Persists state + budget after every program. Honours
+    the 107.R4.4 early-abort and 107.R4.5 spend-anomaly safety rails.
+    """
+    by_id = {r["id"]: r for r in all_requirements}
+    entries = manifest["programs"]
+    log.info(f"Manifest mode: {len(entries)} program(s) — strict order, no partitioning")
+
+    completed_ids = set(state.get("completed", []) + state.get("skipped", []))
+
+    # 107.R4.4 + R4.5 safety state
+    EARLY_ABORT_THRESHOLD = int(os.environ.get("EARLY_ABORT_THRESHOLD", "5"))
+    early_outcomes: list[tuple[str, str]] = []
+    SPEND_ANOMALY_THRESHOLD = float(os.environ.get("SPEND_ANOMALY_THRESHOLD", "0"))
+    SPEND_ANOMALY_AFTER_N = int(os.environ.get("SPEND_ANOMALY_AFTER_N", "10"))
+    outcome_count = 0
+    completed_at_start = len(state.get("completed", []))
+
+    for entry in entries:
+        pid = entry["id"]
+        if budget_exceeded():
+            log.error(f"Budget cap ${BUDGET_USD_CAP} reached — halting before {pid}")
+            break
+
+        # Per-program override for repair loop (consumed by process_requirement)
+        PROGRAM_OVERRIDES[pid] = {
+            "max_sonnet": entry.get("max_sonnet",
+                                    entry.get("max_iterations", MAX_SONNET_ITERATIONS)),
+            "max_opus":   entry.get("max_opus", 0),
+            "model":      entry.get("model", "sonnet"),
+            "mode":       entry.get("mode", "repair"),
+        }
+
+        req = by_id.get(pid)
+        if req is None:
+            log.warning(f"{pid}: not in requirements — skipping")
+            state.setdefault("skipped", []).append(pid)
+            save_state(state)
+            continue
+
+        if pid in completed_ids:
+            log.info(f"{pid}: already completed — skipping")
+            continue
+
+        # Stage embedded source so process_requirement uses it as the prior attempt
+        embedded = entry.get("source", "")
+        if embedded:
+            cat = req["_category"]
+            work_dir = SOLUTIONS_DIR / cat / pid
+            work_dir.mkdir(parents=True, exist_ok=True)
+            (work_dir / "solution.tk").write_text(embedded)
+
+        log.info(f"{pid}: staged embedded source ({len(embedded)}b)" if embedded else f"{pid}: no embedded source")
+        process_requirement(req, state)
+
+        # 107.R4.4 + R4.5 post-program safety check
+        outcome_count += 1
+        last_failed = state.get("failed", [])
+        last_completed = state.get("completed", [])
+        was_pass = pid in last_completed
+        outcome_str = "pass" if was_pass else "fail"
+        fp = ""
+        if not was_pass and last_failed:
+            last_f = last_failed[-1]
+            err_text = last_f.get("error", "") if isinstance(last_f, dict) else ""
+            fp = _error_fingerprint(err_text)
+        b = load_budget()
+        b["passes"] = len(last_completed) - completed_at_start
+        b["fails"] = sum(1 for x in last_failed)
+        if b["passes"] > 0:
+            b["spend_per_pass"] = round(b.get("usd_spent", 0.0) / b["passes"], 4)
+        save_budget(b)
+
+        if EARLY_ABORT_THRESHOLD > 0 and len(early_outcomes) < EARLY_ABORT_THRESHOLD:
+            early_outcomes.append((outcome_str, fp))
+            if len(early_outcomes) == EARLY_ABORT_THRESHOLD:
+                all_fail = all(o == "fail" for o, _ in early_outcomes)
+                uniq_fp = len({f for _, f in early_outcomes if f})
+                if all_fail and uniq_fp <= 2:
+                    msg = (f"EARLY ABORT: first {EARLY_ABORT_THRESHOLD} all failed with "
+                           f"{uniq_fp} unique fingerprint(s). Halting. "
+                           f"Fingerprints: {sorted({f for _, f in early_outcomes if f})}.")
+                    log.error(msg)
+                    state["aborted_early"] = {"reason": msg, "threshold": EARLY_ABORT_THRESHOLD}
+                    save_state(state)
+                    return
+
+        if (SPEND_ANOMALY_THRESHOLD > 0 and outcome_count >= SPEND_ANOMALY_AFTER_N
+                and b.get("passes", 0) == 0 and b.get("usd_spent", 0.0) >= SPEND_ANOMALY_THRESHOLD):
+            msg = (f"SPEND ANOMALY: after {outcome_count} programs, ZERO passes and "
+                   f"${b['usd_spent']:.2f} spent (threshold ${SPEND_ANOMALY_THRESHOLD}).")
+            log.error(msg)
+            state["anomaly_halt"] = {"reason": msg}
+            save_state(state)
+            return
+
+
 def main():
     """Main loop: load requirements, filter to this worker's partition, process."""
     log.info(f"Worker {WORKER_ID}/{TOTAL_WORKERS} starting")
@@ -995,6 +1095,19 @@ def main():
     state = load_state()
     all_requirements = load_all_requirements()
     log.info(f"Loaded {len(all_requirements)} total requirements")
+
+    # 107.R2 + R4: manifest mode — consume the per-worker stratified manifest
+    # from MANIFEST_PATH instead of the hash-partition flow. Each manifest
+    # entry can carry per-program overrides (max_opus/max_sonnet/model/source).
+    if RUN_MODE == "manifest" and MANIFEST_PATH and Path(MANIFEST_PATH).exists():
+        log.info(f"Manifest source: {MANIFEST_PATH}")
+        log.info(f"Caps: sonnet={MAX_SONNET_ITERATIONS} opus={MAX_OPUS_ITERATIONS} toke_api={'on' if USE_TOKE_API else 'off'} budget=${BUDGET_USD_CAP:.2f}")
+        manifest = json.loads(Path(MANIFEST_PATH).read_text())
+        manifest_iteration(manifest, all_requirements, state)
+        b = load_budget()
+        log.info(f"Manifest run complete. Spent ${b.get('usd_spent', 0):.4f}, calls={b.get('calls', 0)}")
+        log.info("Instance left running for manual collection.")
+        return
 
     # Filter to this worker's partition, then sort by category order (simple first)
     my_requirements = [r for r in all_requirements if is_my_work(r["id"])]
