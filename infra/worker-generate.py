@@ -962,7 +962,9 @@ def _save_failure(req: dict, work_dir: Path, last_error: str, state: dict):
         (fail_dir / "last-attempt.tk").write_text(source_path.read_text())
 
     # Save error log
-    (fail_dir / "error.log").write_text(last_error)
+    # 107.R8a: encode with errors='replace' so surrogate pairs from emoji/etc
+    # don't crash the worker (was a recurring UnicodeEncodeError).
+    (fail_dir / "error.log").write_bytes(last_error.encode("utf-8", errors="replace"))
 
     state["failed"].append({"id": req_id, "reason": "max_repairs_exceeded"})
     state["in_progress"] = None
@@ -1049,8 +1051,8 @@ def manifest_iteration(manifest: dict, all_requirements: list[dict], state: dict
             early_outcomes.append((outcome_str, fp))
             if len(early_outcomes) == EARLY_ABORT_THRESHOLD:
                 all_fail = all(o == "fail" for o, _ in early_outcomes)
-                uniq_fp = len({f for _, f in early_outcomes if f})
-                if all_fail and uniq_fp <= 2:
+                non_empty_fps = [f for _, f in early_outcomes if f]; uniq_fp = len(set(non_empty_fps))
+                if all_fail and len(non_empty_fps) >= EARLY_ABORT_THRESHOLD and uniq_fp <= 2:
                     msg = (f"EARLY ABORT: first {EARLY_ABORT_THRESHOLD} all failed with "
                            f"{uniq_fp} unique fingerprint(s). Halting. "
                            f"Fingerprints: {sorted({f for _, f in early_outcomes if f})}.")
@@ -1201,8 +1203,8 @@ def main():
             early_outcomes.append((outcome_str, fp))
             if len(early_outcomes) == EARLY_ABORT_THRESHOLD:
                 all_fail = all(o == "fail" for o, _ in early_outcomes)
-                uniq_fp = len({f for _, f in early_outcomes if f})
-                if all_fail and uniq_fp <= 2:
+                non_empty_fps = [f for _, f in early_outcomes if f]; uniq_fp = len(set(non_empty_fps))
+                if all_fail and len(non_empty_fps) >= EARLY_ABORT_THRESHOLD and uniq_fp <= 2:
                     msg = (
                         f"EARLY ABORT: first {EARLY_ABORT_THRESHOLD} programs all FAILED "
                         f"with {uniq_fp} unique error fingerprint(s) — likely a worker-wide "
