@@ -1029,7 +1029,7 @@
     - input: "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n1\nencrypt\nThe quick brown fox\n"
       expected_output: "v1:VHlHEzUgDxTjucjJo6qA32Z+Wg=="
     - input: "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n2\ndecrypt\nv1:GHIQIxIRABcGBA8KBg==\n"
-      expected_output: "c2VDf`����� (decrypted with key v1)"
+      expected_output: "?c2?VDf`����� (decrypted with key v1)"
     - input: "[{\"version\":1,\"key\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"},{\"version\":2,\"key\":\"fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\"}]\n2\nencrypt\nSecret\n"
       expected_output: "v2:rbnZ6hMg"
   constraints: ["Prefix ciphertext with key version", "Support decryption with any key in ring", "Error on unknown key version", "Active version used for new encryptions only"]
