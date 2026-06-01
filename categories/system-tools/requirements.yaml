@@ -1201,6 +1201,10 @@
     - "Include file size and mtime in manifest"
 
 - id: "SYS-072"
+  disabled: true
+  disabled_reason: "[R8a-AUDIT-TRIVIAL] tests only echo stdin — file fan-out untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R8a-audit"
   title: "Stdin Multiplexer (tee)"
   description: "Read stdin and write it to stdout and to one or more files simultaneously."
   difficulty: 1
@@ -1511,6 +1515,10 @@
     - "Case-insensitive extension grouping"
 
 - id: "SYS-091"
+  disabled: true
+  disabled_reason: "[R8a-AUDIT-TRIVIAL] tests only validate output — throttling logic untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R8a-audit"
   title: "Stdin Rate Limiter"
   description: "Pass stdin to stdout but throttle output to N bytes per second."
   difficulty: 3

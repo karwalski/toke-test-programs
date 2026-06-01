@@ -726,6 +726,10 @@
     - "Must stop after first success"
 
 - id: "SEC-040"
+  disabled: true
+  disabled_reason: "[R8a-AUDIT-TRIVIAL] two tests admit single-branch unsafe-inline check — score computation untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R8a-audit"
   title: "Content Security Policy Analyser"
   description: "Reads a CSP header value from stdin. Parses it and identifies unsafe directives, missing directives, and bypass-enabling configurations."
   difficulty: 3

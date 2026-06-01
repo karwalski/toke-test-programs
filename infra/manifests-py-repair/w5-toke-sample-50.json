@@ -1,0 +1,187 @@
+{
+  "story": "107.R1 follow-up: toke repair sample-50 (1 Opus attempt each)",
+  "worker_id": 5,
+  "generated_at": "2026-05-31T21:26:54.407776+00:00",
+  "mode": "manifest",
+  "total": 10,
+  "programs": [
+    {
+      "id": "SYS-112",
+      "category": "system-tools",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E1004"
+      ],
+      "hint": "Unterminated string literal at end of file. Every \" needs a closing \". If the program looks truncated, regenerate from scratch.",
+      "source": "m=cli;f=trim(s:$str):$str{let len=s.len;let start=mut.0;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(!(c=32 as u8))el{start=i+1};};let end=mut.len;lp(let i=len-1;!(i<0);i=i-1){let c=s.get(i);if(!(c=32 as u8))el{end=i-1};};let result=mut.\"\";lp(let i=start;i<end+1;i=i+1){result=s.concat(result;s.get(i))as$str;};<result};f=padright(s:$str;width:i64):$str{let slen=s.len;if(!(slen<width))el{<s};let result=mut.s;lp(let i=slen;i<width;i=i+1){result=s.concat(result;\" \");};<result};f=bold(s:$str):$str{<s.concat(s.concat(\"\\033[1m\";s);\"\\033[0m\")};f=underline(s:$str):$str{<s.concat(s.concat(\"\\033[4m\";s);\"\\033[0)",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "MFG-051",
+      "category": "manufacturing-ml",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E1003"
+      ],
+      "hint": "Identifier contains underscore (v0.2 syntax). Concatenate words: my_var \u2192 myvar, to_int \u2192 toint, get_count \u2192 getcount.",
+      "source": "m=one_way_anova;f=sum(arr:@($f64))):$f64{let total=mut.0.0;lp(let i=0;i<arr.len;i=i+1){total=total+arr.get(i);};<total};f=mean(arr:@($f64))):$f64{let s=sum(arr);let n=arr.len as$f64;<s/n};f=sumsq",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "DAT-016",
+      "category": "data-processing",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002"
+      ],
+      "hint": "Unexpected '}'. A block closed early \u2014 usually a missing ; before this } or an extra } from over-nesting.",
+      "source": "m=scale;f=scale(arr:@$f64):@$f64{let n=arr.len;if(n=0){<@};let minval=mut.0.0;let maxval=mut.0.0;lp(let i=0;i<n;i=i+1){let v=arr.get(i);if(i=0){minval=v;maxval=v}el{if(v<minval){minval=v};if(v>maxval){maxval=v}}};let range=maxval-minval;let result=mut.@();lp(let i=0;i<n;i=i+1){let v=arr.get(i);let s=(v-minval)/range;result=result+@(s)});<result};f=main():$void{let arr=@(10.0;20.0;30.0;40.0;50.0;60.0;70.0;80.0));let scaled=scale(arr);let n=scaled.len;lp(let i=0;i<n;i=i+1){let s=scaled.get(i);};};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "MSG-031",
+      "category": "messaging",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them.",
+      "source": "m=setup;f=setup(alice:$str;bob:$str):$str{let alicekey=generatekey(alice);let bobkey=generatekey(bob);let aliceephemeral=generateephemeral();let bobephemeral=generateephemeral();let aliceshared=computekey(alicekey;bobephemeral);let bobshared=computekey(bobkey;aliceephemeral);let sessionkey=hashkey(aliceshared;bobshared));let nonce=generatenonce();let ciphertext=encrypt(sessionkey;nonce;alicekey;bobkey));let mac=hashkey(sessionkey;nonce));let result=buildmessage(ciphertext;mac;nonce;alicekey;bobkey));<result};f=generatekey(seed:$str):$str{let hash=hashfunction(seed);let key=extractkey(hash);<key};f=generateephemeral():$str{let ephemeral=generatekey(\"ephemeral\");<ephemeral};f=computekey(shared:$str;ephemeral:$str):$str{let combined=hashfunction(s.concat(shared;ephemeral));let key=extractkey(combined);<key};f=hashfunction(data",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "DEV-005",
+      "category": "devtools",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2002",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them.",
+      "source": "m=gitlog;f=parseauthorline(line:$str):$str{let idx=line.find(\" <\");if(idx<0){<\"\"};let author=line.slice(0;idx);<author};f=countcontributions(author:$str;lines:@$str):i64{let count=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let found=line.find(author);if(found<0){}el{count=count+1};};<count};f=processlog(lines:@$str):i64{let total=mut.0;let count=lines.len;lp(let i=0;i<count;i=i+1){let line=lines.get(i);let author=parseauthorline(line);if(author.len=0){}el{let c=countcontributions(author;line));total=total+c;};};<total};f=main():$i64{let input=\"Author: Alice <alice@example.com>\nAuthor: Bob <bob@example.com>\nAuthor: Alice <alice@example.com>\nAuthor: Charlie <charlie@example.com>\nAuthor: Bob <bob@example.com>\n\";let lines=input.split(\"\\n\");let result=",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "AIA-039",
+      "category": "ai-agents",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2004",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Code is incomplete \u2014 truncated or an unclosed (/[/{/\". Count opening vs closing delimiters; if the program looks heavily truncated, rewrite the complete program from scratch rather than trying to patch the end.",
+      "source": "m=emotdetect;\ni=io:std.io;\ni=s:std.str;\n\nf=detectemotions(text:$str):$str{\n    let lower=text;\n    let bld=s.builder();\n    let found=mut.0;\n    \n    if(s.contains(lower;\"happy\")){\n        if(found>0){s.add(bld;\",\")};\n        s.add(bld;\"{\\\"label\\\":\\\"joy\\\",\\\"intensity\\\":0.8}\");\n        found=found+1\n    }el{\n        if(s.contains(lower;\"joy\")){\n            if(found>0){s.add(bld;\",\")};\n            s.add(bld;\"{\\\"label\\\":\\\"joy\\\",\\\"intensity\\\":0.8}\");\n            found=found+1\n        }el{\n            if(s.contains(lower;\"glad\")){\n                if(found>0){s.add(bld;\",\")};\n                s.add(bld;\"{\\\"label\\\":\\\"joy\\\",\\\"intensity\\\":0.8}\");\n                found=found+1\n            }el{\n                if(s.contains(lower;\"excited\")){\n                    if(found>0){s.add(bld;\",\")};\n                    s.add(bld;\"{\\\"label\\\":\\\"joy\\\",\\\"intensity\\\":0.8}\");\n                    found=found+1\n                }\n            }\n        }\n    };\n    \n    if(s.contains(lower;\"surprise\")){\n        if(found>0){s.add(bld;\",\")};\n        s.add(bld;\"{\\\"label\\\":\\\"surprise\\\",\\\"intensity\\\":0.7}\");\n        found=found+1\n    }el{\n        if(s.contains(lower;\"believe\")){\n            if(found>0){s.add(bld;\",\")};\n            s.add(bld;\"{\\\"label\\\":\\\"surprise\\\",\\\"intensity\\\":0.7}\");\n            found=found+1\n        }el{\n            if(s.contains(lower;\"shock\")){\n                if(found>0){s.add(bld;\",\")};\n                s.add(bld;\"{\\\"label\\\":\\\"surprise\\\",\\\"intensity\\\":0.7}\");\n                found=found+1\n            }el{\n                if(s.contains(lower;\"amaz\")){\n                    if(found>0){s.add(bld;\",\")};\n                    s.add(bld;\"{\\\"label\\\":\\\"surprise\\\",\\\"intensity\\\":0.7}\");\n                    found=found+1\n                }\n            }\n        }\n    };\n    \n    if(s.contains(lower;\"sad\")){\n        if(found>0){s.add(bld;\",\")};\n        s.add(bld;\"{\\\"label\\\":\\\"sadness\\\",\\\"intensity\\\":0.8}\");\n        found=found+1\n    }el{\n        if(s.contains(lower;\"sorrow\")){\n            if(found>0){s.add(bld;\",\")};\n            s.add(bld;\"{\\\"label\\\":\\\"sadness\\\",\\\"intensity\\\":0.8}\");\n            found=found+1\n        }el{\n            if(s.contains(lower;\"unhappy\")){\n                if(found>0){s.add(bld;\",\")};\n                s.add(bld;\"{\\\"label\\\":\\\"sadness\\\",\\\"intensity\\\":0.8}\");\n                found=found+1\n            }el{\n                if(s.contains(lower;\"depress\")){\n                    if(found>0){s.add(bld;\",\")};\n                    s.add(bld;\"{\\\"label\\\":\\\"sadness\\\",\\\"intensity\\\":0.8}\");\n                    found=found+1\n                }el{\n                    if(s.contains(lower;\"miserable\")){\n                        if(found>0){s.add(bld;\",\")};\n                        s.add(bld;\"{\\\"label\\\":\\\"sadness\\\",\\\"intensity\\\":0.8}\");\n                        found=found+1\n                    }\n                }\n            }\n        }\n    };\n    \n    if(s.contains(lower;\"fear\")){\n        if(found>0){s.add(bld;\",\")};\n        s.add(bld;\"{\\\"label\\\":\\\"fear\\\",\\\"intensity\\\":0.7}\");\n        found=found+1\n    }el{\n        if(s.contains(lower;\"dread\")){\n            if(found>0){s.add(bld;\",\")};\n            s.add(bld;\"{\\\"label\\\":\\\"fear\\\",\\\"intensity\\\":0.7}\");\n            found=found+1\n        }el{\n            if(s.contains(lower;\"afraid\")){\n                if(found>0){s.add(bld;\",\")};\n                s.add(bld;\"{\\\"label\\\":\\\"fear\\\",\\\"intensity\\\":0.7}\");\n                found=found+1\n            }el{\n                if(s.contains(lower;\"terrif\")){\n                    if(found>0){s.add(bld;\",\")};\n                    s.add(bld;\"{\\\"label\\\":\\\"fear\\\",\\\"intensity\\\":0.7}\");\n                    found=found+1\n                }el{\n                    if(s.contains(lower;\"scare\")){\n                        if(found>0){s.add(bld;\",\")};\n                        s.add(bld;\"{\\\"label\\\":\\\"fear\\\",\\\"intensity\\\":0.7}\");\n                        found=found+1\n                    }\n                }\n            }\n        }\n    };\n    \n    if(s.contains(lower;\"angry\")){\n        if(found>0){s.add(bld;\",\")};\n        s.add(bld;\"{\\\"label\\\":\\\"anger\\\",\\\"intensity\\\":0.8}\");\n        found=found+1\n    }el{\n        if(s.contains(lower;\"anger\")){\n            if(found>0){s.add(bld;\",\")};\n            s.add(bld;\"{\\\"label\\\":\\\"anger\\\",\\\"intensity\\\":0.8}\");\n            found=found+1\n        }el{\n            if(s.contains(lower;\"furious\")){\n                if(found>0){s.add(bld;\",\")};\n                s.add(bld;\"{\\\"label\\\":\\\"anger\\\",\\\"intensity\\\":0.8}\");\n                found=found+1\n            }el{\n                if(s.contains(lower;\"mad\")){\n                    if(found>0){s.add(bld;\",\")};\n                    s.add(bld;\"{\\\"label\\\":\\\"anger\\\",\\\"intensity\\\":0.8}\");\n                    found=found+1\n                }el{\n                    if(s.contains(lower;\"rage\")){\n                        if(found>0){s.add(bld;\",\")};\n                        s.add(bld;\"{\\\"label\\\":\\\"anger\\\",\\\"intensity\\\":0.8}\");\n                        found=found+1\n                    }\n                }\n            }\n        }\n    };\n    \n    if(s.contains(lower;\"disgust\")){\n        if(found>0){s.add(bld;\",\")};\n        s.add(bld;\"{\\\"label\\\":\\\"disgust\\\",\\\"intensity\\\":0.7}\");\n        found=found+1\n    }el{\n        if(s.contains(lower;\"revolting\")){\n            if(found>0){s.add(bld;\",\")};\n            s.add(bld;\"{\\\"label\\\":\\\"disgust\\\",\\\"intensity\\\":0.7}\");\n            found=found+1\n        }el{\n            if(s.contains(lower;\"repuls\")){\n                if(found>0){s.add(bld;\",\")};\n                s.add(bld;\"{\\\"label\\\":\\\"disgust\\\",\\\"intensity\\\":0.7}\");\n                found=found+1\n            }\n        }\n    };\n    \n    let result=s.concat(\"{\\\"emotions\\\":[\";s.build(bld));\n    result=s.concat(result;\"]}\");\n    <result\n};\n\nf=main():$i64{\n    let input=io.readln();\n    let output=detectemotions(input);\n    io.println(output);\n    <0\n}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "MED-011",
+      "category": "media-content",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2002"
+      ],
+      "hint": "Unexpected token in expression. Common causes: (a) keyword used as identifier (i, f, t, m, as, el, lp, br, let, mut, rt, mt) \u2014 rename; (b) missing operator between values; (c) comma instead of semicolon (toke uses ; everywhere).",
+      "source": "m=titletoslug;f=titletoslug(title:$str):$str{let n=title.len;let slug=mut.\"\";lp(let i=0;i<n;i=i+1){let c=title.get(i);if(c=32){slug=s.concat(slug;\"-\")}el{slug=s.concat(slug;c) as$str}};<slug}};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "SCI-013",
+      "category": "scientific-math",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2002",
+        "E2002"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them. | Extra closing paren ')'. Count parens \u2014 every '(' needs exactly one ')'. Common cause: doubled if((cond)) or trailing paren on a call.",
+      "source": "m=gramschmidt;\ni=math:std.math;\ni=io:std.io;\nf=buildmatrix(rows:$i64;cols:$i64):$str{\n    let out=mut.\"\";\n    lp(let r=0;r<rows;r=r+1){\n        let line=mut.\"\";\n        lp(let c=0;c<cols;c=c+1){\n            let cell=math.abs(math.random() * 100.0));\n            let cs=cell as$str;\n            if(line.len>0){line=s.concat(line;\"&\")}el{};\n            line=line+cs;\n        });\n        if(out.len>0){out=s.concat(out;\"\\n\")}el{};\n        out=s.concat(out;line);\n    });\n    <out\n};\nf=gramschmidt(mat:$str):$str{\n    let lines=mat.split(\"\\n\");\n    let rows=lines.len;\n    let cols=rows;\n    let q=mut.@();\n    let r=mut.@();\n    lp(let i=0;i<rows;i=i+1){\n        let qi=math.random() * 100.0;\n        q=q.push(qi);\n        let ri=math.random() * 100.0;\n        r=r.push(ri);\n    };\n    <q\n};\nf=main():$i64{\n    let mat=buildmatrix(4;4);\n    let gs=gramschmidt(mat);\n    <0\n};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "DAT-112",
+      "category": "data-processing",
+      "status": "BUILD_FAIL",
+      "error_codes": [
+        "E9020"
+      ],
+      "hint": "E9020: no main function defined. Every EXECUTABLE toke program needs an entry point. Add `f=main():$i64{<0;}` (or one that reads stdin via io.readln(), calls your helper functions, and prints results via io.println). Library-only modules compile under --check but cannot be built into a runnable binary.",
+      "source": "m=avg;f=solve(p0:$str):$str{let data=mut.@();let lines=p0.split(\"\\n\");let headers=lines.get(0);let idxname=headers.indexof(\"name\");let idxage=headers.indexof(\"age\");lp(let i=1;i<lines.len;i=i+1){let line=lines.get(i);let cols=line.split(\",\");let name=cols.get(idxname);let age=cols.get(idxage);data=data+@(name);};let total=mut.0;lp(let i=0;i<data.len;i=i+1){let name=data.get(i);if(name=\"alice\"){total=total+1};};<total as$str};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "SYS-040",
+      "category": "system-tools",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2004"
+      ],
+      "hint": "Unexpected '}'. A block closed early \u2014 usually a missing ; before this } or an extra } from over-nesting. | Code is incomplete \u2014 truncated or an unclosed (/[/{/\". Count opening vs closing delimiters; if the program looks heavily truncated, rewrite the complete program from scratch rather than trying to patch the end.",
+      "source": "m=meminfo;f=parseint(s:$str):$i64{let n=s.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=s.get(i);let d=c as i64-48 as i64;m=m*10+d;};<m};f=trimprefix(s:$str;prefix:$str):$str{let n=s.len;let m=prefix.len;if(n<m){<\"\"};let z=mut.true;lp(let i=0;i<m;i=i+1){let c=s.get(i);let d=prefix.get(i);if(!(c=d)){z=false}};if(!(z)){<\"\"};<s.substr(m;n-m)>};f=trimprefix2",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    }
+  ]
+}

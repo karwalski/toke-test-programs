@@ -1268,6 +1268,10 @@
     - "Buffer expires after 5 minutes"
 
 - id: "NET-063"
+  disabled: true
+  disabled_reason: "[R8a-AUDIT-TRIVIAL] tests only verify listen banner — SSE/reconnect logic untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R8a-audit"
   title: "SSE with Reconnect Server"
   description: "SSE server that supports the 'Last-Event-ID' header for resumable streams. Replays missed events after reconnect."
   difficulty: 4
@@ -2353,6 +2357,10 @@
     - "Must clean up created resources even on failure"
 
 - id: "NET-118"
+  disabled: true
+  disabled_reason: "[R8a-AUDIT-TRIVIAL] tests only verify first URL — rate-limit headers/backoff untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R8a-audit"
   title: "API Rate Limit Aware Client"
   description: "Reads a URL list and API key from stdin. Makes requests respecting X-RateLimit-Remaining and X-RateLimit-Reset headers to avoid 429 errors."
   difficulty: 3

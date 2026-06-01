@@ -1,0 +1,221 @@
+{
+  "story": "107.R1 follow-up: toke repair sample-50 (1 Opus attempt each)",
+  "worker_id": 2,
+  "generated_at": "2026-05-31T21:26:54.407776+00:00",
+  "mode": "manifest",
+  "total": 10,
+  "programs": [
+    {
+      "id": "SEC-078",
+      "category": "security",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E3011"
+      ],
+      "hint": "Undeclared identifier 'std'. Check spelling; ensure it is bound with let before use; verify imports. Did you mean 'str'?",
+      "source": "m=cfgsec;f=checkdebug(cfg:$str):$bool{let hasdebug=cfg.contains(\"debug\");if(hasdebug){let debugval=cfg.get(\"debug\");if(debugval=\"true\"){<true};};<false};f=checkcreds(cfg:$str):$bool{let hasuser=cfg.contains(\"user\");let haspass=cfg.contains(\"pass\");if(hasuser){if(haspass){let userval=cfg.get(\"user\");let passval=cfg.get(\"pass\");if(userval=\"admin\"){if(passval=\"password\"){<true};};};};<false};f=checkweak(cfg:$str):$bool{let haslevel=cfg.contains(\"level\");if(haslevel){let levelval=cfg.get(\"level\");if(levelval=\"low\"){<true};};<false};f=main():$i64{let cfg=std.stdin.read();let hasdebug=checkdebug(cfg);let hascreds=checkcreds(cfg);let hasweak=checkweak(cfg);let found=mut.false;if(hasdebug){found=true};if(hascreds){found=true};if(hasweak){found=true};if(found){<1};<0};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "FIN-104",
+      "category": "calculators-finance",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Code is incomplete \u2014 truncated or an unclosed (/[/{/\". Count opening vs closing delimiters; if the program looks heavily truncated, rewrite the complete program from scratch rather than trying to patch the end.",
+      "source": "m=sieve;f=sieve(n:$i64):$str{let limit=n+1;let sieve=mut.@(true;true;true;true;true;true;true;true;true;true",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "CRY-099",
+      "category": "crypto-blockchain",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2002",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them. | Extra closing paren ')'. Count parens \u2014 every '(' needs exactly one ')'. Common cause: doubled if((cond)) or trailing paren on a call.",
+      "source": "m=swap;f=swap(x:$i64;y:$i64):$i64{let fee=mut.0;let amount=mut.0;if(x<0){<0};if(y<0){<0};let product=x*y;let target=product/(100 as$i64));let diff=target-product/100;let swapval=mut.0;if(diff>0){swapval=x-diff}el{swapval=x+diff};<swapval};f=main():$i64{<swap(100;50))};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "CRY-020",
+      "category": "crypto-blockchain",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them. | Extra closing paren ')'. Count parens \u2014 every '(' needs exactly one ')'. Common cause: doubled if((cond)) or trailing paren on a call.",
+      "source": "m=hashcheck;f=hashcheck(p:$str;q:$str):$str{let res=mut.\"INVALID\";let plen=p.len;let qlen=q.len;if(plen>0){if(qlen>19){let first=q.substr(0;19);let rest=q.substr(19;qlen-19));let check=s.concat(first;p);let valid=mut.false;if(check.len=rest.len){let i=mut.0;lp(let idx=0;idx<check.len;idx=idx+1){let c1=check.get(idx);let c2=rest.get(idx);if(!(c1=c2)){i=idx;br};};if(i=check.len){valid=true};};if(!(valid=true)){res=\"INVALID\"}el{res=\"VALID\"}};};<res};};f=main():$void{let p=io:std.io.readline();let q=io:std.io.readline();hashcheck(p;q);};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "EDU-030",
+      "category": "education",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002"
+      ],
+      "hint": "'el' must directly follow an if(...){...} block: if(cond){body}el{body}. Cannot stand alone.",
+      "source": "m=gpatrend;f=parsefloat(s:$str):$f64{let num=mut.0.0;let i=mut.0;let len=s.len;lp(let j=0;j<len;j=j+1){let ch=s.get(j);if(ch=\".\"){i=j+1;lp(let k=i;k<len;k=k+1){let dig=s.get(k);if(!(dig>47))el{if(!(dig<58))){i=k+1;}};};}el{if(!(ch>47))){if(!(ch<58))){let dig=ch as$f64-48.0;num=num+dig;};};};};};};};};};};};};};};};};};};};};};};};};}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "NET-120",
+      "category": "networking-rest",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2003",
+        "E2002",
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them.",
+      "source": "m=sseclient;f=main():$i64{let url=mut.\"\";let idx=mut.0;lp(let i=0;i<100;i=i+1){let c=mut.stdin.readchar();if(c=\"\"){<0};if(c=\"\\n\"){<0};url=url+c;};let con=mut.http:connect(url);let resp=mut.http:recv(con);let events=mut.sse:parse(resp.body);lp(let i=0;i<events.len;i=i+1){let e=events.get(i);let idstr=mut.\"\";if(e.id.len=0){idstr=\"null\"}el{lp(let j=0;j<e.id.len;j=j+1){idstr=idstr+e.id.get(j);};};let eventstr=mut.\"\";if(e.event.len=0){eventstr=\"null\"}el{lp(let j=0;j<e.event.len;j=j+1){eventstr=eventstr+e.event.get(j);};};let datastr=mut.\"\";if(e.data.len=0){datastr=\"null\"}el{lp(let j=0;j<e.data.len;j=j+1){datastr=dat",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "SCI-057",
+      "category": "scientific-math",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2004",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Code is incomplete \u2014 truncated or an unclosed (/[/{/\". Count opening vs closing delimiters; if the program looks heavily truncated, rewrite the complete program from scratch rather than trying to patch the end.",
+      "source": "m=primefactor;f=isprime(n:$i64):$bool{if(n<2){<false};if(n=2){<true};let rem=n-n/2*2;if(rem=0){<false};let i=mut.3;lp(let j=0;j<1;j=j+1){if(i*i>n){br};let rem2=n-n/i*i;if(rem2=0){<true};i=i+2}};f=factorial(n:$i64):$i64{if(n<1){<1};let result=mut.1;lp(let i=1;i<n+1;i=i+1){result=result*i};<result};f=ispoweroftwo(n:$i64):$bool{if(n<1){<false};let m=mut.n;lp(let i=0;i<1;i=i+1){let rem=m-m/2*2;if(rem=0){m=m/2}el{br}};if(m=1){<true};<false};f=main():$i64{let num1=1024;let num2=2048;let",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "SCI-060",
+      "category": "scientific-math",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2004",
+        "E2002",
+        "E2004",
+        "E2002",
+        "E2004",
+        "E2003",
+        "E2002"
+      ],
+      "hint": "Unexpected '}'. A block closed early \u2014 usually a missing ; before this } or an extra } from over-nesting. | Code is incomplete \u2014 truncated or an unclosed (/[/{/\". Count opening vs closing delimiters; if the program looks heavily truncated, rewrite the complete program from scratch rather than trying to patch the end.",
+      "source": "m=dft;f=dft(x:@$c64):@$c64{let n=x.len;let y=mut.@();lp(let i=0;i<n;i=i+1){let yi=mut.0;lp(let j=0;j<n;j=j+1){let term=x.get(j)*($c64{re:0;im:0}}-($c64{re:0;im:0}}-($c64{re:0;im:0}}-",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "NET-183",
+      "category": "networking-rest",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002",
+        "E2004",
+        "E2004",
+        "E2004"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them. | Unexpected token in expression. Common causes: (a) keyword used as identifier (i, f, t, m, as, el, lp, br, let, mut, rt, mt) \u2014 rename; (b) missing operator between values; (c) comma instead of semicolon (toke uses ; everywhere). | Code is incomplete \u2014 truncated or an unclosed (/[/{/\". Count opening vs closing delimiters; if the program looks heavily truncated, rewrite the complete program from scratch rather than trying to patch the end.",
+      "source": "m=harloader;f=loadhar(path:$str):$str{let content=mut.\"\";let idx=mut.0;lp(let i=0;i<1000;i=i+1){let ch=content.get(idx);if(ch=\"\\n\"){<content};idx=idx+1;if(idx>content.len()){<content}};f=main():$void{let path",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "SOC-111",
+      "category": "social-media",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them. | Extra closing paren ')'. Count parens \u2014 every '(' needs exactly one ')'. Common cause: doubled if((cond)) or trailing paren on a call.",
+      "source": "m=banned;f=checkbanned(word:$str):$bool{let banned=@(\"badword1\";\"badword2\";\"inappropriate\";\"abuse\"));let found=mut.false;lp(let idx=0;idx<banned.len;idx=idx+1){if(banned.get(idx)=word){found=true}};<found};f=main():$i64{let result=checkbanned(\"badword1\");<0};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    }
+  ]
+}

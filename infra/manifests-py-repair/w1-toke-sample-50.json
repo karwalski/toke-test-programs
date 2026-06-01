@@ -1,0 +1,188 @@
+{
+  "story": "107.R1 follow-up: toke repair sample-50 (1 Opus attempt each)",
+  "worker_id": 1,
+  "generated_at": "2026-05-31T21:26:54.407776+00:00",
+  "mode": "manifest",
+  "total": 10,
+  "programs": [
+    {
+      "id": "DEV-095",
+      "category": "devtools",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002"
+      ],
+      "hint": "Extra closing paren ')'. Count parens \u2014 every '(' needs exactly one ')'. Common cause: doubled if((cond)) or trailing paren on a call.",
+      "source": "m=validate;f=validatechain(chain:$str):$bool{let parts=chain.split(\"->\");let n=parts.len;let seen=mut.@();lp(let i=0;i<n;i=i+1){let m=parts.get(i);let found=mut.false;lp(let j=0;j<seen.len;j=j+1){if(seen.get(j)=m)){found=true}};if(found){<false};seen=seen+@(m)};<true};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "EDU-033",
+      "category": "education",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E3011"
+      ],
+      "hint": "Undeclared identifier 's'. Check spelling; ensure it is bound with let before use; verify imports. Did you mean 'ok'?",
+      "source": "m=anki;f=anki(front:$str;back:$str):$str{let result=mut.\"\";result=s.concat(result;front);result=s.concat(result;\"\\t\");result=s.concat(result;back);result=s.concat(result;\"\\n\");<result};f=main():$void{let front=\"What is 2 + 2?\";let back=\"4\";let output=anki(front;back);<output};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "FIN-096",
+      "category": "calculators-finance",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003"
+      ],
+      "hint": "Square brackets not allowed. Use @(item1;item2;item3) for arrays and maps; arr.get(idx) for access; arr.len for length.",
+      "source": "m=gcd;i=io:std.io;i=s:std.str;f=gcd(n:$i64;m:$i64):$i64{let a=mut.n;let b=mut.m;lp(let idx=0;!(b=0);idx=idx+1){let tmp=a;a=b;b=tmp-tmp/b*b};<a};f=main():$i64{let line=io.readln();let parts=s.split(line;\",\");let nums=mut.[];idx=0;lp(idx=0;idx<s.len(parts);idx=idx+1){nums=s.push(nums;s.toint(parts[idx]))};let result=nums[0];idx=1;lp(idx=1;idx<s.len(nums);idx=idx+1){result=gcd(result;nums[idx])};io.println(s.fromint(result));<0}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "GAM-032",
+      "category": "games",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002",
+        "E2002"
+      ],
+      "hint": "Extra closing paren ')'. Count parens \u2014 every '(' needs exactly one ')'. Common cause: doubled if((cond)) or trailing paren on a call.",
+      "source": "m=gameoflife;f=neighborhood(x:$i64;y:$i64;grid:@$bool):i64{let count=mut.0;lp(let dx=0;dx<3;dx=dx+1){lp(let dy=0;dy<3;dy=dy+1){let gx=x+dx-1;let gy=y+dy-1;if(gx<0){}el{if(gy<0){}el{if(gy<grid.len){if(gx<grid.get(gy).len){if(!(gx=grid.get(gy).len))){if(!(gy=grid.len))){if(grid.get(gy).get(gx)){count=count+1;};};};};};};};};};};};};};};};};};};};};};};};};}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "DEV-102",
+      "category": "devtools",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2003",
+        "E2002"
+      ],
+      "hint": "Missing semicolon. Toke separates EVERY statement with ; (never newlines). Every let/assignment/call/return needs a trailing ;. Inside lp(){body}, body statements also need ; between them.",
+      "source": "m=audit;f=checklicense(license:$str):$str{let allowed=mut.\"yes\";if(license=\"MIT\"){<allowed};if(license=\"Apache\"){<allowed};if(license=\"GPL\"){let msg=mut.\"no\";if(allowed=\"yes\"){msg=\"yes\"}el{msg=\"no\"};<msg};<allowed};f=auditdependencies(dependencies:@$str):@$str{let issues=mut.@();lp(let i=0;i<dependencies.len;i=i+1){let dep=dependencies.get(i);let license=checklicense(dep);if(license=\"no\"){let issue=dep+\" has incompatible license\";issues=issues+@(issue)}};<issues};f=main():$void{let deps=@(\"jquery\";\"bootstrap\";\"lodash\"));let problems=auditdependencies(deps);lp(let i=0;i<problems.len;i=i+1){let msg=problems.get(i);<msg}};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "AIA-093",
+      "category": "ai-agents",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E3011"
+      ],
+      "hint": "Undeclared identifier 's'. Check spelling; ensure it is bound with let before use; verify imports. Did you mean 'ok'?",
+      "source": "m=querybuilder;f=solve(left:$str;right:$str):$str{let leftcol=left;let rightcol=right;let query=mut.\"SELECT \";query=query+leftcol;query=s.concat(query;\" FROM table1 JOIN table2 ON table1.id=table2.id\");query=s.concat(query;\" WHERE \");query=query+rightcol;query=s.concat(query;\" = 'value'\");<query};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "SOC-021",
+      "category": "social-media",
+      "status": "WRONG_OUTPUT",
+      "error_codes": [],
+      "hint": "Compiles + builds + runs, but output doesn't match expected. Verify: (a) format strings \u2014 use s.format(val;\"%.4f\") for floats with exact decimal places; (b) trailing newlines / whitespace match the expected output exactly; (c) loop boundaries (off-by-one); (d) algorithm correctness against the test cases.",
+      "source": "m=main;f=main():$i64{let result=mut.0;let choice=mut.0;lp(let idx=0;idx<1;idx=idx+1){choice=1;};lp(let idx=0;idx<1;idx=idx+1){if(choice=1){result=choice};};<0};",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "EDU-050",
+      "category": "education",
+      "status": "WRONG_OUTPUT",
+      "error_codes": [],
+      "hint": "Compiles + builds + runs, but output doesn't match expected. Verify: (a) format strings \u2014 use s.format(val;\"%.4f\") for floats with exact decimal places; (b) trailing newlines / whitespace match the expected output exactly; (c) loop boundaries (off-by-one); (d) algorithm correctness against the test cases.",
+      "source": "m=vocab;i=io:std.io;i=s:std.str;f=main():$i64{let vocabline=io.readln();let textline=io.readln();let vocabwords=s.split(vocabline;\",\");let textwords=s.split(textline;\" \");let vidx=mut.0;lp(vidx<vocabwords.len()){let word=vocabwords.get(vidx);let count=mut.0;let tidx=mut.0;lp(tidx<textwords.len()){let textword=textwords.get(tidx);let cleanword=mut.\"\";cleanword=s.trim(textword);if(s.len(cleanword)>0){let lastchar=s.slice(cleanword;s.len(cleanword)-1;s.len(cleanword));if(lastchar=\".\"||lastchar=\",\"||lastchar=\"!\"||lastchar=\"?\"){cleanword=s.slice(cleanword;0;s.len(cleanword)-1)};cleanword=s.trim(cleanword);if(cleanword=word){count=count+1}};tidx=tidx+1};if(count>0){io.println(s.concat(s.concat(word;\": \");s.fromint(count)))};vidx=vidx+1};<0}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "FIN-072",
+      "category": "calculators-finance",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003",
+        "E1003"
+      ],
+      "hint": "Foreign-language keyword detected. Toke does not have this keyword. Check the toke keyword list (m f t i if el lp br let mut as rt mt) and rewrite using a toke equivalent. | Square brackets not allowed. Use @(item1;item2;item3) for arrays and maps; arr.get(idx) for access; arr.len for length.",
+      "source": "m=acc;\ni=io:std.io;\ni=s:std.str;\nf=accbal(n:$i64;m:$i64):$i64{<n-m};\nf=main():$i64{\n  let totalrev=$i64 0;\n  let totalexp=$i64 0;\n  let line=io.readln();\n  while line != \"\" {\n    let parts=s.split(line;\" \");\n    let amount=s.toint(parts[2]);\n    if parts[0] == \"REVENUE\" {\n      totalrev = totalrev + amount;\n    } else if parts[0] == \"EXPENSE\" {\n      totalexp = totalexp + amount;\n    };\n    line = io.readln();\n  };\n  let netprofit=accbal(totalrev;totalexp);\n  io.println(s.concat(s.concat(\"REVENUE: \";s.fromint(totalrev));\".00\"));\n  io.println(s.concat(s.concat(\"EXPENSES: \";s.fromint(totalexp));\".00\"));\n  if netprofit >= 0 {\n    io.println(s.concat(s.concat(\"NET PROFIT: \";s.fromint(netprofit));\".00\"));\n  } else {\n    io.println(s.concat(s.concat(\"NET LOSS: \";s.fromint(-netprofit));\".00\"));\n  };\n  <0\n}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    },
+    {
+      "id": "EDU-055",
+      "category": "education",
+      "status": "COMPILE_FAIL",
+      "error_codes": [
+        "E2002",
+        "E2004"
+      ],
+      "hint": "Unexpected '}'. A block closed early \u2014 usually a missing ; before this } or an extra } from over-nesting.",
+      "source": "m=spellbee;i=io:std.io;i=s:std.str;f=parseword(line:$str):$str{let wordstart=mut.(-1);let wordend=mut.(-1);let defstart=mut.(-1);let defend=mut.(-1);let diffstart=mut.(-1);let diffend=mut.(-1);let idx=mut.0;lp(idx<s.len(line)){let ch=s.slice(line;idx;idx+1);if(ch=\"\\\"\"){let nextidx=idx+1;if(nextidx+3<s.len(line)){let substr=s.slice(line;nextidx;nextidx+4);if(substr=\"word\"){wordstart=idx+8;let endidx=mut.wordstart;lp(endidx<s.len(line)){if(s.slice(line;endidx;endidx+1)=\"\\\"\"){wordend=endidx;br};endidx=endidx+1}}};if(nextidx+9<s.len(line)){let substr2=s.slice(line;nextidx;nextidx+10);if(substr2=\"definition\"){defstart=idx+14;let endidx=mut.defstart;lp(endidx<s.len(line)){if(s.slice(line;endidx;endidx+1)=\"\\\"\"){defend=endidx;br};endidx=endidx+1}}};if(nextidx+9<s.len(line)){let substr3=s.slice(line;nextidx;nextidx+10);if(substr3=\"difficulty\"){diffstart=idx+13;let endidx=mut.diffstart;lp(endidx<s.len(line)){let endch=s.slice(line;endidx;endidx+1);if(endch=\"}\"||endch=\",\"||endch=\"]\"){diffend=endidx;br};endidx=endidx+1}}}};idx=idx+1};if(wordstart>=0&&wordend>wordstart&&defstart>=0&&defend>defstart&&diffstart>=0&&diffend>diffstart){let wordval=s.slice(line;wordstart;wordend);let defval=s.slice(line;defstart;defend);let diffval=s.slice(line;diffstart;diffend);let diff=s.toint(diffval);<s.concat(s.concat(s.concat(s.fromint(diff);\":\");s.concat(s.concat(s.concat(wordval;\":\");defval)))};<\"\"};f=sortwords(words:@($str)):@($str){let sorted=mut.@();let idx=mut.0;lp(idx<words.len()){sorted=sorted+@(words.get(idx));idx=idx+1};let swapped=mut.true;lp(swapped){swapped=false;let j=mut.0;lp(j<sorted.len()-1){let line1=sorted.get(j);let line2=sorted.get(j+1);if(line1>line2){let newsorted=mut.@();let k=mut.0;lp(k<j){newsorted=newsorted+@(sorted.get(k));k=k+1};newsorted=newsorted+@(line2);newsorted=newsorted+@(line1);k=j+2;lp(k<sorted.len()){newsorted=newsorted+@(sorted.get(k));k=k+1};sorted=newsorted;swapped=true};j=j+1}};<sorted};f=main():$i64{let tier1=mut.@();let tier2=mut.@();let tier3=mut.@();let line=io.readln();let items=s.split(line;\"{\");let idx=mut.1;lp(idx<items.len()){let item=s.concat(\"{\";items.get(idx));let result=parseword(item);if(s.len(result)>0){let parts=s.split(result;\":\");if(parts.len()>=3){let tier=parts.get(0);let word=parts.get(1);let defn=parts.get(2);if(tier=\"1\"){tier1=tier1+@(s.concat(s.concat(word;\": \");defn))};if(tier=\"2\"){tier2=tier2+@(s.concat(s.concat(word;\": \");defn))};if(tier=\"3\"){tier3=tier3+@(s.concat(s.concat(word;\": \");defn))}}};idx=idx+1};if(tier1.len()>0){io.println(\"--- Tier 1 ---\");let sorted1=sortwords(tier1);let sidx=mut.0;lp(sidx<sorted1.len()){io.println(sorted1.get(sidx));sidx=sidx+1}};if(tier2.len()>0){io.println(\"--- Tier 2 ---\");let sorted2=sortwords(tier2);let sidx=mut.0;lp(sidx<sorted2.len()){io.println(sorted2.get(sidx));sidx=sidx+1}};if(tier3.len()>0){io.println(\"--- Tier 3 ---\");let sorted3=sortwords(tier3);let sidx=mut.0;lp(sidx<sorted3.len()){io.println(sorted3.get(sidx));sidx=sidx+1}};<0}",
+      "mode": "repair",
+      "model": "opus",
+      "max_iterations": 1,
+      "max_opus": 1,
+      "max_sonnet": 0
+    }
+  ]
+}
