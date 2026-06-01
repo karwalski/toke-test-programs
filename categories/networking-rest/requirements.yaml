@@ -1976,6 +1976,10 @@
     - "Adjustment based on sliding window of last 100 requests"
 
 - id: "NET-098"
+  disabled: true
+  disabled_reason: "[POST-112-AUDIT-TRIVIAL] tests only verify listen banner — OAuth2 flow logic untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "epic-112-audit"
   title: "OAuth2 Authorization Server (Mock)"
   description: "Mock OAuth2 authorization server implementing authorization_code and client_credentials flows. Issues JWTs as access tokens."
   difficulty: 5
@@ -2457,6 +2461,10 @@
     - "Must not print full new key"
 
 - id: "NET-123"
+  disabled: true
+  disabled_reason: "[POST-112-AUDIT-TRIVIAL] tests only check trivial diff marker — JSON diff logic untested"
+  disabled_at: "2026-06-01"
+  disabled_by: "epic-112-audit"
   title: "JSON Diff Client"
   description: "Reads two API endpoint URLs from stdin. Fetches both, diffs the JSON responses, and prints a human-readable diff showing added, removed, and changed fields."
   difficulty: 3
