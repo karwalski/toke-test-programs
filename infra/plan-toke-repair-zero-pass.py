@@ -24,6 +24,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+import yaml
+
 BASE = Path(__file__).resolve().parent.parent
 CATEGORIES = BASE / "categories"
 PY_REFS = BASE / "results" / "python-refs"
@@ -40,10 +42,25 @@ MAX_OPUS = 2  # 1 initial + 1 retry
 SEED = int(os.environ.get("STRATIFY_SEED", "107"))
 
 
+def load_disabled_ids() -> set[str]:
+    disabled: set[str] = set()
+    for req in CATEGORIES.glob("*/requirements.yaml"):
+        try:
+            specs = yaml.safe_load(req.read_text())
+        except Exception:
+            continue
+        for s in specs or []:
+            if s.get("disabled") is True and "id" in s:
+                disabled.add(s["id"])
+    return disabled
+
+
 def main():
     audit = json.loads(AUDIT.read_text())
     hints = json.loads(HINTS.read_text())
     held = {p["id"] for p in json.loads(HELD.read_text())["programs"]}
+    disabled_ids = load_disabled_ids()
+    print(f"Disabled specs in corpus: {len(disabled_ids)}")
 
     # Overlay R3 results to get TRUE current toke status
     prog_status = {p["id"]: p["status"] for p in audit["programs"]}
@@ -78,6 +95,9 @@ def main():
             continue
         if pid in held:
             skipped["in_held"] += 1
+            continue
+        if pid in disabled_ids:
+            skipped["disabled_spec"] += 1
             continue
         # Use effective status (audit + R3 overlay)
         if prog_status.get(pid) == "PASS":
