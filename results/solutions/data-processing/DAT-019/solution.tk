@@ -1,0 +1,1 @@
+m=merge;f=mergejson(a:$str;b:$str;key:$str):$str{let aobj=parsejson(a);let bobj=parsejson(b);let result=mut.jsonobj();let akeys=aobj.keys();let bkeys=bobj.keys();lp(let i=0;i<akeys.len;i=i+1){let k=akeys.get(i);let v=aobj.get(k);result.set(k;v)};lp(let i=0;i<bkeys.len;i=i+1){let k=bkeys.get(i);let v=bobj.get(k);let rkey=s.concat(key;".")+k;result.set(rkey;v)};<result.tojson()>};

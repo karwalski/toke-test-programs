@@ -1,0 +1,24 @@
+m=gridsearch;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+let header=io.readln();
+let besttemp=mut.0;
+let bestpressure=mut.0;
+let bestquality=mut.0;
+lp(let line=io.readln();line!="";line=io.readln()){
+let parts=s.split(line;",");
+if(parts.len()>=3){
+let temp=s.toint(parts.get(0));
+let pressure=s.toint(parts.get(1));
+let quality=s.toint(parts.get(2));
+if(quality>bestquality){
+besttemp=temp;
+bestpressure=pressure;
+bestquality=quality;
+};
+};
+};
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"optimal_params\":{\"temp\":";s.fromint(besttemp));",\"pressure\":");s.fromint(bestpressure));"},\"predicted_quality\":");s.fromint(bestquality));"}"));
+<0
+}

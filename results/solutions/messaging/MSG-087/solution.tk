@@ -1,0 +1,82 @@
+m=chatbot;
+i=io:std.io;
+i=s:std.str;
+f=getcmdname(registry:$str):$str{let p1=s.split(registry;"\"name\":\"");if(p1.len()>=2){let after=p1.get(1);let p2=s.split(after;"\"");if(p2.len()>=1){<p2.get(0)}};<""};
+f=countargs(registry:$str):$i64{let p1=s.split(registry;"\"args\":[");if(p1.len()<2){<0};let after=p1.get(1);let p2=s.split(after;"]");if(p2.len()<1){<0};let argsec=p2.get(0);if(s.contains(argsec;"\"name\"")=false){<0};let names=s.split(argsec;"\"name\":\"");<names.len()-1};
+f=getargname(registry:$str;idx:$i64):$str{let p1=s.split(registry;"\"args\":[");if(p1.len()<2){<""};let after=p1.get(1);let p2=s.split(after;"]");let argsec=p2.get(0);let names=s.split(argsec;"\"name\":\"");if(names.len()>idx+1){let nm=names.get(idx+1);let p3=s.split(nm;"\"");<p3.get(0)};<""};
+f=main():$i64{
+let registry=io.readln();
+let cmdname=s.trim(getcmdname(registry));
+let nargs=countargs(registry);
+let line=mut.s.trim(io.readln());
+lp(line!=""){
+let firstchar=s.slice(line;0;1);
+if(firstchar="/"){
+let body=s.slice(line;1;s.len(line));
+let toks=s.split(body;" ");
+let inname=toks.get(0);
+if(inname=cmdname){
+let providedcount=mut.0;
+lp(let k=1;k<toks.len();k=k+1){
+let tk=toks.get(k);
+let fc=s.slice(tk;0;1);
+if(fc!="-"){providedcount=providedcount+1};
+};
+if(nargs=0){
+if(providedcount=0){
+io.println(s.concat(s.concat("COMMAND: ";cmdname);", args: {}, flags: []"));
+}el{
+io.println(s.concat(s.concat(s.concat("ERROR: \"";cmdname);"\" takes 0 arguments, got ");s.fromint(providedcount)));
+};
+}el{
+let result=mut."";
+result=s.concat(result;"COMMAND: ");
+result=s.concat(result;cmdname);
+result=s.concat(result;", args: {");
+let valarr=mut.@();
+let cur=mut."";
+let started=mut.false;
+let vi=mut.0;
+lp(let k=1;k<toks.len();k=k+1){
+let tk=toks.get(k);
+let fc=s.slice(tk;0;1);
+if(fc!="-"){
+if(vi<nargs-1){
+valarr=valarr+@(tk);
+vi=vi+1;
+}el{
+if(started=false){cur=tk;started=true}el{cur=s.concat(cur;" ");cur=s.concat(cur;tk)};
+};
+};
+};
+valarr=valarr+@(cur);
+lp(let a=0;a<nargs;a=a+1){
+if(a>0){result=s.concat(result;", ")};
+result=s.concat(result;getargname(registry;a));
+result=s.concat(result;": \"");
+if(a<valarr.len()){result=s.concat(result;valarr.get(a))};
+result=s.concat(result;"\"");
+};
+result=s.concat(result;"}, flags: [");
+let flagcount=mut.0;
+lp(let k=1;k<toks.len();k=k+1){
+let tk=toks.get(k);
+let fc=s.slice(tk;0;1);
+if(fc="-"){
+if(flagcount>0){result=s.concat(result;", ")};
+result=s.concat(result;tk);
+flagcount=flagcount+1;
+};
+};
+result=s.concat(result;"]");
+io.println(result);
+};
+}el{
+io.println(s.concat(s.concat("ERROR: unknown command \"";inname);"\""));
+};
+}el{
+io.println("NOT_A_COMMAND");
+};
+line=s.trim(io.readln());
+};
+<0};

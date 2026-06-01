@@ -1,0 +1,6 @@
+{
+  "iteration": 8,
+  "broken_source": "m=main;i=io:std.io;i=s:std.str;i=math:std.math;f=effectiverate(nominal:$f64;freq:$i64):$f64{let freqf=s.tofloat(s.fromint(freq));let rate=1.0+nominal/freqf;let result=math.pow(rate;freqf)-1.0;<result};f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");if(parts.len()>=2){let nominal=s.tofloat(parts.get(0));let freq=s.toint(parts.get(1));let effective=effectiverate(nominal;freq);let percent=effective*100.0;let formatted=s.format(percent;\"%.4f\");io.println(formatted+\"%\")}el{io.println(\"error\")};<0}",
+  "error": "Test failures:\nTest 1: expected '12.6825%', got ''\nTest 2: expected '6.1364%', got ''",
+  "fixed_source": "m=main;i=io:std.io;i=s:std.str;i=math:std.math;f=effectiverate(nominal:$f64;freq:$i64):$f64{let freqf=s.tofloat(s.fromint(freq));let rate=1.0+nominal/freqf;let result=math.pow(rate;freqf)-1.0;<result};f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");if(parts.len()>=2){let nominal=s.tofloat(parts.get(0));let freq=s.toint(parts.get(1));let effective=effectiverate(nominal;freq);let percent=effective*100.0;let formatted=s.format(percent;\"%.4f\");io.println(formatted+\"%\")}el{io.println(\"error\")};<0}"
+}

@@ -1,0 +1,5 @@
+m=colmove;
+i=io:std.io;
+i=s:std.str;
+f=colmove(board:$str;col:$i64):$i64{let n=board.len;let m=col;let r=mut.0;lp(let idx=0;idx<n;idx=idx+1){let c=board.get(idx);if(c=43){let rtmp=idx/7;let ctmp=idx-rtmp*7;if(ctmp=m){if(rtmp<r){r=rtmp}}}};<r};
+f=main():$i64{let board=mut."";lp(let row=0;row<6;row=row+1){board=s.concat(board;io.readln())};let col=s.toint(io.readln());let result=colmove(board;col);if(result=0){io.println("Invalid")}{io.println(s.concat("Valid row ";s.fromint(5-result)))};<0}

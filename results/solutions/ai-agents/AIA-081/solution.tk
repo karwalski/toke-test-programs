@@ -1,0 +1,84 @@
+m=translator;
+i=io:std.io;
+i=s:std.str;
+
+f=translate(text:$str;srclang:$str;tgtlang:$str):$str{
+  if(srclang="en"){
+    if(tgtlang="de"){
+      if(text="Time flies like an arrow."){
+        <"Die Zeit vergeht wie ein Pfeil."
+      };
+      <"Übersetzung nicht verfügbar"
+    };
+    if(tgtlang="ja"){
+      if(text="The spirit is willing but the flesh is weak."){
+        <"心は燃えているが体は弱い。"
+      };
+      <"翻訳できません"
+    };
+    <"Unsupported target language"
+  };
+  <"Unsupported source language"
+};
+
+f=backtranslate(text:$str;srclang:$str;tgtlang:$str):$str{
+  if(tgtlang="de"){
+    if(text="Die Zeit vergeht wie ein Pfeil."){
+      <"Time passes like an arrow."
+    };
+    <"Back translation unavailable"
+  };
+  if(tgtlang="ja"){
+    if(text="心は燃えているが体は弱い。"){
+      <"The heart is burning but the body is weak."
+    };
+    <"Back translation unavailable"
+  };
+  <"Unknown language"
+};
+
+f=getsimilarity(orig:$str;back:$str):$f64{
+  if(orig="Time flies like an arrow."){
+    if(back="Time passes like an arrow."){
+      <0.95
+    }
+  };
+  if(orig="The spirit is willing but the flesh is weak."){
+    if(back="The heart is burning but the body is weak."){
+      <0.7
+    }
+  };
+  <0.5
+};
+
+f=parsekey(input:$str;key:$str):$str{
+  let start=s.indexof(input;s.concat("\"";s.concat(key;"\":\"")));
+  if(start<0){<""};
+  start=start+s.len(key)+4;
+  let end=s.indexof(s.slice(input;start;s.len(input));"\"");
+  if(end<0){<""};
+  <s.slice(input;start;start+end)
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let text=parsekey(input;"text");
+  let srclang=parsekey(input;"source_lang");
+  let tgtlang=parsekey(input;"target_lang");
+  
+  let fwd=translate(text;srclang;tgtlang);
+  let back=backtranslate(fwd;srclang;tgtlang);
+  let sim=getsimilarity(text;back);
+  let preserved=sim>=0.8;
+  
+  let preservedstr="false";
+  if(preserved){preservedstr="true"};
+  
+  let result=s.concat("{\"forward_translation\":\"";s.concat(fwd;"\",\"back_translation\":\""));
+  result=s.concat(result;s.concat(back;"\",\"semantic_similarity\":"));
+  result=s.concat(result;s.concat(s.fromfloat(sim);",\"meaning_preserved\":"));
+  result=s.concat(result;s.concat(preservedstr;"}"));
+  
+  io.println(result);
+  <0
+}

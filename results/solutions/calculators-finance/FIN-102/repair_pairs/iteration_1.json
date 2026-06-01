@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=modinv;i=io:std.io;i=s:std.str;f=extgcd(a:$i64;b:$i64;x:$i64;y:$i64):$i64{if(b=0){<a};let q=a/b;let r=a-q*b;let nx=y;let ny=x-q*y;<extgcd(b;r;nx;ny)};f=modinv(a:$i64;m:$i64):$i64{let x=mut.0;let y=mut.1;let g=extgcd(a;m;x;y);if(g!=1){<-1};if(x<0){x=x+m};<x};f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");let a=s.toint(parts.get(0));let m=s.toint(parts.get(1));let result=modinv(a;m);io.println(s.fromint(result));<0}",
+  "error": "Test failures:\nTest 1: expected '5', got '0'\nTest 2: expected 'NO_INVERSE', got '-1'",
+  "fixed_source": "m=modinv;i=io:std.io;i=s:std.str;f=extgcd(a:$i64;b:$i64):@($i64;$i64;$i64){if(b=0){<@(a;1;0)};let q=a/b;let r=a-q*b;let result=extgcd(b;r);let g=result.get(0);let x=result.get(1);let y=result.get(2);<@(g;y;x-q*y)};f=modinv(a:$i64;m:$i64):$i64{let result=extgcd(a;m);let g=result.get(0);let x=result.get(1);if(g!=1){<-1};if(x<0){<x+m};<x};f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");let a=s.toint(parts.get(0));let m=s.toint(parts.get(1));let result=modinv(a;m);if(result=-1){io.println(\"NO_INVERSE\")}el{io.println(s.fromint(result))};<0}"
+}

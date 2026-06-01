@@ -1,0 +1,132 @@
+m=workflowvalidator;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+t=$node{id:$str;deps:@($str)};
+
+f=parseworkflow(data:$json):@($node){
+  let nodes=j.getarray(data;"nodes");
+  let result=mut.@();
+  lp(let idx=0;idx<nodes.len;idx=idx+1){
+    let n=nodes.get(idx);
+    let id=j.getstring(n;"id");
+    let deparray=j.getarray(n;"depends_on");
+    let deps=mut.@();
+    lp(let didx=0;didx<deparray.len;didx=didx+1){
+      let d=j.getstring(deparray.get(didx);"");
+      deps=deps.append(d)
+    };
+    result=result.append($node{id:id;deps:deps})
+  };
+  <result
+};
+
+f=hascycle(nodes:@($node);n:$node;visited:@($str);stack:@($str)):$str{
+  let found=mut.false;
+  lp(let idx=0;idx<stack.len;idx=idx+1){
+    if(stack.get(idx)=n.id){found=true}
+  };
+  if(found){<n.id};
+  
+  let newstack=stack.append(n.id);
+  lp(let idx=0;idx<n.deps.len;idx=idx+1){
+    let dep=n.deps.get(idx);
+    let depnode=mut.$node{id:"";deps:@()};
+    lp(let nidx=0;nidx<nodes.len;nidx=nidx+1){
+      let nd=nodes.get(nidx);
+      if(nd.id=dep){depnode=nd}
+    };
+    let cycle=hascycle(nodes;depnode;visited;newstack);
+    if(cycle!=""){<cycle}
+  };
+  <""
+};
+
+f=findcycles(nodes:@($node)):@($str){
+  let errors=mut.@();
+  lp(let idx=0;idx<nodes.len;idx=idx+1){
+    let n=nodes.get(idx);
+    let cycle=hascycle(nodes;n;@();@());
+    if(cycle!=""){
+      let msg=s.concat("Cycle detected: ";n.id);
+      msg=s.concat(msg;" -> ");
+      msg=s.concat(msg;cycle);
+      msg=s.concat(msg;" -> ");
+      msg=s.concat(msg;n.id);
+      let alreadyfound=mut.false;
+      lp(let eidx=0;eidx<errors.len;eidx=eidx+1){
+        if(errors.get(eidx)=msg){alreadyfound=true}
+      };
+      if(!alreadyfound){errors=errors.append(msg)}
+    }
+  };
+  <errors
+};
+
+f=topovisit(nodes:@($node);id:$str;visited:@($str);result:@($str)):@($str){
+  let newvisited=visited.append(id);
+  let n=mut.$node{id:"";deps:@()};
+  lp(let idx=0;idx<nodes.len;idx=idx+1){
+    let nd=nodes.get(idx);
+    if(nd.id=id){n=nd}
+  };
+  
+  lp(let idx=0;idx<n.deps.len;idx=idx+1){
+    let dep=n.deps.get(idx);
+    let found=mut.false;
+    lp(let vidx=0;vidx<newvisited.len;vidx=vidx+1){
+      if(newvisited.get(vidx)=dep){found=true}
+    };
+    if(!found){
+      result=topovisit(nodes;dep;newvisited;result)
+    }
+  };
+  
+  let alreadyin=mut.false;
+  lp(let ridx=0;ridx<result.len;ridx=ridx+1){
+    if(result.get(ridx)=id){alreadyin=true}
+  };
+  if(!alreadyin){result=result.append(id)};
+  <result
+};
+
+f=toposort(nodes:@($node)):@($str){
+  let result=mut.@();
+  let visited=mut.@();
+  
+  lp(let idx=0;idx<nodes.len;idx=idx+1){
+    let n=nodes.get(idx);
+    let found=mut.false;
+    lp(let vidx=0;vidx<visited.len;vidx=vidx+1){
+      if(visited.get(vidx)=n.id){found=true}
+    };
+    if(!found){
+      visited=visited.append(n.id);
+      result=topovisit(nodes;n.id;@();result)
+    }
+  };
+  <result
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let data=j.parse(input);
+  let nodes=parseworkflow(data);
+  
+  let errors=findcycles(nodes);
+  let valid=errors.len=0;
+  
+  let order=mut.@();
+  if(valid){
+    order=toposort(nodes)
+  };
+  
+  let result=j.object();
+  j.setbool(result;"valid";valid);
+  j.setarray(result;"errors";j.fromstringarray(errors));
+  j.setarray(result;"execution_order";j.fromstringarray(order));
+  
+  io.println(j.stringify(result));
+  <0
+}

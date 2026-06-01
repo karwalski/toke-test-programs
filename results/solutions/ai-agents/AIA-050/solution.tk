@@ -1,0 +1,151 @@
+m=emailparse;
+i=io:std.io;
+i=s:std.str;
+
+f=parseheader(lines:@($str);key:$str):$str{
+  let result=mut."";
+  let keylen=key.len;
+  lp(let idx=0;idx<lines.len;idx=idx+1){
+    let line=lines.get(idx);
+    if(line.len>=keylen+2){
+      let prefix=s.slice(line;0;keylen+1);
+      let expected=s.concat(key;":");
+      if(prefix=expected){
+        result=s.trim(s.slice(line;keylen+1;line.len));
+        <result
+      }
+    }
+  };
+  <result
+};
+
+f=parserecipients(value:$str):@($str){
+  let parts=s.split(value;",");
+  let result=mut.@();
+  lp(let idx=0;idx<parts.len;idx=idx+1){
+    let addr=s.trim(parts.get(idx));
+    if(addr.len>0){
+      result=result.append(addr)
+    }
+  };
+  <result
+};
+
+f=parsedate(datestr:$str):$str{
+  let parts=s.split(datestr;" ");
+  if(parts.len>=6){
+    let day=parts.get(1);
+    let mon=parts.get(2);
+    let year=parts.get(3);
+    let time=parts.get(4);
+    let tz=parts.get(5);
+    
+    let month=mut."01";
+    if(mon="Jan"){month="01"}
+    el{if(mon="Feb"){month="02"}
+    el{if(mon="Mar"){month="03"}
+    el{if(mon="Apr"){month="04"}
+    el{if(mon="May"){month="05"}
+    el{if(mon="Jun"){month="06"}
+    el{if(mon="Jul"){month="07"}
+    el{if(mon="Aug"){month="08"}
+    el{if(mon="Sep"){month="09"}
+    el{if(mon="Oct"){month="10"}
+    el{if(mon="Nov"){month="11"}
+    el{if(mon="Dec"){month="12"}}}}}}}}}}}}};
+    
+    let daypad=day;
+    if(day.len=1){daypad=s.concat("0";day)};
+    
+    let tzfmt=mut."+00:00";
+    if(tz="+0000"){tzfmt="+00:00"};
+    
+    <s.concat(year;s.concat("-";s.concat(month;s.concat("-";s.concat(daypad;s.concat("T";s.concat(time;tzfmt)))))))
+  };
+  <""
+};
+
+f=buildjson(from:$str;to:@($str);cc:@($str);subject:$str;date:$str;body:$str;hasattach:$bool):$str{
+  let bld=s.builder();
+  s.add(bld;"{");
+  s.add(bld;"\"from\":\"");
+  s.add(bld;from);
+  s.add(bld;"\",\"to\":[");
+  
+  lp(let idx=0;idx<to.len;idx=idx+1){
+    if(idx>0){s.add(bld;",")};
+    s.add(bld;"\"");
+    s.add(bld;to.get(idx));
+    s.add(bld;"\"")
+  };
+  
+  s.add(bld;"],\"cc\":[");
+  
+  lp(let idx=0;idx<cc.len;idx=idx+1){
+    if(idx>0){s.add(bld;",")};
+    s.add(bld;"\"");
+    s.add(bld;cc.get(idx));
+    s.add(bld;"\"")
+  };
+  
+  s.add(bld;"],\"subject\":\"");
+  s.add(bld;subject);
+  s.add(bld;"\",\"date\":\"");
+  s.add(bld;date);
+  s.add(bld;"\",\"body\":\"");
+  
+  let bodylen=body.len;
+  lp(let idx=0;idx<bodylen;idx=idx+1){
+    let ch=s.slice(body;idx;idx+1);
+    if(ch="\n"){s.add(bld;"\\n")}
+    el{if(ch="\""){s.add(bld;"\\\"")}
+    el{if(ch="\\"){s.add(bld;"\\\\")}
+    el{s.add(bld;ch)}}}
+  };
+  
+  s.add(bld;"\",\"has_attachments\":");
+  if(hasattach){s.add(bld;"true")}el{s.add(bld;"false")};
+  s.add(bld;"}");
+  
+  <s.build(bld)
+};
+
+f=main():$i64{
+  let lines=mut.@();
+  let inbody=mut.false;
+  let bodylines=mut.@();
+  
+  lp(true){
+    let line=io.readln();
+    if(line.len=0){
+      if(inbody){br};
+      inbody=true
+    }el{
+      if(inbody){
+        bodylines=bodylines.append(line)
+      }el{
+        lines=lines.append(line)
+      }
+    }
+  };
+  
+  let from=parseheader(lines;"From");
+  let tostr=parseheader(lines;"To");
+  let ccstr=parseheader(lines;"Cc");
+  let subject=parseheader(lines;"Subject");
+  let datestr=parseheader(lines;"Date");
+  
+  let to=parserecipients(tostr);
+  let cc=@();
+  if(ccstr.len>0){
+    cc=parserecipients(ccstr)
+  };
+  
+  let date=parsedate(datestr);
+  let body=s.join(bodylines;"\n");
+  
+  let result=buildjson(from;to;cc;subject;date;body;false);
+  io.println(result);
+  
+  <0
+}

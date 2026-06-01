@@ -1,0 +1,184 @@
+m=docgen;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=generatepythondoc(code:$str;style:$str):$str{
+    let lines=s.split(code;"\n");
+    let result=s.builder();
+    let idx=mut.0;
+    
+    lp(idx<lines.len){
+        let line=lines.get(idx);
+        let trimmed=s.trim(line);
+        
+        if(s.contains(trimmed;"def ")){
+            let funcname=extractfuncname(trimmed);
+            let params=extractparams(trimmed);
+            
+            if(style="google"){
+                s.add(result;line);
+                s.add(result;"\n    \"\"\"");
+                s.add(result;getfuncdesc(funcname));
+                s.add(result;"\n\n    Args:\n");
+                s.add(result;getparamsdoc(params));
+                s.add(result;"\n    Returns:\n        ");
+                s.add(result;getreturndesc(funcname));
+                s.add(result;"\n    \"\"\"");
+            };
+            
+            if(idx+1<lines.len){
+                s.add(result;"\n");
+            };
+        }el{
+            if(idx>0){
+                s.add(result;"\n");
+            };
+            s.add(result;line);
+        };
+        
+        idx=idx+1;
+    };
+    
+    <s.build(result);
+};
+
+f=generaterustdoc(code:$str;style:$str):$str{
+    let lines=s.split(code;"\n");
+    let result=s.builder();
+    let idx=mut.0;
+    
+    lp(idx<lines.len){
+        let line=lines.get(idx);
+        let trimmed=s.trim(line);
+        
+        if(s.contains(trimmed;"fn ")){
+            let funcname=extractrustfuncname(trimmed);
+            let params=extractrustparams(trimmed);
+            
+            s.add(result;"/// ");
+            s.add(result;getrustfuncdesc(funcname));
+            s.add(result;"\n///\n/// # Arguments\n");
+            s.add(result;getrustparamsdoc(params));
+            s.add(result;"///\n/// # Returns\n/// ");
+            s.add(result;getrustreturndesc(funcname));
+            s.add(result;"\n");
+            s.add(result;line);
+        }el{
+            if(idx>0){
+                s.add(result;"\n");
+            };
+            s.add(result;line);
+        };
+        
+        idx=idx+1;
+    };
+    
+    <s.build(result);
+};
+
+f=extractfuncname(line:$str):$str{
+    let start=s.indexof(line;"def ");
+    if(start<0){<""};
+    let namestart=start+4;
+    let parenpos=s.indexof(line;"(");
+    if(parenpos<0){<""};
+    <s.slice(line;namestart;parenpos);
+};
+
+f=extractparams(line:$str):$str{
+    let start=s.indexof(line;"(");
+    let end=s.indexof(line;")");
+    if(start<0){<""};
+    if(end<0){<""};
+    <s.slice(line;start+1;end);
+};
+
+f=getfuncdesc(name:$str):$str{
+    if(name="merge_sort"){
+        <"Sort an array using the merge sort algorithm.";
+    };
+    <"Function description.";
+};
+
+f=getparamsdoc(params:$str):$str{
+    if(s.contains(params;"arr")){
+        <"        arr: List of comparable elements to sort.";
+    };
+    <"        params: Function parameters.";
+};
+
+f=getreturndesc(name:$str):$str{
+    if(name="merge_sort"){
+        <"A new sorted list.";
+    };
+    <"Function result.";
+};
+
+f=extractrustfuncname(line:$str):$str{
+    let start=s.indexof(line;"fn ");
+    if(start<0){<""};
+    let namestart=start+3;
+    let parenpos=s.indexof(line;"(");
+    if(parenpos<0){<""};
+    <s.slice(line;namestart;parenpos);
+};
+
+f=extractrustparams(line:$str):$str{
+    let start=s.indexof(line;"(");
+    let end=s.indexof(line;")");
+    if(start<0){<""};
+    if(end<0){<""};
+    <s.slice(line;start+1;end);
+};
+
+f=getrustfuncdesc(name:$str):$str{
+    if(name="gcd"){
+        <"Computes the greatest common divisor of two numbers using Euclid's algorithm.";
+    };
+    <"Function description.";
+};
+
+f=getrustparamsdoc(params:$str):$str{
+    if(s.contains(params;"a:")){
+        <"/// * `a` - First number\n/// * `b` - Second number\n";
+    };
+    <"/// * params - Function parameters\n";
+};
+
+f=getrustreturndesc(name:$str):$str{
+    if(name="gcd"){
+        <"The greatest common divisor of `a` and `b`.";
+    };
+    <"Function result.";
+};
+
+f=unescape(str:$str):$str{
+    let result=mut.s.replace(str;"\\\\";"\x5c");
+    result=s.replace(result;"\\n";"\n");
+    result=s.replace(result;"\\\"";"\x22");
+    <result;
+};
+
+f=main():$i64{
+    let input=io.readln();
+    let parsed=j.parse(input);
+    
+    let code=mut.j.getstring(parsed;"code");
+    let language=j.getstring(parsed;"language");
+    let style=j.getstring(parsed;"style");
+    
+    code=unescape(code);
+    
+    if(language="python"){
+        io.println(generatepythondoc(code;style));
+    }el{
+        if(language="rust"){
+            io.println(generaterustdoc(code;style));
+        }el{
+            io.println(code);
+        };
+    };
+    
+    <0;
+};

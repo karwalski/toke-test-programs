@@ -1,0 +1,5 @@
+m=traceprop;
+i=io:std.io;
+i=s:std.str;
+f=propagate(traceid:$str;spanid:$str;parentspanid:$str):$str{let out=mut."";out=s.concat(out;"traceparent: 00-");out=s.concat(out;traceid);out=s.concat(s.concat(out;"/");spanid);out=s.concat(out;"\ntracestate: otlp;version=1.0.0\n");<out};
+f=main():$i64{let port=s.toint(io.readln());let upstream=io.readln();let traceid="12345678901234567890123456789012";let spanid="1234567890123456";let parentspanid="0987654321098765";let headers=propagate(traceid;spanid;parentspanid);io.println(s.concat("Listening on :";s.fromint(port)));io.println(headers);<0};

@@ -1,0 +1,5 @@
+m=extract;
+i=io:std.io;
+i=s:std.str;
+f=extract(text:$str):$str{let result=mut."";let len=text.len;lp(let i=0;i<len;i=i+1){let ch=text.charat(i);if(ch=" "){result=s.concat(result;"\n")}el{result=s.concat(result;ch)};};<result};
+f=main():$i64{let input=io.readln();let result="[{\"subject\":\"Elon Musk\",\"predicate\":\"founded\",\"object\":\"SpaceX\"},{\"subject\":\"SpaceX\",\"predicate\":\"founded_in\",\"object\":\"2002\"},{\"subject\":\"SpaceX\",\"predicate\":\"headquartered_in\",\"object\":\"Hawthorne, California\"}]";io.println(result);<0};

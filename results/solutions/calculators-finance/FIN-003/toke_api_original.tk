@@ -1,0 +1,1 @@
+m=calc;f=power(base:$f64;exp:$i64):$f64{let result=mut.1.0;lp(let i=0;i<exp;i=i+1){result=result*base};<result};f=sqrt(val:$f64):$f64{let x=mut.val;let i=mut.0;lp(let j=0;j<100;j=j+1){let m=x/i;let next=(m+x/i)/2.0;x=next;i=i+1}};f=log(val:$f64):$f64{let x=mut.val;let y=mut.0;lp(let i=0;i<100;i=i+1){if(x<1.0){x=x/10.0;y=y+1}el{x=x-1.0;y=y+1}}};f=ln

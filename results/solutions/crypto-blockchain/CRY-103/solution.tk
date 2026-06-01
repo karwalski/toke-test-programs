@@ -1,0 +1,1 @@
+m=slashing;f=isslashed(votes:@$str;threshold:$i64):$bool{let count=mut.0;let seen=mut.@();lp(let i=0;i<votes.len;i=i+1){let v=votes.get(i);let isnew=mut.true;lp(let j=0;j<seen.len;j=j+1){if(seen.get(j)=v)){isnew=false;br;};};if(isnew){count=count+1;seen=seen+@(v);};};if(count>threshold){<true};<false};

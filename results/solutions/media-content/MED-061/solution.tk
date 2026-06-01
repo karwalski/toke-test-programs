@@ -1,0 +1,1 @@
+m=urlencode;f=urlencode(s:$str):$str{let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=32){result=s.concat(result;"%20");}el{result=s.concat(result;c) as$str;};};<result};

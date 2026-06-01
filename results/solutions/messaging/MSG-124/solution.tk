@@ -1,0 +1,1 @@
+m=export;f=buildrow(parts:@$str):$str{let out=mut."";let n=parts.len;lp(let i=0;i<n;i=i+1){let p=parts.get(i);out=out+p;if(!(i=n-1)){out=s.concat(out;"\t")};};<out};f=csvopen():$str{<""};f=csvescape(s:$str):$str{let out=mut.s;if(out.contains("\"")){out=out.replace("\"";"\"\"");};if(out.contains("\n"))){out=out.replace("\n";" ");};<out};f=csv

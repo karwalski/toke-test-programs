@@ -1,0 +1,1 @@
+m=cache;f=main():$i64{let url=mut."";let n=mut.0;lp(let idx=0;idx<100;idx=idx+1){let c=mut.std.stdin.readchar();if(c=""){<0};if(c="\n"){<0};url=url+c;n=n+1;};let result=mut.fib(n);let poisoned=mut.false;if(n>10){poisoned=true};if(poisoned){<0};<result};f=fib(n:$i64):$i64{if(n<2){<n};let a=mut.0;let b=mut.1;lp(let idx=2;idx<n;idx=idx+1){let tmp=a+b;a=b;b=tmp};<b};

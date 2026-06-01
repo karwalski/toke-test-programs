@@ -1,0 +1,42 @@
+m=csvdiff;
+i=io:std.io;
+i=s:std.str;
+f=csvparse(line:$str;delimiter:$str):$str{let parts=line.split(delimiter);if(parts.len=0){<""};<parts.get(0)};
+f=csvcolcount(line:$str;delimiter:$str):$i64{let parts=line.split(delimiter);<parts.len};
+f=parsecsvdata(lines:$str):$map[$str;$str]{let result=map[$str;$str]();let linelist=lines.split("\n");if(linelist.len<2){<result};let header=linelist.get(0);for(let j=1;j<linelist.len;j=j+1){let line=linelist.get(j);if(line.len>0){let parts=line.split(",");if(parts.len>=2){let key=parts.get(0);let value=parts.get(1);result.put(key;value)}}};<result};
+f=main():$i64{
+let csvadata="";
+let line=io.readln();
+while(line.len>0){
+csvadata=s.concat(s.concat(csvadata;line);"\n");
+line=io.readln()
+};
+let csvbdata="";
+line=io.readln();
+while(line.len>0){
+csvbdata=s.concat(s.concat(csvbdata;line);"\n");
+line=io.readln()
+};
+let keycolumn=io.readln();
+let mapa=parsecsvdata(csvadata);
+let mapb=parsecsvdata(csvbdata);
+let allkeys=set[$str]();
+for(key;val in mapa){allkeys.add(key)};
+for(key;val in mapb){allkeys.add(key)};
+for(key in allkeys){
+let inold=mapa.has(key);
+let innew=mapb.has(key);
+if(inold and innew){
+let oldval=mapa.get(key);
+let newval=mapb.get(key);
+if(oldval!=newval){
+io.println("~ "+key+": "+oldval+" -> "+newval)
+}
+}else if(inold and not innew){
+io.println("- "+key+","+mapa.get(key))
+}else if(not inold and innew){
+io.println("+ "+key+","+mapb.get(key))
+}
+};
+<0
+}

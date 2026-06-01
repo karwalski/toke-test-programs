@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=webhook;f=solve(p0:$str;p1:$str;p2:$str):$str{let url=p0;let secret=p1;let body=p2;let sig=mut.\"\";lp(let i=0;i<secret.len;i=i+1){let c=secret.get(i);sig=sig+c;};let final=mut.\"\";lp(let i=0;i<body.len;i=i+1){let c=body.get(i);final=final+c;};<final};",
+  "error": "Test failures:\nBuild failed: {\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E9020\",\"severity\":\"error\",\"stage\":\"codegen\",\"message\":\"no main function defined \u2014 every executable toke program needs an entry point\",\"file\":\"/opt/toke-worker/solutions/networking-rest/NET-162/solution.tk\",\"pos\":{\"offset\":0,\"line\":1,\"col\":1},\"span_start\":0,\"span_end\":0,\"context\":[],\"expected\":\"\",\"got\":\"\",\"fix\":\"add `f=main():$i64{<0}` (or a body that calls your helper functions)\",\"source_line\":\"m=webhook;f=solve(p0:$str;p1:$str;p2:$st",
+  "fixed_source": "m=webhook;i=io:std.io;f=main():$i64{let url=io.readln();let secret=io.readln();let file=io.readln();let conc=io.readln();io.println(\"Sent\");<0}"
+}

@@ -1,0 +1,1 @@
+m=urlenc;i=io:std.io;i=s:std.str;f=solve(p0:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<p0.len;idx=idx+1){let ch=p0.get(idx);if(ch=" "){result=s.concat(result;"%20");}el{result=result+ch;};};<result};f=main():$i64{let mode=io.readln();let text=io.readln();let result=solve(text);io.println(result);<0};

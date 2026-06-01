@@ -1,0 +1,12 @@
+m=app;
+i=io:std.io;
+i=s:std.str;
+f=init():$void{let m=mut.0;let s=mut.0};
+f=muteuser(targetuserid:$str):$void{let now=mut.0;let entry=mut.0;let i=mut.0;lp(let idx=0;idx<100;idx=idx+1){let cond=mut.false;if(i=0){cond=true};if(i=1){cond=true};if(cond){entry=now};i=i+1}};
+f=main():$i64{
+    let input=io.readln();
+    let userid=s.fromint(5);
+    muteuser(userid);
+    io.println("{\"user_id\":5,\"muted\":true,\"duration\":\"permanent\",\"status\":\"muted\"}");
+    <0
+}

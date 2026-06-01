@@ -1,0 +1,44 @@
+m=jsonprint;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let n=s.len(input);
+  if(n=0){io.println("ERROR: invalid JSON: ...");<0};
+  let first=s.slice(input;0;1);
+  if(s.equals(first;"{")){
+    if(s.indexof(input;":")<0){io.println("ERROR: invalid JSON: ...");<0};
+    let out=mut."{";
+    let i=mut.0;
+    let depth=mut.0;
+    let inkey=mut.0;
+    lp(i<n){
+      let ch=s.slice(input;i;i+1);
+      if(s.equals(ch;"{")){
+        out=s.concat(out;"\n  ");
+        depth=depth+1
+      }el{
+        if(s.equals(ch;"}")){
+          out=s.concat(out;"\n}");
+          depth=depth-1
+        }el{
+          if(s.equals(ch;":")){
+            out=s.concat(out;": ")
+          }el{
+            if(s.equals(ch;",")){
+              out=s.concat(out;",\n  ")
+            }el{
+              out=s.concat(out;ch)
+            }
+          }
+        }
+      };
+      i=i+1
+    };
+    io.println(out)
+  }el{
+    io.println("ERROR: invalid JSON: ...")
+  };
+  <0
+}

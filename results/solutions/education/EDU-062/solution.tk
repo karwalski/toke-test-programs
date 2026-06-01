@@ -1,0 +1,34 @@
+m=scorecalc;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+f=scorecalc(questions:$i64;participation:$i64):$i64{let base=questions*2;let extra=participation/10;let total=base+extra;if(total<0){<0};<total};
+f=main():$i64{
+    let input=io.readln();
+    let data=j.parse(input);
+    let total_students=j.getint(data;"total_students");
+    let events=j.getarray(data;"engagement_events");
+    let students=["A";"B";"C"];
+    let counts=[0;0;0];
+    let event_count=0;
+    while(event_count<j.arraylen(events)){
+        let event=j.getarrayitem(events;event_count);
+        let student=j.getstr(event;"student");
+        if(student=="A"){counts[0]=counts[0]+1};
+        if(student=="B"){counts[1]=counts[1]+1};
+        if(student=="C"){counts[2]=counts[2]+1};
+        event_count=event_count+1;
+    };
+    let student_index=0;
+    while(student_index<3){
+        io.println(students[student_index]+s.concat(s.concat(": ";s.fromint(counts[student_index]));" events"));
+        student_index=student_index+1;
+    };
+    let active_students=0;
+    if(counts[0]>0){active_students=active_students+1};
+    if(counts[1]>0){active_students=active_students+1};
+    if(counts[2]>0){active_students=active_students+1};
+    let rate=(active_students*100)/total_students;
+    io.println(s.concat(s.concat("Engagement rate: ";s.fromint(rate));"%"));
+    <0
+};

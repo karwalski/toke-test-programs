@@ -1,0 +1,1 @@
+m=samplelog;f=samplelog(rate:i64;msg:$str):$void{let shouldsample=mut.false;let r=rate as u64;let v=0 as u64;if(r=0){shouldsample=true}el{let rmod=r-v;if(rmod=0){shouldsample=true}el{shouldsample=false}}};if(shouldsample){let out=mut."";out=s.concat(out;msg);<out}};

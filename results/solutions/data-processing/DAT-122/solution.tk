@@ -1,0 +1,1 @@
+m=cdcpipeline;f=extractkey(event:$str):$str{let idx=mut.0;let len=event.len;lp(let i=0;i<len;i=i+1){let ch=event.get(i);if(ch=":"){idx=i};};let keylen=idx-1;let key=mut."";lp(let i=0;i<keylen;i=i+1){key=s.concat(key;event.get(i+1)));};<key};f=extractvalue(event:$str):$str{let len=event.len;let idx=mu

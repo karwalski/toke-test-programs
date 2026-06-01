@@ -1,0 +1,25 @@
+{
+  "id": "SCI-040",
+  "category": "scientific-math",
+  "title": "Combinations Generator",
+  "description": "Generate all combinations C(n,k) from a list of elements.",
+  "difficulty": 2,
+  "stdlib_modules": [
+    "std.math",
+    "std.collections",
+    "std.io"
+  ],
+  "repair_count": 5,
+  "one_shot": false,
+  "toke_api_compiled": false,
+  "warnings": [
+    "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"W5001\",\"severity\":\"warning\",\"stage\":\"arena_check\",\"message\":\"value 'r2' escapes its scope: bound in a nested block (depth 2)\",\"file\":\"/opt/toke-worker/solutions/scientific-math/SCI-040/solution.tk\",\"pos\":{\"offset\":463,\"line\":1,\"col\":464},\"span_start\":463,\"span_end\":463,\"context\":[],\"expected\":\"\",\"got\":\"\",\"fix\":\"move the binding to the function body or return a copy\",\"source_line\":\"m=combo;i=io:std.io;i=s:std.str;f=combo(arr:@($str);n:$i64;k:$i64;start:$i64;current:@($str);result:$i64):$i64{if(current.len()=k){lp(let i=0;i<current.len();i=i+1){if(i>0){io.print(\\\" \\\")};io.print(current.get(i))};io.println(\\\"\\\");<result+1}el{if(start<n){let newcur=mut.@();lp(let j=0;j<current.len();j=j+1){newcur=newcur.push(current.get(j))};newcur=newcur.push(arr.get(start));let r1=combo(arr;n;k;start+1;newcur;result);let r2=combo(arr;n;k;start+1;current;r1);<r2}el{<result}}};f=main():$i64{let line1=io.readln();let parts1=s.split(line1;\\\" \\\");let arr=mut.@();lp(let i=0;i<parts1.len();i=i+1){arr=arr.push(parts1.get(i))};let line2=io.readln();let k=s.toint(line2);let current=@();let result=combo(arr;arr.len();k;0;current;0);io.println(s.concat(\\\"Total: \\\";s.fromint(result)));<0}\"}"
+  ],
+  "generated_at": "2026-05-27T04:26:26.748647+00:00",
+  "worker_id": 2,
+  "source_chars": 783,
+  "source_lines": 1,
+  "has_companion": true,
+  "has_repair_pairs": true,
+  "test_cases_count": 2
+}

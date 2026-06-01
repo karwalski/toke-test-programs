@@ -1,0 +1,1 @@
+m=recproxy;f=recordmode(p:$str):$str{let msg=mut."";if(p="record"){msg="Recording..."}el{if(p="replay"){msg="Replaying..."}el{msg="Unknown mode"}};let result=mut."";result=msg;<result};f=main():$str{let mode=recordmode("record");<mode};

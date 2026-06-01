@@ -1,0 +1,5 @@
+m=five;
+i=io:std.io;
+i=s:std.str;
+f=five(num1:@$i64;num2:$i64):@$i64{let sorted=mut.num1;lp(let i=0;i<sorted.len;i=i+1){lp(let j=i+1;j<sorted.len;j=j+1){if(sorted.get(i)>sorted.get(j)){let tmp=sorted.get(i);sorted.get(i)=sorted.get(j);sorted.get(j)=tmp;};};};let len=sorted.len;let min=sorted.get(0);let max=sorted.get(len-1);let median=sorted.get(len/2);let q1idx=len/4;let q3idx=len*3/4;let q1=sorted.get(q1idx);let q3=sorted.get(q3idx);let result=mut.@();result=result+@(min);result=result+@(q1);result=result+@(median);result=result+@(q3);result=result+@(max);<result};
+f=main():$i64{let line=io.readln();let parts=s.split(line;",");let numbers=mut.@();lp(let i=0;i<parts.len;i=i+1){numbers=numbers+@(s.toint(parts.get(i)));};let result=five(numbers;0);let output=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.fromint(result.get(0));" ");s.fromint(result.get(1)));" ");s.fromint(result.get(2)));" ");s.fromint(result.get(3)));" ");s.fromint(result.get(4)));io.println(output);<0};

@@ -1,0 +1,1 @@
+m=payg;i=io:std.io;i=s:std.str;f=paygtax(gross:$f64):$f64{if(gross<=350.0){<0.0};if(gross<=865.0){<(gross-350.0)*0.19};if(gross<=2307.0){<97.85+(gross-865.0)*0.325};<97.85+468.65+(gross-2307.0)*0.37};f=main():$i64{let weekly=s.tofloat(io.readln());let tax=paygtax(weekly);io.println(s.format(tax;"%.2f"));<0}

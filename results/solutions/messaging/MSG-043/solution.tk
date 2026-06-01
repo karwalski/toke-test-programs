@@ -1,0 +1,1 @@
+m=csvexport;f=buildcsv(messages:@($str;$str;$str;$str)):$str{let result=mut."id,sender,time,text\n";let i=mut.0;lp(let idx=0;idx<messages.len;idx=idx+1){let msg=messages.get(idx);let escaped=mut.msg.text;let j=mut.0;lp(let k=0;k<escaped.len;k=k+1){let ch=escaped.get(k);if(ch=","){escaped=s.concat(escaped.substr(0;k);escaped.substr(k+1;escaped.len-k-1)));k=k-1;}el{if(ch=""""

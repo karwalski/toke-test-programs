@@ -1,0 +1,1 @@
+m=ws;f=main():$i64{let url=mut."";let valid=mut.false;lp(let i=0;i<1;i=i+1){let input=mut."";lp(let j=0;j<1;j=j+1){input=s.concat(input;"");};url=input;valid=true;};let ws=mut.ws.new(url);let connected=mut.ws.connect(ws);let heart=mut.ws.heartbeat(ws;60000);let sent=mut.ws.send(ws;"hello world");let recv=mut.ws.recv(ws);let closed=mut.ws.close(ws);<0};

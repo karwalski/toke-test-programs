@@ -1,0 +1,47 @@
+{
+  "m": "comments.edit",
+  "f": "main",
+  "i": {
+    "std.http": "http",
+    "std.json": "json",
+    "std.db": "db",
+    "std.auth": "auth",
+    "std.time": "time"
+  },
+  "t": {
+    "comment": {
+      "id": "str",
+      "content": "str",
+      "author_id": "str",
+      "post_id": "str",
+      "created_at": "i64",
+      "updated_at": "i64",
+      "likes": "i32",
+      "dislikes": "i32",
+      "is_deleted": "bool"
+    }
+  },
+  "f": [
+    {
+      "name": "main",
+      "params": [],
+      "return_type": "i64",
+      "body": "let comment_id=\"c1234567890\";let new_content=\"This is the updated comment.\";let updated_comment=comments.edit(comment_id,new_content);<0"
+    },
+    {
+      "name": "edit",
+      "params": [
+        {
+          "name": "comment_id",
+          "type": "str"
+        },
+        {
+          "name": "new_content",
+          "type": "str"
+        }
+      ],
+      "return_type": "comment",
+      "body": "let db_result=db.query(\"SELECT * FROM comments WHERE id=?\",comment_id);let existing_comment=json.parse(db_result);let updated_comment=comments.create(new_content,existing_comment.author_id,existing_comment.post_id));<updated_comment>"
+    }
+  ]
+}

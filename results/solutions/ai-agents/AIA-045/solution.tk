@@ -1,0 +1,1 @@
+m=main;f=checkduplicate(items:@$str;newitem:$str):$bool{let found=mut.false;lp(let i=0;i<items.len;i=i+1){if(items.get(i)=newitem){found=true};};<found};f=main():$void{let items=@$str;items.push("apple");items.push("banana");items.push("cherry");let newitem="aple";let isduplicate=checkduplicate(items;newitem);if(isduplicate){<void}el{<void}};

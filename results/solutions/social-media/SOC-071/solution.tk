@@ -1,0 +1,1 @@
+m=main;f=main():$void{let body=mut.std.http.readbody();let req=std.http.parserequest(body);let action=req.action;let token=req.token;let user_id=req.user_id;let follow_status=mut.std.db.exec("insert into follows (follower_id, followed_id) values (?, ?)");let resp=std.http.buildresponse(200;"{\"follow_status\":\"ok\"}");};

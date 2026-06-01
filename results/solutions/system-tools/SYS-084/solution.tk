@@ -1,0 +1,1 @@
+m=net;f=ping(host:$str):$str{let cmd="ping -c 4 ";let fullcmd=s.concat(cmd;host);let result=mut."";let i=mut.0;lp(let idx=0;idx<1000;idx=idx+1){let ch=fullcmd.get(idx);if(ch=0){br};result=result+ch};let finalresult=mut."";lp(let idx=0;idx<result.len;idx=idx+1){let ch=result.get(idx);if(ch=10){br};finalresult=finalresult+ch};<finalresult};

@@ -1,0 +1,1 @@
+m=vigenere;f=encrypt(key:$str;text:$str):$str{let n=key.len;let m=text.len;let result=mut."";lp(let i=0;i<m;i=i+1){let c=text.get(i);let shift=key.get(i as u64)-97;let newc=mut.c;if(!(c<97)){if(!(c>122)){let base=c as i64-97;let newbase=base+shift;let modval=newbase-newbase/26*26;let newc=modval+97;}}result=result+newc;};<result};f=de

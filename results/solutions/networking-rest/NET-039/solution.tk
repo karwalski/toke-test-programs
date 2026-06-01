@@ -1,0 +1,1 @@
+m=httpserver;f=main():$i64{let port=8080;let maxbody=1024;let msg="Payload Too Large";let err="{";let key="\"error\": ";let val="\"Payload too large\"";let end="}";let parts=@(msg;err;key;val;end));let n=parts.len;let out=mut."";lp(let i=0;i<n;i=i+1){let part=parts.get(i);out=out+part};<0};f=handlerequest(bodylen:$i64):$str{let max=1024;if(bodylen>max){

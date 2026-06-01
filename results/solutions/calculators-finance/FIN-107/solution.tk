@@ -1,0 +1,1 @@
+m=breakeven;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=3){let fixed=s.tofloat(parts.get(0));let variable=s.tofloat(parts.get(1));let price=s.tofloat(parts.get(2));let units=fixed/(price-variable);let revenue=units*price;io.println(s.fromfloat(units));io.println(s.format(revenue;"%.2f"))}el{io.println("error")};<0}

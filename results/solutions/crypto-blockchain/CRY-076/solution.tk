@@ -1,0 +1,1 @@
+m=timestampproof;f=hash(data:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<data.len;idx=idx+1){let ch=data.get(idx);let hashval=mut.0;lp(let j=0;j<result.len;j=j+1){let rch=result.get(j);hashval=hashval+rch as$i64;};hashval=hashval+ch as$i64;let newch=hashval as$str;result=result+newch;};<result};f=currenttimestamp(

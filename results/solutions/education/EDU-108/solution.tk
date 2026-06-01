@@ -1,0 +1,1 @@
+m=curriculumtracker;f=trackprogress(studentid:$str;standardid:$str;completestatus:$bool):$str{let result=mut."";if(completestatus){result="mastered"}el{result="in progress"};let output=s.concat(s.concat(s.concat(s.concat(s.concat("student: ";studentid);" | standard: ");standardid);" | status: ");result);<output};f=main():$i64{let progress=trackprogress("s123";"st001";true);<0};

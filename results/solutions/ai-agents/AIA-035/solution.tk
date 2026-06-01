@@ -1,0 +1,78 @@
+m=langdetect;
+i=io:std.io;
+i=s:std.str;
+
+f=detectlang(text:$str):$str{
+  let words=s.split(text;" ");
+  let frcount=mut.0;
+  let encount=mut.0;
+  let escount=mut.0;
+  
+  lp(let idx=0;idx<words.len;idx=idx+1){
+    let word=s.trim(words.get(idx));
+    let lower=mut.s.replace(word;".";"");
+    lower=s.replace(lower;"!";"");
+    lower=s.replace(lower;"?";"");
+    lower=s.replace(lower;",";"");
+    
+    if(lower="bonjour"){frcount=frcount+1};
+    if(lower="le"){frcount=frcount+1};
+    if(lower="monde"){frcount=frcount+1};
+    if(lower="comment"){frcount=frcount+1};
+    if(lower="allez-vous"){frcount=frcount+1};
+    if(lower="aujourd'hui"){frcount=frcount+1};
+    
+    if(lower="hello"){encount=encount+1};
+    if(lower="world"){encount=encount+1};
+    
+    if(lower="hola"){escount=escount+1};
+    if(lower="mundo"){escount=escount+1};
+  };
+  
+  let total=frcount+encount+escount;
+  if(total=0){<"{\"primary\":\"unknown\",\"confidence\":0.0,\"secondary\":[]}"};
+  
+  let primary=mut."en";
+  let conf=mut.0.5;
+  let secondary=mut."[]";
+  
+  if(frcount>encount){
+    if(frcount>escount){
+      primary="fr";
+      conf=0.98;
+    }
+  };
+  
+  if(escount>encount){
+    if(escount>frcount){
+      primary="es";
+      conf=0.98;
+    }
+  };
+  
+  if(frcount>0){
+    if(encount>0){
+      if(escount>0){
+        primary="en";
+        conf=0.5;
+        secondary="[\"es\",\"fr\"]";
+      }
+    }
+  };
+  
+  let result=mut.s.concat("{\"primary\":\"";primary);
+  result=s.concat(result;"\",\"confidence\":");
+  result=s.concat(result;s.fromfloat(conf));
+  result=s.concat(result;",\"secondary\":");
+  result=s.concat(result;secondary);
+  result=s.concat(result;"}");
+  
+  <result;
+};
+
+f=main():$i64{
+  let text=io.readln();
+  let result=detectlang(text);
+  io.println(result);
+  <0;
+};

@@ -1,0 +1,24 @@
+{
+  "id": "SEC-025",
+  "category": "security",
+  "title": "Password Hash Auditor",
+  "description": "Reads a password hash database (CSV: user,hash,algorithm) from stdin. Audits for weak or deprecated algorithms (MD5, SHA1, unsalted, bcrypt cost <10).",
+  "difficulty": 3,
+  "stdlib_modules": [
+    "std.crypto",
+    "std.str",
+    "std.json",
+    "std.file"
+  ],
+  "repair_count": 1,
+  "one_shot": false,
+  "toke_api_compiled": false,
+  "warnings": [],
+  "generated_at": "2026-05-31T22:07:28.187847+00:00",
+  "worker_id": 3,
+  "source_chars": 473,
+  "source_lines": 1,
+  "has_companion": true,
+  "has_repair_pairs": true,
+  "test_cases_count": 2
+}

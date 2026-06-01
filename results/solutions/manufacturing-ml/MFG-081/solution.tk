@@ -1,0 +1,27 @@
+m=reorder;
+i=io:std.io;
+i=s:std.str;
+f=reorderpoint(demandrate:$i64;leadtime:$i64):$i64{let result=demandrate*leadtime;<result};
+f=main():$i64{
+let header=io.readln();
+let output="{\"items\":[";
+let first=true;
+let line=io.readln();
+while line != "" {
+  if !first {
+    output=s.concat(output;",");
+  };
+  let parts=s.split(line;",");
+  let item=parts[0];
+  let demand=s.toint(parts[1]);
+  let leaddays=s.toint(parts[2]);
+  let safetydays=s.toint(parts[3]);
+  let totaldemand=demand*(leaddays+safetydays);
+  output=s.concat(output;"{\"item\":\"") + item + s.concat(s.concat("\",\"reorder_point\":";s.fromint(totaldemand));"}");
+  first=false;
+  line=io.readln();
+};
+output=s.concat(output;"]}");
+io.println(output);
+<0
+}

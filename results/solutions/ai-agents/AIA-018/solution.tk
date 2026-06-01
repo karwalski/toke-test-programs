@@ -1,0 +1,89 @@
+m=selectchunks;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+f=main():$i64{
+    let input=io.readln();
+    let parsed=j.parse(input);
+    let chunks=parsed.get("chunks");
+    let maxtokens=s.toint(parsed.get("max_tokens"));
+    
+    let chunkids=mut.@();
+    let tokencounts=mut.@();
+    let relevancescores=mut.@();
+    
+    lp(let idx=0;idx<chunks.len;idx=idx+1){
+        let chunk=chunks.get(idx);
+        chunkids=chunkids+@(chunk.get("id"));
+        tokencounts=tokencounts+@(s.toint(chunk.get("token_count")));
+        relevancescores=relevancescores+@(s.tofloat(chunk.get("relevance_score")))
+    };
+    
+    let n=chunks.len;
+    let indices=mut.@();
+    lp(let idx=0;idx<n;idx=idx+1){
+        indices=indices+@(idx)
+    };
+    
+    lp(let idx=0;idx<n-1;idx=idx+1){
+        let jdx=mut.idx+1;
+        lp(jdx<n){
+            let idx1=indices.get(idx);
+            let idx2=indices.get(jdx);
+            let score1=relevancescores.get(idx1);
+            let score2=relevancescores.get(idx2);
+            if(score2>score1){
+                let temp=indices.get(idx);
+                let newindices=mut.@();
+                lp(let k=0;k<indices.len;k=k+1){
+                    if(k=idx){
+                        newindices=newindices+@(indices.get(jdx))
+                    }el{
+                        if(k=jdx){
+                            newindices=newindices+@(temp)
+                        }el{
+                            newindices=newindices+@(indices.get(k))
+                        }
+                    }
+                };
+                indices=newindices
+            };
+            jdx=jdx+1
+        }
+    };
+    
+    let selectedids=mut.@();
+    let totaltokens=mut.0;
+    
+    lp(let idx=0;idx<n;idx=idx+1){
+        let realidx=indices.get(idx);
+        let tokens=tokencounts.get(realidx);
+        if(totaltokens+tokens<=maxtokens){
+            selectedids=selectedids+@(chunkids.get(realidx));
+            totaltokens=totaltokens+tokens
+        }
+    };
+    
+    let utilisation=mut.0.0;
+    if(maxtokens>0){
+        utilisation=totaltokens as$f64/maxtokens as$f64
+    };
+    
+    let result=mut."{\"selected\":[";
+    lp(let idx=0;idx<selectedids.len;idx=idx+1){
+        if(idx>0){
+            result=s.concat(result;",")
+        };
+        result=s.concat(result;"\"");
+        result=s.concat(result;selectedids.get(idx));
+        result=s.concat(result;"\"")
+    };
+    result=s.concat(result;"],\"total_tokens\":");
+    result=s.concat(result;s.fromint(totaltokens));
+    result=s.concat(result;",\"utilisation\":");
+    result=s.concat(result;s.fromfloat(utilisation));
+    result=s.concat(result;"}");
+    
+    io.println(result);
+    <0
+}

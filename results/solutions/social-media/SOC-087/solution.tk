@@ -1,0 +1,1 @@
+m=autocomplete;f=extractkeywords(s:$str):@$str{let n=s.len;let keywords=mut.@();let current=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=32){if(!(current.len=0))){keywords=keywords+@(current)};current=""}el{current=current+(c as$str))}}

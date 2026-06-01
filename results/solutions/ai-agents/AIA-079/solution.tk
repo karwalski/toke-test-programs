@@ -1,0 +1,117 @@
+m=i18nextract;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=extractkey(text:$str):$str{
+  let lower=s.lowercase(text);
+  let key=s.replace(lower;" ";"_");
+  let key2=s.replace(key;".";"");
+  let key3=s.replace(key2;"?";"");
+  let key4=s.replace(key3;"!";"");
+  let key5=s.replace(key4;",";"");
+  let key6=s.replace(key5;"'";"");
+  let key7=s.replace(key6;"-";"");
+  let parts=s.split(key7;"_");
+  if(parts.len=0){<"key"};
+  if(parts.len=1){<parts.get(0)};
+  if(parts.len=2){
+    let p1=parts.get(0);
+    let p2=parts.get(1);
+    <s.concat(p2;s.concat("_";p1))
+  };
+  let p1=parts.get(0);
+  let p2=parts.get(1);
+  <s.concat(p1;s.concat("_";p2))
+};
+
+f=extractpython(code:$str):@($str){
+  let results=mut.@();
+  let lines=s.split(code;"\\n");
+  lp(let idx=0;idx<lines.len;idx=idx+1){
+    let line=lines.get(idx);
+    if(s.contains(line;"print(\"")){
+      let start=s.indexof(line;"\"");
+      if(start>=0){
+        let rest=s.slice(line;start+1;s.len(line));
+        let end=s.indexof(rest;"\"");
+        if(end>=0){
+          let text=s.slice(rest;0;end);
+          if(!s.contains(s.lowercase(text);"debug")){
+            if(!s.contains(s.lowercase(text);"log")){
+              if(!s.contains(s.lowercase(text);"connection")){
+                results=s.append(results;text)
+              }
+            }
+          }
+        }
+      }
+    };
+    if(s.contains(line;"alert(\"")){
+      let start=s.indexof(line;"alert(\"");
+      if(start>=0){
+        let rest=s.slice(line;start+7;s.len(line));
+        let end=s.indexof(rest;"\"");
+        if(end>=0){
+          let text=s.slice(rest;0;end);
+          results=s.append(results;text)
+        }
+      }
+    }
+  };
+  <results
+};
+
+f=extracthtml(code:$str):@($str){
+  let results=mut.@();
+  let pos=mut.0;
+  lp(pos<s.len(code)){
+    let tagstart=s.indexof(s.slice(code;pos;s.len(code));"<");
+    if(tagstart<0){br};
+    pos=pos+tagstart+1;
+    
+    let tagend=s.indexof(s.slice(code;pos;s.len(code));">");
+    if(tagend<0){br};
+    
+    let tag=s.slice(code;pos;pos+tagend);
+    if(!s.contains(tag;"!--")){
+      pos=pos+tagend+1;
+      let closestart=s.indexof(s.slice(code;pos;s.len(code));"<");
+      if(closestart>0){
+        let content=s.trim(s.slice(code;pos;pos+closestart));
+        if(s.len(content)>0){
+          results=s.append(results;content)
+        }
+      };
+      pos=pos+1
+    }el{
+      pos=pos+tagend+1
+    }
+  };
+  <results
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let data=j.parse(input);
+  let code=j.getstring(data;"code");
+  let lang=j.getstring(data;"language");
+  
+  let strings=mut.@();
+  if(lang="python"){
+    strings=extractpython(code)
+  };
+  if(lang="html"){
+    strings=extracthtml(code)
+  };
+  
+  let result=j.object();
+  lp(let idx=0;idx<strings.len;idx=idx+1){
+    let text=strings.get(idx);
+    let key=extractkey(text);
+    j.setstring(result;key;text)
+  };
+  
+  io.println(j.stringify(result));
+  <0
+}

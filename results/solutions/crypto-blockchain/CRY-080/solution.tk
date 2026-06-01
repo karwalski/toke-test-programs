@@ -1,0 +1,11 @@
+To prove that a committed value \( v \) is in the range \([0, 2^n))\) without revealing it, we can use a zero-knowledge proof (ZK-proof). Specifically, we can use a range proof, which is a type of ZK-proof.
+
+Here are the components of the proof:
+
+1. **Commitment**: The value \( v \) is committed using a cryptographic hash function. Let \( h \) be the hash function, and let \( c = h(v) \) be the commitment.
+
+2. **Range Proof**: The commitment \( c \) is proven to be the hash of a value \( v \) that lies within the range \([0, 2^n))\). This is done using a range proof protocol, such as the Bulletproofs protocol.
+
+3. **Challenge and Response**: The prover generates a challenge \( e \) that is used to verify the range proof. The verifier then generates a response \( r \) that is used to verify the range proof. The range proof is verified if the verifier's response \( r \) satisfies the verification equation \( e = h(r) \).
+
+In summary, the components of the proof are the commitment \( c \), the range proof

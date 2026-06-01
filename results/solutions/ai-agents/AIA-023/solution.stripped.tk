@@ -1,0 +1,69 @@
+m=queryexpander;
+i=io:std.io;
+i=s:std.str;
+
+f=expandquery(query:$str;num:$i64):@($str){
+  let expansions=mut.@();
+  
+  if(s.contains(query;"_")){
+    if(s.contains(query;"_")){
+      if(num>=3){
+        expansions=@("_";"_";"_");
+      }el{
+        expansions=@("_";"_");
+      };
+    };
+  }el{
+    if(s.contains(query;"_")){
+      expansions=@("_";"_");
+    };
+  };
+  
+  <expansions;
+};
+
+f=extractjsonfield(input:$str;field:$str):$str{
+  let start=s.indexof(input;s.concat("_""_"\"_")));
+  if(start<0){<"_"};
+  
+  let valuestart=start+s.len(field)+3;
+  let c=s.slice(input;valuestart;valuestart+1);
+  
+  if(c="_""_"\"_");
+    if(end<0){<"_"};
+    <s.slice(input;valuestart+1;valuestart+1+end);
+  }el{
+    let rest=s.slice(input;valuestart;s.len(input));
+    let end=s.indexof(rest;"_");
+    if(end<0){
+      let end2=s.indexof(rest;"_");
+      if(end2<0){<rest};
+      <s.slice(rest;0;end2);
+    };
+    <s.slice(rest;0;end);
+  };
+};
+
+f=main():$i64{
+  let input=io.readln();
+  
+  let query=extractjsonfield(input;"_");
+  let numstr=extractjsonfield(input;"_");
+  let num=s.toint(numstr);
+  
+  let expansions=expandquery(query;num);
+  
+  let result=mut."_"original\"_""_"\"_"expansions\"_");
+  
+  lp(let idx=0;idx<expansions.len;idx=idx+1){
+    if(idx>0){
+      result=s.concat(result;"_");
+    };
+    result=s.concat(result;"_""_"\"_");
+  };
+  
+  result=s.concat(result;"_");
+  
+  io.println(result);
+  <0;
+}

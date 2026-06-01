@@ -1,0 +1,1 @@
+m=striphtml;f=striphtml(s:$str):$str{let result=mut."";let len=s.len;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(c=60){let nextidx=i+1;let isclose=mut.false;let j=mut.nextidx;lp(j=nextidx;j<len;j=j+1){let ch=s.get(j);if(ch=47){isclose=true;j=len};if(isclose){i=j}el{if(ch=60){i=j}}};}el{result=result+c}}};<result};

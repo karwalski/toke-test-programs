@@ -1,0 +1,50 @@
+m=toolschema;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=main():$i64{
+    let input=io.readln();
+    let data=j.parse(input);
+    
+    let name=j.getstring(data;"name");
+    let desc=j.getstring(data;"description");
+    let params=j.getarray(data;"params");
+    
+    let props=j.object();
+    let required=j.array();
+    
+    lp(let idx=0;idx<j.arraylen(params);idx=idx+1){
+        let param=j.arrayget(params;idx);
+        let pname=j.getstring(param;"name");
+        let ptype=j.getstring(param;"type");
+        let pdesc=j.getstring(param;"description");
+        let preq=j.getbool(param;"required");
+        
+        let prop=j.object();
+        j.setstring(prop;"type";ptype);
+        j.setstring(prop;"description";pdesc);
+        j.setobject(props;pname;prop);
+        
+        if(preq){
+            j.arraypush(required;j.string(pname))
+        }
+    };
+    
+    let parameters=j.object();
+    j.setstring(parameters;"type";"object");
+    j.setobject(parameters;"properties";props);
+    j.setarray(parameters;"required";required);
+    
+    let fnobj=j.object();
+    j.setstring(fnobj;"name";name);
+    j.setstring(fnobj;"description";desc);
+    j.setobject(fnobj;"parameters";parameters);
+    
+    let result=j.object();
+    j.setstring(result;"type";"function");
+    j.setobject(result;"function";fnobj);
+    
+    io.println(j.stringify(result));
+    <0
+}

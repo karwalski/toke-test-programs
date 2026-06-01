@@ -1,0 +1,1 @@
+m=integrate;f=integrate(a:f64;b:f64;n:i64;c:i64):f64{let h=(b-a)/n;let sum=mut.0.0;lp(let i=0;i<n;i=i+1){let x=a+i*h;let y=evalpoly(c;x);sum=sum+y};let result=(sum*h)/2.0;<result};f=evalpoly(c:i64;x:f64):f64{let result=mut.0.0;let coeff=mut.c;let i=mut.0;lp(let j=0;j<coeff;j=j+1){result=result+x;};<result};

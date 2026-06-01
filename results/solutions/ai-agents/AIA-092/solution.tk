@@ -1,0 +1,8 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/agents",
+    "description": "List all agents",
+    "request_body": null,
+    "response_schema": "{\"agents\":[{\"id\":\"$str\",\"name\":\"$str\",\"description\":\"$str\",\"schedule\":\"$str\",\"status\":\"$str\",\"last_run\":\"$str\",\"next_run\":\"$str\",\"error\":\"$str\",\"retry_count\":\"$i64\",\"max_retries\":\"$i64\",\"on_failure\":\"$str\",\"on_success\":\"$str\",\"inputs\":[{\"name\":\"$str\",\"type\":\"$str\",\"description\":\"$str\",\"required\":\"$bool\"}],\"outputs\":[{\"name\":\"$str\",\"type\":\"$str\",\"description\":\"$str\"}]}]}"
+  },

@@ -1,0 +1,27 @@
+m=monte;
+i=io:std.io;
+i=s:std.str;
+i=rand:std.rand;
+i=math:std.math;
+f=solve(val:$i64;other:$i64):$f64{if(val<0){<0.0};if(other<0){<0.0};if(val>other){<0.0};let ratio=val as$f64/other as$f64;let pi=3.14159265358979;let result=pi*ratio;let clamped=mut.result;if(clamped<0.0){clamped=0.0};if(clamped>pi){clamped=pi};<clamped};
+f=main():$i64{
+let line=io.readln();
+let parts=s.split(line;" ");
+let samples=s.toint(parts[0]);
+let seed=s.toint(parts[1]);
+rand.seed(seed);
+let inside=mut.0;
+let total=mut.0;
+while(total<samples){
+let x=rand.uniform()*2.0-1.0;
+let y=rand.uniform()*2.0-1.0;
+if(x*x+y*y<=1.0){
+inside=inside+1;
+};
+total=total+1;
+};
+let pi_estimate=4.0*inside as$f64/samples as$f64;
+let formatted=s.format(pi_estimate;6);
+io.println(formatted);
+<0;
+};

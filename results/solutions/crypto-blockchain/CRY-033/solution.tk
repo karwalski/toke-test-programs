@@ -1,0 +1,1 @@
+m=verify;f=verify(pubkey:$str;msg:$str;sig:$str):$str{let valid=mut."INVALID";let sigr=mut.sig;let len=sigr.len as i64;let pad=mut.0;if(len>64){valid="INVALID"}el{if(!(len=64))){pad=64-len;sigr=sigr+pad as$str;let len2=sigr.len as i64;if(!(len2=64))){valid="INVALID"}el{valid="VALID"}}};<valid};

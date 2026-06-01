@@ -1,0 +1,1 @@
+m=encryptdemo;i=crypto:std.crypto;i=str:std.str;f=main():$i64{let alicekey=crypto.generatekeypair("rsa";2048);let bobkey=crypto.generatekeypair("rsa";2048);let message=str.tobytes("hello world");let alicepriv=alicekey.priv;let encrypted=crypto.encrypt(message;alicepriv;"rsa");let bobpriv=bobkey.priv;let wrongkey=crypto.encrypt(message;bobpriv;"rsa");<0};

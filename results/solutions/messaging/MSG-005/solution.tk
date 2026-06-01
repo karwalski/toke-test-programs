@@ -1,0 +1,1 @@
+m=diffiehellman;f=powermod(base:$i64;exp:$i64;m:$i64):$i64{let result=mut.1;let base=mut.base;let exp=mut.exp;lp(let i=0;i<exp;i=i+1){let tmp=result*base;let modval=tmp-tmp/m*m;result=modval;};<result};f=diffiehellman(g:$i64;p:$i64):$i64{let a=powermod(g;3;p);let b=powermod(g;4;p);let s=powermod(b;3;p);<s};f=main():$i64{let g=3;let p=23;let result=diffiehellman(g;p);<result};

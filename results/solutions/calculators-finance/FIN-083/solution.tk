@@ -1,0 +1,1 @@
+m=pv;i=io:std.io;i=s:std.str;i=math:std.math;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=3){let fv=s.tofloat(parts.get(0));let rate=s.tofloat(parts.get(1));let years=s.tofloat(parts.get(2));let base=1.0+rate;let factor=math.pow(base;years);let pv=fv/factor;let formatted=s.format(pv;"%.2f");io.println(formatted)}el{io.println("0.00")};<0}

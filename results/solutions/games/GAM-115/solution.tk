@@ -1,0 +1,1 @@
+m=validtile;f=validtile(grid:$str):$str{let lines=grid.split("\n");let nrows=lines.len;let ncols=lines.get(0).len;let seen=mut.@($str);lp(let r=0;r<nrows;r=r+1){lp(let c=0;c<ncols;c=c+1){let ch=lines.get(r).get(c);if(ch=" "){<""};let id=ch as$str;if(!(id="A")){if(!(id="B"))){if(!(id="C"))){if(!(id="D")){let msg="Invalid: piece "+id+" is not a valid tetromino";<msg}}}};let pos

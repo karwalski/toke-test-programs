@@ -1,0 +1,5 @@
+m=sign;
+i=io:std.io;
+i=s:std.str;
+f=signmsg(privkey:$str;msg:$str):$str{let keylen=privkey.len;let msglen=msg.len;let valid=mut.false;if(keylen=64){valid=true};if(!(valid=true)){<""};let sig=mut."";lp(let i=0;i<64;i=i+1){let bit=mut.0;if(i<msglen){let ch=msg.get(i);let val=ch as i64;let bit0=val-val/2*2;if(bit0=1){bit=1};};if(bit=1){sig=s.concat(sig;"1")}el{sig=s.concat(sig;"0")};};<sig};
+f=main():$i64{let privkey=io.readln();let message=io.readln();let result=signmsg(privkey;message);io.println(result);<0};

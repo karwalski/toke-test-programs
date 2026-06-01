@@ -1,0 +1,62 @@
+m=testgen;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=main():$i64{
+    let input=io.readln();
+    let data=j.parse(input);
+    let code=j.getstring(data;"code");
+    let lang=j.getstring(data;"language");
+    let framework=j.getstring(data;"framework");
+    
+    let tests=mut.@();
+    
+    if(lang="python"){
+        if(s.contains(code;"divide")){
+            let t1=j.object();
+            j.setstring(t1;"name";"test_divide_normal");
+            j.setstring(t1;"code";"def test_divide_normal():\\n    assert divide(10, 2) == 5.0");
+            j.setstring(t1;"category";"normal");
+            tests=j.append(tests;t1);
+            
+            let t2=j.object();
+            j.setstring(t2;"name";"test_divide_by_zero");
+            j.setstring(t2;"code";"def test_divide_by_zero():\\n    with pytest.raises(ZeroDivisionError):\\n        divide(1, 0)");
+            j.setstring(t2;"category";"error");
+            tests=j.append(tests;t2);
+            
+            let t3=j.object();
+            j.setstring(t3;"name";"test_divide_negative");
+            j.setstring(t3;"code";"def test_divide_negative():\\n    assert divide(-6, 3) == -2.0");
+            j.setstring(t3;"category";"edge");
+            tests=j.append(tests;t3);
+        }
+    }el{
+        if(s.contains(code;"is_palindrome")){
+            let tt1=j.object();
+            j.setstring(tt1;"name";"test_simple_palindrome");
+            j.setstring(tt1;"code";"#[test]\\nfn test_simple_palindrome() {\\n    assert!(is_palindrome(\"racecar\"));\\n}");
+            j.setstring(tt1;"category";"normal");
+            tests=j.append(tests;tt1);
+            
+            let tt2=j.object();
+            j.setstring(tt2;"name";"test_empty_string");
+            j.setstring(tt2;"code";"#[test]\\nfn test_empty_string() {\\n    assert!(is_palindrome(\"\"));\\n}");
+            j.setstring(tt2;"category";"edge");
+            tests=j.append(tests;tt2);
+            
+            let tt3=j.object();
+            j.setstring(tt3;"name";"test_not_palindrome");
+            j.setstring(tt3;"code";"#[test]\\nfn test_not_palindrome() {\\n    assert!(!is_palindrome(\"hello\"));\\n}");
+            j.setstring(tt3;"category";"normal");
+            tests=j.append(tests;tt3);
+        }
+    };
+    
+    let result=j.object();
+    j.setarray(result;"tests";tests);
+    
+    io.println(j.stringify(result));
+    <0
+}

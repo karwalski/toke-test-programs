@@ -1,0 +1,176 @@
+m=emotdetect;
+i=io:std.io;
+i=s:std.str;
+
+f=detectemotions(text:$str):$str{
+    let lower=text;
+    let bld=s.builder();
+    let found=mut.0;
+    
+    if(s.contains(lower;"happy")){
+        if(found>0){s.add(bld;",")};
+        s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
+        found=found+1
+    }el{
+        if(s.contains(lower;"joy")){
+            if(found>0){s.add(bld;",")};
+            s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
+            found=found+1
+        }el{
+            if(s.contains(lower;"glad")){
+                if(found>0){s.add(bld;",")};
+                s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
+                found=found+1
+            }el{
+                if(s.contains(lower;"excited")){
+                    if(found>0){s.add(bld;",")};
+                    s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
+                    found=found+1
+                }
+            }
+        }
+    };
+    
+    if(s.contains(lower;"surprise")){
+        if(found>0){s.add(bld;",")};
+        s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
+        found=found+1
+    }el{
+        if(s.contains(lower;"believe")){
+            if(found>0){s.add(bld;",")};
+            s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
+            found=found+1
+        }el{
+            if(s.contains(lower;"shock")){
+                if(found>0){s.add(bld;",")};
+                s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
+                found=found+1
+            }el{
+                if(s.contains(lower;"amaz")){
+                    if(found>0){s.add(bld;",")};
+                    s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
+                    found=found+1
+                }
+            }
+        }
+    };
+    
+    if(s.contains(lower;"sad")){
+        if(found>0){s.add(bld;",")};
+        s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
+        found=found+1
+    }el{
+        if(s.contains(lower;"sorrow")){
+            if(found>0){s.add(bld;",")};
+            s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
+            found=found+1
+        }el{
+            if(s.contains(lower;"unhappy")){
+                if(found>0){s.add(bld;",")};
+                s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
+                found=found+1
+            }el{
+                if(s.contains(lower;"depress")){
+                    if(found>0){s.add(bld;",")};
+                    s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
+                    found=found+1
+                }el{
+                    if(s.contains(lower;"miserable")){
+                        if(found>0){s.add(bld;",")};
+                        s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
+                        found=found+1
+                    }
+                }
+            }
+        }
+    };
+    
+    if(s.contains(lower;"fear")){
+        if(found>0){s.add(bld;",")};
+        s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
+        found=found+1
+    }el{
+        if(s.contains(lower;"dread")){
+            if(found>0){s.add(bld;",")};
+            s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
+            found=found+1
+        }el{
+            if(s.contains(lower;"afraid")){
+                if(found>0){s.add(bld;",")};
+                s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
+                found=found+1
+            }el{
+                if(s.contains(lower;"terrif")){
+                    if(found>0){s.add(bld;",")};
+                    s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
+                    found=found+1
+                }el{
+                    if(s.contains(lower;"scare")){
+                        if(found>0){s.add(bld;",")};
+                        s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
+                        found=found+1
+                    }
+                }
+            }
+        }
+    };
+    
+    if(s.contains(lower;"angry")){
+        if(found>0){s.add(bld;",")};
+        s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
+        found=found+1
+    }el{
+        if(s.contains(lower;"anger")){
+            if(found>0){s.add(bld;",")};
+            s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
+            found=found+1
+        }el{
+            if(s.contains(lower;"furious")){
+                if(found>0){s.add(bld;",")};
+                s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
+                found=found+1
+            }el{
+                if(s.contains(lower;"mad")){
+                    if(found>0){s.add(bld;",")};
+                    s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
+                    found=found+1
+                }el{
+                    if(s.contains(lower;"rage")){
+                        if(found>0){s.add(bld;",")};
+                        s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
+                        found=found+1
+                    }
+                }
+            }
+        }
+    };
+    
+    if(s.contains(lower;"disgust")){
+        if(found>0){s.add(bld;",")};
+        s.add(bld;"{\"label\":\"disgust\",\"intensity\":0.7}");
+        found=found+1
+    }el{
+        if(s.contains(lower;"revolting")){
+            if(found>0){s.add(bld;",")};
+            s.add(bld;"{\"label\":\"disgust\",\"intensity\":0.7}");
+            found=found+1
+        }el{
+            if(s.contains(lower;"repuls")){
+                if(found>0){s.add(bld;",")};
+                s.add(bld;"{\"label\":\"disgust\",\"intensity\":0.7}");
+                found=found+1
+            }
+        }
+    };
+    
+    let result=s.concat("{\"emotions\":[";s.build(bld));
+    result=s.concat(result;"]}");
+    <result
+};
+
+f=main():$i64{
+    let input=io.readln();
+    let output=detectemotions(input);
+    io.println(output);
+    <0
+}

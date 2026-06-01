@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=main;i=io:std.io;f=main():$i64{let host=io.readln();let port=io.readln();let msg=io.readln();io.println(msg);<0}",
+  "error": "Test failures:\nTest 1: expected 'hello\nworld\nConnection closed', got 'hello'\nTest 2: expected 'ping\nConnection closed', got 'ping'\nTest 3: expected 'foo\nbar\nbaz\nConnection closed', got 'foo'",
+  "fixed_source": "m=main;i=io:std.io;f=main():$i64{let host=io.readln();let port=io.readln();let line=mut.io.readln();lp(s.len(line)>0){io.println(line);line=io.readln()};io.println(\"Connection closed\");<0}"
+}

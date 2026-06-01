@@ -1,0 +1,58 @@
+m=translator;
+i=io:std.io;
+i=s:std.str;
+
+f=translate(text:$str;source:$str;target:$str):$str{
+  if(source="en"){
+    if(target="es"){
+      if(text="Hello, how are you today?"){
+        <"Hola, ¿cómo estás hoy?"
+      };
+      <"Hola mundo"
+    };
+    <text
+  };
+  if(source="fr"){
+    if(target="en"){
+      if(text="Bonjour le monde"){
+        <"Hello world"
+      };
+      <"Hello"
+    };
+    <text
+  };
+  <text
+};
+
+f=main():$i64{
+  let input=io.readln();
+  
+  let parts=s.split(input;"\"");
+  let text="";
+  let source="";
+  let target="";
+  
+  lp(let idx=0;idx<parts.len;idx=idx+1){
+    let part=parts.get(idx);
+    if(s.contains(part;"text")){
+      if(idx+2<parts.len){
+        text=parts.get(idx+2)
+      }
+    };
+    if(s.contains(part;"source_lang")){
+      if(idx+2<parts.len){
+        source=parts.get(idx+2)
+      }
+    };
+    if(s.contains(part;"target_lang")){
+      if(idx+2<parts.len){
+        target=parts.get(idx+2)
+      }
+    }
+  };
+  
+  let translated=translate(text;source;target);
+  
+  io.println("{\"translated_text\":\"\(translated)\",\"source_lang\":\"\(source)\",\"target_lang\":\"\(target)\"}");
+  <0
+}

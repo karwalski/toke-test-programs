@@ -1,0 +1,6 @@
+{
+  "iteration": 2,
+  "broken_source": "m=compoundinterest;i=io:std.io;i=s:std.str;i=math:std.math;f=compoundinterest(principal:$f64;rate:$f64;compfreq:$i64;time:$i64):$f64{let t=time as $f64;let n=compfreq as $f64;let r=rate/100.0;let base=1.0+r/n;let exponent=n*t;let result=principal*math.pow(base;exponent);<result};f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");if(parts.len()>=4){let principal=s.tofloat(parts.get(0));let rate=s.tofloat(parts.get(1));let compfreq=s.toint(parts.get(2));let time=s.toint(parts.get(3));let result=compoundinterest(principal;rate;compfreq;time);io.println(s.format(result;\"%.2f\"))};<0}",
+  "error": "Test failures:\nTest 1: expected '1647.01', got '1005.01'\nTest 2: expected '7429.74', got '5020.04'",
+  "fixed_source": "m=compoundinterest;i=io:std.io;i=s:std.str;i=math:std.math;f=compoundinterest(principal:$f64;rate:$f64;compfreq:$i64;time:$i64):$f64{let t=time as $f64;let n=compfreq as $f64;let base=1.0+rate/n;let exponent=n*t;let result=principal*math.pow(base;exponent);<result};f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");if(parts.len()>=4){let principal=s.tofloat(parts.get(0));let rate=s.tofloat(parts.get(1));let compfreq=s.toint(parts.get(2));let time=s.toint(parts.get(3));let result=compoundinterest(principal;rate;compfreq;time);io.println(s.format(result;\"%.2f\"))};<0}"
+}

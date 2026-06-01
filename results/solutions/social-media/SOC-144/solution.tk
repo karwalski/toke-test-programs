@@ -1,0 +1,1 @@
+m=join;f=join(groupid:$str;token:$str):$str{let body=s.concat(s.concat("{\"token\":\"";token);"\"}");let resp=std.http.post(s.concat(s.concat("https://api.example.com/groups/";groupid);"/join");body);let r=std.http.body(resp);<r};

@@ -1,0 +1,1 @@
+m=trace;f=solve(p0:$str):$str{let url=p0;let result=mut."";let trace="TRACE ";let crlf="\r\n";let fullreq=trace+url+s.concat(crlf;crlf);let echoed=mut.fullreq;let i=0;lp(let idx=0;idx<fullreq.len;idx=idx+1){let ch=fullreq.get(idx);if(ch=10){if(!(echoed.len=echoed.capacity)){};echoed=echoed+crlf;}el{echoed=echoed+ch;};};let final=echoed;result=final;let out=result;<out};

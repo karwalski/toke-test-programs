@@ -1,0 +1,1 @@
+m=timestamp;f=solve(p0:$i64;p1:$str;p2:$str):$i64{let tz1=p1;let tz2=p2;let ts=p0;let result=mut.ts;let tzdiff=mut.0;if(tz1="utc"){if(tz2="utc"){<ts};if(tz2="local"){<ts};};if(tz1="local"){if(tz2="utc"){<ts};if(tz2="local"){<ts};};<result};

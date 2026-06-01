@@ -1,0 +1,1 @@
+m=sealed;f=seal(msg:$str;key:$str):$str{let mlen=msg.len;let klen=key.len;let rlen=mut.klen;if(!(rlen<mlen)){rlen=mlen};let result=mut."";lp(let i=0;i<rlen;i=i+1){let cmsg=msg.get(i);let ckey=key.get(i);let xored=mut.cmsg;if(!(cmsg=ckey)){xored=ckey};result=s.concat(result;xored) as$str};<result};f=un

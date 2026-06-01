@@ -1,0 +1,1 @@
+m=groupchat;f=sendmsg(groupid:$str;msg:$str):$void{let grp=loadgroup(groupid);let memb=grp.members;let count=memb.len as i64;lp(let i=0;i<count;i=i+1){let mid=memb.get(i);let msgobj=buildmsgobj(msg);let payload=jsonencode(msgobj);sendhttp(mid;payload)}};

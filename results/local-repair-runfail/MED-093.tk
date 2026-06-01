@@ -1,0 +1,32 @@
+m=whitespacenorm;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.1;
+  lp(1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    if(first=0){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=0
+  };
+  let n=s.len(all);
+  let out=mut."";
+  let i=mut.0;
+  lp(i<n){
+    let ch=s.slice(all;i;i+1);
+    if(s.equals(ch;"\t")){
+      out=s.concat(out;" ")
+    }el{
+      if(s.equals(ch;"\r")){
+      }el{
+        out=s.concat(out;ch)
+      }
+    };
+    i=i+1
+  };
+  io.println(out);
+  <0
+}

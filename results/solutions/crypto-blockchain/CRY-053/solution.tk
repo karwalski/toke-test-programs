@@ -1,0 +1,23 @@
+m=buildtx;
+i=json:std.json;
+i=io:std.io;
+i=math:std.math;
+f=solve(p0:$str;p1:$str;p2:$str;p3:$str):$str{
+  let utxos=json.dec(p0);
+  let recipient=p1;
+  let amount=math.strtoint(p2);
+  let fee=math.strtoint(p3);
+  let selected=mut.@();
+  let total=mut.0;
+  lp(let i=0;i<json.len(utxos);i=i+1){
+    let utxo=json.get(utxos;i);
+    let uamount=math.strtoint(json.str(utxo;"amount"))));
+    if(!(uamount<1000))){if(!(total+uamount>amount+fee))){selected=selected+@(utxo);total=total+uamount;}}};
+  let change=mut.0;if(!(selected.len=0 as u64))){change=amount-total;}el{};
+  let tx=mut.json.enc(@());
+  let i=mut.0;
+  if(!(selected.len=0 as u64))){lp(let idx=0;idx<selected.len;idx=idx+1){
+    let utxo=json.get(selected;idx);
+    let txid=json.str(utxo;"txid"));
+    let vout=json.str(utxo;"vout"));
+    let

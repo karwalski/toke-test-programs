@@ -1,0 +1,1 @@
+m=align;f=align(text:$str;align:$str;width:$i64):$str{let result=mut."";let pad=mut.0;if(align="left"){pad=0}el{if(align="right"){pad=width-text.len as$i64}el{if(align="centre"){pad=(width-text.len as$i64)/2}el{pad=0}}}};lp(let idx=0;idx<pad;idx=idx+1){result=s.concat(result;" ")};result=s.concat(result;text)

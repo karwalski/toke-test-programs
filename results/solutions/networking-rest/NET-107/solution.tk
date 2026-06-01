@@ -1,0 +1,1 @@
+m=main;i=http:std.http;f=main():$void{let url=std.stdin.read();let resp=http.head(url);let keys=resp.headers.keys;lp(let i=0;i<keys.len;i=i+1){let k=keys.get(i);let v=resp.headers.get(k);std.stdout.write(k+"="+v+"\n");};};

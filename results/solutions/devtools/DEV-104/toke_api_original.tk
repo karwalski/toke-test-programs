@@ -1,0 +1,6 @@
+m=healthdashboard;i=json:std.json;i=str:std.str;i=io:std.io;f=buildstatusbar(p:$str;q:$str):$str{let bar=str.concat("[ ";str.concat(p;str.concat(" %] (";str.concat(q;" ms"))))))};f=generateheader(title:$str):$str{let header=str.concat("Health Dashboard
+";str.concat("-------------------
+";str.concat("Title: ";str.concat(title;"
+"))))))};f=generatetimelinenow():$str{let now=str.now();let line=str.concat("Time: ";str.concat(now;"
+"))));<line};f=generatetimelinenowwithlabel(label:$str):$str{let now=str.now();let line=str.concat(label;str.concat(": ";str.concat(now;"
+"))))));<line};f=generatetimelinenowwithlabelandformat(label:$str;format:$str):$str{let now=str.nowwithformat(format

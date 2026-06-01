@@ -1,0 +1,5 @@
+m=split;
+i=io:std.io;
+i=s:std.str;
+f=split(text:$str):@$str{let result=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<text.len;idx=idx+1){let ch=text.get(idx);if(ch="\n"){if(!(current="")){result=result+@(current);current="";};}el{current=current+ch;};};if(!(current="")){result=result+@(current);};<result};
+f=main():$i64{let alltext=mut."";lp(1){let line=io.readln();if(line=""){br;};alltext=s.concat(s.concat(alltext;line);"\n");};let paragraphs=split(alltext);let paracount=mut.1;lp(let idx=0;idx<paragraphs.len;idx=idx+1){let para=paragraphs.get(idx);if(!(para="")){io.println(s.concat(s.concat("=== PARA ";s.fromint(paracount));" ==="));io.println(para);paracount=paracount+1;};};< 0};

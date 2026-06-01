@@ -1,0 +1,1 @@
+m=main;i=http:std.http;i=io:std.io;f=main():$void{let url=io.stdin.read();let resp=http.get(url);let status=resp.status;let body=resp.body;io.stdout.write(status as$str);io.stdout.write(body);};

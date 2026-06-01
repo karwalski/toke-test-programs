@@ -1,0 +1,1 @@
+m=meminfo;f=parseint(s:$str):$i64{let n=s.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=s.get(i);let d=c as i64-48 as i64;m=m*10+d;};<m};f=trimprefix(s:$str;prefix:$str):$str{let n=s.len;let m=prefix.len;if(n<m){<""};let z=mut.true;lp(let i=0;i<m;i=i+1){let c=s.get(i);let d=prefix.get(i);if(!(c=d)){z=false}};if(!(z)){<""};<s.substr(m;n-m)>};f=trimprefix2

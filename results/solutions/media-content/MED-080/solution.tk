@@ -1,0 +1,1 @@
+m=expand;f=expand(s:$str):$str{let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=":"){let j=mut.i+1;lp(let k=j;k<n;k=k+1){let cc=s.get(k);if(cc=":"){if(k-j>0){let shortcode=s.slice(j;k);result=s.concat(result;" ");};j=k+1;};};if(j<n){let shortcode=s.slice(j;n);result=s.concat(result;" ");};};}el{result=result+c;};};<result};

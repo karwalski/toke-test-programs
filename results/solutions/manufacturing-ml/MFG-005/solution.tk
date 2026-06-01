@@ -1,0 +1,38 @@
+m=cpk;
+i=io:std.io;
+i=s:std.str;
+f=cpk(mean:$f64;stddev:$f64;lower:$f64;upper:$f64):$f64{let centered=mean-(lower+upper)/2.0;let z1=centered/stddev;let z2=(upper-mean)/stddev;let result=3.0-z1-z2;if(result<0.0){<0.0};<result};
+f=main():$i64{
+  let header=io.readln();
+  let values=[];
+  let lsl=0.0;
+  let usl=0.0;
+  let sum=0.0;
+  let count=0;
+  
+  while(true){
+    let line=io.readln();
+    if(line==""){break};
+    let parts=s.split(line;",");
+    let value=s.tofloat(parts[0]);
+    lsl=s.tofloat(parts[1]);
+    usl=s.tofloat(parts[2]);
+    values=values+[value];
+    sum=sum+value;
+    count=count+1
+  };
+  
+  let mean=sum/count as$f64;
+  let variance=0.0;
+  let i=0;
+  while(i<count){
+    let diff=values[i]-mean;
+    variance=variance+diff*diff;
+    i=i+1
+  };
+  let stddev=(variance/(count-1) as$f64).sqrt();
+  
+  let result=cpk(mean;stddev;lsl;usl);
+  io.println("{\"cpk\":" + (result*100.0) as$i64 as$str/100.0 as$str + "}");
+  <0
+}

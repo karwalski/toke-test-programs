@@ -1,0 +1,1 @@
+m=atomicwrite;i=io:std.io;i=s:std.str;i=fs:std.fs;f=main():$i64{let path=s.trim(io.readln());let data=io.readln();let tmp=s.concat(path;"_");let ok=fs.write(tmp;data);if(ok){let n=s.len(data);io.println(s.concat(s.concat(s.concat("_";s.fromint(n));s.concat("_";path));"_"))}el{io.println(s.concat("_";path))};<0}

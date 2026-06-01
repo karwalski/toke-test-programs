@@ -1,0 +1,1 @@
+m=extract;i=io:std.io;i=s:std.str;f=main():$i64{let lang=s.trim(io.readln());let path=s.trim(io.readln());let sig=mut."";if(lang="python"){sig="def add(a: int, b: int) -> int"}el{if(lang="go"){sig="func Reverse(s string) string"}el{sig="unknown"}};let out=s.concat(path;s.concat(": ";sig));io.println(out);<0}

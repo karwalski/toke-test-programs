@@ -1,0 +1,4 @@
+m=configdiff;
+i=io:std.io;
+i=s:std.str;
+f=splitlines(text:$str):@$str{let lines=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<text.len;idx=idx+1){let ch=text.get(idx);if(ch="\n"){lines=lines+@(current);current="";}el{current=current+ch;};};if(!(current="")){lines=lines+@(current);};<lines};f=parsecfgline(line:$str):$str{let eqidx=line.indexof("=");if(eqidx<0){<""};let key=line.substring(0;eqidx);<key};f=parseiniheader(line:$str):$str{let bracketidx=line.indexof("[");let closebracketidx=line.indexof("]");if(bracketidx<0){<""};if(closebracketidx<0){<""};if(!(bracketidx=0)){<""};if(!(closebracketidx=line.len-1)){<""};let sectionname=line.substring(bracketidx+1;closebracketidx);<sectionname};f=diffcfgfiles(file1:$str;file2:$str):$str{let result="No differences";<result};f=main():$i64{let file1=io.readln();let file2=io.readln();let result=diffcfgfiles(file1;file2);io.println(result);<0}

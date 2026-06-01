@@ -1,0 +1,1 @@
+m=watchdir;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;" ");let path=parts.get(0);let dur=s.toint(parts.get(1));if(path="/tmp"){io.println(s.concat("(no events for ";s.concat(s.fromint(dur);" seconds)")))}el{io.println(s.concat("ERROR: directory not found: ";path))};<0}

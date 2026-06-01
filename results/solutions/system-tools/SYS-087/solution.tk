@@ -1,0 +1,1 @@
+m=perms;f=fixperms(path:$str):$bool{let stat=mut.stat(path);if(stat=0){<false};let isdir=mut.isdirectory(path);if(isdir){let result=mut.setdirectorypermissions(path;755);if(result=false){<false}}el{let result=mut.setfilepermissions(path;644);if(result=false){<false}};<true};

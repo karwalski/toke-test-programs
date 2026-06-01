@@ -1,0 +1,6 @@
+{
+  "iteration": 2,
+  "broken_source": "m=main;i=io:std.io;f=main():$i64{let host=io.readln();let port=io.readln();let line=mut.io.readln();lp(s.len(line)>0){io.println(line);line=io.readln()};io.println(\"Connection closed\");<0}",
+  "error": "Compile error:\n{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E3011\",\"severity\":\"error\",\"stage\":\"name_resolution\",\"message\":\"identifier 's' is not declared\",\"file\":\"/opt/toke-worker/solutions/networking-rest/NET-143/solution.tk\",\"pos\":{\"offset\":103,\"line\":1,\"col\":104},\"span_start\":103,\"span_end\":103,\"context\":[],\"expected\":\"\",\"got\":\"\",\"fix\":\"did you mean 'io'?\",\"source_line\":\"m=main;i=io:std.io;f=main():$i64{let host=io.readln();let port=io.readln();let line=mut.io.readln();lp(s.len(line)>0){io.println(line);line=io.readln()};io.println(\\\"Connection closed\\\");<0}\"}",
+  "fixed_source": "m=main;i=io:std.io;i=s:std.str;f=main():$i64{let host=io.readln();let port=io.readln();let line=mut.io.readln();lp(s.len(line)>0){io.println(line);line=io.readln()};io.println(\"Connection closed\");<0}"
+}

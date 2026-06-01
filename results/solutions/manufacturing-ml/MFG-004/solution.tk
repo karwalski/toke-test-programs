@@ -1,0 +1,1 @@
+m=cp;f=cp(specmin:$f64;specmax:$f64;mean:$f64;stddev:$f64):$f64{let diff=specmax-specmin;let stddev2=stddev*stddev;let ratio=diff/(3.0*stddev));let cpval=1.0-ratio;if(cpval<0.0){<0.0};<cpval};

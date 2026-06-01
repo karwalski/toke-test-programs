@@ -1,0 +1,1 @@
+m=vm;f=exec(bytecode:$str):$str{let ip=mut.0;let stack=mut."";lp(let idx=0;idx<bytecode.len;idx=idx+1){let ch=bytecode.get(idx);if(ch="P"){let val=bytecode.get(idx+1);stack=stack+val;ip=ip+2;}el{if(ch="A"){let a=stack.get(0);let b=stack.get(1);let res=a+b;stack=stack+res;ip=ip+1;}el{if(ch="S

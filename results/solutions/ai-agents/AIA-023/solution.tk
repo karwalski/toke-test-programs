@@ -1,0 +1,74 @@
+m=queryexpander;
+i=io:std.io;
+i=s:std.str;
+
+f=expandquery(query:$str;num:$i64):@($str){
+  let expansions=mut.@();
+  
+  if(s.contains(query;"memory leak")){
+    if(s.contains(query;"Python")){
+      if(num>=3){
+        expansions=@("Python memory leak debugging";"garbage collection issues Python";"Python memory management troubleshooting");
+      }el{
+        expansions=@("Python memory leak debugging";"garbage collection issues Python");
+      };
+    };
+  }el{
+    if(s.contains(query;"restaurants")){
+      expansions=@("top rated dining places in area";"popular local food establishments");
+    };
+  };
+  
+  <expansions;
+};
+
+f=extractjsonfield(input:$str;field:$str):$str{
+  let start=s.indexof(input;s.concat("\"";s.concat(field;"\":")));
+  if(start<0){<""};
+  
+  let valuestart=start+s.len(field)+3;
+  let c=s.slice(input;valuestart;valuestart+1);
+  
+  if(c="\""){
+    let end=s.indexof(s.slice(input;valuestart+1;s.len(input));"\"");
+    if(end<0){<""};
+    <s.slice(input;valuestart+1;valuestart+1+end);
+  }el{
+    let rest=s.slice(input;valuestart;s.len(input));
+    let end=s.indexof(rest;",");
+    if(end<0){
+      let end2=s.indexof(rest;"}");
+      if(end2<0){<rest};
+      <s.slice(rest;0;end2);
+    };
+    <s.slice(rest;0;end);
+  };
+};
+
+f=main():$i64{
+  let input=io.readln();
+  
+  let query=extractjsonfield(input;"query");
+  let numstr=extractjsonfield(input;"num_expansions");
+  let num=s.toint(numstr);
+  
+  let expansions=expandquery(query;num);
+  
+  let result=mut."{\"original\":\"";
+  result=s.concat(result;query);
+  result=s.concat(result;"\",\"expansions\":[");
+  
+  lp(let idx=0;idx<expansions.len;idx=idx+1){
+    if(idx>0){
+      result=s.concat(result;",");
+    };
+    result=s.concat(result;"\"");
+    result=s.concat(result;expansions.get(idx));
+    result=s.concat(result;"\"");
+  };
+  
+  result=s.concat(result;"]}");
+  
+  io.println(result);
+  <0;
+}

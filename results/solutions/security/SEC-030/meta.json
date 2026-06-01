@@ -1,0 +1,24 @@
+{
+  "id": "SEC-030",
+  "category": "security",
+  "title": "SSRF Vulnerability Scanner",
+  "description": "Reads a list of API endpoints from stdin. Tests each for Server-Side Request Forgery by injecting internal IP addresses and metadata service URLs into URL parameters.",
+  "difficulty": 4,
+  "stdlib_modules": [
+    "std.http",
+    "std.str",
+    "std.json",
+    "std.net"
+  ],
+  "repair_count": 1,
+  "one_shot": false,
+  "toke_api_compiled": false,
+  "warnings": [],
+  "generated_at": "2026-06-01T01:36:46.644533+00:00",
+  "worker_id": 2,
+  "source_chars": 250,
+  "source_lines": 1,
+  "has_companion": true,
+  "has_repair_pairs": true,
+  "test_cases_count": 2
+}

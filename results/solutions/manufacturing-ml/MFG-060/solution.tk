@@ -1,0 +1,1 @@
+m=split;f=split(dataset:$str;trainratio:$i64):$str{let n=dataset.len;let trainn=mut.0;if(trainratio<100){trainn=(n*trainratio)/100;}el{trainn=n;};let result=mut."";lp(let i=0;i<trainn;i=i+1){result=s.concat(result;dataset.get(i));};<result};

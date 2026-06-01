@@ -1,0 +1,15 @@
+m=graph;
+i=io:std.io;
+i=s:std.str;
+f=solve(p0:$str;p1:$str):$str{let p=mut.p0;let q=mut.p1;let result=mut."";lp(let i=0;i<q.len;i=i+1){let c=q.get(i);if(c=" "){<result};result=result+c;};<result};
+f=main():$i64{
+let language=io.readln();
+let result=mut."";
+lp(let line=io.readln();line!=""){
+if(line.contains(".py")){
+result=s.concat(s.concat(result;line);" -> utils.py\n");
+}
+};
+io.println(result);
+<0
+}

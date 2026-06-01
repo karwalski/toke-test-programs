@@ -1,0 +1,1 @@
+m=sieve;f=sieve(n:$i64):@$i64{let m=mut.0;let limit=mut.0;let tmp=mut.0;tmp=n*2;limit=tmp+1;let sieve=mut.@();lp(let idx=0;idx<limit;idx=idx+1){sieve=sieve+@(1)};lp(let i=1;!(i*2>n);i=i+1){lp(let j=i+i;j*2<n;j=j+i){let idx=j*2;sieve=sieve+@(0)}};let result=mut.@();lp(let idx=1;idx<n;idx=idx+1){let val=sieve.get(idx*2);if(val=1){result=result+@(idx)}};<result};

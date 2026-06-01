@@ -1,0 +1,44 @@
+m=errhandler;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let input=io.readln();
+  
+  let improved=mut."";
+  let suggestion=mut."";
+  let code=mut."";
+  
+  if(s.contains(input;"ECONNREFUSED")){
+    if(s.contains(input;"5432")){
+      improved="Cannot connect to the database server.";
+      suggestion="Ensure PostgreSQL is running on port 5432. Try: sudo systemctl start postgresql";
+      code="DB_CONNECTION_REFUSED"
+    }
+  }el{
+    if(s.contains(input;"TypeError")){
+      if(s.contains(input;"Cannot read properties of undefined")){
+        if(s.contains(input;"reading map")){
+          improved="Attempted to use .map() on data that has not loaded yet.";
+          suggestion="Add a null check or loading state before accessing the data array. Example: data?.map(...) or check if data is defined before rendering.";
+          code="NULL_ARRAY_ACCESS"
+        }
+      }
+    }
+  };
+  
+  let parts=@(
+    "{\"improved_message\":\"";
+    improved;
+    "\",\"suggestion\":\"";
+    suggestion;
+    "\",\"error_code\":\"";
+    code;
+    "\"}"
+  );
+  
+  let output=s.join(parts;"");
+  io.println(output);
+  
+  <0
+}

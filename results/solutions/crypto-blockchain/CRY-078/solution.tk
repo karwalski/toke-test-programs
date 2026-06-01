@@ -1,0 +1,1 @@
+m=certchain;f=verifychain(certs:$str):bool{let parts=certs.split(",");let n=parts.len;let issuer=mut."";lp(let i=0;i<n;i=i+1){let cert=parts.get(i);let isissuer=cert.contains("issuer");if(isissuer){issuer=cert};};let isvalid=mut.false;if(issuer.len>0){isvalid=true};<isvalid};

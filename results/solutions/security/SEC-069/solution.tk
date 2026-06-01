@@ -1,0 +1,5 @@
+m=docker;
+i=io:std.io;
+i=s:std.str;
+f=solve(p0:$str):$str{let result=mut."";let lines=p0.split("\n");let n=lines.len;lp(let i=0;i<n;i=i+1){let line=lines.get(i);let parts=line.split(":");let m=parts.len;if(m>1){let key=parts.get(0);let val=parts.get(1);let trimmedval=val.trim();let isroot=trimmedval="root";let hassensenv=trimmedval.len>5;let isworldwritable=trimmedval.len>5;let hasexposedport=trimmedval.len>5;let hasvolumemount=trimmedval.len>5;if(isroot){result=s.concat(result;"root detected\n")};if(hassensenv){result=s.concat(result;"sensitive env var detected\n")};if(isworldwritable){result=s.concat(result;"world-writable volume detected\n")};if(hasexposedport){result=s.concat(result;"exposed port detected\n")};if(hasvolumemount){result=s.concat(result;"volume mount detected\n")};};};<result};
+f=main():$i64{let imagename=io.readln();let result=solve(imagename);io.println(result);<0};

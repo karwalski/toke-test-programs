@@ -1,0 +1,1 @@
+m=stripid;f=stripid(s:$str):$str{let len=s.len;let start=mut.0;lp(let idx=0;idx<len;idx=idx+1){let ch=s.get(idx);if(ch="["){start=idx+1};if(ch="]"){let end=idx;let extracted=s.substr(start;end-start);<extracted};if(ch="("){start=idx+1};if(ch=")"){let end=idx;let extracted=s.substr(start;end-start);<extracted};};let result=mut.""

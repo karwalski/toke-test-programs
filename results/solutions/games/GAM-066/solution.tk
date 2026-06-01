@@ -1,0 +1,40 @@
+m=picrossvalidator;
+i=io:std.io;
+i=str:std.str;
+i=col:std.collections;
+
+f=validate(grid:$str;rowclues:$str;colclues:$str):$str{
+    let rows=str.split(grid;"
+");
+    let rowcluearr=str.split(rowclues;"
+");
+    let colcluearr=str.split(colclues;"
+");
+    let n=rows.len;
+    let m=rows.get(0).len;
+    let rowclues=col.newarr(n);
+    let colclues=col.newarr(m);
+    let i=0;
+    lp(let idx=0;idx<rowcluearr.len;idx=idx+1){
+        let clue=rowcluearr.get(idx);
+        let len=str.len(clue);
+        let j=0;
+        lp(let k=0;k<len;k=k+1){
+            let ch=str.charat(clue;k);
+            let isnum=str.isdigit(ch);
+            if(isnum){
+                let digit=str.toint(ch);
+                if(digit<1){
+                    let msg=str.concat("Invalid: row ";str.concat(str.fromint(idx+1));" col 1")));
+                    <msg;
+                };
+            };
+        };
+    };
+    let j=0;
+    lp(let k=0;k<colcluearr.len;k=k+1){
+        let clue=colcluearr.get(k);
+        let len=str.len(clue);
+        let i=0;
+        lp(let m=0;m<len;m=m+1){
+            let ch=str.charat(clue;m

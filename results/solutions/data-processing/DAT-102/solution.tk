@@ -1,0 +1,31 @@
+{
+  "m": "changelog";
+  "i": {
+    "io": "std.io";
+    "str": "std.str";
+    "collections": "std.collections"
+  };
+  "t": {
+    "changelogentry": {
+      "version": "$str";
+      "changes": "$str"
+    }
+  };
+  "f": {
+    "parsechangelog": {
+      "params": ["changelog": "$str"];
+      "body": [
+        "let lines=io.splitlines(changelog);",
+        "let entries=mut.@();",
+        "let i=mut.0;",
+        "lp(let idx=0;idx<lines.len;idx=idx+1){",
+        "let line=lines.get(idx);",
+        "let isversion=io.startswith(line,\"##\");",
+        "if(isversion){",
+        "let versionline=line;",
+        "let nextlineidx=idx+1;",
+        "let changeslist=mut.@();",
+        "lp(let j=nextlineidx;j<lines.len;j=j+1){",
+        "let linenum=j+1;",
+        "let linestr=lines.get(j);",
+        "let isblank=io.startswith(linestr,\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"

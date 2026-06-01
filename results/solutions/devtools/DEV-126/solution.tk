@@ -1,0 +1,1 @@
+m=manifest;f=solve(p0:$str;p1:$str;p2:$str):$str{let appname=p0;let version=p1;let deps=p2;let result=mut."";result=s.concat(result;"app_name: ")+appname+"\n";result=s.concat(result;"version: ")+version+"\n";result=s.concat(result;"dependencies:\n");let lines=deps.split("\n");lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);result=s.concat(result;"  - ")+line+"\n";};<result};

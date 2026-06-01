@@ -1,0 +1,30 @@
+To list all Linux namespaces for a given PID, you can use the following Python script:
+
+```python
+import os
+
+def get_namespace(pid, namespace):
+    try:
+        with open(f"/proc/{pid}/ns/{namespace}"), "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None
+
+def list_namespaces(pid):
+    namespaces = [
+        "pid", "net", "mnt", "uts", "ipc", "user"
+    ]
+    results = {}
+    for namespace in namespaces:
+        result = get_namespace(pid, namespace)
+        results[namespace] = result
+    return results
+
+# Example usage
+pid = 1234
+namespaces = list_namespaces(pid)
+for namespace, result in namespaces.items():
+    print(f"{namespace}: {result}")
+```
+
+This script defines functions to get the namespace for a given PID and to list all namespaces for a given PID. The script then demonstrates how to use these functions.

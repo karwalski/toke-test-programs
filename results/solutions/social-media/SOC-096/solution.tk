@@ -1,0 +1,1 @@
+m=notifications;f=handle(req:i64):i64{let action=req.action;let token=req.token;let prefs=req.preferences;if(action="set"){let saved=std.db.save(prefs);<std.json.enc(saved)}el{<std.json.enc(prefs)}}};f=main():i64{let raw=std.io.read();let req=std.json.dec(raw);let resp=handle(req);let out=std.json.enc(resp);<std.io.write(out)};

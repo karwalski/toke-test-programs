@@ -1,0 +1,6 @@
+{
+  "iteration": 9,
+  "broken_source": "m=schedule;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let topics=@(\"Math\";\"Science\";\"History\");let hours=2;let dates=@(\"2024-01-01\";\"2024-01-02\";\"2024-01-03\");let dayidx=mut.0;lp(dayidx<dates.len()){if(dayidx<topics.len()){let datestr=dates.get(dayidx);let topic=topics.get(dayidx);io.println(datestr+\": \"+topic+\" (\"+s.fromint(hours)+\" hours)\")};dayidx=dayidx+1};<0}",
+  "error": "Test failures:\nTest 1: expected '2024-01-01: Math (2 hours)\n2024-01-02: Science (2 hours)\n2024-01-03: History (2 hours)', got ''\nTest 2: expected '2024-01-01: Physics (2 hours)\n2024-01-01: Chemistry (2 hours)', got ''",
+  "fixed_source": "m=schedule;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let topics=@(\"Math\";\"Science\";\"History\");let hours=2;let dates=@(\"2024-01-01\";\"2024-01-02\";\"2024-01-03\");let dayidx=mut.0;lp(dayidx<dates.len()){if(dayidx<topics.len()){let datestr=dates.get(dayidx);let topic=topics.get(dayidx);io.println(datestr+\": \"+topic+\" (\"+s.fromint(hours)+\" hours)\")};dayidx=dayidx+1};<0}"
+}

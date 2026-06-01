@@ -1,0 +1,1 @@
+m=sudoku;f=issolved(grid:@$i64):$bool{let valid=mut.true;lp(let row=0;row<9;row=row+1){let seen=mut.@($i64);lp(let col=0;col<9;col=col+1){let cell=grid.get((row*9)+col)as$i64;if(cell<1){valid=false;}el{let found=mut.false;lp(let i=0;i<seen.len;i=i+1){if(seen.get(i)=cell){found=true;};};if(!found){seen=seen+@(cell);};};};};};};};};};};};};};};};};};};};};};};};};}

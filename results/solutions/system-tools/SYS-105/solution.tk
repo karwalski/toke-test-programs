@@ -1,0 +1,16 @@
+To list running Docker containers with detailed information, you can use the following Docker command:
+
+```sh
+docker ps --format "table {{.ID}}}\\t{{.Names}}}\\t{{.Image}}}\\t{{.Status}}}\\t{{.Ports}}}\\t{{.Size}}"
+```
+
+This command uses the `--format` option to specify a custom table format. The format string includes placeholders for various container attributes:
+
+- `{{.ID}}}`: Container ID
+- `{{.Names}}}`: Container name
+- `{{.Image}}}`: Image name
+- `{{.Status}}}`: Container status (e.g., "Up 2 hours")
+- `{{.Ports}}}`: Ports mapping
+- `{{.Size}}}`: Container size
+
+When you run this command, it will display a table with the specified columns, showing the details of each running container.

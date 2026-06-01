@@ -1,0 +1,10 @@
+m=lintreport;f=countviolations(lines:@$str):i64{let count=mut.0;let n=lines.len;lp(let i=0;i<n;i=i+1){let line=lines.get(i);if(!(line.len<1))){let firstchar=line.get(0);if(firstchar="E"){count=count+1;};if(firstchar="W"){count=count+1;};};};<count};f=formatreport(violations:i64;filename:$str):$str{let result=mut."";result=s.concat(result;"Lint Report
+");result=s.concat(result;"Filename: ");result=s.concat(result;filename);result=s.concat(result;"
+");result=s.concat(result;"Violations: ");result=s.concat(result;violations) as$str;result=s.concat(result;"
+");result=s.concat(result;"---");result=s.concat(result;"
+");<result};f=main():$str{let violations=countviolations(@"Error: undefined variable x
+";"Warning: unused variable y
+";"Info: parsing complete
+";"Error: type mismatch
+";"Warning: deprecated function
+";));let report=formatreport(violations;"/projects/myproject/src/main.tkt"));<report};

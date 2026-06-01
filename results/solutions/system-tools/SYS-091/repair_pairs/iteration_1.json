@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=throttle;f=solve(left:$i64;right:$i64):$i64{let result=mut.0;if(left<right){result=left}el{result=right};<result};f=main():$i64{let x=42;let y=43;let z=solve(x;y);<z};",
+  "error": "Test failures:\nTest 1: expected 'hello', got ''\nTest 2: expected 'ERROR: rate must be > 0', got ''\nTest 3: expected 'The quick brown fox jumps over the lazy dog.', got ''\nTest 4: expected 'abcdefghij', got ''",
+  "fixed_source": "m=throttle;i=io:std.io;i=s:std.str;f=main():$i64{let rate=s.toint(io.readln());let data=io.readln();if(rate>0){io.println(data)}el{io.println(\"ERROR: rate must be > 0\")};<0}"
+}

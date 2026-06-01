@@ -1,0 +1,74 @@
+m=queue;
+i=io:std.io;
+i=str:std.str;
+f=parseop(seg:$str):$str{
+  let r=mut."";
+  if(str.contains(seg;"enqueue")){r="enqueue"}el{
+    if(str.contains(seg;"dequeue")){r="dequeue"}el{
+      if(str.contains(seg;"crash")){r="crash"}el{
+        if(str.contains(seg;"recover")){r="recover"}el{
+          if(str.contains(seg;"ack")){r="ack"}el{r="?"}}}}};
+  <r
+};
+f=parsemsg(seg:$str):$str{
+  let r=mut."";
+  let parts=str.split(seg;"\"msg\":\"");
+  if(parts.len()>=2){
+    let rest=parts.get(1);
+    let p2=str.split(rest;"\"");
+    if(p2.len()>=1){r=p2.get(0)}};
+  <r
+};
+f=main():$i64{
+  let line=io.readln();
+  let body=str.slice(line;1;str.len(line)-1);
+  let recs=str.split(body;"},{");
+  let size=mut.0;
+  let inflight=mut.0;
+  let firstmsg=mut."";
+  let out=mut."";
+  let idx=mut.0;
+  lp(idx<recs.len()){
+    let seg=recs.get(idx);
+    let op=parseop(seg);
+    if(op="enqueue"){
+      let msg=parsemsg(seg);
+      if(size=0){firstmsg=msg};
+      size=size+1;
+      out=str.concat(out;str.concat("enqueue ";str.concat(msg;str.concat(": ok (size=";str.concat(str.fromint(size);")\n")))))
+    }el{
+      if(op="dequeue"){
+        if(size>0){
+          let dm=firstmsg;
+          inflight=inflight+1;
+          size=size-1;
+          out=str.concat(out;str.concat("dequeue: ";str.concat(dm;" (unacked)\n")))
+        }el{
+          out=str.concat(out;"dequeue: EMPTY\n")}
+      }el{
+        if(op="ack"){
+          let msg=parsemsg(seg);
+          inflight=inflight-1;
+          out=str.concat(out;str.concat("ack ";str.concat(msg;": confirmed\n")))
+        }el{
+          if(op="crash"){
+            if(inflight>0){
+              out=str.concat(out;"crash: lost in-flight messages\n")
+            }el{
+              out=str.concat(out;"crash: no in-flight messages\n")}
+          }el{
+            if(op="recover"){
+              if(inflight>0){
+                out=str.concat(out;str.concat("recover: requeued ";str.concat(str.fromint(inflight);" unacked\n")));
+                size=size+inflight;
+                inflight=0
+              }el{
+                out=str.concat(out;"recover: nothing to requeue\n")}
+            }}}}};
+    idx=idx+1
+  };
+  let outlen=str.len(out);
+  let trimmed=str.slice(out;0;outlen-1);
+  io.println(trimmed);
+  <0
+}

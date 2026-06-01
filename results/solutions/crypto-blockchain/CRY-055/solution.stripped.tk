@@ -1,0 +1,22 @@
+m=tokentransfers;
+i=io:std.io;
+i=s:std.str;
+f=parsebal(json:$str;name:$str):$i64{
+  let parts=s.split(json;"_");
+  let result=mut.0;
+  let found=mut.0;
+  lp(let idx=0;idx<parts.len();idx=idx+1){
+    let part=parts.get(idx);
+    let kv=s.split(part;"_");
+    if(kv.len()>=2){
+      let rawkey=kv.get(0);
+      let cleaned=mut."_";
+      lp(let j=0;j<s.len(rawkey);j=j+1){
+        let ch=s.slice(rawkey;j;j+1);
+        if(ch!="_"){
+          if(ch!="_"){
+            if(ch!="_""_""_"}"_"{"_"alice"_"bob"_""_" "_"alice"_"ERROR: Insufficient balance for "_"alice"_"{\"_":"_",\"_":"_"}");
+    io.println(out);
+  };
+  <0
+};

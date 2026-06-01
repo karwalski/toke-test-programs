@@ -1,0 +1,1 @@
+m=segcheck;f=solve(p0:$str;p1:$str):$str{let p=mut.p0;let q=mut.p1;let result=mut."";let found=mut.false;lp(let i=0;i<p.len;i=i+1){let ch=p.get(i);if(ch=":"){found=true;let j=i+1;lp(let k=j;k<p.len;k=k+1){let c=p.get(k);if(c=","){i=k;br};if(k=p.len-1){i=k;br};};br};};if(found){let segname=mut.""

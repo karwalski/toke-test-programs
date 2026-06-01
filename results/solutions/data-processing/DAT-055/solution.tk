@@ -1,0 +1,5 @@
+m=buildnested;
+i=io:std.io;
+i=s:std.str;
+f=buildnested(obj:$str):$str{let result=mut."{}";let keys=obj.split(".");lp(let i=0;i<keys.len;i=i+1){let key=keys.get(i);let newresult=mut."{}";lp(let j=0;j<result.len;j=j+1){let ch=result.get(j);if(ch="{"){newresult=newresult+key+":{}";};if(ch="}"){newresult=newresult+key+":{}";};if(!(ch="{")){if(!(ch="}")){newresult=newresult+ch;};};};result=newresult;};<result};
+f=main():$i64{let input=io.readln();let result=buildnested(input);io.println(result);<0};

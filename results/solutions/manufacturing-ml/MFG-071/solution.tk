@@ -1,0 +1,1 @@
+m=plan;f=plan(aql:$str;lotsize:$i64):$str{let p=mut.0;let n=mut.0;if(aql="0.1"){p=1;n=10}el{if(aql="0.5"){p=3;n=50}el{if(aql="1.0"){p=5;n=100}el{p=0;n=0}}}};let result=mut."";if(p>0){result=s.concat("n=";n) as$str+s.concat(" p=";p) as$str}el{result="invalid"};<result};

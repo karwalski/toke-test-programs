@@ -1,0 +1,212 @@
+m=removeduplicates;
+i=io:std.io;
+i=j:std.json;
+i=s:std.str;
+
+f=normalizeargs(args:$str):$str{
+    let keys=@();
+    
+    if(s.contains(args;"\"q\"")){
+        keys=keys+@("q");
+    };
+    if(s.contains(args;"\"url\"")){
+        keys=keys+@("url");
+    };
+    if(s.contains(args;"\"method\"")){
+        keys=keys+@("method");
+    };
+    
+    let sorted=mut.keys;
+    
+    lp(let idx=0;idx<sorted.len-1;idx=idx+1){
+        lp(let jdx=idx+1;jdx<sorted.len;jdx=jdx+1){
+            let a=sorted.get(idx);
+            let b=sorted.get(jdx);
+            if(a>b){
+                sorted.set(idx;b);
+                sorted.set(jdx;a);
+            };
+        };
+    };
+    
+    let parts=mut.@();
+    lp(let idx=0;idx<sorted.len;idx=idx+1){
+        let key=sorted.get(idx);
+        let searchkey=s.concat("\"";s.concat(key;"\":"));
+        let startpos=s.indexof(args;searchkey);
+        if(startpos>=0){
+            let valstart=startpos+s.len(searchkey);
+            let valend=mut.valstart;
+            let inquote=mut.false;
+            let depth=mut.0;
+            
+            lp(valend<s.len(args)){
+                let ch=s.slice(args;valend;valend+1);
+                if(ch="\""){
+                    if(valend>0){
+                        let prev=s.slice(args;valend-1;valend);
+                        if(prev!="\\"){
+                            inquote=!inquote;
+                        };
+                    }el{
+                        inquote=!inquote;
+                    };
+                };
+                if(!inquote){
+                    if(ch="{"){
+                        depth=depth+1;
+                    };
+                    if(ch="}"){
+                        depth=depth-1;
+                    };
+                    if(depth=0){
+                        let isc=ch=",";
+                        let isb=ch="}";
+                        if(isc||isb){
+                            br;
+                        };
+                    };
+                };
+                valend=valend+1;
+            };
+            
+            let val=s.slice(args;valstart;valend);
+            let pair=s.concat(key;"::");
+            pair=s.concat(pair;val);
+            parts=parts+@(pair);
+        };
+    };
+    
+    <s.join(parts;"|")
+};
+
+f=main():$i64{
+    let input=io.readln();
+    let calls=j.parse(input);
+    let unique=mut.@();
+    let duplicates=mut.@();
+    let seen=mut.@();
+    
+    let callsstr=j.stringify(calls);
+    let callslen=mut.0;
+    
+    let idx=mut.0;
+    lp(idx<s.len(callsstr)){
+        if(s.slice(callsstr;idx;idx+6)="{\"id\":"){
+            callslen=callslen+1;
+        };
+        idx=idx+1;
+    };
+    
+    idx=0;
+    let callstart=mut.1;
+    let callidx=mut.0;
+    
+    lp(callidx<callslen){
+        let callend=mut.callstart;
+        let depth=mut.0;
+        let foundstart=mut.false;
+        
+        lp(callend<s.len(callsstr)){
+            let ch=s.slice(callsstr;callend;callend+1);
+            if(ch="{"){
+                depth=depth+1;
+                foundstart=true;
+            };
+            if(ch="}"){
+                depth=depth-1;
+                if(foundstart){
+                    if(depth=0){
+                        callend=callend+1;
+                        br;
+                    };
+                };
+            };
+            callend=callend+1;
+        };
+        
+        let callstr=s.slice(callsstr;callstart;callend);
+        let call=j.parse(callstr);
+        
+        let idstart=s.indexof(callstr;"\"id\":\"")+6;
+        let idend=s.indexof(s.slice(callstr;idstart;s.len(callstr));"\"");
+        let callid=s.slice(callstr;idstart;idstart+idend);
+        
+        let toolstart=s.indexof(callstr;"\"tool\":\"")+8;
+        let toolend=s.indexof(s.slice(callstr;toolstart;s.len(callstr));"\"");
+        let tool=s.slice(callstr;toolstart;toolstart+toolend);
+        
+        let argsstart=s.indexof(callstr;"\"arguments\":")+ 12;
+        let argsend=mut.argsstart;
+        let argsdepth=mut.0;
+        let foundargs=mut.false;
+        
+        lp(argsend<s.len(callstr)){
+            let ch=s.slice(callstr;argsend;argsend+1);
+            if(ch="{"){
+                argsdepth=argsdepth+1;
+                foundargs=true;
+            };
+            if(ch="}"){
+                argsdepth=argsdepth-1;
+                if(foundargs){
+                    if(argsdepth=0){
+                        argsend=argsend+1;
+                        br;
+                    };
+                };
+            };
+            argsend=argsend+1;
+        };
+        
+        let args=s.slice(callstr;argsstart;argsend);
+        
+        let callkey=s.concat(tool;"::");
+        let argskey=normalizeargs(args);
+        callkey=s.concat(callkey;argskey);
+        
+        let isdupe=mut.false;
+        
+        lp(let sidx=0;sidx<seen.len;sidx=sidx+1){
+            let seenitem=seen.get(sidx);
+            if(seenitem=callkey){
+                isdupe=true;
+            };
+        };
+        
+        if(isdupe){
+            duplicates=duplicates+@(callid);
+        }el{
+            unique=unique+@(call);
+            seen=seen+@(callkey);
+        };
+        
+        callstart=callend+1;
+        callidx=callidx+1;
+    };
+    
+    let result=mut."{\"unique_calls\":[";
+    
+    lp(let uidx=0;uidx<unique.len;uidx=uidx+1){
+        if(uidx>0){
+            result=s.concat(result;",");
+        };
+        result=s.concat(result;j.stringify(unique.get(uidx)));
+    };
+    
+    result=s.concat(result;"],\"duplicates\":[");
+    
+    lp(let didx=0;didx<duplicates.len;didx=didx+1){
+        if(didx>0){
+            result=s.concat(result;",");
+        };
+        result=s.concat(result;"\"");
+        result=s.concat(result;duplicates.get(didx));
+        result=s.concat(result;"\"");
+    };
+    
+    result=s.concat(result;"]}");
+    
+    io.println(result);
+    <0
+}

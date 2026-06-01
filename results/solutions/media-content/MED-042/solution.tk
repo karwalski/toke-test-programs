@@ -1,0 +1,5 @@
+m=camelToSnake;
+i=io:std.io;
+i=s:std.str;
+f=camelToSnake(s:$str):$str{let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c>64){if(c<91){result=s.concat(result;"_");let lower=c+32;result=s.concat(result;lower) as$str;}el{result=s.concat(result;c) as$str;};}el{result=s.concat(result;c) as$str;};};<result};
+f=main():$i64{lp(tr){let line=io.readln();if(line==""){br;};let result=camelToSnake(line);io.println(result);};;<0};

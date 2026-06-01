@@ -1,0 +1,1 @@
+m=conv;f=convget(page:$i64;perpage:$i64):$str{let total=100;let offset=page*perpage;let fromidx=offset;let toidx=offset+perpage;let result=mut."";lp(let idx=fromidx;idx<toidx;idx=idx+1){let msg=s.concat("msg_";idx) as$str;result=s.concat(s.concat(result;msg);"\n");};<result};

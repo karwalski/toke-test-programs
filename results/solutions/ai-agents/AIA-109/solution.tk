@@ -1,0 +1,185 @@
+m=entitymem;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=extractentities(msg:$str):@($str){
+    let entities=mut.@();
+    let words=s.split(msg;" ");
+    lp(let idx=0;idx<words.len;idx=idx+1){
+        let word=words.get(idx);
+        if(word.len>0){
+            let first=s.slice(word;0;1);
+            if(first>="A"){
+                if(first<="Z"){
+                    entities=entities.append(word);
+                };
+            };
+        };
+    };
+    <entities;
+};
+
+f=extractfacts(msg:$str;entity:$str):@($str){
+    let facts=mut.@();
+    let lower=s.tolower(msg);
+    
+    if(s.contains(lower;"works at")){
+        let parts=s.split(msg;"works at ");
+        if(parts.len>=2){
+            let company=s.trim(parts.get(1));
+            let cparts=s.split(company;" ");
+            if(cparts.len>0){
+                facts=facts.append(s.concat("works at ";cparts.get(0)));
+            };
+        };
+    };
+    
+    if(s.contains(lower;"lives in")){
+        let parts=s.split(msg;"lives in ");
+        if(parts.len>=2){
+            let location=s.trim(parts.get(1));
+            let lparts=s.split(location;" ");
+            if(lparts.len>0){
+                let place=lparts.get(0);
+                if(lparts.len>=2){
+                    place=s.concat(s.concat(place;" ");lparts.get(1));
+                };
+                facts=facts.append(s.concat("lives in ";place));
+            };
+        };
+    };
+    
+    if(s.contains(lower;"moved to")){
+        let parts=s.split(msg;"moved to ");
+        if(parts.len>=2){
+            let location=s.trim(parts.get(1));
+            let lparts=s.split(location;" ");
+            if(lparts.len>0){
+                let place=lparts.get(0);
+                if(lparts.len>=2){
+                    place=s.concat(s.concat(place;" ");lparts.get(1));
+                };
+                facts=facts.append(s.concat("lives in ";place));
+            };
+        };
+    };
+    
+    if(s.contains(lower;"started at")){
+        let parts=s.split(msg;"started at ");
+        if(parts.len>=2){
+            let company=s.trim(parts.get(1));
+            let cparts=s.split(company;".");
+            if(cparts.len>0){
+                facts=facts.append(s.concat("works at ";cparts.get(0)));
+            };
+        };
+    };
+    
+    if(s.contains(lower;"has a")){
+        let eidx=s.indexof(lower;s.tolower(entity));
+        if(eidx>=0){
+            let afterentity=s.slice(msg;eidx+entity.len;msg.len);
+            if(s.contains(afterentity;"has a")){
+                let hidx=s.indexof(afterentity;"has a");
+                let factstart=hidx+0;
+                let factpart=s.slice(afterentity;factstart;afterentity.len);
+                let dotidx=s.indexof(factpart;".");
+                if(dotidx>0){
+                    facts=facts.append(s.trim(s.slice(factpart;0;dotidx)));
+                }el{
+                    facts=facts.append(s.trim(factpart));
+                };
+            };
+        };
+    };
+    
+    <facts;
+};
+
+f=main():$i64{
+    let input=io.readln();
+    let parsed=j.parse(input);
+    
+    let currentmem=j.getobj(parsed;"current_memory");
+    let newmsg=j.getstr(parsed;"new_message");
+    
+    let entities=extractentities(newmsg);
+    let newfacts=mut.@();
+    let updatedfacts=mut.@();
+    let updatedmem=j.object();
+    
+    lp(let eidx=0;eidx<entities.len;eidx=eidx+1){
+        let entity=entities.get(eidx);
+        let facts=extractfacts(newmsg;entity);
+        let currentfacts=mut.@();
+        
+        if(j.haskey(currentmem;entity)){
+            let cfacts=j.getarr(currentmem;entity);
+            lp(let cidx=0;cidx<j.arrlen(cfacts);cidx=cidx+1){
+                currentfacts=currentfacts.append(j.getstr(cfacts;cidx));
+            };
+        };
+        
+        let finalfacts=mut.@();
+        
+        lp(let fidx=0;fidx<facts.len;fidx=fidx+1){
+            let fact=facts.get(fidx);
+            let updated=mut.false;
+            
+            lp(let cidx=0;cidx<currentfacts.len;cidx=cidx+1){
+                let cfact=currentfacts.get(cidx);
+                if(s.contains(fact;"works at")){
+                    if(s.contains(cfact;"works at")){
+                        let ufact=j.object();
+                        j.setstr(ufact;"entity";entity);
+                        j.setstr(ufact;"old";cfact);
+                        j.setstr(ufact;"new";fact);
+                        updatedfacts=updatedfacts.append(ufact);
+                        updated=true;
+                    };
+                };
+            };
+            
+            if(!updated){
+                let nfact=j.object();
+                j.setstr(nfact;"entity";entity);
+                j.setstr(nfact;"fact";fact);
+                newfacts=newfacts.append(nfact);
+            };
+            
+            finalfacts=finalfacts.append(fact);
+        };
+        
+        lp(let cidx=0;cidx<currentfacts.len;cidx=cidx+1){
+            let cfact=currentfacts.get(cidx);
+            if(!s.contains(cfact;"works at")){
+                finalfacts=finalfacts.append(cfact);
+            };
+        };
+        
+        let factsarr=j.array();
+        lp(let fidx=0;fidx<finalfacts.len;fidx=fidx+1){
+            j.pusharr(factsarr;finalfacts.get(fidx));
+        };
+        j.setobj(updatedmem;entity;factsarr);
+    };
+    
+    let result=j.object();
+    j.setobj(result;"updated_memory";updatedmem);
+    
+    let nfarr=j.array();
+    lp(let nidx=0;nidx<newfacts.len;nidx=nidx+1){
+        j.pusharr(nfarr;newfacts.get(nidx));
+    };
+    j.setobj(result;"new_facts";nfarr);
+    
+    let ufarr=j.array();
+    lp(let uidx=0;uidx<updatedfacts.len;uidx=uidx+1){
+        j.pusharr(ufarr;updatedfacts.get(uidx));
+    };
+    j.setobj(result;"updated_facts";ufarr);
+    
+    io.println(j.stringify(result));
+    <0
+}

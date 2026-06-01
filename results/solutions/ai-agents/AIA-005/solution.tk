@@ -1,0 +1,44 @@
+m=recover;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+    let input=io.readln();
+    
+    let strategy=mut."";
+    let newtool=mut."";
+    let newargs=mut."";
+    
+    if(s.contains(input;"LIMIT_EXCEEDED")){
+        strategy="retry";
+        let start=s.indexof(input;"\"tool\":\"");
+        if(start>=0){
+            let toolstart=start+8;
+            let toolend=s.indexof(s.slice(input;toolstart;s.len(input));"\"");
+            if(toolend>=0){
+                newtool=s.slice(input;toolstart;toolstart+toolend)
+            }
+        };
+        let querystart=s.indexof(input;"\"query\":\"");
+        if(querystart>=0){
+            let qstart=querystart+9;
+            let qend=s.indexof(s.slice(input;qstart;s.len(input));"\"");
+            if(qend>=0){
+                let query=s.slice(input;qstart;qstart+qend);
+                newargs="{\"query\":\"\(query)\",\"limit\":100}"
+            }
+        }
+    }el{
+        if(s.contains(input;"CONNECTION_REFUSED")){
+            strategy="alternative";
+            if(s.contains(input;"database_query")){
+                newtool="cache_lookup";
+                newargs="{\"key\":\"users\"}"
+            }
+        }
+    };
+    
+    let result="{\"strategy\":\"\(strategy)\",\"action\":{\"tool\":\"\(newtool)\",\"arguments\":\(newargs)}}";
+    io.println(result);
+    <0
+}

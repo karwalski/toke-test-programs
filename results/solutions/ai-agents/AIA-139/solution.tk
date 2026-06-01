@@ -1,0 +1,1 @@
+m=abtest;f=varianta(n:$i64):$i64{<n};f=variantb(n:$i64):$i64{<n};f=runa(b:$i64):$i64{<b};f=runb(a:$i64):$i64{<a};f=compare(a:$i64;b:$i64):$bool{if(a>b){<true};<false};f=declarewinner(a:$i64;b:$i64):$str{if(compare(a;b))){<"varianta"}el{<"variantb"}};f=main():$i64{let a=runa(15);let b=runb(10);let winner=declarewinner(a;b);<0};

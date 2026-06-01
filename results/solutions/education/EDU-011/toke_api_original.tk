@@ -1,0 +1,59 @@
+m=vocab;
+i=io:std.io;
+i=s:std.str;
+
+f=parsejson(line:$str):@($str){
+    let result=mut.@();
+    let start=mut.0;
+    let inquote=mut.0;
+    let current=mut."";
+    let idx=mut.0;
+    
+    lp(idx<s.len(line)){
+        let ch=s.slice(line;idx;idx+1);
+        if(ch="\""){
+            if(inquote=0){
+                inquote=1;
+                current="";
+            }el{
+                inquote=0;
+                result=result.push(current);
+            }
+        }el{
+            if(inquote=1){
+                current=s.concat(current;ch);
+            }
+        };
+        idx=idx+1;
+    };
+    <result
+}
+
+f=main():$i64{
+    let jsonline=io.readln();
+    let words=parsejson(jsonline);
+    
+    let word=mut."";
+    let definition=mut."";
+    
+    if(words.len()>=2){
+        word=words.get(0);
+        definition=words.get(1);
+    };
+    
+    let quizline=io.readln();
+    let testword=io.readln();
+    let answer=io.readln();
+    
+    io.println(s.concat("Define: ";testword));
+    
+    if(s.trim(answer)=definition){
+        io.println("Correct!");
+        io.println("Score: 1/1 (100%)");
+    }el{
+        io.println("Incorrect!");
+        io.println("Score: 0/1 (0%)");
+    };
+    
+    <0
+}

@@ -1,0 +1,1 @@
+m=nelson;f=solve(p0:$str):$str{let lhs=mut."";let rhs=mut."";let n=p0.len;lp(let i=0;i<n;i=i+1){let c=p0.get(i);if(c=";"){lhs=rhs;rhs="";}el{rhs=rhs+c;};};let result=mut."";if(lhs.len>0){result=s.concat(s.concat(s.concat(result;"\"");lhs);"\"");};if(rhs.len>0){if(result.len>0){result=s.concat(result;" ");};result=s.concat(s.concat(s.concat(result;"\"");rhs);"\"");};<result};

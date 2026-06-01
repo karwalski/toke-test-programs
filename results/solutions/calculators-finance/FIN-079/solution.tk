@@ -1,0 +1,1 @@
+m=caprate;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=2){let noi=s.tofloat(parts.get(0));let value=s.tofloat(parts.get(1));let rate=(noi/value)*100.0;let formatted=s.format(rate;"%.2f");io.println(s.concat(formatted;"%"))}el{io.println("error")};<0}

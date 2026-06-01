@@ -1,0 +1,1 @@
+m=tasklist;f=solve(p0:$str):$str{let lines=p0.split("\n");let total=mut.0;let done=mut.0;let i=mut.0;lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);let ischecked=line.contains("[x]");if(ischecked){done=done+1};total=total+1;};let result=mut."";result=s.concat(result;"Summary: ")+done+"/"+total+" completed";let j

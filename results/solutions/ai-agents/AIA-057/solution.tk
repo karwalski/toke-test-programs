@@ -1,0 +1,1 @@
+m=extractargs;f=extractargs(text:$str):@$str{let args=mut.@();let lines=text.split("\n");lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let found=line.contains("for");let foundev=line.contains("evidence");if(found){let claim=line.split("for")[1].trim();args=args+@(claim)};if(foundev){let evidence=line.split("evidence")[1].trim();args=args+@(evidence))}};<args};

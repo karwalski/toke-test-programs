@@ -1,0 +1,1 @@
+m=querybuilder;f=solve(left:$str;right:$str):$str{let leftcol=left;let rightcol=right;let query=mut."SELECT ";query=query+leftcol;query=s.concat(query;" FROM table1 JOIN table2 ON table1.id=table2.id");query=s.concat(query;" WHERE ");query=query+rightcol;query=s.concat(query;" = 'value'");<query};

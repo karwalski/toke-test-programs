@@ -1,0 +1,1 @@
+m=portfolio;f=dotproduct(a:@$f64;b:@$f64):$f64{let result=mut.0.0;lp(let i=0;i<a.len;i=i+1){result=result+(a.get(i)*b.get(i)))};<result};f=portfolioreturn(prices:@$f64;weights:@$f64):$f64{let n=prices.len;let dot=dotproduct(prices;weights);let ret=mut.0.0;lp(let i=0;i<n;i=i+1){let p=prices.get(i);let w=weights.get(i);let tmp=p*w;ret=ret+tmp};let total=ret;let result=total;let ou

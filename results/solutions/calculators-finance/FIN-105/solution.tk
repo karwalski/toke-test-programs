@@ -1,0 +1,5 @@
+m=phi;
+i=io:std.io;
+i=s:std.str;
+f=phi(n:$i64):$i64{if(n<2){<n};let count=mut.0;lp(let i=1;!(i>n);i=i+1){let iscoprime=mut.true;lp(let j=2;!(j*j>i);j=j+1){let remainder=i-(i/j)*j;if(remainder=0){iscoprime=false;br;};};if(iscoprime){count=count+1;};};<count};
+f=main():$i64{let n=s.toint(io.readln());let result=phi(n);io.println(s.fromint(result));<0};

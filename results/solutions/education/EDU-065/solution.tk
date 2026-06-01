@@ -1,0 +1,41 @@
+m=sumshw;
+i=io:std.io;
+i=s:std.str;
+i=json:std.json;
+f=sumshw(scores:@$i64):$i64{let total=mut.0;lp(let i=0;i<scores.len;i=i+1){let val=scores.get(i);if(val<0){let other=0-val;total=total+other;}el{total=total+val;};};<total};
+f=main():$i64{
+let input=io.readln();
+let parsed=json.parse(input);
+let students=mut.map();
+lp(let i=0;i<parsed.len;i=i+1){
+let record=parsed.get(i);
+let student=record.get("student");
+let earned=record.get("points_earned") as$i64;
+let possible=record.get("points_possible") as$i64;
+if(students.has(student)){
+let existing=students.get(student);
+let newearned=existing.get(0)+earned;
+let newpossible=existing.get(1)+possible;
+students.set(student;[newearned;newpossible]);
+}el{
+students.set(student;[earned;possible]);
+};
+};
+let results=mut.[];
+for(student;totals in students){
+let earned=totals.get(0);
+let possible=totals.get(1);
+let percentage=(earned*100)/possible;
+results.push([student;earned;possible;percentage]);
+};
+results.sort(fn(a;b){b.get(3)-a.get(3);});
+lp(let i=0;i<results.len;i=i+1){
+let result=results.get(i);
+let student=result.get(0);
+let earned=result.get(1);
+let possible=result.get(2);
+let percentage=result.get(3);
+io.println(student+s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(": ";s.fromint(earned));"/");s.fromint(possible));" (");s.fromint(percentage));"%)"));
+};
+<0
+}

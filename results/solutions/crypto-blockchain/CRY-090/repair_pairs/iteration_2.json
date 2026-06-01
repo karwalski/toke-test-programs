@@ -1,0 +1,6 @@
+{
+  "iteration": 2,
+  "broken_source": "m=txsize;i=io:std.io;i=s:std.str;f=solve(p0:$i64;p1:$i64):$i64{let legacy=p0;let witness=p1;let weight=legacy+8*witness;let vbytes=mut.weight/4;let rem=weight-vbytes*4;if(!(rem=0)){vbytes=vbytes+1};<vbytes};f=main():$i64{let legacy=s.toint(io.readln());let witness=s.toint(io.readln());let weight=legacy+8*witness;let vbytes=solve(legacy;witness);io.println(s.fromint(weight));io.println(s.fromint(vbytes));<0}",
+  "error": "Test failures:\nTest 1: expected '450\n113', got '500\n125'\nTest 2: expected '900\n225', got '1000\n250'",
+  "fixed_source": "m=txsize;i=io:std.io;i=s:std.str;f=solve(p0:$i64;p1:$i64):$i64{let legacy=p0;let witness=p1;let weight=legacy*4+witness;let vbytes=mut.weight/4;let rem=weight-vbytes*4;if(!(rem=0)){vbytes=vbytes+1};<vbytes};f=main():$i64{let legacy=s.toint(io.readln());let witness=s.toint(io.readln());let weight=legacy*4+witness;let vbytes=solve(legacy;witness);io.println(s.fromint(weight));io.println(s.fromint(vbytes));<0}"
+}

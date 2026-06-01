@@ -1,0 +1,1 @@
+m=httpserver;f=main():$void{let port=8080;let msg="Server started on port 8080";<};f=metricsget():$str{let count=123;let rate=0.015;let s=mut."";s=s.concat(s;"http_requests_total ")+count+"\n";s=s.concat(s;"http_response_latency_seconds_bucket{le=\"0.01\"} 23)

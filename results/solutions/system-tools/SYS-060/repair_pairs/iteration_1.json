@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=urlenc;i=io:std.io;i=s:std.str;f=solve(p0:$str):$str{let result=mut.\"\";let i=mut.0;lp(let idx=0;idx<p0.len;idx=idx+1){let ch=p0.get(idx);if(ch=\" \"){result=s.concat(result;\"%20\");}el{result=result+ch;};};<result};f=main():$i64{let mode=io.readln();let text=io.readln();let result=solve(text);io.println(result);<0};",
+  "error": "Test failures:\nTest 1: expected 'hello%20world', got ''\nTest 2: expected 'hello world', got ''",
+  "fixed_source": "m=urlenc;i=io:std.io;i=s:std.str;f=encode(p0:$str):$str{let result=mut.\"\";lp(let idx=0;idx<p0.len;idx=idx+1){let ch=s.slice(p0;idx;idx+1);if(ch=\" \"){result=s.concat(result;\"%20\")}el{result=s.concat(result;ch)}};<result};f=decode(p0:$str):$str{let result=mut.\"\";let idx=mut.0;lp(idx<p0.len){let ch=s.slice(p0;idx;idx+1);if(ch=\"%\"){result=s.concat(result;\" \");idx=idx+3}el{result=s.concat(result;ch);idx=idx+1}};<result};f=main():$i64{let mode=s.trim(io.readln());let text=io.readln();if(mode=\"encode\"){io.println(encode(text))}el{io.println(decode(text))};<0};"
+}

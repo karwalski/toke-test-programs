@@ -1,0 +1,18 @@
+m=sigmalvl;f=sigmalvl(count:$i64):$str{if(count<1){<"none"};if(count<2){<"low"};if(count<3){<"medium"};if(count<4){<"high"};<"critical"}
+i=io:std.io;i=s:std.str;i=math:std.math;
+f=main():$i64{
+let header=io.readln();
+let line=io.readln();
+let parts=s.split(line;",");
+let units=s.toint(parts[0]);
+let defects=s.toint(parts[1]);
+let opportunities=s.toint(parts[2]);
+let total_opportunities=units*opportunities;
+let dpo=(defects as$f64)/(total_opportunities as$f64);
+let dpmo=dpo*1000000.0;
+let yield_percent=(1.0-dpo)*100.0;
+let sigma_level=math.invnorm(1.0-dpo)+1.5;
+let result=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"dpo\":";s.fromfloat(dpo));",\"dpmo\":");s.fromfloat(dpmo));",\"sigma_level\":");s.fromfloat(sigma_level));",\"yield_percent\":");s.fromfloat(yield_percent));"}");
+io.println(result);
+<0
+}

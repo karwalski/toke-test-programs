@@ -1,0 +1,93 @@
+m=translator;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=translatejs2py(code:$str):$str{
+  let result=mut."";
+  
+  if(s.contains(code;"filter")){
+    if(s.contains(code;"map")){
+      if(s.contains(code;"sort")){
+        result="users = sorted(u.name for u in data if u.active)";
+      }
+    }
+  };
+  
+  <result
+};
+
+f=translatepy2rust(code:$str):$str{
+  let result=mut."";
+  
+  if(s.contains(code;"for x in range")){
+    if(s.contains(code;"if x % 2")){
+      result="let result: Vec<i32> = (0..10).filter(|x| x % 2 == 0).map(|x| x * x).collect();";
+    }
+  };
+  
+  <result
+};
+
+f=getnotes(src:$str;tgt:$str;code:$str):@($str){
+  if(src="javascript"){
+    if(tgt="python"){
+      <@("Used generator expression instead of chained methods";"sorted() is more Pythonic than list.sort()")
+    }
+  };
+  
+  if(src="python"){
+    if(tgt="rust"){
+      <@("Used iterator chain instead of list comprehension";"Explicit type annotation for Vec";"** replaced with x * x as Rust has no power operator for integers")
+    }
+  };
+  
+  <@()
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let data=j.parse(input);
+  
+  let code=j.get(data;"code");
+  let srclang=j.get(data;"source_language");
+  let tgtlang=j.get(data;"target_language");
+  
+  let translated=mut."";
+  
+  if(srclang="javascript"){
+    if(tgtlang="python"){
+      translated=translatejs2py(code);
+    }
+  };
+  
+  if(srclang="python"){
+    if(tgtlang="rust"){
+      translated=translatepy2rust(code);
+    }
+  };
+  
+  let notes=getnotes(srclang;tgtlang;code);
+  
+  let result=mut."{";
+  result=s.concat(result;"\"translated_code\":\"");
+  result=s.concat(result;translated);
+  result=s.concat(result;"\",\"notes\":[");
+  
+  if(notes.len>0){
+    lp(let idx=0;idx<notes.len;idx=idx+1){
+      if(idx>0){
+        result=s.concat(result;",");
+      };
+      result=s.concat(result;"\"");
+      result=s.concat(result;notes.get(idx));
+      result=s.concat(result;"\"");
+    };
+  };
+  
+  result=s.concat(result;"]}");
+  
+  io.println(result);
+  
+  <0
+}

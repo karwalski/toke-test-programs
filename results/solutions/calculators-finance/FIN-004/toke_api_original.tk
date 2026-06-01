@@ -1,0 +1,1 @@
+m=addstr;f=addstr(val:$str;other:$str):$str{if(val=other){<val};let a=mut.val;let b=mut.other;if(a.len<b.len){let tmp=a;a=b;b=tmp};let result=mut."";let carry=mut.0;lp(let i=0;i<a.len;i=i+1){let va=a.get(i);let vb=mut.0;if(i<b.len){vb=b.get(i)};let sum=va+vb+carry;let digit=sum-(sum/10)*10;result=digit as$str+result;carry=sum/10};if(carry>0){result=carry as$str+result};<result};

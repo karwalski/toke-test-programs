@@ -1,0 +1,1 @@
+m=gst;f=gst(rate:$f64;amount:$f64):$f64{let result=mut.0;if(rate>0){let gst=amount*rate;result=amount+gst}el{result=amount};<result};f=main():$i64{let rate=0.1;let amount=100.0;let total=gst(rate;amount);<0};

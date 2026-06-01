@@ -1,0 +1,58 @@
+{
+  "m": "replan";
+  "f": "replan(plan:i64;completed:i64;failed:i64;goal:$str):$str{
+    let steps=plan.steps;
+    let remaining=mut.@();
+    lp(let i=0;i<steps.len;i=i+1){
+      let step=steps.get(i);
+      let should_add=mut.false;
+      if(step.id<0){should_add=true}el{
+        let is_completed=mut.false;
+        lp(let j=0;j<completed.len;j=j+1){
+          if(completed.get(j)=step.id){is_completed=true}
+        };
+        if(!is_completed){should_add=true}
+      };
+      if(should_add){remaining=remaining.push(step)}
+    };
+    let revised=mut.@();
+    lp(let i=0;i<remaining.len;i=i+1){
+      let step=remaining.get(i);
+      let new_step=mut.step;
+      if(step.id<0){
+        new_step=step.copywith(id=step.id*-1))
+      };
+      revised=revised.push(new_step)
+    };
+    let output=mut."";
+    lp(let i=0;i<revised.len;i=i+1){
+      let step=revised.get(i);
+      let line=mut."";
+      line=line+step.id;
+      line=line+": ";
+      line=line+step.action;
+      if(step.status="pending"){
+        line=line+" [pending]"
+      }el{
+        if(step.status="in_progress"){
+          line=line+" [in_progress]"
+        }el{
+          if(step.status="completed"){
+            line=line+" [completed]"
+          }el{
+            if(step.status="failed"){
+              line=line+" [failed: "+step.error+"]"
+            }el{
+              line=line+" [unknown status]"
+            }
+          }
+        }
+      };
+      output=output+line;
+      if(!(i=(revised.len-1)))){output=output+"\n"}
+    };
+    <output
+  }";
+  "i": "std.llm:llm_call";
+  "t": "step:{id:$str;action:$str;status:$str;error:$str}"
+}

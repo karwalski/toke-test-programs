@@ -1,0 +1,54 @@
+m=httpserver;
+i=http:std.http;
+i=json:std.json;
+i=str:std.str;
+i=time:std.time;
+i=crypto:std.crypto;
+
+f=main():$void{
+  let port=8080;
+  let listener=http.listen(port);
+  let state=mut.$state{keys:@()};
+
+  lp(let lv=0;true;lv=lv){
+    let conn=http.accept(listener);
+    let req=http.read(conn);
+    let resp=mut.http.emptyresp();
+    let method=req.method;
+    let path=req.path;
+
+    if(str.eq(method;"GET"))){
+      if(str.eq(path;"/health"))){
+        resp=http.okresp("ok");
+      }el{
+        resp=http.notfoundresp();
+      };
+    }el{
+      if(str.eq(method;"POST"))){
+        if(str.eq(path;"/api"))){
+          let body=req.body;
+          let parsed=json.parse(body);
+          let key=json.str(parsed;"key"));
+          let prompt=json.str(parsed;"prompt"));
+          let tokens=mut.0;
+          let found=mut.false;
+          let i=mut.0;
+
+          lp(let lv=0;true;lv=lv){
+            if(i<state.keys.len){
+              let entry=state.keys.get(i);
+              if(str.eq(entry.key;key))){
+                tokens=entry.tokens;
+                found=true;
+              };
+              i=i+1;
+            }el{
+              br;
+            };
+          };
+
+          if(found=false){
+            let entry=$rateentry{key:key;tokens:1000;lastreset:time.now()};
+            state.keys.push(entry);
+            tokens=1000;
+          }el{

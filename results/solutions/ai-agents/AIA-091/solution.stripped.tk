@@ -1,0 +1,38 @@
+m=errhandler;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let input=io.readln();
+  
+  let improved=mut."_";
+  let suggestion=mut."_";
+  let code=mut."_";
+  
+  if(s.contains(input;"_")){
+    if(s.contains(input;"_")){
+      improved="_";
+      suggestion="_";
+      code="_"
+    }
+  }el{
+    if(s.contains(input;"_")){
+      if(s.contains(input;"_")){
+        if(s.contains(input;"_")){
+          improved="_";
+          suggestion="_";
+          code="_"
+        }
+      }
+    }
+  };
+  
+  let parts=@(
+    "_"improved_message\"_""_"\"_"suggestion\"_""_"\"_"error_code\"_""_"\"_"
+  );
+  
+  let output=s.join(parts;"_");
+  io.println(output);
+  
+  <0
+}

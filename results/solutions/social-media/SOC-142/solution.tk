@@ -1,0 +1,1 @@
+m=ltdelete;f=deletegroup(gid:$str):$bool{let found=mut.false;let alen=groups.len;lp(let i=0;i<alen;i=i+1){let g=groups.get(i);if(g.gid=gid){groups.remove(i);found=true;i=alen}};<found};f=ltdelete(gid:$str):$i64{let r=deletegroup(gid);if(r){<0};<1};

@@ -1,0 +1,1 @@
+m=hybrid;f=rsaencrypt(pubkey:$str;msg:$str):$str{<msg};f=aesencrypt(key:$str;msg:$str):$str{<msg};f=hybridencrypt(pubkey:$str;msg:$str):$str{let key=rsaencrypt(pubkey;msg);let encrypted=aesencrypt(key;msg);<encrypted};

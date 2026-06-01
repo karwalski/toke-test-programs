@@ -1,0 +1,1 @@
+m=feedback;f=buildfeedback(score:i64;notes:@$str):$str{let result=mut."";let len=notes.len;lp(let idx=0;idx<len;idx=idx+1){let note=notes.get(idx);result=s.concat(result;"* ")+note+"\n";};let scorestr=score as$str;result=s.concat(result;"Your score: ")+scorestr+"\n";if(score<60){result=s.concat(result;"You need to work harder.");};<result};

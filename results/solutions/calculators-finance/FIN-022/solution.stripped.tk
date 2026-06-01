@@ -1,0 +1,1 @@
+m=gst;i=io:std.io;i=s:std.str;f=gst(rate:$f64;amount:$f64):$f64{let result=mut.0.0;if(rate>0.0){let gstamt=amount*rate;result=amount+gstamt}el{result=amount};<result};f=main():$i64{let rate=0.1;let amount=100.0;let total=gst(rate;amount);io.println(s.format(amount;"_"));io.println(s.format(amount*rate;"_"));<0}

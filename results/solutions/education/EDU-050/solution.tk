@@ -1,0 +1,60 @@
+m=vocab;
+i=io:std.io;
+i=s:std.str;
+
+f=cleanword(w:$str):$str{
+  let t=s.trim(w);
+  let n=s.len(t);
+  if(n=0){<t};
+  let last=s.slice(t;n-1;n);
+  if(s.equals(last;".")){<s.slice(t;0;n-1)};
+  if(s.equals(last;",")){<s.slice(t;0;n-1)};
+  if(s.equals(last;"!")){<s.slice(t;0;n-1)};
+  if(s.equals(last;"?")){<s.slice(t;0;n-1)};
+  if(s.equals(last;";")){<s.slice(t;0;n-1)};
+  <t
+};
+
+f=main():$i64{
+  let vocabline=s.trim(io.readln());
+  let vocabwords=s.split(vocabline;",");
+  let counts=mut.@($i64);
+  let i=mut.0;
+  lp(i<vocabwords.len()){
+    counts=counts+@(0);
+    i=i+1
+  };
+  lp(1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let textwords=s.split(line;" ");
+    lp(let tidx=0;tidx<textwords.len();tidx=tidx+1){
+      let tw=cleanword(textwords.get(tidx));
+      let twl=s.tolower(tw);
+      lp(let vidx=0;vidx<vocabwords.len();vidx=vidx+1){
+        let vw=s.tolower(s.trim(vocabwords.get(vidx)));
+        if(s.equals(twl;vw)){
+          counts=counts.set(vidx;counts.get(vidx)+1)
+        }
+      }
+    }
+  };
+  let printed=mut.0;
+  lp(printed<vocabwords.len()){
+    let best=mut.0-1;
+    let bestcount=mut.0;
+    lp(let vidx=0;vidx<vocabwords.len();vidx=vidx+1){
+      let c=counts.get(vidx);
+      if(c>bestcount){
+        bestcount=c;
+        best=vidx
+      }
+    };
+    if(best<0){br};
+    let vw=s.trim(vocabwords.get(best));
+    io.println(s.concat(s.concat(vw;": ");s.fromint(bestcount)));
+    counts=counts.set(best;0);
+    printed=printed+1
+  };
+  <0
+}

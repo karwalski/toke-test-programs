@@ -1,0 +1,12 @@
+m=nonogram;
+i=io:std.io;
+i=s:std.str;
+f=solve(p:$str;q:$str):$str{let result=mut."";let rowlen=p.len;let currentstate=mut.q;let i=mut.0;lp(let idx=0;idx<rowlen;idx=idx+1){let cell=mut.currentstate.get(idx);if(cell=" "){let nextcell=currentstate.get(idx+1);if(nextcell="x"){result=s.concat(result;"x")}el{result=s.concat(result;" ")};result=s.concat(result;" ")}el{result=result+cell};};<result};
+f=main():$i64{
+let rowlen=s.toint(io.readln());
+let cluesline=io.readln();
+let currentstate=io.readln();
+let result=solve(s.fromint(rowlen);currentstate);
+io.println(result);
+<0
+}

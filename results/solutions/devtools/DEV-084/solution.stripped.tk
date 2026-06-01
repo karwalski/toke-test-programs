@@ -1,0 +1,1 @@
+m=validate;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let allaction=s.contains(line;"_"Action\"_"*\"_");let allresource=s.contains(line;"_"Resource\"_"*\"_");let out=mut."_";if(allaction){out=s.concat(out;"_")};if(allresource){if(s.len(out)>0){out=s.concat(out;"_")};out=s.concat(out;"_")};if(s.len(out)=0){out="_"};io.println(out);<0}

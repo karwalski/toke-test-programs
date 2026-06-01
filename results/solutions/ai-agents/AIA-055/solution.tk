@@ -1,0 +1,103 @@
+m=commentextractor;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=main():$i64{
+    let input=io.readln();
+    let data=j.parse(input);
+    let code=j.get(data;"code");
+    let lang=j.get(data;"language");
+    
+    let lines=s.split(code;"\\n");
+    let results=mut.@();
+    
+    lp(let linenum=0;linenum<lines.len;linenum=linenum+1){
+        let line=lines.get(linenum);
+        let origline=line;
+        
+        if(lang="python"){
+            let hashidx=s.indexof(line;"#");
+            if(hashidx>=0){
+                let beforehash=s.slice(line;0;hashidx);
+                let comment=s.slice(line;hashidx+1;s.len(line));
+                let commenttext=s.trim(comment);
+                let category=categorize(commenttext;beforehash);
+                addcomment(results;category;commenttext;linenum+1)
+            }
+        }el{
+            let slashidx=s.indexof(line;"//");
+            if(slashidx>=0){
+                let beforeslash=s.slice(line;0;slashidx);
+                let comment=s.slice(line;slashidx+2;s.len(line));
+                let commenttext=s.trim(comment);
+                let category=categorize(commenttext;beforeslash);
+                addcomment(results;category;commenttext;linenum+1)
+            }
+        }
+    };
+    
+    let output=buildresults(results);
+    io.println(output);
+    <0
+};
+
+f=categorize(text:$str;beforecomment:$str):$str{
+    if(s.contains(text;"TODO:")){
+        <"todo"
+    };
+    if(s.contains(text;"FIXME:")){
+        <"fixme"
+    };
+    let trimmedbefore=s.trim(beforecomment);
+    if(s.len(trimmedbefore)>0){
+        <"inline"
+    };
+    <"documentation"
+};
+
+f=addcomment(results:@($void);category:$str;text:$str;linenum:$i64):$void{
+    let obj=j.object();
+    j.set(obj;"type";category);
+    
+    if(category="todo"){
+        let idx=s.indexof(text;":");
+        if(idx>=0){
+            let todotext=s.trim(s.slice(text;idx+1;s.len(text)));
+            j.set(obj;"text";todotext)
+        }el{
+            j.set(obj;"text";text)
+        }
+    }el{
+        if(category="fixme"){
+            let idx=s.indexof(text;":");
+            if(idx>=0){
+                let fixmetext=s.trim(s.slice(text;idx+1;s.len(text)));
+                j.set(obj;"text";fixmetext)
+            }el{
+                j.set(obj;"text";text)
+            }
+        }el{
+            j.set(obj;"text";text)
+        }
+    };
+    
+    j.set(obj;"line_number";linenum);
+    results.push(obj)
+};
+
+f=buildresults(results:@($void)):$str{
+    let b=s.builder();
+    s.add(b;"[");
+    
+    lp(let idx=0;idx<results.len;idx=idx+1){
+        if(idx>0){
+            s.add(b;",")
+        };
+        let item=results.get(idx);
+        s.add(b;j.stringify(item))
+    };
+    
+    s.add(b;"]");
+    <s.build(b)
+}

@@ -1,0 +1,1 @@
+m=multinorm;f=checknormality(data:@$f64):$str{let n=data.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let v=data.get(i);if(v<0.0){m=m+1}};let zor=mut.false;if(m>0){zor=true};if(zor){<"not normal"};<"normal"};f=consensus(result:$str):$str{if(result="not normal"){<"not normal"};<"normal"};f=multinormality(data:@$f64):$str{let part1=checknormality(data);let part2=consensus(part1);<part2};

@@ -1,0 +1,71 @@
+m=trianglet;
+i=io:std.io;
+i=s:std.str;
+
+f=trianglet(n:$i64):$i64{if(n<1){<0};let m=mut.0;lp(let i=1;!(i>n);i=i+1){m=m+i};<m};
+
+f=main():$i64{
+    let board=mut.[];
+    lp(let line=io.readln();!(line=="");line=io.readln()){
+        board=board+[line]
+    };
+    
+    if(board.len==0){
+        io.println("No solution");
+        <0
+    };
+    
+    let rows=board.len;
+    let pegs=mut.[];
+    let empty=mut.-1;
+    
+    lp(let r=0;!(r>=rows);r=r+1){
+        let row=board[r];
+        lp(let c=0;!(c>=row.len);c=c+1){
+            if(row[c]=='O'){
+                pegs=pegs+[[r;c]]
+            }else{
+                if(row[c]=='.'){
+                    empty=[r;c]
+                }
+            }
+        }
+    };
+    
+    if(empty[0]==-1){
+        io.println("No solution");
+        <0
+    };
+    
+    if(pegs.len==1){
+        io.println("Already solved");
+        <0
+    };
+    
+    lp(let i=0;!(i>=pegs.len);i=i+1){
+        let peg=pegs[i];
+        let pr=peg[0];
+        let pc=peg[1];
+        let er=empty[0];
+        let ec=empty[1];
+        
+        let dr=er-pr;
+        let dc=ec-pc;
+        
+        if((dr*dr+dc*dc)==4){
+            let mr=(pr+er)/2;
+            let mc=(pc+ec)/2;
+            
+            lp(let j=0;!(j>=pegs.len);j=j+1){
+                let mpeg=pegs[j];
+                if(mpeg[0]==mr && mpeg[1]==mc){
+                    io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("peg at ";s.fromint(pr));",");s.fromint(pc));" jumps over ");s.fromint(mr));",");s.fromint(mc));" to ");s.fromint(er));",");s.fromint(ec)));
+                    <0
+                }
+            }
+        }
+    };
+    
+    io.println("No solution");
+    <0
+}

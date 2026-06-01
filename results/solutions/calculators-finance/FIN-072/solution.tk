@@ -1,0 +1,28 @@
+m=acc;
+i=io:std.io;
+i=s:std.str;
+f=accbal(n:$i64;m:$i64):$i64{<n-m};
+f=main():$i64{
+  let totalrev=$i64 0;
+  let totalexp=$i64 0;
+  let line=io.readln();
+  while line != "" {
+    let parts=s.split(line;" ");
+    let amount=s.toint(parts[2]);
+    if parts[0] == "REVENUE" {
+      totalrev = totalrev + amount;
+    } else if parts[0] == "EXPENSE" {
+      totalexp = totalexp + amount;
+    };
+    line = io.readln();
+  };
+  let netprofit=accbal(totalrev;totalexp);
+  io.println(s.concat(s.concat("REVENUE: ";s.fromint(totalrev));".00"));
+  io.println(s.concat(s.concat("EXPENSES: ";s.fromint(totalexp));".00"));
+  if netprofit >= 0 {
+    io.println(s.concat(s.concat("NET PROFIT: ";s.fromint(netprofit));".00"));
+  } else {
+    io.println(s.concat(s.concat("NET LOSS: ";s.fromint(-netprofit));".00"));
+  };
+  <0
+}

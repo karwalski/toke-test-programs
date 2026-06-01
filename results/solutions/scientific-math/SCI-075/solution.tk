@@ -1,0 +1,1 @@
+m=coinchange;f=coinchange(coins:@$i64;target:$i64):$i64{let dp=mut.@($i64){target+1};lp(let i=0;i<coins.len;i=i+1){let coin=coins.get(i);if(coin>target){}el{if(dp.get(coin))=0){dp.get(coin)=1;}el{dp.get(coin)=dp.get(coin)+1;};};};let min=mut.dp.get(1);lp(let i=1;i<dp.len;i=i+1){if(dp.get(i))=0){}el{if(min>dp.get(i))){min=dp.get(i);};};};<min};

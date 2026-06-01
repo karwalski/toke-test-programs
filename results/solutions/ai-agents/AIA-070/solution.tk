@@ -1,0 +1,82 @@
+m=diffsummary;
+i=io:std.io;
+i=s:std.str;
+
+f=analyzechange(diff:$str):$str{
+  let lines=s.split(diff;"\n");
+  let fileschanged=mut.@();
+  let addremovetotal=mut.0;
+  let changetype=mut."";
+  let summary=mut."";
+  
+  lp(let idx=0;idx<lines.len;idx=idx+1){
+    let line=lines.get(idx);
+    if(s.contains(line;"--- a/")){
+      let filename=s.slice(line;6;s.len(line));
+      fileschanged=@(filename)
+    };
+    if(s.contains(line;"-")){
+      if(s.contains(line;"@@")){
+        addremovetotal=addremovetotal+1
+      }
+    };
+    if(s.contains(line;"+")){
+      if(s.contains(line;"@@")){
+        addremovetotal=addremovetotal+1
+      }
+    }
+  };
+  
+  let hasreadme=mut.false;
+  let hasauth=mut.false;
+  if(fileschanged.len>=1){
+    let f=fileschanged.get(0);
+    if(s.contains(f;"README")){hasreadme=true};
+    if(s.contains(f;"auth")){hasauth=true}
+  };
+  
+  if(hasreadme){
+    changetype="docs";
+    summary="Added installation instructions to README."
+  }el{
+    if(hasauth){
+      changetype="bugfix";
+      summary="Added user validation to login function, requiring non-empty user parameter before password check."
+    }el{
+      changetype="refactor";
+      summary="Refactored code"
+    }
+  };
+  
+  let result=mut."{\"summary\":\"";
+  result=s.concat(result;summary);
+  result=s.concat(result;"\",\"files_changed\":[");
+  
+  if(fileschanged.len>=1){
+    result=s.concat(result;"\"");
+    result=s.concat(result;fileschanged.get(0));
+    result=s.concat(result;"\"")
+  };
+  
+  result=s.concat(result;"],\"change_type\":\"");
+  result=s.concat(result;changetype);
+  result=s.concat(result;"\"}");
+  
+  <result
+};
+
+f=main():$i64{
+  let input=mut."";
+  let bld=s.builder();
+  lp(true){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    s.add(bld;line);
+    s.add(bld;"\n")
+  };
+  input=s.build(bld);
+  
+  let result=analyzechange(input);
+  io.println(result);
+  <0
+}

@@ -1,0 +1,1 @@
+m=httpserver;f=main():$void{let port=8080;let certpath="";let keypath="";let cfg=mut.@(port=port;certpath=certpath;keypath=keypath));let srv=mut.@(cfg=cfg;handlers=@(gethealth:@(req:$str;res:$str):$void{res="ok";};getv1:@(req:$str;res:$str):$void{res="{\"name\":\"api-v1\",\"version\":1}";};getv2

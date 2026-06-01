@@ -1,0 +1,5 @@
+m=encfile;
+i=io:std.io;
+i=s:std.str;
+f=solve(p0:$str;p1:$str;p2:$str):$str{let fname=p0;let fhash=p1;let fsize=p2;let result=mut."";result=s.concat(s.concat(s.concat(result;"filename=");fname);"\n");result=s.concat(result;"content_hash=")+fhash+"\n";result=s.concat(s.concat(s.concat(result;"size=");fsize);"\n");result=s.concat(result;"mime_type=application/octet-stream\n");result=s.concat(result;"encrypted_thumbnail=...\n");<result};
+f=main():$i64{let fname=io.readln();let fsize=io.readln();let mimetype=io.readln();let chash=io.readln();let ekey=io.readln();let result=solve(fname;chash;fsize);io.println(result);<0};

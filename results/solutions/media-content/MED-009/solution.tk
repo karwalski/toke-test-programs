@@ -1,0 +1,5 @@
+m=fogindex;
+i=io:std.io;
+i=s:std.str;
+f=fogindex(text:$str):$i64{let words=mut.0;let sentences=mut.0;let chars=mut.0;let n=text.len;lp(let i=0;i<n;i=i+1){let c=text.get(i);if(c=32){words=words+1};if(c=46){sentences=sentences+1};chars=chars+1;};if(sentences=0){<0};let avgwords=words as f64/sentences as f64;let avgchars=chars as f64/sentences as f64;let fog=avgchars+1.05*avgwords-3.1;if(fog<0){<0};<fog as$i64};
+f=main():$i64{let text=io.readln();let result=fogindex(text);io.println(s.concat(s.concat("fog: ";s.fromint(result));".0"));<0};

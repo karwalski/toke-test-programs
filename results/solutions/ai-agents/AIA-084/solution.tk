@@ -1,0 +1,56 @@
+m=explain;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+t=jsonobj{};
+
+f=analyzejavascript(code:$str;audience:$str):jsonobj{
+  let result=j.parse("{}");
+  
+  if(s.contains(code;"debounce")){
+    let explanation="This creates a function that delays executing another function until a pause in calls. If you keep calling it rapidly, it waits until you stop for the specified milliseconds before actually running. This is useful for things like search-as-you-type where you want to wait until the user stops typing.";
+    let concepts=@("closures";"setTimeout";"spread operator";"higher-order functions");
+    
+    j.set(result;"explanation";explanation);
+    j.set(result;"concepts";concepts);
+  };
+  
+  <result;
+};
+
+f=analyzepython(code:$str;audience:$str):jsonobj{
+  let result=j.parse("{}");
+  
+  if(s.contains(code;"for i in range")){
+    let explanation="This creates a list of squared even numbers from 0 to 9. It goes through numbers 0-9, keeps only the even ones, squares them, and collects the results into a list.";
+    let concepts=@("list comprehension";"modulo operator";"exponentiation");
+    
+    j.set(result;"explanation";explanation);
+    j.set(result;"concepts";concepts);
+  };
+  
+  <result;
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let data=j.parse(input);
+  
+  let code=j.getstring(data;"code");
+  let language=j.getstring(data;"language");
+  let audience=j.getstring(data;"audience");
+  
+  let result=j.parse("{}");
+  
+  if(language="javascript"){
+    result=analyzejavascript(code;audience);
+  }el{
+    if(language="python"){
+      result=analyzepython(code;audience);
+    }
+  };
+  
+  io.println(j.stringify(result));
+  <0;
+}

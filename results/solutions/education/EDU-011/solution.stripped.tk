@@ -1,0 +1,17 @@
+m=vocab;
+i=io:std.io;
+i=s:std.str;
+
+f=parsejson(line:$str):@($str){
+    let result=mut.@();
+    let inquote=mut.0;
+    let current=mut."_";
+    let idx=mut.0;
+    
+    lp(idx<s.len(line)){
+        let ch=s.slice(line;idx;idx+1);
+        if(ch="_""_""_""_""_"Define: "_"Correct!"_"Score: 1/1 (100%)"_"Incorrect. Answer: "_"Score: 0/1 (0%)");
+    };
+    
+    <0;
+};

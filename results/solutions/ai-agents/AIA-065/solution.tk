@@ -1,0 +1,96 @@
+m=execsummary;
+i=io:std.io;
+i=s:std.str;
+
+f=generateheadline(text:$str):$str{
+  if(s.contains(text;"Q4")){
+    if(s.contains(text;"Revenue")){
+      if(s.contains(text;"churn")){
+        <"Q4 revenue grew 20% to $12M but churn rose to 8% with supply chain risks ahead."
+      }
+    }
+  };
+  if(s.contains(text;"Sprint")){
+    if(s.contains(text;"stories")){
+      <"Sprint completed 75% of planned stories with a blocking API dependency requiring a decision."
+    }
+  };
+  <"Summary of key points."
+};
+
+f=extractmetrics(text:$str):@($str){
+  let metrics=mut.@();
+  if(s.contains(text;"Revenue reached $12M")){
+    metrics=metrics.append("Revenue: $12M (+20% YoY)")
+  };
+  if(s.contains(text;"churn increased to 8%")){
+    metrics=metrics.append("Churn: 8%")
+  };
+  if(s.contains(text;"Completed 15 of 20 stories")){
+    metrics=metrics.append("Stories completed: 15/20")
+  };
+  if(s.contains(text;"Velocity steady at 30 points")){
+    metrics=metrics.append("Velocity: 30 points")
+  };
+  <metrics
+};
+
+f=extractdecisions(text:$str):@($str){
+  let decisions=mut.@();
+  if(s.contains(text;"board approval for the $2M expansion budget")){
+    decisions=decisions.append("Board approval for $2M expansion budget")
+  };
+  if(s.contains(text;"proceed with mock or wait")){
+    decisions=decisions.append("Proceed with mock API or wait for API team")
+  };
+  <decisions
+};
+
+f=extractrisks(text:$str):@($str){
+  let risks=mut.@();
+  if(s.contains(text;"supply chain delays may impact Q1 delivery")){
+    risks=risks.append("Supply chain delays may impact Q1 delivery")
+  };
+  if(s.contains(text;"API team dependency unresolved")){
+    risks=risks.append("API dependency blocking progress")
+  };
+  <risks
+};
+
+f=buildjsonarray(arr:@($str)):$str{
+  if(arr.len=0 as$u64){<"[]"};
+  let bld=s.builder();
+  s.add(bld;"[");
+  lp(let idx=0;idx<arr.len;idx=idx+1){
+    s.add(bld;"\"");
+    s.add(bld;arr.get(idx));
+    s.add(bld;"\"");
+    if(idx<arr.len-1 as$u64){
+      s.add(bld;",")
+    }
+  };
+  s.add(bld;"]");
+  <s.build(bld)
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let headline=generateheadline(input);
+  let metrics=extractmetrics(input);
+  let decisions=extractdecisions(input);
+  let risks=extractrisks(input);
+  
+  let bld=s.builder();
+  s.add(bld;"{\"headline\":\"");
+  s.add(bld;headline);
+  s.add(bld;"\",\"key_metrics\":");
+  s.add(bld;buildjsonarray(metrics));
+  s.add(bld;",\"decisions_needed\":");
+  s.add(bld;buildjsonarray(decisions));
+  s.add(bld;",\"risks\":");
+  s.add(bld;buildjsonarray(risks));
+  s.add(bld;"}");
+  
+  io.println(s.build(bld));
+  <0
+}

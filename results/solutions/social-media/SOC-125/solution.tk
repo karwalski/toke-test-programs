@@ -1,0 +1,42 @@
+{
+  "m": "trends";
+  "i": {
+    "http": "std.http",
+    "json": "std.json",
+    "db": "std.db",
+    "time": "std.time",
+    "str": "std.str"
+  },
+  "f": [
+    {
+      "n": "fetchtrends";
+      "p": [
+        {
+          "name": "limit";
+          "type": "i64"
+        }
+      ];
+      "r": "i64";
+      "body": [
+        {
+          "let": "sql=\"SELECT id, title, category, upvotes, downvotes, created_at FROM trends ORDER BY upvotes DESC LIMIT ?\""
+        },
+        {
+          "let": "limitval=limit as i64"
+        },
+        {
+          "let": "stmt=db.many(db;sql;limitval))"
+        },
+        {
+          "let": "events=mut.@()"
+        },
+        {
+          "lp": {
+            "let": "i=0";
+            "cond": "i<stmt.len";
+            "body": [
+              {
+                "let": "row=stmt.get(i)"
+              },
+              {
+                "let": "id=row.id

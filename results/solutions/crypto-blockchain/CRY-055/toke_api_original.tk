@@ -1,0 +1,47 @@
+m=tokentransfers;
+i=json:std.json;
+i=io:std.io;
+f=parseinitialbalances(lines:@($str)):i64):@($str):i64{
+  let balances=json.parse(lines.get(0)));
+  <balances
+};
+f=parsetransferline(line:$str):$str{
+  let parts=json.split(line;" ");
+  <json.get(parts;"1"))
+};
+f=processtransfers(balances:@($str):i64):@($str):i64{
+  let lines=io.readlines(0);
+  let i=1;
+  lp(let lv=0;!(i>lines.len));lv=lv){
+    let line=lines.get(i);
+    let fromaddr=parsetransferline(line);
+    let toaddr=json.get(lines.get(i);"2"));
+    let amount=json.get(lines.get(i);"3")).to.i64();
+    let frombal=balances.get(fromaddr);
+    let tobal=balances.get(toaddr);
+    let newfrombal=frombal-amount;
+    let newtobal=tobal+amount;
+    balances.set(fromaddr;newfrombal));
+    balances.set(toaddr;newtobal));
+    i=i+1;
+  };
+  <balances
+};
+f=main():$void{
+  let lines=io.readlines(0);
+  let balances=parseinitialbalances(lines);
+  let updated=processtransfers(balances);
+  let output=buildoutput(updated);
+  io.println(output)
+};
+f=buildoutput(balances:@($str):i64):$str{
+  let sortedaddrs=balances.keys.sorted();
+  let result=mut."";
+  lp(let i=0;i<sortedaddrs.len;i=i+1){
+    let addr=sortedaddrs.get(i);
+    let bal=balances.get(addr);
+    let line=addr+" "+bal.as.str()+"\n";
+    result=s.concat(result;line)
+  };
+  <result
+};

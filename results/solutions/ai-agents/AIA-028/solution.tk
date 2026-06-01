@@ -1,0 +1,1 @@
+m=compress;f=compress(passages:@$str;query:$str):$str{let relevant=mut."";lp(let i=0;i<passages.len;i=i+1){let p=passages.get(i);if(p.contains(query)){relevant=relevant+p+"\n";};};let result=mut."";let sentences=mut.relevant.split("\n");lp(let j=0;j<sentences.len;j=j+1){let s=sentences.get(j);if(s.contains(query)){result=result+s+"\n";};};<result};

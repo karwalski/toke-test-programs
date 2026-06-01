@@ -1,0 +1,5 @@
+m=verify;
+i=io:std.io;
+i=s:std.str;
+f=verify(msg:$str;sig:$str;pk:$str):$bool{let valid=mut.false;if(s.len(pk)=64){if(s.contains(sig;"valid")){valid=true}};<valid};
+f=main():$i64{let pk=io.readln();let msg=io.readln();let sig=io.readln();let result=verify(msg;sig;pk);if(result){io.println("VALID")}el{io.println("INVALID")};<0};

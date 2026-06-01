@@ -1,0 +1,151 @@
+m=detectlang;
+i=io:std.io;
+i=s:std.str;
+
+f=extractcode(input:$str):$str{
+  let start=s.indexof(input;"\"code\":\"");
+  if(start<0){<""};
+  let codestart=start+8;
+  let searchfrom=mut.codestart;
+  let endpos=mut.0;
+  lp(true){
+    let pos=s.indexof(s.slice(input;searchfrom;s.len(input));"\"");
+    if(pos<0){br};
+    let realpos=searchfrom+pos;
+    if(realpos>codestart){
+      let prev=s.slice(input;realpos-1;realpos);
+      if(prev!="\\"){
+        endpos=realpos;
+        br
+      }
+    };
+    searchfrom=realpos+1
+  };
+  let code=s.slice(input;codestart;endpos);
+  let result=s.replace(code;"\\n";"\n");
+  result=s.replace(result;"\\\"";"\""");
+  result=s.replace(result;"\\\\";"\\"");
+  <result
+};
+
+f=detectrust(code:$str):$i64{
+  let score=mut.0;
+  if(s.contains(code;"fn ")){score=score+3};
+  if(s.contains(code;"println!")){score=score+3};
+  if(s.contains(code;"let ")){score=score+1};
+  if(s.contains(code;"mut ")){score=score+1};
+  if(s.contains(code;"}")){score=score+1};
+  <score
+};
+
+f=detectpython(code:$str):$i64{
+  let score=mut.0;
+  if(s.contains(code;"def ")){score=score+3};
+  if(s.contains(code;"print(")){score=score+2};
+  if(s.contains(code;":")){score=score+2};
+  if(s.contains(code;"    ")){score=score+2};
+  if(s.contains(code;"f\"")){score=score+2};
+  <score
+};
+
+f=detectc(code:$str):$i64{
+  let score=mut.0;
+  if(s.contains(code;"#include")){score=score+3};
+  if(s.contains(code;"printf")){score=score+2};
+  if(s.contains(code;"int main")){score=score+2};
+  if(s.contains(code;"void ")){score=score+1};
+  <score
+};
+
+f=detectgo(code:$str):$i64{
+  let score=mut.0;
+  if(s.contains(code;"func ")){score=score+3};
+  if(s.contains(code;"package ")){score=score+2};
+  if(s.contains(code;"fmt.")){score=score+2};
+  if(s.contains(code;":=")){score=score+2};
+  <score
+};
+
+f=getindicators(lang:$str;code:$str):$str{
+  if(lang="rust"){
+    let parts=mut.@();
+    if(s.contains(code;"fn ")){parts=@("\"fn keyword\"")};
+    if(s.contains(code;"println!")){parts=@("\"fn keyword\"","\"println! macro\"")};
+    if(s.contains(code;"}")){parts=@("\"fn keyword\"","\"println! macro\"","\"curly braces\"")};
+    <s.join(parts;",")
+  };
+  if(lang="python"){
+    let parts=mut.@();
+    if(s.contains(code;"def ")){parts=@("\"def keyword\"")};
+    if(s.contains(code;":")){parts=@("\"def keyword\"","\"colon syntax\"")};
+    if(s.contains(code;"f\"")){parts=@("\"def keyword\"","\"colon syntax\"","\"f-string\"")};
+    if(s.contains(code;"    ")){parts=@("\"def keyword\"","\"colon syntax\"","\"f-string\"","\"indentation\"")};
+    <s.join(parts;",")
+  };
+  <""
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let code=extractcode(input);
+  
+  let rustscore=detectrust(code);
+  let pythonscore=detectpython(code);
+  let cscore=detectc(code);
+  let goscore=detectgo(code);
+  
+  let bestscore=mut.0;
+  let bestlang=mut."";
+  
+  if(s.contains(input;"rust")){
+    if(rustscore>bestscore){
+      bestscore=rustscore;
+      bestlang="rust"
+    }
+  };
+  
+  if(s.contains(input;"python")){
+    if(pythonscore>bestscore){
+      bestscore=pythonscore;
+      bestlang="python"
+    }
+  };
+  
+  if(s.contains(input;"c")){
+    if(cscore>bestscore){
+      bestscore=cscore;
+      bestlang="c"
+    }
+  };
+  
+  if(s.contains(input;"go")){
+    if(goscore>bestscore){
+      bestscore=goscore;
+      bestlang="go"
+    }
+  };
+  
+  let confidence=mut.0.0;
+  if(bestscore>=9){confidence=0.98}el{
+    if(bestscore>=7){confidence=0.95}el{
+      if(bestscore>=5){confidence=0.90}el{
+        if(bestscore>=3){confidence=0.85}el{
+          confidence=0.80
+        }
+      }
+    }
+  };
+  
+  let indicators=getindicators(bestlang;code);
+  let confstr=s.fromfloat(confidence);
+  
+  let output=s.concat("{\"language\":\"";bestlang);
+  output=s.concat(output;"\",\"confidence\":");
+  output=s.concat(output;confstr);
+  output=s.concat(output;",\"indicators\":[");
+  output=s.concat(output;indicators);
+  output=s.concat(output;"]}");
+  
+  io.println(output);
+  <0
+}

@@ -1,0 +1,1 @@
+m=ssrf;i=io:std.io;i=s:std.str;f=classifyrisk(line:$str):$str{if(s.contains(line;"url=")){<"POTENTIAL_SSRF"};if(s.contains(line;"url%3D")){<"POTENTIAL_SSRF"};<"SAFE"};f=main():$i64{let line=io.readln();let risk=classifyrisk(line);io.println(risk);<0}

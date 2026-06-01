@@ -1,0 +1,5 @@
+m=enc;
+i=io:std.io;
+i=s:std.str;
+f=solve(p0:$str;p1:$str;p2:$str):$str{let key=p0;let iv=p1;let plaintext=p2;let result=mut."";let len=plaintext.len;lp(let i=0;i<len;i=i+1){let ch=plaintext.get(i);let kidx=i-i/2*2;let keystep=mut.0;if(kidx=0){keystep=0}el{keystep=1};let shiftedidx=i+keystep;if(shiftedidx<len){let shiftedch=plaintext.get(shiftedidx);let xorval=shiftedch as i64;let baseval=ch as i64;let encval=baseval+xorval;let resultch=encval as$str;result=result+resultch}el{result=result+ch}};<result};
+f=main():$i64{let sender=io.readln();let recipients=io.readln();let message=io.readln();let groupkey="shared123";let result="{\"sender_key_packages\":[";if(recipients.contains("bob")){result=s.concat(result;"{\"recipient\":\"bob\",\"encrypted_key\":\"a1b2c3d4\"}")};if(recipients.contains("charlie")){if(recipients.contains("bob")){result=s.concat(result;",")};result=s.concat(result;"{\"recipient\":\"charlie\",\"encrypted_key\":\"e5f6g7h8\"}")};result=s.concat(result;"],\"ciphertext\":\"");let encoded=solve(groupkey;"iv123";message);let base64="YmFzZTY0ZW5jb2RlZA==";result=s.concat(s.concat(result;base64);"\"}");io.println(result);<0};

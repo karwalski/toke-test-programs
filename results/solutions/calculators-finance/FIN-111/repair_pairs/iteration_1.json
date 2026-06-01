@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=fib;i=io:std.io;i=s:std.str;f=main():$i64{let n=s.toint(io.readln());let a=mut.0;let b=mut.1;let idx=mut.2;lp(idx<=n){let temp=a+b;a=b;b=temp;idx=idx+1};io.println(s.fromint(a));<0}",
+  "error": "Test failures:\nTest 1: expected '55', got '34'\nTest 2: expected '12586269025', got '7778742049'",
+  "fixed_source": "m=fib;i=io:std.io;i=s:std.str;f=main():$i64{let n=s.toint(io.readln());let a=mut.0;let b=mut.1;let idx=mut.0;lp(idx<n){let temp=a+b;a=b;b=temp;idx=idx+1};io.println(s.fromint(b));<0}"
+}

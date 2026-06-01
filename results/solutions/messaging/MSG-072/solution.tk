@@ -1,0 +1,1 @@
+m=migrate;f=migrate(msg:$str;version:$i64):$str{if(version=1){<msg};if(version=2){let parts=msg.split(":");if(parts.len=2){let key=parts.get(0);let value=parts.get(1);let newmsg=key+"="+value;<newmsg};<msg};if(version=3){let parts=msg.split("=

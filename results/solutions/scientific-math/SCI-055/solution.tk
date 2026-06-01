@@ -1,0 +1,1 @@
+m=pointinpolygon;f=pointinpolygon(p:$point;q:$point):$str{let px=p.x;let py=p.y;let qx=q.x;let qy=q.y;let dx=px-qx;let dy=py-qy;let dot=dx*qy-dy*qx;if(dot<0){<"inside"};if(dot=0){<"boundary"};<"outside"};

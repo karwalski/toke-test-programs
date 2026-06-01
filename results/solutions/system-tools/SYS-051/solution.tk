@@ -1,0 +1,24 @@
+To achieve the task of running two commands, comparing their standard output (stdout) using `diff`, and showing the added, removed, and changed lines, you can follow these steps:
+
+1. Run the first command and capture its stdout.
+2. Run the second command and capture its stdout.
+3. Use `diff` to compare the two captured stdouts.
+4. Display the output of `diff`, which will show the added, removed, and changed lines.
+
+Here is an example of how you might write a script to perform these steps:
+
+```bash
+#!/bin/bash
+
+# Step 1: Run the first command and capture its stdout
+cmd1="echo Hello from command 1"
+stdout1=$(eval $cmd1)
+
+# Step 2: Run the second command and capture its stdout
+cmd2="echo Hello from command 2"
+stdout2=$(eval $cmd2))
+
+# Step 3: Use diff to compare the two captured stdouts
+diff_output=$(diff <(echo "$stdout1") | (echo "$stdout2") | (echo "$stdout1") | (echo "$stdout2")))
+
+# Step 4: Display the output of diff

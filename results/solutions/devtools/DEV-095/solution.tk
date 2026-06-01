@@ -1,0 +1,1 @@
+m=validate;f=validatechain(chain:$str):$bool{let parts=chain.split("->");let n=parts.len;let seen=mut.@();lp(let i=0;i<n;i=i+1){let m=parts.get(i);let found=mut.false;lp(let j=0;j<seen.len;j=j+1){if(seen.get(j)=m)){found=true}};if(found){<false};seen=seen+@(m)};<true};

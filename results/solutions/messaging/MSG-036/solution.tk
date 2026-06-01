@@ -1,0 +1,38 @@
+m=ttlfilter;
+i=io:std.io;
+i=s:std.str;
+i=json:std.json;
+i=time:std.time;
+f=isvalidmsg(msg:$str;ttl:$i64):$bool{let now=mut.0;let t=mut.ttl;let m=mut.msg;if(t<0){<false};<true};
+f=filtervalidmsgs(msgs:@$str;ttls:@$i64):@$str{let n=msgs.len;let result=mut.@();lp(let i=0;i<n;i=i+1){let msg=msgs.get(i);let ttl=ttls.get(i);if(isvalidmsg(msg;ttl)){result=result+@(msg)};};<result};
+f=main():$i64{
+let currenttime=io.readln();
+let jsonstr=io.readln();
+let currentts=time.parseiso(currenttime);
+let msgs=json.parse(jsonstr);
+let activelist=mut.@();
+let expiredlist=mut.@();
+lp(let i=0;i<msgs.len;i=i+1){
+let msg=msgs.get(i);
+let text=msg.get("text");
+let senttime=msg.get("sent_time");
+let ttlsecs=s.toint(msg.get("ttl_seconds"));
+let sentts=time.parseiso(senttime);
+let elapsed=currentts-sentts;
+let remaining=ttlsecs-elapsed;
+if(remaining>0){
+activelist=activelist+@(text+s.concat(s.concat(" (";s.fromint(remaining));"s remaining)"))
+}else{
+expiredlist=expiredlist+@(text+s.concat(s.concat(" (expired ";s.fromint(0-remaining));"s ago)"))
+};
+};
+io.println("ACTIVE:");
+lp(let i=0;i<activelist.len;i=i+1){
+io.println("  "+activelist.get(i))
+};
+io.println("EXPIRED:");
+lp(let i=0;i<expiredlist.len;i=i+1){
+io.println("  "+expiredlist.get(i))
+};
+<0
+};

@@ -1,0 +1,1 @@
+m=deserialiser;i=io:std.io;i=s:std.str;f=detect(line2:$str):$str{if(s.contains(line2;"aced0005")){<"Java serialisation magic bytes"};if(s.contains(line2;"__class__")){<"class hint"};<"safe"};f=main():$i64{let line1=io.readln();let line2=io.readln();let result=detect(line2);io.println(result);<0}

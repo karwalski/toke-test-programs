@@ -1,0 +1,1 @@
+m=banned;f=checkbanned(word:$str):$bool{let banned=@("badword1";"badword2";"inappropriate";"abuse"));let found=mut.false;lp(let idx=0;idx<banned.len;idx=idx+1){if(banned.get(idx)=word){found=true}};<found};f=main():$i64{let result=checkbanned("badword1");<0};

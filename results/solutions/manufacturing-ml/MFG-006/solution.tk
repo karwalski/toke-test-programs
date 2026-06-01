@@ -1,0 +1,1 @@
+m=xbar;f=calcxbar(data:@$f64):$f64{let total=mut.0.0;lp(let i=0;i<data.len;i=i+1){total=total+data.get(i);};<total/data.len as$f64};f=calccontrollimits(xbar:$f64;stddev:$f64;n:$i64):@$f64{let mean=xbar;let se=stddev/(n as$f64));let lcl=mean-3.0*se;let ucl=mean+3.0*se;<@(lcl;mean;ucl))};

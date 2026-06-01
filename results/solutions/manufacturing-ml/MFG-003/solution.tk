@@ -1,0 +1,5 @@
+m=checklimits;
+i=io:std.io;
+i=s:std.str;
+f=checklimits(vals:@$f64;lo:$f64;hi:$f64):$bool{let n=vals.len;lp(let i=0;i<n;i=i+1){let v=vals.get(i);if(v<lo){<false};if(v>hi){<false}};<true};
+f=main():$i64{let header=io.readln();let vals=@$f64{};let lsl=$f64{0.0};let usl=$f64{0.0};let outcount=0;let firstrow=true;lp(true){let line=io.readln();if(line==""){break};let parts=s.split(line;",");if(parts.len>=3){let measurement=s.tofloat(parts.get(0));if(firstrow){lsl=s.tofloat(parts.get(1));usl=s.tofloat(parts.get(2));firstrow=false};vals.add(measurement)}};let allspec=checklimits(vals;lsl;usl);let n=vals.len;lp(let i=0;i<n;i=i+1){let v=vals.get(i);if(v<lsl){outcount=outcount+1};if(v>usl){outcount=outcount+1}};if(allspec){io.println(s.concat(s.concat("{\"in_spec\":true,\"out_of_spec_count\":";s.fromint(outcount));"}"))}else{io.println(s.concat(s.concat("{\"in_spec\":false,\"out_of_spec_count\":";s.fromint(outcount));"}"))};< 0};

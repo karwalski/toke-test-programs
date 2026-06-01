@@ -1,0 +1,1 @@
+m=comments;f=fetchcomments(postid:$str;page:$i64;sortby:$str):$str{let url="https://api.example.com/comments";let params=s.concat(s.concat(s.concat("?post_id=";postid);"&page=");page) as$str+s.concat("&sort_by=";sortby);let fullurl=s.concat(url;params);let response=fetch(fullurl);let comments=jsonparse(response);<comments};

@@ -1,0 +1,1 @@
+m=spaced;f=spaced(n:$i64):$i64{if(n<1){<0};let days=mut.@();lp(let i=0;i<n;i=i+1){days=days+@(0)};lp(let i=0;i<n;i=i+1){let j=i+1;if(j<n){let diff=j-i;lp(let k=0;k<diff;k=k+1){let idx=i+1+k;days.get(idx)=days.get(idx)+diff-k}}}};<days};

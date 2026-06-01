@@ -1,0 +1,1 @@
+m=score;f=normalize(scores:@($i64)):@$i64){let min=mut.0;let max=mut.0;let first=mut.true;lp(let i=0;i<scores.len;i=i+1){let val=scores.get(i);if(first){min=val;max=val;first=false}el{if(val<min){min=val};if(val>max){max=val}}}};let range=max-min;let result=mut.@()

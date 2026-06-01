@@ -1,0 +1,6 @@
+m=validate;
+i=io:std.io;
+i=s:std.str;
+f=getfield(line:$str;key:$str):$str{let pat=s.concat("\"";key);let pat2=s.concat(pat;"\":\"");let rest=s.split(line;pat2);if(rest.len()<2){<""};let after=rest.get(1);let parts=s.split(after;"\"");if(parts.len()<1){<""};<parts.get(0)};
+f=validatechain(input:$str):$str{let blocks=s.split(input;"},{");let n=blocks.len();if(n<2){<"VALID"};let result=mut."VALID";let found=mut.false;let idx=mut.1;lp(idx<n){if(!(found)){let cur=blocks.get(idx);let prev=blocks.get(idx-1);let prevhash=getfield(prev;"\"hash");let curprev=getfield(cur;"previous_hash");if(curprev!=prevhash){result=s.concat("ERROR: Block ";s.fromint(idx));result=s.concat(result;" previous_hash mismatch");found=true}};idx=idx+1};<result};
+f=main():$i64{let input=io.readln();let result=validatechain(input);io.println(result);<0};

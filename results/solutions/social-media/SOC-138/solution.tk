@@ -1,0 +1,1 @@
+m=removeuser;f=removeuser(users:@$str;id:$str):@$str{let result=mut.@();lp(let i=0;i<users.len;i=i+1){let current=users.get(i);if(current=id){<result};result=result+@(current)};<result};f=main():$void{let users=@("alice";"bob";"charlie"));let id="bob";let updated=removeuser(users;id);lp(let i=0;i<updated.len;i=i+1){let user=updated.get(i);<user}};

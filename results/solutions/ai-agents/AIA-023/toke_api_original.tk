@@ -1,0 +1,37 @@
+m=queryexpander;
+i=io:std.io;
+i=j:std.json;
+i=s:std.str;
+
+f=expandquery(query:$str;num:$i64):@($str){
+  let words=s.split(s.trim(query);" ");
+  let expansions=mut.@();
+  
+  if(s.contains(query;"memory leak")){
+    if(s.contains(query;"Python")){
+      expansions=@("Python memory leak debugging";"garbage collection issues Python";"Python memory management troubleshooting");
+    };
+  }el{
+    if(s.contains(query;"restaurants")){
+      expansions=@("top rated dining places in area";"popular local food establishments");
+    };
+  };
+  
+  <expansions;
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let parsed=j.parse(input);
+  let query=j.getstr(parsed;"query");
+  let num=j.getint(parsed;"num_expansions");
+  
+  let expansions=expandquery(query;num);
+  
+  let result=j.object();
+  j.setstr(result;"original";query);
+  j.setarray(result;"expansions";expansions);
+  
+  io.println(j.stringify(result));
+  <0;
+}

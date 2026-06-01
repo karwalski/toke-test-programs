@@ -1,0 +1,37 @@
+m=pchart;
+i=io:std.io;
+i=s:std.str;
+f=pchart(n:$i64;y:$i64):$void{let p=mut.0;let q=mut.0;lp(let i=0;i<y;i=i+1){q=q+1};lp(let i=0;i<n;i=i+1){p=p+1};let result=mut.p;lp(let i=0;i<q;i=i+1){result=result+1};let final=result;lp(let i=0;i<final;i=i+1){<i}};
+f=main():$i64{
+let header=io.readln();
+let samples=mut.[];
+let defectives=mut.[];
+let totaldefects=mut.0;
+let totalsamples=mut.0;
+lp(let line=io.readln();line!=""){
+let parts=s.split(line;",");
+let samplesize=s.toint(parts[0]);
+let defectcount=s.toint(parts[1]);
+samples=samples+[samplesize];
+defectives=defectives+[defectcount];
+totaldefects=totaldefects+defectcount;
+totalsamples=totalsamples+samplesize
+};
+let pbar=totaldefects as$f64/totalsamples as$f64;
+let ucl=pbar+3.0*(pbar*(1.0-pbar)/(totalsamples as$f64/samples.len as$f64))**0.5;
+let lcl=pbar-3.0*(pbar*(1.0-pbar)/(totalsamples as$f64/samples.len as$f64))**0.5;
+if(lcl<0.0){lcl=0.0};
+let outofcontrol=mut.[];
+lp(let i=0;i<defectives.len;i=i+1){
+let p=defectives[i] as$f64/samples[i] as$f64;
+if(p>ucl){outofcontrol=outofcontrol+[i]}
+};
+let result=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"p_bar\":";s.fromfloat(pbar));",\"ucl\":");s.fromfloat(ucl));",\"lcl\":");s.fromfloat(lcl));",\"out_of_control\":[");
+lp(let i=0;i<outofcontrol.len;i=i+1){
+if(i>0){result=s.concat(result;",")};
+result=s.concat(result;s.fromint(outofcontrol[i]))
+};
+result=s.concat(result;"]}");
+io.println(result);
+<0
+}

@@ -1,0 +1,1 @@
+m=hexfield;f=solve(p0:$str;p1:$str):$str{let hexstr=p0;let fielddef=p1;let result=mut."";let hlen=hexstr.len;let deflen=fielddef.len;let startidx=mut.0;let endidx=mut.0;let found=mut.false;lp(let i=0;i<deflen;i=i+1){let ch=fielddef.get(i);if(ch=":"){found=true};if(!(found)){startidx=startidx+1};}

@@ -1,0 +1,1 @@
+m=relaytrace;f=tracepath(hops:@$str):$str{let total=mut.0;let count=hops.len;lp(let i=0;i<count;i=i+1){let h=hops.get(i);let parts=h.split("=");if(parts.len=2){let t=parts.get(1);let numeric=t.toint;if(!(numeric<0)){total=total+numeric;};};};<total as$str;};

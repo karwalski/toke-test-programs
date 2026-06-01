@@ -1,0 +1,71 @@
+m=queue;
+i=io:std.io;
+i=str:std.str;
+f=parseop(seg:$str):$str{
+  let r=mut."_";
+  if(str.contains(seg;"_")){r="_"}el{
+    if(str.contains(seg;"_")){r="_"}el{
+      if(str.contains(seg;"_")){r="_"}el{
+        if(str.contains(seg;"_")){r="_"}el{
+          if(str.contains(seg;"_")){r="_"}el{r="_"}}}}};
+  <r
+};
+f=parsemsg(seg:$str):$str{
+  let r=mut."_";
+  let parts=str.split(seg;"_"msg\"_""_"\"_");
+    if(p2.len()>=1){r=p2.get(0)}};
+  <r
+};
+f=main():$i64{
+  let line=io.readln();
+  let body=str.slice(line;1;str.len(line)-1);
+  let recs=str.split(body;"_");
+  let size=mut.0;
+  let inflight=mut.0;
+  let firstmsg=mut."_";
+  let out=mut."_";
+  let idx=mut.0;
+  lp(idx<recs.len()){
+    let seg=recs.get(idx);
+    let op=parseop(seg);
+    if(op="_"){
+      let msg=parsemsg(seg);
+      if(size=0){firstmsg=msg};
+      size=size+1;
+      out=str.concat(out;str.concat("_";str.concat(msg;str.concat("_";str.concat(str.fromint(size);"_")))))
+    }el{
+      if(op="_"){
+        if(size>0){
+          let dm=firstmsg;
+          inflight=inflight+1;
+          size=size-1;
+          out=str.concat(out;str.concat("_";str.concat(dm;"_")))
+        }el{
+          out=str.concat(out;"_")}
+      }el{
+        if(op="_"){
+          let msg=parsemsg(seg);
+          inflight=inflight-1;
+          out=str.concat(out;str.concat("_";str.concat(msg;"_")))
+        }el{
+          if(op="_"){
+            if(inflight>0){
+              out=str.concat(out;"_")
+            }el{
+              out=str.concat(out;"_")}
+          }el{
+            if(op="_"){
+              if(inflight>0){
+                out=str.concat(out;str.concat("_";str.concat(str.fromint(inflight);"_")));
+                size=size+inflight;
+                inflight=0
+              }el{
+                out=str.concat(out;"_")}
+            }}}}};
+    idx=idx+1
+  };
+  let outlen=str.len(out);
+  let trimmed=str.slice(out;0;outlen-1);
+  io.println(trimmed);
+  <0
+}

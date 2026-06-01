@@ -1,0 +1,1 @@
+m=fileperms;f=checkperm(p:$str):$bool{let result=mut.false;if(p="r"){result=true};if(p="w"){result=true};if(p="x"){result=true};<result};f=octalperm(p:$str):$str{let result=mut."";if(p="r"){result="4"};if(p="w"){result="2"};if(p="x"){result="1"};if(p="rwx"){result="7"};if(p="rw-"){result="6"};if(p="r-x"){result="5"};if(p="---"){result="0"};<result};f=symbolic

@@ -1,0 +1,51 @@
+m=build;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=build(target:$str;inputs:@$str):$str{let output=mut."";let found=mut.false;lp(let i=0;i<inputs.len;i=i+1){let inp=inputs.get(i);if(inp=target){found=true};};if(found){output="build";}el{output="skip";};<output};
+
+f=main():$i64{
+let input=io.readln();
+let data=j.parse(input);
+let targets=data.get("targets");
+let changed=data.get("changed_files");
+let rebuild=mut.@$str[];
+let needsrebuild=mut.@$str[];
+
+lp(let i=0;i<changed.len;i=i+1){
+    let changedfile=changed.get(i);
+    lp(let t=0;t<targets.len;t=t+1){
+        let target=targets.get(t);
+        let name=target.get("name");
+        let inputs=target.get("inputs");
+        lp(let inp=0;inp<inputs.len;inp=inp+1){
+            if(inputs.get(inp)=changedfile){
+                rebuild.add(name);
+            };
+        };
+    };
+};
+
+lp(let r=0;r<rebuild.len;r=r+1){
+    let rebuilding=rebuild.get(r);
+    lp(let t=0;t<targets.len;t=t+1){
+        let target=targets.get(t);
+        let name=target.get("name");
+        let depends=target.get("depends_on");
+        lp(let d=0;d<depends.len;d=d+1){
+            if(depends.get(d)=rebuilding){
+                rebuild.add(name);
+            };
+        };
+    };
+};
+
+io.println("Needs rebuild:");
+lp(let i=0;i<rebuild.len;i=i+1){
+    let name=rebuild.get(i);
+    io.println(s.concat(s.fromint(i+1);". ")+name);
+};
+
+<0
+}

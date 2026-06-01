@@ -1,0 +1,47 @@
+m=path;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let base=s.trim(io.readln());
+  let rel=s.trim(io.readln());
+  let baseparts=s.split(base;"/");
+  let stack=mut.@($str);
+  let stacklen=mut.0;
+  lp(let i=0;i<baseparts.len();i=i+1){
+    let p=baseparts.get(i);
+    if(s.len(p)>0){
+      stack=stack+@(p);
+      stacklen=stacklen+1
+    }
+  };
+  let relparts=s.split(rel;"/");
+  lp(let i=0;i<relparts.len();i=i+1){
+    let p=relparts.get(i);
+    if(s.equals(p;"..")){
+      if(stacklen>0){
+        stacklen=stacklen-1
+      }
+    }el{
+      if(s.equals(p;".")){
+      }el{
+        if(s.len(p)>0){
+          if(stacklen<stack.len()){
+            stack=stack.set(stacklen;p)
+          }el{
+            stack=stack+@(p)
+          };
+          stacklen=stacklen+1
+        }
+      }
+    }
+  };
+  let out=mut."";
+  lp(let i=0;i<stacklen;i=i+1){
+    out=s.concat(out;"/");
+    out=s.concat(out;stack.get(i))
+  };
+  if(s.len(out)=0){out="/"};
+  io.println(out);
+  <0
+}

@@ -1,0 +1,1 @@
+m=sign;f=sign(msg:$str;seed:$str):$str{let privkey=seed;let msgbytes=msg;let r=mut.0;let s=mut.0;let e=mut.0;lp(let i=0;i<64;i=i+1){let idx=i as u64;let byte=msgbytes.get(idx);let acc=mut.0;lp(let j=0;j<8;j=j+1){let bit=byte/2;let rem=byte-bit*2;let acc=acc+rem;let byte=acc;};}

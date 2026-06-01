@@ -1,0 +1,1 @@
+m=mask;f=maskcard(card:$str):$str{let len=card.len;let masklen=len-4;let maskpart="****";let result=mut."";lp(let i=0;i<masklen;i=i+1){result=s.concat(result;maskpart)};lp(let i=0;i<4;i=i+1){let idx=masklen+i;result=s.concat(result;card.get(idx))};<result};

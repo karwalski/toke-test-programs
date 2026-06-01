@@ -1,0 +1,5 @@
+m=mac;
+i=io:std.io;
+i=s:std.str;
+f=solve(p0:$str;p1:$str):$str{let key=p0;let msg=p1;let len=key.len;let pad=mut."";lp(let i=0;i<len;i=i+1){pad=s.concat(pad;key.sub(i;1))};let msglen=msg.len;lp(let i=0;i<msglen;i=i+1){pad=pad+msg.sub(i;1)};let result=mut."";lp(let i=0;i<pad.len;i=i+1){let ch=pad.sub(i;1);let val=ch.ord;let other=val+100000;let r=other-other/100000*100000;result=result+r.chr;};<result};
+f=main():$i64{let key=io.readln();let message=io.readln();let result=solve(key;message);io.println(result);<0}

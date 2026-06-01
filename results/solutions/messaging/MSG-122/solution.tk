@@ -1,0 +1,1 @@
+m=quota;f=checkquota(user:$str;messagesize:$i64;currentquota:$i64):$bool{let newquota=currentquota+messagesize;let limit=10000;if(newquota>limit){<false};<true};f=main():$void{let user="alice";let messagesize=3000;let currentquota=5000;let result=checkquota(user;messagesize;currentquota);let pass=mut.false;if(result){pass=true};if(pass){<void}el{<void}};

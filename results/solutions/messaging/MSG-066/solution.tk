@@ -1,0 +1,7 @@
+m=validateid;
+i=io:std.io;
+i=s:std.str;
+i=crypto:std.crypto;
+f=validateid(id:$str):$bool{let len=id.len;if(len<32){if(len>0){<true};<false};<false};
+f=generatekey(sender:$str;recipient:$str;content:$str;timestamp:$str):$str{let data=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(sender;"|");recipient);"|");content);"|");timestamp);let hash=crypto.sha256(data);<hash};
+f=main():$i64{let operation=io.readln();if(operation=="generate"){let sender=io.readln();let recipient=io.readln();let content=io.readln();let timestamp=io.readln();let key=generatekey(sender;recipient;content;timestamp);io.println(key)}else{if(operation=="validate"){let key=io.readln();let stored=io.readln();let keys=s.split(stored;",");let isdupe=false;let index=0;while(index<keys.len){if(keys[index]==key){isdupe=true;index=keys.len}else{index=index+1}};if(isdupe){io.println("DUPLICATE")}else{io.println("UNIQUE")}}else{io.println("INVALID")}};< 0}

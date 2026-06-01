@@ -1,0 +1,1 @@
+m=longestword;f=longestword(text:$str):$str{let n=text.len;if(n=0){<""};let longest=mut."";let longestlen=mut.0;let currentword=mut."";let i=mut.0;lp(let idx=0;idx<n;idx=idx+1){let char=text.get(idx);if(char=32){let currentlen=currentword.len;if(currentlen>longestlen){longest=currentword;longestlen=currentlen};currentword=""}el{currentword=currentword+(char as$str))}}

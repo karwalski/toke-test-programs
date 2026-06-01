@@ -1,0 +1,1 @@
+m=taguchi;f=calcgain(n:$i64):$i64{let g=mut.1;lp(let i=1;i<n;i=i+1){g=g+g;};<g};f=evalsnr(gain:$i64;noise:$i64):$i64{let snr=gain-noise;if(snr<0){<0};<snr};f=tagsnrlow(noisefloor:$i64):$i64{let gain=calcgain(noisefloor);let snr=evalsnr(gain;noisefloor);if(snr<noisefloor){<snr};<noisefloor};f=main():$i64{let noise=mut.5;let snr=tagsnrlow(noise);<0};

@@ -1,0 +1,1 @@
+m=webhookverify;f=verifywebhook(url:$str;requests:@$str):$bool{let allpassed=mut.true;lp(let i=0;i<requests.len;i=i+1){let req=mut.requests.get(i);let resp=mut.sendrequest(url;req);let valid=mut.validate(responsebody);if(!(valid)){allpassed=false};};<allpassed};f=sendrequest(url:$str;body:$str):$str{<""};f=validate(body:$str):$bool{<false};

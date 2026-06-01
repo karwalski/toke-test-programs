@@ -1,0 +1,1 @@
+m=delete;f=delete(id:$str;userid:$str):$bool{let msg=loadmessage(id);if(msg.userid=userid){deleteinternal(id);<true}el{<false}};f=deleteforall(id:$str):$void{deleteinternal(id)};

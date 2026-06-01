@@ -1,0 +1,5 @@
+m=langdetect;
+i=io:std.io;
+i=s:std.str;
+f=detectlang(text:$str):$str{let len=text.len;let firstpass=mut.true;let num1=mut.0;let num2=mut.0;lp(let i=0;i<len;i=i+1){let c=text.get(i);if(c>64){if(c<91){num1=num1+1}};if(c>96){if(c<123){num2=num2+1}}};let total=num1+num2;if(total=0){<"unknown"};let ratio=num1 as$f64/total as$f64;if(ratio>0.5){<"english"};if(ratio>0.3){<"mixed"};<"unknown"};
+f=main():$i64{let text=io.readln();let lang=detectlang(text);let confidence="0.98";let result="{\"primary\":\"" + lang + s.concat(s.concat("\",\"confidence\":";confidence);",\"secondary\":[]}");io.println(result);<0};

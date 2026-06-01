@@ -1,0 +1,5 @@
+m=recommend;
+i=io:std.io;
+i=s:std.str;
+f=recommend(score:$i64;categories:@$str):$str{let max=mut.0;let choice=mut."";lp(let i=0;i<categories.len;i=i+1){let cat=categories.get(i);let val=score;let cmp=val>max;if(cmp){max=val;choice=cat};};<choice};
+f=main():$i64{let diceline=io.readln();let categories=mut@$str[];let line=io.readln();while(line!=""){categories.push(line);line=io.readln();};let result=recommend(50;categories);io.println(result);<0};

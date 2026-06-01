@@ -1,0 +1,7 @@
+m=phone;
+i=io:std.io;
+i=s:std.str;
+f=phone(p:$str):$str{let q=mut."";let n=p.len;lp(let i=0;i<n;i=i+1){let c=p.get(i);let d=mut."";if(c>47){if(c<58){d="*";}}if(c>64){if(c<91){d="*";}}if(c>96){if(c<123){d="*";}}q=s.concat(q;d);};<q};
+f=digittoletters(d:$str):$arr$str{if(d=="2"){<["a";"b";"c"];}if(d=="3"){<["d";"e";"f"];}if(d=="4"){<["g";"h";"i"];}if(d=="5"){<["j";"k";"l"];}if(d=="6"){<["m";"n";"o"];}if(d=="7"){<["p";"q";"r";"s"];}if(d=="8"){<["t";"u";"v"];}if(d=="9"){<["w";"x";"y";"z"];};<[];};
+f=wordtodigits(w:$str):$str{let r=mut."";let n=w.len;lp(let i=0;i<n;i=i+1){let c=w.get(i);if(c>=97){if(c<=99){r=s.concat(r;"2");}elif(c<=102){r=s.concat(r;"3");}elif(c<=105){r=s.concat(r;"4");}elif(c<=108){r=s.concat(r;"5");}elif(c<=111){r=s.concat(r;"6");}elif(c<=115){r=s.concat(r;"7");}elif(c<=118){r=s.concat(r;"8");}elif(c<=122){r=s.concat(r;"9");}}};<r};
+f=main():$i64{let digits=io.readln();let words=mut.[];lp(true){let line=io.readln();if(line==""){break;}words.push(line);}words.sort();let matches=mut.[];let n=words.len;lp(let i=0;i<n;i=i+1){let w=words.get(i);if(wordtodigits(w)==digits){matches.push(w);}}let m=matches.len;lp(let i=0;i<m;i=i+1){io.println(matches.get(i));};<0}

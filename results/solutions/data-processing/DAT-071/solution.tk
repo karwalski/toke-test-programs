@@ -1,0 +1,46 @@
+m=tsv2csv;
+i=io:std.io;
+i=s:std.str;
+f=tsv2csv(input:$str):$str{
+    let result=mut."";
+    let lines=s.split(input;"\n");
+    let linecount=lines.len;
+    lp(let i=0;i<linecount;i=i+1){
+        let line=lines.get(i);
+        if(line.len>0){
+            let fields=s.split(line;"\t");
+            let fieldcount=fields.len;
+            lp(let j=0;j<fieldcount;j=j+1){
+                let field=fields.get(j);
+                if(s.contains(field;",")){
+                    result=s.concat(result;"\"")+field+"\"";
+                }el{
+                    result=result+field;
+                };
+                if(j<fieldcount-1){
+                    result=s.concat(result;",");
+                };
+            };
+            if(i<linecount-1){
+                result=s.concat(result;"\n");
+            };
+        };
+    };
+    <result
+};
+f=main():$i64{
+    let input=mut."";
+    let line=io.readln();
+    lp(let continue=true;continue){
+        input=s.concat(input;line);
+        line=io.readln();
+        if(line=""){
+            continue=false;
+        }el{
+            input=s.concat(input;"\n");
+        };
+    };
+    let result=tsv2csv(input);
+    io.println(result);
+    <0
+};

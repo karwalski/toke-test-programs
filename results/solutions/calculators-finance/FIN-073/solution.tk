@@ -1,0 +1,32 @@
+m=balance;
+i=io:std.io;
+i=s:std.str;
+f=balance(assets:$i64;liabilities:$i64):$i64{let equity=assets-liabilities;<equity};
+f=main():$i64{
+let assettotal=$i64=0;
+let liabilitytotal=$i64=0;
+let equitytotal=$i64=0;
+let line=io.readln();
+while(s.len(line)>0){
+let parts=s.split(line;" ");
+let amount=s.toint(parts[2]);
+if(s.eq(parts[0];"ASSET")){
+assettotal=assettotal+amount;
+}else if(s.eq(parts[0];"LIABILITY")){
+liabilitytotal=liabilitytotal+amount;
+}else if(s.eq(parts[0];"EQUITY")){
+equitytotal=equitytotal+amount;
+};
+line=io.readln();
+};
+io.println(s.concat(s.concat("ASSETS: ";s.fromint(assettotal));".00"));
+io.println(s.concat(s.concat("LIABILITIES: ";s.fromint(liabilitytotal));".00"));
+io.println(s.concat(s.concat("EQUITY: ";s.fromint(equitytotal));".00"));
+let calculated=balance(assettotal;liabilitytotal);
+if(calculated==equitytotal){
+io.println("BALANCED");
+}else{
+io.println("NOT BALANCED");
+};
+<0
+}

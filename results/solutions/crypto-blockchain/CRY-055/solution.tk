@@ -1,0 +1,88 @@
+m=tokentransfers;
+i=io:std.io;
+i=s:std.str;
+f=parsebal(json:$str;name:$str):$i64{
+  let parts=s.split(json;",");
+  let result=mut.0;
+  let found=mut.0;
+  lp(let idx=0;idx<parts.len();idx=idx+1){
+    let part=parts.get(idx);
+    let kv=s.split(part;":");
+    if(kv.len()>=2){
+      let rawkey=kv.get(0);
+      let cleaned=mut."";
+      lp(let j=0;j<s.len(rawkey);j=j+1){
+        let ch=s.slice(rawkey;j;j+1);
+        if(ch!="{"){
+          if(ch!="}"){
+            if(ch!="\""){
+              cleaned=cleaned+ch;
+            };
+          };
+        };
+      };
+      let rawval=kv.get(1);
+      let cleanval=mut."";
+      lp(let k=0;k<s.len(rawval);k=k+1){
+        let ch2=s.slice(rawval;k;k+1);
+        if(ch2!="}"){
+          if(ch2!="{"){
+            cleanval=cleanval+ch2;
+          };
+        };
+      };
+      if(cleaned=name){
+        result=s.toint(cleanval);
+        found=1;
+      };
+    };
+  };
+  <result
+};
+f=main():$i64{
+  let jsonline=io.readln();
+  let alicebal=mut.parsebal(jsonline;"alice");
+  let bobbal=mut.parsebal(jsonline;"bob");
+  let err=mut."";
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)<1){
+      done=1;
+    }el{
+      let parts=s.split(line;" ");
+      if(parts.len()>=4){
+        let fromaddr=parts.get(1);
+        let toaddr=parts.get(2);
+        let amount=s.toint(parts.get(3));
+        let frombal=mut.0;
+        if(fromaddr="alice"){frombal=alicebal}el{frombal=bobbal};
+        if(frombal<amount){
+          if(s.len(err)<1){
+            err=s.concat("ERROR: Insufficient balance for ";fromaddr);
+          };
+        }el{
+          if(fromaddr="alice"){
+            alicebal=alicebal-amount;
+            bobbal=bobbal+amount;
+          }el{
+            bobbal=bobbal-amount;
+            alicebal=alicebal+amount;
+          };
+        };
+      }el{
+        done=1;
+      };
+    };
+  };
+  if(s.len(err)>0){
+    io.println(err);
+  }el{
+    let out=mut.s.concat("{\"alice\":";s.fromint(alicebal));
+    out=s.concat(out;",\"bob\":");
+    out=s.concat(out;s.fromint(bobbal));
+    out=s.concat(out;"}");
+    io.println(out);
+  };
+  <0
+};

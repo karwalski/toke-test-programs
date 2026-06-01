@@ -1,0 +1,33 @@
+m=decliningbalance;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=round2(x:$f64):$f64{
+  let scaled=x*100.0;
+  let rounded=math.round(scaled);
+  <rounded/100.0
+};
+
+f=main():$i64{
+  let line=io.readln();
+  let parts=s.split(line;" ");
+  if(parts.len()>=3){
+    let val=s.tofloat(parts.get(0));
+    let rate=s.tofloat(parts.get(1));
+    let n=s.toint(parts.get(2));
+    let current=mut.val;
+    let year=mut.1;
+    lp(year<=n){
+      let rawdep=current*rate;
+      let depreciation=round2(rawdep);
+      current=current-depreciation;
+      let yearstr=s.fromint(year);
+      let depstr=s.format(depreciation;"%.2f");
+      let balstr=s.format(current;"%.2f");
+      io.println(s.concat(s.concat(s.concat(s.concat(yearstr;",");depstr);",");balstr));
+      year=year+1
+    }
+  };
+  <0
+}

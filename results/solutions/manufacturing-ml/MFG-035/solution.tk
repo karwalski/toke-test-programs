@@ -1,0 +1,29 @@
+m=weibull;
+i=io:std.io;
+i=s:std.str;
+f=weibullpdf(x:$f64;k:$f64):$f64{let result=mut.0.0;if(k>0.0){let base=x/k;let exp=base;let term=mut.1.0;let sum=mut.0.0;let i=mut.0;lp(let idx=0;idx<10;idx=idx+1){term=term*exp;sum=sum+term;i=i+1};result=sum};<result};
+f=weibullcdf(x:$f64;k:$f64):$f64{let result=mut.0.0;if(k>0.0){let base=x/k;result=1.0-weibullpdf(x;k)};<result};
+f=fitweibull(times:$arr<$f64>):$arr<$f64>{let n=times.len();let sumx=mut.0.0;let sumx2=mut.0.0;let sumlnx=mut.0.0;let i=mut.0;lp(i<n){let t=times[i];sumx=sumx+t;sumx2=sumx2+t*t;sumlnx=sumlnx+ln(t);i=i+1};let meanx=sumx/(n as$f64);let varx=(sumx2-(sumx*sumx)/(n as$f64))/((n-1) as$f64);let beta=1.2/sqrt(varx/meanx/meanx);let eta=meanx/gamma(1.0+1.0/beta);let meanlife=eta*gamma(1.0+1.0/beta);let rel200=1.0-weibullcdf(200.0;eta);let result=arr<$f64>.new(4);result[0]=beta;result[1]=eta;result[2]=meanlife;result[3]=rel200;<result};
+f=ln(x:$f64):$f64{let result=mut.0.0;if(x>0.0){let y=x-1.0;let term=y;let sum=y;let i=mut.2;lp(i<=10){term=term*(-y);sum=sum+term/(i as$f64);i=i+1};result=sum};<result};
+f=sqrt(x:$f64):$f64{let result=mut.1.0;if(x>=0.0){let guess=x/2.0;let i=mut.0;lp(i<10){guess=(guess+x/guess)/2.0;i=i+1};result=guess};<result};
+f=gamma(x:$f64):$f64{let result=mut.1.0;if(x>0.0){let g=0.99999999999980993;let coeffs=arr<$f64>.new(8);coeffs[0]=676.5203681218851;coeffs[1]=-1259.1392167224028;coeffs[2]=771.32342877765313;coeffs[3]=-176.61502916214059;coeffs[4]=12.507343278686905;coeffs[5]=-0.13857109526572012;coeffs[6]=9.9843695780195716e-6;coeffs[7]=1.5056327351493116e-7;let z=x-1.0;let sum=g;let i=mut.0;lp(i<8){sum=sum+coeffs[i]/(z+(i as$f64)+1.0);i=i+1};let t=z+7.5;result=sqrt(2.0*3.14159265)*pow(t;z+0.5)*exp(-t)*sum};<result};
+f=pow(base:$f64;exp:$f64):$f64{let result=mut.1.0;if(base>0.0){let i=mut.0;lp(i<(exp as$i32)){result=result*base;i=i+1}};<result};
+f=exp(x:$f64):$f64{let result=mut.1.0;let term=mut.1.0;let i=mut.1;lp(i<=20){term=term*x/(i as$f64);result=result+term;i=i+1};<result};
+f=main():$i64{
+    let line=io.readln();
+    let times=arr<$f64>.new(0);
+    lp(true){
+        let dataline=io.readln();
+        if(s.len(dataline)==0){break};
+        let val=s.tof64(dataline);
+        times.push(val)
+    };
+    let params=fitweibull(times);
+    let beta=params[0];
+    let eta=params[1];
+    let meanlife=params[2];
+    let rel200=params[3];
+    let output=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"beta\":";s.fromf64(beta));",\"eta\":");s.fromf64(eta));",\"mean_life\":");s.fromf64(meanlife));",\"reliability_at_200\":");s.fromf64(rel200));"}");
+    io.println(output);
+    <0
+}

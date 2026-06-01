@@ -1,0 +1,26 @@
+m=rebalance;
+i=io:std.io;
+i=s:std.str;
+f=rebalance(target:$i64;current:$i64):$i64{let diff=target-current;if(diff<0){<0};<diff};
+f=main():$i64{
+  let totalvalue=s.toint(io.readln());
+  let line=io.readln();
+  while(line!=""){
+    let parts=s.split(line;" ");
+    let asset=parts[0];
+    let currentpct=s.toint(parts[1]);
+    let targetpct=s.toint(parts[2]);
+    let currentval=(totalvalue*currentpct)/100;
+    let targetval=(totalvalue*targetpct)/100;
+    let diff=rebalance(targetval;currentval);
+    if(diff>0){
+      io.println(asset+s.concat(s.concat(" BUY ";s.fromint(diff));".00"))
+    }else if(diff<0){
+      io.println(asset+s.concat(s.concat(" SELL ";s.fromint(0-diff));".00"))
+    }else{
+      io.println(asset+" HOLD 0.00")
+    };
+    line=io.readln()
+  };
+  <0
+}

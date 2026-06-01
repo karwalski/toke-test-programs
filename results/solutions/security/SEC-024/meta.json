@@ -1,0 +1,24 @@
+{
+  "id": "SEC-024",
+  "category": "security",
+  "title": "JWT Security Auditor",
+  "description": "Reads one or more JWT tokens from stdin. Audits each for security issues: algorithm confusion (none, RS256 vs HS256), missing claims (exp, iss, aud), weak signatures.",
+  "difficulty": 4,
+  "stdlib_modules": [
+    "std.str",
+    "std.json",
+    "std.crypto",
+    "std.time"
+  ],
+  "repair_count": 3,
+  "one_shot": false,
+  "toke_api_compiled": false,
+  "warnings": [],
+  "generated_at": "2026-06-01T00:59:16.559519+00:00",
+  "worker_id": 4,
+  "source_chars": 262,
+  "source_lines": 1,
+  "has_companion": true,
+  "has_repair_pairs": true,
+  "test_cases_count": 2
+}

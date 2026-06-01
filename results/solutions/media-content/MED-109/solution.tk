@@ -1,0 +1,1 @@
+m=clean;i=io:std.io;i=s:std.str;f=clean(text:$str):$str{let result=mut."";let len=s.len(text);lp(let j=0;j<len;j=j+1){let ch=s.slice(text;j;j+1);if(ch!="\r"){if(ch!="\x00"){if(ch!="\n"){result=result+ch}}}};<result};f=main():$i64{let input=io.readln();let output=clean(input);io.println(output);<0};

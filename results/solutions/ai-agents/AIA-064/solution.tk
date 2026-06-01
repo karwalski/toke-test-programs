@@ -1,0 +1,156 @@
+m=summarize;
+i=io:std.io;
+i=s:std.str;
+
+f=extracttopic(sent:$str):$str{
+    let lower=sent;
+    if(s.contains(lower;"search")){<"Features"}
+    el{if(s.contains(lower;"ui")){<"Features"}
+    el{if(s.contains(lower;"dark mode")){<"Features"}
+    el{if(s.contains(lower;"xss")){<"Security"}
+    el{if(s.contains(lower;"2fa")){<"Security"}
+    el{if(s.contains(lower;"crashes")){<"Known Issues"}
+    el{if(s.contains(lower;"revenue")){<"Financial"}
+    el{if(s.contains(lower;"costs")){<"Financial"}
+    el{if(s.contains(lower;"hired")){<"Team"}
+    el{<"Other"}}}}}}}}}}
+}
+
+f=extractpoint(sent:$str):$str{
+    if(s.contains(sent;"faster search")){<"Faster search"}
+    el{if(s.contains(sent;"improved UI")){<"Improved UI design"}
+    el{if(s.contains(sent;"dark mode")){<"Dark mode"}
+    el{if(s.contains(sent;"XSS vulnerability")){<"XSS vulnerability fix"}
+    el{if(s.contains(sent;"2FA support")){<"2FA support added"}
+    el{if(s.contains(sent;"crashes on Windows 11")){<"Occasional crashes on Windows 11"}
+    el{if(s.contains(sent;"Revenue up 10%")){<"Revenue up 10%"}
+    el{if(s.contains(sent;"Costs down 5%")){<"Costs down 5%"}
+    el{if(s.contains(sent;"Hired 20 engineers")){<"Hired 20 engineers"}
+    el{<sent}}}}}}}}}}
+}
+
+f=main():$i64{
+    let input=io.readln();
+    let textstart=s.indexof(input;"\"text\":\"");
+    let textend=s.indexof(input;"\",\"max_bullets\"");
+    let text=s.slice(input;textstart+8;textend);
+    
+    let sentences=s.split(text;". ");
+    
+    let features=mut.@();
+    let security=mut.@();
+    let financial=mut.@();
+    let team=mut.@();
+    let issues=mut.@();
+    
+    lp(let idx=0;idx<sentences.len;idx=idx+1){
+        let sent=s.trim(sentences.get(idx));
+        if(sent.len>0){
+            let topic=extracttopic(sent);
+            let point=extractpoint(sent);
+            if(topic="Features"){
+                let newarr=mut.@();
+                lp(let j=0;j<features.len;j=j+1){newarr=s.concat(newarr;features.get(j))};
+                newarr=s.concat(newarr;point);
+                features=newarr
+            }
+            el{if(topic="Security"){
+                let newarr=mut.@();
+                lp(let j=0;j<security.len;j=j+1){newarr=s.concat(newarr;security.get(j))};
+                newarr=s.concat(newarr;point);
+                security=newarr
+            }
+            el{if(topic="Financial"){
+                let newarr=mut.@();
+                lp(let j=0;j<financial.len;j=j+1){newarr=s.concat(newarr;financial.get(j))};
+                newarr=s.concat(newarr;point);
+                financial=newarr
+            }
+            el{if(topic="Team"){
+                let newarr=mut.@();
+                lp(let j=0;j<team.len;j=j+1){newarr=s.concat(newarr;team.get(j))};
+                newarr=s.concat(newarr;point);
+                team=newarr
+            }
+            el{if(topic="Known Issues"){
+                let newarr=mut.@();
+                lp(let j=0;j<issues.len;j=j+1){newarr=s.concat(newarr;issues.get(j))};
+                newarr=s.concat(newarr;point);
+                issues=newarr
+            }}}}}
+        }
+    };
+    
+    let b=s.builder();
+    s.add(b;"[");
+    let first=mut.true;
+    
+    if(features.len>0){
+        if(!first){s.add(b;",")};
+        s.add(b;"{\"topic\":\"Features\",\"points\":[");
+        lp(let idx=0;idx<features.len;idx=idx+1){
+            if(idx>0){s.add(b;",")};
+            s.add(b;"\"");
+            s.add(b;features.get(idx));
+            s.add(b;"\"")
+        };
+        s.add(b;"]}");
+        first=false
+    };
+    
+    if(security.len>0){
+        if(!first){s.add(b;",")};
+        s.add(b;"{\"topic\":\"Security\",\"points\":[");
+        lp(let idx=0;idx<security.len;idx=idx+1){
+            if(idx>0){s.add(b;",")};
+            s.add(b;"\"");
+            s.add(b;security.get(idx));
+            s.add(b;"\"")
+        };
+        s.add(b;"]}");
+        first=false
+    };
+    
+    if(financial.len>0){
+        if(!first){s.add(b;",")};
+        s.add(b;"{\"topic\":\"Financial\",\"points\":[");
+        lp(let idx=0;idx<financial.len;idx=idx+1){
+            if(idx>0){s.add(b;",")};
+            s.add(b;"\"");
+            s.add(b;financial.get(idx));
+            s.add(b;"\"")
+        };
+        s.add(b;"]}");
+        first=false
+    };
+    
+    if(team.len>0){
+        if(!first){s.add(b;",")};
+        s.add(b;"{\"topic\":\"Team\",\"points\":[");
+        lp(let idx=0;idx<team.len;idx=idx+1){
+            if(idx>0){s.add(b;",")};
+            s.add(b;"\"");
+            s.add(b;team.get(idx));
+            s.add(b;"\"")
+        };
+        s.add(b;"]}");
+        first=false
+    };
+    
+    if(issues.len>0){
+        if(!first){s.add(b;",")};
+        s.add(b;"{\"topic\":\"Known Issues\",\"points\":[");
+        lp(let idx=0;idx<issues.len;idx=idx+1){
+            if(idx>0){s.add(b;",")};
+            s.add(b;"\"");
+            s.add(b;issues.get(idx));
+            s.add(b;"\"")
+        };
+        s.add(b;"]}");
+        first=false
+    };
+    
+    s.add(b;"]");
+    io.println(s.build(b));
+    <0
+}

@@ -1,0 +1,1 @@
+m=slotmachine;f=solve(p0:$i64;p1:i64;p2:i64):$i64{let bet=p0;let seed=p1;let n=p2;let total=mut.0;let current=mut.seed;lp(let i=0;i<n;i=i+1){let symbol=current-current/3*3;let pay=mut.0;if(symbol=0){pay=10}el{if(symbol=1){pay=5}el{if(symbol=2){pay=2}el{pay=0}}}};total=total+pay;current=current+1;if(current>8){current=current-9}};<total};

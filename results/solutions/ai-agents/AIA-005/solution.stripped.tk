@@ -1,0 +1,38 @@
+m=recover;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+    let input=io.readln();
+    
+    let strategy=mut."_";
+    let newtool=mut."_";
+    let newargs=mut."_";
+    
+    if(s.contains(input;"_")){
+        strategy="_";
+        let start=s.indexof(input;"_"tool\"_""_"\"_");
+            if(toolend>=0){
+                newtool=s.slice(input;toolstart;toolstart+toolend)
+            }
+        };
+        let querystart=s.indexof(input;"_"query\"_""_"\"_");
+            if(qend>=0){
+                let query=s.slice(input;qstart;qstart+qend);
+                newargs="_"query\"_"\(query)\"_"limit\"_"
+            }
+        }
+    }el{
+        if(s.contains(input;"_")){
+            strategy="_";
+            if(s.contains(input;"_")){
+                newtool="_";
+                newargs="_"key\"_"users\"_"
+            }
+        }
+    };
+    
+    let result="_"strategy\"_"\(strategy)\"_"action\"_"tool\"_"\(newtool)\"_"arguments\"_";
+    io.println(result);
+    <0
+}

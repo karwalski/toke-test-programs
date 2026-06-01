@@ -1,0 +1,1 @@
+m=stripslashes;f=stripslashes(s:$str):$str{let n=s.len;let r=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=92){let nextidx=i+1;if(nextidx<n){let nextc=s.get(nextidx);if(nextc=92){r=r+92 as$str;i=i+1;nextidx=i+1;};};};r=s.concat(r;c) as$str;};<r};

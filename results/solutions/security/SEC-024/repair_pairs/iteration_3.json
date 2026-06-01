@@ -1,0 +1,6 @@
+{
+  "iteration": 3,
+  "broken_source": "m=jwtaudit;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;\".\");if(parts.len()>=1){let header=parts.get(0);if(s.contains(header;\"bm9uZQ\")){io.println(\"none_algorithm\")}el{io.println(\"issues\")}}el{io.println(\"issues\")};<0}",
+  "error": "Test failures:\nTest 1: expected 'none_algorithm', got 'issues'",
+  "fixed_source": "m=jwtaudit;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;\".\");if(parts.len()>=1){let header=parts.get(0);if(s.contains(header;\"ub25l\")){io.println(\"none_algorithm\")}el{io.println(\"issues\")}}el{io.println(\"issues\")};<0}"
+}

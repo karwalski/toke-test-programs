@@ -1,0 +1,32 @@
+m=extract;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let line=mut.io.readln();
+  let result=mut."{";
+  let count=mut.0;
+  lp(line!=""){
+    let colon=s.indexof(line;":");
+    let eq=s.indexof(line;"=");
+    let sep=mut.colon;
+    if(colon<0){sep=eq};
+    if(eq>=0){if(colon<0){sep=eq}el{if(eq<colon){sep=eq}}};
+    if(sep>=0){
+      let key=mut.s.slice(line;0;sep);
+      let val=mut.s.slice(line;sep+1;s.len(line));
+      key=s.trim(key);
+      val=s.trim(val);
+      if(count>0){result=s.concat(result;",")};
+      result=s.concat(result;"\"");
+      result=s.concat(result;key);
+      result=s.concat(result;"\":\"");
+      result=s.concat(result;val);
+      result=s.concat(result;"\"");
+      count=count+1
+    };
+    line=io.readln()
+  };
+  result=s.concat(result;"}");
+  io.println(result);
+  <0
+}

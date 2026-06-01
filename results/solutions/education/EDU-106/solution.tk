@@ -1,0 +1,21 @@
+m=lessonhook;
+i=io:std.io;
+i=s:std.str;
+f=hook(subject:$str):$str{if(subject="math"){<"solve this puzzle:"};if(subject="science"){<"what is the effect of..."};if(subject="history"){<"what were the consequences of..."};if(subject="literature"){<"what is the theme of this book?"}};
+f=main():$i64{
+let input=io.readln();
+let parts=s.split(input;",");
+let subject=s.trim(s.split(s.split(parts[0];"\"")[1];"\"")[0]);
+let topic=s.trim(s.split(s.split(parts[1];"\"")[1];"\"")[0]);
+let gradelevel=s.toint(s.trim(s.split(s.split(parts[2];"\"")[1];"\"")[0]));
+let hooktype=s.trim(s.split(s.split(parts[3];"\"")[1];"\"")[0]);
+let hooktext=hook(subject);
+io.println(s.concat(s.concat("Lesson Hook: ";topic);s.concat(s.concat(s.concat(s.concat(" (";subject);", Grade ");s.fromint(gradelevel));")")));
+if(hooktype="question"){
+io.println("Opening Question: If there were no gravity, what would happen to everything on Earth?")
+} else {
+io.println("Opening Hook: " + hooktext)
+};
+io.println(s.concat(s.concat("Purpose: Activate prior knowledge and curiosity about ";topic);"."));
+<0
+}

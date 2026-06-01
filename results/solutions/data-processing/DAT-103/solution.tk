@@ -1,0 +1,1 @@
+m=inijson;f=solve(p0:$str):$str{let lines=p0.split("\n");let result=mut."";let first=mut.true;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let trimmed=line.trim();let iscomment=trimmed.startswith(";");let isblank=trimmed.len=0;if(!(iscomment)){if(!(isblank)){if(!(first)){result=s.concat(result;"\n");};result=s.concat(result;trimmed);first=false;};};};<result};

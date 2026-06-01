@@ -1,0 +1,87 @@
+m=coinchange;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let line=io.readln();
+  let target=s.toint(s.trim(line));
+  let line2=io.readln();
+  let parts=s.split(s.trim(line2);" ");
+  let coins=mut.@($i64);
+  let cidx=mut.0;
+  lp(cidx<parts.len()){
+    coins=coins+@(s.toint(parts.get(cidx)));
+    cidx=cidx+1
+  };
+  let n=coins.len();
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-1;j=j+1){
+      let aa=coins.get(j);
+      let bb=coins.get(j+1);
+      if(aa<bb){
+        coins=coins.set(j;bb);
+        coins=coins.set(j+1;aa)
+      }
+    }
+  };
+  let big=target+1;
+  let dp=mut.@($i64);
+  let used=mut.@($i64);
+  let di=mut.0;
+  lp(di<=target){
+    if(di=0){dp=dp+@(0)}el{dp=dp+@(big)};
+    used=used+@(0-1);
+    di=di+1
+  };
+  let a=mut.1;
+  lp(a<=target){
+    let ci=mut.0;
+    lp(ci<n){
+      let c=coins.get(ci);
+      if(c<=a){
+        let prev=dp.get(a-c);
+        if(prev+1<dp.get(a)){
+          dp=dp.set(a;prev+1);
+          used=used.set(a;ci)
+        }
+      };
+      ci=ci+1
+    };
+    a=a+1
+  };
+  let best=dp.get(target);
+  if(best>=big){io.println("Impossible");<0};
+  let counts=mut.@($i64);
+  let z=mut.0;
+  lp(z<n){counts=counts+@(0);z=z+1};
+  let cur=mut.target;
+  lp(cur>0){
+    let ui=used.get(cur);
+    counts=counts.set(ui;counts.get(ui)+1);
+    cur=cur-coins.get(ui)
+  };
+  let total=mut.0;
+  let tt=mut.0;
+  lp(tt<n){total=total+counts.get(tt);tt=tt+1};
+  let outl=mut."";
+  let oi=mut.0;
+  let first=mut.1;
+  lp(oi<n){
+    let cc=counts.get(oi);
+    if(cc>0){
+      let r=mut.0;
+      lp(r<cc){
+        if(first=0){outl=s.concat(outl;" ")};
+        outl=s.concat(outl;s.fromint(coins.get(oi)));
+        first=0;
+        r=r+1
+      }
+    };
+    oi=oi+1
+  };
+  outl=s.concat(outl;": ");
+  outl=s.concat(outl;s.fromint(total));
+  outl=s.concat(outl;" coins");
+  io.println(outl);
+  <0
+}

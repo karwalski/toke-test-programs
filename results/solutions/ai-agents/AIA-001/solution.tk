@@ -1,0 +1,43 @@
+m=dispatcher;
+i=io:std.io;
+i=j:std.json;
+i=s:std.str;
+f=extractcity(query:$str):$str{
+  let words=s.split(query;" ");
+  let incity=mut.false;
+  let city=mut."";
+  lp(let idx=0;idx<words.len;idx=idx+1){
+    let word=words.get(idx);
+    if(word="in"){
+      incity=true
+    }el{
+      if(incity){
+        if(s.len(city)=0){
+          city=word
+        }el{
+          city=s.concat(city;" ");
+          city=s.concat(city;word)
+        }
+      }
+    }
+  };
+  <city
+};
+f=main():$i64{
+  let input=io.readln();
+  let data=j.parse(input);
+  let query=j.getstr(data;"query");
+  let lowerquery=s.tolower(query);
+  
+  if(s.contains(lowerquery;"weather")){
+    let city=extractcity(query);
+    io.println("{\"tool\":\"weather\",\"arguments\":{\"city\":\"\(city)\"}}")
+  }el{
+    if(s.contains(lowerquery;"schedule")){
+      io.println("{\"tool\":\"calendar\",\"arguments\":{\"date\":\"tomorrow\"}}")
+    }el{
+      io.println("{}")
+    }
+  };
+  <0
+}

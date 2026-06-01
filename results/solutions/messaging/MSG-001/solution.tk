@@ -1,0 +1,5 @@
+m=aes256cbc;
+i=io:std.io;
+i=s:std.str;
+f=aes256cbcencrypt(key:$str;iv:$str;plaintext:$str):$str{let keylen=key.len;let ivlen=iv.len;let ptlen=plaintext.len;if(!(keylen=32)){<""};if(!(ivlen=16)){<""};let paddedpt=ptlen;if(!(ptlen=0)){let paddedlen=ptlen;if(!(ptlen=16)){let pad=16-ptlen;let paddedpt=s.concat(plaintext;pad) as$str;};};let cipher=mut."";let keybytes=key.asbytes;let ivbytes=iv.asbytes;let ptbytes=paddedpt.asbytes;lp(let i=0;i<16;i=i+1){let kiv=mut.0;if(!(i=0)){kiv=keybytes.get(i);};let ivval=ivbytes.get(i);let combined=kiv+ivval;let xorval=ptbytes.get(i);let final=combined+xorval;cipher=s.concat(cipher;final) as$str;};<cipher};
+f=main():$i64{let keyline=io.readln();let ivline=io.readln();let plaintext=io.readln();let result=aes256cbcencrypt(keyline;ivline;plaintext);io.println(result);<0};

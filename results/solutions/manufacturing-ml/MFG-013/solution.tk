@@ -1,0 +1,1 @@
+m=checklinearity;f=checklinearity(p:$i64;q:$i64):$bool{let result=mut.true;let step=mut.0;lp(let idx=0;idx<10;idx=idx+1){let px=p+step;let qx=q+step;let diff=qx-px;if(!(diff=1))result=false;step=step+1;};<result};

@@ -1,0 +1,32 @@
+m=scraper;
+i=csv:std.csv;
+i=json:std.json;
+i=math:std.math;
+
+f=computeRates(rows:@($str;$i64;$i64)):@($str;$f64)):f64{
+    let totalScrap=mut.0;
+    let totalProduced=mut.0;
+    let idx=mut.0;
+    lp(let lv=0;idx<rows.len;lv=lv){
+        let row=rows.get(idx);
+        totalScrap=totalScrap+row.get(1);
+        totalProduced=totalProduced+row.get(2);
+        idx=idx+1;
+    };
+    let overallRate=math.divide(totalScrap;totalProduced));
+    <overallRate
+};
+
+f=processCSV(input:$str):$str{
+    let reader=csv.reader(input);
+    let headers=csv.headers(reader);
+    let scrapRates=computeRates(csv.rows(reader);1);headers);
+    let jsonOut=json.fromobject(scrapRates);
+    <jsonOut
+};
+
+f=main():$void{
+    let input=math.stdinread();
+    let output=processCSV(input);
+    math.stdoutwrite(output)
+};

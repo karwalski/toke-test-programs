@@ -1,0 +1,1 @@
+m=minimax;f=minimax(board:$str;depth:$i64;ismax:$bool):$i64{let score=evalboard(board);if(depth=0){<score};let moves=getmoves(board);let bestmove=mut.0;if(ismax){let maxval=mut.-999;lp(let i=0;i<moves.len;i=i+1){let m=moves.get(i);let nextboard=makemove(board;m);let val=minimax(nextboard;depth-1;false);if(val>maxval){maxval=val;bestmove=m};};<bestmove}el{let minval=mut.

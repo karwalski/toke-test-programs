@@ -1,0 +1,63 @@
+m=newton;
+i=io:std.io;
+i=s:std.str;
+
+f=fget(a:@$f64;idx:$i64):$f64{
+  <a.get(idx)
+};
+
+f=main():$i64{
+  let nline=s.trim(io.readln());
+  let n=s.toint(nline);
+  let xs=mut.@($f64);
+  let ys=mut.@($f64);
+  lp(let i=0;i<n;i=i+1){
+    let line=s.trim(io.readln());
+    let parts=s.split(line;" ");
+    xs=xs+@(s.tofloat(parts.get(0)));
+    ys=ys+@(s.tofloat(parts.get(1)))
+  };
+  let maxcols=n;
+  let totalsize=n*maxcols;
+  let flat=mut.@($f64);
+  lp(let k=0;k<totalsize;k=k+1){flat=flat+@(0.0)};
+  lp(let i=0;i<n;i=i+1){
+    flat=flat.set(i*maxcols;fget(ys;i))
+  };
+  lp(let col=1;col<n;col=col+1){
+    lp(let row=0;row<n-col;row=row+1){
+      let next=fget(flat;(row+1)*maxcols+col-1);
+      let curr=fget(flat;row*maxcols+col-1);
+      let xa=fget(xs;row+col);
+      let xb=fget(xs;row);
+      let diff=(next-curr)/(xa-xb);
+      flat=flat.set(row*maxcols+col;diff)
+    }
+  };
+  io.println("Divided Difference Table:");
+  lp(let row=0;row<n;row=row+1){
+    let outl=mut."";
+    outl=s.concat(outl;s.format(fget(xs;row);"%.6f"));
+    lp(let col=0;col<n-row;col=col+1){
+      outl=s.concat(outl;" ");
+      outl=s.concat(outl;s.format(fget(flat;row*maxcols+col);"%.6f"))
+    };
+    io.println(outl)
+  };
+  lp(1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){br};
+    let xq=s.tofloat(t);
+    let result=mut.fget(flat;0);
+    let term=mut.1.0;
+    lp(let i=1;i<n;i=i+1){
+      let xi=fget(xs;i-1);
+      term=term*(xq-xi);
+      result=result+term*fget(flat;i)
+    };
+    io.println(s.concat(s.concat(s.concat("p(";t);") = ");s.format(result;"%.6f")))
+  };
+  <0
+}

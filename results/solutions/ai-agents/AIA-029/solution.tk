@@ -1,0 +1,5 @@
+m=anscheck;
+i=io:std.io;
+i=s:std.str;
+f=checkans(ans:$str;ctxs:@$str):$str{let parts=ans.split(" ");let first=parts.get(0);let second=parts.get(1);let found=mut.false;lp(let i=0;i<ctxs.len;i=i+1){let ctx=ctxs.get(i);if(ctx.contains(first)){found=true;};};if(found){<ans};<""};
+f=main():$i64{let input=io.readln();let result=checkans(input;@$str{});io.println(result);<0};

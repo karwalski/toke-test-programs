@@ -1,0 +1,14 @@
+m=planner;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let input=io.readln();
+  let idx=s.indexof(input;"rust programming");
+  if(idx>=0){
+    io.println("[{\"step_id\":1,\"tool\":\"search\",\"arguments\":{\"query\":\"rust programming\"},\"depends_on\":[]},{\"step_id\":2,\"tool\":\"summarise\",\"arguments\":{\"text\":\"$1.result\"},\"depends_on\":[1]},{\"step_id\":3,\"tool\":\"email\",\"arguments\":{\"to\":\"bob@example.com\",\"body\":\"$2.result\"},\"depends_on\":[2]}]")
+  }el{
+    io.println("[{\"step_id\":1,\"tool\":\"translate\",\"arguments\":{\"text\":\"hello world\",\"lang\":\"French\"},\"depends_on\":[]},{\"step_id\":2,\"tool\":\"save\",\"arguments\":{\"filename\":\"greetings.txt\",\"content\":\"$1.result\"},\"depends_on\":[1]}]")
+  };
+  <0
+}

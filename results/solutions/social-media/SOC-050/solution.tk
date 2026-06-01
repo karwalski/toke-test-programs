@@ -1,0 +1,1 @@
+m=react;f=getreactions(postid:$str):$str{let query="SELECT reaction_type, COUNT(*) as count FROM reactions WHERE post_id=? GROUP BY reaction_type";let result=execquery(query;postid);<result};f=topreactors(postid:$str):$str{let query="SELECT user_id

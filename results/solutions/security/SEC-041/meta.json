@@ -1,0 +1,23 @@
+{
+  "id": "SEC-041",
+  "category": "security",
+  "title": "Insecure Deserialization Detector",
+  "description": "Reads serialised object data from stdin (Java serialised, Python pickle, PHP serialised, JSON with class hints). Detects patterns indicating unsafe deserialisation.",
+  "difficulty": 4,
+  "stdlib_modules": [
+    "std.str",
+    "std.json",
+    "std.crypto"
+  ],
+  "repair_count": 1,
+  "one_shot": false,
+  "toke_api_compiled": false,
+  "warnings": [],
+  "generated_at": "2026-06-01T01:14:21.722233+00:00",
+  "worker_id": 2,
+  "source_chars": 296,
+  "source_lines": 1,
+  "has_companion": true,
+  "has_repair_pairs": true,
+  "test_cases_count": 2
+}

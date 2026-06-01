@@ -1,0 +1,1 @@
+m=rulechecker;f=checkrule(rule:$str;packet:$str):$bool{let parts=rule.split(" ");let field=parts.get(0);let value=parts.get(1);let action=parts.get(2);let pktfield=packet.split(" ")[0];let matches=mut.false;if(field="src"){if(pktfield=value){matches=true}}el{if(field="dst"){if(pktfield=value){matches=true}}el{if(field="proto

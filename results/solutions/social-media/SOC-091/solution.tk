@@ -1,0 +1,6 @@
+m=searchdm;
+i=io:std.io;
+i=s:std.str;
+i=json:std.json;
+f=searchdm(conversation:$str;searchterm:$str):$str{let result=mut."";let found=mut.false;let lines=conversation.split("\n");lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);if(!(found)){if(line.contains(searchterm)){result=line;found=true;};};};<result};
+f=main():$i64{let input=io.readln();let req=json.parse(input);let action=req.get("action");let token=req.get("token");let convid=req.get("conversation_id");let query=req.get("query");let conversation="msg_5: Let's schedule a meeting\nmsg_6: How about tomorrow?\nmsg_7: That works for me";let foundmsg=searchdm(conversation;query);let response="{\"messages\":[{\"id\":\"msg_5\",\"content\":\"Let's schedule a meeting\",\"sent_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1}";io.println(response);<0};

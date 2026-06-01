@@ -1,0 +1,1 @@
+m=workflow;f=calculateeta(completed:$i64;remaining:$i64;elapsed:$i64):$i64{if(remaining=0){<0};let avg=elapsed/completed;let eta=avg*remaining;<eta};f=main():$i64{let completed=3;let remaining=2;let elapsed=10;let eta=calculateeta(completed;remaining;elapsed);<0};

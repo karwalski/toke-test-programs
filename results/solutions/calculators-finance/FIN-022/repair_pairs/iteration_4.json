@@ -1,0 +1,6 @@
+{
+  "iteration": 4,
+  "broken_source": "m=gst;i=io:std.io;i=s:std.str;f=gst(rate:$f64;amount:$f64):$f64{let result=mut.0.0;if(rate>0.0){let gstamt=amount*rate;result=amount+gstamt}el{result=amount};<result};f=main():$i64{let rate=0.1;let amount=100.0;let total=gst(rate;amount);io.println(s.fromfloat(amount));io.println(s.fromfloat(amount*rate));<0}",
+  "error": "Test failures:\nTest 1: expected '100.00\n10.00', got '100\n10'\nTest 2: expected '100.00\n10.00', got '100\n10'",
+  "fixed_source": "m=gst;i=io:std.io;i=s:std.str;f=gst(rate:$f64;amount:$f64):$f64{let result=mut.0.0;if(rate>0.0){let gstamt=amount*rate;result=amount+gstamt}el{result=amount};<result};f=main():$i64{let rate=0.1;let amount=100.0;let total=gst(rate;amount);io.println(s.format(amount;\"%.2f\"));io.println(s.format(amount*rate;\"%.2f\"));<0}"
+}

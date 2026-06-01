@@ -1,0 +1,60 @@
+m=csvfromjson;
+i=io:std.io;
+i=s:std.str;
+f=isalnum(c:$str):$bool{if(c="0"){<1=1};if(c="1"){<1=1};if(c="2"){<1=1};if(c="3"){<1=1};if(c="4"){<1=1};if(c="5"){<1=1};if(c="6"){<1=1};if(c="7"){<1=1};if(c="8"){<1=1};if(c="9"){<1=1};<1!=1};
+f=main():$i64{
+let input=io.readln();
+let n=s.len(input);
+let result=mut."";
+let header=mut."";
+let row=mut."";
+let cur=mut."";
+let instr=mut.0;
+let isval=mut.0;
+let objcount=mut.0;
+let keycount=mut.0;
+let curisstr=mut.0;
+let idx=mut.0;
+lp(idx<n){
+let ch=s.slice(input;idx;idx+1);
+if(ch="\""){
+if(instr=1){instr=0;if(isval=1){curisstr=1;};}el{instr=1;};
+}el{
+if(instr=1){cur=cur+ch;}el{
+if(ch="{"){isval=0;cur="";curisstr=0;}el{
+if(ch=":"){
+if(objcount=0){if(keycount=0){header=cur;}el{header=s.concat(header;",");header=s.concat(header;cur);};keycount=keycount+1;};
+isval=1;cur="";curisstr=0;
+}el{
+if(ch=","){
+if(isval=1){
+let val=mut.cur;
+if(curisstr=1){if(s.contains(cur;" ")){val=s.concat("\"";cur);val=s.concat(val;"\"");};};
+if(s.len(row)=0){row=val;}el{row=s.concat(row;",");row=s.concat(row;val);};
+isval=0;cur="";curisstr=0;
+};
+}el{
+if(ch="}"){
+if(isval=1){
+let val=mut.cur;
+if(curisstr=1){if(s.contains(cur;" ")){val=s.concat("\"";cur);val=s.concat(val;"\"");};};
+if(s.len(row)=0){row=val;}el{row=s.concat(row;",");row=s.concat(row;val);};
+};
+if(objcount=0){result=header;};
+result=s.concat(result;"\n");
+result=s.concat(result;row);
+row="";
+objcount=objcount+1;
+isval=0;cur="";curisstr=0;
+}el{
+if(isval=1){if(ch!=" "){cur=cur+ch;}el{cur=cur+ch;};};
+};
+};
+};
+};
+};
+};
+idx=idx+1;
+};
+io.println(result);
+<0};

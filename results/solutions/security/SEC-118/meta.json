@@ -1,0 +1,24 @@
+{
+  "id": "SEC-118",
+  "category": "security",
+  "title": "Cryptographic Key Derivation Auditor",
+  "description": "Reads a password and KDF configuration from stdin. Evaluates the KDF parameters (PBKDF2/bcrypt/scrypt/argon2) for security and estimates crack time on modern hardware.",
+  "difficulty": 3,
+  "stdlib_modules": [
+    "std.crypto",
+    "std.str",
+    "std.json",
+    "std.time"
+  ],
+  "repair_count": 0,
+  "one_shot": true,
+  "toke_api_compiled": true,
+  "warnings": [],
+  "generated_at": "2026-06-01T01:35:00.299206+00:00",
+  "worker_id": 5,
+  "source_chars": 449,
+  "source_lines": 1,
+  "has_companion": true,
+  "has_repair_pairs": false,
+  "test_cases_count": 2
+}

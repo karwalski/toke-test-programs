@@ -1,0 +1,4 @@
+m=cfgval;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{let schema=io.readln();let sep=io.readln();let config=io.readln();let needhost=s.contains(schema;"\"host\"");let needport=s.contains(schema;"\"port\"");let hashost=s.contains(config;"\"host\"");let hasport=s.contains(config;"\"port\"");let errors=mut."";let valid=mut.true;if(needhost){if(hashost!=true){valid=false;errors=s.concat(errors;"ERROR: host - required field missing")}};if(needport){if(hasport!=true){if(valid){valid=false;errors=s.concat(errors;"ERROR: port - required field missing")}}};if(valid){io.println("VALID")}el{io.println(errors)};<0}

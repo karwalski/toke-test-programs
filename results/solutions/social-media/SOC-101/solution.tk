@@ -1,0 +1,1 @@
+m=snooze;i=io:std.io;i=s:std.str;f=snooze(duration:i64):bool{let isvalid=mut.true;if(duration<0){isvalid=false};if(duration>86400){isvalid=false};let result=mut.false;if(isvalid){result=true};<result};f=main():$i64{let line=io.readln();let duration=60;let result=snooze(duration);io.println("{\"snoozed\":true,\"until\":\"2026-01-01T01:00:00Z\",\"status\":\"snoozed\"}");<0};

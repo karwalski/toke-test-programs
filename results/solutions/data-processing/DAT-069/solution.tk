@@ -1,0 +1,18 @@
+m=deepmerge;
+i=io:std.io;
+i=s:std.str;
+f=deepmerge(a:$str;b:$str):$str{let result=mut.a;let blen=b.len;lp(let bi=0;bi<blen;bi=bi+1){let ch=b.get(bi);let rlen=result.len;let found=mut.false;lp(let ri=0;ri<rlen;ri=ri+1){if(result.get(ri)=ch){found=true};};if(!(found)){result=result+ch};};<result};
+f=main():$i64{
+  let input=mut."";
+  let line=mut.io.readln();
+  while(line!=""){
+    if(line="---"){
+      line=io.readln();
+    }else{
+      input=s.concat(s.concat(input;line);"\n");
+      line=io.readln();
+    };
+  };
+  io.println(input);
+  <0
+};

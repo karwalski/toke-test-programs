@@ -1,0 +1,6 @@
+{
+  "iteration": 2,
+  "broken_source": "m=crontab;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;\" \");let minute=parts.get(0);let cmd=parts.get(5);let result=mut.\"\";if(s.contains(minute;\"/\")){let mparts=s.split(minute;\"/\");let step=mparts.get(1);result=s.concat(cmd;s.concat(\": every \";s.concat(step;\" minutes\")))}el{result=s.concat(cmd;s.concat(\": every hour at :\";minute))};io.println(result);<0}",
+  "error": "Test failures:\nTest 1: expected '/bin/cleanup: every hour at :00', got '/bin/cleanup: every hour at :0'",
+  "fixed_source": "m=crontab;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;\" \");let minute=parts.get(0);let cmd=parts.get(5);let result=mut.\"\";if(s.contains(minute;\"/\")){let mparts=s.split(minute;\"/\");let step=mparts.get(1);result=s.concat(cmd;s.concat(\": every \";s.concat(step;\" minutes\")))}el{let disp=mut.minute;if(minute=\"0\"){disp=\"00\"};result=s.concat(cmd;s.concat(\": every hour at :\";disp))};io.println(result);<0}"
+}

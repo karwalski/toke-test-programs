@@ -1,0 +1,1 @@
+m=urlscanner;f=extractscheme(url:$str):$str{let schemeend=mut.0;let found=mut.false;lp(let i=0;i<url.len;i=i+1){let ch=url.get(i);if(ch=":"){schemeend=i;found=true;br;};};if(found){<url.sub(0;schemeend))}el{<""}};f=extracthost(url:$str):$str{let hoststart=mut.0;let host

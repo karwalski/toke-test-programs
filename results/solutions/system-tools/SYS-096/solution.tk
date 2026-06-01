@@ -1,0 +1,14 @@
+To list all zombie (defunct) processes on a Unix-like system, you can use the `ps` command. Here is a step-by-step guide to achieve this:
+
+1. Open a terminal.
+2. Run the following command to list all processes, including zombies:
+
+   ```sh
+   ps aux | awk '{if ($8 == "Z")) {print $2, $3, $10}}'
+   ```
+
+   This command uses `ps aux` to get a list of all processes. The `awk` command filters this list to show only processes that are zombies (indicated by `Z` in the 8th column)).
+
+3. The output will show the PID, parent PID, and command name of all zombie processes.
+
+This method provides a quick and effective way to identify and list all zombie processes on a Unix-like system.

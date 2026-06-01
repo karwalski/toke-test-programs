@@ -1,0 +1,1 @@
+m=mean;f=solve(p0:$str):$f64{let data=mut.@();let lines=p0.split("\n");let idx=mut.1;lp(let i=1;i<lines.len;i=i+1){let line=lines.get(i);let cols=line.split(",");if(cols.len<2){<0.0};let val=cols.get(1);let num=val.to-f64();data=data+@(num);};let sum=mut.0.0;lp(let i=0;i<data.len;i=i+1){sum=sum+data.get(i);};let count=data.len as-f64();let avg=sum/count;<avg};

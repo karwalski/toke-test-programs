@@ -1,0 +1,1 @@
+m=runlen;f=decode(s:$str):$str{let n=s.len;let m=mut.0;let result=mut."";lp(let idx=0;idx<n;idx=idx+1){let ch=s.get(idx);if(ch>47){if(ch<58){let times=ch-48;let sym=s.get(idx-1);let tmp=mut."";lp(let j=0;j<times;j=j+1){tmp=tmp+sym};result=s.concat(result;tmp)}el{m=1}}el{m=1}};if(m=0){<result};<""};

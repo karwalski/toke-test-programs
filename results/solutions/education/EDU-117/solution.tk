@@ -1,0 +1,1 @@
+m=portfolio;f=grade(sample:$str):$str{let keywords=@("project";"assignment";"task";"challenge"));let found=mut.false;let result=mut."";lp(let i=0;i<keywords.len;i=i+1){let kw=keywords.get(i);if(sample.contains(kw)){found=true;result=kw;};};if(found){<result}el{<""}};f=skill

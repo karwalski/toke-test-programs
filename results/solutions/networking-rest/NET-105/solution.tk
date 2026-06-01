@@ -1,0 +1,1 @@
+m=main;i=http:std.http;i=json:std.json;i=str:std.str;f=main():$void{let url=mut.str.read();let body=mut.str.read();let resp=http.patch(url;body);let out=json.enc(resp);str.print(out);};

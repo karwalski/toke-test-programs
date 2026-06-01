@@ -1,0 +1,86 @@
+m=lightsout;
+i=io:std.io;
+i=s:std.str;
+i=mut:std.mut;
+
+f=solve(grid:$[i64];size:$i64):$[i64]{
+    let pressed=mut.array(size*size;0);
+    let current=mut.array(size*size;0);
+    lp(let i=0;i<size*size;i=i+1){
+        current.set(i;grid.get(i));
+    };
+    
+    lp(let row=0;row<size;row=row+1){
+        lp(let col=0;col<size;col=col+1){
+            let idx=row*size+col;
+            if(current.get(idx)=1){
+                pressed.set(idx;1);
+                current.set(idx;1-current.get(idx));
+                if(row>0){
+                    let up=(row-1)*size+col;
+                    current.set(up;1-current.get(up));
+                };
+                if(row<size-1){
+                    let down=(row+1)*size+col;
+                    current.set(down;1-current.get(down));
+                };
+                if(col>0){
+                    let left=row*size+(col-1);
+                    current.set(left;1-current.get(left));
+                };
+                if(col<size-1){
+                    let right=row*size+(col+1);
+                    current.set(right;1-current.get(right));
+                };
+            };
+        };
+    };
+    
+    lp(let i=0;i<size*size;i=i+1){
+        if(current.get(i)=1){
+            <mut.array(0;0);
+        };
+    };
+    <pressed;
+};
+
+f=main():$i64{
+    let lines=mut.array(0;"");
+    let size=mut.0;
+    lp(let running=true;running){
+        let line=io.readln();
+        if(s.length(line)=0){
+            running=false;
+        }else{
+            if(size=0){
+                size=s.length(line);
+            };
+            lines.append(line);
+        };
+    };
+    
+    let grid=mut.array(size*size;0);
+    lp(let i=0;i<size;i=i+1){
+        let line=lines.get(i);
+        lp(let j=0;j<size;j=j+1){
+            let char=s.char(line;j);
+            let val=s.toint(char);
+            grid.set(i*size+j;val);
+        };
+    };
+    
+    let result=solve(grid;size);
+    if(result.length()=0){
+        io.println("Unsolvable");
+    }else{
+        lp(let i=0;i<size;i=i+1){
+            lp(let j=0;j<size;j=j+1){
+                let idx=i*size+j;
+                if(result.get(idx)=1){
+                    io.println(s.concat(s.concat(s.fromint(i);" ");s.fromint(j)));
+                };
+            };
+        };
+    };
+    <0;
+};

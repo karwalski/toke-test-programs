@@ -1,0 +1,1 @@
+m=xmltojson;f=xmltojson(s:$str):$str{let n=s.len;let i=mut.0;let out=mut."";lp(let j=0;j<n;j=j+1){let c=s.get(j);if(c=">"){i=i+1}el{if(c="<"){if(i>0){out=s.concat(out;"\"");out=s.concat(out;s.slice(j+1;n));out=s.concat(out;"}");j=n}}el{if(!(i>0))){out=s.concat(out;"{")}}}}};<out};

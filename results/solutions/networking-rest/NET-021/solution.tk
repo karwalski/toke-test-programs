@@ -1,0 +1,1 @@
+m=echo;f=main():$void{let srv=ws.srv.new("0.0.0.0";8080);let con=ws.srv.accept(srv);let msg=ws.srv.recv(con);let echo="echo: "+msg;ws.srv.send(con;echo);};

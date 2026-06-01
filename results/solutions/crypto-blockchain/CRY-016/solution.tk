@@ -1,0 +1,41 @@
+m=pbkdf2;
+i=io:std.io;
+i=s:std.str;
+i=crypto:std.crypto;
+f=solve(p0:$str;p1:$str;p2:i64):$str{
+    let derived=crypto.pbkdf2hmacsha256(p0;p1;p2;32);
+    let hex=mut."";
+    lp(let i=0;i<derived.len;i=i+1){
+        let byte=derived.sub(i;1);
+        let val=byte as i64;
+        let hexbyte=mut."";
+        let high=val/16;
+        let low=val%16;
+        if(high<10){hexbyte=s.concat(hexbyte;s.fromint(high));}else{
+            if(high==10){hexbyte=s.concat(hexbyte;"a");};
+            if(high==11){hexbyte=s.concat(hexbyte;"b");};
+            if(high==12){hexbyte=s.concat(hexbyte;"c");};
+            if(high==13){hexbyte=s.concat(hexbyte;"d");};
+            if(high==14){hexbyte=s.concat(hexbyte;"e");};
+            if(high==15){hexbyte=s.concat(hexbyte;"f");};
+        };
+        if(low<10){hexbyte=s.concat(hexbyte;s.fromint(low));}else{
+            if(low==10){hexbyte=s.concat(hexbyte;"a");};
+            if(low==11){hexbyte=s.concat(hexbyte;"b");};
+            if(low==12){hexbyte=s.concat(hexbyte;"c");};
+            if(low==13){hexbyte=s.concat(hexbyte;"d");};
+            if(low==14){hexbyte=s.concat(hexbyte;"e");};
+            if(low==15){hexbyte=s.concat(hexbyte;"f");};
+        };
+        hex=s.concat(hex;hexbyte);
+    };
+    <hex
+};
+f=main():$i64{
+    let password=io.readln();
+    let salt=io.readln();
+    let iterations=s.toint(io.readln());
+    let result=solve(password;salt;iterations);
+    io.println(result);
+    <0
+};

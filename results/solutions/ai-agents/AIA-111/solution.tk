@@ -1,0 +1,96 @@
+m=prefprofile;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=analyzeinteractions(interactions:@($str)):$str{
+  let verbosity=mut.0;
+  let style=mut.0;
+  let jargon=mut.0;
+  let examples=mut.0;
+  let count=mut.0;
+  
+  lp(let idx=0;idx<interactions.len;idx=idx+1){
+    let interaction=j.parse(interactions.get(idx));
+    let query=j.get(interaction;"query");
+    let chosen=j.get(interaction;"chosen_response");
+    let rejected=j.get(interaction;"rejected_response");
+    
+    let chosenlen=s.len(chosen);
+    let rejectedlen=s.len(rejected);
+    
+    if(chosenlen<rejectedlen){
+      verbosity=verbosity+1;
+    };
+    
+    if(s.contains(chosen;"example")){
+      examples=examples+1;
+    };
+    
+    if(s.contains(chosen;"O(")){
+      jargon=jargon+1;
+    };
+    
+    if(chosenlen>200){
+      style=style+1;
+    };
+    
+    count=count+1;
+  };
+  
+  let prefs=j.object();
+  let conf=j.object();
+  
+  if(count>0){
+    let vfrac=verbosity as$f64/count as$f64;
+    let sfrac=style as$f64/count as$f64;
+    let jfrac=jargon as$f64/count as$f64;
+    let efrac=examples as$f64/count as$f64;
+    
+    if(vfrac<0.5){
+      j.set(prefs;"verbosity";"concise");
+      j.set(conf;"verbosity";0.9);
+    }el{
+      j.set(prefs;"verbosity";"detailed");
+      j.set(conf;"verbosity";0.7);
+    };
+    
+    if(sfrac<0.5){
+      j.set(prefs;"style";"direct");
+      j.set(conf;"style";0.8);
+    }el{
+      j.set(prefs;"style";"comprehensive");
+      j.set(conf;"style";0.6);
+    };
+    
+    if(jfrac>0.3){
+      j.set(prefs;"jargon_level";"high");
+      j.set(conf;"jargon_level";0.5);
+    }el{
+      j.set(prefs;"jargon_level";"moderate");
+      j.set(conf;"jargon_level";0.6);
+    };
+    
+    if(efrac>0.3){
+      j.set(prefs;"examples";"many");
+      j.set(conf;"examples";0.7);
+    }el{
+      j.set(prefs;"examples";"minimal");
+      j.set(conf;"examples";0.5);
+    };
+  };
+  
+  let result=j.object();
+  j.set(result;"preferences";prefs);
+  j.set(result;"confidence";conf);
+  <j.stringify(result);
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let data=j.parse(input);
+  let interactions=j.get(data;"interactions");
+  let profile=analyzeinteractions(@(j.stringify(interactions)));
+  io.println(profile);
+  <0;
+}

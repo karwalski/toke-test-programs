@@ -1,0 +1,50 @@
+m=normalise;f=normalise(val:$f64;lo:$f64;hi:$f64):$f64{let range=hi-lo;let diff=val-lo;let norm=diff/range;<norm};
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let header=io.readln();
+  let data=[];
+  let line=io.readln();
+  while line!=""{
+    let parts=s.split(line;",");
+    let row=[];
+    for part in parts{
+      row.push(s.tofloat(part));
+    };
+    data.push(row);
+    line=io.readln();
+  };
+  
+  let cols=data[0].len();
+  let mins=[];
+  let maxs=[];
+  
+  for col in 0..cols{
+    let colvals=[];
+    for row in data{
+      colvals.push(row[col]);
+    };
+    let minval=colvals[0];
+    let maxval=colvals[0];
+    for val in colvals{
+      if val<minval{minval=val;};
+      if val>maxval{maxval=val;};
+    };
+    mins.push(minval);
+    maxs.push(maxval);
+  };
+  
+  let normalised=[];
+  for row in data{
+    let normrow=[];
+    for col in 0..cols{
+      let normval=normalise(row[col];mins[col];maxs[col]);
+      normrow.push(normval);
+    };
+    normalised.push(normrow);
+  };
+  
+  let result="{\"normalised\":" + s.fromarray(normalised) + ",\"min\":" + s.fromarray(mins) + ",\"max\":" + s.fromarray(maxs) + "}";
+  io.println(result);
+  <0
+};

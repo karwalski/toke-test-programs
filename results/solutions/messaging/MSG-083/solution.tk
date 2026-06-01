@@ -1,0 +1,1 @@
+m=shamir;f=binomial(n:$i64;k:$i64):$i64{if(k<0){<0};if(k>n){<0};let res=mut.1;lp(let i=0;i<k;i=i+1){res=res*(n-i)/(i+1))};<res};f=modpow(base:$i64;exp:$i64;m:$i64):$i64{let result=mut.1;let baseval=mut.base;let expval=mut.exp;lp(let i=0;expval>0;i=i+1){let odd=expval-expval/2*2;if(odd=1){result=result*baseval;result=result-m*(result-m*(result-m*(result-m*(result-m*(

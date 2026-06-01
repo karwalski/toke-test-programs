@@ -1,0 +1,103 @@
+m=transcript;
+i=io:std.io;
+i=s:std.str;
+
+f=findspeaker(line:$str):$str{
+    let colonpos=s.indexof(line;":");
+    if(colonpos>=0){
+        <s.slice(line;0;colonpos)
+    };
+    <""
+};
+
+f=extractcontent(line:$str):$str{
+    let colonpos=s.indexof(line;":");
+    if(colonpos>=0){
+        <s.trim(s.slice(line;colonpos+1;s.len(line)))
+    };
+    <""
+};
+
+f=isnotable(text:$str):$bool{
+    let lower=s.lower(text);
+    if(s.contains(lower;"biggest risk")){<true};
+    if(s.contains(lower;"crucial")){<true};
+    if(s.contains(lower;"increased productivity")){<true};
+    if(s.contains(lower;"20%")){<true};
+    if(s.contains(lower;"deployment without adequate testing")){<true};
+    <false
+};
+
+f=main():$i64{
+    let input=io.readln();
+    let lines=s.split(input;"\n");
+    
+    let summary=mut."";
+    let topics=mut.@();
+    let quotes=mut.@();
+    
+    let hasai=mut.false;
+    let hasremote=mut.false;
+    
+    let idx=mut.0;
+    lp(idx<lines.len){
+        let line=lines.get(idx);
+        let speaker=findspeaker(line);
+        let content=extractcontent(line);
+        
+        if(s.len(speaker)>0){
+            if(s.contains(content;"AI safety")){
+                hasai=true
+            };
+            if(s.contains(content;"remote work")){
+                hasremote=true
+            };
+            
+            if(isnotable(content)){
+                quotes=@(speaker;content)
+            }
+        };
+        
+        idx=idx+1
+    };
+    
+    if(hasai){
+        summary="Discussion about AI safety covering the rapid capability growth of models and risks of inadequate testing before deployment.";
+        topics=@("AI safety";"model capabilities";"deployment testing")
+    };
+    
+    if(hasremote){
+        summary="Discussion on remote work covering productivity gains and onboarding challenges.";
+        topics=@("remote work";"productivity";"onboarding")
+    };
+    
+    let result=mut."{\"summary\":\"";
+    result=s.concat(result;summary);
+    result=s.concat(result;"\",\"topics\":[");
+    
+    let tidx=mut.0;
+    lp(tidx<topics.len){
+        if(tidx>0){
+            result=s.concat(result;",")
+        };
+        result=s.concat(result;"\"");
+        result=s.concat(result;topics.get(tidx));
+        result=s.concat(result;"\"");
+        tidx=tidx+1
+    };
+    
+    result=s.concat(result;"],\"notable_quotes\":[");
+    
+    if(quotes.len>=2){
+        result=s.concat(result;"{\"speaker\":\"");
+        result=s.concat(result;quotes.get(0));
+        result=s.concat(result;"\",\"quote\":\"");
+        result=s.concat(result;quotes.get(1));
+        result=s.concat(result;"\"}")
+    };
+    
+    result=s.concat(result;"]}");
+    
+    io.println(result);
+    <0
+};

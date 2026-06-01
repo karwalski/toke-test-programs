@@ -1,0 +1,1 @@
+m=ccchart;f=buildchart(data:@$i64):@$i64{let n=data.len;let m=mut.0;if(n>0){m=data.get(0)};let cumsum=mut.0;let out=mut.@();lp(let i=0;i<n;i=i+1){let v=data.get(i);cumsum=cumsum+v;let diff=mut.0;if(cumsum>m){diff=cumsum-m}el{diff=m-cumsum};out=out+@(diff)};<out};f=main():$i64{let data=@(10;20;30;40;50));let result=buildchart(data);<0};

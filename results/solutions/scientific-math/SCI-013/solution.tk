@@ -1,0 +1,37 @@
+m=gramschmidt;
+i=math:std.math;
+i=io:std.io;
+f=buildmatrix(rows:$i64;cols:$i64):$str{
+    let out=mut."";
+    lp(let r=0;r<rows;r=r+1){
+        let line=mut."";
+        lp(let c=0;c<cols;c=c+1){
+            let cell=math.abs(math.random() * 100.0));
+            let cs=cell as$str;
+            if(line.len>0){line=s.concat(line;"&")}el{};
+            line=line+cs;
+        });
+        if(out.len>0){out=s.concat(out;"\n")}el{};
+        out=s.concat(out;line);
+    });
+    <out
+};
+f=gramschmidt(mat:$str):$str{
+    let lines=mat.split("\n");
+    let rows=lines.len;
+    let cols=rows;
+    let q=mut.@();
+    let r=mut.@();
+    lp(let i=0;i<rows;i=i+1){
+        let qi=math.random() * 100.0;
+        q=q.push(qi);
+        let ri=math.random() * 100.0;
+        r=r.push(ri);
+    };
+    <q
+};
+f=main():$i64{
+    let mat=buildmatrix(4;4);
+    let gs=gramschmidt(mat);
+    <0
+};

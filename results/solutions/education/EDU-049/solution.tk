@@ -1,0 +1,97 @@
+m=recommend;
+i=io:std.io;
+i=s:std.str;
+f=parsepreqs(prereqstr:$str):@($str){
+  let trimmed=s.trim(prereqstr);
+  let result=mut.@();
+  if(s.len(trimmed)=0){
+    <result
+  };
+  let parts=s.split(trimmed;"\"");
+  let idx=mut.1;
+  lp(idx<parts.len()){
+    if(idx%2=1){
+      let part=s.trim(parts.get(idx));
+      if(s.len(part)>0){
+        result=result+@(part)
+      }
+    };
+    idx=idx+2
+  };
+  <result
+};
+f=checkreqs(prereqs:@($str);completed:@($str)):$bool{
+  let idx=mut.0;
+  lp(idx<prereqs.len()){
+    let reqid=s.trim(prereqs.get(idx));
+    let found=mut.0;
+    let cidx=mut.0;
+    lp(cidx<completed.len()){
+      if(s.trim(completed.get(cidx))=reqid){
+        found=1
+      };
+      cidx=cidx+1
+    };
+    if(found=0){
+      <(0=1)
+    };
+    idx=idx+1
+  };
+  <(1=1)
+};
+f=main():$i64{
+  let line=io.readln();
+  let parts=s.split(line;":");
+  if(parts.len()<2){
+    <0
+  };
+  let topicspart=parts.get(1);
+  let topicstrs=s.split(topicspart;"{");
+  let completed=mut.@();
+  let available=mut.@();
+  let idx=mut.1;
+  lp(idx<topicstrs.len()){
+    let topic=topicstrs.get(idx);
+    let idstart=s.split(topic;"\"id\":\"");
+    if(idstart.len()>=2){
+      let idpart=idstart.get(1);
+      let idend=s.split(idpart;"\"");
+      if(idend.len()>=1){
+        let topicid=idend.get(0);
+        let titlestart=s.split(topic;"\"title\":\"");
+        if(titlestart.len()>=2){
+          let titlepart=titlestart.get(1);
+          let titleend=s.split(titlepart;"\"");
+          if(titleend.len()>=1){
+            let title=titleend.get(0);
+            let prereqs=mut.@();
+            let prereqstart=s.split(topic;"\"prerequisites\":[");
+            if(prereqstart.len()>=2){
+              let prereqpart=prereqstart.get(1);
+              let prereqend=s.split(prereqpart;"]");
+              if(prereqend.len()>=1){
+                let prereqstr=prereqend.get(0);
+                prereqs=parsepreqs(prereqstr)
+              }
+            };
+            if(s.contains(topic;"\"completed\":true")){
+              completed=completed+@(topicid)
+            }el{
+              if(checkreqs(prereqs;completed)){
+                available=available+@(title)
+              }
+            }
+          }
+        }
+      }
+    };
+    idx=idx+1
+  };
+  io.println("Recommended:");
+  let aidx=mut.0;
+  lp(aidx<available.len()){
+    io.println(s.concat("- ";available.get(aidx)));
+    aidx=aidx+1
+  };
+  <0
+}

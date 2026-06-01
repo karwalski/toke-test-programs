@@ -1,0 +1,1 @@
+m=csvprofile;f=profilecol(rows:@($str);$str);colidx:$i64;colname:$str):$str{let total=rows.len;let nullcount=mut.0;lp(let ri=0;ri<total;ri=ri+1){let cell=rows.get(ri);if(cell.len=0){nullcount=nullcount+1}};let nullpct=nullcount as$f64*100.0/total as$f64;let notnullcount=total-nullcount;let values=mut.@($str)

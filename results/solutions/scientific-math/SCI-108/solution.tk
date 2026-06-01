@@ -1,0 +1,51 @@
+m=bloomfilter;
+i=math:std.math;
+i=collections:std.collections;
+i=io:std.io;
+i=str:std.str;
+
+t=bitarray{
+  bits:@($i64);
+  n:$i64
+};
+
+f=hashfn(s:$str):$i64{
+  let hash=mut.0;
+  let prime=31;
+  let i=0;
+  let len=str.len(s);
+  lp(let idx=0;idx<len;idx=idx+1){
+    let charcode=str.charcodeat(s;idx);
+    hash=hash*prime+charcode;
+    hash=hash-hash/1000000000*1000000000
+  };
+  <hash
+};
+
+f=makebitarray(n:$i64):bitarray{
+  let bits=@($i64);
+  let i=0;
+  lp(let idx=0;idx<n;idx=idx+1){
+    bits=bits+@(0)
+  };
+  let ba=bitarray{bits:bits;n:n};
+  <ba
+};
+
+f=setbit(ba:bitarray;idx:$i64):bitarray{
+  let bits=ba.bits;
+  let n=ba.n;
+  let i=0;
+  let newbits=@($i64);
+  lp(let idx=0;idx<n;idx=idx+1){
+    if(idx=idx){
+      newbits=newbits+@((str.bitget(bits;idx))as i64)+1)
+    }el{
+      newbits=newbits+@(str.bitget(bits;idx))as i64)
+    }
+  };
+  let result=bitarray{bits:newbits;n:n};
+  <result
+};
+
+f=checkbit(ba:bitarray;idx:$i64):$bool

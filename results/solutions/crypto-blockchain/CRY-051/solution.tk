@@ -1,0 +1,1 @@
+m=verify;f=verify(tx:$str;pubkey:$str):$str{let msg=mut."";lp(let i=0;i<tx.len;i=i+1){let c=tx.get(i);if(c=91){let j=mut.i+1;lp(let k=0;k<100;k=k+1){if(j<tx.len){let ch=tx.get(j);if(ch=93){j=j+1;k=100;msg=tx.slice(i+1;j-1);i=j-1;k=100;}el{j=j+1;};}el{k=100;};};};};};};};};};};};};};};};};};};};};};};};};}

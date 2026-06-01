@@ -1,0 +1,1 @@
+m=queue;f=buildqueue(cards:@($str;$str;$str))):$str{let queue=mut."";let n=cards.len;lp(let i=0;i<n;i=i+1){let card=cards.get(i);let due=card.get(2);if(queue.len=0){queue=due}el{queue=s.concat(queue;"\n")+due}};<queue};f=main():$void{let cards=@($str;"Alice";"2024-01-15"));let queue=buildqueue(cards);<queue};

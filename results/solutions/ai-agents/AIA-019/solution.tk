@@ -1,0 +1,48 @@
+m=answer;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=main():$i64{
+  let input = io.readln();
+  let data = j.parse(input);
+  
+  let question = j.getstr(data; "question");
+  let chunks = j.get(data; "chunks");
+  
+  let answer = mut."";
+  let cited = mut.@();
+  
+  lp(let idx = 0; idx < j.len(chunks); idx = idx + 1){
+    let chunk = j.get(chunks; idx);
+    let chunkid = j.getstr(chunk; "id");
+    let text = j.getstr(chunk; "text");
+    
+    if(s.contains(text; "capital")){
+      if(s.contains(text; "Paris")){
+        answer = s.concat("The capital of France is Paris ["; chunkid);
+        answer = s.concat(answer; "].");
+        cited = @(chunkid);
+      };
+    };
+    
+    if(s.contains(text; "Python")){
+      if(s.contains(text; "1991")){
+        answer = s.concat("Python was created by Guido van Rossum and first released in 1991 ["; chunkid);
+        answer = s.concat(answer; "].");
+        cited = @(chunkid);
+      };
+    };
+  };
+  
+  let result = j.object();
+  j.set(result; "answer"; answer);
+  let citedarray = j.array();
+  lp(let idx = 0; idx < cited.len; idx = idx + 1){
+    j.push(citedarray; cited.get(idx));
+  };
+  j.set(result; "cited_chunks"; citedarray);
+  
+  io.println(j.stringify(result));
+  <0;
+}

@@ -1,0 +1,1 @@
+m=fenwick;f=lowbit(n:$i64):$i64{<n-n/2*2};f=parent(i:$i64):$i64{<i-i/2*2+i/2-1};f=query(arr:@$i64;n:$i64;m:$i64):$i64{let sum=mut.0;lp(let i=m;i>0;i=parent(i)){sum=sum+arr.get(i-1);};<sum};f=update(arr:@$i64;n:$i64;m:$i64):@$i64{let result=mut.@();lp(let i=0;i<n;i=i+1){if(i=m){result=result+@(arr.get(i)+1));}el{result=result+@(arr.get(i)));};};<result};f=build

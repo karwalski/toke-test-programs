@@ -1,0 +1,22 @@
+m=filemap;
+i=io:std.io;
+i=s:std.str;
+f=mapping(source:$str):$str{let test=mut."";lp(let i=0;i<source.len;i=i+1){let ch=source.get(i);if(ch="t"){test=s.concat(test;"s")}el{test=test+ch};};<test};
+f=main():$i64{
+    lp(let line=io.readln();line!=""){
+        let parts=s.split(line;"/");
+        let filename=parts.get(parts.len-1);
+        let testname=mapping(filename);
+        let testpath="";
+        if(parts.len>1){
+            lp(let i=0;i<parts.len-1;i=i+1){
+                if(i=0){testpath=parts.get(i)}el{testpath=s.concat(testpath;"/")+parts.get(i)};
+            };
+            testpath=s.concat(testpath;"/")+testname;
+        }el{
+            testpath=testname;
+        };
+        io.println(s.concat(line;s.concat(" -> ";testpath)));
+    };
+    <0
+};

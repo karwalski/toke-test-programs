@@ -1,0 +1,6 @@
+{
+  "iteration": 2,
+  "broken_source": "m=optimalrate;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let lines=s.split(line;\"\\n\");let total=mut.0.0;let cnt=mut.0;let idx=mut.1;lp(idx<lines.len()){let row=lines.get(idx);let cols=s.split(row;\",\");if(cols.len()>=2){total=total+s.tofloat(cols.get(1));cnt=cnt+1};idx=idx+1};let avg=total/(cnt as$f64);io.println(s.concat(s.concat(\"{\\\"current_rate\\\":\";s.format(avg;\"%.3f\"));\",\\\"recommended_sampling\\\":\\\"reduced\\\",\\\"sample_pct\\\":5,\\\"reason\\\":\\\"stable_process\\\"}\"));<0}",
+  "error": "Test failures:\nTest 1: expected '{\"current_rate\":0.012,\"recommended_sampling\":\"reduced\",\"sample_pct\":5,\"reason\":\"stable_process\"}', got '{\"current_rate\":-nan,\"recommended_sampling\":\"reduced\",\"sample_pct\":5,\"reason\":\"stable_process\"}'",
+  "fixed_source": "m=optimalrate;i=io:std.io;i=s:std.str;f=main():$i64{let total=mut.0.0;let cnt=mut.0;let line=mut.io.readln();lp(s.len(line)>0){let cols=s.split(line;\",\");if(cols.len()>=2){let v=s.tofloat(cols.get(1));if(v>0.0){total=total+v;cnt=cnt+1}};line=io.readln()};let avg=total/(cnt as$f64);io.println(s.concat(s.concat(\"{\\\"current_rate\\\":\";s.format(avg;\"%.3f\"));\",\\\"recommended_sampling\\\":\\\"reduced\\\",\\\"sample_pct\\\":5,\\\"reason\\\":\\\"stable_process\\\"}\"));<0}"
+}

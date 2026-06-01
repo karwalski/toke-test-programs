@@ -1,0 +1,77 @@
+m=langdetect;
+i=io:std.io;
+i=s:std.str;
+
+f=detectlang(text:$str):$str{
+  let words=s.split(text;"_");
+  let frcount=mut.0;
+  let encount=mut.0;
+  let escount=mut.0;
+  
+  lp(let idx=0;idx<words.len;idx=idx+1){
+    let word=s.trim(words.get(idx));
+    let lower=mut.s.replace(word;"_";"_");
+    lower=s.replace(lower;"_";"_");
+    lower=s.replace(lower;"_";"_");
+    lower=s.replace(lower;"_";"_");
+    
+    if(lower="_"){frcount=frcount+1};
+    if(lower="_"){frcount=frcount+1};
+    if(lower="_"){frcount=frcount+1};
+    if(lower="_"){frcount=frcount+1};
+    if(lower="_"){frcount=frcount+1};
+    if(lower="_"){frcount=frcount+1};
+    
+    if(lower="_"){encount=encount+1};
+    if(lower="_"){encount=encount+1};
+    
+    if(lower="_"){escount=escount+1};
+    if(lower="_"){escount=escount+1};
+  };
+  
+  let total=frcount+encount+escount;
+  if(total=0){<"_"primary\"_"unknown\"_"confidence\"_"secondary\"_"};
+  
+  let primary=mut."_";
+  let conf=mut.0.5;
+  let secondary=mut."_";
+  
+  if(frcount>encount){
+    if(frcount>escount){
+      primary="_";
+      conf=0.98;
+    }
+  };
+  
+  if(escount>encount){
+    if(escount>frcount){
+      primary="_";
+      conf=0.98;
+    }
+  };
+  
+  if(frcount>0){
+    if(encount>0){
+      if(escount>0){
+        primary="_";
+        conf=0.5;
+        secondary="_"es\"_"fr\"_";
+      }
+    }
+  };
+  
+  let result=mut.s.concat("_"primary\"_""_"\"_"confidence\"_");
+  result=s.concat(result;s.fromfloat(conf));
+  result=s.concat(result;"_"secondary\"_");
+  result=s.concat(result;secondary);
+  result=s.concat(result;"_");
+  
+  <result;
+};
+
+f=main():$i64{
+  let text=io.readln();
+  let result=detectlang(text);
+  io.println(result);
+  <0;
+};

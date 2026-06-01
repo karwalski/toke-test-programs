@@ -1,0 +1,35 @@
+m=maxact;
+i=io:std.io;
+i=s:std.str;
+t=activity{name:$str;start:$i64;end:$i64};
+f=maxactivities(n:$i64;m:$i64):$i64{let count=mut.0;let i=mut.0;lp(let idx=0;idx<n;idx=idx+1){let start=n.get(idx);let j=mut.0;let found=mut.false;lp(let k=0;k<m;k=k+1){let end=m.get(k);if(!(end<start)){found=true};};if(found){count=count+1};};<count};
+f=main():$i64{
+let n=s.toint(io.readln());
+let activities=mut.[]t;
+lp(let idx=0;idx<n;idx=idx+1){
+let line=io.readln();
+let parts=s.split(line;" ");
+let name=parts.get(0);
+let start=s.toint(parts.get(1));
+let end=s.toint(parts.get(2));
+activities.push(t{name=name;start=start;end=end});
+};
+activities.sort(fn(a:t;b:t):$i64{<a.end-b.end});
+let selected=mut.[]t;
+let lastend=mut.-1;
+lp(let idx=0;idx<activities.len();idx=idx+1){
+let act=activities.get(idx);
+if(act.start>=lastend){
+selected.push(act);
+lastend=act.end;
+};
+};
+io.print("Activities: ");
+lp(let idx=0;idx<selected.len();idx=idx+1){
+if(idx>0){io.print(" ");};
+io.print(selected.get(idx).name);
+};
+io.println("");
+io.println(s.concat("Total: ";s.fromint(selected.len())));
+<0
+};

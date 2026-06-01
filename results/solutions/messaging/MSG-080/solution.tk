@@ -1,0 +1,1 @@
+m=chaintracker;f=buildchain(parts:@$str):$str{let result=mut."";let count=parts.len;lp(let i=0;i<count;i=i+1){let part=parts.get(i);if(i=0){result=part}el{result=s.concat(result;"->")+part};};<result};f=checkchain(chain:$str;maxlen:i64):$str{let parts=chain.split("->");let count=parts.len;if(count>maxlen){<""}el{let result=mut.""

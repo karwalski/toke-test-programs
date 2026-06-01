@@ -1,0 +1,1 @@
+m=jsonpath;f=eval(expr:$str;env:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<expr.len;idx=idx+1){let ch=expr.get(idx);if(ch="$"){let j=mut.idx+1;lp(let k=j;k<expr.len;k=k+1){let c=expr.get(k);if(c="."){j=k+1}el{if(c="["){let m=mut.k+1;lp(let n=m;n<expr.len;n=n+1){let d=expr.get(n);if(d="]"){m=n;br};};};};};};};};};};};};};};};};};};};};};};};};}

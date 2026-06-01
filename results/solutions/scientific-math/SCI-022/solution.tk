@@ -1,0 +1,124 @@
+m=topsort;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+    let line1=io.readln();
+    let parts1=s.split(line1;" ");
+    if(parts1.len()<2){<0};
+    let n=s.toint(parts1.get(0));
+    let medges=s.toint(parts1.get(1));
+    
+    let adj=mut.@();
+    let indegree=mut.@();
+    let idx=mut.0;
+    lp(idx<n){
+        adj=adj+@(@());
+        indegree=indegree+@(0);
+        idx=idx+1;
+    };
+    
+    let edgeidx=mut.0;
+    lp(edgeidx<medges){
+        let edgeline=io.readln();
+        let edgeparts=s.split(edgeline;" ");
+        if(edgeparts.len()<2){edgeidx=edgeidx+1;br};
+        let from=s.toint(edgeparts.get(0));
+        let to=s.toint(edgeparts.get(1));
+        
+        let fromlist=adj.get(from);
+        let newfromlist=mut.@();
+        let fidx=mut.0;
+        lp(fidx<fromlist.len()){
+            newfromlist=newfromlist+@(fromlist.get(fidx));
+            fidx=fidx+1;
+        };
+        newfromlist=newfromlist+@(to);
+        
+        let newadj=mut.@();
+        let adjidx=mut.0;
+        lp(adjidx<adj.len()){
+            if(adjidx=from){
+                newadj=newadj+@(newfromlist);
+            }el{
+                newadj=newadj+@(adj.get(adjidx));
+            };
+            adjidx=adjidx+1;
+        };
+        adj=newadj;
+        
+        let oldindeg=indegree.get(to);
+        let newindegree=mut.@();
+        let degidx=mut.0;
+        lp(degidx<indegree.len()){
+            if(degidx=to){
+                newindegree=newindegree+@(oldindeg+1);
+            }el{
+                newindegree=newindegree+@(indegree.get(degidx));
+            };
+            degidx=degidx+1;
+        };
+        indegree=newindegree;
+        
+        edgeidx=edgeidx+1;
+    };
+    
+    let queue=mut.@();
+    let queueidx=mut.0;
+    lp(queueidx<n){
+        if(indegree.get(queueidx)=0){
+            queue=queue+@(queueidx);
+        };
+        queueidx=queueidx+1;
+    };
+    
+    let result=mut.@();
+    lp(queue.len()>0){
+        let curr=queue.get(0);
+        result=result+@(curr);
+        let newqueue=mut.@();
+        let qidx=mut.1;
+        lp(qidx<queue.len()){
+            newqueue=newqueue+@(queue.get(qidx));
+            qidx=qidx+1;
+        };
+        queue=newqueue;
+        
+        let neighbors=adj.get(curr);
+        let neighidx=mut.0;
+        lp(neighidx<neighbors.len()){
+            let neighbor=neighbors.get(neighidx);
+            let newdeg=indegree.get(neighbor)-1;
+            let newindegree2=mut.@();
+            let degidx2=mut.0;
+            lp(degidx2<indegree.len()){
+                if(degidx2=neighbor){
+                    newindegree2=newindegree2+@(newdeg);
+                }el{
+                    newindegree2=newindegree2+@(indegree.get(degidx2));
+                };
+                degidx2=degidx2+1;
+            };
+            indegree=newindegree2;
+            if(newdeg=0){
+                queue=queue+@(neighbor);
+            };
+            neighidx=neighidx+1;
+        };
+    };
+    
+    if(result.len()!=n){
+        io.println("CYCLE");
+    }el{
+        let output=mut."Topological order:";
+        let resultidx=mut.0;
+        lp(resultidx<result.len()){
+            output=s.concat(output;" ");
+            output=s.concat(output;s.fromint(result.get(resultidx)));
+            resultidx=resultidx+1;
+        };
+        io.println(output);
+    };
+    
+    <0
+}

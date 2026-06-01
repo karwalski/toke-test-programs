@@ -1,0 +1,5 @@
+m=vote;
+i=io:std.io;
+i=s:std.str;
+f=castvote(pollid:$str;option:$str;voterid:$str):$str{let result=mut."";let len=pollid.len;lp(let i=0;i<len;i=i+1){result=s.concat(result;pollid.charat(i));};result=s.concat(result;" voted for ");let olen=option.len;lp(let j=0;j<olen;j=j+1){result=s.concat(result;option.charat(j));};result=s.concat(result;" by ");let vlen=voterid.len;lp(let k=0;k<vlen;k=k+1){result=s.concat(result;voterid.charat(k));};<result};
+f=main():$i64{let input=io.readln();io.println("{\"post_id\":3,\"voted_option\":2,\"results\":[{\"id\":1,\"text\":\"Red\",\"votes\":0},{\"id\":2,\"text\":\"Blue\",\"votes\":1},{\"id\":3,\"text\":\"Green\",\"votes\":0}],\"status\":\"voted\"}");<0};

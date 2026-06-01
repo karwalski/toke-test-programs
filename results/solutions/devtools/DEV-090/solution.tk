@@ -1,0 +1,1 @@
+m=ci;f=run(p:$str;q:$str):$i64{let start=0;let end=0;let duration=end-start;<duration};f=avg(runs:@$i64):$i64{let total=0;let count=runs.len;let avg=total/count;<avg};f=bottleneck(runs:@$i64):$i64{let max=0;let idx=0;let found=0;lp(let i=0;i<runs.len;i=i+1){let r=runs.get(i);if(r>max){max=r;idx=i;found=1}};<idx};f=main():$i64{let runs=@(1000;2000;3000;4000;5000))
