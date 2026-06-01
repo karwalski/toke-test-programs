@@ -1,4 +1,8 @@
 - id: "MSG-001"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'encrypted_base64_ciphertext'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "AES-256 message encryption"
   description: "Encrypt a plaintext message using AES-256-CBC with a provided key and IV, outputting the ciphertext as base64."
   difficulty: 2
@@ -13,6 +17,10 @@
   constraints: ["Key must be exactly 256 bits", "IV must be exactly 128 bits", "Use PKCS7 padding"]
 
 - id: "MSG-002"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] python printed traceback for input '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n001122334455667'"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "AES-256 message decryption"
   description: "Decrypt a base64-encoded AES-256-CBC ciphertext using a provided key and IV, outputting the original plaintext."
   difficulty: 2
@@ -27,6 +35,10 @@
   constraints: ["Validate padding before output", "Return error on invalid padding", "Handle empty plaintext"]
 
 - id: "MSG-003"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs contain literal '...' placeholders, indicating the test harness expects exact string equality against an unfillable template"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "RSA key pair generation"
   description: "Generate an RSA-2048 key pair and output the public and private keys in PEM format."
   difficulty: 3
@@ -41,6 +53,10 @@
   constraints: ["Support 2048 and 4096 bit keys", "Output valid PEM format", "Use secure random number generation"]
 
 - id: "MSG-004"
+  disabled: true
+  disabled_reason: "[non-deterministic] The test cases expect the literal string 'base64_rsa_ciphertext' as output for two different plaintexts ('Secret' and 'Hello') with truncated/invalid PEM keys ('MIIBI...')"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "RSA message encryption"
   description: "Encrypt a short message using RSA-OAEP with a provided public key."
   difficulty: 3
@@ -69,6 +85,10 @@
   constraints: ["Validate that p is prime", "Validate that g is a primitive root mod p", "Use modular exponentiation"]
 
 - id: "MSG-006"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: 'alice_pub_hex\\nbob_pub_hex\\nshared_secret_hex\\naes_key_hex'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "ECDH key exchange"
   description: "Perform an Elliptic Curve Diffie-Hellman key exchange using P-256, deriving a shared AES key."
   difficulty: 4
@@ -76,13 +96,19 @@
   input_format: "Line 1: Alice's private key (hex). Line 2: Bob's private key (hex)."
   output_format: "Line 1: Alice's public key (hex, uncompressed). Line 2: Bob's public key (hex, uncompressed). Line 3: derived shared secret (hex). Line 4: derived AES-256 key (hex, SHA-256 of shared secret)."
   test_cases:
-    - input: "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721\n60fc7b12d663b64c1d62de0e2b263b34892a416b3697bd0a96c4e7ad4e6c821a"
-      expected_output: "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex"
-    - input: "ab12cd34ef56789012345678901234567890123456789012345678901234abcd\ndeadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234"
-      expected_output: "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex"
+    - input: "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721\n60fc7b12d663b64c1d62de0e2b263b34892a416b3697bd0a96c4e7ad4e6c821a\n"
+      expected_output: "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299\n044d093b866a5bc9e1f97f95de9d005ce9843fa0e32b4586f7e4b504b87c810a29ba06b5826c4fcb35edfa6c6707b8043596d77b13ec558c2750fc96a3b3d52423\nca34be19a613804cfe421d961989ec1f0fb65f881ece0c7c8c84d121397bcdaa\n84f603a599f9e046e92e188bbdf578862a833e3adfa0db2aa469e9ecb72407a8"
+    - input: "ab12cd34ef56789012345678901234567890123456789012345678901234abcd\ndeadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234\n"
+      expected_output: "044491633d71f2a5b9a12de562118352abd28a601c9e4c775643f8b7ec00bb4a71f3406d41c88ee6a05773bfa7e6832dd9b7afd7c22935dda88fe3d6c2a1dffa71\n04612bcbc5cb6da2c8bf0b841ab217ec3811d3766a2eb61ddcc429fa23d4e9615e0fb98d63425249a1bb52e47c61a555d6d9c9ccdc359de7c51c67b4db16d4c168\n5af4b791514b54a2f578f20e12c10d75cb9de07e5991bb954b95aa70fa42dd66\n9e9ddb7fa67fa5a1e31243ae066773bd871d68934914115654b26e9722535236"
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\n0000000000000000000000000000000000000000000000000000000000000002\n"
+      expected_output: "046b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c2964fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5\n047cf27b188d034f7e8a52380304b51ac3c08969e277f21b35a60b48fc4766997807775510db8ed040293d9ac69f7430dbba7dade63ce982299e04b79d227873d1\n7cf27b188d034f7e8a52380304b51ac3c08969e277f21b35a60b48fc47669978\n23775201799b2234a18e8071e409cec80d42632fe77534180afdc533c9b76f81"
   constraints: ["Use NIST P-256 curve", "Validate private keys are in valid range", "Derive AES key using SHA-256 of x-coordinate"]
 
 - id: "MSG-007"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'signature_hex_128_chars'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Digital signature creation"
   description: "Sign a message using Ed25519, outputting the signature in hex."
   difficulty: 3
@@ -426,13 +452,17 @@
   input_format: "Line 1: Alice's identity key (hex). Line 2: Bob's identity key (hex). Line 3: Bob's signed pre-key (hex). Line 4: Bob's one-time pre-key (hex)."
   output_format: "JSON object with: shared_secret (hex), session_key (hex, derived via HKDF), associated_data (hex)."
   test_cases:
-    - input: "alice_identity_key_hex\nbob_identity_key_hex\nbob_signed_prekey_hex\nbob_onetime_prekey_hex"
-      expected_output: "{\"shared_secret\":\"hex\",\"session_key\":\"hex\",\"associated_data\":\"hex\"}"
-    - input: "key1_hex\nkey2_hex\nprekey_hex\notp_hex"
-      expected_output: "{\"shared_secret\":\"hex\",\"session_key\":\"hex\",\"associated_data\":\"hex\"}"
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+      expected_output: "{\"shared_secret\": \"46e7a40d1c7b3cd811478b9b8cef201528eb0e14ba10d7584794f939998e5239f0917d3afb110a88e4e85a72665d520d684f82536605dd47d6ffcc17e9b0bc616b5b6d833434e4dd06b24408ba922d1b232e8dfb47b389c27c55b58681fdf299d2227e458684bf95a49511c2973a0fe1ebac7e67fe8407d164a8e82667e0b068\", \"session_key\": \"f95fe1b2bb964b4402dce50ed3841f11f8f88a63c61c11de744bf521b4920f02\", \"associated_data\": \"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeffedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\"}"
+    - input: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef\ncafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\nabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+      expected_output: "{\"shared_secret\": \"74a09476dfee81566010dce337e1db3a7ac1f4b8d48a4d1299f84ed740da4df4ae1d0567b7b2987db7297e9048d46357166854ddf9b4755bb83c165d654b9bf9d5fafeaf0321807acd4c152781b481b8ea2527b58c6a28da445a028a11b8f239fe12178ff7ac9bd95988cea24f4ae90beec6b31b7a3dafc98226d6f5697ab188\", \"session_key\": \"037f76f9df38e7c88bec737e2162f0472f138de381a26ead8edb569ef2df0357\", \"associated_data\": \"deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe\"}"
   constraints: ["Implement X3DH protocol steps", "Use HKDF-SHA256 for key derivation", "Include identity keys in associated data"]
 
 - id: "MSG-032"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input 'ab01cd23ef45678901234567890abcde01234567890abcdef01234567890abcde\\n3\\n': Traceback (most recent call last):\n  File '/tmp/tmp6ivyyisc"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Double ratchet message key derivation"
   description: "Implement the symmetric ratchet step of the Double Ratchet algorithm, deriving message keys from a chain key."
   difficulty: 5
@@ -447,6 +477,10 @@
   constraints: ["Chain key derived via HMAC-SHA256 with constant 0x01", "Message key derived via HMAC-SHA256 with constant 0x02", "Previous chain keys must not be recoverable from later keys"]
 
 - id: "MSG-033"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs in the test cases are literal placeholder strings ('base64', 'hex', 'hex') rather than actual computed values"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Message encryption with forward secrecy"
   description: "Encrypt a message using a derived message key with associated data, ensuring forward secrecy properties."
   difficulty: 4
@@ -609,9 +643,11 @@
   output_format: "JSON with: salt (hex), nonce (hex), encrypted_data (base64), key_params (argon2id parameters)."
   test_cases:
     - input: "MySecurePassword123!\n[{\"id\":\"1\",\"text\":\"Secret message\"}]"
-      expected_output: "{\"salt\":\"hex\",\"nonce\":\"hex\",\"encrypted_data\":\"base64\",\"key_params\":{\"algorithm\":\"argon2id\",\"memory\":65536,\"iterations\":3,\"parallelism\":4}}"
-    - input: "short\n[{\"id\":\"1\",\"text\":\"data\"}]"
-      expected_output: "{\"salt\":\"hex\",\"nonce\":\"hex\",\"encrypted_data\":\"base64\",\"key_params\":{\"algorithm\":\"argon2id\",\"memory\":65536,\"iterations\":3,\"parallelism\":4}}"
+      expected_output: "{\"encrypted_data\":\"UPeNTkC+14hT0uyovYW4QVf/XxUAJgQhY6meo/P4FtGQr/83jA+n9hVrwqFC3AIIRP/IXA==\",\"key_params\":{\"algorithm\":\"argon2id\",\"iterations\":3,\"memory\":65536,\"parallelism\":4},\"nonce\":\"90c24df5f4476575de667b0e\",\"salt\":\"00267a0591e4a5c12f174cf8d8bb6fc3\"}"
+    - input: "AnotherPass456\n[{\"id\":\"1\",\"text\":\"hello\"},{\"id\":\"2\",\"text\":\"world\"}]"
+      expected_output: "{\"encrypted_data\":\"GnaHxDAT5M8VB6KQ9PwnnKo1z3BokAfKfeUe9r527+Fdy7KbruC+2wNQlZi29qs1P9zQoXaOW5aHvUc2Lh+xUs/8zKV0\",\"key_params\":{\"algorithm\":\"argon2id\",\"iterations\":3,\"memory\":65536,\"parallelism\":4},\"nonce\":\"9f2641365dcd4131045831d2\",\"salt\":\"7c57a0dc7e58bc052bf8cdca7e657716\"}"
+    - input: "passw0rd!\n[{\"id\":\"42\",\"text\":\"deterministic test\"}]"
+      expected_output: "{\"encrypted_data\":\"P7Q5sdn7nRK75QReq2i0AjsHNxxpEpoa7RimKorW5bKvc48Oa1zHA3jNd6a1Kp5Hd3Ge1p8ryVoq\",\"key_params\":{\"algorithm\":\"argon2id\",\"iterations\":3,\"memory\":65536,\"parallelism\":4},\"nonce\":\"d19d491dcd59f3c987991412\",\"salt\":\"318a812f2ff744b56c65e9f3f36d9de7\"}"
   constraints: ["Use Argon2id for key derivation", "Random 16-byte salt", "AES-256-GCM for encryption", "Minimum password length of 8 chars"]
 
 - id: "MSG-045"
@@ -783,6 +819,10 @@
   constraints: ["Only create dictionary entries for phrases appearing 2+ times", "Calculate compression ratio", "Minimum phrase length configurable"]
 
 - id: "MSG-057"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs contain literal placeholder strings ('hex', 'base64') rather than actual cryptographic values"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "End-to-end encrypted group key distribution"
   description: "Implement sender-key based group encryption where the sender distributes a group key to each member individually."
   difficulty: 5
@@ -811,6 +851,10 @@
   constraints: ["Unacked messages survive crash", "Acked messages are permanently removed", "FIFO ordering maintained", "Dequeue returns oldest unacked"]
 
 - id: "MSG-059"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Encode messages into WebSocket frame format with proper opcode, masking, and length encoding.' 'Hex-encoded WebSocket frame bytes with expl"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket frame encoding"
   description: "Encode messages into WebSocket frame format with proper opcode, masking, and length encoding."
   difficulty: 3
@@ -825,6 +869,10 @@
   constraints: ["Client frames must be masked", "Server frames must not be masked", "Support 7-bit, 16-bit, and 64-bit length encoding", "Generate random 4-byte mask for client"]
 
 - id: "MSG-060"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Decode WebSocket frame bytes back into readable message content.' 'Decoded frame: FIN, opcode, masked, payload length, and decoded payload"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket frame decoding"
   description: "Decode WebSocket frame bytes back into readable message content."
   difficulty: 3
@@ -881,6 +929,10 @@
   constraints: ["Handle unknown fields gracefully (skip)", "Validate wire type matches schema", "Support missing optional fields"]
 
 - id: "MSG-064"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input 'a1b2c3d4e5f6071829303142535465768798a9bacbdcedfe0f1e2d3c4b5a69788\\nfedcba98765432': Traceback (most recent call last):\n  File '/tmp/"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Sealed sender message construction"
   description: "Construct a sealed sender message where the recipient cannot determine the sender without decryption."
   difficulty: 5
@@ -972,10 +1024,14 @@
   input_format: "Line 1: JSON key ring [{\"version\":1,\"key\":\"hex\"},{\"version\":2,\"key\":\"hex\"}]. Line 2: active version. Line 3: operation (encrypt/decrypt). Line 4: message or ciphertext."
   output_format: "For encrypt: versioned ciphertext. For decrypt: plaintext with key version used."
   test_cases:
-    - input: "[{\"version\":1,\"key\":\"aabb...\"},{\"version\":2,\"key\":\"ccdd...\"}]\n2\nencrypt\nHello World"
-      expected_output: "v2:base64_ciphertext"
-    - input: "[{\"version\":1,\"key\":\"aabb...\"},{\"version\":2,\"key\":\"ccdd...\"}]\n2\ndecrypt\nv1:base64_ciphertext"
-      expected_output: "Hello World (decrypted with key v1)"
+    - input: "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n2\nencrypt\nHello World\n"
+      expected_output: "v2:t4uxoNSKzucFCjE="
+    - input: "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n1\nencrypt\nThe quick brown fox\n"
+      expected_output: "v1:VHlHEzUgDxTjucjJo6qA32Z+Wg=="
+    - input: "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n2\ndecrypt\nv1:GHIQIxIRABcGBA8KBg==\n"
+      expected_output: "c2VDf`����� (decrypted with key v1)"
+    - input: "[{\"version\":1,\"key\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"},{\"version\":2,\"key\":\"fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\"}]\n2\nencrypt\nSecret\n"
+      expected_output: "v2:rbnZ6hMg"
   constraints: ["Prefix ciphertext with key version", "Support decryption with any key in ring", "Error on unknown key version", "Active version used for new encryptions only"]
 
 - id: "MSG-071"
@@ -1063,6 +1119,10 @@
   constraints: ["Use range assignment strategy", "Rebalance on every join/leave", "Even distribution (differ by at most 1)"]
 
 - id: "MSG-077"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input '3\\nab01cd23ef45678901234567890abcde01234567890abcdef01234567890abcde\\n5\\n': Traceback (most recent call last):\n  File '/tmp/tmprjt04"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Message encryption with perfect forward secrecy rotation"
   description: "Implement ephemeral key rotation for perfect forward secrecy, rotating keys every N messages."
   difficulty: 4
@@ -1154,10 +1214,12 @@
   input_format: "Line 1: secret key (hex). Line 2: total shares N. Line 3: threshold K."
   output_format: "N shares in hex format, each labeled with share index."
   test_cases:
-    - input: "deadbeefcafebabe1234567890abcdef\n5\n3"
-      expected_output: "share 1: hex_share_1\nshare 2: hex_share_2\nshare 3: hex_share_3\nshare 4: hex_share_4\nshare 5: hex_share_5\nreconstruction requires any 3 of 5 shares"
-    - input: "0123456789abcdef\n3\n2"
-      expected_output: "share 1: hex_share_1\nshare 2: hex_share_2\nshare 3: hex_share_3\nreconstruction requires any 2 of 3 shares"
+    - input: "deadbeefcafebabe1234567890abcdef\n5\n3\n"
+      expected_output: "share 1: 2b7e28268a85a10a6a75eaa8ad1be7b3\nshare 2: d774564a05673702e20a7e9cc364f774\nshare 3: 22a7c083451c2cb69a4bc24cfed4dd28\nshare 4: 018f240e687061cce98e31cc92c81a4e\nshare 5: f45cb2c7280b7a7891cf8d1caf783012\nreconstruction requires any 3 of 5 shares"
+    - input: "0123456789abcdef\n3\n2\n"
+      expected_output: "share 1: df87b451f2c054a2\nshare 2: a670bc0b7f7de475\nshare 3: 78d44d3d04167d38\nreconstruction requires any 2 of 3 shares"
+    - input: "ff\n4\n2\n"
+      expected_output: "share 1: 0c\nshare 2: 02\nshare 3: f1\nshare 4: 1e\nreconstruction requires any 2 of 4 shares"
   constraints: ["K <= N", "Any K shares can reconstruct", "Fewer than K shares reveal nothing", "Use GF(256) arithmetic"]
 
 - id: "MSG-084"
@@ -1252,10 +1314,12 @@
   input_format: "Line 1: message hash (hex). Line 2: recipient private key (hex). Line 3: timestamp."
   output_format: "JSON delivery receipt with: msg_hash, recipient_sig, timestamp, receipt_hash (chained)."
   test_cases:
-    - input: "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\nrecipient_private_key_hex\n2024-01-15T10:00:00Z"
-      expected_output: "{\"msg_hash\":\"abcdef...\",\"recipient_sig\":\"hex_sig\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"receipt_hash\":\"hex_hash\"}"
-    - input: "0000000000000000000000000000000000000000000000000000000000000000\nkey_hex\n2024-06-01T12:00:00Z"
-      expected_output: "{\"msg_hash\":\"0000...\",\"recipient_sig\":\"hex_sig\",\"timestamp\":\"2024-06-01T12:00:00Z\",\"receipt_hash\":\"hex_hash\"}"
+    - input: "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\n2024-01-15T10:00:00Z\n"
+      expected_output: "{\"msg_hash\":\"abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\",\"recipient_sig\":\"2e1c54e7622b4e262103ae38476ecbea2d7bf4abe3fec41ae6bcf85cfb52b387\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"receipt_hash\":\"ca88516edfb701ef09e73eb07e787d40ac76f51cddcb97f1bebcf6edbd31e10e\"}"
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n2024-06-01T12:00:00Z\n"
+      expected_output: "{\"msg_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"recipient_sig\":\"2472e0dfeb95a1362d02611cf55e60a0d1f3f34522961d5ff2e343c05971062c\",\"timestamp\":\"2024-06-01T12:00:00Z\",\"receipt_hash\":\"024368a1ff29880922cb9a5360c648a7a1d576cfb24262f76aaa7c5b67afd8bf\"}"
+    - input: "deadbeefcafebabe1122334455667788deadbeefcafebabe1122334455667788\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n2025-03-20T08:30:45Z\n"
+      expected_output: "{\"msg_hash\":\"deadbeefcafebabe1122334455667788deadbeefcafebabe1122334455667788\",\"recipient_sig\":\"806e2ab1e56e868f6877af4e224aa685b56e83b9b54b001eb629e81bd1970fc0\",\"timestamp\":\"2025-03-20T08:30:45Z\",\"receipt_hash\":\"7af4dd3c76449931a4686dff0826cba41c7cbc0a00062c16a79fafcb5bafb9c7\"}"
   constraints: ["Receipt hash chains previous receipt", "Signature covers msg_hash + timestamp", "Verifiable by sender using recipient's public key"]
 
 - id: "MSG-091"
@@ -1336,10 +1400,12 @@
   input_format: "Line 1: file name. Line 2: file size in bytes. Line 3: MIME type. Line 4: content hash (hex). Line 5: encryption key (hex)."
   output_format: "JSON attachment metadata with encrypted fields and plaintext routing info."
   test_cases:
-    - input: "photo.jpg\n245760\nimage/jpeg\nabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      expected_output: "{\"encrypted_metadata\":\"base64\",\"content_hash\":\"abcdef...\",\"size\":245760,\"key_hash\":\"sha256_of_key\"}"
-    - input: "doc.pdf\n1024\napplication/pdf\nhash_hex\nkey_hex"
-      expected_output: "{\"encrypted_metadata\":\"base64\",\"content_hash\":\"hash_hex\",\"size\":1024,\"key_hash\":\"sha256_of_key\"}"
+    - input: "photo.jpg\n245760\nimage/jpeg\nabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n"
+      expected_output: "{\"content_hash\":\"abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\",\"encrypted_metadata\":\"egEjDuXOo45sRmddq9ulgHVMaw35zO/DI04sCuyJ981oTiQA7ISnn2REZxo=\",\"key_hash\":\"4884fdaafea47c29fea7159d0daddd9c085d6200e1359e85bb81736af6b7c837\",\"size\":245760}"
+    - input: "doc.pdf\n1024\napplication/pdf\n1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n"
+      expected_output: "{\"content_hash\":\"1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff\",\"encrypted_metadata\":\"hf7c8RoxXHGTuZiiVDBdc9Cs3v5UeBB9l7Hfukx2U2COsNP7FyBbf5DzyvwQdk8=\",\"key_hash\":\"8d2e4d6374b604562a5d8c04a4dfc035fa499ec7ad373bd48bd2bd62ca75c3b5\",\"size\":1024}"
+    - input: "report.txt\n42\ntext/plain\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\nffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n"
+      expected_output: "{\"content_hash\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\",\"encrypted_metadata\":\"hN2ZlpOakZ6Smt3F3Y2aj5CNi9GLh4vd092SlpKa3cXdi5qHi9CPk56Wkd2C\",\"key_hash\":\"af9613760f72635fbdb44a5a0a63c39f12af30f950a6ee5c971be188e89c4051\",\"size\":42}"
   constraints: ["Encrypt filename and MIME type", "Content hash remains in plaintext for dedup", "Include key hash for key verification", "Size remains in plaintext for quota"]
 
 - id: "MSG-097"
@@ -1434,10 +1500,12 @@
   input_format: "Line 1: version byte. Line 2: user A public key (hex). Line 3: user B public key (hex)."
   output_format: "QR code payload: version + combined key fingerprint data in base64. Plus human-readable numeric comparison."
   test_cases:
-    - input: "1\nalice_public_key_hex_64chars_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nbob_public_key_hex_64chars_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-      expected_output: "qr_payload: base64_data\nnumeric_code: 12345 67890 12345 67890 12345 67890\nversion: 1\nfingerprint: sha256(sorted_keys)"
-    - input: "2\nkey_a_hex\nkey_b_hex"
-      expected_output: "qr_payload: base64_data\nnumeric_code: xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx\nversion: 2\nfingerprint: sha256(sorted_keys)"
+    - input: "1\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"
+      expected_output: "qr_payload: AeLYD3jXkCdVbWYZoUAGBau9ymu26yTggx4z7NVGb6X2\nnumeric_code: 10260 44495 29900 58078 37180 22982\nversion: 1\nfingerprint: e2d80f78d79027556d6619a1400605abbdca6bb6eb24e0831e33ecd5466fa5f6"
+    - input: "2\ndeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n"
+      expected_output: "qr_payload: Ag6U6Ye4dXI3PSr0n4mTifLW7RZFZhNE8k/51nGXh1nZ\nnumeric_code: 00659 54850 11670 30879 76973 49424\nversion: 2\nfingerprint: 0e94e987b87572373d2af49f899389f2d6ed1645661344f24ff9d671978759d9"
+    - input: "1\nffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n0000000000000000000000000000000000000000000000000000000000000000\n"
+      expected_output: "qr_payload: AbupHKhdyRSy7D77nhbnJnv5GTsUNQ0g+6iotAZzCuMK\nnumeric_code: 08488 12976 27063 87478 56636 67679\nversion: 1\nfingerprint: bba91ca85dc914b2ec3efb9e16e7267bf9193b14350d20fba8a8b406730ae30a"
   constraints: ["Sort keys lexicographically before combining", "Result must be same regardless of who scans", "Include version for forward compatibility", "Numeric code is first 30 digits of fingerprint decimal"]
 
 - id: "MSG-104"
@@ -1595,6 +1663,10 @@
   constraints: ["Match by hash first (exact), then pattern (prefix)", "Report match method", "Empty hash means pattern-only matching", "Scan all attachments"]
 
 - id: "MSG-115"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs contain literal placeholder strings ('hex', 'base64') rather than actual computed values"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Message encryption key backup to cloud"
   description: "Prepare encryption keys for secure cloud backup by wrapping them with a master key derived from user password."
   difficulty: 4
@@ -1686,10 +1758,12 @@
   input_format: "Line 1: signer private key (hex). Line 2: message. Line 3: timestamp authority response (JSON with time and ta_signature)."
   output_format: "JSON signed message bundle: content, signer_sig, timestamp, ta_sig, combined_hash."
   test_cases:
-    - input: "signer_private_key_hex\nImportant agreement text\n{\"time\":\"2024-01-15T10:00:00Z\",\"ta_signature\":\"ta_sig_hex\"}"
-      expected_output: "{\"content\":\"Important agreement text\",\"signer_sig\":\"hex\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"ta_sig\":\"ta_sig_hex\",\"combined_hash\":\"hex\"}"
-    - input: "key_hex\nShort msg\n{\"time\":\"2024-06-01T00:00:00Z\",\"ta_signature\":\"sig_hex\"}"
-      expected_output: "{\"content\":\"Short msg\",\"signer_sig\":\"hex\",\"timestamp\":\"2024-06-01T00:00:00Z\",\"ta_sig\":\"sig_hex\",\"combined_hash\":\"hex\"}"
+    - input: "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456\nImportant agreement text\n{\"time\":\"2024-01-15T10:00:00Z\",\"ta_signature\":\"deadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234\"}"
+      expected_output: "{\"content\":\"Important agreement text\",\"signer_sig\":\"10ceba6d3164682fdcbca45bddb7283212259706a23572817ac142cbf308caea\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"ta_sig\":\"deadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234\",\"combined_hash\":\"838007fe40e9243fe45862aa0de7e22a4ff49e5bdb256ddb3c14f8948ed035b3\"}"
+    - input: "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\nShort msg\n{\"time\":\"2024-06-01T00:00:00Z\",\"ta_signature\":\"1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\"}"
+      expected_output: "{\"content\":\"Short msg\",\"signer_sig\":\"7ca80ebdcbfd1c31c1fc7d69bdd5d02edba9d4b9075dacf9ca433ac413cc44de\",\"timestamp\":\"2024-06-01T00:00:00Z\",\"ta_sig\":\"1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\",\"combined_hash\":\"5bb00b7ced15182f3eb1ad1e299c2c1d42b925e5dd96649f424ad661578c9e0a\"}"
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nAnother test message with more content\n{\"time\":\"2025-03-20T12:34:56Z\",\"ta_signature\":\"abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789\"}"
+      expected_output: "{\"content\":\"Another test message with more content\",\"signer_sig\":\"f4df44a904ebcd83cc125905ef9b883c1010de046aec1931ab8baf44c155f935\",\"timestamp\":\"2025-03-20T12:34:56Z\",\"ta_sig\":\"abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789\",\"combined_hash\":\"a46aab03895ad9d1fec11e0b7357a53aed51c353b59d8cdb217f0d5a3f449d00\"}"
   constraints: ["Signer signs content + timestamp", "TA signs hash of content", "Combined hash binds all components", "Proves message existed at timestamp"]
 
 - id: "MSG-122"
@@ -1742,10 +1816,10 @@
   input_format: "Line 1: initiator static key (hex). Line 2: responder static key (hex). Line 3: pre-shared payload."
   output_format: "Handshake transcript: each message's encrypted content and derived keys at each stage."
   test_cases:
-    - input: "initiator_static_hex\nresponder_static_hex\nInitial payload"
-      expected_output: "-> e, es, s, ss (message 1)\n  ephemeral: hex\n  encrypted_static: hex\n  encrypted_payload: hex\n<- e, ee, se (message 2)\n  ephemeral: hex\n  encrypted_payload: hex\nsession keys:\n  initiator_send: hex\n  initiator_recv: hex"
-    - input: "key_i_hex\nkey_r_hex\nHello"
-      expected_output: "-> e, es, s, ss (message 1)\n  ephemeral: hex\n  encrypted_static: hex\n  encrypted_payload: hex\n<- e, ee, se (message 2)\n  ephemeral: hex\n  encrypted_payload: hex\nsession keys:\n  initiator_send: hex\n  initiator_recv: hex"
+    - input: "0101010101010101010101010101010101010101010101010101010101010101\n0202020202020202020202020202020202020202020202020202020202020202\nInitial payload"
+      expected_output: "-> e, es, s, ss (message 1)\n  ephemeral: cae700938bd9c8ba6df46f4981870cc93a52b03dbc32c3d5a591d6ea62047d20\n  encrypted_static: 787cba38271bbc786eaac4a4e8d5115d99cbc4950f8cad91b60ff35e2c89cb0119a0d6ba6f7bc05637f0c140fb0f81fe\n  encrypted_payload: 37b7c86558996cccef3d608f2ff7f794583cd8ec01b014eb0ba8c11222e78c\n<- e, ee, se (message 2)\n  ephemeral: 10c78b4cee0ed3833961d95cc69796d9401f245f4d650c1646c0d0dbaf2c6a61\n  encrypted_payload: 3fd021ac18ede009278ee8a1ec087498\nsession keys:\n  initiator_send: f8105596c1cfe18f3adccb6922df49f526ee0185e10941ad3494f492bf8c71b4\n  initiator_recv: 188f95f3aa3965ce57a28b6572e3aa3de96685b671d6a582ad6eaa0fb95eb080"
+    - input: "1111111111111111111111111111111111111111111111111111111111111111\n2222222222222222222222222222222222222222222222222222222222222222\nHello"
+      expected_output: "-> e, es, s, ss (message 1)\n  ephemeral: 54e1f317c175916706b3462c648d760357cbd09892c327532a6c964c570aa517\n  encrypted_static: 1443661849ea15529f6e732cef16fccd3cb761424527adc44814e0170be5bbf4d80f3005cba62885a9ae795c74d23747\n  encrypted_payload: d0bd9b1a5f3c49fa0bf144390af5a7a47735657194\n<- e, ee, se (message 2)\n  ephemeral: 19e40b2c91532f17860efbb70c420b9f704b81e4ffada96abb92a98ef53ab50c\n  encrypted_payload: b2489a508a2e72dd405333771e0679ca\nsession keys:\n  initiator_send: 41467f7cc1386001bacbde5c666e3b8b2f495f7d15e2ef479f23adb072c1473d\n  initiator_recv: a9fc686e690ab10eed9687a3befc8d5af814759be66bb387592dc0c563845b7e"
   constraints: ["Follow Noise IK pattern exactly", "Use X25519 for DH", "Use ChaChaPoly for AEAD", "Use SHA-256 for hashing", "Derive split keys after handshake"]
 
 - id: "MSG-126"
@@ -1875,6 +1949,10 @@
   constraints: ["Compare counters bidirectionally", "Identify messages acked by one but not other", "Generate minimal reconciliation actions", "Verify consistency after reconciliation"]
 
 - id: "MSG-135"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/unfixable] Python's standard library has no AES-GCM implementation nor RSA-OAEP encryption (only hashlib/hmac primitives), so a stdlib-only deterministic hybrid RSA-OAEP+A"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Hybrid encryption envelope (RSA + AES)"
   description: "Implement hybrid encryption: generate random AES key, encrypt message with AES, encrypt AES key with RSA."
   difficulty: 3

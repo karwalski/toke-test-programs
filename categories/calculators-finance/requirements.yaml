@@ -349,15 +349,25 @@
   input_format: "First line: taxable income. Following lines: 'threshold rate' pairs (ascending)"
   output_format: "Total tax to 2 decimal places"
   test_cases:
-    - input: "80000\n18200 0\n45000 0.19\n120000 0.325"
-      expected_output: "14617.00"
-    - input: "50000\n10000 0\n40000 0.20\n100000 0.30"
-      expected_output: "9000.00"
+    - input: "50000\n10000 0\n40000 0.20\n100000 0.30\n"
+      expected_output: "2000.00"
+    - input: "80000\n18200 0\n45000 0.19\n120000 0.325\n"
+      expected_output: "6650.00"
+    - input: "200000\n0 0.10\n50000 0.20\n100000 0.30\n150000 0.40\n"
+      expected_output: "50000.00"
+    - input: "5000\n10000 0\n40000 0.20\n"
+      expected_output: "0.00"
+    - input: "100000\n0 0.15\n"
+      expected_output: "15000.00"
   constraints:
     - "Each bracket applies only to income within that range"
     - "Income below first threshold is tax-free"
 
 - id: "FIN-022"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '100.00\\n10.00'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "GST/VAT Calculator"
   description: "Calculate GST/VAT inclusive or exclusive amount given a rate."
   difficulty: 1
@@ -1622,6 +1632,10 @@
     - "Handle large exponents"
 
 - id: "FIN-100"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '23'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Chinese Remainder Theorem"
   description: "Solve a system of simultaneous congruences using CRT."
   difficulty: 4
@@ -1761,9 +1775,13 @@
   output_format: "Two lines: simple_payback_years, discounted_payback_years (to 2 decimals)"
   test_cases:
     - input: "10000 0.10\n3000,4000,5000,6000"
-      expected_output: "2.60\n3.15"
+      expected_output: "2.60\n3.05"
     - input: "5000 0.05\n2000,2000,2000,2000"
-      expected_output: "2.50\n2.72"
+      expected_output: "2.50\n2.74"
+    - input: "10000 0.10\n2000,2000,2000,2000"
+      expected_output: "NEVER_RECOVERED\nNEVER_RECOVERED"
+    - input: "1000 0.0\n500,500,500"
+      expected_output: "2.00\n2.00"
   constraints:
     - "Interpolate within the year payback occurs"
     - "NEVER_RECOVERED if cash flows insufficient"
@@ -2063,9 +2081,11 @@
   output_format: "Covariance matrix (values to 6 decimal places)"
   test_cases:
     - input: "0.05,0.02,-0.01,0.03\n0.02,0.01,0.03,-0.01"
-      expected_output: "0.000492 -0.000108\n-0.000108 0.000292"
+      expected_output: "0.000625 -0.000175\n-0.000175 0.000292"
     - input: "1,2,3\n4,5,6"
-      expected_output: "0.666667 0.666667\n0.666667 0.666667"
+      expected_output: "1.000000 1.000000\n1.000000 1.000000"
+    - input: "1,2,3,4,5\n2,4,6,8,10\n5,4,3,2,1"
+      expected_output: "2.500000 5.000000 -2.500000\n5.000000 10.000000 -5.000000\n-2.500000 -5.000000 2.500000"
   constraints:
     - "Use sample covariance (divide by n-1)"
     - "Matrix is symmetric"

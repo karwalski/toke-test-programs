@@ -3,6 +3,10 @@
 # Servers: NET-001..NET-100  |  Clients: NET-101..NET-200
 
 - id: "NET-001"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Starts an HTTP server on a configurable port, responds to GET / with 'Hello, World!' and a 200 status code.' 'Prints 'Listening on :<port>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Hello World HTTP Server"
   description: "Starts an HTTP server on a configurable port, responds to GET / with 'Hello, World!' and a 200 status code."
   difficulty: 1
@@ -19,6 +23,10 @@
     - "Must return Content-Type: text/plain"
 
 - id: "NET-002"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with named routes: GET /hello returns 'Hello', GET /ping returns 'pong', any other path returns 404.' 'Prints 'Listening on :<p"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Router Server"
   description: "HTTP server with named routes: GET /hello returns 'Hello', GET /ping returns 'pong', any other path returns 404."
   difficulty: 2
@@ -35,6 +43,10 @@
     - "Must return Content-Type: application/json for JSON responses"
 
 - id: "NET-003"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Server that handles GET, POST, PUT, DELETE on /resource and returns the method name and body as JSON.' 'Logs each request; responds with JS"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Method Handler Server"
   description: "Server that handles GET, POST, PUT, DELETE on /resource and returns the method name and body as JSON."
   difficulty: 2
@@ -51,6 +63,10 @@
     - "Must echo request body in response"
 
 - id: "NET-004"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'In-memory REST API for users. Supports GET /users, POST /users, GET /users/:id, PUT /users/:id, DELETE /users/:id.' 'JSON responses; logs e"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "User CRUD API Server"
   description: "In-memory REST API for users. Supports GET /users, POST /users, GET /users/:id, PUT /users/:id, DELETE /users/:id."
   difficulty: 3
@@ -68,6 +84,10 @@
     - "IDs must be auto-incremented integers"
 
 - id: "NET-005"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'In-memory REST API for products with fields: id, name, price, stock. Full CRUD on /products.' 'JSON responses' 'Product CRUD API Server'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Product CRUD API Server"
   description: "In-memory REST API for products with fields: id, name, price, stock. Full CRUD on /products."
   difficulty: 3
@@ -84,6 +104,10 @@
     - "Stock must be non-negative integer"
 
 - id: "NET-006"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'In-memory REST API for orders. Each order has id, userId, items (array), status, createdAt. Full CRUD on /orders.' 'JSON responses with ISO"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Order CRUD API Server"
   description: "In-memory REST API for orders. Each order has id, userId, items (array), status, createdAt. Full CRUD on /orders."
   difficulty: 3
@@ -100,6 +124,10 @@
     - "createdAt set automatically on POST"
 
 - id: "NET-007"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'In-memory REST API for comments. Each comment has id, postId, author, body, createdAt. Supports filtering by postId via query param.' 'JSON"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Comment CRUD API Server"
   description: "In-memory REST API for comments. Each comment has id, postId, author, body, createdAt. Supports filtering by postId via query param."
   difficulty: 3
@@ -116,6 +144,10 @@
     - "Must return empty array, not 404, when no comments found"
 
 - id: "NET-008"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with JWT-based auth. POST /login returns a signed JWT. Protected routes require Authorization: Bearer <token>.' 'JSON responses"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "JWT Authentication Middleware Server"
   description: "HTTP server with JWT-based auth. POST /login returns a signed JWT. Protected routes require Authorization: Bearer <token>."
   difficulty: 4
@@ -133,6 +165,10 @@
     - "POST /login accepts {username, password} JSON"
 
 - id: "NET-009"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server where clients pass X-API-Key header. Server validates against a set of allowed keys read from stdin.' 'JSON responses; 401 for"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "API Key Authentication Middleware Server"
   description: "HTTP server where clients pass X-API-Key header. Server validates against a set of allowed keys read from stdin."
   difficulty: 3
@@ -149,6 +185,10 @@
     - "Must log authentication failures"
 
 - id: "NET-010"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with cookie-based sessions. POST /login creates a session, GET /profile requires a valid session cookie, POST /logout destroys"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Session-Based Authentication Server"
   description: "HTTP server with cookie-based sessions. POST /login creates a session, GET /profile requires a valid session cookie, POST /logout destroys the session."
   difficulty: 4
@@ -166,6 +206,10 @@
     - "Must set HttpOnly and SameSite=Strict cookie flags"
 
 - id: "NET-011"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that logs every request to stdout in Combined Log Format: IP, timestamp, method, path, status, response size.' 'Combined Log Fo"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Request Logging Middleware Server"
   description: "HTTP server that logs every request to stdout in Combined Log Format: IP, timestamp, method, path, status, response size."
   difficulty: 2
@@ -182,6 +226,10 @@
     - "Must record response size in bytes"
 
 - id: "NET-012"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that adds CORS headers to all responses. Reads allowed origins from stdin. Handles preflight OPTIONS requests.' 'Passes request"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "CORS Middleware Server"
   description: "HTTP server that adds CORS headers to all responses. Reads allowed origins from stdin. Handles preflight OPTIONS requests."
   difficulty: 3
@@ -199,6 +247,10 @@
     - "Wildcard origin must not be combined with credentials"
 
 - id: "NET-013"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that enforces a per-IP rate limit (N requests per second). Returns 429 Too Many Requests when exceeded.' 'Passes requests throu"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Rate Limiting Middleware Server"
   description: "HTTP server that enforces a per-IP rate limit (N requests per second). Returns 429 Too Many Requests when exceeded."
   difficulty: 4
@@ -216,6 +268,10 @@
     - "Rate limit per IP address"
 
 - id: "NET-014"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that enforces a per-request timeout. If a handler takes longer than N milliseconds, returns 503 Service Unavailable.' 'Returns"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Request Timeout Middleware Server"
   description: "HTTP server that enforces a per-request timeout. If a handler takes longer than N milliseconds, returns 503 Service Unavailable."
   difficulty: 3
@@ -232,6 +288,10 @@
     - "Must log timeout events with path and duration"
 
 - id: "NET-015"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with a custom 404 handler that returns a JSON error body with the requested path and a helpful message.' 'JSON {error, path, su"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "404 Not Found Error Handler"
   description: "HTTP server with a custom 404 handler that returns a JSON error body with the requested path and a helpful message."
   difficulty: 1
@@ -248,6 +308,10 @@
     - "Must include the requested path in the error body"
 
 - id: "NET-016"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with a global panic/error recovery middleware that catches handler panics and returns 500 with a sanitised error message.' 'JSO"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "500 Internal Server Error Handler"
   description: "HTTP server with a global panic/error recovery middleware that catches handler panics and returns 500 with a sanitised error message."
   difficulty: 3
@@ -265,6 +329,10 @@
     - "Must log stack trace to stderr"
 
 - id: "NET-017"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with JSON schema validation middleware. POST /data accepts JSON; validates against a schema and returns 422 with field errors o"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Request Validation Middleware Server"
   description: "HTTP server with JSON schema validation middleware. POST /data accepts JSON; validates against a schema and returns 422 with field errors on failure."
   difficulty: 4
@@ -281,6 +349,10 @@
     - "Must return 422 Unprocessable Entity status code"
 
 - id: "NET-018"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'REST API server for a list of items supporting cursor-based pagination. GET /items?cursor=X&limit=N returns a page of results plus next cur"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Pagination API Server"
   description: "REST API server for a list of items supporting cursor-based pagination. GET /items?cursor=X&limit=N returns a page of results plus next cursor."
   difficulty: 4
@@ -299,6 +371,10 @@
     - "Cursor must be opaque (base64 encoded)"
 
 - id: "NET-019"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that generates ETags for responses and handles If-None-Match conditional requests with 304 Not Modified.' 'Sets ETag header; re"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "ETag Caching Server"
   description: "HTTP server that generates ETags for responses and handles If-None-Match conditional requests with 304 Not Modified."
   difficulty: 4
@@ -315,6 +391,10 @@
     - "Must handle both strong and weak ETags"
 
 - id: "NET-020"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with an in-memory TTL cache. GET /cache/:key returns cached value or 404. POST /cache/:key stores value with TTL from X-Cache-T"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "TTL Cache Server"
   description: "HTTP server with an in-memory TTL cache. GET /cache/:key returns cached value or 404. POST /cache/:key stores value with TTL from X-Cache-TTL header."
   difficulty: 4
@@ -332,6 +412,10 @@
     - "DELETE /cache/:key must invalidate entry"
 
 - id: "NET-021"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server that echoes every received message back to the sender with a 'echo: ' prefix.' 'Prints 'WS Listening on :<port>'; logs eac"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Echo Server"
   description: "WebSocket server that echoes every received message back to the sender with a 'echo: ' prefix."
   difficulty: 3
@@ -349,6 +433,10 @@
     - "Must handle client disconnections gracefully"
 
 - id: "NET-022"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server that broadcasts every message received from any client to all currently connected clients.' 'Prints 'WS Listening on :<por"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Broadcast Server"
   description: "WebSocket server that broadcasts every message received from any client to all currently connected clients."
   difficulty: 3
@@ -365,6 +453,10 @@
     - "Must handle concurrent sends safely"
 
 - id: "NET-023"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server supporting named rooms. Clients send JSON {action: 'join'|'leave'|'message', room, text}. Messages are broadcast only to r"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Chat Rooms Server"
   description: "WebSocket server supporting named rooms. Clients send JSON {action: 'join'|'leave'|'message', room, text}. Messages are broadcast only to room members."
   difficulty: 4
@@ -382,6 +474,10 @@
     - "Must clean up empty rooms"
 
 - id: "NET-024"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that streams server-sent events. GET /events streams a counter event every second. GET /events?topic=X filters by topic.' 'SSE"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Server-Sent Events (SSE) Server"
   description: "HTTP server that streams server-sent events. GET /events streams a counter event every second. GET /events?topic=X filters by topic."
   difficulty: 3
@@ -399,6 +495,10 @@
     - "Must send 'retry: 3000' on connect"
 
 - id: "NET-025"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that accepts multipart/form-data file uploads on POST /upload. Saves files to a temp directory and returns JSON with filename a"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "File Upload Server"
   description: "HTTP server that accepts multipart/form-data file uploads on POST /upload. Saves files to a temp directory and returns JSON with filename and size."
   difficulty: 4
@@ -416,6 +516,10 @@
     - "Checksum must be SHA-256 of file contents"
 
 - id: "NET-026"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that serves files from a directory specified on stdin. GET /files/:name streams the file with correct Content-Type and Content-"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "File Download Server"
   description: "HTTP server that serves files from a directory specified on stdin. GET /files/:name streams the file with correct Content-Type and Content-Disposition."
   difficulty: 3
@@ -433,6 +537,10 @@
     - "Must support Range requests for partial downloads"
 
 - id: "NET-027"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with GET /health that returns {status, uptime, version} JSON and GET /ready that returns 200 or 503 based on readiness.' 'JSON"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Health Check Endpoint Server"
   description: "HTTP server with GET /health that returns {status, uptime, version} JSON and GET /ready that returns 200 or 503 based on readiness."
   difficulty: 2
@@ -449,6 +557,10 @@
     - "/health always returns 200; /ready may return 503"
 
 - id: "NET-028"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with GET /metrics that returns Prometheus-format text metrics: request count, response latency histogram, error rate.' 'Prometh"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Prometheus Metrics Endpoint Server"
   description: "HTTP server with GET /metrics that returns Prometheus-format text metrics: request count, response latency histogram, error rate."
   difficulty: 4
@@ -465,6 +577,10 @@
     - "Histogram buckets: 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1000ms"
 
 - id: "NET-029"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server supporting two API versions via URL prefix: /v1/items and /v2/items. v2 returns additional fields.' 'JSON responses; v1 and v2"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "API Versioning Server (URL Path)"
   description: "HTTP server supporting two API versions via URL prefix: /v1/items and /v2/items. v2 returns additional fields."
   difficulty: 3
@@ -482,6 +598,10 @@
     - "Both versions must coexist"
 
 - id: "NET-030"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that uses the Accept: application/vnd.api.v1+json or v2+json header to route to different response schemas.' 'JSON responses pe"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "API Versioning Server (Accept Header)"
   description: "HTTP server that uses the Accept: application/vnd.api.v1+json or v2+json header to route to different response schemas."
   difficulty: 3
@@ -498,6 +618,10 @@
     - "Must set Content-Type to match requested version"
 
 - id: "NET-031"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that receives POST /webhook payloads, validates HMAC-SHA256 signature from X-Webhook-Signature header, and logs valid payloads."
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Webhook Receiver Server"
   description: "HTTP server that receives POST /webhook payloads, validates HMAC-SHA256 signature from X-Webhook-Signature header, and logs valid payloads."
   difficulty: 4
@@ -515,6 +639,10 @@
     - "Must log event type from payload"
 
 - id: "NET-032"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that accepts POST /events and fans out to a list of registered webhook URLs. Reads target URLs from stdin. Retries failed deliv"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Webhook Dispatcher Server"
   description: "HTTP server that accepts POST /events and fans out to a list of registered webhook URLs. Reads target URLs from stdin. Retries failed deliveries up to 3 times."
   difficulty: 5
@@ -532,6 +660,10 @@
     - "Must sign payloads with HMAC-SHA256"
 
 - id: "NET-033"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with a circuit breaker wrapping a downstream service. Reads downstream URL from stdin. Opens circuit after 5 consecutive failur"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Circuit Breaker Pattern Server"
   description: "HTTP server with a circuit breaker wrapping a downstream service. Reads downstream URL from stdin. Opens circuit after 5 consecutive failures, half-opens after 30s."
   difficulty: 5
@@ -549,6 +681,10 @@
     - "Must log state transitions"
 
 - id: "NET-034"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP reverse proxy that retries failed upstream requests (5xx or network errors) up to N times with exponential backoff. Reads N and upstre"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Retry Proxy Server"
   description: "HTTP reverse proxy that retries failed upstream requests (5xx or network errors) up to N times with exponential backoff. Reads N and upstream URL from stdin."
   difficulty: 4
@@ -566,6 +702,10 @@
     - "Must add X-Retry-Count header to final response"
 
 - id: "NET-035"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP reverse proxy that distributes requests to multiple upstream servers in round-robin. Reads upstream list from stdin.' 'Proxied respons"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Load Balancer Server (Round Robin)"
   description: "HTTP reverse proxy that distributes requests to multiple upstream servers in round-robin. Reads upstream list from stdin."
   difficulty: 4
@@ -582,6 +722,10 @@
     - "Health check: HEAD / every 10s"
 
 - id: "NET-036"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server accepting POST /query with {fields: [...], filter: {...}} and returning only the requested fields from an in-memory dataset.' '"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "GraphQL-style Query Server"
   description: "HTTP server accepting POST /query with {fields: [...], filter: {...}} and returning only the requested fields from an in-memory dataset."
   difficulty: 4
@@ -598,6 +742,10 @@
     - "Must support nested field selection"
 
 - id: "NET-037"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that responds with JSON, XML, or plain text based on the Accept header from the client.' 'Response body in requested format; 40"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Content Negotiation Server"
   description: "HTTP server that responds with JSON, XML, or plain text based on the Accept header from the client."
   difficulty: 3
@@ -614,6 +762,10 @@
     - "Default to JSON if Accept is */*"
 
 - id: "NET-038"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that assigns a unique UUID to every request, propagates it as X-Request-ID header in the response, and includes it in logs.' 'A"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Request ID Middleware Server"
   description: "HTTP server that assigns a unique UUID to every request, propagates it as X-Request-ID header in the response, and includes it in logs."
   difficulty: 2
@@ -630,6 +782,10 @@
     - "Generated IDs must be UUID v4 format"
 
 - id: "NET-039"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that rejects requests with bodies larger than N bytes. Returns 413 Payload Too Large with JSON error.' '413 JSON error for over"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Body Size Limit Middleware Server"
   description: "HTTP server that rejects requests with bodies larger than N bytes. Returns 413 Payload Too Large with JSON error."
   difficulty: 2
@@ -646,6 +802,10 @@
     - "Must also check actual body size during read"
 
 - id: "NET-040"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with HTTP Basic Authentication. Reads username:password pairs from stdin. Returns 401 with WWW-Authenticate header when unauthe"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Basic Auth Middleware Server"
   description: "HTTP server with HTTP Basic Authentication. Reads username:password pairs from stdin. Returns 401 with WWW-Authenticate header when unauthenticated."
   difficulty: 2
@@ -662,6 +822,10 @@
     - "Must not store plaintext passwords; compare hashes"
 
 - id: "NET-041"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that reads a list of source-to-destination URL redirects from stdin and performs permanent (301) or temporary (302) redirects.'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Redirect Server"
   description: "HTTP server that reads a list of source-to-destination URL redirects from stdin and performs permanent (301) or temporary (302) redirects."
   difficulty: 2
@@ -678,6 +842,10 @@
     - "Must log redirect events"
 
 - id: "NET-042"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Simple HTTP reverse proxy that forwards all requests to an upstream URL, passing through headers and body, and returning the upstream respo"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Reverse Proxy Server"
   description: "Simple HTTP reverse proxy that forwards all requests to an upstream URL, passing through headers and body, and returning the upstream response."
   difficulty: 3
@@ -694,6 +862,10 @@
     - "Must forward X-Forwarded-For and X-Real-IP"
 
 - id: "NET-043"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that serves static files from a directory. Supports directory listings, index.html fallback, and correct MIME types.' 'File byt"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Static File Server"
   description: "HTTP server that serves static files from a directory. Supports directory listings, index.html fallback, and correct MIME types."
   difficulty: 3
@@ -711,6 +883,10 @@
     - "Must prevent directory traversal"
 
 - id: "NET-044"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that gzip-compresses responses when the client sends Accept-Encoding: gzip. Sets Content-Encoding: gzip header.' 'Compressed or"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Gzip Compression Middleware Server"
   description: "HTTP server that gzip-compresses responses when the client sends Accept-Encoding: gzip. Sets Content-Encoding: gzip header."
   difficulty: 3
@@ -727,6 +903,10 @@
     - "Do not compress bodies < 1 KB"
 
 - id: "NET-045"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server implementing JSON-RPC 2.0 over POST /rpc. Supports methods: add, subtract, multiply with numeric params.' 'JSON-RPC 2.0 respons"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "JSON RPC Server"
   description: "HTTP server implementing JSON-RPC 2.0 over POST /rpc. Supports methods: add, subtract, multiply with numeric params."
   difficulty: 4
@@ -744,6 +924,10 @@
     - "Must handle notifications (id=null)"
 
 - id: "NET-046"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with token bucket rate limiting per API key. Each key gets a separate bucket. Reads key-to-rate mapping from stdin.' '429 with"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Token Bucket Rate Limiter Server"
   description: "HTTP server with token bucket rate limiting per API key. Each key gets a separate bucket. Reads key-to-rate mapping from stdin."
   difficulty: 5
@@ -760,6 +944,10 @@
     - "Unknown keys get default rate of 1 req/s"
 
 - id: "NET-047"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with GET /search?q=<term>&page=<n>&limit=<n> that searches an in-memory list of documents by title and body text.' 'JSON {resul"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Server-Side Search API"
   description: "HTTP server with GET /search?q=<term>&page=<n>&limit=<n> that searches an in-memory list of documents by title and body text."
   difficulty: 3
@@ -777,6 +965,10 @@
     - "Must support pagination"
 
 - id: "NET-048"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with POST /bulk that accepts an array of operations (create/update/delete) and applies them atomically, returning per-operation"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Bulk Operations API Server"
   description: "HTTP server with POST /bulk that accepts an array of operations (create/update/delete) and applies them atomically, returning per-operation results."
   difficulty: 4
@@ -794,6 +986,10 @@
     - "Must return 207 Multi-Status"
 
 - id: "NET-049"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server where GET /poll?lastId=N holds the connection open until a new event with id > lastId is available, then responds with the even"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Long Polling Server"
   description: "HTTP server where GET /poll?lastId=N holds the connection open until a new event with id > lastId is available, then responds with the event."
   difficulty: 4
@@ -811,6 +1007,10 @@
     - "Must handle concurrent pollers"
 
 - id: "NET-050"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server serving GET /openapi.json that returns a valid OpenAPI 3.0 spec document describing the server's own endpoints.' 'OpenAPI 3.0 J"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "REST API with Full OpenAPI Spec Server"
   description: "HTTP server serving GET /openapi.json that returns a valid OpenAPI 3.0 spec document describing the server's own endpoints."
   difficulty: 4
@@ -828,6 +1028,10 @@
     - "Must include authentication requirements"
 
 - id: "NET-051"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server where POST requests include an Idempotency-Key header. Duplicate requests with the same key return the cached first response in"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Idempotency Key Server"
   description: "HTTP server where POST requests include an Idempotency-Key header. Duplicate requests with the same key return the cached first response instead of re-processing."
   difficulty: 4
@@ -844,6 +1048,10 @@
     - "Must expire cache entries after window"
 
 - id: "NET-052"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that measures and reports timing for each phase (db, cache, render) in the Server-Timing response header.' 'All responses inclu"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Server-Timing Header Server"
   description: "HTTP server that measures and reports timing for each phase (db, cache, render) in the Server-Timing response header."
   difficulty: 3
@@ -860,6 +1068,10 @@
     - "All durations in milliseconds"
 
 - id: "NET-053"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that streams a large JSON array line-by-line (NDJSON format) for GET /stream, allowing clients to parse incrementally.' 'NDJSON"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Streaming JSON Response Server"
   description: "HTTP server that streams a large JSON array line-by-line (NDJSON format) for GET /stream, allowing clients to parse incrementally."
   difficulty: 3
@@ -876,6 +1088,10 @@
     - "Must flush after each line"
 
 - id: "NET-054"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that uses HTTP/2 server push to proactively send CSS and JS assets when serving an HTML page.' 'HTML page with server-pushed CS"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP/2 Server Push Server"
   description: "HTTP server that uses HTTP/2 server push to proactively send CSS and JS assets when serving an HTML page."
   difficulty: 5
@@ -892,6 +1108,10 @@
     - "Push assets defined by Link: </style.css>; rel=preload headers"
 
 - id: "NET-055"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server implementing optimistic concurrency with conditional PUT. PUT /resources/:id requires If-Match: <etag> header and returns 412 i"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Conditional PUT Server"
   description: "HTTP server implementing optimistic concurrency with conditional PUT. PUT /resources/:id requires If-Match: <etag> header and returns 412 if ETag does not match."
   difficulty: 4
@@ -908,6 +1128,10 @@
     - "Must return 428 Precondition Required if If-Match missing"
 
 - id: "NET-056"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with an audit logging middleware that records all mutating requests (POST, PUT, PATCH, DELETE) to an append-only log file.' 'Pa"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Audit Log Middleware Server"
   description: "HTTP server with an audit logging middleware that records all mutating requests (POST, PUT, PATCH, DELETE) to an append-only log file."
   difficulty: 3
@@ -924,6 +1148,10 @@
     - "Log file must be append-only"
 
 - id: "NET-057"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server implementing a minimal GraphQL endpoint supporting queries and mutations for a User type over POST /graphql.' 'GraphQL JSON res"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "GraphQL Mutation Server"
   description: "HTTP server implementing a minimal GraphQL endpoint supporting queries and mutations for a User type over POST /graphql."
   difficulty: 5
@@ -940,6 +1168,10 @@
     - "Must return 200 even for GraphQL errors"
 
 - id: "NET-058"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that parses multipart/form-data requests and returns a JSON summary of all fields and files received.' 'JSON {fields: {<name>:"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Multipart Form Data Parser Server"
   description: "HTTP server that parses multipart/form-data requests and returns a JSON summary of all fields and files received."
   difficulty: 4
@@ -956,6 +1188,10 @@
     - "Must return 400 for malformed multipart data"
 
 - id: "NET-059"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that reads X-Client-IP, performs a lookup against a built-in GeoIP stub, and adds X-Country, X-Region headers before proxying.'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Geo-location Header Enricher Server"
   description: "HTTP server that reads X-Client-IP, performs a lookup against a built-in GeoIP stub, and adds X-Country, X-Region headers before proxying."
   difficulty: 4
@@ -972,6 +1208,10 @@
     - "Must not block if GeoIP lookup times out (>100ms)"
 
 - id: "NET-060"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that deduplicates concurrent identical GET requests (same path + query). While the first request is in-flight, subsequent dupli"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Request Deduplication Server"
   description: "HTTP server that deduplicates concurrent identical GET requests (same path + query). While the first request is in-flight, subsequent duplicates wait and share the result."
   difficulty: 5
@@ -988,6 +1228,10 @@
     - "Only deduplicates GET and HEAD"
 
 - id: "NET-061"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server that sends a ping frame every N seconds. Disconnects clients that miss 3 consecutive pings.' 'Logs ping/pong events and cl"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Heartbeat Server"
   description: "WebSocket server that sends a ping frame every N seconds. Disconnects clients that miss 3 consecutive pings."
   difficulty: 3
@@ -1004,6 +1248,10 @@
     - "Must log reason for disconnection"
 
 - id: "NET-062"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server that buffers messages sent while a client is temporarily disconnected and replays them on reconnect (using a client ID coo"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Message Queue Server"
   description: "WebSocket server that buffers messages sent while a client is temporarily disconnected and replays them on reconnect (using a client ID cookie)."
   difficulty: 5
@@ -1037,6 +1285,10 @@
     - "Must send retry: 5000 on connect"
 
 - id: "NET-064"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server implementing HTTP Digest Authentication (RFC 7616) with MD5 algorithm.' '401 with WWW-Authenticate: Digest on first request; 20"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Digest Auth Server"
   description: "HTTP server implementing HTTP Digest Authentication (RFC 7616) with MD5 algorithm."
   difficulty: 5
@@ -1054,6 +1306,10 @@
     - "Must reject replayed nonces"
 
 - id: "NET-065"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server implementing Range request support for large file downloads. Responds with 206 Partial Content and the requested byte range.' '"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Partial Content Server (Range Requests)"
   description: "HTTP server implementing Range request support for large file downloads. Responds with 206 Partial Content and the requested byte range."
   difficulty: 4
@@ -1070,6 +1326,10 @@
     - "Must return 416 Range Not Satisfiable for invalid ranges"
 
 - id: "NET-066"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server storing resources as an immutable event log. POST /events appends events. GET /state/:id reconstructs current state by replayin"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Event Sourcing API Server"
   description: "HTTP server storing resources as an immutable event log. POST /events appends events. GET /state/:id reconstructs current state by replaying events."
   difficulty: 5
@@ -1087,6 +1347,10 @@
     - "GET /events/:id returns full event history"
 
 - id: "NET-067"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Caching HTTP forward proxy. Serves GET requests from cache if cached and not expired (per Cache-Control: max-age). Otherwise fetches from o"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Proxy with Cache Server"
   description: "Caching HTTP forward proxy. Serves GET requests from cache if cached and not expired (per Cache-Control: max-age). Otherwise fetches from origin."
   difficulty: 5
@@ -1103,6 +1367,10 @@
     - "Cache key: method + URL"
 
 - id: "NET-068"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server acting as a service registry. Services POST /register with {name, host, port, healthUrl}. GET /services returns healthy service"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Microservice Service Registry Server"
   description: "HTTP server acting as a service registry. Services POST /register with {name, host, port, healthUrl}. GET /services returns healthy services. Registry polls health URLs."
   difficulty: 5
@@ -1120,6 +1388,10 @@
     - "TTL-based auto-deregistration if service doesn't re-register within 60s"
 
 - id: "NET-069"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP proxy implementing the CONNECT method for HTTPS tunnelling. Client sends CONNECT host:port, proxy opens TCP connection and bridges bot"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Tunnel Server (CONNECT)"
   description: "HTTP proxy implementing the CONNECT method for HTTPS tunnelling. Client sends CONNECT host:port, proxy opens TCP connection and bridges both ends."
   difficulty: 5
@@ -1136,6 +1408,10 @@
     - "Must reject CONNECT to internal/private IPs"
 
 - id: "NET-070"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that handles SIGTERM/SIGINT by stopping new connections and waiting up to 30 seconds for in-flight requests to complete before"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Graceful Shutdown Server"
   description: "HTTP server that handles SIGTERM/SIGINT by stopping new connections and waiting up to 30 seconds for in-flight requests to complete before exiting."
   difficulty: 3
@@ -1152,6 +1428,10 @@
     - "Must return 503 to any requests arriving during shutdown"
 
 - id: "NET-071"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server returning HATEOAS-style JSON responses where each resource includes _links with related action URLs.' 'JSON with _links.self, _"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "REST API with HATEOAS Links"
   description: "HTTP server returning HATEOAS-style JSON responses where each resource includes _links with related action URLs."
   difficulty: 4
@@ -1168,6 +1448,10 @@
     - "Collection responses must include _links.next and _links.prev for pagination"
 
 - id: "NET-072"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server that accepts binary frames containing a simple protocol: 4-byte message type + payload. Parses and responds with acknowled"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Binary Protocol Server"
   description: "WebSocket server that accepts binary frames containing a simple protocol: 4-byte message type + payload. Parses and responds with acknowledgement frames."
   difficulty: 4
@@ -1184,6 +1468,10 @@
     - "Malformed frames: respond with type 0 error frame"
 
 - id: "NET-073"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with IP allowlist middleware. Reads allowed CIDR ranges from stdin. Returns 403 Forbidden for requests from unlisted IPs.' '403"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "IP Allowlist Middleware Server"
   description: "HTTP server with IP allowlist middleware. Reads allowed CIDR ranges from stdin. Returns 403 Forbidden for requests from unlisted IPs."
   difficulty: 3
@@ -1200,6 +1488,10 @@
     - "Must support both IPv4 and IPv6 CIDR notation"
 
 - id: "NET-074"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server serving feature flags. GET /flags/:key returns {enabled: true|false}. Flags can be toggled via POST /flags/:key {enabled: bool}"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Feature Flag API Server"
   description: "HTTP server serving feature flags. GET /flags/:key returns {enabled: true|false}. Flags can be toggled via POST /flags/:key {enabled: bool}. Supports percentage rollouts."
   difficulty: 4
@@ -1216,6 +1508,10 @@
     - "Must require X-User-ID header for percentage flags"
 
 - id: "NET-075"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP API gateway that reads a routing config from stdin (JSON) and proxies requests to appropriate microservices based on path prefix rules"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "API Gateway with Route Config Server"
   description: "HTTP API gateway that reads a routing config from stdin (JSON) and proxies requests to appropriate microservices based on path prefix rules."
   difficulty: 5
@@ -1233,6 +1529,10 @@
     - "Must add X-Gateway-Route header to upstream request"
 
 - id: "NET-076"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that aggregates request metrics (count, latency percentiles, error rate) per endpoint and returns them as JSON on GET /stats.'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Metrics Aggregator Server"
   description: "HTTP server that aggregates request metrics (count, latency percentiles, error rate) per endpoint and returns them as JSON on GET /stats."
   difficulty: 4
@@ -1249,6 +1549,10 @@
     - "Must support GET /stats/reset to clear metrics"
 
 - id: "NET-077"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server maintaining multiple versions of resource data. GET /v/:version/items returns the state of items at that version. POST /items i"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Multiversion Data API Server"
   description: "HTTP server maintaining multiple versions of resource data. GET /v/:version/items returns the state of items at that version. POST /items increments version."
   difficulty: 5
@@ -1265,6 +1569,10 @@
     - "Must support version diff: GET /diff/:v1/:v2"
 
 - id: "NET-078"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server streaming real-time service health updates via SSE. Monitors registered services and pushes status change events.' 'SSE events:"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Health Dashboard SSE Server"
   description: "HTTP server streaming real-time service health updates via SSE. Monitors registered services and pushes status change events."
   difficulty: 4
@@ -1281,6 +1589,10 @@
     - "Only push events when status changes"
 
 - id: "NET-079"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Full-featured JSON REST API with built-in rate limiting, request validation, pagination, and error handling for a 'tasks' resource.' 'JSON"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Rate-Limited JSON API Server"
   description: "Full-featured JSON REST API with built-in rate limiting, request validation, pagination, and error handling for a 'tasks' resource."
   difficulty: 5
@@ -1298,6 +1610,10 @@
     - "Supports ?priority=high|medium|low filter"
 
 - id: "NET-080"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that reads an OpenAPI 3.0 JSON spec from stdin and automatically generates mock responses based on the schema examples.' 'Mock"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Mock Server from OpenAPI Spec"
   description: "HTTP server that reads an OpenAPI 3.0 JSON spec from stdin and automatically generates mock responses based on the schema examples."
   difficulty: 5
@@ -1315,6 +1631,10 @@
     - "Must return correct status codes per spec"
 
 - id: "NET-081"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server accepting POST /batch with a JSON array of sub-requests. Executes all sub-requests concurrently and returns their responses in"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Batch Request Fan-out Server"
   description: "HTTP server accepting POST /batch with a JSON array of sub-requests. Executes all sub-requests concurrently and returns their responses in order."
   difficulty: 5
@@ -1332,6 +1652,10 @@
     - "Must preserve order in response array"
 
 - id: "NET-082"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'REST API server for hierarchical resources: /orgs/:orgId/teams/:teamId/members. Full CRUD at each level with parent-child relationship vali"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Hierarchical Resource API Server"
   description: "REST API server for hierarchical resources: /orgs/:orgId/teams/:teamId/members. Full CRUD at each level with parent-child relationship validation."
   difficulty: 4
@@ -1348,6 +1672,10 @@
     - "Deleting a parent must cascade-delete children"
 
 - id: "NET-083"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server where DELETE /resources/:id performs a soft delete (sets deletedAt timestamp). Deleted resources are excluded from GET /resourc"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Soft Delete API Server"
   description: "HTTP server where DELETE /resources/:id performs a soft delete (sets deletedAt timestamp). Deleted resources are excluded from GET /resources unless ?include_deleted=true."
   difficulty: 3
@@ -1364,6 +1692,10 @@
     - "Hard delete via DELETE /resources/:id?permanent=true"
 
 - id: "NET-084"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP proxy that forwards a configurable set of headers from client to upstream and from upstream back to client. Reads header lists from st"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Header Forwarding Proxy Server"
   description: "HTTP proxy that forwards a configurable set of headers from client to upstream and from upstream back to client. Reads header lists from stdin."
   difficulty: 3
@@ -1379,6 +1711,10 @@
     - "Must not forward security-sensitive headers like Cookie unless explicitly listed"
 
 - id: "NET-085"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with GET /ws-stats returning real-time WebSocket connection stats (total, active, messages sent/received) as JSON.' 'JSON {tota"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Load Tester Server"
   description: "HTTP server with GET /ws-stats returning real-time WebSocket connection stats (total, active, messages sent/received) as JSON."
   difficulty: 3
@@ -1395,6 +1731,10 @@
     - "Thread-safe counter updates"
 
 - id: "NET-086"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server where POST /sign generates a time-limited signed URL for a resource. GET /resource validates the signature and expiry before se"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Signed URL Generator Server"
   description: "HTTP server where POST /sign generates a time-limited signed URL for a resource. GET /resource validates the signature and expiry before serving."
   difficulty: 4
@@ -1411,6 +1751,10 @@
     - "Default expiry: 15 minutes"
 
 - id: "NET-087"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with GET /migrations returning pending migrations, POST /migrations/run applying them, and GET /migrations/history showing appl"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Schema Migration API Server"
   description: "HTTP server with GET /migrations returning pending migrations, POST /migrations/run applying them, and GET /migrations/history showing applied migrations."
   difficulty: 4
@@ -1428,6 +1772,10 @@
     - "Must be idempotent: running applied migration is a no-op"
 
 - id: "NET-088"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server implementing publish-subscribe. Clients send {action: 'subscribe'|'publish'|'unsubscribe', topic, message}.' 'Delivered me"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Pub/Sub Broker Server"
   description: "WebSocket server implementing publish-subscribe. Clients send {action: 'subscribe'|'publish'|'unsubscribe', topic, message}."
   difficulty: 4
@@ -1444,6 +1792,10 @@
     - "Must support retained messages per topic"
 
 - id: "NET-089"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP proxy that maintains a connection pool to an upstream service, reusing TCP connections. Reports pool stats (active, idle, total) on GE"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Connection Pool Proxy Server"
   description: "HTTP proxy that maintains a connection pool to an upstream service, reusing TCP connections. Reports pool stats (active, idle, total) on GET /pool/stats."
   difficulty: 5
@@ -1460,6 +1812,10 @@
     - "Idle connections closed after 30 seconds"
 
 - id: "NET-090"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server middleware that propagates distributed tracing headers (W3C Trace Context: traceparent, tracestate) to upstream calls.' 'Proxie"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Trace Propagation Middleware Server"
   description: "HTTP server middleware that propagates distributed tracing headers (W3C Trace Context: traceparent, tracestate) to upstream calls."
   difficulty: 4
@@ -1476,6 +1832,10 @@
     - "Format: 00-<traceId>-<spanId>-01"
 
 - id: "NET-091"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server where every resource has a 'version' field. PUT requires X-Version header matching current version; mismatches return 409 Confl"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "REST API with Optimistic Locking Server"
   description: "HTTP server where every resource has a 'version' field. PUT requires X-Version header matching current version; mismatches return 409 Conflict."
   difficulty: 4
@@ -1492,6 +1852,10 @@
     - "Must include X-Resource-Version header in all responses"
 
 - id: "NET-092"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server extracting tenant ID from subdomain or X-Tenant-ID header. Each tenant has isolated data. Reads initial tenant configs from std"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Multi-Tenant API Server"
   description: "HTTP server extracting tenant ID from subdomain or X-Tenant-ID header. Each tenant has isolated data. Reads initial tenant configs from stdin."
   difficulty: 5
@@ -1508,6 +1872,10 @@
     - "Must support both header and subdomain tenant identification"
 
 - id: "NET-093"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that parses and enforces Cache-Control directives. Implements must-revalidate, no-cache, no-store, max-age, s-maxage, private.'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Cache-Control Parser Server"
   description: "HTTP server that parses and enforces Cache-Control directives. Implements must-revalidate, no-cache, no-store, max-age, s-maxage, private."
   difficulty: 4
@@ -1524,6 +1892,10 @@
     - "must-revalidate must contact origin even when cached"
 
 - id: "NET-094"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server with GET /docs that renders HTML API documentation generated from inline route metadata (title, description, params, response s"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "API Blueprint Documentation Server"
   description: "HTTP server with GET /docs that renders HTML API documentation generated from inline route metadata (title, description, params, response schema)."
   difficulty: 3
@@ -1540,6 +1912,10 @@
     - "HTML must include try-it section with form inputs"
 
 - id: "NET-095"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP/2 server implementing a simple binary framing protocol over POST requests. Supports unary and server-streaming RPC patterns.' 'Binary"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "gRPC-style HTTP/2 Server"
   description: "HTTP/2 server implementing a simple binary framing protocol over POST requests. Supports unary and server-streaming RPC patterns."
   difficulty: 5
@@ -1556,6 +1932,10 @@
     - "5-byte frame: 1-byte compressed flag + 4-byte message length"
 
 - id: "NET-096"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'WebSocket server tracking user online/offline presence. Clients announce identity on connect. GET /presence returns current online users.'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Presence API Server (WebSocket)"
   description: "WebSocket server tracking user online/offline presence. Clients announce identity on connect. GET /presence returns current online users."
   difficulty: 4
@@ -1572,6 +1952,10 @@
     - "Must broadcast presence-change events to all connected clients"
 
 - id: "NET-097"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that adjusts per-route timeout based on observed p95 latency. Routes that consistently take longer get automatic timeout extens"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Adaptive Timeout Server"
   description: "HTTP server that adjusts per-route timeout based on observed p95 latency. Routes that consistently take longer get automatic timeout extension."
   difficulty: 5
@@ -1604,6 +1988,10 @@
     - "Access tokens expire in 3600 seconds"
 
 - id: "NET-099"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server using RFC 5988 Link headers for pagination. GET /items returns current page with Link: <url>; rel=next, <url>; rel=prev headers"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Link Header Pagination Server"
   description: "HTTP server using RFC 5988 Link headers for pagination. GET /items returns current page with Link: <url>; rel=next, <url>; rel=prev headers."
   difficulty: 3
@@ -1620,6 +2008,10 @@
     - "Default page size 25; accepts ?page=N&per_page=N"
 
 - id: "NET-100"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server acting as a sidecar proxy: intercepts all inbound traffic, applies mTLS validation, rate limiting, and retries, before forwardi"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Service Mesh Sidecar Server"
   description: "HTTP server acting as a sidecar proxy: intercepts all inbound traffic, applies mTLS validation, rate limiting, and retries, before forwarding to the local service."
   difficulty: 5
@@ -1639,6 +2031,10 @@
 # ---- CLIENT programs (NET-101 to NET-200) ----
 
 - id: "NET-101"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL from stdin, performs an HTTP GET request, and prints the response status code and body to stdout.' 'First line: status code. Re"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP GET Client"
   description: "Reads a URL from stdin, performs an HTTP GET request, and prints the response status code and body to stdout."
   difficulty: 1
@@ -1655,6 +2051,10 @@
     - "Must print error message to stderr and exit non-zero on network failure"
 
 - id: "NET-102"
+  disabled: true
+  disabled_reason: "[requires-network] Spec requires live HTTP POST to external network (httpbin.org), which is forbidden (no network) and non-deterministic"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP POST Client"
   description: "Reads a URL and JSON body from stdin, performs an HTTP POST request with Content-Type: application/json, and prints status and response body."
   difficulty: 1
@@ -1671,6 +2071,10 @@
     - "Must handle non-JSON response bodies gracefully"
 
 - id: "NET-103"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads URL, resource ID, and JSON body from stdin, performs an HTTP PUT request, and prints the result.' 'First line: status code. Remaining"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP PUT Client"
   description: "Reads URL, resource ID, and JSON body from stdin, performs an HTTP PUT request, and prints the result."
   difficulty: 1
@@ -1686,6 +2090,10 @@
     - "Must handle 204 No Content responses (empty body is valid)"
 
 - id: "NET-104"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL from stdin, performs an HTTP DELETE request, and prints the status code and any response body.' 'Status code; response body if"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP DELETE Client"
   description: "Reads a URL from stdin, performs an HTTP DELETE request, and prints the status code and any response body."
   difficulty: 1
@@ -1701,6 +2109,10 @@
     - "Must exit non-zero on 4xx/5xx responses"
 
 - id: "NET-105"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP PATCH Client"
   description: "Reads a URL and partial JSON body from stdin, performs an HTTP PATCH request, and prints the response."
   difficulty: 1
@@ -1716,6 +2128,10 @@
     - "Content-Type: application/merge-patch+json"
 
 - id: "NET-106"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Command-line REST API client that reads an operation (list|get|create|update|delete) and parameters from stdin, calls a JSON REST API, and"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "REST API CRUD Consumer Client"
   description: "Command-line REST API client that reads an operation (list|get|create|update|delete) and parameters from stdin, calls a JSON REST API, and prints results."
   difficulty: 2
@@ -1732,6 +2148,10 @@
     - "Must show status code alongside response"
 
 - id: "NET-107"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Header Inspector Client"
   description: "Reads a URL from stdin, performs an HTTP HEAD request, and prints all response headers as key: value pairs."
   difficulty: 1
@@ -1812,6 +2232,10 @@
     - "Must print total elapsed time"
 
 - id: "NET-112"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Polling'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Long Polling Client"
   description: "Reads a long-poll URL from stdin. Continuously polls the endpoint and prints new events as they arrive. Handles 204 No Content (no new events) gracefully."
   difficulty: 3
@@ -1828,6 +2252,10 @@
     - "Must stop after timeout seconds"
 
 - id: "NET-113"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires making live HTTP requests to external services (httpbin.org), which violates the 'no network' constraint of the test environment"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Batch API Request Client"
   description: "Reads a list of URLs from stdin and fetches all of them concurrently, printing status and first line of body for each URL in input order."
   difficulty: 3
@@ -1845,6 +2273,10 @@
     - "Timeout per request: 30 seconds"
 
 - id: "NET-114"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a WebSocket URL and messages from stdin. Connects, sends each message, and prints received messages until the connection closes.' 'Re"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "WebSocket Client"
   description: "Reads a WebSocket URL and messages from stdin. Connects, sends each message, and prints received messages until the connection closes."
   difficulty: 3
@@ -1861,6 +2293,10 @@
     - "Must print close code and reason"
 
 - id: "NET-115"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Downloaded'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "File Download Client"
   description: "Reads a URL and destination file path from stdin. Downloads the file with a progress bar (percentage, bytes downloaded, speed)."
   difficulty: 3
@@ -1877,6 +2313,10 @@
     - "Must verify Content-Length matches downloaded size"
 
 - id: "NET-116"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Download complete'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Resumable Download Client"
   description: "Downloads a file with resume capability. If the destination file exists, uses HTTP Range requests to continue from where it left off."
   difficulty: 4
@@ -1893,6 +2333,10 @@
     - "Must verify file integrity with ETag or Content-MD5 if available"
 
 - id: "NET-117"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Step 1 (Create): PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "REST API Integration Test Client"
   description: "Reads a base URL from stdin and runs a test suite: creates a resource, reads it back, updates it, verifies the update, then deletes it. Reports PASS/FAIL."
   difficulty: 3
@@ -1925,6 +2369,10 @@
     - "Must retry once after 429"
 
 - id: "NET-119"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires making actual HTTP GET requests to user-supplied URLs (e.g., https://httpbin.org/get and http://localhost:8080), which requires network access that is not avai..."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP Benchmark Client"
   description: "Reads a URL, concurrency, and request count from stdin. Sends the specified number of concurrent GET requests and prints latency stats (min, max, mean, p50, p95, p99)."
   difficulty: 4
@@ -1941,6 +2389,10 @@
     - "Percentiles computed from all latency samples"
 
 - id: "NET-120"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Event #1:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "SSE Consumer Client"
   description: "Reads an SSE endpoint URL from stdin, connects, and prints each incoming event's id, event type, and data fields as they arrive."
   difficulty: 2
@@ -1957,6 +2409,10 @@
     - "Must reconnect on connection drop (using Last-Event-ID)"
 
 - id: "NET-121"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Webhook Sender Client"
   description: "Reads a webhook URL, secret, and JSON payload from stdin. Signs the payload with HMAC-SHA256 and POSTs it with the signature header."
   difficulty: 3
@@ -1973,6 +2429,10 @@
     - "Must print delivery status (delivered/failed)"
 
 - id: "NET-122"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Rotation'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Key Rotation Client"
   description: "Reads a base URL and current API key from stdin. Calls POST /api-keys/rotate, extracts the new key, verifies it works on a test endpoint, and prints the new key."
   difficulty: 3
@@ -2005,6 +2465,10 @@
     - "Array diffs show index of change"
 
 - id: "NET-124"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL and a JSON schema for the expected response from stdin. Fetches the URL and validates the response body against the schema. Pri"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Response Validator Client"
   description: "Reads a URL and a JSON schema for the expected response from stdin. Fetches the URL and validates the response body against the schema. Prints PASS or FAIL with details."
   difficulty: 3
@@ -2021,6 +2485,10 @@
     - "Must list all schema violations"
 
 - id: "NET-125"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires making real HTTP POST requests to external GraphQL endpoints (e.g"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "GraphQL Query Client"
   description: "Reads a GraphQL endpoint URL and query string from stdin. Sends the query as POST with application/json Content-Type and pretty-prints the JSON response."
   difficulty: 2
@@ -2037,6 +2505,10 @@
     - "Must detect and display GraphQL errors even with 200 status"
 
 - id: "NET-126"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Total:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Paginated API Consumer Client"
   description: "Reads a paginated API base URL from stdin. Fetches all pages following Link headers or nextCursor until exhausted. Writes all items as NDJSON to stdout."
   difficulty: 3
@@ -2053,6 +2525,10 @@
     - "Must respect max items limit"
 
 - id: "NET-127"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL and retry config from stdin. Makes GET requests with configurable retry on 5xx errors, using jittered exponential backoff.' 'Fi"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Client with Retry Logic"
   description: "Reads a URL and retry config from stdin. Makes GET requests with configurable retry on 5xx errors, using jittered exponential backoff."
   difficulty: 3
@@ -2069,6 +2545,10 @@
     - "Only retry on 5xx and connection errors, not 4xx"
 
 - id: "NET-128"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'users='"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Concurrent API Stress Client"
   description: "Reads a URL and scenario config from stdin. Runs a ramp-up stress test: gradually increases concurrent users, measures throughput and error rate."
   difficulty: 4
@@ -2085,6 +2565,10 @@
     - "Must report when error rate exceeds 5%"
 
 - id: "NET-129"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP client wrapper that implements a circuit breaker. Opens after N consecutive failures, preventing requests for 30s, then allows one pro"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "API Client with Circuit Breaker"
   description: "HTTP client wrapper that implements a circuit breaker. Opens after N consecutive failures, preventing requests for 30s, then allows one probe request."
   difficulty: 4
@@ -2101,6 +2585,10 @@
     - "Half-open: exactly one probe request"
 
 - id: "NET-130"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'TLS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "mTLS HTTP Client"
   description: "Reads a URL, client cert path, and client key path from stdin. Makes HTTPS requests using mutual TLS authentication."
   difficulty: 4
@@ -2132,6 +2620,10 @@
     - "Must warn if returned Content-Type does not match requested format"
 
 - id: "NET-132"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "OAuth2 Client Credentials Client"
   description: "Reads a token URL, client ID, client secret, and API URL from stdin. Obtains an OAuth2 access token using client_credentials flow, then calls the API."
   difficulty: 3
@@ -2148,6 +2640,10 @@
     - "Must not log client secret"
 
 - id: "NET-133"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'OK'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Link Checker Client"
   description: "Reads a base URL from stdin. Fetches the page, extracts all <a href> links, checks each link for a 2xx response, and reports broken links."
   difficulty: 3
@@ -2165,6 +2661,10 @@
     - "Must follow at most one redirect per link"
 
 - id: "NET-134"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires real HTTP network requests to httpbin.org and localhost:8089, but the sandbox has no network access and no local server"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP Cookie Jar Client"
   description: "Reads a series of URL requests from stdin. Maintains a cookie jar across requests (stores cookies from Set-Cookie headers and sends them on subsequent requests)."
   difficulty: 3
@@ -2182,6 +2682,10 @@
     - "Must not send cookies cross-domain"
 
 - id: "NET-135"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Proxy-through Client"
   description: "Reads a proxy URL and target URL from stdin. Makes the request through the HTTP proxy (CONNECT for HTTPS, direct for HTTP). Prints response."
   difficulty: 3
@@ -2198,6 +2702,10 @@
     - "Must support proxy authentication if proxy URL includes credentials"
 
 - id: "NET-136"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'BREAKING CHANGES'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Changelog Diff Client"
   description: "Reads two versioned API base URLs from stdin. Fetches /openapi.json from each, diffs the paths and schemas, and prints a changelog of breaking vs non-breaking changes."
   difficulty: 4
@@ -2215,6 +2723,10 @@
     - "New optional fields are non-breaking"
 
 - id: "NET-137"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Connected'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "WebSocket Chat Client"
   description: "Reads a WebSocket URL and username from stdin. Connects to a chat room server, reads messages from stdin, sends them, and prints incoming messages."
   difficulty: 3
@@ -2231,6 +2743,10 @@
     - "Must send {action: 'join', room: 'general'} on connect"
 
 - id: "NET-138"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Match rate:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Canary Test Client"
   description: "Reads two server URLs (stable and canary) and N requests from stdin. Sends each request to both, compares responses, and reports divergences."
   difficulty: 4
@@ -2247,6 +2763,10 @@
     - "Must report status code divergences separately from body divergences"
 
 - id: "NET-139"
+  disabled: true
+  disabled_reason: "[non-deterministic] Test cases are inconsistent with the stated output format"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "JWT Decoder Client"
   description: "Reads a JWT token from stdin. Decodes (without verifying signature) the header and payload and pretty-prints them as JSON. Checks expiry."
   difficulty: 2
@@ -2263,6 +2783,10 @@
     - "Must not require network access"
 
 - id: "NET-140"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Fuzzer Client"
   description: "Reads a base URL and endpoint list from stdin. Sends malformed inputs to each endpoint (null bytes, overlong strings, special chars) and reports unexpected 5xx errors."
   difficulty: 4
@@ -2279,6 +2803,10 @@
     - "Must not crash the fuzzer on non-JSON responses"
 
 - id: "NET-141"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'HAR written'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Archive (HAR) Recorder Client"
   description: "Reads a list of URLs from stdin, fetches each, and writes a HAR (HTTP Archive) JSON file capturing all request/response details."
   difficulty: 4
@@ -2295,6 +2823,10 @@
     - "Must include request/response headers, body, timing"
 
 - id: "NET-142"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'A:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "DNS Lookup Client"
   description: "Reads a hostname from stdin and performs DNS lookups for A, AAAA, MX, TXT, and CNAME records. Prints results for each record type."
   difficulty: 2
@@ -2318,15 +2850,21 @@
   input_format: "First line: host. Second line: port. Subsequent lines: messages (blank to finish)"
   output_format: "Server response per sent message; 'Connection closed' at end"
   test_cases:
-    - input: "localhost\n7\nhello\nworld\n"
-      expected_output: "hello"
-    - input: "echo.example.com\n7\nping\n"
-      expected_output: "ping"
+    - input: "localhost\n7\nhello\nworld\n\n"
+      expected_output: "hello\nworld\nConnection closed"
+    - input: "echo.example.com\n7\nping\n\n"
+      expected_output: "ping\nConnection closed"
+    - input: "testhost\n12345\nfoo\nbar\nbaz\n\n"
+      expected_output: "foo\nbar\nbaz\nConnection closed"
   constraints:
     - "Must timeout reads after 10 seconds"
     - "Must close connection cleanly"
 
 - id: "NET-144"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Status Code Checker Client"
   description: "Reads a list of URLs from stdin and checks each one, reporting the HTTP status code, final URL after redirects, and response time."
   difficulty: 1
@@ -2343,6 +2881,10 @@
     - "Timeout per URL: 10 seconds"
 
 - id: "NET-145"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Mock Client (Playback)"
   description: "Reads a HAR file path and request list from stdin. Instead of making real HTTP requests, plays back responses from the HAR file that match the requested URLs."
   difficulty: 4
@@ -2359,6 +2901,10 @@
     - "Must support multiple recordings of the same URL (replay in sequence)"
 
 - id: "NET-146"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Multipart Upload Client"
   description: "Reads a URL and file paths from stdin. Uploads the files as a multipart/form-data POST request and prints the server's response."
   difficulty: 3
@@ -2375,6 +2921,10 @@
     - "Must display upload progress"
 
 - id: "NET-147"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires actual HTTP network requests to httpbin.org, but the test environment has no network access"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP Response Caching Client"
   description: "HTTP client that caches GET responses locally (in /tmp) respecting Cache-Control headers. Serves cached responses without network round-trips when fresh."
   difficulty: 4
@@ -2391,6 +2941,10 @@
     - "Must include If-None-Match and If-Modified-Since on conditional re-fetches"
 
 - id: "NET-148"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Connection reused'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Keep-Alive Connection Reuse Client"
   description: "Reads a list of URLs (all to the same host) from stdin. Fetches them over a single persistent (keep-alive) TCP connection, reporting time saved vs new connections."
   difficulty: 4
@@ -2407,6 +2961,10 @@
     - "Must close connection on last request (Connection: close)"
 
 - id: "NET-149"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '{'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Parallel API Aggregator Client"
   description: "Reads multiple API endpoint URLs from stdin. Fetches all concurrently, merges the JSON responses into a single object, and prints the merged result."
   difficulty: 3
@@ -2423,6 +2981,10 @@
     - "Failed endpoints included as {error: '...'} value"
 
 - id: "NET-150"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Monitoring'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Server Health Monitor Client"
   description: "Reads a list of service URLs and check interval from stdin. Continuously polls each service and reports status changes, uptime percentage, and average response time."
   difficulty: 3
@@ -2439,6 +3001,10 @@
     - "Must log timestamp for each status change"
 
 - id: "NET-151"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Tunnel established'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Tunnel Client (CONNECT)"
   description: "Reads a proxy URL, target host:port, and messages from stdin. Uses HTTP CONNECT to tunnel a TCP connection through the proxy, then sends/receives messages."
   difficulty: 4
@@ -2455,6 +3021,10 @@
     - "Must verify '200 Connection established' before tunnelling"
 
 - id: "NET-152"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Protocol:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP/2 Client"
   description: "Reads a URL from stdin and makes an HTTP/2 request, printing the protocol version used, headers, and response body."
   difficulty: 3
@@ -2471,6 +3041,10 @@
     - "Must fall back to HTTP/1.1 if server does not support HTTP/2"
 
 - id: "NET-153"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a base URL, filter params, and max pages from stdin. Fetches paginated results applying filters, and writes all matching items to std"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "REST API Client with Pagination and Filtering"
   description: "Reads a base URL, filter params, and max pages from stdin. Fetches paginated results applying filters, and writes all matching items to stdout as NDJSON."
   difficulty: 3
@@ -2503,6 +3077,10 @@
     - "Must handle SOAPFault responses"
 
 - id: "NET-155"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads host, port, path, expected status, and timeout from stdin. Makes a single HTTP health check request and exits 0 on pass, 1 on fail.'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Health Check Probe Client"
   description: "Reads host, port, path, expected status, and timeout from stdin. Makes a single HTTP health check request and exits 0 on pass, 1 on fail."
   difficulty: 1
@@ -2519,6 +3097,10 @@
     - "Must include response time in output"
 
 - id: "NET-156"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Relaying'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Server-Sent Events Relay Client"
   description: "Reads a source SSE URL and target webhook URL from stdin. Subscribes to the SSE stream and POSTs each event to the webhook URL."
   difficulty: 3
@@ -2535,6 +3117,10 @@
     - "Must reconnect to SSE on disconnection"
 
 - id: "NET-157"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL from stdin and sends an HTTP TRACE request, printing the echoed request headers as returned by the server.' 'Echoed request hea"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Trace Client"
   description: "Reads a URL from stdin and sends an HTTP TRACE request, printing the echoed request headers as returned by the server."
   difficulty: 2
@@ -2551,6 +3137,10 @@
     - "Must detect if server blocks TRACE (405) vs allows it"
 
 - id: "NET-158"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'FOUND'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Endpoint Discovery Client"
   description: "Reads a base URL from stdin. Probes common API paths (/api, /v1, /health, /openapi.json, /swagger.json, /docs) and reports which ones respond with 2xx."
   difficulty: 2
@@ -2567,6 +3157,10 @@
     - "Timeout per probe: 5 seconds"
 
 - id: "NET-159"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'AUTHENTICATED'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Authentication Credential Tester Client"
   description: "Reads a URL, auth type (basic|bearer|apikey), and credentials from stdin. Tests whether the credentials grant access and reports the result."
   difficulty: 2
@@ -2584,6 +3178,10 @@
     - "API Key: X-API-Key header"
 
 - id: "NET-160"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'In 'record' mode: proxies all requests to a real server and saves request/response pairs. In 'replay' mode: serves saved responses without"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Mock Record-and-Replay Client"
   description: "In 'record' mode: proxies all requests to a real server and saves request/response pairs. In 'replay' mode: serves saved responses without network access."
   difficulty: 5
@@ -2600,6 +3198,10 @@
     - "Must save response headers and body"
 
 - id: "NET-161"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Hop 1:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Redirect Chain Tracer Client"
   description: "Reads a URL from stdin and traces the full redirect chain, printing each hop: URL, status, Location header, and response time."
   difficulty: 2
@@ -2616,6 +3218,10 @@
     - "Max hops: 20"
 
 - id: "NET-162"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Sent'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Batch Webhook Sender Client"
   description: "Reads a webhook URL, secret, and NDJSON file of events from stdin. Sends each event as a signed webhook POST with configurable concurrency."
   difficulty: 3
@@ -2632,6 +3238,10 @@
     - "Retry failed sends up to 3 times"
 
 - id: "NET-163"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a domain name from stdin. Queries the crt.sh CT log API and lists all known SSL certificates for that domain with their validity date"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Certificate Transparency Log Client"
   description: "Reads a domain name from stdin. Queries the crt.sh CT log API and lists all known SSL certificates for that domain with their validity dates."
   difficulty: 3
@@ -2648,6 +3258,10 @@
     - "Must flag expired certificates"
 
 - id: "NET-164"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Summary:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "TCP Port Scanner Client"
   description: "Reads a host and port range from stdin. Attempts TCP connections to each port concurrently and reports open/closed/filtered status."
   difficulty: 3
@@ -2665,6 +3279,10 @@
     - "Filtered = no response within timeout"
 
 - id: "NET-165"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'mean:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Latency Baseline Client"
   description: "Reads a list of URLs from stdin, makes N requests to each, and produces a latency baseline report: mean, stddev, p50, p95, p99 per endpoint."
   difficulty: 3
@@ -2681,6 +3299,10 @@
     - "Must report error count separately"
 
 - id: "NET-166"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'SERVING'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "gRPC Health Check Client"
   description: "Reads a gRPC server address from stdin and calls the standard grpc.health.v1.Health/Check RPC, printing the service status."
   difficulty: 3
@@ -2697,6 +3319,10 @@
     - "Must handle TLS and plaintext"
 
 - id: "NET-167"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Item 1:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Streaming HTTP Response Consumer Client"
   description: "Reads a streaming NDJSON URL from stdin. Connects and processes each JSON line as it arrives, printing a summary of each object."
   difficulty: 2
@@ -2713,6 +3339,10 @@
     - "Must handle stream interruption gracefully"
 
 - id: "NET-168"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Service-to-Service Auth Client"
   description: "Reads a token URL, service ID, private key path, and target API URL from stdin. Generates a service JWT, obtains an access token, and calls the target API."
   difficulty: 4
@@ -2729,6 +3359,10 @@
     - "Must cache access token until 60s before expiry"
 
 - id: "NET-169"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Transfer complete'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "WebSocket Binary Data Sender Client"
   description: "Reads a WebSocket URL and binary data file path from stdin. Connects, reads the file in chunks, and sends each chunk as a binary WebSocket frame."
   difficulty: 3
@@ -2745,6 +3379,10 @@
     - "Must handle back-pressure (wait for ACK before sending next chunk)"
 
 - id: "NET-170"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'fn'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Client Library Generator Probe"
   description: "Reads an OpenAPI spec URL from stdin. Fetches the spec and generates a toke-style client stub (function signatures with types) for each endpoint."
   difficulty: 5
@@ -2761,6 +3399,10 @@
     - "Must generate type annotations from schema"
 
 - id: "NET-171"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Phase'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Server-Timing Analyser Client"
   description: "Reads a URL from stdin, makes N requests, collects Server-Timing headers, and produces a breakdown of average time spent per server-side phase."
   difficulty: 3
@@ -2777,6 +3419,10 @@
     - "Must handle missing Server-Timing header gracefully"
 
 - id: "NET-172"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "JSON Patch Client"
   description: "Reads a URL and a JSON Patch document (RFC 6902) from stdin. Fetches the current resource, applies the patch locally to validate it, then sends it as HTTP PATCH."
   difficulty: 3
@@ -2793,6 +3439,10 @@
     - "Content-Type: application/json-patch+json"
 
 - id: "NET-173"
+  disabled: true
+  disabled_reason: "[requires-network] Spec requires making real HTTP requests to live URLs (api.example.com, httpbin.org) to inspect response headers/bodies for deprecation signals"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "API Deprecation Checker Client"
   description: "Reads a list of API URLs from stdin. Checks each for deprecation signals: Deprecation header, Sunset header, or deprecation notice in the response body."
   difficulty: 2
@@ -2809,6 +3459,10 @@
     - "Must parse date in Sunset header"
 
 - id: "NET-174"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Resilience score:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Chaos Client"
   description: "Reads a base URL from stdin and runs a chaos test: randomly sends malformed headers, wrong Content-Types, and missing required fields. Reports server resilience score."
   difficulty: 4
@@ -2825,6 +3479,10 @@
     - "Chaos types: no Content-Type, garbage body, oversized body, invalid auth"
 
 - id: "NET-175"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires fetching live HTTP URLs (jsonplaceholder.typicode.com, httpbin.org) from the test environment, which violates the 'no network' constraint of the sandbox"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP API Schema Infer Client"
   description: "Reads a list of API URLs from stdin. Fetches each and infers a JSON Schema for the response body from the actual response structure."
   difficulty: 4
@@ -2841,6 +3499,10 @@
     - "Must mark fields present in all sampled responses as required"
 
 - id: "NET-176"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Connected'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "WebSocket Reconnecting Client"
   description: "Reads a WebSocket URL from stdin. Connects, sends messages, and automatically reconnects with exponential backoff if the connection is lost."
   difficulty: 3
@@ -2857,6 +3519,10 @@
     - "Must not resend messages that were already acknowledged"
 
 - id: "NET-177"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires sending an actual HTTP OPTIONS request to external/remote URLs (httpbin.org and localhost:8083), but the expected output for both test cases is simply 'Allow:'..."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP OPTIONS Prober Client"
   description: "Reads a URL from stdin, sends an HTTP OPTIONS request, and reports which methods are allowed and what CORS headers are present."
   difficulty: 1
@@ -2889,6 +3555,10 @@
     - "TTFB: time from request sent to first response byte"
 
 - id: "NET-179"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Score:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Security Header Checker Client"
   description: "Reads a URL from stdin. Fetches it and grades the response against OWASP recommended security headers: HSTS, CSP, X-Frame-Options, etc."
   difficulty: 2
@@ -2905,6 +3575,10 @@
     - "HSTS and CSP worth most points"
 
 - id: "NET-180"
+  disabled: true
+  disabled_reason: "[requires-network] The spec requires making real HTTP requests to external services (httpbin.org), which violates the no-network constraint of the sandbox"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HTTP API Client with Structured Logging"
   description: "HTTP client that logs every request and response as structured JSON to stderr (with timestamp, url, method, status, latency) and prints only the response body to stdout."
   difficulty: 2
@@ -2921,6 +3595,10 @@
     - "Must not include request body in log if it contains 'password' key"
 
 - id: "NET-181"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL and timeout in milliseconds from stdin. Fetches the URL enforcing the timeout. If exceeded, prints 'TIMEOUT' and exits non-zero"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP API Timeout Enforcer Client"
   description: "Reads a URL and timeout in milliseconds from stdin. Fetches the URL enforcing the timeout. If exceeded, prints 'TIMEOUT' and exits non-zero."
   difficulty: 1
@@ -2937,6 +3615,10 @@
     - "Must exit non-zero on TIMEOUT"
 
 - id: "NET-182"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Client with Request Signing (AWS SigV4)"
   description: "Reads an AWS service URL, access key, secret key, and region from stdin. Signs the request with AWS Signature Version 4 and makes the GET request."
   difficulty: 5
@@ -2953,6 +3635,10 @@
     - "Must use current UTC timestamp"
 
 - id: "NET-183"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Replaying'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HAR Replay Client"
   description: "Reads a HAR file path from stdin. Replays all recorded requests in sequence with the original timing delays. Compares live responses to recorded ones."
   difficulty: 4
@@ -2969,6 +3655,10 @@
     - "Must ignore volatile response fields (Date, ETag changes)"
 
 - id: "NET-184"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Integration Test Harness Client"
   description: "Reads a YAML test suite from stdin (list of request/expected_response pairs) and runs each test, reporting PASS/FAIL with diff on failure."
   difficulty: 4
@@ -2985,6 +3675,10 @@
     - "Must print total PASS/FAIL count"
 
 - id: "NET-185"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Resolved'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Service Discovery Client"
   description: "Reads a service registry URL from stdin. Lists all registered services, their health status, and resolves the best endpoint for a given service name."
   difficulty: 3
@@ -3001,6 +3695,10 @@
     - "Must show last health check time"
 
 - id: "NET-186"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Compression ratio:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Compression Benchmark Client"
   description: "Reads a URL from stdin. Makes two requests (with and without Accept-Encoding: gzip) and compares response sizes and times. Reports compression ratio and speed impact."
   difficulty: 3
@@ -3017,6 +3715,10 @@
     - "Must measure only transfer size (not decompressed size) for ratio"
 
 - id: "NET-187"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'MATCH'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Diff Tool Client"
   description: "Reads two base URLs and a list of endpoint paths from stdin. Compares responses between environments (staging vs production) and highlights differences."
   difficulty: 4
@@ -3033,6 +3735,10 @@
     - "Must support configuring ignored fields via env var"
 
 - id: "NET-188"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Warming'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Cache Warm Client"
   description: "Reads a sitemap URL (XML) or plain URL list from stdin. Fetches all URLs concurrently to pre-warm a CDN or cache. Reports hit/miss counts from cache response headers."
   difficulty: 3
@@ -3049,6 +3755,10 @@
     - "Must not fail on 404s during warming"
 
 - id: "NET-189"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Bridging'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "SSE to WebSocket Bridge Client"
   description: "Reads an SSE source URL and a WebSocket target URL from stdin. Bridges SSE events to WebSocket, forwarding each SSE event as a WebSocket message."
   difficulty: 4
@@ -3065,6 +3775,10 @@
     - "Must buffer up to 100 events if WS is temporarily unavailable"
 
 - id: "NET-190"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'CLEAN'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP API Key Extractor Client"
   description: "Reads a list of web page URLs from stdin. Scrapes each page looking for API key patterns (common formats like Bearer tokens, AWS keys, etc.) and reports findings."
   difficulty: 3
@@ -3081,6 +3795,10 @@
     - "Must redact found values in output"
 
 - id: "NET-191"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PROTECTED'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Replay Attack Detector Client"
   description: "Reads a webhook URL and a list of recorded requests from a HAR file. Replays each request a second time and reports whether the server correctly rejects replays."
   difficulty: 4
@@ -3097,6 +3815,10 @@
     - "Must report overall vulnerability score"
 
 - id: "NET-192"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Total items:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "REST API Pagination Stress Client"
   description: "Reads a paginated API URL from stdin. Rapidly fetches all pages concurrently (ignoring rate limits), measures response consistency, and reports any pagination gaps or duplicates."
   difficulty: 4
@@ -3113,6 +3835,10 @@
     - "Detect gaps by sequence number if present"
 
 - id: "NET-193"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Gateway Route Tester Client"
   description: "Reads an API gateway base URL and routing config from stdin. Tests each defined route by sending a request and verifying it reaches the correct upstream."
   difficulty: 3
@@ -3129,6 +3855,10 @@
     - "Must test that unmapped routes return 404"
 
 - id: "NET-194"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'CREATE: PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Mock Server Client Pair (Integration Test)"
   description: "Starts a mock HTTP server in the background, then runs a client against it. Tests the full request/response cycle for a CRUD resource."
   difficulty: 4
@@ -3146,6 +3876,10 @@
     - "Must test at minimum 4 HTTP verbs"
 
 - id: "NET-195"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "WebSocket Server-Client Integration Test"
   description: "Starts a WebSocket echo server and a client in the same program. Client sends N messages, verifies all are echoed back, reports PASS/FAIL."
   difficulty: 4
@@ -3162,6 +3896,10 @@
     - "Must verify all messages received in order"
 
 - id: "NET-196"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "SSE Server-Client Integration Test"
   description: "Starts an SSE server and a client in the same program. Server pushes N events; client receives them and verifies completeness and ordering."
   difficulty: 4
@@ -3178,6 +3916,10 @@
     - "Must detect missing events"
 
 - id: "NET-197"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Rate Limiter Server-Client Integration Test"
   description: "Starts a rate-limiting server and a client. Client fires requests at 2x the rate limit, verifies that approximately the right number are rejected with 429."
   difficulty: 4
@@ -3194,6 +3936,10 @@
     - "Expected rejection rate is approximately 50%"
 
 - id: "NET-198"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Login: PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "JWT Auth Server-Client Integration Test"
   description: "Starts a JWT auth server and a client. Client logs in, accesses protected routes with the token, tests token expiry behaviour, and reports all steps."
   difficulty: 4
@@ -3210,6 +3956,10 @@
     - "Must verify 401 on expired token"
 
 - id: "NET-199"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Normal: PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Circuit Breaker Server-Client Integration Test"
   description: "Starts a circuit breaker proxy server and a downstream mock. Client sends requests, downstream starts failing, and test verifies circuit opens and half-opens correctly."
   difficulty: 5
@@ -3226,6 +3976,10 @@
     - "Must control downstream failure programmatically"
 
 - id: "NET-200"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Register user: PASS'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Full Microservice Integration Test Suite"
   description: "Starts a user service, product service, and API gateway. Runs an end-to-end test: register user, add product, place order, verify order appears in user's order history."
   difficulty: 5

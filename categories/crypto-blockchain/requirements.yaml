@@ -236,10 +236,12 @@
   input_format: "Line 1: password. Line 2: salt"
   output_format: "64-character lowercase hex derived key"
   test_cases:
-    - input: "password\nNaCl"
-      expected_output: "fdbabe1c9d3472007856e7190d01e72cc0044298fc1c149afbf4c8996fb92427"
-    - input: "test\nsalt"
-      expected_output: "a84db0c4ae77f1d1559a4e1b828d59e6b5b2c2e78e0e4f3a8c1d2e3f4a5b6c7d"
+    - input: "password\nNaCl\n"
+      expected_output: "a8430d7e581f9ca03c952df506ac66c757899d67a21d71c0f1900bd778ac1d14"
+    - input: "test\nsalt\n"
+      expected_output: "72f47a5f6bcb1b96a9d77b2c2f1463395d4a3a325fada6290fc0fef7bcddb58e"
+    - input: "hello\nworld\n"
+      expected_output: "112191f6cf9a48ad3d20bdb2ed4c9754ca31aebd62f5ad15cb9c5303a17063c8"
   constraints: ["N=16384, r=8, p=1", "Output 32 bytes"]
 
 - id: "CRY-018"
@@ -257,6 +259,10 @@
   constraints: ["t=3, m=65536 KiB, p=4 lanes", "Output 32 bytes", "Salt must be >= 8 bytes"]
 
 - id: "CRY-019"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '$2b$10$'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Bcrypt Password Hash"
   description: "Read a password from stdin. Generate a bcrypt hash with cost factor 10 and output it."
   difficulty: 2
@@ -293,9 +299,11 @@
   output_format: "Hex encoded ciphertext"
   test_cases:
     - input: "0000000000000000000000000000000000000000000000000000000000000000\n00000000000000000000000000000000\nhello world12345"
-      expected_output: "a7305e48c6a2e52e8a3cce2e4c8a7658"
+      expected_output: "ff2cce9574cf23625ad58eadf9b1679b63493ce0f6c6d4848394ba1447180d83"
     - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000000000000000000000000000\ntest data padding"
-      expected_output: "8b1a9953c4611296a827abf8c47804d7e3e8a1f2b5c4d6e7f8a9b0c1d2e3f4a5"
+      expected_output: "e440fc911c1c7280757e585c2077185c5e0857fd3b6357e9d5310b2917e08560"
+    - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nfedcba9876543210fedcba9876543210\nThe quick brown fox jumps over the lazy dog"
+      expected_output: "dafaea91abf1ae38d91482d885fff9afeaf86f7701dd7d85b521c9dadc86adaf3732a09f579d30a0e225a5440de62f02"
   constraints: ["AES-256-CBC mode", "PKCS7 padding", "Key and IV as hex input"]
 
 - id: "CRY-022"
@@ -306,13 +314,19 @@
   input_format: "Line 1: 64-char hex key. Line 2: 32-char hex IV. Line 3: hex ciphertext"
   output_format: "Decrypted plaintext string"
   test_cases:
-    - input: "0000000000000000000000000000000000000000000000000000000000000000\n00000000000000000000000000000000\na7305e48c6a2e52e8a3cce2e4c8a7658"
-      expected_output: "hello world12345"
-    - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n00000000000000000000000000000000\n8b1a9953c4611296a827abf8c47804d7"
-      expected_output: "test data paddin"
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n00000000000000000000000000000000\n5b6b1d5d33e8b25e4e7c7c7e6e7e0c3f8a3f9f8c1e8b6e4c2d5a7f8b9c0d1e2f"
+      expected_output: "6�֖ve�[( Uu�.|2����҂y�I�"
+    - input: "0000000000000000000000000000000000000000000000000000000000000000\n00000000000000000000000000000000\n"
+      expected_output: "plaintext_for_00000000"
+    - input: "0101010101010101010101010101010101010101010101010101010101010101\n02020202020202020202020202020202\n"
+      expected_output: "plaintext_for_01010101"
   constraints: ["AES-256-CBC mode", "Remove PKCS7 padding", "Return plaintext as UTF-8"]
 
 - id: "CRY-023"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: 'ciphertext_hex\\nauth_tag_hex'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "AES-256-GCM Encrypt"
   description: "Read key (hex), nonce (hex), and plaintext from stdin. Output ciphertext and auth tag as hex."
   difficulty: 3
@@ -327,6 +341,10 @@
   constraints: ["AES-256-GCM mode", "12-byte nonce", "Output both ciphertext and 16-byte auth tag"]
 
 - id: "CRY-024"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] all inputs produced identical output (looks hardcoded): 'AUTH_FAILED'"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "AES-256-GCM Decrypt"
   description: "Read key (hex), nonce (hex), ciphertext (hex), and auth tag (hex). Output plaintext or AUTH_FAILED."
   difficulty: 3
@@ -341,6 +359,10 @@
   constraints: ["Must verify auth tag before returning plaintext", "Return AUTH_FAILED on tag mismatch"]
 
 - id: "CRY-025"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: 'ciphertext_with_tag_hex'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "ChaCha20-Poly1305 Encrypt"
   description: "Read key (hex), nonce (hex), and plaintext. Output ciphertext with appended auth tag as hex."
   difficulty: 3
@@ -349,9 +371,11 @@
   output_format: "Hex encoded ciphertext || auth tag"
   test_cases:
     - input: "0000000000000000000000000000000000000000000000000000000000000001\n000000000000000000000002\ntest"
-      expected_output: "ciphertext_with_tag_hex"
+      expected_output: "96f0fa29482546300c8c2fc3b7fac934340a417b"
     - input: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\naaaaaaaaaaaaaaaaaaaaaaaa\nhello world"
-      expected_output: "ciphertext_with_tag_hex"
+      expected_output: "dea01e74b8d3eb41412cb17fe9cb9b68c21929b1e467340e002805"
+    - input: "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f\n070000004041424344454647\nLadies and Gentlemen of the class of '99"
+      expected_output: "d31a8d34648e60db7b86afbc53ef7ec2a4aded51296e08fea9e2b5a736ee62d63dbea45e8ca967122eb838bb957e60b8f30a8bc490057bad"
   constraints: ["ChaCha20-Poly1305 AEAD", "12-byte nonce", "16-byte Poly1305 tag appended"]
 
 - id: "CRY-026"
@@ -369,6 +393,10 @@
   constraints: ["Key repeats cyclically over plaintext", "Byte-wise XOR"]
 
 - id: "CRY-027"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs contain placeholder strings like '<512-bit modulus hex>' and '<private exponent hex>' rather than concrete deterministic values"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "RSA Key Pair Generation (Simulated)"
   description: "Read a bit size from stdin. Output a simulated RSA key pair showing n, e, d components as hex."
   difficulty: 4
@@ -383,6 +411,10 @@
   constraints: ["Use standard e=65537", "Generate valid p,q primes", "Compute d = e^-1 mod phi(n)"]
 
 - id: "CRY-028"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: 'encrypted_hex'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "RSA Encrypt (Textbook)"
   description: "Read n (hex), e (hex), and plaintext message (as integer). Output ciphertext c = m^e mod n."
   difficulty: 3
@@ -404,13 +436,19 @@
   input_format: "Line 1: n (hex). Line 2: d (hex). Line 3: ciphertext integer (hex)"
   output_format: "Decrypted message as integer"
   test_cases:
-    - input: "b3510a2b\nprivate_d_hex\ncipher_hex"
-      expected_output: "42"
-    - input: "ffff\n2aab\n151b"
-      expected_output: "7"
+    - input: "ffff\n2aab\n151b\n"
+      expected_output: "55107"
+    - input: "3b9aca07\n1a2b3c4d\n12345678\n"
+      expected_output: "19786087"
+    - input: "10001\n5\n2\n"
+      expected_output: "32"
   constraints: ["Textbook RSA (no padding)", "c^d mod n"]
 
 - id: "CRY-030"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'r=<32-byte hex>\\ns=<32-byte hex>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "ECDSA Sign (Simulated)"
   description: "Read a private key (hex) and message. Output a simulated ECDSA signature (r, s) using secp256k1."
   difficulty: 4
@@ -425,6 +463,10 @@
   constraints: ["Use secp256k1 curve", "Hash message with SHA-256 before signing", "Deterministic k (RFC 6979)"]
 
 - id: "CRY-031"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] all inputs produced identical output (looks hardcoded): 'INVALID'"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "ECDSA Verify"
   description: "Read public key (hex), message, and signature (r,s). Output VALID or INVALID."
   difficulty: 4
@@ -439,6 +481,10 @@
   constraints: ["Verify on secp256k1 curve", "Hash message with SHA-256"]
 
 - id: "CRY-032"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: 'signature_128_hex'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Ed25519 Sign"
   description: "Read a 64-char hex private seed and a message. Output the Ed25519 signature as hex."
   difficulty: 4
@@ -453,6 +499,10 @@
   constraints: ["Ed25519 (RFC 8032)", "64-byte signature output"]
 
 - id: "CRY-033"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/unfixable] Python's standard library does not include Ed25519 signature verification (no ed25519 in hashlib/hmac/secrets), so a stdlib-only reference implementation would "
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Ed25519 Verify"
   description: "Read public key (hex), message, and signature (hex). Output VALID or INVALID."
   difficulty: 4
@@ -481,6 +531,10 @@
   constraints: ["Compute g^a mod p and g^b mod p", "Shared secret = (g^b)^a mod p = (g^a)^b mod p"]
 
 - id: "CRY-035"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: 'shared_secret_hex'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "ECDH Key Exchange (secp256k1)"
   description: "Read two private keys (hex). Output the shared ECDH secret (x-coordinate) on secp256k1."
   difficulty: 4
@@ -488,10 +542,12 @@
   input_format: "Line 1: private key A (64-char hex). Line 2: private key B (64-char hex)"
   output_format: "64-character hex shared secret (x-coordinate of shared point)"
   test_cases:
-    - input: "0000000000000000000000000000000000000000000000000000000000000001\n0000000000000000000000000000000000000000000000000000000000000002"
-      expected_output: "shared_secret_hex"
-    - input: "0000000000000000000000000000000000000000000000000000000000000003\n0000000000000000000000000000000000000000000000000000000000000005"
-      expected_output: "shared_secret_hex"
+    - input: "0000000000000000000000000000000000000000000000000000000000000001\n0000000000000000000000000000000000000000000000000000000000000002\n"
+      expected_output: "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5"
+    - input: "0000000000000000000000000000000000000000000000000000000000000003\n0000000000000000000000000000000000000000000000000000000000000005\n"
+      expected_output: "d7924d4f7d43ea965a465ae3095ff41131e5946f3c85f79e44adbcf8e27e080e"
+    - input: "00000000000000000000000000000000000000000000000000000000deadbeef\n00000000000000000000000000000000000000000000000000000000cafebabe\n"
+      expected_output: "ba1bd3cb58e2fce103d3d0b32dc6a6b9678b7d1593f87746297a0c7fac331380"
   constraints: ["secp256k1 curve", "Output x-coordinate of privA * pubB = privB * pubA"]
 
 - id: "CRY-036"
@@ -579,6 +635,10 @@
   constraints: ["Hash160 the public key", "Prepend version byte 0x00", "Append 4-byte checksum (first 4 bytes of double-SHA256)", "Base58 encode"]
 
 - id: "CRY-042"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input '7f0b85f38e9a367db9ba36e09871bea600ab0fcfc3e8fa81bf1e3cf44feab79144e1c8a679e4c2c5': Traceback (most recent call last):\n  File '/tmp/t"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Ethereum Address from Public Key"
   description: "Read an uncompressed public key (hex, without 04 prefix). Output the checksummed Ethereum address."
   difficulty: 3
@@ -614,10 +674,12 @@
   input_format: "Line 1: index (int). Line 2: timestamp (ISO 8601). Line 3: data string. Line 4: previous_hash (hex)"
   output_format: "JSON object with fields: index, timestamp, data, previous_hash, hash"
   test_cases:
-    - input: "0\n2024-01-01T00:00:00Z\nGenesis Block\n0000000000000000000000000000000000000000000000000000000000000000"
-      expected_output: "{\"index\":0,\"timestamp\":\"2024-01-01T00:00:00Z\",\"data\":\"Genesis Block\",\"previous_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"hash\":\"<sha256 of block content>\"}"
-    - input: "1\n2024-01-01T00:01:00Z\nSecond Block\nabc123"
-      expected_output: "{\"index\":1,\"timestamp\":\"2024-01-01T00:01:00Z\",\"data\":\"Second Block\",\"previous_hash\":\"abc123\",\"hash\":\"<sha256>\"}"
+    - input: "0\n2024-01-01T00:00:00Z\nGenesis Block\n0000000000000000000000000000000000000000000000000000000000000000\n"
+      expected_output: "{\"index\":0,\"timestamp\":\"2024-01-01T00:00:00Z\",\"data\":\"Genesis Block\",\"previous_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"hash\":\"7f1180d24eefa49123067f5fa473a81b90ecafd2cd01ba386296c7b32d633742\"}"
+    - input: "1\n2024-01-01T00:01:00Z\nSecond Block\nabc123\n"
+      expected_output: "{\"index\":1,\"timestamp\":\"2024-01-01T00:01:00Z\",\"data\":\"Second Block\",\"previous_hash\":\"abc123\",\"hash\":\"d27d85faa36a532fb310ceb9f20b141f7305538d1d409836ff88125d577cf719\"}"
+    - input: "42\n2025-06-15T12:30:45Z\nHello, World!\ndeadbeefcafebabe\n"
+      expected_output: "{\"index\":42,\"timestamp\":\"2025-06-15T12:30:45Z\",\"data\":\"Hello, World!\",\"previous_hash\":\"deadbeefcafebabe\",\"hash\":\"4f6cb1eeb71393ce5469d96bb021d323f9a689667ebb2bd3a504783912b98505\"}"
   constraints: ["Hash computed from: index + timestamp + data + previous_hash", "Output valid JSON"]
 
 - id: "CRY-045"
@@ -698,10 +760,12 @@
   input_format: "Line 1: JSON transaction {from, to, amount, nonce}. Line 2: 64-char hex private key"
   output_format: "JSON transaction with added 'signature' field (hex)"
   test_cases:
-    - input: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0}\nprivate_key_hex"
-      expected_output: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0,\"signature\":\"<hex sig>\"}"
-    - input: "{\"from\":\"addr1\",\"to\":\"addr3\",\"amount\":50,\"nonce\":1}\nprivate_key_hex"
-      expected_output: "{\"from\":\"addr1\",\"to\":\"addr3\",\"amount\":50,\"nonce\":1,\"signature\":\"<hex sig>\"}"
+    - input: "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0}\n0000000000000000000000000000000000000000000000000000000000000001"
+      expected_output: "{\"amount\":100,\"from\":\"addr1\",\"nonce\":0,\"signature\":\"11065adbf285a6a474284718d5e78bbb6166c98037c88a1233f0eb33546cad180d71beeb157786dcf486966f493b676ad013ab98176da8d7fd2a6bf735fecc2e\",\"to\":\"addr2\"}"
+    - input: "{\"from\":\"addr1\",\"to\":\"addr3\",\"amount\":50,\"nonce\":1}\nc9bdb83ce5e6e35f9e6c8f3e8e4c5b7a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a"
+      expected_output: "{\"amount\":50,\"from\":\"addr1\",\"nonce\":1,\"signature\":\"1d465ebf5c2fa01c3dc47477c1e3dab5e187912fc1dd7ed9a6ed638f52e8a35b49f13489bde57d3caee7a18d6ef4ae3b9017347657efc05fae1c68521e08cd01\",\"to\":\"addr3\"}"
+    - input: "{\"from\":\"alice\",\"to\":\"bob\",\"amount\":777,\"nonce\":42}\n0000000000000000000000000000000000000000000000000000000000000002"
+      expected_output: "{\"amount\":777,\"from\":\"alice\",\"nonce\":42,\"signature\":\"39eff84b1e7e6fc809d8959b52768b46883b7738bc2677ad14ac841992ca27b3113bbc66786e0a07d132167bf4148bf8000dab5416ec0a3d16b9ee86ebad0a58\",\"to\":\"bob\"}"
   constraints: ["Sign SHA-256 hash of canonical JSON (sorted keys, no spaces)", "ECDSA secp256k1 signature"]
 
 - id: "CRY-051"
@@ -901,6 +965,10 @@
   constraints: ["Generate random private keys", "Derive Bitcoin address", "Loop until prefix matches", "Limit iterations to prevent timeout"]
 
 - id: "CRY-065"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '<derived_key_hex>\\n<chain_code_hex>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HD Wallet Key Derivation (BIP32)"
   description: "Read a master seed (hex) and derivation path. Output the derived child private key."
   difficulty: 5
@@ -937,9 +1005,11 @@
   output_format: "160-character hex (80 bytes) serialized block header (little-endian)"
   test_cases:
     - input: "1\n0000000000000000000000000000000000000000000000000000000000000000\n3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a\n1231006505\n1d00ffff\n2083236893"
-      expected_output: "0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c"
-    - input: "2\nprevhash\nmerkle\n1000\n1d00ffff\n0"
-      expected_output: "<serialized header hex>"
+      expected_output: "0100000000000000000000000000000000000000000000000000000000000000000000004a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b29ab5f49ffff001d1dac2b7c"
+    - input: "2\n00000000000000000000000000000000000000000000000000000000000000ff\nabcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789\n1000\n1d00ffff\n0"
+      expected_output: "02000000ff000000000000000000000000000000000000000000000000000000000000008967452301efcdab8967452301efcdab8967452301efcdab8967452301efcdabe8030000ffff001d00000000"
+    - input: "536870912\n00000000000000000007878ec04bb2b2e12317804810f4c26033585b3f81ffaa\nbe117b2cb4f25c5fbfb22dafee68a98a1e89c75ddf01b8a82fc4dcc6a18f6d10\n1593475202\n170b3ce8\n3705286997"
+      expected_output: "00000020aaff813f5b583360c2f41048801723e1b2b24bc08e8707000000000000000000106d8fa1c6dcc42fa8b801df5dc7891e8aa968eeaf2db2bf5f5cf2b42c7b11be8280fa5ee83c0b175531dadc"
   constraints: ["Little-endian encoding for all fields", "version: 4 bytes, prev_hash: 32 bytes, merkle_root: 32 bytes, timestamp: 4 bytes, bits: 4 bytes, nonce: 4 bytes"]
 
 - id: "CRY-068"
@@ -971,6 +1041,10 @@
   constraints: ["hashrate = difficulty * 2^32 / block_time", "Output in scientific notation"]
 
 - id: "CRY-070"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PROBABLY_IN\\nDEFINITELY_NOT_IN'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Bloom Filter for Transactions"
   description: "Read a list of items to add and items to check. Implement a Bloom filter and output membership test results."
   difficulty: 3
@@ -1050,13 +1124,19 @@
   input_format: "Line 1: JSON event signatures {name: [param_types]}. Remaining: EMIT event_name param1 param2..."
   output_format: "JSON array of {topic: keccak256(signature), data: [params]}"
   test_cases:
-    - input: "{\"Transfer\":[\"address\",\"address\",\"uint256\"]}\nEMIT Transfer alice bob 100"
-      expected_output: "[{\"topic\":\"<keccak256 of Transfer(address,address,uint256)>\",\"data\":[\"alice\",\"bob\",\"100\"]}]"
-    - input: "{\"Mint\":[\"address\",\"uint256\"]}\nEMIT Mint alice 50\nEMIT Mint bob 30"
-      expected_output: "[{\"topic\":\"<hash>\",\"data\":[\"alice\",\"50\"]},{\"topic\":\"<hash>\",\"data\":[\"bob\",\"30\"]}]"
+    - input: "{\"Transfer\":[\"address\",\"address\",\"uint256\"]}\nEMIT Transfer alice bob 100\n"
+      expected_output: "[{\"topic\":\"ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\",\"data\":[\"alice\",\"bob\",\"100\"]}]"
+    - input: "{\"Mint\":[\"address\",\"uint256\"]}\nEMIT Mint alice 50\nEMIT Mint bob 30\n"
+      expected_output: "[{\"topic\":\"0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885\",\"data\":[\"alice\",\"50\"]},{\"topic\":\"0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885\",\"data\":[\"bob\",\"30\"]}]"
+    - input: "{\"Approval\":[\"address\",\"address\",\"uint256\"],\"Burn\":[\"address\",\"uint256\"]}\nEMIT Approval alice bob 42\nEMIT Burn carol 7\nEMIT Approval bob alice 1\n"
+      expected_output: "[{\"topic\":\"8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\",\"data\":[\"alice\",\"bob\",\"42\"]},{\"topic\":\"cc16f5dbb4873280815c1ee09dbd06736cffcc184412cf7a71a0fdb75d397ca5\",\"data\":[\"carol\",\"7\"]},{\"topic\":\"8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\",\"data\":[\"bob\",\"alice\",\"1\"]}]"
   constraints: ["Topic is Keccak-256 of event signature string", "Signature format: Name(type1,type2,...)"]
 
 - id: "CRY-076"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '<current timestamp>\\n<sha256 hash>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Timestamp Authority"
   description: "Read data and output a timestamp proof: hash of data concatenated with current timestamp, plus the timestamp."
   difficulty: 2
@@ -1078,10 +1158,12 @@
   input_format: "Line 1: subject. Line 2: issuer. Line 3: public key (hex). Line 4: not_before (ISO 8601). Line 5: not_after (ISO 8601)"
   output_format: "JSON certificate with fields: subject, issuer, public_key, validity{not_before, not_after}, serial, fingerprint (SHA-256 of all fields)"
   test_cases:
-    - input: "alice\nCA\npubkey_hex\n2024-01-01T00:00:00Z\n2025-01-01T00:00:00Z"
-      expected_output: "{\"subject\":\"alice\",\"issuer\":\"CA\",\"public_key\":\"pubkey_hex\",\"validity\":{\"not_before\":\"2024-01-01T00:00:00Z\",\"not_after\":\"2025-01-01T00:00:00Z\"},\"serial\":\"<random>\",\"fingerprint\":\"<sha256>\"}"
-    - input: "bob\nCA\nkey2\n2024-06-01T00:00:00Z\n2024-12-31T23:59:59Z"
-      expected_output: "{\"subject\":\"bob\",\"issuer\":\"CA\",...}"
+    - input: "alice\nCA\n0123456789abcdef\n2024-01-01T00:00:00Z\n2025-01-01T00:00:00Z\n"
+      expected_output: "{\"fingerprint\":\"1697b14e0d319962b2dfb08acaed1c9027a527598e981d11da33c1060c36f6d3\",\"issuer\":\"CA\",\"public_key\":\"0123456789abcdef\",\"serial\":\"877cc0587bc8da22634b7f8d5b0ed1a3\",\"subject\":\"alice\",\"validity\":{\"not_after\":\"2025-01-01T00:00:00Z\",\"not_before\":\"2024-01-01T00:00:00Z\"}}"
+    - input: "bob\nCA\ndeadbeefcafe\n2024-06-01T00:00:00Z\n2024-12-31T23:59:59Z\n"
+      expected_output: "{\"fingerprint\":\"44f304d789df5b24b3597cf568036f21420a8b2d2c0515d46d2d9665a186d65f\",\"issuer\":\"CA\",\"public_key\":\"deadbeefcafe\",\"serial\":\"5f3d4792189ff5f8e99e59ef4ce214e0\",\"subject\":\"bob\",\"validity\":{\"not_after\":\"2024-12-31T23:59:59Z\",\"not_before\":\"2024-06-01T00:00:00Z\"}}"
+    - input: "charlie.example.com\nRoot CA Inc\nabcdef0123456789abcdef0123456789\n2023-03-15T12:00:00Z\n2026-03-15T12:00:00Z\n"
+      expected_output: "{\"fingerprint\":\"6d5ab2e45938631385c1bf4f15cf04d0ad9cbee1c6170f44dee6872ec28c56a2\",\"issuer\":\"Root CA Inc\",\"public_key\":\"abcdef0123456789abcdef0123456789\",\"serial\":\"bcd8e286f7d0f4129f74dbee8c16e2cb\",\"subject\":\"charlie.example.com\",\"validity\":{\"not_after\":\"2026-03-15T12:00:00Z\",\"not_before\":\"2023-03-15T12:00:00Z\"}}"
   constraints: ["Generate random serial number", "Fingerprint is SHA-256 of canonical JSON of certificate fields (excluding fingerprint)"]
 
 - id: "CRY-078"
@@ -1113,6 +1195,10 @@
   constraints: ["commitment = SHA-256(value || nonce)", "Verify by recomputing and comparing"]
 
 - id: "CRY-080"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: '{'commitment':'<hex>','range_bits':8,'proof_valid':true}'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Zero-Knowledge Range Proof (Simplified)"
   description: "Prove a committed value is in range [0, 2^n) without revealing it. Output proof components."
   difficulty: 5
@@ -1120,10 +1206,14 @@
   input_format: "Line 1: value (integer). Line 2: n (range bits). Line 3: blinding factor (hex)"
   output_format: "JSON proof with commitment and bit commitments"
   test_cases:
-    - input: "42\n8\nblinding_hex"
-      expected_output: "{\"commitment\":\"<hex>\",\"range_bits\":8,\"proof_valid\":true}"
-    - input: "300\n8\nblinding_hex"
+    - input: "42\n8\ndeadbeefcafebabe\n"
+      expected_output: "{\"commitment\":\"7ef7478a597c2361fd3cfd338aa30a6f07a32c6e440c0bf8eefde5c6ac549c50\",\"range_bits\":8,\"bit_commitments\":[\"aa0836b8f42e96e73faf1b3543ff7342eab7fb9307124381fade6f964df9cf4d\",\"3366ce05c0c19623892f4bd936ca2ef77de04091a49d5b36bd4e997dd4be6edb\",\"26b05175668fc575b883645f44c4bcdf55b80fb257c0fb471bab322313790ec8\",\"5e4c2894bbafd1f1e43a9c5663c174f2de279a62fe26eaa751a69acddf3391b5\",\"b0f9a637d006c1f0a167fd53d4bf02e8b1d8900b0b01e4f13a7f182411879fe2\",\"8fa2d72f907832d6eb624b94b78425e233493689225f12cb702a24d542da5c04\",\"2cd2492b9d2ba468b6816922383056504ff454ace9020e70ea26b315383e4153\",\"94d8bb8b19f468086d5447692596ea230896d229a200d7d3b4f8dc0cf982008a\"],\"proof_valid\":true}"
+    - input: "300\n8\ndeadbeefcafebabe\n"
       expected_output: "{\"error\":\"Value 300 not in range [0, 256)\"}"
+    - input: "1023\n10\n0123456789abcdef\n"
+      expected_output: "{\"commitment\":\"39a866d24a1977b3446417294fc6b24c5b9289219929f29c4a0f575656345a24\",\"range_bits\":10,\"bit_commitments\":[\"c94cef108f24445fdae0a3a6dcc132ae619982adaf9988d41ee6e66ab56b9f56\",\"1ac6f4052990977cf0f18b66c7de282a3bdc21d36a015f9d2fc1325fd5b295a5\",\"93e057253841e57b9be7018709503b60fff5802604fc552abdfdb5c3c7ce278e\",\"296b878e6257987d8269d6dc43a2e093cf430dffb17a6146b83b2134a8c92bf5\",\"7a90446ac4d147e28bbca5122fe58d8a74fd1425a0d63c2bad2ae87841116465\",\"22a8a2ccb067e89738c6b0a7d63ea758f5e6cee4690f7c253158b44f32994ea6\",\"298f484d4d17d7589a7f78817d0f59bf5638487a969fd4a8c8a325ba4eab51b8\",\"c673b3d87f82d9af926fbf36ef40ab38af080c1837d026e273f270ddb7cbbeba\",\"fea6bc3378decf96c4bfb74f2d9fced0b4c2c04fd93df0bd62dc3a1fc81de2cd\",\"adb9004676a6ae4480f56730da7b80166a9a8ab9cb58ec66dfd081d878cd2fe4\"],\"proof_valid\":true}"
+    - input: "0\n4\nff\n"
+      expected_output: "{\"commitment\":\"ac30a0ef79cd0b6f9bfafcd3049f3b29dab4e4036224a38f346f462ba56ada4d\",\"range_bits\":4,\"bit_commitments\":[\"a476bf4614b7f4c1c99252ee7080bb7101a99be0c2ae118c2d386a6c000711b7\",\"b928fcd132a96b71a80de3dfd8b8e7492266e7a06fa07fd2edaa736365d81772\",\"6e83b03a287aae74b83d69fc54b8d3903e2588cd265a0e03a80672a1f4efb81e\",\"09a650f2d6bcaaad5525429ffc7e7b36afce7bd6af956130691b4c393f69eb80\"],\"proof_valid\":true}"
   constraints: ["Value must be in [0, 2^n)", "Generate Pedersen-like commitment", "Output error if out of range"]
 
 - id: "CRY-081"
@@ -1155,6 +1245,10 @@
   constraints: ["C = (g^v * h^r) mod p", "Generators g and h must have unknown discrete log relation for security"]
 
 - id: "CRY-083"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: '{'key_image':'<hex>','c0':'<hex>','s_values':['<hex>','<hex>','<hex>']}'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Ring Signature (Simplified)"
   description: "Generate a ring signature that proves one of N public keys signed without revealing which."
   difficulty: 5
@@ -1162,13 +1256,19 @@
   input_format: "Line 1: message. Line 2: signer index (0-based). Line 3: private key of signer (hex). Line 4: JSON array of all public keys (hex)"
   output_format: "JSON ring signature {key_image, c0, s_values[]}"
   test_cases:
-    - input: "hello\n0\nprivkey_hex\n[\"pubkey1\",\"pubkey2\",\"pubkey3\"]"
-      expected_output: "{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\",\"<hex>\"]}"
-    - input: "test\n1\nprivkey_hex\n[\"pk1\",\"pk2\"]"
-      expected_output: "{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\"]}"
+    - input: "hello\n0\n0000000000000000000000000000000000000000000000000000000000000001\n[\"0000000000000000000000000000000000000000000000000000000000000001\",\"0000000000000000000000000000000000000000000000000000000000000002\",\"0000000000000000000000000000000000000000000000000000000000000003\"]"
+      expected_output: "{\"key_image\": \"6340d0bfee2e9d04fcc13ecdaf9830b17a22e57eb817f8b64830c23481fa57d6\", \"c0\": \"7435735cc5bdfd69708a024561b76932cd80feffa7fcdc1ca91f3b6b9413d2fd\", \"s_values\": [\"60931f9faa3d5df9b00e95fb8ac66f12ea19760bf48007f2e21c8464b9afc532\", \"b7f56807aa787716c30a762f28de470daf5284ac4e6a29fd23f85f22f9c0eef0\", \"236819f0ebbbb1fe0f9070d6963b1c76b34ad9f14b915b2ce67c8ebe2d59d120\"]}"
+    - input: "test\n1\n00000000000000000000000000000000000000000000000000000000000000aa\n[\"00000000000000000000000000000000000000000000000000000000000000bb\",\"00000000000000000000000000000000000000000000000000000000000000aa\"]"
+      expected_output: "{\"key_image\": \"89f232f3e2c8514e2eff9193d8d0937ee8d7c3beae4962a03f6bfd98c8bf5bd6\", \"c0\": \"3dc3e166fbe82efacb7054109364bb18e02ac06d4dcc95a50ff655a816731bc9\", \"s_values\": [\"766e917a84d248115460027057dc287fb3246eab590a521731df0bfb7b3465fb\", \"c0e87a903300dbe1fed654b1e672b849a40dce656e2809d0a02d183108380df9\"]}"
+    - input: "secret message\n2\nfeedface00000000000000000000000000000000000000000000000000000001\n[\"1111111111111111111111111111111111111111111111111111111111111111\",\"2222222222222222222222222222222222222222222222222222222222222222\",\"feedface00000000000000000000000000000000000000000000000000000001\",\"4444444444444444444444444444444444444444444444444444444444444444\"]"
+      expected_output: "{\"key_image\": \"6cc67a634c27cf88293601959574c5288decc13677db6a9fe8d0f2bae967e07a\", \"c0\": \"ee6387003fdea4e7ae0a29e1978dee8147a0e169c4bfc7935b1cc0d6629bab3a\", \"s_values\": [\"0416aeadbc3d685706107213cf34fda86d8d9de17f1db156a7cf9ce2794c9620\", \"734a4343afbc9681b61641c09b14435a53b158f78e2f3a1f19cf57296e511659\", \"ddd431d501e1efa8f2342449e6c025a22bac230a01ad783a70d0eac5dd63db5d\", \"3dd6522703259fc3346978db3571a6883bba053d6491f4c0602679f3bbaa88fa\"]}"
   constraints: ["Anonymity set is all public keys in ring", "Key image prevents double-spending", "Verifier cannot determine which key signed"]
 
 - id: "CRY-084"
+  disabled: true
+  disabled_reason: "[non-deterministic] Test cases provide placeholder strings ('scan_pubkey_hex', 'spend_pubkey2') as inputs and literal placeholders ('<ephemeral_pubkey>', '<stealth_address>') as expected outputs"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Stealth Address Generation"
   description: "Generate a one-time stealth address from recipient's public keys. Output the ephemeral and stealth address."
   difficulty: 4
@@ -1211,6 +1311,10 @@
   constraints: ["Sender pays fee", "Credit receives, debit sends + fee"]
 
 - id: "CRY-087"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input '0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2\\n873dff81c02f5': Traceback (most recent call last):\n  File '/usr/"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "HD Wallet Address Generation"
   description: "Read a master public key and generate N receiving addresses (BIP44 path m/44'/0'/0'/0/i)."
   difficulty: 4
@@ -1423,6 +1527,10 @@
   constraints: ["Primary sort: cumulative_work (higher wins)", "Tiebreaker: length (longer wins)"]
 
 - id: "CRY-102"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '<weighted random selection>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Proof of Stake Validator Selection"
   description: "Read validators with stake amounts and a random seed. Select the next block proposer weighted by stake."
   difficulty: 3
@@ -1521,6 +1629,10 @@
   constraints: ["Bech32 encoding (BIP173)", "Include checksum", "Witness version as first data byte"]
 
 - id: "CRY-109"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '<base64 signature>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Message Signing (Bitcoin-style)"
   description: "Read a private key (WIF) and message. Output the Bitcoin signed message (Base64 signature)."
   difficulty: 4
@@ -1535,6 +1647,10 @@
   constraints: ["Hash: SHA256(SHA256(Bitcoin Signed Message:\\n + message))", "Recoverable ECDSA signature", "Include recovery flag byte"]
 
 - id: "CRY-110"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] all inputs produced identical output (looks hardcoded): 'INVALID'"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Verify Bitcoin Signed Message"
   description: "Read address, message, and signature. Verify the signature and output VALID or INVALID."
   difficulty: 4
@@ -1609,6 +1725,10 @@
   constraints: ["RFC 4226 HOTP", "HMAC-SHA1", "Dynamic truncation", "6 digits zero-padded"]
 
 - id: "CRY-115"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '<random salt>\\n<derived key>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Key Stretching with Salt"
   description: "Read a password and generate a salted, stretched key. Output salt and derived key."
   difficulty: 2
@@ -1644,10 +1764,14 @@
   input_format: "Line 1: function signature (e.g., transfer(address,uint256)). Remaining lines: argument values"
   output_format: "Hex ABI-encoded calldata (4-byte selector + 32-byte padded args)"
   test_cases:
-    - input: "transfer(address,uint256)\n0x1234567890abcdef1234567890abcdef12345678\n100"
-      expected_output: "a9059cbb0000000000000000000000001234567890abcdef1234567890abcdef1234567800000000000000000000000000000000000000000000000000000000000000064"
-    - input: "balanceOf(address)\n0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+    - input: "transfer(address,uint256)\n0x1234567890abcdef1234567890abcdef12345678\n100\n"
+      expected_output: "a9059cbb0000000000000000000000001234567890abcdef1234567890abcdef123456780000000000000000000000000000000000000000000000000000000000000064"
+    - input: "balanceOf(address)\n0xabcdefabcdefabcdefabcdefabcdefabcdefabcd\n"
       expected_output: "70a08231000000000000000000000000abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+    - input: "approve(address,uint256)\n0x0000000000000000000000000000000000000001\n1000000000000000000\n"
+      expected_output: "095ea7b300000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000de0b6b3a7640000"
+    - input: "totalSupply()\n"
+      expected_output: "18160ddd"
   constraints: ["Function selector = first 4 bytes of Keccak-256 of signature", "Arguments padded to 32 bytes", "Addresses left-padded, uints right-padded"]
 
 - id: "CRY-118"
@@ -1723,6 +1847,10 @@
   constraints: ["slow = 25th percentile", "average = 50th percentile (median)", "fast = 75th percentile"]
 
 - id: "CRY-123"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '<keccak256 signing hash>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Replay Protection (Chain ID)"
   description: "Read a raw transaction and chain ID. Add EIP-155 replay protection and output the signing hash."
   difficulty: 3
@@ -1730,10 +1858,12 @@
   input_format: "Line 1: JSON raw tx {nonce, gas_price, gas_limit, to, value, data}. Line 2: chain_id"
   output_format: "Signing hash (Keccak-256 of RLP(tx fields + chain_id + 0 + 0))"
   test_cases:
-    - input: "{\"nonce\":0,\"gas_price\":20,\"gas_limit\":21000,\"to\":\"0xrecipient\",\"value\":1000,\"data\":\"\"}\n1"
-      expected_output: "<keccak256 signing hash>"
-    - input: "{\"nonce\":5,\"gas_price\":50,\"gas_limit\":50000,\"to\":\"0xaddr\",\"value\":0,\"data\":\"0xabcd\"}\n137"
-      expected_output: "<keccak256 signing hash>"
+    - input: "{\"nonce\":0,\"gas_price\":20,\"gas_limit\":21000,\"to\":\"0x000000000000000000000000000000000000dead\",\"value\":1000,\"data\":\"\"}\n1"
+      expected_output: "5f528e5fbc6188f5f666ce2d5d92e5b5975d753613c5eec9999ce377dac39bf7"
+    - input: "{\"nonce\":5,\"gas_price\":50,\"gas_limit\":50000,\"to\":\"0x00000000000000000000000000000000000000aa\",\"value\":0,\"data\":\"0xabcd\"}\n137"
+      expected_output: "3d7e8d3672ee9b5f69721a9257db00b2fb8f88804e7bab692ee39d95bc47dc6a"
+    - input: "{\"nonce\":42,\"gas_price\":1000000000,\"gas_limit\":100000,\"to\":\"0xffffffffffffffffffffffffffffffffffffffff\",\"value\":123456789,\"data\":\"0xdeadbeef\"}\n5"
+      expected_output: "19bb478a8fb7f4fd3f6d5e053a987c458348b3b109e98ef562eca5e0166d4e65"
   constraints: ["EIP-155: append chain_id, 0, 0 before signing", "Hash = Keccak-256 of RLP encoded transaction"]
 
 - id: "CRY-124"
@@ -1858,10 +1988,14 @@
   input_format: "Line 1: r (hex). Line 2: s (hex). Line 3: curve order n (hex)"
   output_format: "CANONICAL or MALLEABLE (normalized s = <hex>)"
   test_cases:
-    - input: "r_hex\nsmall_s_hex\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+    - input: "1\n1\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n"
       expected_output: "CANONICAL"
-    - input: "r_hex\nlarge_s_hex\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
-      expected_output: "MALLEABLE (normalized s = <n - s as hex>)"
+    - input: "1\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n"
+      expected_output: "MALLEABLE (normalized s = 1)"
+    - input: "abcdef\n7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n"
+      expected_output: "CANONICAL"
+    - input: "deadbeef\n7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a1\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n"
+      expected_output: "MALLEABLE (normalized s = 7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0)"
   constraints: ["If s > n/2, signature is malleable", "Normalize by replacing s with n - s", "BIP62/EIP-2 low-S requirement"]
 
 - id: "CRY-133"
@@ -1887,12 +2021,20 @@
   output_format: "Line 1: filter (hex). Line 2: MATCH or NO_MATCH"
   test_cases:
     - input: "[\"addr1\",\"addr2\",\"addr3\"]\naddr2"
-      expected_output: "<filter_hex>\nMATCH"
+      expected_output: "03808dbf12fe502212\nMATCH"
     - input: "[\"addr1\",\"addr2\"]\naddr3"
-      expected_output: "<filter_hex>\nNO_MATCH"
+      expected_output: "0256124c32a640\nNO_MATCH"
+    - input: "[\"alice\",\"bob\",\"carol\",\"dave\",\"eve\"]\nfrank"
+      expected_output: "05b21e2cee58d657c6c7a5e60186\nNO_MATCH"
+    - input: "[\"alice\",\"bob\",\"carol\",\"dave\",\"eve\"]\ncarol"
+      expected_output: "05b21e2cee58d657c6c7a5e60186\nMATCH"
   constraints: ["Golomb-Rice coding with P=19 (BIP158 parameter)", "SipHash for element hashing", "False positive rate ~1/2^P"]
 
 - id: "CRY-135"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs in test cases contain placeholders like <uuid> and <hex> rather than concrete values"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Encrypted Keystore (Web3 Format)"
   description: "Read a private key and password. Output an encrypted keystore JSON (Web3 Secret Storage)."
   difficulty: 4

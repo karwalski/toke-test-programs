@@ -329,9 +329,13 @@
   output_format: "Bucket contents after each digit pass, then sorted result"
   test_cases:
     - input: "170 45 75 90 802 24 2 66"
-      expected_output: "Pass 1 (ones): [170,90] [1:] [2:802,2] [4:24] [5:45,75] [6:66] ...\nPass 2 (tens): [2,802] [4:45] [6:66] [7:170,75] [9:90] ...\nPass 3 (hundreds): [2,24,45,66,75,90] [1:170] [8:802]\nSorted: 2 24 45 66 75 90 170 802"
+      expected_output: "Pass 1 (ones): [0:170,90] [2:802,2] [4:24] [5:45,75] [6:66]\nPass 2 (tens): [0:802,2] [2:24] [4:45] [6:66] [7:170,75] [9:90]\nPass 3 (hundreds): [0:2,24,45,66,75,90] [1:170] [8:802]\nSorted: 2 24 45 66 75 90 170 802"
     - input: "10 1 100"
-      expected_output: "Pass 1 (ones): [10,100] [1:1]\nPass 2 (tens): [1,100] [1:10]\nPass 3 (hundreds): [1,10] [1:100]\nSorted: 1 10 100"
+      expected_output: "Pass 1 (ones): [0:10,100] [1:1]\nPass 2 (tens): [0:100,1] [1:10]\nPass 3 (hundreds): [0:1,10] [1:100]\nSorted: 1 10 100"
+    - input: "5 3 8 1 9 2 7 4 6"
+      expected_output: "Pass 1 (ones): [1:1] [2:2] [3:3] [4:4] [5:5] [6:6] [7:7] [8:8] [9:9]\nSorted: 1 2 3 4 5 6 7 8 9"
+    - input: "999 1 50 500 5"
+      expected_output: "Pass 1 (ones): [0:50,500] [1:1] [5:5] [9:999]\nPass 2 (tens): [0:500,1,5] [5:50] [9:999]\nPass 3 (hundreds): [0:1,5,50] [5:500] [9:999]\nSorted: 1 5 50 500 999"
   constraints: ["Must read from stdin", "Base 10", "Show non-empty buckets only"]
 
 - id: "DAT-025"
@@ -1063,6 +1067,10 @@
   constraints: ["Must read from stdin", "Columns in specified order", "Source columns removed"]
 
 - id: "DAT-077"
+  disabled: true
+  disabled_reason: "[impossible-output] The expected hash outputs ('a3b4c5d6' for 'Alice', 'f1e2d3c4' for 'a@b.com') do not correspond to the first 8 hex chars of any standard hash function (MD5, SHA1, SHA256, SHA512,..."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Data Anonymiser"
   description: "Anonymise a dataset by generalising numeric fields into ranges and hashing string fields."
   difficulty: 3

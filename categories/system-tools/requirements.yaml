@@ -7,9 +7,9 @@
   output_format: "Lines of: TIMESTAMP EVENT filepath (e.g. 2026-01-01T00:00:00 CREATED /tmp/foo.txt)"
   test_cases:
     - input: "/tmp 0"
-      expected_output: "(no events printed when duration is 0)"
-    - input: "/nonexistent 0"
-      expected_output: "ERROR: directory not found: /nonexistent"
+      expected_output: ""
+    - input: "/nonexistent_dir_xyz_12345 0"
+      expected_output: "ERROR: directory not found: /nonexistent_dir_xyz_12345"
   constraints:
     - "Must poll at least once per second"
     - "Must handle non-existent directories gracefully"
@@ -102,10 +102,12 @@
   input_format: "Line 1: source path. Line 2: destination path"
   output_format: "Copied: N files\\nSkipped: N files\\nErrors: N files"
   test_cases:
-    - input: "/tmp/src\n/tmp/dst"
-      expected_output: "Copied: N files\nSkipped: N files\nErrors: 0 files"
-    - input: "/nonexistent\n/tmp/dst"
-      expected_output: "ERROR: source not found: /nonexistent"
+    - input: "/tmp/sysbk_test_src_a\n/tmp/sysbk_test_dst_a\n"
+      expected_output: "Copied: 3 files\nSkipped: 0 files\nErrors: 0 files"
+    - input: "/tmp/sysbk_nonexistent_xyz_12345\n/tmp/sysbk_test_dst_b\n"
+      expected_output: "ERROR: source not found: /tmp/sysbk_nonexistent_xyz_12345"
+    - input: "/tmp/sysbk_test_src_b\n/tmp/sysbk_test_dst_c\n"
+      expected_output: "Copied: 1 files\nSkipped: 0 files\nErrors: 0 files"
   constraints:
     - "Create destination directory if missing"
     - "Preserve directory structure"
@@ -198,10 +200,14 @@
   input_format: "Line 1: mode (compute|verify). For compute: file paths (one per line). For verify: manifest path then file paths."
   output_format: "compute: SHA256 filepath. verify: OK filepath | FAIL filepath"
   test_cases:
-    - input: "compute\n/tmp/test.txt"
-      expected_output: "(sha256hex)  /tmp/test.txt"
-    - input: "verify\n/tmp/manifest.sha256\n/tmp/test.txt"
-      expected_output: "OK /tmp/test.txt"
+    - input: "compute\nhello world"
+      expected_output: "SHA256 b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9 hello world"
+    - input: "compute\nThe quick brown fox jumps over the lazy dog"
+      expected_output: "SHA256 d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592 The quick brown fox jumps over the lazy dog"
+    - input: "verify\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  empty\nb94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9  hello\nempty\nhello\nnotfound"
+      expected_output: "OK empty\nOK hello\nFAIL notfound"
+    - input: "verify\n0000000000000000000000000000000000000000000000000000000000000000  hello\nhello"
+      expected_output: "FAIL hello"
   constraints:
     - "Use standard hex-encoded SHA-256"
     - "Manifest format: hash  filepath (two spaces)"
@@ -239,6 +245,10 @@
     - "Stale lock: PID in file no longer exists"
 
 - id: "SYS-016"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Daemon started: pid=N'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Daemon Skeleton"
   description: "Implement a minimal daemon: fork to background, write PID file, handle SIGTERM for clean shutdown, log to file."
   difficulty: 5
@@ -303,6 +313,10 @@
     - "Process uptime from process start time"
 
 - id: "SYS-020"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/unfixable] Output depends on the runtime machine's OS, kernel, hostname, CPU count, and RAM, so the same Python produces different outputs on different test hosts, making "
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "OS Info Reporter"
   description: "Report OS name, version, kernel version, hostname, CPU count, and total RAM."
   difficulty: 1
@@ -319,6 +333,10 @@
     - "RAM rounded to nearest GB"
 
 - id: "SYS-021"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input '3\\n10 0 root\\n20 10 child1\\n30 10 child2\\n40 20 grand1\\n50 40 ggrand\\n60 30 grand2\\n10\\n': Traceback (most recent call last):\n  File"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Process Tree Printer"
   description: "Print the process tree rooted at a given PID (or all processes if PID=1), showing parent-child relationships."
   difficulty: 4
@@ -374,10 +392,12 @@
   input_format: "Line 1: source path. Line 2: dest path. Line 3: delete (yes/no)"
   output_format: "COPY filepath\\nSKIP filepath\\nDELETE filepath\\nDone: C copied, S skipped, D deleted"
   test_cases:
-    - input: "/tmp/src\n/tmp/dst\nno"
-      expected_output: "(COPY/SKIP lines)\nDone: N copied, N skipped, 0 deleted"
-    - input: "/tmp/src\n/tmp/dst\nyes"
-      expected_output: "(COPY/SKIP/DELETE lines)\nDone: N copied, N skipped, N deleted"
+    - input: "/tmp/sys024_src_a\n/tmp/sys024_dst_a\nno\n"
+      expected_output: "SKIP a.txt\nCOPY sub/b.txt\nDone: 1 copied, 1 skipped, 0 deleted"
+    - input: "/tmp/sys024_src_b\n/tmp/sys024_dst_b\nyes\n"
+      expected_output: "COPY x.txt\nCOPY y.txt\nDELETE z.txt\nDone: 2 copied, 0 skipped, 1 deleted"
+    - input: "/tmp/sys024_src_c\n/tmp/sys024_dst_c\nno\n"
+      expected_output: "COPY only.txt\nDone: 1 copied, 0 skipped, 0 deleted"
   constraints:
     - "Compare by mtime and size"
     - "Preserve directory structure"
@@ -390,10 +410,14 @@
   input_format: "Line 1: directory to scan. Line 2: action (report|delete)"
   output_format: "Group of duplicates: DUPLICATE filepath (keeping first). Summary: N duplicate groups, N files removed."
   test_cases:
-    - input: "/tmp/dedup_test\nreport"
-      expected_output: "DUPLICATE ... (or 'No duplicates found')"
-    - input: "/tmp/dedup_test\ndelete"
-      expected_output: "(duplicate groups then summary)"
+    - input: "3\nfile1.txt|hello world\nfile2.txt|hello world\nfile3.txt|different content\nreport"
+      expected_output: "DUPLICATE file2.txt (keeping file1.txt)\nSummary: 1 duplicate groups, 0 files removed"
+    - input: "4\na.txt|same\nb.txt|same\nc.txt|same\nd.txt|unique\ndelete"
+      expected_output: "DUPLICATE b.txt (keeping a.txt)\nDUPLICATE c.txt (keeping a.txt)\nSummary: 1 duplicate groups, 2 files removed"
+    - input: "2\nonly.txt|alone\nother.txt|different\nreport"
+      expected_output: "No duplicates found\nSummary: 0 duplicate groups, 0 files removed"
+    - input: "5\nz.txt|content1\ny.txt|content1\nx.txt|content2\nw.txt|content2\nv.txt|content3\ndelete"
+      expected_output: "DUPLICATE x.txt (keeping w.txt)\nDUPLICATE z.txt (keeping y.txt)\nSummary: 2 duplicate groups, 2 files removed"
   constraints:
     - "Use SHA-256 for content comparison"
     - "Keep first (alphabetically) copy when deleting"
@@ -406,10 +430,14 @@
   input_format: "Line 1: directory. Line 2: pattern (regex). Line 3: replacement. Line 4: dry-run (yes/no)"
   output_format: "RENAME old -> new (one per file). Summary: N files renamed."
   test_cases:
-    - input: "/tmp/renames\n\\.txt$\n.log\nyes"
-      expected_output: "RENAME foo.txt -> foo.log\nSummary: N files renamed."
-    - input: "/tmp/renames\n\\.txt$\n.log\nno"
-      expected_output: "(same but actually renames files)"
+    - input: "foo.txt\nbar.txt\nbaz.md\n---\n\\.txt$\n.log\nyes\n"
+      expected_output: "RENAME foo.txt -> foo.log\nRENAME bar.txt -> bar.log\nSummary: 2 files renamed."
+    - input: "foo.txt\nbar.txt\nbaz.md\nfoo.log\n---\n\\.txt$\n.log\nno\n"
+      expected_output: "RENAME bar.txt -> bar.log\nSummary: 1 files renamed."
+    - input: "report1.dat\nreport2.dat\nnotes.txt\n---\n^report\nfinal_report\nno\n"
+      expected_output: "RENAME report1.dat -> final_report1.dat\nRENAME report2.dat -> final_report2.dat\nSummary: 2 files renamed."
+    - input: "a.txt\nb.txt\nc.log\n---\n\\.txt$\n.log\nyes\n"
+      expected_output: "RENAME a.txt -> a.log\nRENAME b.txt -> b.log\nSummary: 2 files renamed."
   constraints:
     - "Dry-run must not modify filesystem"
     - "Skip files where rename would cause collision"
@@ -438,10 +466,12 @@
   input_format: "Lines of: TRASH filepath | LIST | RESTORE name | EMPTY"
   output_format: "TRASH: Moved to trash: name. LIST: name original_path deleted_at. RESTORE: Restored to path. EMPTY: Emptied N items."
   test_cases:
-    - input: "TRASH /tmp/deleteme.txt\nLIST\nRESTORE deleteme.txt"
-      expected_output: "Moved to trash: deleteme.txt\ndeleteme.txt ... (list)\nRestored to /tmp/deleteme.txt"
-    - input: "EMPTY"
-      expected_output: "Emptied N items."
+    - input: "TRASH /work/a.txt\nTRASH /work/b.txt\nLIST\nRESTORE a.txt\nLIST\nEMPTY\n"
+      expected_output: "Moved to trash: a.txt\nMoved to trash: b.txt\na.txt /work/a.txt 1\nb.txt /work/b.txt 2\nRestored to /work/a.txt\nb.txt /work/b.txt 2\nEmptied 1 items."
+    - input: "TRASH /work/x.txt\nTRASH /work/y.txt\nTRASH /work/z.txt\nLIST\nEMPTY\nLIST\n"
+      expected_output: "Moved to trash: x.txt\nMoved to trash: y.txt\nMoved to trash: z.txt\nx.txt /work/x.txt 1\ny.txt /work/y.txt 2\nz.txt /work/z.txt 3\nEmptied 3 items.\n(empty)"
+    - input: "TRASH /work/only.txt\nRESTORE only.txt\nLIST\n"
+      expected_output: "Moved to trash: only.txt\nRestored to /work/only.txt\n(empty)"
   constraints:
     - "Metadata stored as JSON alongside trashed file"
     - "Trash dir: ~/.local/share/Trash/files (or equivalent)"
@@ -534,10 +564,14 @@
   input_format: "Line 1: template file path (or - for stdin). Line 2: output file path (or - for stdout)"
   output_format: "Template with all ${VAR}/$VAR replaced by their values (or empty string if unset)"
   test_cases:
-    - input: "-\n-\nHello ${USER}"
-      expected_output: "Hello (current username)"
-    - input: "-\n-\nPath is $PATH"
-      expected_output: "Path is (current PATH value)"
+    - input: "-\n-\nHello ${USER}, welcome!\nUSER=$USER"
+      expected_output: "Hello alice, welcome!\nUSER=alice"
+    - input: "-\n-\nPath: $MYPATH and home: ${MYHOME}\nUnset: ${NOPE} end"
+      expected_output: "Path: /usr/local/bin:/usr/bin and home: /home/alice\nUnset:  end"
+    - input: "-\n-\nMix $A and ${B} and $$ and \\$C"
+      expected_output: "Mix apple and banana and $$ and \\"
+    - input: "-\n-\nNo vars here, just text.\nLine 2."
+      expected_output: "No vars here, just text.\nLine 2."
   constraints:
     - "Unset variables expand to empty string"
     - "Support both ${VAR} and $VAR syntax"
@@ -559,6 +593,10 @@
     - "Show file sizes in human-readable form"
 
 - id: "SYS-036"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs are literal placeholder strings ('(matching .log files modified in last day)\nN files found.' and '(files >= 1KB)\nN files found.') rather than concrete determi..."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "File Search (find replacement)"
   description: "Search for files matching name pattern, min/max size, and modified within N days."
   difficulty: 3
@@ -582,10 +620,12 @@
   input_format: "Line 1: pattern (regex). Line 2: directory or file path. Line 3: recursive (yes/no)"
   output_format: "filepath:linenum:matching line"
   test_cases:
-    - input: "error\n/tmp/test.log\nno"
-      expected_output: "/tmp/test.log:N:... (matching lines)"
-    - input: "TODO\n/tmp/src\nyes"
-      expected_output: "(matching lines across all files)"
+    - input: "error\n---\nfile1.log\nstart of log\nerror: disk full\nall good\nERROR: case test\nanother error here\n---\nno"
+      expected_output: "file1.log:2:error: disk full\nfile1.log:5:another error here"
+    - input: "TODO\n---\nsrc/main.py|src/utils.py|README.md\n# main.py\ndef foo():\n    # TODO: implement\n    pass\n--FILE--\n# utils.py\ndef bar():\n    return 42\n# TODO refactor\n--FILE--\n# README\nNo todos here\n---\nyes"
+      expected_output: "src/main.py:3:    # TODO: implement\nsrc/utils.py:4:# TODO refactor"
+    - input: "foo.*bar\n---\ntest.txt\nfoo and bar\nfoobar\nfoo bar baz\nbarfoo\nnothing\n---\nno"
+      expected_output: "test.txt:1:foo and bar\ntest.txt:2:foobar\ntest.txt:3:foo bar baz"
   constraints:
     - "Case-sensitive by default"
     - "Binary files skipped with a warning"
@@ -614,10 +654,12 @@
   input_format: "Line 1: PID. Line 2: interval_ms. Line 3: samples"
   output_format: "CPU% histogram: 0-10%: N, 10-20%: N, ..., 90-100%: N"
   test_cases:
-    - input: "1\n100\n5"
-      expected_output: "CPU% histogram: 0-10%: N, ..."
-    - input: "99999\n100\n5"
-      expected_output: "ERROR: PID not found: 99999"
+    - input: "5\n5 15 25 35 45\n"
+      expected_output: "CPU% histogram: 0-10%: 1, 10-20%: 1, 20-30%: 1, 30-40%: 1, 40-50%: 1, 50-60%: 0, 60-70%: 0, 70-80%: 0, 80-90%: 0, 90-100%: 0"
+    - input: "10\n0 9 10 19 20 50 75 99 100 100\n"
+      expected_output: "CPU% histogram: 0-10%: 2, 10-20%: 2, 20-30%: 1, 30-40%: 0, 40-50%: 0, 50-60%: 1, 60-70%: 0, 70-80%: 1, 80-90%: 0, 90-100%: 3"
+    - input: "3\n100 0 50\n"
+      expected_output: "CPU% histogram: 0-10%: 1, 10-20%: 0, 20-30%: 0, 30-40%: 0, 40-50%: 0, 50-60%: 1, 60-70%: 0, 70-80%: 0, 80-90%: 0, 90-100%: 1"
   constraints:
     - "Bucket boundaries: 0,10,20,...,100"
     - "Total samples must equal requested count"
@@ -631,9 +673,13 @@
   output_format: "System: total=N free=N used=N\\n[PID N: rss=N vsz=N shared=N private=N] (all in MB)"
   test_cases:
     - input: ""
-      expected_output: "System: total=N free=N used=N"
-    - input: "1"
-      expected_output: "System: ...\nPID 1: rss=N vsz=N shared=N private=N"
+      expected_output: "System: total=8000.0 free=2000.0 used=6000.0"
+    - input: "1\n"
+      expected_output: "System: total=8000.0 free=2000.0 used=6000.0\nPID 1: rss=12.06 vsz=229.07 shared=6.0 private=6.06"
+    - input: "999999\n"
+      expected_output: "System: total=8000.0 free=2000.0 used=6000.0\nNOT FOUND"
+    - input: "2\n"
+      expected_output: "System: total=8000.0 free=2000.0 used=6000.0\nPID 2: rss=0.5 vsz=10.0 shared=0.38 private=0.12"
   constraints:
     - "Values in MB, rounded to 2dp"
     - "Report NOT FOUND for invalid PID"
@@ -687,6 +733,10 @@
     - "Skip comment lines (#)"
 
 - id: "SYS-044"
+  disabled: true
+  disabled_reason: "[non-deterministic] Test 1 expects the literal placeholder string '(files with ages, STALE if > 24h)' as stdout, but this is a description, not actual expected output"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "File Age Reporter"
   description: "Report the age (since last modification) of files in a directory, marking stale files beyond a threshold."
   difficulty: 1
@@ -815,6 +865,10 @@
     - "Exit code 1 if differences exist, 0 if identical"
 
 - id: "SYS-052"
+  disabled: true
+  disabled_reason: "[non-deterministic] The expected outputs in the test cases contain literal placeholders ('...' and 'N') rather than concrete strings, and depend on the contents/size of an external file (/tmp/big.b..."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "File Splitter"
   description: "Split a large file into N equal-sized chunks or chunks of at most M bytes."
   difficulty: 2
@@ -838,10 +892,14 @@
   input_format: "Line 1: output file path. Subsequent lines: input file paths in order"
   output_format: "Merged: N files into OUTPUT. Total: N bytes."
   test_cases:
-    - input: "/tmp/merged.txt\n/tmp/a.txt\n/tmp/b.txt"
-      expected_output: "Merged: 2 files into /tmp/merged.txt. Total: N bytes."
-    - input: "/tmp/out.txt\n/nonexistent"
-      expected_output: "ERROR: not found: /nonexistent"
+    - input: "/tmp/sys053_merged.txt\n/tmp/sys053_a.txt\n/tmp/sys053_b.txt"
+      expected_output: "Merged: 2 files into /tmp/sys053_merged.txt. Total: 14 bytes."
+    - input: "/tmp/sys053_out.txt\n/tmp/sys053_nonexistent_xyz_12345"
+      expected_output: "ERROR: not found: /tmp/sys053_nonexistent_xyz_12345"
+    - input: "/tmp/sys053_single.txt\n/tmp/sys053_a.txt"
+      expected_output: "Merged: 1 files into /tmp/sys053_single.txt. Total: 7 bytes."
+    - input: "/tmp/sys053_three.txt\n/tmp/sys053_a.txt\n/tmp/sys053_b.txt\n/tmp/sys053_c.txt"
+      expected_output: "Merged: 3 files into /tmp/sys053_three.txt. Total: 34 bytes."
   constraints:
     - "No separator between file contents"
     - "Create output file (overwrite if exists)"
@@ -1047,9 +1105,13 @@
   output_format: "JSON array of objects"
   test_cases:
     - input: "name,age\nalice,30\nbob,25"
-      expected_output: "[{\"age\":\"30\",\"name\":\"alice\"},{\"age\":\"25\",\"name\":\"bob\"}]"
+      expected_output: "[{\"name\":\"alice\",\"age\":\"30\"},{\"name\":\"bob\",\"age\":\"25\"}]"
     - input: "col\nonly one"
       expected_output: "[{\"col\":\"only one\"}]"
+    - input: "a,b,c\n1,2,3\n4,5,6"
+      expected_output: "[{\"a\":\"1\",\"b\":\"2\",\"c\":\"3\"},{\"a\":\"4\",\"b\":\"5\",\"c\":\"6\"}]"
+    - input: "name,quote\nalice,\"hello, world\"\nbob,simple"
+      expected_output: "[{\"name\":\"alice\",\"quote\":\"hello, world\"},{\"name\":\"bob\",\"quote\":\"simple\"}]"
   constraints:
     - "Handle quoted CSV fields with commas"
     - "Keys in same order as header"
@@ -1110,10 +1172,14 @@
   input_format: "Line 1: regex pattern. Remaining: text to search."
   output_format: "Each match on its own line"
   test_cases:
-    - input: "\\d+"
-      expected_output: "(all numbers found)"
-    - input: "[a-z]+@[a-z]+\\.[a-z]+"
-      expected_output: "(all email-like patterns)"
+    - input: "\\d+\nI have 3 cats and 12 dogs and 100 fish"
+      expected_output: "3\n12\n100"
+    - input: "[a-z]+@[a-z]+\\.[a-z]+\nContact alice@example.com or bob@test.org for info"
+      expected_output: "alice@example.com\nbob@test.org"
+    - input: "(\\w+)=(\\d+)\nfoo=1 bar=22 baz=333"
+      expected_output: "foo\nbar\nbaz"
+    - input: "\\b[A-Z][a-z]+\\b\nAlice and Bob went to Paris with Charlie"
+      expected_output: "Alice\nBob\nParis\nCharlie"
   constraints:
     - "Support capture groups (output group 1 if present)"
     - "No duplicates unless pattern repeats"
@@ -1286,10 +1352,14 @@
   input_format: "Line 1: file path. Line 2: N lines. Line 3: follow_duration_seconds (0=no follow)"
   output_format: "Last N lines of file, then new lines as appended."
   test_cases:
-    - input: "/tmp/test.log\n3\n0"
-      expected_output: "(last 3 lines of file)"
-    - input: "/nonexistent\n5\n0"
-      expected_output: "ERROR: file not found: /nonexistent"
+    - input: "/tmp/sys081_test_a.log\n3\n0\n"
+      expected_output: "line3\nline4\nline5"
+    - input: "/tmp/sys081_nonexistent_xyz\n5\n0\n"
+      expected_output: "ERROR: file not found: /tmp/sys081_nonexistent_xyz"
+    - input: "/tmp/sys081_test_b.log\n10\n0\n"
+      expected_output: "only_one_line\ntwo"
+    - input: "/tmp/sys081_test_c.log\n2\n0\n"
+      expected_output: "entry_19\nentry_20"
   constraints:
     - "Handle files shorter than N lines"
     - "Follow polls at 250ms intervals"
@@ -1302,10 +1372,12 @@
   input_format: "Line 1: timestamp_pattern (regex). Remaining lines: log file paths."
   output_format: "Merged log lines in chronological order"
   test_cases:
-    - input: "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\n/tmp/log1.txt\n/tmp/log2.txt"
-      expected_output: "(merged chronological lines)"
-    - input: "\\d{4}-\\d{2}-\\d{2}\n/tmp/only.log"
-      expected_output: "(lines from single file)"
+    - input: "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\n---\n2024-01-01T10:00:00 INFO start\n2024-01-01T10:05:00 INFO mid\n2024-01-01T10:10:00 INFO end\n---\n2024-01-01T10:02:00 WARN slow\n2024-01-01T10:05:00 INFO mid\n2024-01-01T10:07:00 ERROR fail\n  continuation of error\n"
+      expected_output: "2024-01-01T10:00:00 INFO start\n2024-01-01T10:02:00 WARN slow\n2024-01-01T10:05:00 INFO mid\n2024-01-01T10:07:00 ERROR fail\n  continuation of error\n2024-01-01T10:10:00 INFO end"
+    - input: "\\d{4}-\\d{2}-\\d{2}\n---\n2023-06-15 event A\n2023-06-10 event B\n2023-06-20 event C\nextra context for C\n2023-06-10 event B\n"
+      expected_output: "2023-06-10 event B\n2023-06-15 event A\n2023-06-20 event C\nextra context for C"
+    - input: "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\n---\n2024-12-31T23:59:59 year end\n2024-01-01T00:00:00 year start\n---\n2024-06-15T12:00:00 midyear\n---\n2024-01-01T00:00:00 year start\n2024-03-03T03:03:03 march\n"
+      expected_output: "2024-01-01T00:00:00 year start\n2024-03-03T03:03:03 march\n2024-06-15T12:00:00 midyear\n2024-12-31T23:59:59 year end"
   constraints:
     - "Lines without matching timestamp treated as continuation of previous"
     - "Stable sort on equal timestamps"
@@ -1447,9 +1519,13 @@
   output_format: "Input data passed through at throttled rate"
   test_cases:
     - input: "10\nhello"
-      expected_output: "hello (output at ≤10 B/s)"
+      expected_output: "hello"
     - input: "0\ntest"
       expected_output: "ERROR: rate must be > 0"
+    - input: "100\nThe quick brown fox jumps over the lazy dog."
+      expected_output: "The quick brown fox jumps over the lazy dog."
+    - input: "50\nabcdefghij"
+      expected_output: "abcdefghij"
   constraints:
     - "Buffer in chunks, sleep between chunks as needed"
     - "Accuracy within 10%"
@@ -1487,6 +1563,10 @@
     - "Values to 2 decimal places"
 
 - id: "SYS-094"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs in test cases use literal ellipses ('...') as placeholders rather than concrete expected values, making exact string matching impossible"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Swap Usage Reporter"
   description: "Report swap space total, used, free, and the top N processes using swap."
   difficulty: 2
@@ -1503,6 +1583,10 @@
     - "Sort by swap usage descending"
 
 - id: "SYS-095"
+  disabled: true
+  disabled_reason: "[non-deterministic] The expected outputs in the test cases are not literal strings but parenthetical descriptions ('(core dumps found or \'No core dumps found\')' and '(searches default locations)')"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Core Dump Finder"
   description: "Search common locations for core dump files, report path, size, and associated binary."
   difficulty: 2
@@ -1567,6 +1651,10 @@
     - "Extract inode from symlink target"
 
 - id: "SYS-099"
+  disabled: true
+  disabled_reason: "[non-deterministic] The expected outputs are literal placeholder strings like '(top 5 syscalls by count)' and '(top 3 syscalls)' rather than actual syscall data"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "System Call Tracer (stub)"
   description: "Wrap strace/dtruss to run a command and report the N most frequent syscalls with counts."
   difficulty: 5
@@ -1599,6 +1687,10 @@
     - "Use sysctl hw.cpufrequency on macOS"
 
 - id: "SYS-101"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected output is a placeholder template ('Battery: N% .."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Battery Status Reporter"
   description: "Report laptop battery status: level, charging state, time remaining, and cycle count."
   difficulty: 2
@@ -1638,10 +1730,16 @@
   input_format: "Line 1: length. Line 2: charset (all|alpha|numeric|alnum|symbols). Line 3: count"
   output_format: "N passwords, one per line"
   test_cases:
-    - input: "16\nall\n3"
-      expected_output: "(3 passwords of length 16 with mixed chars)"
-    - input: "8\nnumeric\n2"
-      expected_output: "(2 passwords of 8 digits)"
+    - input: "16\nall\n3\n42\n"
+      expected_output: "odJFCrn*l+2edlBD\n#]d)z*1C5+Jau2RJ\ntBRnlWmTS]Hf6&pW"
+    - input: "8\nnumeric\n2\n123\n"
+      expected_output: "04164106\n88550225"
+    - input: "12\nalpha\n4\n7\n"
+      expected_output: "ujzPdeIgxLdG\nncfBAepfJBdK\nhoOOLdKLzdoc\nJisAjIhKtJRl"
+    - input: "10\nalnum\n2\n999\n"
+      expected_output: "YRf53KKIFE\ni4ZPuPYP20"
+    - input: "6\nsymbols\n3\n1\n"
+      expected_output: "%#($][\n]=&$]!\n=+![(*"
   constraints:
     - "Cryptographically secure random source"
     - "all = a-zA-Z0-9 + symbols"
@@ -1663,6 +1761,10 @@
     - "Top 5 most changed files"
 
 - id: "SYS-105"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs are placeholder descriptions ('(running containers or No containers found)') rather than concrete strings, making them impossible to match exactly"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Docker Container Lister"
   description: "List running Docker containers with name, image, status, ports, and resource usage."
   difficulty: 2
@@ -1695,6 +1797,10 @@
     - "Graceful handling if no entries match"
 
 - id: "SYS-107"
+  disabled: true
+  disabled_reason: "[non-deterministic] Expected outputs are literal placeholders ('(datetime)', '(duration)', 'N') rather than concrete values, and the actual boot time/uptime are runtime-dependent and non-determinis..."
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Boot Time Reporter"
   description: "Report the last boot time and current uptime in multiple formats."
   difficulty: 1
@@ -1814,10 +1920,12 @@
   input_format: "Line 1: log file path. Line 2: timestamp regex. Line 3: bucket (second|minute|hour)"
   output_format: "BUCKET_START count (one per bucket, sorted by time)"
   test_cases:
-    - input: "/tmp/timed.log\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nminute"
-      expected_output: "(per-minute counts)"
-    - input: "/tmp/timed.log\n\\d{4}-\\d{2}-\\d{2}\nhour"
-      expected_output: "(per-hour counts)"
+    - input: "2024-01-15T10:00:05 event a\n2024-01-15T10:00:45 event b\n2024-01-15T10:02:10 event c\n2024-01-15T10:02:30 event d\n2024-01-15T10:02:55 event e\nno timestamp here\n2024-01-15T10:04:00 event f\n---\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nminute\n"
+      expected_output: "2024-01-15T10:00 2\n2024-01-15T10:01 0\n2024-01-15T10:02 3\n2024-01-15T10:03 0\n2024-01-15T10:04 1"
+    - input: "2024-01-15T08:30:00 a\n2024-01-15T09:15:00 b\n2024-01-15T09:45:00 c\n2024-01-15T11:00:00 d\n2024-01-16T00:30:00 e\n---\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nhour\n"
+      expected_output: "2024-01-15T08 1\n2024-01-15T09 2\n2024-01-15T10 0\n2024-01-15T11 1\n2024-01-15T12 0\n2024-01-15T13 0\n2024-01-15T14 0\n2024-01-15T15 0\n2024-01-15T16 0\n2024-01-15T17 0\n2024-01-15T18 0\n2024-01-15T19 0\n2024-01-15T20 0\n2024-01-15T21 0\n2024-01-15T22 0\n2024-01-15T23 0\n2024-01-16T00 1"
+    - input: "2024-03-01T12:00:00 x\n2024-03-01T12:00:00 y\n2024-03-01T12:00:03 z\n---\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nsecond\n"
+      expected_output: "2024-03-01T12:00:00 2\n2024-03-01T12:00:01 0\n2024-03-01T12:00:02 0\n2024-03-01T12:00:03 1"
   constraints:
     - "Skip lines without matching timestamp"
     - "Include buckets with zero events"
@@ -1846,10 +1954,12 @@
   input_format: "Lines of systemd unit names"
   output_format: "unit: ACTIVE_STATE sub=SUBSTATE pid=N (or pid=- if not running)"
   test_cases:
-    - input: "ssh.service"
-      expected_output: "ssh.service: active sub=running pid=N (or inactive ...)"
-    - input: "nonexistent.service"
-      expected_output: "nonexistent.service: not-found sub=dead pid=-"
+    - input: "ssh.service\nnonexistent.service\n"
+      expected_output: "ssh.service: active sub=running pid=579\nnonexistent.service: not-found sub=dead pid=-"
+    - input: "cron.service\nfoo.bar.baz\n"
+      expected_output: "cron.service: active sub=running pid=391\nfoo.bar.baz: not-found sub=dead pid=-"
+    - input: "systemd-journald.service\n"
+      expected_output: "systemd-journald.service: active sub=running pid=127"
   constraints:
     - "Use systemctl show command"
     - "Graceful on non-systemd systems (report N/A)"
@@ -1894,10 +2004,14 @@
   input_format: "Optional: name filter"
   output_format: "name size_KB use_count (one per module)"
   test_cases:
-    - input: ""
-      expected_output: "(list of loaded modules)"
-    - input: "ext"
-      expected_output: "(modules matching 'ext')"
+    - input: "---\next4 737280 1 - Live 0x0000000000000000\nbtrfs 1245184 0 - Live 0x0000000000000000\nxfs 1564672 2 - Live 0x0000000000000000\nvfat 24576 1 - Live 0x0000000000000000\next2 86016 0 - Live 0x0000000000000000\n"
+      expected_output: "ext4 720 1\nbtrfs 1216 0\nxfs 1528 2\nvfat 24 1\next2 84 0"
+    - input: "ext\n---\next4 737280 1 - Live 0x0000000000000000\nbtrfs 1245184 0 - Live 0x0000000000000000\nxfs 1564672 2 - Live 0x0000000000000000\nvfat 24576 1 - Live 0x0000000000000000\next2 86016 0 - Live 0x0000000000000000\n"
+      expected_output: "ext4 720 1\next2 84 0"
+    - input: "btrfs\n---\next4 737280 1 - Live 0x0000000000000000\nbtrfs 1245184 0 - Live 0x0000000000000000\n"
+      expected_output: "btrfs 1216 0"
+    - input: "xyz\n---\next4 737280 1 - Live 0x0000000000000000\n"
+      expected_output: ""
   constraints:
     - "Read from /proc/modules on Linux"
     - "Graceful on macOS (use kextstat)"
@@ -2047,6 +2161,10 @@
     - "Reject patches beyond file end"
 
 - id: "SYS-129"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/unfixable] The spec requires reading actual system mount state (/proc/mounts or mount command), which is non-deterministic across environments and depends on system state "
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Mount Point Analyser"
   description: "List all mount points, their filesystem type, options, and read/write status."
   difficulty: 2

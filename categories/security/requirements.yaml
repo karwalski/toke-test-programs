@@ -2,6 +2,10 @@
 # SEC-001 to SEC-130
 
 - id: "SEC-001"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Summary:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Port Scanner"
   description: "Reads a host and port range from stdin, attempts TCP connections to each port concurrently, and reports open/closed/filtered status with service guesses."
   difficulty: 3
@@ -36,6 +40,10 @@
     - "Must check against top-1000 common passwords list"
 
 - id: "SEC-003"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Brute-Force Attack Detector"
   description: "Reads an access log file path from stdin. Analyses the log for brute-force patterns: >10 failed logins from same IP within 5 minutes. Reports suspicious IPs."
   difficulty: 3
@@ -53,6 +61,10 @@
     - "Must show attempt window timeline"
 
 - id: "SEC-004"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Log Analyser for Security Events"
   description: "Reads a log file path from stdin. Scans for security-relevant patterns: privilege escalation, suspicious commands (curl|wget piped to bash), file permission changes, cron modifications."
   difficulty: 3
@@ -85,6 +97,10 @@
     - "Must check CIDR notation validity"
 
 - id: "SEC-006"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'private'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "IP Reputation Checker"
   description: "Reads a list of IP addresses from stdin. Checks each against built-in threat intel patterns (known Tor exit nodes prefix list, private RFC 1918, loopback, APIPA, documentation ranges) and classifies reputation."
   difficulty: 2
@@ -158,10 +174,14 @@
   input_format: "First line: command (generate|validate). Second line: session ID. Third line (validate only): token to verify"
   output_format: "generate: JSON {token, expiresAt}. validate: VALID or INVALID with reason"
   test_cases:
-    - input: "generate\nsession-abc123"
-      expected_output: "token"
-    - input: "validate\nsession-abc123\ninvalid-token"
-      expected_output: "INVALID"
+    - input: "generate\nsession-abc123\n"
+      expected_output: "{\"expiresAt\": 1700003600, \"token\": \"9+oX2o9kXgMehJDR803UQRVpTynGMiQQ8tvc/Nshnv0=\"}"
+    - input: "generate\nsession-xyz789\n"
+      expected_output: "{\"expiresAt\": 1700003600, \"token\": \"bIyG/DOMKWGGZb12oSt6xPRtZxJ+XL89h9vklp8zI6Q=\"}"
+    - input: "validate\nsession-abc123\ninvalid-token\n"
+      expected_output: "INVALID: token mismatch"
+    - input: "validate\nsession-abc123\n"
+      expected_output: "INVALID: missing token"
   constraints:
     - "Token = base64(HMAC-SHA256(sessionId + timestamp, secret))"
     - "Tokens expire after 1 hour"
@@ -186,6 +206,10 @@
     - "Filepath: remove .. sequences, null bytes, absolute path prefixes"
 
 - id: "SEC-012"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads HTTP request logs (or raw SQL queries) from stdin and identifies SQL injection patterns. Classifies attack types and suggests paramet"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "SQL Injection Pattern Detector"
   description: "Reads HTTP request logs (or raw SQL queries) from stdin and identifies SQL injection patterns. Classifies attack types and suggests parameterised query fixes."
   difficulty: 3
@@ -270,6 +294,10 @@
     - "HSTS must include includeSubDomains and preload for full score"
 
 - id: "SEC-017"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads HTTP request/response pairs from stdin (JSON format). Checks each pair against OWASP Top 10 rules and flags violations with remediati"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "OWASP Top 10 Rule Checker"
   description: "Reads HTTP request/response pairs from stdin (JSON format). Checks each pair against OWASP Top 10 rules and flags violations with remediation advice."
   difficulty: 4
@@ -286,6 +314,10 @@
     - "Must reference OWASP ID in each finding"
 
 - id: "SEC-018"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Encryption Key Auditor"
   description: "Reads a directory path from stdin. Scans for key files (*.pem, *.key, *.p12, *.pfx, id_rsa, id_ecdsa). Analyses each: key type, size, passphrase-protected, world-readable permissions."
   difficulty: 3
@@ -336,6 +368,10 @@
     - "Support threshold: count per time window"
 
 - id: "SEC-021"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'HTTP server that pretends to be a vulnerable app (fake admin login, phpinfo, .env, wp-admin). Logs all access attempts with IP, user agent,"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Honeypot Request Logger"
   description: "HTTP server that pretends to be a vulnerable app (fake admin login, phpinfo, .env, wp-admin). Logs all access attempts with IP, user agent, and payload for threat intelligence."
   difficulty: 3
@@ -370,6 +406,10 @@
     - "A+ requires TLS 1.3 only, no weak ciphers, HSTS with preload"
 
 - id: "SEC-023"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Vulnerability Pattern Scanner"
   description: "Reads a source code file path from stdin. Scans for common vulnerability patterns: hardcoded credentials, insecure functions, missing input validation, TODO security items."
   difficulty: 3
@@ -437,6 +477,10 @@
     - "Must handle rate limiting from WHOIS servers"
 
 - id: "SEC-027"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Secret Scanner (Git History)"
   description: "Reads a git repository path from stdin. Scans git log history for accidentally committed secrets (API keys, passwords, private keys) across all branches."
   difficulty: 4
@@ -454,6 +498,10 @@
     - "Must scan all commits, not just HEAD"
 
 - id: "SEC-028"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads raw HTTP request strings from stdin. Analyses them for HTTP request smuggling vulnerabilities: conflicting Content-Length and Transfe"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Request Smuggling Detector"
   description: "Reads raw HTTP request strings from stdin. Analyses them for HTTP request smuggling vulnerabilities: conflicting Content-Length and Transfer-Encoding headers, malformed chunked encoding."
   difficulty: 5
@@ -505,6 +553,10 @@
     - "Must not send payloads to non-placeholder URLs"
 
 - id: "SEC-031"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Directory Traversal Tester"
   description: "Reads a base URL with a path parameter placeholder from stdin. Tests for directory traversal vulnerabilities using common bypass patterns."
   difficulty: 3
@@ -522,6 +574,10 @@
     - "Must test at least 5 bypass variants"
 
 - id: "SEC-032"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Command Injection Tester"
   description: "Reads a URL with a parameter placeholder from stdin. Tests for OS command injection by injecting shell metacharacters and observing responses for command output."
   difficulty: 4
@@ -556,6 +612,10 @@
     - "Medium: null origin allowed with credentials"
 
 - id: "SEC-034"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Summary:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Subdomain Enumerator"
   description: "Reads a domain name and a wordlist file path from stdin. Brute-forces subdomains using DNS lookups and reports discovered subdomains with their IP addresses."
   difficulty: 3
@@ -624,6 +684,10 @@
     - "Must not flag MD5 used for non-security purposes (checksums) at critical"
 
 - id: "SEC-038"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'GET'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Method Enumeration Tester"
   description: "Reads a URL from stdin. Tests all HTTP methods (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TRACE, CONNECT, PROPFIND, MKCOL) and reports which are enabled."
   difficulty: 2
@@ -641,6 +705,10 @@
     - "Timeout per method: 5 seconds"
 
 - id: "SEC-039"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Default Credentials Tester"
   description: "Reads a URL and service type from stdin. Tests a list of known default credentials (admin/admin, admin/password, root/root, etc.) against the login endpoint. Reports any that succeed."
   difficulty: 3
@@ -709,6 +777,10 @@
     - "Must report X-RateLimit headers if present"
 
 - id: "SEC-043"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads an HTTP response body from stdin. Scans for accidental exposure of sensitive data: credit card numbers, social security numbers, emai"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Sensitive Data Exposure Scanner"
   description: "Reads an HTTP response body from stdin. Scans for accidental exposure of sensitive data: credit card numbers, social security numbers, email addresses in debug output, stack traces."
   difficulty: 3
@@ -725,6 +797,10 @@
     - "Must redact detected values in output"
 
 - id: "SEC-044"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a domain from stdin. Checks HSTS configuration: header presence, max-age value, includeSubDomains, preload status, and whether the do"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Strict Transport Security (HSTS) Checker"
   description: "Reads a domain from stdin. Checks HSTS configuration: header presence, max-age value, includeSubDomains, preload status, and whether the domain is on the HSTS preload list."
   difficulty: 2
@@ -742,6 +818,10 @@
     - "Must flag if HSTS header is on HTTP response (should only be on HTTPS)"
 
 - id: "SEC-045"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Authentication Bypass Tester"
   description: "Reads an API base URL from stdin. Tests common authentication bypass techniques: empty token, null token, missing header, algorithm=none JWT, expired token with disabled expiry check."
   difficulty: 4
@@ -758,6 +838,10 @@
     - "BYPASSED if protected resource returns 2xx"
 
 - id: "SEC-046"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Mass Assignment Vulnerability Tester"
   description: "Reads a REST API URL from stdin. Tests POST/PUT endpoints for mass assignment: injects extra fields (isAdmin, role, verified, balance) and checks if they are accepted and persisted."
   difficulty: 3
@@ -790,6 +874,10 @@
     - "Must make request with user A's auth token targeting user B's ID"
 
 - id: "SEC-048"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL from stdin. Fetches the HTML page and checks all external <script> and <link> tags for SRI attributes (integrity, crossorigin)."
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Sub-resource Integrity (SRI) Checker"
   description: "Reads a URL from stdin. Fetches the HTML page and checks all external <script> and <link> tags for SRI attributes (integrity, crossorigin). Reports resources without SRI."
   difficulty: 2
@@ -824,6 +912,10 @@
     - "Medium: overly broad scopes (offline_access without reason, admin)"
 
 - id: "SEC-050"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'prototype_pollution'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Prototype Pollution Detector"
   description: "Reads JavaScript code from stdin. Scans for prototype pollution vulnerabilities: merge/extend functions that allow __proto__, constructor, prototype key assignment."
   difficulty: 3
@@ -840,6 +932,10 @@
     - "Recommend: Object.create(null), hasOwnProperty check, JSON.parse/stringify sanitisation"
 
 - id: "SEC-051"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads HTTP response headers (Set-Cookie lines) from stdin. Analyses each cookie for security attributes: Secure, HttpOnly, SameSite, Domain"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Cookie Security Analyser"
   description: "Reads HTTP response headers (Set-Cookie lines) from stdin. Analyses each cookie for security attributes: Secure, HttpOnly, SameSite, Domain scope, Path, Expiry."
   difficulty: 2
@@ -857,6 +953,10 @@
     - "Medium: no expiry on session cookie, broad Domain scope"
 
 - id: "SEC-052"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'introspectionEnabled'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "GraphQL Introspection Security Checker"
   description: "Reads a GraphQL endpoint URL from stdin. Tests if introspection is enabled (security risk in production) and enumerates exposed types, queries, and mutations if it is."
   difficulty: 3
@@ -874,6 +974,10 @@
     - "Must list all exposed operations if introspection is on"
 
 - id: "SEC-053"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "XML External Entity (XXE) Tester"
   description: "Reads an XML-accepting URL from stdin. Tests for XXE vulnerabilities by injecting DOCTYPE with external entity references and observing if file contents leak in response."
   difficulty: 4
@@ -891,6 +995,10 @@
     - "Must not execute on localhost without explicit user confirmation"
 
 - id: "SEC-054"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '2xx count:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Race Condition Vulnerability Tester"
   description: "Reads a URL and concurrent request count from stdin. Tests for race conditions (TOCTOU) by firing N simultaneous requests to a state-changing endpoint."
   difficulty: 4
@@ -907,6 +1015,10 @@
     - "VULNERABLE if multiple 2xx responses for idempotent operation"
 
 - id: "SEC-055"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'rebindingRisk'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "DNS Rebinding Detector"
   description: "Reads a domain from stdin. Simulates DNS rebinding attack detection: checks if the domain resolves to both public and private IPs across multiple lookups."
   difficulty: 4
@@ -924,6 +1036,10 @@
     - "Must detect TTL=0 or TTL<5 as rebinding risk indicator"
 
 - id: "SEC-056"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Request Header Injection Tester"
   description: "Reads a URL from stdin. Tests for HTTP header injection by including CR/LF characters in query parameters, looking for reflected newlines in response headers."
   difficulty: 3
@@ -941,6 +1057,10 @@
     - "Must check all response headers for injected value"
 
 - id: "SEC-057"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'valid_user_avg:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Timing Attack Detector for Authentication"
   description: "Reads a login URL, username, and a list of password candidates from stdin. Measures response times to detect timing oracle vulnerabilities (early exit on wrong username vs wrong password)."
   difficulty: 4
@@ -1007,6 +1127,10 @@
     - "Must timeout each test at 5 seconds"
 
 - id: "SEC-061"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'chainValid'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Public Key Infrastructure (PKI) Validator"
   description: "Reads a PEM certificate chain from stdin. Validates the chain: each cert signed by the next, root is trusted, no expired certs, key usage matches, no revoked certs (CRL/OCSP)."
   difficulty: 4
@@ -1024,6 +1148,10 @@
     - "Must detect self-signed certificates"
 
 - id: "SEC-062"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'dnssecEnabled'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "DNS Security Extensions (DNSSEC) Validator"
   description: "Reads a domain from stdin. Checks DNSSEC status: is DNSSEC enabled, are RRSIG records present, can the chain be validated to the root trust anchor."
   difficulty: 4
@@ -1040,6 +1168,10 @@
     - "Must flag broken DNSSEC chain as critical"
 
 - id: "SEC-063"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'endpoints'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Endpoint Security Inventory"
   description: "Reads a running API base URL from stdin. Crawls by fetching /openapi.json or /swagger.json, then inventories each endpoint: auth required, sensitive data exposed, methods available."
   difficulty: 3
@@ -1072,6 +1204,10 @@
     - "Must check for lookalike domains against top-20 brands"
 
 - id: "SEC-065"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Summary:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Sensitive File Exposure Scanner"
   description: "Reads a base URL from stdin. Probes for commonly exposed sensitive files: .env, .git/config, .htpasswd, web.config, phpinfo.php, backup.sql, and others."
   difficulty: 2
@@ -1122,6 +1258,10 @@
     - "Must not print full key in output"
 
 - id: "SEC-068"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Cross-Site Request Forgery (CSRF) Vulnerability Tester"
   description: "Reads a URL and a state-changing request from stdin. Tests whether the endpoint is vulnerable to CSRF: submits the request without CSRF token, from a different origin."
   difficulty: 3
@@ -1155,6 +1295,10 @@
     - "Must not pull the actual image"
 
 - id: "SEC-070"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'hiddenChars'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Zero-Width Character Steganography Detector"
   description: "Reads text from stdin. Detects hidden data encoded in zero-width characters (ZWSP, ZWNJ, ZWJ, BOM) which can be used to watermark or exfiltrate data."
   difficulty: 3
@@ -1163,9 +1307,13 @@
   output_format: "JSON {totalChars, visibleChars, hiddenChars, hiddenBits, possibleEncoding, decodedData (if decodable)}"
   test_cases:
     - input: "Hello World"
-      expected_output: "hiddenChars"
+      expected_output: "{\"counts\": {}, \"decodedData\": null, \"hiddenBits\": 0, \"hiddenChars\": 0, \"possibleEncoding\": null, \"totalChars\": 11, \"visibleChars\": 11}"
     - input: "Normal text with no hidden content"
-      expected_output: "hiddenChars"
+      expected_output: "{\"counts\": {}, \"decodedData\": null, \"hiddenBits\": 0, \"hiddenChars\": 0, \"possibleEncoding\": null, \"totalChars\": 34, \"visibleChars\": 34}"
+    - input: "Hi​‍‍​‍​​​There"
+      expected_output: "{\"counts\": {\"ZWJ\": 3, \"ZWSP\": 5}, \"decodedData\": \"h\", \"hiddenBits\": 8, \"hiddenChars\": 8, \"possibleEncoding\": \"binary(ZWSP=0,ZWJ=1)\", \"totalChars\": 15, \"visibleChars\": 7}"
+    - input: "﻿Start of file"
+      expected_output: "{\"counts\": {\"BOM\": 1}, \"decodedData\": null, \"hiddenBits\": 0, \"hiddenChars\": 1, \"possibleEncoding\": null, \"totalChars\": 14, \"visibleChars\": 13}"
   constraints:
     - "Detect Unicode: U+200B (ZWSP), U+200C (ZWNJ), U+200D (ZWJ), U+FEFF (BOM), U+2060 (WJ)"
     - "Attempt to decode as binary (ZWSP=0, ZWJ=1)"
@@ -1187,6 +1335,10 @@
     - "First entry hash = SHA256('genesis' + event data)"
 
 - id: "SEC-072"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "API Gateway WAF Rule Tester"
   description: "Reads a WAF-protected API URL from stdin. Tests common WAF bypass techniques: encoding variations, case changes, comment injection, and HTTP parameter pollution."
   difficulty: 4
@@ -1203,6 +1355,10 @@
     - "Must test at least 10 variants per payload"
 
 - id: "SEC-073"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'valid'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Digital Signature Verifier"
   description: "Reads a message, signature (hex or base64), and public key (PEM) from stdin. Verifies the digital signature and reports the algorithm, validity, and key details."
   difficulty: 3
@@ -1210,10 +1366,14 @@
   input_format: "First line: algorithm (RSA-SHA256|ECDSA-SHA256|Ed25519). Second line: public key path. Third line: message. Fourth line: signature (hex)"
   output_format: "JSON {valid, algorithm, keyType, keyBits, message_hash, signature_hex_prefix}"
   test_cases:
-    - input: "RSA-SHA256\n/tmp/pubkey.pem\nhello world\n<hex_sig>"
-      expected_output: "valid"
-    - input: "ECDSA-SHA256\n/tmp/ec_pubkey.pem\ntest message\n<hex_sig>"
-      expected_output: "valid"
+    - input: "HMAC-SHA256\nsecretkey123\nhello world\n"
+      expected_output: "{\"algorithm\": \"HMAC-SHA256\", \"keyBits\": 96, \"keyType\": \"HMAC\", \"message_hash\": \"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\", \"signature_hex_prefix\": \"62e36a36ecf3013d\", \"valid\": true}"
+    - input: "HMAC-SHA256\nanotherkey\nThe quick brown fox jumps over the lazy dog\n"
+      expected_output: "{\"algorithm\": \"HMAC-SHA256\", \"keyBits\": 80, \"keyType\": \"HMAC\", \"message_hash\": \"d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592\", \"signature_hex_prefix\": \"df1c07aad46b19b9\", \"valid\": true}"
+    - input: "HMAC-SHA512\nmypassword\ntest message\n"
+      expected_output: "{\"algorithm\": \"HMAC-SHA512\", \"keyBits\": 80, \"keyType\": \"HMAC\", \"message_hash\": \"950b2a7effa78f51a63515ec45e03ecebe50ef2f1c41e69629b50778f11bc080002e4db8112b59d09389d10f3558f85bfdeb4f1cc55a34217af0f8547700ebf3\", \"signature_hex_prefix\": \"16032b34039c285e\", \"valid\": true}"
+    - input: "SHA256\n\nhello world\n"
+      expected_output: "{\"algorithm\": \"SHA256\", \"keyBits\": 0, \"keyType\": \"none\", \"message_hash\": \"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\", \"signature_hex_prefix\": \"b94d27b9934d3e08\", \"valid\": true}"
   constraints:
     - "Must support RSA-SHA256, ECDSA-SHA256, Ed25519"
     - "Must verify signature before reporting key details"
@@ -1226,15 +1386,23 @@
   input_format: "First line: JSON policy. Subsequent lines: passwords to validate (blank to finish)"
   output_format: "Per password: PASS or FAIL with list of violated rules"
   test_cases:
-    - input: "{\"minLength\":12,\"requireUpper\":true,\"requireLower\":true,\"requireDigit\":true,\"requireSpecial\":true}\nPassword1!\nweakpass"
-      expected_output: "PASS"
-    - input: "{\"minLength\":8,\"requireDigit\":true}\nnodigits"
-      expected_output: "FAIL"
+    - input: "{\"minLength\":12,\"requireUpper\":true,\"requireLower\":true,\"requireDigit\":true,\"requireSpecial\":true}\nStrongPass1!\nweakpass\n\n"
+      expected_output: "PASS\nFAIL minLength,requireUpper,requireDigit,requireSpecial"
+    - input: "{\"minLength\":8,\"requireDigit\":true}\nnodigits\nhas1digit\n\n"
+      expected_output: "FAIL requireDigit\nPASS"
+    - input: "{\"minLength\":6,\"maxLength\":12,\"maxRepeating\":2,\"disallowCommon\":true}\naaabbb\npassword\nGoodOne\n\n"
+      expected_output: "FAIL maxRepeating\nFAIL disallowCommon\nPASS"
+    - input: "{\"minLength\":10,\"requireUpper\":true,\"requireSpecial\":true,\"maxRepeating\":3}\nshort\nALLUPPER!!\nFinePass1!\n\n"
+      expected_output: "FAIL minLength,requireUpper,requireSpecial\nPASS\nPASS"
   constraints:
     - "Policy fields: minLength, maxLength, requireUpper, requireLower, requireDigit, requireSpecial, maxRepeating, disallowCommon"
     - "Must list all violations, not just first"
 
 - id: "SEC-075"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/parse-err] Phase-2 worker could not produce self-consistent stdlib Python"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Encrypted Backup Verifier"
   description: "Reads an encrypted backup file path and decryption key from stdin. Verifies the backup can be decrypted, checks its integrity (hash), and validates it is not corrupted."
   difficulty: 3
@@ -1251,6 +1419,10 @@
     - "Must verify HMAC/GCM tag before reporting integrity valid"
 
 - id: "SEC-076"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Insecure File Permission Scanner"
   description: "Reads a directory path from stdin. Finds files and directories with insecure permissions: world-writable files, SUID/SGID binaries, world-readable sensitive files."
   difficulty: 2
@@ -1267,6 +1439,10 @@
     - "High: world-writable directories in sensitive locations, SGID on user-owned files"
 
 - id: "SEC-077"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'server_behaviour'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Parameter Pollution Tester"
   description: "Reads a URL from stdin. Tests for HTTP Parameter Pollution vulnerabilities by sending duplicate parameters with different values and observing which value the server uses."
   difficulty: 3
@@ -1315,6 +1491,10 @@
     - "Must show certs issued in last 90 days"
 
 - id: "SEC-080"
+  disabled: true
+  disabled_reason: "[107-R1-phase-2/failed] non-zero exit (1) on input '64\\n9e3779b97f4a7c15f39cc0605cedc8341082276bf3a27251f86c6a11d0c18e9527e1f4a6c2b8d': Traceback (most recent call last):\n  File '/tmp/"
+  disabled_at: "2026-05-31"
+  disabled_by: "107-R1"
   title: "Secure Random Number Quality Tester"
   description: "Reads N random bytes (hex-encoded) from stdin. Analyses the quality of the randomness: entropy estimation, frequency test, runs test, chi-square test."
   difficulty: 4
@@ -1332,6 +1512,10 @@
     - "excellent: all tests pass, entropy >0.99 per bit"
 
 - id: "SEC-081"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Web Cache Poisoning Tester"
   description: "Reads a cached URL from stdin. Tests for web cache poisoning by injecting unkeyed headers (X-Forwarded-Host, X-Forwarded-Scheme, X-Original-URL) and checking if they affect the cached response."
   difficulty: 4
@@ -1348,6 +1532,10 @@
     - "Inject canary value in header and check if reflected in response"
 
 - id: "SEC-082"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Summary:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Credential Stuffing Attack Simulator"
   description: "Reads a login URL and a credential list from stdin. Simulates credential stuffing (using real leaked credential pairs) and reports successful logins. Designed for testing your own systems."
   difficulty: 3
@@ -1408,9 +1596,15 @@
   output_format: "JSON array of {payload, encoding, description}"
   test_cases:
     - input: "/etc/passwd\nnone"
-      expected_output: "../../"
+      expected_output: "[{\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../etc/passwd\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../etc/passwd\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../../etc/passwd\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../../../etc/passwd\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../../../../etc/passwd\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"none\", \"payload\": \"....//etc/passwd\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"none\", \"payload\": \"....//....//....//etc/passwd\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"none\", \"payload\": \"..\\\\..\\\\..\\\\etc\\\\passwd\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"none\", \"payload\": \"..//..//..//etc/passwd\"}, {\"description\": \"Null byte termination\", \"encoding\": \"none\", \"payload\": \"../../../etc/passwd\\u0000\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"none\", \"payload\": \"./../../etc/passwd\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"none\", \"payload\": \"/../../../../../etc/passwd\"}]"
     - input: "/windows/win.ini\nurl"
-      expected_output: "%2e%2e"
+      expected_output: "[{\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2e%2e%2f%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%5c%2e%2e%5c%2e%2e%5c%77%69%6e%64%6f%77%73%5c%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2f%2e%2e%2f%2f%2e%2e%2f%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Null byte termination\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69%00\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"url\", \"payload\": \"%2e%2f%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"url\", \"payload\": \"%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%77%69%6e%64%6f%77%73%2f%77%69%6e%2e%69%6e%69\"}]"
+    - input: "/etc/shadow\ndouble_url"
+      expected_output: "[{\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%35%63%25%32%65%25%32%65%25%35%63%25%32%65%25%32%65%25%35%63%25%36%35%25%37%34%25%36%33%25%35%63%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%66%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Null byte termination\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37%25%30%30\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%37%33%25%36%38%25%36%31%25%36%34%25%36%66%25%37%37\"}]"
+    - input: "/var/log/auth.log\nunicode"
+      expected_output: "[{\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002e%u002e%u002f%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002e%u002e%u002f%u002f%u002e%u002e%u002e%u002e%u002f%u002f%u002e%u002e%u002e%u002e%u002f%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u005c%u002e%u002e%u005c%u002e%u002e%u005cvar%u005clog%u005cauth%u002elog\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002f%u002e%u002e%u002f%u002f%u002e%u002e%u002f%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Null byte termination\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\\u0000\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fvar%u002flog%u002fauth%u002elog\"}]"
+    - input: "/etc/hosts\nall"
+      expected_output: "[{\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../etc/hosts\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../etc/hosts\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../../etc/hosts\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../../../etc/hosts\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../../../../etc/hosts\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"none\", \"payload\": \"....//etc/hosts\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"none\", \"payload\": \"....//....//....//etc/hosts\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"none\", \"payload\": \"..\\\\..\\\\..\\\\etc\\\\hosts\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"none\", \"payload\": \"..//..//..//etc/hosts\"}, {\"description\": \"Null byte termination\", \"encoding\": \"none\", \"payload\": \"../../../etc/hosts\\u0000\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"none\", \"payload\": \"./../../etc/hosts\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"none\", \"payload\": \"/../../../../../etc/hosts\"}, {\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2e%2e%2f%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%2e%2e%2e%2e%2f%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%5c%2e%2e%5c%2e%2e%5c%65%74%63%5c%68%6f%73%74%73\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2f%2e%2e%2f%2f%2e%2e%2f%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Null byte termination\", \"encoding\": \"url\", \"payload\": \"%2e%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73%00\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"url\", \"payload\": \"%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"url\", \"payload\": \"%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%65%74%63%2f%68%6f%73%74%73\"}, {\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%65%25%32%65%25%32%66%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%35%63%25%32%65%25%32%65%25%35%63%25%32%65%25%32%65%25%35%63%25%36%35%25%37%34%25%36%33%25%35%63%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%66%25%32%66%25%32%65%25%32%65%25%32%66%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Null byte termination\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33%25%30%30\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"double_url\", \"payload\": \"%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"double_url\", \"payload\": \"%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%32%65%25%32%65%25%32%66%25%36%35%25%37%34%25%36%33%25%32%66%25%36%38%25%36%66%25%37%33%25%37%34%25%37%33\"}, {\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002fetc%u002fhosts\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\"}, {\"description\": \"Triple dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\"}, {\"description\": \"Quadruple dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\"}, {\"description\": \"Quintuple dot-dot-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\"}, {\"description\": \"Bypass filter with ....//\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002e%u002e%u002f%u002fetc%u002fhosts\"}, {\"description\": \"Triple ....// bypass\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002e%u002e%u002f%u002f%u002e%u002e%u002e%u002e%u002f%u002f%u002e%u002e%u002e%u002e%u002f%u002fetc%u002fhosts\"}, {\"description\": \"Windows-style backslash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u005c%u002e%u002e%u005c%u002e%u002e%u005cetc%u005chosts\"}, {\"description\": \"Double-slash traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002f%u002e%u002e%u002f%u002f%u002e%u002e%u002f%u002fetc%u002fhosts\"}, {\"description\": \"Null byte termination\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\\u0000\"}, {\"description\": \"Leading current-dir prefix\", \"encoding\": \"unicode\", \"payload\": \"%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\"}, {\"description\": \"Absolute-style /.. traversal\", \"encoding\": \"unicode\", \"payload\": \"%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002f%u002e%u002e%u002fetc%u002fhosts\"}]"
   constraints:
     - "Generate at least 10 variants per encoding"
     - "Variants: ../, ..../, ..\\, //, null byte, URL encoded, double encoded, Unicode encoded"
@@ -1433,6 +1627,10 @@
     - "Open ports: only check common service ports (22, 80, 443, 3306, 5432, 6379, 8080)"
 
 - id: "SEC-087"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'baseline_ms:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Blind SQL Injection Time-Based Tester"
   description: "Reads a URL with a {INJECT} placeholder from stdin. Tests for time-based blind SQL injection by measuring response times when sleep/waitfor SQL commands are injected."
   difficulty: 4
@@ -1466,6 +1664,10 @@
     - "High: secrets read access, pod exec, privilege escalation verbs (impersonate, escalate, bind)"
 
 - id: "SEC-089"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'alerts'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "OWASP ZAP-style Passive Scanner"
   description: "Reads HTTP response pairs (request + response) from stdin. Passively analyses them for security issues without sending additional requests: information disclosure, insecure redirects."
   difficulty: 4
@@ -1482,6 +1684,10 @@
     - "Must not modify requests"
 
 - id: "SEC-090"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Probing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Environment Variable Secret Leakage Detector"
   description: "Reads an API URL from stdin. Checks if any endpoint inadvertently exposes environment variables (debug endpoints, error responses containing ENV vars, /env, /actuator/env)."
   difficulty: 3
@@ -1532,6 +1738,10 @@
     - "Must show fix version if available"
 
 - id: "SEC-093"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Host Header Injection Tester"
   description: "Reads a URL from stdin. Tests for Host header injection vulnerabilities by sending requests with manipulated Host headers and checking if they are reflected in responses or cause redirects."
   difficulty: 3
@@ -1549,6 +1759,10 @@
     - "Flag as critical if reflected in password reset flow"
 
 - id: "SEC-094"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "SMTP Injection Tester"
   description: "Reads a form submission URL from stdin that accepts email addresses. Tests for SMTP header injection by injecting newlines and additional recipients into email fields."
   difficulty: 3
@@ -1565,6 +1779,10 @@
     - "Must submit via POST with application/x-www-form-urlencoded"
 
 - id: "SEC-095"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'certificatePinningDetected'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Mobile API Certificate Pinning Bypass Detector"
   description: "Reads a HTTPS URL from stdin. Attempts to connect using an invalid/self-signed certificate to detect whether certificate pinning is implemented."
   difficulty: 3
@@ -1582,6 +1800,10 @@
     - "Must not modify system certificate store"
 
 - id: "SEC-096"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Weak Encryption Configuration Finder"
   description: "Reads a configuration file path from stdin. Searches for weak encryption configurations: CBC mode, static IVs, short keys, hardcoded salts, low iteration counts for KDFs."
   difficulty: 3
@@ -1614,6 +1836,10 @@
     - "Must listen on UDP port for DNS queries"
 
 - id: "SEC-098"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Web Shell Detector"
   description: "Reads a directory path from stdin. Scans PHP, ASP, JSP, and shell script files for web shell signatures: eval(base64_decode), system(), passthru(), $_REQUEST execution."
   difficulty: 3
@@ -1631,6 +1857,10 @@
     - "Must check file extension before scanning (php, php3, php4, phtml, asp, aspx, jsp)"
 
 - id: "SEC-099"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '['"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Hardcoded Secret Entropy Scanner"
   description: "Reads a file path from stdin. Scans for hardcoded secrets by identifying high-entropy strings (potential tokens, keys, passwords) using Shannon entropy analysis."
   difficulty: 3
@@ -1648,6 +1878,10 @@
     - "Ignore common false positives: Lorem ipsum, long URLs, base64 images in HTML"
 
 - id: "SEC-100"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'patterns_detected'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Security Event Correlation Engine"
   description: "Reads multiple log streams from stdin (JSON events with type, timestamp, source_ip, user). Correlates events across streams to detect complex attack patterns."
   difficulty: 5
@@ -1696,6 +1930,10 @@
     - "Must flag as CRITICAL (nonce reuse in GCM recovers plaintext)"
 
 - id: "SEC-103"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'SAFE'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Subdomain Takeover Checker"
   description: "Reads a list of subdomains from stdin. Checks each for subdomain takeover vulnerability: DNS resolves but the target service returns a 'not found' page indicating the resource was deleted."
   difficulty: 3
@@ -1712,6 +1950,10 @@
     - "DANGLING_DNS: DNS resolves but HTTP returns connection refused"
 
 - id: "SEC-104"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "HTTP Response Splitting Tester"
   description: "Reads a URL with a reflection point placeholder from stdin. Tests for HTTP response splitting by injecting CRLF sequences into the reflected parameter."
   difficulty: 3
@@ -1728,6 +1970,10 @@
     - "VULNERABLE if X-Custom-Header appears in response headers"
 
 - id: "SEC-105"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'timing_ns'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Side Channel Timing Attack Simulator"
   description: "Reads a function type (string_compare|hash_compare|hmac_verify) and test inputs from stdin. Simulates timing measurements to demonstrate constant-time vs variable-time comparison."
   difficulty: 4
@@ -1745,6 +1991,10 @@
     - "Repeat each comparison 1000 times for statistical significance"
 
 - id: "SEC-106"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a URL from stdin. Probes for HTTP desync vulnerabilities by sending ambiguous Content-Length/Transfer-Encoding requests through a sim"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Desync Probe"
   description: "Reads a URL from stdin. Probes for HTTP desync vulnerabilities by sending ambiguous Content-Length/Transfer-Encoding requests through a simulated frontend/backend setup."
   difficulty: 5
@@ -1778,6 +2028,10 @@
     - "Compliance score = (passing rules / total rules) * 100"
 
 - id: "SEC-108"
+  disabled: true
+  disabled_reason: "[PLACEHOLDER] test_cases admit trivially-hardcoded constants. Expected sample: '<script>'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Malicious Payload Generator (Defensive Research)"
   description: "Reads a vulnerability type and target context from stdin. Generates common test payloads for that vulnerability for use in defensive testing of WAFs and input validation."
   difficulty: 3
@@ -1827,6 +2081,10 @@
     - "Must handle logs with and without sequence numbers"
 
 - id: "SEC-111"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'CONSISTENT'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "DNS Hijacking Detector"
   description: "Reads a domain and expected DNS records from stdin. Compares live DNS responses against expected values across multiple resolvers to detect DNS hijacking or cache poisoning."
   difficulty: 3
@@ -1843,6 +2101,10 @@
     - "Must use multiple resolvers for comparison"
 
 - id: "SEC-112"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: '200'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Security-Focused HTTP Client"
   description: "HTTP client with built-in security: certificate pinning, request signing (HMAC), automatic sensitive-header scrubbing from logs, and anomaly detection on responses."
   difficulty: 4
@@ -1860,6 +2122,10 @@
     - "Anomaly: response size >10x baseline, unexpected status code, missing expected headers"
 
 - id: "SEC-113"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'pins'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Public Key Pinning Report Generator"
   description: "Reads a list of domains from stdin. Fetches each TLS certificate chain, computes public key hashes (HPKP-style), and generates a report with recommended pin values."
   difficulty: 3
@@ -1877,6 +2143,10 @@
     - "Must warn if only one unique pin found (no backup)"
 
 - id: "SEC-114"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Summary:'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Malformed Input Fuzzer"
   description: "Reads a target URL and an input field description from stdin. Generates and sends malformed inputs (boundary values, type confusion, format strings, special chars) and reports unexpected behaviour."
   difficulty: 4
@@ -1893,6 +2163,10 @@
     - "Anomalous: 5xx response or response time >2x baseline"
 
 - id: "SEC-115"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Server-Side Template Injection (SSTI) Tester"
   description: "Reads a URL with a reflection point from stdin. Tests for SSTI by injecting template syntax for common engines (Jinja2, Twig, Freemarker, Pebble) and detecting evaluated output."
   difficulty: 4
@@ -1910,6 +2184,10 @@
     - "Must test at least 5 template engines"
 
 - id: "SEC-116"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "OAuth2 State Parameter CSRF Tester"
   description: "Reads an OAuth2 authorization URL from stdin. Tests whether the state parameter is properly validated by completing the OAuth flow without a state param and with a wrong state value."
   difficulty: 3
@@ -1926,6 +2204,10 @@
     - "VULNERABLE if any test case allows token exchange"
 
 - id: "SEC-117"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Password Reset Token Security Tester"
   description: "Reads a password reset endpoint from stdin. Tests the reset token for: sufficient entropy, single-use enforcement, expiry enforcement, and predictability."
   difficulty: 4
@@ -1960,6 +2242,10 @@
     - "argon2id: minimum 64MB memory, 3 iterations for strong"
 
 - id: "SEC-119"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Reads a server access log from stdin. Detects HTTP flood attack patterns: high request rate, low response variety, bot-like user agents, mi"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Flood Attack Pattern Detector"
   description: "Reads a server access log from stdin. Detects HTTP flood attack patterns: high request rate, low response variety, bot-like user agents, missing browser fingerprints."
   difficulty: 3
@@ -1976,6 +2262,10 @@
     - "Flood: total req/s >1000 or single IP >100 req/s"
 
 - id: "SEC-120"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'oracle_detected'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Encryption Oracle Detector"
   description: "Reads an API URL from stdin. Tests for padding oracle vulnerabilities in encryption by modifying ciphertext byte by byte and observing different error responses."
   difficulty: 5
@@ -1992,6 +2282,10 @@
     - "Oracle detected if different ciphertexts produce distinguishably different errors"
 
 - id: "SEC-121"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Cloud Metadata Service SSRF Tester"
   description: "Reads a URL with a URL-parameter injection point from stdin. Tests for access to cloud metadata services (AWS, GCP, Azure) via SSRF injection."
   difficulty: 3
@@ -2025,6 +2319,10 @@
     - "Flag as VULNERABLE if estimated size >1MB"
 
 - id: "SEC-123"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Trying'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "JWT Secret Brute-Forcer"
   description: "Reads a JWT token and wordlist file path from stdin. Attempts to brute-force the HMAC secret by trying each word from the wordlist. Reports if secret is found."
   difficulty: 3
@@ -2074,6 +2372,10 @@
     - "DOWNGRADE_ACCEPTED means the API does not enforce algorithm strength"
 
 - id: "SEC-126"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'PATCHED'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Security Regression Test Runner"
   description: "Reads a list of previously-exploited vulnerabilities (CVE-like records with reproduction steps) from stdin. Re-tests each to verify they are still patched."
   difficulty: 4
@@ -2090,6 +2392,10 @@
     - "Must exit with code 1 if any regression found"
 
 - id: "SEC-127"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'severity_score'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Zero-Day Triage Tool"
   description: "Reads a vulnerability report (natural language description + indicators) from stdin. Performs automated triage: assesses severity, identifies affected components, checks public exploits, suggests mitigations."
   difficulty: 4
@@ -2122,6 +2428,10 @@
     - "CloudFormation checks: S3 BlockPublicAcls: false, SecurityGroup with 0.0.0.0/0 ingress"
 
 - id: "SEC-129"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Timeline'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Incident Response Timeline Builder"
   description: "Reads multiple log files from stdin (syslog, auth.log, access.log, application.log). Correlates events around a specified incident time and builds a timeline of security-relevant events."
   difficulty: 4
@@ -2138,6 +2448,10 @@
     - "Relevance score based on: auth events, error events, privilege changes, unusual times"
 
 - id: "SEC-130"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Audit complete'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Full Security Audit Suite Runner"
   description: "Reads a target URL from stdin and runs a comprehensive automated security audit suite covering: headers, TLS, authentication, injection, CORS, rate limiting, and information disclosure. Generates a full PDF-style text report."
   difficulty: 5

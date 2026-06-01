@@ -32,6 +32,10 @@
   constraints: ["REST API pattern", "JSON in/out", "JWT token format"]
 
 - id: "SOC-003"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Fetch a user profile by user ID, returning public profile information.' 'stdout: JSON response with user profile fields' 'User profile retr"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "User profile retrieval"
   description: "Fetch a user profile by user ID, returning public profile information."
   difficulty: 1

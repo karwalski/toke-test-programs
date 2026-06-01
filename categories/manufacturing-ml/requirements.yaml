@@ -261,8 +261,14 @@
   input_format: "stdin: CSV with multiple feature columns and target column"
   output_format: "stdout: JSON with coefficients array, intercept, r_squared"
   test_cases:
-    - input: "temp,pressure,quality\n100,50,85\n110,55,90\n120,60,95\n130,65,100"
-      expected_output: '{"coefficients":[0.33,0.33],"intercept":35.0,"r_squared":1.0}'
+    - input: "temp,pressure,quality\n100,50,85\n110,60,92\n120,55,95\n130,70,103\n"
+      expected_output: "{\"coefficients\": [0.4315, 0.2519], \"intercept\": 29.3333, \"r_squared\": 0.9999}"
+    - input: "x1,x2,x3,y\n1,2,3,10\n2,1,4,12\n3,3,2,15\n4,2,1,16\n5,5,5,25\n"
+      expected_output: "{\"coefficients\": [2.5467, 1.1042, 0.8037], \"intercept\": 2.678, \"r_squared\": 0.9992}"
+    - input: "a,b,target\n0,0,1\n1,0,3\n0,1,4\n1,1,6\n2,1,8\n"
+      expected_output: "{\"coefficients\": [2.0, 3.0], \"intercept\": 1.0, \"r_squared\": 1.0}"
+    - input: "f1,f2,f3,out\n1,1,1,6\n2,3,1,11\n3,2,4,17\n4,5,2,21\n5,1,3,16\n6,4,5,28\n7,2,1,17\n"
+      expected_output: "{\"coefficients\": [1.5387, 2.0954, 2.0765], \"intercept\": -0.0143, \"r_squared\": 0.9989}"
   constraints: ["ordinary least squares", "report all coefficients"]
 
 - id: "MFG-023"
@@ -1413,8 +1419,12 @@
   input_format: "stdin: CSV with multiple process columns and defect_rate column"
   output_format: "stdout: JSON with correlations ranked and likely_root_cause"
   test_cases:
-    - input: "temp,humidity,speed,defect_rate\n100,50,10,2\n105,51,10,4\n110,50,11,6\n115,52,10,8"
-      expected_output: '{"correlations":[{"variable":"temp","r":0.99},{"variable":"speed","r":0.45},{"variable":"humidity","r":0.63}],"likely_root_cause":"temp"}'
+    - input: "temp,humidity,speed,defect_rate\n100,50,10,2\n105,51,10,4\n110,50,11,6\n115,52,10,8\n"
+      expected_output: "{\"correlations\": [{\"variable\": \"temp\", \"r\": 1.0}, {\"variable\": \"humidity\", \"r\": 0.67}, {\"variable\": \"speed\", \"r\": 0.26}], \"likely_root_cause\": \"temp\"}"
+    - input: "pressure,flow,vibration,defect_rate\n10,5,1,1\n20,5,2,2\n30,5,3,3\n40,5,4,4\n50,5,5,5\n"
+      expected_output: "{\"correlations\": [{\"variable\": \"pressure\", \"r\": 1.0}, {\"variable\": \"vibration\", \"r\": 1.0}, {\"variable\": \"flow\", \"r\": 0.0}], \"likely_root_cause\": \"pressure\"}"
+    - input: "a,b,c,defect_rate\n1,10,5,3\n2,9,6,5\n3,8,7,4\n4,7,8,6\n5,6,9,8\n"
+      expected_output: "{\"correlations\": [{\"variable\": \"a\", \"r\": 0.9}, {\"variable\": \"b\", \"r\": -0.9}, {\"variable\": \"c\", \"r\": 0.9}], \"likely_root_cause\": \"a\"}"
   constraints: ["absolute correlation", "root cause = highest |r|"]
 
 - id: "MFG-119"

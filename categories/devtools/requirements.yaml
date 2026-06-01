@@ -83,6 +83,10 @@
   constraints: ["Run command with input piped to stdin", "Compare stdout with expected_output", "Trim trailing whitespace from output"]
 
 - id: "DEV-007"
+  disabled: true
+  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'min: Nms\\nmax: Nms\\nmean: Nms\\nstddev: Nms'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R7-trivial-test-cases"
   title: "Benchmark Harness"
   description: "Runs a command N times and reports timing statistics"
   difficulty: 3
@@ -580,10 +584,14 @@
   input_format: "First line: min_lines threshold. Remaining: file paths"
   output_format: "Duplicate blocks listed with file locations"
   test_cases:
-    - input: "3\n/tmp/a.py\n/tmp/b.py"
-      expected_output: "Duplicate block (3 lines):\n  /tmp/a.py:5\n  /tmp/b.py:10"
-    - input: "5\n/tmp/unique.py"
+    - input: "3\n---FILE: a.py---\ndef foo():\n    x = 1\n    y = 2\n    z = 3\n    return x + y + z\n\ndef bar():\n    pass\n---FILE: b.py---\ndef other():\n    print('hi')\n    x = 1\n    y = 2\n    z = 3\n    return x + y + z\n"
+      expected_output: "Duplicate block (4 lines):\n  a.py:2\n  b.py:3"
+    - input: "5\n---FILE: unique.py---\ndef solo():\n    a = 1\n    b = 2\n    return a + b\n"
       expected_output: "No duplicates found"
+    - input: "2\n---FILE: x.py---\n# comment\na = 1\nb = 2\n\nc = 3\n---FILE: y.py---\n# different comment\na = 1\nb = 2\nd = 4\n"
+      expected_output: "Duplicate block (2 lines):\n  x.py:2\n  y.py:2"
+    - input: "4\n---FILE: p.py---\nimport os\nimport sys\nx = 10\ny = 20\nz = 30\n# end\n---FILE: q.py---\n# header\nimport os\nimport sys\nx = 10\ny = 20\nz = 30\n"
+      expected_output: "Duplicate block (5 lines):\n  p.py:1\n  q.py:2"
   constraints: ["Exact line matching only (no fuzzy)", "Ignore blank lines and comment-only lines", "Minimum block size = min_lines"]
 
 - id: "DEV-043"
@@ -678,10 +686,12 @@
   input_format: "First line: language. Remaining: file paths"
   output_format: "Lines of 'file: N% comments (N comment / N code lines)'"
   test_cases:
-    - input: "python\n/tmp/example.py"
-      expected_output: "/tmp/example.py: 25% comments (5 comment / 20 code lines)"
-    - input: "go\n/tmp/main.go"
-      expected_output: "/tmp/main.go: 10% comments (2 comment / 18 code lines)"
+    - input: "python\n/tmp/dev049_example.py\n"
+      expected_output: "/tmp/dev049_example.py: 24% comments (5 comment / 16 code lines)"
+    - input: "go\n/tmp/dev049_main.go\n"
+      expected_output: "/tmp/dev049_main.go: 11% comments (2 comment / 17 code lines)"
+    - input: "python\n/tmp/dev049_small.py\n"
+      expected_output: "/tmp/dev049_small.py: 40% comments (2 comment / 3 code lines)"
   constraints: ["Python: # lines", "Go: // and /* */ lines", "Skip blank lines in both counts", "Percentage = comment_lines / (comment_lines + code_lines) * 100"]
 
 - id: "DEV-050"
@@ -811,6 +821,10 @@
   constraints: ["Support *, */N, ranges (N-M), lists (N,M), specific values", "Five-field standard cron only"]
 
 - id: "DEV-059"
+  disabled: true
+  disabled_reason: "[requires-network] auto-flagged from spec scan: 'Looks up HTTP status codes and returns their meaning and category' 'Lines of 'code: message (category)'' 'HTTP Status Code Reference'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "HTTP Status Code Reference"
   description: "Looks up HTTP status codes and returns their meaning and category"
   difficulty: 1
@@ -930,10 +944,12 @@
   input_format: "One file path per line on stdin"
   output_format: "Lines of 'ext: N files, X KB' sorted by file count descending"
   test_cases:
-    - input: "/tmp/a.go\n/tmp/b.go\n/tmp/c.py"
-      expected_output: "go: 2 files, N KB\npy: 1 files, N KB"
-    - input: "/tmp/README.md"
-      expected_output: "md: 1 files, N KB"
+    - input: "/tmp/devo67_a.go\n/tmp/devo67_b.go\n/tmp/devo67_c.py\n"
+      expected_output: "go: 2 files, 0.04 KB\npy: 1 files, 0.01 KB"
+    - input: "/tmp/devo67_README.md\n"
+      expected_output: "md: 1 files, 0.01 KB"
+    - input: "/tmp/devo67_noext\n/tmp/devo67_x.PY\n/tmp/devo67_y.py\n"
+      expected_output: "py: 2 files, 0.24 KB\nno-ext: 1 files, 0.10 KB"
   constraints: ["Group by extension (lowercase)", "Report size in KB rounded to 2 decimal places", "Files without extension: group as 'no-ext'"]
 
 - id: "DEV-068"
@@ -1021,6 +1037,10 @@
   constraints: ["├── for non-last sibling", "└── for last sibling", "│   for continuation lines", "Sort siblings alphabetically"]
 
 - id: "DEV-074"
+  disabled: true
+  disabled_reason: "[requires-llm] auto-flagged from spec scan: 'Counts approximate GPT-style tokens in text for LLM context estimation' 'Lines: 'chars: N', 'words: N', 'approx_tokens: N'' 'Token Counter'"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R2-spec-scan"
   title: "Token Counter"
   description: "Counts approximate GPT-style tokens in text for LLM context estimation"
   difficulty: 2
@@ -1771,9 +1791,15 @@
   input_format: "First line: JSON {dependencies: {pkg: ver}}. Second line: source directory path"
   output_format: "Lines of 'UNUSED: package' sorted alphabetically, or 'ALL DEPENDENCIES USED'"
   test_cases:
-    - input: "{\"dependencies\":{\"express\":\"4.18.0\",\"lodash\":\"4.17.21\"}}\n/tmp/project"
+    - input: "{\"dependencies\":{\"express\":\"4.18.0\",\"lodash\":\"4.17.21\"},\"files\":{\"app.js\":\"const express = require('express');\\nconst app = express();\\napp.listen(3000);\"}}"
       expected_output: "UNUSED: lodash"
-    - input: "{\"dependencies\":{\"react\":\"18.0.0\"}}\n/tmp/react-project"
+    - input: "{\"dependencies\":{\"react\":\"18.0.0\",\"react-dom\":\"18.0.0\"},\"files\":{\"index.js\":\"import React from 'react';\\nimport ReactDOM from 'react-dom/client';\"}}"
+      expected_output: "ALL DEPENDENCIES USED"
+    - input: "{\"dependencies\":{\"@types/node\":\"18.0.0\",\"typescript\":\"5.0.0\",\"unused-pkg\":\"1.0.0\"},\"files\":{\"main.ts\":\"import * as ts from 'typescript';\\nimport { readFileSync } from '@types/node';\"}}"
+      expected_output: "UNUSED: unused-pkg"
+    - input: "{\"dependencies\":{\"axios\":\"1.0.0\",\"chalk\":\"5.0.0\",\"dotenv\":\"16.0.0\"},\"files\":{\"server.js\":\"const x = 1;\",\"readme.md\":\"require('axios')\"}}"
+      expected_output: "UNUSED: axios\nUNUSED: chalk\nUNUSED: dotenv"
+    - input: "{\"dependencies\":{\"lodash\":\"4.0.0\"},\"files\":{\"a.js\":\"const _ = require('lodash/get');\\nconst y = require('lodash');\"}}"
       expected_output: "ALL DEPENDENCIES USED"
   constraints: ["Scan .js and .ts files for require/import statements", "Package name match is prefix match (e.g. 'lodash' matches 'lodash/get')", "Ignore scoped package scope (@org) in check"]
 
