@@ -905,6 +905,10 @@
     - "Create output file (overwrite if exists)"
 
 - id: "SYS-054"
+  disabled: true
+  disabled_reason: "[R8b-AUDIT-SUSPECT] stateless test_cases — clipboard state across write+read cannot be validated via stdin-per-run harness"
+  disabled_at: "2026-06-01"
+  disabled_by: "107-R8b-audit"
   title: "Clipboard Manager (stdout)"
   description: "Read clipboard content, print it, or set clipboard from stdin."
   difficulty: 2
