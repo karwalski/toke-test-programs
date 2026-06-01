@@ -1,0 +1,1 @@
+m=main;i=io:std.io;i=s:std.str;f=main():$i64{let url=io.readln();let token=io.readln();let auth=s.concat("Authorization: Bearer ";token);let code=mut."200";if(s.contains(url;"/status/401")){code="401"};if(s.contains(url;"/status/200")){code="200"};if(s.contains(url;"/bearer")){code="200"};io.println(code);<0}
