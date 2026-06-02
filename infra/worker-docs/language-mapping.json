@@ -1,0 +1,193 @@
+{
+  "patterns": [
+    {
+      "other": "def function_name(x, y):",
+      "toke": "f=functionname(x:$i64;y:$i64):$i64{...}",
+      "note": "f= declares functions. Parameters separated by semicolons. Types required.",
+      "languages": ["python", "ruby"],
+      "keywords": ["def", "function", "fn"]
+    },
+    {
+      "other": "function name(x, y) { }",
+      "toke": "f=name(x:$i64;y:$i64):$i64{...}",
+      "note": "No 'function' keyword. Use f=. No commas, use semicolons.",
+      "languages": ["javascript", "typescript"],
+      "keywords": ["function"]
+    },
+    {
+      "other": "func name(x int, y int) int { }",
+      "toke": "f=name(x:$i64;y:$i64):$i64{...}",
+      "note": "Types use $ prefix: $i64, $f64, $str, $bool. Semicolons separate params.",
+      "languages": ["go"],
+      "keywords": ["func"]
+    },
+    {
+      "other": "fn name(x: i64, y: i64) -> i64 { }",
+      "toke": "f=name(x:$i64;y:$i64):$i64{...}",
+      "note": "fn→f=, commas→semicolons, ->→:, types need $ prefix.",
+      "languages": ["rust"],
+      "keywords": ["fn"]
+    },
+    {
+      "other": "for i in range(n):",
+      "toke": "lp(let i=0;i<n;i=i+1){...}",
+      "note": "No for/while keywords. Use lp() for all loops. Three-part or condition-only.",
+      "languages": ["python"],
+      "keywords": ["for", "range", "loop", "iterate"]
+    },
+    {
+      "other": "for (let i = 0; i < n; i++) { }",
+      "toke": "lp(let i=0;i<n;i=i+1){...}",
+      "note": "for→lp. No ++ operator, use i=i+1. Semicolons separate parts.",
+      "languages": ["javascript", "c", "java"],
+      "keywords": ["for", "loop"]
+    },
+    {
+      "other": "while (condition) { }",
+      "toke": "lp(condition){...}",
+      "note": "while→lp. Condition-only form: lp(x>0){...}",
+      "languages": ["javascript", "c", "java", "python"],
+      "keywords": ["while", "loop"]
+    },
+    {
+      "other": "for i, val := range arr { }",
+      "toke": "lp(let i=0;i<arr.len;i=i+1){let val=arr.get(i);...}",
+      "note": "No range-based for. Use index loop with .len and .get().",
+      "languages": ["go"],
+      "keywords": ["range", "iterate", "foreach"]
+    },
+    {
+      "other": "if condition { } else { }",
+      "toke": "if(condition){...}el{...}",
+      "note": "else→el. Condition MUST be in parentheses. Braces required.",
+      "languages": ["go", "rust", "python", "javascript"],
+      "keywords": ["if", "else", "elif", "else if"]
+    },
+    {
+      "other": "return value",
+      "toke": "<value",
+      "note": "return→< (angle bracket). Or use rt value; for explicit return keyword.",
+      "languages": ["python", "javascript", "go", "rust", "c"],
+      "keywords": ["return"]
+    },
+    {
+      "other": "print(value) / console.log(value) / fmt.Println(value)",
+      "toke": "io.println(value)",
+      "note": "Import std.io: i=io:std.io; then io.println(s) for string output.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["print", "println", "console.log", "fmt.Println", "printf", "puts", "echo", "output"]
+    },
+    {
+      "other": "input() / readline() / scanner.Scan()",
+      "toke": "io.readln()",
+      "note": "Import std.io. Returns string. Parse with s.toint() or s.tofloat().",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["input", "readline", "stdin", "read"]
+    },
+    {
+      "other": "int(s) / parseInt(s) / strconv.Atoi(s)",
+      "toke": "s.toint(str_value)",
+      "note": "Import std.str as s: i=s:std.str; then s.toint(io.readln())",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["parseInt", "int", "atoi", "to integer", "string to int"]
+    },
+    {
+      "other": "str(n) / String(n) / strconv.Itoa(n)",
+      "toke": "s.fromint(n)",
+      "note": "Import std.str as s. Or use: n as $str (cast syntax).",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["toString", "str", "itoa", "int to string", "string conversion"]
+    },
+    {
+      "other": "float(s) / parseFloat(s)",
+      "toke": "s.tofloat(str_value)",
+      "note": "Import std.str as s.",
+      "languages": ["python", "javascript"],
+      "keywords": ["parseFloat", "float", "to float", "string to float"]
+    },
+    {
+      "other": "s.split(delimiter) / strings.Split(s, d)",
+      "toke": "s.split(str_value;delimiter)",
+      "note": "Import std.str as s. Returns array. Access with .get(idx). Check .len before access.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["split", "tokenize", "explode"]
+    },
+    {
+      "other": "len(s) / s.length / len(arr)",
+      "toke": "s.len(str_value) or arr.len",
+      "note": "For strings: s.len(str_val) (function). For arrays: arr.len (property, no parens).",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["length", "len", "size", "count"]
+    },
+    {
+      "other": "s.contains(sub) / sub in s / strings.Contains(s, sub)",
+      "toke": "s.contains(str_val;sub)",
+      "note": "Import std.str. Returns bool.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["contains", "includes", "in", "indexOf"]
+    },
+    {
+      "other": "arr.append(x) / arr.push(x) / append(arr, x)",
+      "toke": "arr=arr+@(x)",
+      "note": "No in-place append. Create new array: arr=arr+@(newval). Requires mut.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["append", "push", "add", "insert"]
+    },
+    {
+      "other": "arr[i] / arr.get(i)",
+      "toke": "arr.get(i)",
+      "note": "No square brackets. Use .get(index). Check bounds with arr.len first.",
+      "languages": ["python", "javascript", "go", "rust"],
+      "keywords": ["index", "subscript", "bracket", "access", "element"]
+    },
+    {
+      "other": "[1, 2, 3] / []int{1, 2, 3}",
+      "toke": "@(1;2;3)",
+      "note": "Arrays use @(). Semicolons separate elements. No commas. No square brackets.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["array", "list", "slice", "vector", "[]"]
+    },
+    {
+      "other": "let x = 0; x = x + 1",
+      "toke": "let x=mut.0;x=x+1",
+      "note": "Variables reassigned later MUST use mut. (dot after mut). let x=0 is immutable.",
+      "languages": ["javascript", "rust"],
+      "keywords": ["mutable", "var", "let", "const", "reassign", "mut"]
+    },
+    {
+      "other": "f\"{name} is {age}\" / `${name} is ${age}`",
+      "toke": "name+\" is \"+s.fromint(age)",
+      "note": "No string interpolation. Use + concatenation. Convert non-strings with s.fromint/s.fromfloat or 'as $str'.",
+      "languages": ["python", "javascript"],
+      "keywords": ["f-string", "template literal", "interpolation", "format string"]
+    },
+    {
+      "other": "import os / const fs = require('fs')",
+      "toke": "i=alias:std.module;",
+      "note": "Imports use i=alias:module; format. Must be after m= and before f=. Use alias to call: alias.func().",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["import", "require", "use", "from"]
+    },
+    {
+      "other": "math.sqrt(x) / Math.sqrt(x)",
+      "toke": "math.sqrt(x)",
+      "note": "Import: i=math:std.math; then math.sqrt(), math.pow(), math.abs(), math.sin(), math.cos(), math.ln(), math.log10().",
+      "languages": ["python", "javascript"],
+      "keywords": ["sqrt", "pow", "abs", "math", "sin", "cos"]
+    },
+    {
+      "other": "s.replace(old, new) / strings.Replace(s, old, new, -1)",
+      "toke": "s.replace(str_val;old;new_val)",
+      "note": "Import std.str. Semicolons separate args.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["replace", "substitute", "sub"]
+    },
+    {
+      "other": "s.trim() / strings.TrimSpace(s)",
+      "toke": "s.trim(str_val)",
+      "note": "Import std.str.",
+      "languages": ["python", "javascript", "go"],
+      "keywords": ["trim", "strip", "trimspace"]
+    }
+  ]
+}

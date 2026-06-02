@@ -1,0 +1,21 @@
+{
+  "tkc_version": "0.3.9",
+  "worker_id": 4,
+  "generated_at": "2026-05-29T12:10:59+00:00",
+  "mode": "test",
+  "test_label": "w4-BUILD_FAIL-DEV-056",
+  "programs": [
+    {
+      "id": "DEV-056",
+      "category": "devtools",
+      "current_status": "BUILD_FAIL",
+      "bucket": "build_fail",
+      "hint": "MISSING MAIN. Add f=main():{...<0} as the entry point. Read input with io.readln(), print with io.println().",
+      "source": "m=logfilter;f=solve(p0:$str;p1:$str):$str{let level=mut.0;if(p0=\"info\"){level=1};if(p0=\"warn\"){level=2};if(p0=\"error\"){level=3};let minlevel=mut.0;if(p1=\"info\"){minlevel=1};if(p1=\"warn\"){minlevel=2};if(p1=\"error\"){minlevel=3};if(!(level<minlevel)){<p0};<\"\"};",
+      "mode": "repair",
+      "model": "sonnet+opus",
+      "max_sonnet": 15,
+      "max_opus": 5
+    }
+  ]
+}

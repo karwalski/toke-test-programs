@@ -1,0 +1,21 @@
+{
+  "tkc_version": "0.3.9",
+  "worker_id": 3,
+  "generated_at": "2026-05-29T12:10:59+00:00",
+  "mode": "test",
+  "test_label": "w3-E1003-DAT-039",
+  "programs": [
+    {
+      "id": "DAT-039",
+      "category": "data-processing",
+      "current_status": "COMPILE_FAIL",
+      "bucket": "compile_fail",
+      "hint": "REGENERATED (foundation), E1003: Square brackets are not allowed in default mode. Use @() for arrays/maps and arr.get(idx) for indexing.",
+      "source": "{\n  \"m\": \"logparse\",\n  \"i\": {\n    \"str\": \"std.str\",\n    \"io\": \"std.io\",\n    \"col\": \"std.collections\"\n  },\n  \"t\": {\n    \"logline\": \"$str\",\n    \"parsed\": \"$str\"\n  },\n  \"f\": [\n    {\n      \"n\": \"extractfield\",\n      \"p\": [\n        {\n          \"n\": \"line\",\n          \"t\": \"$str\"\n        },\n        {\n          \"n\": \"pattern",
+      "mode": "repair",
+      "model": "sonnet+opus",
+      "max_sonnet": 15,
+      "max_opus": 5
+    }
+  ]
+}
