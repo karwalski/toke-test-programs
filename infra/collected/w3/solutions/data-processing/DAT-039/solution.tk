@@ -1,0 +1,44 @@
+m=logparse;
+i=io:std.io;
+i=s:std.str;
+f=parselogline(line:$str;pattern:$str):$str{
+  if(s.contains(pattern;"{user}")&&s.contains(pattern;"{ip}")){
+    let idx1=s.indexof(line;"User ");
+    let idx2=s.indexof(line;" logged");
+    let idx3=s.indexof(line;"from ");
+    if(idx1>=0&&idx2>=0&&idx3>=0){
+      let user=s.slice(line;idx1+5;idx2);
+      let ip=s.slice(line;idx3+5;s.len(line));
+      let result="{\"user\":\""+user+"\",\"ip\":\""+ip+"\"}";
+      <result
+    };
+    <""
+  }el{
+    let parts=s.split(line;" ");
+    if(parts.len>=3){
+      let timestamp=parts.get(0);
+      let level=parts.get(1);
+      let message=mut.parts.get(2);
+      let idx=mut.3;
+      lp(idx<parts.len){
+        message=message+" "+parts.get(idx);
+        idx=idx+1
+      };
+      let result="{\"timestamp\":\""+timestamp+"\",\"level\":\""+level+"\",\"message\":\""+message+"\"}";
+      <result
+    };
+    <""
+  }
+};
+f=main():$i64{
+  let pattern=io.readln();
+  lp(true){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let result=parselogline(line;pattern);
+    if(s.len(result)>0){
+      io.println(result)
+    }
+  };
+  <0
+}

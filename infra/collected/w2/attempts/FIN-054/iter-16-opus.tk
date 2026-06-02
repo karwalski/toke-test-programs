@@ -1,0 +1,68 @@
+m=quadfit;
+i=io:std.io;
+i=s:std.str;
+f=solve(xvals:@($f64);yvals:@($f64)):@($f64){
+  let n=xvals.len;
+  let sumx=mut.0.0;
+  let sumy=mut.0.0;
+  let sumx2=mut.0.0;
+  let sumx3=mut.0.0;
+  let sumx4=mut.0.0;
+  let sumxy=mut.0.0;
+  let sumx2y=mut.0.0;
+  lp(let j=0;j<n;j=j+1){
+    let xi=xvals.get(j);
+    let yi=yvals.get(j);
+    sumx=sumx+xi;
+    sumy=sumy+yi;
+    sumx2=sumx2+xi*xi;
+    sumx3=sumx3+xi*xi*xi;
+    sumx4=sumx4+xi*xi*xi*xi;
+    sumxy=sumxy+xi*yi;
+    sumx2y=sumx2y+xi*xi*yi
+  };
+  let nf=n as$f64;
+  let a11=nf;
+  let a12=sumx;
+  let a13=sumx2;
+  let a21=sumx;
+  let a22=sumx2;
+  let a23=sumx3;
+  let a31=sumx2;
+  let a32=sumx3;
+  let a33=sumx4;
+  let det=a11*(a22*a33-a23*a32)-a12*(a21*a33-a23*a31)+a13*(a21*a32-a22*a31);
+  let det1=sumy*(a22*a33-a23*a32)-a12*(sumxy*a33-a23*sumx2y)+a13*(sumxy*a32-a22*sumx2y);
+  let det2=a11*(sumxy*a33-sumx2y*a32)-sumy*(a21*a33-sumx2y*a31)+a13*(a21*sumxy-sumxy*a31);
+  let det3=a11*(a22*sumx2y-sumxy*a32)-a12*(a21*sumx2y-sumxy*a31)+sumy*(a21*a32-a22*a31);
+  let aval=det1/det;
+  let bval=det2/det;
+  let cval=det3/det;
+  <@(aval;bval;cval)
+};
+f=main():$i64{
+  let xline=io.readln();
+  let yline=io.readln();
+  let xparts=s.split(xline;",");
+  let yparts=s.split(yline;",");
+  let xvals=mut.@();
+  let yvals=mut.@();
+  lp(let j=0;j<xparts.len;j=j+1){
+    let xstr=s.trim(xparts.get(j));
+    let xval=s.tofloat(xstr);
+    xvals=xvals+@(xval)
+  };
+  lp(let j=0;j<yparts.len;j=j+1){
+    let ystr=s.trim(yparts.get(j));
+    let yval=s.tofloat(ystr);
+    yvals=yvals+@(yval)
+  };
+  let result=solve(xvals;yvals);
+  let astr=s.fromfloat(result.get(0));
+  let bstr=s.fromfloat(result.get(1));
+  let cstr=s.fromfloat(result.get(2));
+  io.println(astr);
+  io.println(bstr);
+  io.println(cstr);
+  <0
+}

@@ -1,0 +1,42 @@
+m=logparse;
+i=io:std.io;
+i=s:std.str;
+f=parselogline(line:$str;pattern:$str):$str{
+  let parts=s.split(line;" ");
+  if(s.contains(pattern;"user")){
+    if(parts.len>=2){
+      let user=parts.get(0);
+      let ip=parts.get(1);
+      let result="{\"user\":\""+user+"\",\"ip\":\""+ip+"\"}";
+      <result
+    }
+  }el{
+    if(parts.len>=3){
+      let timestamp=parts.get(0);
+      let level=parts.get(1);
+      let message=mut.parts.get(2);
+      let idx=mut.3;
+      lp(idx<parts.len){
+        message=message+" "+parts.get(idx);
+        idx=idx+1
+      };
+      let result="{\"timestamp\":\""+timestamp+"\",\"level\":\""+level+"\",\"message\":\""+message+"\"}";
+      <result
+    }
+  };
+  <""
+};
+f=main():$i64{
+  let pattern="{timestamp} {level} {message}";
+  let line1="2024-01-01 INFO service started";
+  let line2="2024-01-01 ERROR connection refused";
+  let result1=parselogline(line1;pattern);
+  let result2=parselogline(line2;pattern);
+  if(s.len(result1)>0){
+    io.println(result1)
+  };
+  if(s.len(result2)>0){
+    io.println(result2)
+  };
+  <0
+}

@@ -1,0 +1,77 @@
+m=quadfit;
+i=io:std.io;
+i=s:std.str;
+f=solve(xvals:@($f64);yvals:@($f64)):@($f64){
+  let n=xvals.len;
+  let sumx=mut.0.0;
+  let sumy=mut.0.0;
+  let sumx2=mut.0.0;
+  let sumx3=mut.0.0;
+  let sumx4=mut.0.0;
+  let sumxy=mut.0.0;
+  let sumx2y=mut.0.0;
+  lp(let j=0;j<n;j=j+1){
+    let xi=xvals.get(j);
+    let yi=yvals.get(j);
+    sumx=sumx+xi;
+    sumy=sumy+yi;
+    sumx2=sumx2+xi*xi;
+    sumx3=sumx3+xi*xi*xi;
+    sumx4=sumx4+xi*xi*xi*xi;
+    sumxy=sumxy+xi*yi;
+    sumx2y=sumx2y+xi*xi*yi
+  };
+  let nf=n as$f64;
+  let a11=sumx4;
+  let a12=sumx3;
+  let a13=sumx2;
+  let a21=sumx3;
+  let a22=sumx2;
+  let a23=sumx;
+  let a31=sumx2;
+  let a32=sumx;
+  let a33=nf;
+  let b1=sumx2y;
+  let b2=sumxy;
+  let b3=sumy;
+  let det=a11*(a22*a33-a23*a32)-a12*(a21*a33-a23*a31)+a13*(a21*a32-a22*a31);
+  let det1=b1*(a22*a33-a23*a32)-a12*(b2*a33-a23*b3)+a13*(b2*a32-a22*b3);
+  let det2=a11*(b2*a33-b3*a32)-b1*(a21*a33-a23*a31)+a13*(a21*b3-b2*a31);
+  let det3=a11*(a22*b3-b2*a32)-a12*(a21*b3-b2*a31)+b1*(a21*a32-a22*a31);
+  let aval=det1/det;
+  let bval=det2/det;
+  let cval=det3/det;
+  <@(aval;bval;cval)
+};
+f=main():$i64{
+  let xline=io.readln();
+  let yline=io.readln();
+  let xparts=s.split(xline;",");
+  let yparts=s.split(yline;",");
+  let xvals=mut.@();
+  let yvals=mut.@();
+  lp(let idx=0;idx<xparts.len;idx=idx+1){
+    let xstr=s.trim(xparts.get(idx));
+    let xval=s.tofloat(xstr);
+    xvals=xvals+@(xval)
+  };
+  lp(let idx=0;idx<yparts.len;idx=idx+1){
+    let ystr=s.trim(yparts.get(idx));
+    let yval=s.tofloat(ystr);
+    yvals=yvals+@(yval)
+  };
+  let result=solve(xvals;yvals);
+  let aval=result.get(0);
+  let bval=result.get(1);
+  let cval=result.get(2);
+  let astr=s.fromfloat(aval);
+  let bstr=s.fromfloat(bval);
+  let cstr=s.fromfloat(cval);
+  if(astr.len>6){astr=s.slice(astr;0;6)};
+  if(bstr.len>6){bstr=s.slice(bstr;0;6)};
+  if(cstr.len>6){cstr=s.slice(cstr;0;6)};
+  io.println(astr);
+  io.println(bstr);
+  io.println(cstr);
+  <0
+}

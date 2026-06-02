@@ -1,0 +1,149 @@
+m=gramschmidt;
+i=math:std.math;
+i=io:std.io;
+i=s:std.str;
+f=parseinput():@(@($f64)){
+    let firstline=io.readln();
+    let dims=s.split(firstline;" ");
+    let rows=s.toint(dims.get(0));
+    let cols=s.toint(dims.get(1));
+    let matrix=mut.@();
+    lp(let r=0;r<rows;r=r+1){
+        let line=io.readln();
+        let values=s.split(line;" ");
+        let row=mut.@();
+        lp(let c=0;c<cols;c=c+1){
+            let val=s.tofloat(values.get(c));
+            row=row.push(val);
+        };
+        matrix=matrix.push(row);
+    };
+    <matrix
+};
+f=dotproduct(a:@($f64);b:@($f64)):$f64{
+    let sum=mut.0.0;
+    lp(let idx=0;idx<a.len;idx=idx+1){
+        sum=sum+a.get(idx)*b.get(idx);
+    };
+    <sum
+};
+f=vectornorm(v:@($f64)):$f64{
+    let sum=mut.0.0;
+    lp(let idx=0;idx<v.len;idx=idx+1){
+        let val=v.get(idx);
+        sum=sum+val*val;
+    };
+    <math.sqrt(sum)
+};
+f=vectorscale(v:@($f64);scale:$f64):@($f64){
+    let result=mut.@();
+    lp(let idx=0;idx<v.len;idx=idx+1){
+        result=result.push(v.get(idx)*scale);
+    };
+    <result
+};
+f=vectorsub(a:@($f64);b:@($f64)):@($f64){
+    let result=mut.@();
+    lp(let idx=0;idx<a.len;idx=idx+1){
+        result=result.push(a.get(idx)-b.get(idx));
+    };
+    <result
+};
+f=createzerom(rows:$i64;cols:$i64):@(@($f64)){
+    let result=mut.@();
+    lp(let idx=0;idx<rows;idx=idx+1){
+        let row=mut.@();
+        lp(let jdx=0;jdx<cols;jdx=jdx+1){
+            row=row.push(0.0);
+        };
+        result=result.push(row);
+    };
+    <result
+};
+f=transposeq(qvecs:@(@($f64));rows:$i64):@(@($f64)){
+    let result=mut.@();
+    lp(let idx=0;idx<rows;idx=idx+1){
+        let row=mut.@();
+        lp(let jdx=0;jdx<qvecs.len;jdx=jdx+1){
+            row=row.push(qvecs.get(jdx).get(idx));
+        };
+        result=result.push(row);
+    };
+    <result
+};
+f=formatvalue(val:$f64):$str{
+    if(val<0.0000005 && val>-0.0000005){
+        <"0.000000"
+    };
+    <s.format(val;"%.6f")
+};
+f=printmatrix(matrix:@(@($f64))):$void{
+    lp(let idx=0;idx<matrix.len;idx=idx+1){
+        let row=matrix.get(idx);
+        let line=mut."";
+        lp(let jdx=0;jdx<row.len;jdx=jdx+1){
+            if(jdx>0){line=line+" ";};
+            let val=row.get(jdx);
+            line=line+formatvalue(val);
+        };
+        io.println(line);
+    };
+};
+f=setrmatrix(rmat:@(@($f64));row:$i64;col:$i64;val:$f64):@(@($f64)){
+    let newmat=mut.@();
+    lp(let idx=0;idx<rmat.len;idx=idx+1){
+        if(idx=row){
+            let oldrow=rmat.get(idx);
+            let newrow=mut.@();
+            lp(let jdx=0;jdx<oldrow.len;jdx=jdx+1){
+                if(jdx=col){
+                    newrow=newrow.push(val);
+                }el{
+                    newrow=newrow.push(oldrow.get(jdx));
+                };
+            };
+            newmat=newmat.push(newrow);
+        }el{
+            newmat=newmat.push(rmat.get(idx));
+        };
+    };
+    <newmat
+};
+f=main():$i64{
+    let matrix=parseinput();
+    let qvecs=mut.@();
+    let rows=matrix.len;
+    let cols=matrix.get(0).len;
+    let rmat=mut.createzerom(cols;cols);
+    lp(let jdx=0;jdx<cols;jdx=jdx+1){
+        let col=mut.@();
+        lp(let idx=0;idx<rows;idx=idx+1){
+            col=col.push(matrix.get(idx).get(jdx));
+        };
+        let u=mut.col;
+        lp(let kdx=0;kdx<jdx;kdx=kdx+1){
+            let qk=qvecs.get(kdx);
+            let proj=dotproduct(col;qk);
+            rmat=setrmatrix(rmat;kdx;jdx;proj);
+            let scaled=vectorscale(qk;proj);
+            u=vectorsub(u;scaled);
+        };
+        let norm=vectornorm(u);
+        rmat=setrmatrix(rmat;jdx;jdx;norm);
+        if(norm>0.0){
+            let qj=vectorscale(u;1.0/norm);
+            qvecs=qvecs.push(qj);
+        }el{
+            let zero=mut.@();
+            lp(let idx=0;idx<rows;idx=idx+1){
+                zero=zero.push(0.0);
+            };
+            qvecs=qvecs.push(zero);
+        };
+    };
+    let q=transposeq(qvecs;rows);
+    printmatrix(q);
+    io.println("");
+    printmatrix(rmat);
+    <0
+};

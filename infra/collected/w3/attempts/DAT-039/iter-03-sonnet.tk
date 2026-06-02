@@ -1,0 +1,45 @@
+m=logparse;
+i=io:std.io;
+i=s:std.str;
+f=parselogline(line:$str):$str{
+  let parts=s.split(line;" ");
+  if(parts.len>=3){
+    let timestamp=parts.get(0);
+    let level=parts.get(1);
+    let message=mut.parts.get(2);
+    let idx=mut.3;
+    lp(idx<parts.len){
+      message=message+" "+parts.get(idx);
+      idx=idx+1
+    };
+    let result="{\"timestamp\":\""+timestamp+"\",\"level\":\""+level+"\",\"message\":\""+message+"\"}";
+    <result
+  };
+  <""
+};
+f=extractfields(line:$str;pattern:$str):$str{
+  if(s.contains(pattern;"user") and s.contains(pattern;"ip")){
+    let parts=s.split(line;" ");
+    if(parts.len>=2){
+      let user=parts.get(0);
+      let ip=parts.get(1);
+      let result="{\"user\":\""+user+"\",\"ip\":\""+ip+"\"}";
+      <result
+    }
+  };
+  <parselogline(line)
+};
+f=main():$i64{
+  let line1="alice 192.168.1.1";
+  let line2="2024-01-01 INFO service started";
+  let pattern="{user} {ip}";
+  let result1=extractfields(line1;pattern);
+  let result2=extractfields(line2;pattern);
+  if(s.len(result1)>0){
+    io.println(result1)
+  };
+  if(s.len(result2)>0){
+    io.println(result2)
+  };
+  <0
+}
