@@ -1,0 +1,2517 @@
+{
+  "total": 204,
+  "by_category": {
+    "calculators-finance": 2,
+    "crypto-blockchain": 29,
+    "data-processing": 1,
+    "devtools": 6,
+    "education": 1,
+    "games": 10,
+    "media-content": 2,
+    "messaging": 7,
+    "networking-rest": 76,
+    "scientific-math": 1,
+    "security": 67,
+    "system-tools": 2
+  },
+  "by_issue_type": {
+    "ALL_TESTS_SAME_OUTPUT": 156,
+    "SENTINEL_OUTPUT": 75,
+    "PLACEHOLDER": 18
+  },
+  "vulnerabilities": [
+    {
+      "id": "FIN-022",
+      "category": "calculators-finance",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '100.00\\n10.00'"
+      ],
+      "expected_outputs": [
+        "100.00\n10.00",
+        "100.00\n10.00"
+      ]
+    },
+    {
+      "id": "FIN-100",
+      "category": "calculators-finance",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '23'"
+      ],
+      "expected_outputs": [
+        "23",
+        "23"
+      ]
+    },
+    {
+      "id": "CRY-019",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '$2b$10$'"
+      ],
+      "expected_outputs": [
+        "$2b$10$",
+        "$2b$10$"
+      ]
+    },
+    {
+      "id": "CRY-020",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "CRY-023",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'ciphertext_hex\\nauth_tag_hex'",
+        "PLACEHOLDER in test_1: 'ciphertext_hex\\nauth_tag_hex'",
+        "PLACEHOLDER in test_2: 'ciphertext_hex\\nauth_tag_hex'"
+      ],
+      "expected_outputs": [
+        "ciphertext_hex\nauth_tag_hex",
+        "ciphertext_hex\nauth_tag_hex"
+      ]
+    },
+    {
+      "id": "CRY-025",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'ciphertext_with_tag_hex'",
+        "PLACEHOLDER in test_1: 'ciphertext_with_tag_hex'",
+        "PLACEHOLDER in test_2: 'ciphertext_with_tag_hex'"
+      ],
+      "expected_outputs": [
+        "ciphertext_with_tag_hex",
+        "ciphertext_with_tag_hex"
+      ]
+    },
+    {
+      "id": "CRY-028",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: 'encrypted_hex'"
+      ],
+      "expected_outputs": [
+        "encrypted_hex",
+        "151b"
+      ]
+    },
+    {
+      "id": "CRY-030",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'r=<32-byte hex>\\ns=<32-byte hex>'"
+      ],
+      "expected_outputs": [
+        "r=<32-byte hex>\ns=<32-byte hex>",
+        "r=<32-byte hex>\ns=<32-byte hex>"
+      ]
+    },
+    {
+      "id": "CRY-031",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "CRY-032",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'signature_128_hex'",
+        "PLACEHOLDER in test_1: 'signature_128_hex'",
+        "PLACEHOLDER in test_2: 'signature_128_hex'"
+      ],
+      "expected_outputs": [
+        "signature_128_hex",
+        "signature_128_hex"
+      ]
+    },
+    {
+      "id": "CRY-033",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "CRY-035",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'shared_secret_hex'",
+        "PLACEHOLDER in test_1: 'shared_secret_hex'",
+        "PLACEHOLDER in test_2: 'shared_secret_hex'"
+      ],
+      "expected_outputs": [
+        "shared_secret_hex",
+        "shared_secret_hex"
+      ]
+    },
+    {
+      "id": "CRY-045",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "ERROR: Block 1 previous_hash mismatch"
+      ]
+    },
+    {
+      "id": "CRY-049",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "CRY-051",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "CRY-065",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<derived_key_hex>\\n<chain_code_hex>'"
+      ],
+      "expected_outputs": [
+        "<derived_key_hex>\n<chain_code_hex>",
+        "<derived_key_hex>\n<chain_code_hex>"
+      ]
+    },
+    {
+      "id": "CRY-070",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PROBABLY_IN\\nDEFINITELY_NOT_IN'"
+      ],
+      "expected_outputs": [
+        "PROBABLY_IN\nDEFINITELY_NOT_IN",
+        "PROBABLY_IN\nDEFINITELY_NOT_IN"
+      ]
+    },
+    {
+      "id": "CRY-076",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<current timestamp>\\n<sha256 hash>'"
+      ],
+      "expected_outputs": [
+        "<current timestamp>\n<sha256 hash>",
+        "<current timestamp>\n<sha256 hash>"
+      ]
+    },
+    {
+      "id": "CRY-078",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "ERROR: Certificate 0 issuer 'wrong' does not match certificate 1 subject 'inter'"
+      ]
+    },
+    {
+      "id": "CRY-079",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'VALID'"
+      ],
+      "expected_outputs": [
+        "<sha256 of 'secret123||randomnonce456'>",
+        "VALID"
+      ]
+    },
+    {
+      "id": "CRY-080",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: '{\"commitment\":\"<hex>\",\"range_bits\":8,\"proof_valid\":true}'"
+      ],
+      "expected_outputs": [
+        "{\"commitment\":\"<hex>\",\"range_bits\":8,\"proof_valid\":true}",
+        "{\"error\":\"Value 300 not in range [0, 256)\"}"
+      ]
+    },
+    {
+      "id": "CRY-081",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'VALID'"
+      ],
+      "expected_outputs": [
+        "<commitment>,<challenge>,<response>",
+        "VALID"
+      ]
+    },
+    {
+      "id": "CRY-083",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: '{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\",\"<hex>\"]}'",
+        "PLACEHOLDER in test_2: '{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\"]}'"
+      ],
+      "expected_outputs": [
+        "{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\",\"<hex>\"]}",
+        "{\"key_image\":\"<hex>\",\"c0\":\"<hex>\",\"s_values\":[\"<hex>\",\"<hex>\"]}"
+      ]
+    },
+    {
+      "id": "CRY-084",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<ephemeral_pubkey>\\n<stealth_address>'"
+      ],
+      "expected_outputs": [
+        "<ephemeral_pubkey>\n<stealth_address>",
+        "<ephemeral_pubkey>\n<stealth_address>"
+      ]
+    },
+    {
+      "id": "CRY-102",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<weighted random selection>'"
+      ],
+      "expected_outputs": [
+        "<weighted random selection>",
+        "<weighted random selection>"
+      ]
+    },
+    {
+      "id": "CRY-106",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID: checksum mismatch"
+      ]
+    },
+    {
+      "id": "CRY-109",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<base64 signature>'"
+      ],
+      "expected_outputs": [
+        "<base64 signature>",
+        "<base64 signature>"
+      ]
+    },
+    {
+      "id": "CRY-110",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "CRY-115",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<random salt>\\n<derived key>'"
+      ],
+      "expected_outputs": [
+        "<random salt>\n<derived key>",
+        "<random salt>\n<derived key>"
+      ]
+    },
+    {
+      "id": "CRY-123",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '<keccak256 signing hash>'"
+      ],
+      "expected_outputs": [
+        "<keccak256 signing hash>",
+        "<keccak256 signing hash>"
+      ]
+    },
+    {
+      "id": "CRY-135",
+      "category": "crypto-blockchain",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: '{\"version\":3,\"id\":\"<uuid>\",\"crypto\":{\"cipher\":\"aes-128-ctr\",\"ciphertext\":\"<hex>\",\"cipherparams\":{\"iv\":\"<hex>\"},\"kdf\":\"scrypt\",\"kdfparams\":{\"n\":8192,\"r\":8,\"p\":1,\"dklen\":32,\"salt\":\"<hex>\"},\"mac\":\"<hex>\"}}'"
+      ],
+      "expected_outputs": [
+        "{\"version\":3,\"id\":\"<uuid>\",\"crypto\":{\"cipher\":\"aes-128-ctr\",\"ciphertext\":\"<hex>\",\"cipherparams\":{\"iv\":\"<hex>\"},\"kdf\":\"scrypt\",\"kdfparams\":{\"n\":8192,\"r\":8,\"p\":1,\"dklen\":32,\"salt\":\"<hex>\"},\"mac\":\"<hex>\"}}",
+        "{\"version\":3,...}"
+      ]
+    },
+    {
+      "id": "DAT-005",
+      "category": "data-processing",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'Valid'"
+      ],
+      "expected_outputs": [
+        "Valid",
+        "Error: required field 'name' missing"
+      ]
+    },
+    {
+      "id": "DEV-007",
+      "category": "devtools",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'min: Nms\\nmax: Nms\\nmean: Nms\\nstddev: Nms'"
+      ],
+      "expected_outputs": [
+        "min: Nms\nmax: Nms\nmean: Nms\nstddev: Nms",
+        "min: Nms\nmax: Nms\nmean: Nms\nstddev: Nms"
+      ]
+    },
+    {
+      "id": "DEV-011",
+      "category": "devtools",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "ERROR: port - required field missing"
+      ]
+    },
+    {
+      "id": "DEV-065",
+      "category": "devtools",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "ERROR: /info - required field missing"
+      ]
+    },
+    {
+      "id": "DEV-079",
+      "category": "devtools",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "MISSING: payload"
+      ]
+    },
+    {
+      "id": "DEV-089",
+      "category": "devtools",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "ERROR: /apiVersion - required field missing\nERROR: /metadata/name - required field missing"
+      ]
+    },
+    {
+      "id": "DEV-119",
+      "category": "devtools",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "ERROR: name - must not contain spaces\nERROR: version - must be valid semver\nERROR: main - required field missing\nERROR: api_version - required field missing"
+      ]
+    },
+    {
+      "id": "EDU-037",
+      "category": "education",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "MISSING: X -> Y (implies)"
+      ]
+    },
+    {
+      "id": "GAM-006",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'Invalid'"
+      ],
+      "expected_outputs": [
+        "Valid row 4",
+        "Invalid"
+      ]
+    },
+    {
+      "id": "GAM-010",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'Valid'",
+        "SENTINEL_OUTPUT in test_2: 'Invalid'"
+      ],
+      "expected_outputs": [
+        "Valid",
+        "Invalid"
+      ]
+    },
+    {
+      "id": "GAM-030",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'Invalid'"
+      ],
+      "expected_outputs": [
+        "2",
+        "Invalid"
+      ]
+    },
+    {
+      "id": "GAM-045",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'Valid'"
+      ],
+      "expected_outputs": [
+        "Invalid: AA",
+        "Valid"
+      ]
+    },
+    {
+      "id": "GAM-053",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'Valid'"
+      ],
+      "expected_outputs": [
+        "Invalid move at step 1",
+        "Valid"
+      ]
+    },
+    {
+      "id": "GAM-066",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'Valid'"
+      ],
+      "expected_outputs": [
+        "Valid",
+        "Invalid: col 2"
+      ]
+    },
+    {
+      "id": "GAM-092",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'Valid'"
+      ],
+      "expected_outputs": [
+        "Valid",
+        "Invalid: tromino 1 not L-shaped"
+      ]
+    },
+    {
+      "id": "GAM-109",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'Valid'"
+      ],
+      "expected_outputs": [
+        "Valid",
+        "Invalid: shares edge with same colour"
+      ]
+    },
+    {
+      "id": "GAM-111",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '0 1 2'"
+      ],
+      "expected_outputs": [
+        "0 1 2",
+        "0 1 2"
+      ]
+    },
+    {
+      "id": "GAM-117",
+      "category": "games",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'Pass'"
+      ],
+      "expected_outputs": [
+        "Taboo: SUN",
+        "Pass"
+      ]
+    },
+    {
+      "id": "MED-017",
+      "category": "media-content",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "Line 2: jumped from H1 to H3"
+      ]
+    },
+    {
+      "id": "MED-127",
+      "category": "media-content",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "MISSING: place"
+      ]
+    },
+    {
+      "id": "MSG-001",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'encrypted_base64_ciphertext'"
+      ],
+      "expected_outputs": [
+        "encrypted_base64_ciphertext",
+        "encrypted_base64_ciphertext"
+      ]
+    },
+    {
+      "id": "MSG-004",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'base64_rsa_ciphertext'"
+      ],
+      "expected_outputs": [
+        "base64_rsa_ciphertext",
+        "base64_rsa_ciphertext"
+      ]
+    },
+    {
+      "id": "MSG-006",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: 'alice_pub_hex\\nbob_pub_hex\\nshared_secret_hex\\naes_key_hex'",
+        "PLACEHOLDER in test_2: 'alice_pub_hex\\nbob_pub_hex\\nshared_secret_hex\\naes_key_hex'"
+      ],
+      "expected_outputs": [
+        "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex",
+        "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex"
+      ]
+    },
+    {
+      "id": "MSG-007",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'signature_hex_128_chars'"
+      ],
+      "expected_outputs": [
+        "signature_hex_128_chars",
+        "signature_hex_128_chars"
+      ]
+    },
+    {
+      "id": "MSG-008",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'VALID'",
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "VALID",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "MSG-032",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: 'step 1: ck=new_chain_key_hex mk=message_key_hex\\nstep 2: ck=new_chain_key_hex mk=message_key_hex\\nstep 3: ck=new_chain_key_hex mk=message_key_hex'",
+        "PLACEHOLDER in test_2: 'step 1: ck=chain_key_hex mk=message_key_hex\\nstep 2: ck=chain_key_hex mk=message_key_hex'"
+      ],
+      "expected_outputs": [
+        "step 1: ck=new_chain_key_hex mk=message_key_hex\nstep 2: ck=new_chain_key_hex mk=message_key_hex\nstep 3: ck=new_chain_key_hex mk=message_key_hex",
+        "step 1: ck=chain_key_hex mk=message_key_hex\nstep 2: ck=chain_key_hex mk=message_key_hex"
+      ]
+    },
+    {
+      "id": "MSG-033",
+      "category": "messaging",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '{\"ciphertext\":\"base64\",\"nonce\":\"hex\",\"tag\":\"hex\"}'"
+      ],
+      "expected_outputs": [
+        "{\"ciphertext\":\"base64\",\"nonce\":\"hex\",\"tag\":\"hex\"}",
+        "{\"ciphertext\":\"base64\",\"nonce\":\"hex\",\"tag\":\"hex\"}"
+      ]
+    },
+    {
+      "id": "NET-105",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-107",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-111",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'FAIL'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    {
+      "id": "NET-112",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Polling'"
+      ],
+      "expected_outputs": [
+        "Polling",
+        "Polling"
+      ]
+    },
+    {
+      "id": "NET-115",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Downloaded'"
+      ],
+      "expected_outputs": [
+        "Downloaded",
+        "Downloaded"
+      ]
+    },
+    {
+      "id": "NET-116",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Download complete'"
+      ],
+      "expected_outputs": [
+        "Download complete",
+        "Download complete"
+      ]
+    },
+    {
+      "id": "NET-117",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Step 1 (Create): PASS'"
+      ],
+      "expected_outputs": [
+        "Step 1 (Create): PASS",
+        "Step 1 (Create): PASS"
+      ]
+    },
+    {
+      "id": "NET-119",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Requests/sec:'"
+      ],
+      "expected_outputs": [
+        "Requests/sec:",
+        "Requests/sec:"
+      ]
+    },
+    {
+      "id": "NET-120",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Event #1:'"
+      ],
+      "expected_outputs": [
+        "Event #1:",
+        "Event #1:"
+      ]
+    },
+    {
+      "id": "NET-121",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-122",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Rotation'"
+      ],
+      "expected_outputs": [
+        "Rotation",
+        "Rotation"
+      ]
+    },
+    {
+      "id": "NET-124",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'FAIL'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    {
+      "id": "NET-125",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '{'"
+      ],
+      "expected_outputs": [
+        "{",
+        "{"
+      ]
+    },
+    {
+      "id": "NET-126",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Total:'"
+      ],
+      "expected_outputs": [
+        "Total:",
+        "Total:"
+      ]
+    },
+    {
+      "id": "NET-128",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'users='"
+      ],
+      "expected_outputs": [
+        "users=",
+        "users="
+      ]
+    },
+    {
+      "id": "NET-130",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'TLS'"
+      ],
+      "expected_outputs": [
+        "TLS",
+        "TLS"
+      ]
+    },
+    {
+      "id": "NET-132",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-133",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'OK'",
+        "SENTINEL_OUTPUT in test_1: 'OK'",
+        "SENTINEL_OUTPUT in test_2: 'OK'"
+      ],
+      "expected_outputs": [
+        "OK",
+        "OK"
+      ]
+    },
+    {
+      "id": "NET-134",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-135",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-136",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'BREAKING CHANGES'"
+      ],
+      "expected_outputs": [
+        "BREAKING CHANGES",
+        "BREAKING CHANGES"
+      ]
+    },
+    {
+      "id": "NET-137",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Connected'"
+      ],
+      "expected_outputs": [
+        "Connected",
+        "Connected"
+      ]
+    },
+    {
+      "id": "NET-138",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Match rate:'"
+      ],
+      "expected_outputs": [
+        "Match rate:",
+        "Match rate:"
+      ]
+    },
+    {
+      "id": "NET-140",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "NET-141",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'HAR written'"
+      ],
+      "expected_outputs": [
+        "HAR written",
+        "HAR written"
+      ]
+    },
+    {
+      "id": "NET-142",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'A:'"
+      ],
+      "expected_outputs": [
+        "A:",
+        "A:"
+      ]
+    },
+    {
+      "id": "NET-144",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-145",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-146",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-147",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'FETCHED'"
+      ],
+      "expected_outputs": [
+        "FETCHED",
+        "FETCHED"
+      ]
+    },
+    {
+      "id": "NET-148",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Connection reused'"
+      ],
+      "expected_outputs": [
+        "Connection reused",
+        "Connection reused"
+      ]
+    },
+    {
+      "id": "NET-149",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '{'"
+      ],
+      "expected_outputs": [
+        "{",
+        "{"
+      ]
+    },
+    {
+      "id": "NET-150",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Monitoring'"
+      ],
+      "expected_outputs": [
+        "Monitoring",
+        "Monitoring"
+      ]
+    },
+    {
+      "id": "NET-151",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Tunnel established'"
+      ],
+      "expected_outputs": [
+        "Tunnel established",
+        "Tunnel established"
+      ]
+    },
+    {
+      "id": "NET-152",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Protocol:'"
+      ],
+      "expected_outputs": [
+        "Protocol:",
+        "Protocol:"
+      ]
+    },
+    {
+      "id": "NET-156",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Relaying'"
+      ],
+      "expected_outputs": [
+        "Relaying",
+        "Relaying"
+      ]
+    },
+    {
+      "id": "NET-158",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'FOUND'"
+      ],
+      "expected_outputs": [
+        "FOUND",
+        "FOUND"
+      ]
+    },
+    {
+      "id": "NET-159",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'AUTHENTICATED'"
+      ],
+      "expected_outputs": [
+        "AUTHENTICATED",
+        "AUTHENTICATED"
+      ]
+    },
+    {
+      "id": "NET-160",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'Replaying'"
+      ],
+      "expected_outputs": [
+        "Recording",
+        "Replaying"
+      ]
+    },
+    {
+      "id": "NET-161",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Hop 1:'"
+      ],
+      "expected_outputs": [
+        "Hop 1:",
+        "Hop 1:"
+      ]
+    },
+    {
+      "id": "NET-162",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Sent'",
+        "SENTINEL_OUTPUT in test_1: 'Sent'",
+        "SENTINEL_OUTPUT in test_2: 'Sent'"
+      ],
+      "expected_outputs": [
+        "Sent",
+        "Sent"
+      ]
+    },
+    {
+      "id": "NET-164",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Summary:'"
+      ],
+      "expected_outputs": [
+        "Summary:",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "NET-165",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'mean:'"
+      ],
+      "expected_outputs": [
+        "mean:",
+        "mean:"
+      ]
+    },
+    {
+      "id": "NET-166",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'SERVING'",
+        "SENTINEL_OUTPUT in test_1: 'SERVING'",
+        "SENTINEL_OUTPUT in test_2: 'SERVING'"
+      ],
+      "expected_outputs": [
+        "SERVING",
+        "SERVING"
+      ]
+    },
+    {
+      "id": "NET-167",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Item 1:'"
+      ],
+      "expected_outputs": [
+        "Item 1:",
+        "Item 1:"
+      ]
+    },
+    {
+      "id": "NET-168",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-169",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Transfer complete'"
+      ],
+      "expected_outputs": [
+        "Transfer complete",
+        "Transfer complete"
+      ]
+    },
+    {
+      "id": "NET-170",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'fn'"
+      ],
+      "expected_outputs": [
+        "fn",
+        "fn"
+      ]
+    },
+    {
+      "id": "NET-171",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Phase'"
+      ],
+      "expected_outputs": [
+        "Phase",
+        "Phase"
+      ]
+    },
+    {
+      "id": "NET-172",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-173",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'ACTIVE'",
+        "SENTINEL_OUTPUT in test_1: 'ACTIVE'",
+        "SENTINEL_OUTPUT in test_2: 'ACTIVE'"
+      ],
+      "expected_outputs": [
+        "ACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": "NET-174",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Resilience score:'"
+      ],
+      "expected_outputs": [
+        "Resilience score:",
+        "Resilience score:"
+      ]
+    },
+    {
+      "id": "NET-175",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'type'"
+      ],
+      "expected_outputs": [
+        "type",
+        "type"
+      ]
+    },
+    {
+      "id": "NET-176",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Connected'"
+      ],
+      "expected_outputs": [
+        "Connected",
+        "Connected"
+      ]
+    },
+    {
+      "id": "NET-177",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Allow:'"
+      ],
+      "expected_outputs": [
+        "Allow:",
+        "Allow:"
+      ]
+    },
+    {
+      "id": "NET-179",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Score:'"
+      ],
+      "expected_outputs": [
+        "Score:",
+        "Score:"
+      ]
+    },
+    {
+      "id": "NET-180",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '{'"
+      ],
+      "expected_outputs": [
+        "{",
+        "{"
+      ]
+    },
+    {
+      "id": "NET-182",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "NET-183",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Replaying'",
+        "SENTINEL_OUTPUT in test_1: 'Replaying'",
+        "SENTINEL_OUTPUT in test_2: 'Replaying'"
+      ],
+      "expected_outputs": [
+        "Replaying",
+        "Replaying"
+      ]
+    },
+    {
+      "id": "NET-184",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PASS'",
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "NET-185",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Resolved'"
+      ],
+      "expected_outputs": [
+        "Resolved",
+        "Resolved"
+      ]
+    },
+    {
+      "id": "NET-186",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Compression ratio:'"
+      ],
+      "expected_outputs": [
+        "Compression ratio:",
+        "Compression ratio:"
+      ]
+    },
+    {
+      "id": "NET-187",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'MATCH'"
+      ],
+      "expected_outputs": [
+        "MATCH",
+        "MATCH"
+      ]
+    },
+    {
+      "id": "NET-188",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Warming'"
+      ],
+      "expected_outputs": [
+        "Warming",
+        "Warming"
+      ]
+    },
+    {
+      "id": "NET-189",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Bridging'"
+      ],
+      "expected_outputs": [
+        "Bridging",
+        "Bridging"
+      ]
+    },
+    {
+      "id": "NET-190",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'CLEAN'"
+      ],
+      "expected_outputs": [
+        "CLEAN",
+        "CLEAN"
+      ]
+    },
+    {
+      "id": "NET-191",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PROTECTED'"
+      ],
+      "expected_outputs": [
+        "PROTECTED",
+        "PROTECTED"
+      ]
+    },
+    {
+      "id": "NET-192",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Total items:'"
+      ],
+      "expected_outputs": [
+        "Total items:",
+        "Total items:"
+      ]
+    },
+    {
+      "id": "NET-193",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PASS'",
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "NET-194",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'CREATE: PASS'"
+      ],
+      "expected_outputs": [
+        "CREATE: PASS",
+        "CREATE: PASS"
+      ]
+    },
+    {
+      "id": "NET-195",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PASS'",
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "NET-196",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PASS'",
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "NET-197",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PASS'",
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "id": "NET-198",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Login: PASS'"
+      ],
+      "expected_outputs": [
+        "Login: PASS",
+        "Login: PASS"
+      ]
+    },
+    {
+      "id": "NET-199",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Normal: PASS'"
+      ],
+      "expected_outputs": [
+        "Normal: PASS",
+        "Normal: PASS"
+      ]
+    },
+    {
+      "id": "NET-200",
+      "category": "networking-rest",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Register user: PASS'"
+      ],
+      "expected_outputs": [
+        "Register user: PASS",
+        "Register user: PASS"
+      ]
+    },
+    {
+      "id": "SCI-105",
+      "category": "scientific-math",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'false'"
+      ],
+      "expected_outputs": [
+        "true\n3\napp apple application",
+        "false"
+      ]
+    },
+    {
+      "id": "SEC-001",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Summary:'"
+      ],
+      "expected_outputs": [
+        "Summary:",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "SEC-003",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-004",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-005",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'valid'"
+      ],
+      "expected_outputs": [
+        "valid",
+        "issues"
+      ]
+    },
+    {
+      "id": "SEC-006",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'private'"
+      ],
+      "expected_outputs": [
+        "private",
+        "private"
+      ]
+    },
+    {
+      "id": "SEC-008",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PERMIT'",
+        "SENTINEL_OUTPUT in test_2: 'DENY'"
+      ],
+      "expected_outputs": [
+        "PERMIT",
+        "DENY"
+      ]
+    },
+    {
+      "id": "SEC-010",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "token",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "SEC-018",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-023",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-027",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-031",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-032",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-034",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Summary:'"
+      ],
+      "expected_outputs": [
+        "Summary:",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "SEC-035",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_2: 'INVALID'"
+      ],
+      "expected_outputs": [
+        "Code:",
+        "INVALID"
+      ]
+    },
+    {
+      "id": "SEC-038",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'GET'"
+      ],
+      "expected_outputs": [
+        "GET",
+        "GET"
+      ]
+    },
+    {
+      "id": "SEC-039",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-045",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-046",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-050",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'prototype_pollution'"
+      ],
+      "expected_outputs": [
+        "prototype_pollution",
+        "prototype_pollution"
+      ]
+    },
+    {
+      "id": "SEC-052",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'introspectionEnabled'"
+      ],
+      "expected_outputs": [
+        "introspectionEnabled",
+        "introspectionEnabled"
+      ]
+    },
+    {
+      "id": "SEC-053",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-054",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '2xx count:'"
+      ],
+      "expected_outputs": [
+        "2xx count:",
+        "2xx count:"
+      ]
+    },
+    {
+      "id": "SEC-055",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'rebindingRisk'"
+      ],
+      "expected_outputs": [
+        "rebindingRisk",
+        "rebindingRisk"
+      ]
+    },
+    {
+      "id": "SEC-056",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-057",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'valid_user_avg:'"
+      ],
+      "expected_outputs": [
+        "valid_user_avg:",
+        "valid_user_avg:"
+      ]
+    },
+    {
+      "id": "SEC-061",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'chainValid'"
+      ],
+      "expected_outputs": [
+        "chainValid",
+        "chainValid"
+      ]
+    },
+    {
+      "id": "SEC-062",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'dnssecEnabled'"
+      ],
+      "expected_outputs": [
+        "dnssecEnabled",
+        "dnssecEnabled"
+      ]
+    },
+    {
+      "id": "SEC-063",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'endpoints'"
+      ],
+      "expected_outputs": [
+        "endpoints",
+        "endpoints"
+      ]
+    },
+    {
+      "id": "SEC-065",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Summary:'"
+      ],
+      "expected_outputs": [
+        "Summary:",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "SEC-068",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-070",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'hiddenChars'"
+      ],
+      "expected_outputs": [
+        "hiddenChars",
+        "hiddenChars"
+      ]
+    },
+    {
+      "id": "SEC-072",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-073",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'valid'",
+        "SENTINEL_OUTPUT in test_1: 'valid'",
+        "SENTINEL_OUTPUT in test_2: 'valid'"
+      ],
+      "expected_outputs": [
+        "valid",
+        "valid"
+      ]
+    },
+    {
+      "id": "SEC-074",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PASS'",
+        "SENTINEL_OUTPUT in test_2: 'FAIL'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    {
+      "id": "SEC-076",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-077",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'server_behaviour'"
+      ],
+      "expected_outputs": [
+        "server_behaviour",
+        "server_behaviour"
+      ]
+    },
+    {
+      "id": "SEC-081",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-082",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Summary:'"
+      ],
+      "expected_outputs": [
+        "Summary:",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "SEC-087",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'baseline_ms:'"
+      ],
+      "expected_outputs": [
+        "baseline_ms:",
+        "baseline_ms:"
+      ]
+    },
+    {
+      "id": "SEC-089",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'alerts'"
+      ],
+      "expected_outputs": [
+        "alerts",
+        "alerts"
+      ]
+    },
+    {
+      "id": "SEC-090",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Probing'"
+      ],
+      "expected_outputs": [
+        "Probing",
+        "Probing"
+      ]
+    },
+    {
+      "id": "SEC-093",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-094",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-095",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'certificatePinningDetected'"
+      ],
+      "expected_outputs": [
+        "certificatePinningDetected",
+        "certificatePinningDetected"
+      ]
+    },
+    {
+      "id": "SEC-096",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-098",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-099",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '['"
+      ],
+      "expected_outputs": [
+        "[",
+        "["
+      ]
+    },
+    {
+      "id": "SEC-100",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'patterns_detected'"
+      ],
+      "expected_outputs": [
+        "patterns_detected",
+        "patterns_detected"
+      ]
+    },
+    {
+      "id": "SEC-103",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'SAFE'"
+      ],
+      "expected_outputs": [
+        "SAFE",
+        "SAFE"
+      ]
+    },
+    {
+      "id": "SEC-104",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-105",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'timing_ns'"
+      ],
+      "expected_outputs": [
+        "timing_ns",
+        "timing_ns"
+      ]
+    },
+    {
+      "id": "SEC-108",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "PLACEHOLDER in test_1: '<script>'"
+      ],
+      "expected_outputs": [
+        "<script>",
+        "OR"
+      ]
+    },
+    {
+      "id": "SEC-111",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'CONSISTENT'"
+      ],
+      "expected_outputs": [
+        "CONSISTENT",
+        "CONSISTENT"
+      ]
+    },
+    {
+      "id": "SEC-112",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): '200'"
+      ],
+      "expected_outputs": [
+        "200",
+        "200"
+      ]
+    },
+    {
+      "id": "SEC-113",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'pins'"
+      ],
+      "expected_outputs": [
+        "pins",
+        "pins"
+      ]
+    },
+    {
+      "id": "SEC-114",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Summary:'"
+      ],
+      "expected_outputs": [
+        "Summary:",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "SEC-115",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-116",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-117",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-120",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'oracle_detected'"
+      ],
+      "expected_outputs": [
+        "oracle_detected",
+        "oracle_detected"
+      ]
+    },
+    {
+      "id": "SEC-121",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Testing'"
+      ],
+      "expected_outputs": [
+        "Testing",
+        "Testing"
+      ]
+    },
+    {
+      "id": "SEC-123",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Trying'"
+      ],
+      "expected_outputs": [
+        "Trying",
+        "Trying"
+      ]
+    },
+    {
+      "id": "SEC-124",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'PASS'"
+      ],
+      "expected_outputs": [
+        "PASS",
+        "Summary:"
+      ]
+    },
+    {
+      "id": "SEC-126",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'PATCHED'"
+      ],
+      "expected_outputs": [
+        "PATCHED",
+        "PATCHED"
+      ]
+    },
+    {
+      "id": "SEC-127",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'severity_score'"
+      ],
+      "expected_outputs": [
+        "severity_score",
+        "severity_score"
+      ]
+    },
+    {
+      "id": "SEC-129",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Timeline'"
+      ],
+      "expected_outputs": [
+        "Timeline",
+        "Timeline"
+      ]
+    },
+    {
+      "id": "SEC-130",
+      "category": "security",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Audit complete'"
+      ],
+      "expected_outputs": [
+        "Audit complete",
+        "Audit complete"
+      ]
+    },
+    {
+      "id": "SYS-016",
+      "category": "system-tools",
+      "n_test_cases": 2,
+      "issues": [
+        "ALL_TESTS_SAME_OUTPUT (n=2): 'Daemon started: pid=N'"
+      ],
+      "expected_outputs": [
+        "Daemon started: pid=N",
+        "Daemon started: pid=N"
+      ]
+    },
+    {
+      "id": "SYS-054",
+      "category": "system-tools",
+      "n_test_cases": 2,
+      "issues": [
+        "SENTINEL_OUTPUT in test_1: 'OK'"
+      ],
+      "expected_outputs": [
+        "OK",
+        "hello clipboard"
+      ]
+    }
+  ]
+}

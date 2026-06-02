@@ -1,0 +1,298 @@
+{
+  "total_errors_and_timeouts": 80,
+  "total_errors": 70,
+  "total_timeouts": 10,
+  "groups": {
+    "ValueError_hex": {
+      "count": 25,
+      "program_ids": [
+        "CRY-029",
+        "CRY-087",
+        "CRY-042",
+        "CRY-123",
+        "CRY-125",
+        "CRY-050",
+        "CRY-033",
+        "CRY-084",
+        "CRY-083",
+        "CRY-049",
+        "CRY-132",
+        "SEC-080",
+        "MSG-125",
+        "MSG-115",
+        "MSG-032",
+        "MSG-057",
+        "MSG-077",
+        "MSG-103",
+        "MSG-121",
+        "MSG-119",
+        "MSG-129",
+        "MSG-127",
+        "MSG-064",
+        "MSG-090",
+        "MSG-031"
+      ],
+      "common_modules_or_patterns": [
+        "Placeholder hex strings used instead of actual hex values",
+        "bytes.fromhex() on non-hex placeholders"
+      ]
+    },
+    "TIMEOUT": {
+      "count": 10,
+      "program_ids": [
+        "SEC-038",
+        "SEC-086",
+        "NET-158",
+        "NET-128",
+        "NET-129",
+        "NET-053",
+        "NET-165",
+        "SYS-084",
+        "GAM-128",
+        "GAM-118"
+      ],
+      "common_modules_or_patterns": [
+        "Server programs (HTTP/socket listeners)",
+        "Infinite event loops",
+        "Interactive input waits"
+      ]
+    },
+    "ModuleNotFoundError": {
+      "count": 7,
+      "program_ids": [
+        "CRY-135",
+        "SOC-135",
+        "SEC-075",
+        "SYS-020",
+        "SYS-102",
+        "SYS-039",
+        "MSG-070"
+      ],
+      "common_modules_or_patterns": [
+        "cryptography (3)",
+        "psutil (2)",
+        "Cryptodome (1)",
+        "Crypto (1)"
+      ]
+    },
+    "EOFError_stdin": {
+      "count": 6,
+      "program_ids": [
+        "CRY-040",
+        "NET-040",
+        "NET-046",
+        "NET-150",
+        "SYS-106",
+        "SYS-038"
+      ],
+      "common_modules_or_patterns": [
+        "Programs call input() but no stdin provided"
+      ]
+    },
+    "IndexError": {
+      "count": 5,
+      "program_ids": [
+        "SCI-068",
+        "CRY-017",
+        "GAM-109",
+        "GAM-100",
+        "MSG-003"
+      ],
+      "common_modules_or_patterns": [
+        "Logic/data bugs in generated code"
+      ]
+    },
+    "Other": {
+      "count": 5,
+      "program_ids": [
+        "SEC-111",
+        "SEC-123",
+        "AIA-086",
+        "DEV-009",
+        "SYS-045"
+      ],
+      "common_modules_or_patterns": [
+        "Logic/data bugs in generated code"
+      ]
+    },
+    "FileNotFoundError": {
+      "count": 5,
+      "program_ids": [
+        "SYS-107",
+        "SYS-094",
+        "SYS-002",
+        "SYS-053",
+        "SYS-052"
+      ],
+      "common_modules_or_patterns": [
+        "/proc/* (Linux-only, fails on macOS)",
+        "/tmp files missing prerequisites"
+      ]
+    },
+    "SyntaxError": {
+      "count": 4,
+      "program_ids": [
+        "CRY-024",
+        "AIA-072",
+        "MED-036",
+        "MED-129"
+      ],
+      "common_modules_or_patterns": [
+        "Malformed generated code: unclosed parens, unterminated strings"
+      ]
+    },
+    "ValueError_other": {
+      "count": 3,
+      "program_ids": [
+        "MFG-064",
+        "EDU-043",
+        "GAM-089"
+      ],
+      "common_modules_or_patterns": [
+        "Various: string-to-float conversion, unpacking, positive input validation"
+      ]
+    },
+    "ValueError_base64": {
+      "count": 3,
+      "program_ids": [
+        "MSG-002",
+        "MSG-004",
+        "MSG-135"
+      ],
+      "common_modules_or_patterns": [
+        "base64 decoding of placeholder/dummy encoded strings"
+      ]
+    },
+    "TypeError": {
+      "count": 2,
+      "program_ids": [
+        "CRY-025",
+        "SEC-128"
+      ],
+      "common_modules_or_patterns": [
+        "Logic/data bugs in generated code"
+      ]
+    },
+    "AttributeError": {
+      "count": 2,
+      "program_ids": [
+        "MFG-080",
+        "MFG-024"
+      ],
+      "common_modules_or_patterns": [
+        "Logic/data bugs in generated code"
+      ]
+    },
+    "KeyError": {
+      "count": 2,
+      "program_ids": [
+        "DAT-076",
+        "GAM-002"
+      ],
+      "common_modules_or_patterns": [
+        "Logic/data bugs in generated code"
+      ]
+    },
+    "ZeroDivisionError": {
+      "count": 1,
+      "program_ids": [
+        "SCI-129"
+      ],
+      "common_modules_or_patterns": [
+        "Logic/data bugs in generated code"
+      ]
+    }
+  },
+  "by_category": {
+    "ai-agents": {
+      "total_programs": 140,
+      "error_count": 2,
+      "timeout_count": 0,
+      "error_rate_pct": 1.4
+    },
+    "calculators-finance": {
+      "total_programs": 130,
+      "error_count": 0,
+      "timeout_count": 0,
+      "error_rate_pct": 0.0
+    },
+    "crypto-blockchain": {
+      "total_programs": 134,
+      "error_count": 16,
+      "timeout_count": 0,
+      "error_rate_pct": 11.9
+    },
+    "data-processing": {
+      "total_programs": 130,
+      "error_count": 1,
+      "timeout_count": 0,
+      "error_rate_pct": 0.8
+    },
+    "devtools": {
+      "total_programs": 130,
+      "error_count": 1,
+      "timeout_count": 0,
+      "error_rate_pct": 0.8
+    },
+    "education": {
+      "total_programs": 130,
+      "error_count": 1,
+      "timeout_count": 0,
+      "error_rate_pct": 0.8
+    },
+    "games": {
+      "total_programs": 130,
+      "error_count": 4,
+      "timeout_count": 2,
+      "error_rate_pct": 4.6
+    },
+    "manufacturing-ml": {
+      "total_programs": 135,
+      "error_count": 3,
+      "timeout_count": 0,
+      "error_rate_pct": 2.2
+    },
+    "media-content": {
+      "total_programs": 130,
+      "error_count": 2,
+      "timeout_count": 0,
+      "error_rate_pct": 1.5
+    },
+    "messaging": {
+      "total_programs": 135,
+      "error_count": 18,
+      "timeout_count": 0,
+      "error_rate_pct": 13.3
+    },
+    "networking-rest": {
+      "total_programs": 200,
+      "error_count": 3,
+      "timeout_count": 5,
+      "error_rate_pct": 4.0
+    },
+    "scientific-math": {
+      "total_programs": 130,
+      "error_count": 2,
+      "timeout_count": 0,
+      "error_rate_pct": 1.5
+    },
+    "security": {
+      "total_programs": 130,
+      "error_count": 5,
+      "timeout_count": 2,
+      "error_rate_pct": 5.4
+    },
+    "social-media": {
+      "total_programs": 150,
+      "error_count": 1,
+      "timeout_count": 0,
+      "error_rate_pct": 0.7
+    },
+    "system-tools": {
+      "total_programs": 130,
+      "error_count": 11,
+      "timeout_count": 1,
+      "error_rate_pct": 9.2
+    }
+  }
+}
