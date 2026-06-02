@@ -495,6 +495,10 @@
   constraints: ["Use AES-256-GCM", "Random nonce for each message", "Include associated data in authentication", "Message key used exactly once then deleted"]
 
 - id: "MSG-034"
+  disabled: true
+  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
+  disabled_at: "2026-06-02"
+  disabled_by: "epic-112-cheat-audit"
   title: "Contact fingerprint generation"
   description: "Generate a human-readable safety number for verifying end-to-end encryption between two contacts."
   difficulty: 3

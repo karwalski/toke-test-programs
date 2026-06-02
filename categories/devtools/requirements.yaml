@@ -1784,6 +1784,10 @@
   constraints: ["env_vars as sorted array of {name, value}", "Compact JSON output", "Keys sorted alphabetically throughout"]
 
 - id: "DEV-127"
+  disabled: true
+  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
+  disabled_at: "2026-06-02"
+  disabled_by: "epic-112-cheat-audit"
   title: "Dead Dependency Finder"
   description: "Finds declared dependencies that are never imported in any source file"
   difficulty: 4

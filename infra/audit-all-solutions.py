@@ -73,6 +73,40 @@ def is_dual_branch_same_output(src: str) -> bool:
     return len(set(matches)) == 1
 
 
+def is_input_discriminator_cheat(src: str, exp_outputs: list) -> bool:
+    """Detect the 'read input, branch on substring, print hardcoded literal' cheat.
+
+    Pattern observed 2026-06-02: agent reads stdin, checks
+    s.contains(input;"X") or s.indexof(input;"X"), and for each branch
+    prints a HARDCODED string literal that matches one of the test_cases'
+    expected_output. No real algorithm. Flags as TRIVIAL even when the
+    discriminator differs per test case (dual-branch-same doesn't catch it).
+    """
+    if "io.readln" not in src:
+        return False
+    discriminators = re.findall(r's\.(?:contains|indexof|startswith|endswith|equals)\s*\(\s*[a-zA-Z]+\s*;', src)
+    if len(discriminators) < 1:
+        return False
+    # Match string literal with escaped-quote support: "..." where chars are
+    # any non-quote OR escaped quote. Min unescaped length ~10 chars.
+    println_lits = re.findall(r'io\.println\s*\(\s*"((?:\\.|[^"\\]){10,})"\s*\)', src)
+    if not println_lits:
+        return False
+    matches = 0
+    for lit in println_lits:
+        # Unescape toke string literal: \" → ", \\ → \, \n → newline, \t → tab
+        unesc = (lit.replace('\\"', '"').replace('\\\\', '\\')
+                    .replace('\\n', '\n').replace('\\t', '\t').replace('\\r', '\r'))
+        for exp in exp_outputs:
+            ex_clean = (exp or "").strip()
+            if not ex_clean:
+                continue
+            if unesc in ex_clean or ex_clean in unesc:
+                matches += 1
+                break
+    return matches >= max(1, len(println_lits) // 2)
+
+
 def classify(pid: str, src: str, spec: dict) -> dict:
     tcs = spec.get("test_cases", [])
     has_loop = "lp(" in src
@@ -120,6 +154,9 @@ def classify(pid: str, src: str, spec: dict) -> dict:
     # Dual-branch trivially printing the same thing
     if is_dual_branch_same_output(src) and len(set(exp_vals)) == 1:
         return {"verdict": "DUAL-BRANCH-SAME-OUTPUT", "src_len": src_len}
+    # Input-discriminator + hardcoded-output cheat (2026-06-02)
+    if is_input_discriminator_cheat(src, exp_vals):
+        return {"verdict": "TRIVIAL", "src_len": src_len, "reason": "input-discriminator hardcoded output"}
     # Trivial: tiny + no loop + no branching + ONLY main
     if src_len < 200 and not has_loop and not has_branching and not has_helpers:
         return {"verdict": "TRIVIAL", "src_len": src_len, "reason": "tiny no-logic single-main"}

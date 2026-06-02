@@ -1283,6 +1283,10 @@
   constraints: ["Generate random ephemeral keypair", "Shared secret via ECDH", "Stealth = spend_pub + H(shared_secret)*G"]
 
 - id: "CRY-085"
+  disabled: true
+  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
+  disabled_at: "2026-06-02"
+  disabled_by: "epic-112-cheat-audit"
   title: "Coin Mixing Simulation"
   description: "Simulate a CoinJoin mixing transaction. Read multiple inputs and outputs. Verify amounts balance."
   difficulty: 3

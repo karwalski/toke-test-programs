@@ -22,6 +22,10 @@
   constraints: ["Must handle ambiguous queries by selecting best match", "Output valid JSON"]
 
 - id: "AIA-002"
+  disabled: true
+  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
+  disabled_at: "2026-06-02"
+  disabled_by: "epic-112-cheat-audit"
   title: "Multi-tool chain"
   description: "Given a complex query requiring multiple tools, produce an ordered execution plan as a JSON array of tool calls with dependency references."
   difficulty: 3
@@ -1828,6 +1832,10 @@
 # =============================================================================
 
 - id: "AIA-126"
+  disabled: true
+  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
+  disabled_at: "2026-06-02"
+  disabled_by: "epic-112-cheat-audit"
   title: "Goal decomposition planner"
   description: "Break a high-level goal into a sequence of actionable steps with success criteria."
   difficulty: 3
