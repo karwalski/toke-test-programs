@@ -1,0 +1,1 @@
+m=quadfit;f=quadfit(x:$f64;y:$f64):$f64{let sumx=mut.0.0;let sumy=mut.0.0;let sumx2=mut.0.0;let sumxy=mut.0.0;lp(let i=0;i<x.len;i=i+1){let xi=x.get(i);let yi=y.get(i);sumx=sumx+xi;sumy=sumy+yi;sumx2=sumx2+xi*xi;sumxy=sumxy+xi*yi};let denom=sumx2-sumx*sumx/x.len as$f64;let a=sumxy-sumx*sumy/x.len as$f64;let b=sumx2-sumx*sumx/x.len as$f64;let c=sumy-a*sumx/b;let result

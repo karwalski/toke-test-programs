@@ -1,0 +1,22 @@
+{
+  "id": "SEC-080",
+  "category": "security",
+  "outcome": "failed",
+  "test_cases": [
+    {
+      "input": "16\n00000000000000000000000000000000",
+      "expected_output": "{\"chi_square\": 4080.0, \"chi_square_pass\": false, \"entropy_per_bit\": 0.0, \"frequency_test_pass\": false, \"quality\": \"poor\", \"runs_test_pass\": false}"
+    },
+    {
+      "input": "16\nffffffffffffffffffffffffffffffff",
+      "expected_output": "{\"chi_square\": 4080.0, \"chi_square_pass\": false, \"entropy_per_bit\": 0.0, \"frequency_test_pass\": false, \"quality\": \"poor\", \"runs_test_pass\": false}"
+    },
+    {
+      "input": "32\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected_output": "{\"chi_square\": 992.0, \"chi_square_pass\": false, \"entropy_per_bit\": 1.0, \"frequency_test_pass\": true, \"quality\": \"fair\", \"runs_test_pass\": true}"
+    }
+  ],
+  "python": "import sys, json, math\n\ndef main():\n    data = sys.stdin.read().split()\n    n = int(data[0])\n    hexstr = data[1]\n    b = bytes.fromhex(hexstr)\n    assert len(b) == n\n    # bits\n    bits = []\n    for byte in b:\n        for i in range(7, -1, -1):\n            bits.append((byte >> i) & 1)\n    total_bits = len(bits)\n    ones = sum(bits)\n    zeros = total_bits - ones\n    # Shannon entropy per bit using bit frequencies\n    if ones == 0 or zeros == 0:\n        entropy_per_bit = 0.0\n    else:\n        p1 = ones / total_bits\n        p0 = zeros / total_bits\n        entropy_per_bit = -(p1*math.log2(p1) + p0*math.log2(p0))\n    # Frequency test: bit ratio within 0.5 +/- 0.1\n    ratio = ones / total_bits\n    frequency_test_pass = abs(ratio - 0.5) <= 0.1\n    # Runs test: count runs\n    runs = 1\n    for i in range(1, total_bits):\n        if bits[i] != bits[i-1]:\n            runs += 1\n    # Expected runs ~ 2*n*p*(1-p) + 1 ; pass if |runs - expected| < 2*sqrt(2n*p*(1-p))\n    p = ratio\n    if p == 0 or p == 1:\n        runs_test_pass = False\n    else:\n        expected_runs = 2 * total_bits * p * (1-p)\n        std = math.sqrt(2 * total_bits * p * (1-p) * (2*total_bits*p*(1-p) - 1) / (total_bits - 1)) if total_bits > 1 else 0\n        if std == 0:\n            runs_test_pass = False\n        else:\n            z = abs(runs - expected_runs) / std\n            runs_test_pass = z < 1.96\n    # Chi-square test on byte frequencies\n    freq = [0]*256\n    for byte in b:\n        freq[byte] += 1\n    expected = n / 256\n    if expected > 0:\n        chi_square = sum((f - expected)**2 / expected for f in freq)\n    else:\n        chi_square = 0.0\n    # 255 degrees of freedom, 95% critical value ~ 293.2478\n    chi_square_pass = chi_square < 293.2478\n    # Quality\n    passes = sum([frequency_test_pass, runs_test_pass, chi_square_pass])\n    if passes == 3 and entropy_per_bit > 0.99:\n        quality = 'excellent'\n    elif passes == 3:\n        quality = 'good'\n    elif passes == 2:\n        quality = 'fair'\n    else:\n        quality = 'poor'\n    out = {\n        'entropy_per_bit': round(entropy_per_bit, 6),\n        'frequency_test_pass': frequency_test_pass,\n        'runs_test_pass': runs_test_pass,\n        'chi_square': round(chi_square, 4),\n        'chi_square_pass': chi_square_pass,\n        'quality': quality\n    }\n    print(json.dumps(out, sort_keys=True))\n\nmain()\n",
+  "reason": "non-zero exit (1) on input '64\\n9e3779b97f4a7c15f39cc0605cedc8341082276bf3a27251f86c6a11d0c18e9527e1f4a6c2b8d': Traceback (most recent call last):\n  File \"/tmp/tmpq_vd0cxq.py\", line 75, in <module>\n    main()\n  File \"/tmp/tmpq_vd0cxq.py\", line 7, in main\n    b = bytes.fromhex(hexstr)\nValueError: non-hexadecimal",
+  "validated_at": "2026-05-31T03:43:59.120611+00:00"
+}

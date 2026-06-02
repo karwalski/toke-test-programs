@@ -1,0 +1,1 @@
+m=chown;f=chown(path:$str;owner:$str;group:$str;recursive:$bool;dryrun:$bool):$str{let msg=mut."";if(dryrun){msg="DRY-RUN: "};let cmd=mut."chown ";if(recursive){cmd=cmd+"-R "};cmd=cmd+owner+":"+group+" "+path;msg=msg+cmd;<msg};f=main():$void{let r1=chown("/data";"user";"group";true;false));let r2=chown("/etc/hosts";"root";"root";false;true));<};

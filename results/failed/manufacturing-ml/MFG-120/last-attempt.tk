@@ -1,0 +1,1 @@
+m=optimalrate;f=ratehistory(recent:$i64;total:$i64):$f{let r=recent as$f;let t=total as$f;<r/t};f=optimalrate(qr:$f):$i64{let r=qr as$i64;if(r<1){<1};if(r>100){<100};<r};f=main():$i64{let r=ratehistory(25;100));let opt=optimalrate(r);<0};

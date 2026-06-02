@@ -1,0 +1,26 @@
+{
+  "id": "SEC-074",
+  "category": "security",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "{\"minLength\":12,\"requireUpper\":true,\"requireLower\":true,\"requireDigit\":true,\"requireSpecial\":true}\nStrongPass1!\nweakpass\n\n",
+      "expected_output": "PASS\nFAIL minLength,requireUpper,requireDigit,requireSpecial"
+    },
+    {
+      "input": "{\"minLength\":8,\"requireDigit\":true}\nnodigits\nhas1digit\n\n",
+      "expected_output": "FAIL requireDigit\nPASS"
+    },
+    {
+      "input": "{\"minLength\":6,\"maxLength\":12,\"maxRepeating\":2,\"disallowCommon\":true}\naaabbb\npassword\nGoodOne\n\n",
+      "expected_output": "FAIL maxRepeating\nFAIL disallowCommon\nPASS"
+    },
+    {
+      "input": "{\"minLength\":10,\"requireUpper\":true,\"requireSpecial\":true,\"maxRepeating\":3}\nshort\nALLUPPER!!\nFinePass1!\n\n",
+      "expected_output": "FAIL minLength,requireUpper,requireSpecial\nPASS\nPASS"
+    }
+  ],
+  "python": "import sys, json\n\nCOMMON = {'password','123456','12345678','qwerty','abc123','letmein','admin','welcome','monkey','iloveyou'}\nSPECIALS = set('!@#$%^&*()-_=+[]{};:,.<>/?\\\\|`~\\'\"')\n\ndef validate(pw, pol):\n    v = []\n    if 'minLength' in pol and len(pw) < pol['minLength']:\n        v.append('minLength')\n    if 'maxLength' in pol and len(pw) > pol['maxLength']:\n        v.append('maxLength')\n    if pol.get('requireUpper') and not any(c.isupper() for c in pw):\n        v.append('requireUpper')\n    if pol.get('requireLower') and not any(c.islower() for c in pw):\n        v.append('requireLower')\n    if pol.get('requireDigit') and not any(c.isdigit() for c in pw):\n        v.append('requireDigit')\n    if pol.get('requireSpecial') and not any(c in SPECIALS for c in pw):\n        v.append('requireSpecial')\n    if 'maxRepeating' in pol:\n        m = pol['maxRepeating']\n        run = 1\n        bad = False\n        for i in range(1, len(pw)):\n            if pw[i] == pw[i-1]:\n                run += 1\n                if run > m:\n                    bad = True\n                    break\n            else:\n                run = 1\n        if bad:\n            v.append('maxRepeating')\n    if pol.get('disallowCommon') and pw.lower() in COMMON:\n        v.append('disallowCommon')\n    return v\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    if not data:\n        return\n    pol = json.loads(data[0])\n    for line in data[1:]:\n        if line == '':\n            break\n        v = validate(line, pol)\n        if not v:\n            print('PASS')\n        else:\n            print('FAIL ' + ','.join(v))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:13.494559+00:00"
+}

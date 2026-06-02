@@ -1,0 +1,1 @@
+m=convread;f=httpget(url:$str):$str{let result=mut."";let empty=mut.true;lp(let i=0;i<1000;i=i+1){let c=httpreadchar(url);if(c=""){br};empty=false;result=result+c};if(empty){<""};<result};f=httpreadchar

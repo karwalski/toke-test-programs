@@ -1,0 +1,15 @@
+Test failures:
+Test 1: expected 'AUDIT LOG:
+[10:00:00] encrypt m1 with k1: OK
+[10:00:01] decrypt m1 with k1: OK
+[10:00:02] decrypt m2 with k2: FAILED
+---
+operations: encrypt=1, decrypt=2
+success rate: 66.7% (2/3)
+keys used: k1=2, k2=1', got ''
+Test 2: expected 'AUDIT LOG:
+[00:00:00] encrypt m1 with k1: OK
+---
+operations: encrypt=1
+success rate: 100.0% (1/1)
+keys used: k1=1', got ''

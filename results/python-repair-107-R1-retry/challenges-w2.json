@@ -1,0 +1,16 @@
+[
+  {
+    "spec_challenge": "Test 1's expected output contains 65 hex characters for the uint256 argument (value 100) instead of 64: '...00000000000000000000000000000000000000000000000000000000000000064'. A correct ABI encoding pads to exactly 32 bytes (64 hex chars), which would be '...0000000000000000000000000000000000000000000000000000000000000064'. The expected string has an extra '0' nibble, making the total calldata length not a multiple of 32 bytes. Test 2 is correctly 4+32 bytes. The two tests are inconsistent with the stated spec.",
+    "suggested_amendment": "Fix Test 1's expected stdout to 'a9059cbb0000000000000000000000001234567890abcdef1234567890abcdef12345678000000000000000000000000000000000000000000000000000000000000064' so each argument is exactly 64 hex characters (32 bytes) as required by ABI encoding.",
+    "id": "CRY-117",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T08:15:14.772215+00:00"
+  },
+  {
+    "spec_challenge": "The expected discounted payback values in the test cases cannot be reproduced by any standard discounted payback formula. For Test 1 (investment=10000, r=0.10, cf=[3000,4000,5000,6000]): discounting at (1+r)^t gives DCFs [2727.27, 3305.79, 3756.57, 4098.08] with cumulative [2727.27, 6033.06, 9789.63, 13887.71]. Recovery occurs in year 4; standard interpolation gives 3 + (10000-9789.63)/4098.08 = 3.05, not the expected 3.15. Trying alternative conventions (exponent t-1, mid-year, continuous compounding, undiscounted interpolation in discounted recovery year, discounting investment, etc.) none produce 3.15 for Test 1 AND 2.72 for Test 2 simultaneously. The expected outputs appear inconsistent with any deterministic discounted-payback formula.",
+    "suggested_amendment": "Specify the exact discounted-payback formula (discount factor convention, indexing, and interpolation method) and recompute the expected outputs. For example, using DCF_t = CF_t/(1+r)^t and linear interpolation, Test 1 should expect 3.05 and Test 2 should expect 2.74.",
+    "id": "FIN-108",
+    "category": "calculators-finance",
+    "raised_at": "2026-05-31T08:18:19.728695+00:00"
+  }
+]

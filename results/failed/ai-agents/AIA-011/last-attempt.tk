@@ -1,0 +1,1 @@
+m=remove_duplicates;f=remove_duplicates(calls:@$str):@$str{let result=mut.@();lp(let i=0;i<calls.len;i=i+1){let call=calls.get(i);let is_duplicate=mut.false;lp(let j=0;j<result.len;j=j+1){let r=result.get(j);if(r=call){is_duplicate=true;};};if(!(is_duplicate)){result=result+@(call);};};<result};

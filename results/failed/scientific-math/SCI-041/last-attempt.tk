@@ -1,0 +1,1 @@
+m=catalan;f=catalan(n:$i64):$i64{if(n<0){<0};if(n=0){<1};let result=mut.0;lp(let i=0;i<n;i=i+1){let binom=binomial(n;i);let val=binom;if(val>0){result=result+val}};<result};f=binomial(n:$i64;k:$i64):$i64{if(k<0){<0};if(k>n){<0};let result=mut.1;lp(let i=0;i<k;i=i+1){let numerator=n-i;let denominator=i+1;result=result*numerator/denominator};<result};

@@ -1,0 +1,44 @@
+[
+  {
+    "spec_challenge": "The expected outputs (47 rounds for seed 42, 31 rounds for seed 7) depend on an unspecified exact simulation of War: shuffle algorithm details (random.shuffle vs others), deck representation/ordering before shuffle, card-dealing strategy (alternating vs split-half), order in which won cards are appended (winner's then loser's? card1 then card2?), number of face-down cards in a war (commonly 3, sometimes 1), tie-break rules for repeated war ties, and what counts as a 'round'. There is no canonical specification; without knowing the exact reference algorithm that produced 47/31, the outputs cannot be reproduced reliably.",
+    "suggested_amendment": "Pin down the simulation precisely: (1) initial deck order (e.g., suits S,H,D,C and ranks 2..A), (2) shuffle method (random.seed(seed); random.shuffle(deck)), (3) dealing method (first 26 to P1, next 26 to P2), (4) round mechanics including append order (e.g., winner appends card1 then card2 to bottom of their pile), (5) war rules (number of face-down cards, behavior on insufficient cards, behavior on repeated ties), and (6) definition of 'round' (does a war count as 1 round or multiple). Provide a reference implementation alongside the spec.",
+    "id": "GAM-003",
+    "category": "games",
+    "raised_at": "2026-05-31T04:20:15.660547+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs contain literal placeholder strings ('hex', 'hex', 'base64') rather than actual encrypted values. Since salt and nonce must be random 16-byte and 12-byte values respectively, and encrypted_data is derived from them, the actual output can never equal these placeholder strings. The tests appear to be schema/template descriptions rather than concrete expected outputs.",
+    "suggested_amendment": "Change test validation to parse the output as JSON and verify: (1) 'salt' is a valid 32-char hex string, (2) 'nonce' is a valid hex string, (3) 'encrypted_data' is valid base64, (4) 'key_params' matches the expected object exactly. Alternatively, allow a fixed seed/salt/nonce to be supplied via input so outputs are deterministic.",
+    "id": "MSG-044",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:26:25.598922+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects the literal string 'Comparisons: N' instead of an actual count, while Test 2 expects 'Comparisons: 1'. Test 1's expected output is inconsistent \u2014 it appears the placeholder 'N' was never replaced with the actual expected comparison count (which is 10 for input '5 3 8 1 9 2'). The two test cases are mutually contradictory regarding the Comparisons line format.",
+    "suggested_amendment": "Update Test 1's expected output to 'Sorted: 1 2 3 5 8 9\\nMerge depth: 3\\nComparisons: 10' so both tests consistently expect the actual integer comparison count.",
+    "id": "SCI-027",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:31.610155+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs literally contain the placeholder strings '(divided diff table)' and '(table)' instead of the actual numerical divided difference table. The spec text says 'Show divided difference table' but the test cases expect the literal placeholder text, making the requirement contradictory. Additionally test 1 expects p(3)=27 for points (1,1),(2,8),(4,64) which fit y=x^3 exactly giving 27, but test 2 expects p(1)=5 for points (0,1),(2,9) which is linear y=1+4x giving 5 \u2014 these are computable, but the table format is undefined.",
+    "suggested_amendment": "Either (a) specify the exact format of the divided difference table in the output and update test cases to include actual numbers, or (b) explicitly state that the literal string '(divided diff table)' / '(table)' should be printed as a placeholder header before the query results.",
+    "id": "SCI-067",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:49.369511+00:00"
+  },
+  {
+    "spec_challenge": "The test cases have placeholder/non-deterministic expected outputs ('X.XXXX', 'X.XX', '...') that cannot be matched by any deterministic program. Additionally, Test 1 expects route '0 1 2 3 4 0' which contradicts the spec's instruction to 'try all start nodes, report best' \u2014 if all start nodes are tried, the output route may not begin with the user-supplied start node 0, and even starting from 0 the nearest-neighbour route is '0 1 2 4 3 0' or '0 4 1 2 3 0' depending on tie-breaking, not '0 1 2 3 4 0'. Furthermore, the spec says the third line should be 'Approximation ratio vs lower bound: X.XX' but Test 1's expected output uses 'Approximation ratio: X.XX'.",
+    "suggested_amendment": "Replace placeholders in test cases with exact numeric values, clarify whether output route must start at the user-supplied start node or the best-found start node, specify tie-breaking rules for nearest neighbour, define the MST lower bound precisely (e.g. Prim's algorithm on complete Euclidean graph), and fix the inconsistent label ('Approximation ratio' vs 'Approximation ratio vs lower bound').",
+    "id": "SCI-081",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:56.778891+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs contain literal 'N' placeholders rather than actual numeric values, making it impossible to produce matching output deterministically. Test 1 expects exactly 'System: total=N free=N used=N' with the letter N, not real memory values. Additionally, memory values depend on the host system at runtime and cannot be predicted by the test harness.",
+    "suggested_amendment": "Either (1) specify the test harness uses regex/pattern matching where 'N' means 'any number', or (2) mock the memory sources (e.g., provide /proc/meminfo content via stdin) so outputs are deterministic. Also clarify exact formatting (integer vs 2dp float, since spec says rounded to 2dp but example shows 'N').",
+    "id": "SYS-040",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:28:31.529642+00:00"
+  }
+]

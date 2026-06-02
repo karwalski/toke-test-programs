@@ -1,0 +1,1 @@
+m=sentiment;f=sentiment(text:$str):$str{let n=text.len;let m=mut.0;let pos=mut.0;let neg=mut.0;lp(let i=0;i<n;i=i+1){let c=text.get(i);if(c=32){m=m+1;if(m=pos){<text.sub(pos;neg)};if(m=neg){<text.sub(pos;neg)};pos=m;neg=m;}el{if(c>47){if(c<58

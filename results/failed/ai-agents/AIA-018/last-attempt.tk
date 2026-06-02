@@ -1,0 +1,1 @@
+m=selectchunks;f=selectchunks(chunks:@$str;maxtokens:$i64):@$str{let selected=mut.@();let currenttokens=mut.0;let i=mut.0;lp(let lvli=0;lvli<chunks.len;lvli=lvli+1){let chunk=chunks.get(lvli);let chunklen=chunk.len;if(currenttokens+chunklen>maxtokens){if(selected.len=0){<selected};<selected};selected=selected+@(chunk);currenttokens=currenttokens+chunklen;i=i+1};<selected};

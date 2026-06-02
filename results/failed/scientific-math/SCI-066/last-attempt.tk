@@ -1,0 +1,47 @@
+m=lagrange;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=lagrange(xvals:@$f64;yvals:@$f64;x:$f64):$f64{
+    let result=mut.0.0;
+    let n=xvals.len();
+    let ii=mut.0;
+    lp(ii<n){
+        let term=mut.yvals.get(ii);
+        let jj=mut.0;
+        lp(jj<n){
+            if(jj!=ii){
+                let num=x-xvals.get(jj);
+                let den=xvals.get(ii)-xvals.get(jj);
+                term=term*num/den;
+            };
+            jj=jj+1;
+        };
+        result=result+term;
+        ii=ii+1;
+    };
+    <result;
+};
+
+f=main():$i64{
+    let n=s.toint(io.readln());
+    let xvals=mut.@();
+    let yvals=mut.@();
+    let idx=mut.0;
+    lp(idx<n){
+        let line=io.readln();
+        let parts=s.split(line;" ");
+        if(parts.len()>=2){
+            let x=s.tofloat(parts.get(0));
+            let y=s.tofloat(parts.get(1));
+            xvals=xvals+@(x);
+            yvals=yvals+@(y);
+        };
+        idx=idx+1;
+    };
+    let x=s.tofloat(io.readln());
+    let result=lagrange(xvals;yvals;x);
+    io.println(s.concat("p(";s.concat(s.fromfloat(x);s.concat(") = ";s.format(result;"%.6f")))));
+    <0;
+}

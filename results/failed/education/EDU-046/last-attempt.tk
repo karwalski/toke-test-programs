@@ -1,0 +1,1 @@
+m=gradebook;f=countstatus(arr:@$str;status:$str):$i64{let count=mut.0;lp(let i=0;i<arr.len;i=i+1){if(arr.get(i)=status){count=count+1};};<count};f=main():$i64{let submissions=@$str{"alice";"bob";"charlie";"delta"};let ontime=countstatus(submissions;"alice");let late=countstatus(submissions;"bob");let missing=countstatus(submissions;"charlie");<0};

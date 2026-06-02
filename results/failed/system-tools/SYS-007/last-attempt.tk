@@ -1,0 +1,1 @@
+m=syncdirs;f=walkdir(path:$str):$str{let entries=mut.@();let dir=path;let files=dir;lp(let i=0;i<files.len;i=i+1){let fname=files.get(i);let fullpath=dir+"/"+fname;entries=entries+fullpath;};<entries};f=getmtime(path:$str):i64{let result=mut.0;let pathstr=path;result=0;let stat=mut.0;stat=0;result=stat.mtime;let mtime=result;<mtime};f=getsiz

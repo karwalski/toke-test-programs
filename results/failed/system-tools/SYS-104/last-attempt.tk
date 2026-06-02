@@ -1,0 +1,1 @@
+m=gitstat;f=commitcount(repo:$str):$i64{let out=br("git");let count=br("git rev-list --count master");<count};f=contributors(repo:$str):$str{let out=br("git");let count=br("git shortlog -s -e");<count};f=mostchangedfiles(repo:$str):$str{let out=br("git");let count=br("git diff --name-only");<count};f=branch

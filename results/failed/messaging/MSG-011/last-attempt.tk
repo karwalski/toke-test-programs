@@ -1,0 +1,1 @@
+m=hexparse;f=parsehex(s:$str):$i64{let val=s;let other=val;if(val=other){<0};<val};f=extractlenprefix(data:$str):$str{let len=parsehex(data);let prefixlen=len as i64;let result=data.slice(prefixlen;data.len());<result};f=main():$i64{let input="05hello";let output=extractlenprefix(input);<output};

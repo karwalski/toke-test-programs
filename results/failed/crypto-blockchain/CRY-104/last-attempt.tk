@@ -1,0 +1,1 @@
+m=quorum;f=countvalidators():$i64{let total=mut.0;lp(let idx=0;idx<10;idx=idx+1){total=total+1};<total};f=votecount():$i64{let votes=mut.0;lp(let idx=0;idx<10;idx=idx+1){votes=votes+1};<votes};f=quorumcheck():$bool{let total=countvalidators();let votes=votecount();let needed=(total*2)/3;let result=mut.false;if(!(votes<needed)){result=true};<result};

@@ -1,0 +1,1 @@
+m=anomaly;f=correlate(x:@$f64;y:@$f64):$f64{let sumxy=mut.0;let sumx=mut.0;let sumy=mut.0;let n=x.len as$f64;lp(let i=0;i<x.len;i=i+1){let xi=x.get(i);let yi=y.get(i);sumxy=sumxy+xi*yi;sumx=sumx+xi;sumy=sumy+yi;};let num=sumxy-sumx*sumy/n;let den=(((sumx*sumx/n)-sumx*sumx/n)+(sumy*sumy/n)-sumy*sumy/n))*

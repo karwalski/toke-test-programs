@@ -1,0 +1,1 @@
+m=apihealth;f=checkport(baseurl:$str):$str{let colonidx=mut.0;let found=mut.false;lp(let idx=0;idx<baseurl.len;idx=idx+1){let ch=baseurl.get(idx);if(ch=":"){colonidx=idx;found=true;br};};if(found){<baseurl.sub(0;colonidx)}el{<""}};f=checkhttps(baseurl:$str):$str{let prefix=mut.""

@@ -1,0 +1,9 @@
+[
+  {
+    "spec_challenge": "Test cases use inconsistent or unspecified bracket semantics. Test 2 (income=50000; brackets 10000@0, 40000@0.20, 100000@0.30 \u2192 9000.00) is consistent with the rule 'rate listed with threshold T applies to income between T and the next threshold': (40000-10000)*0.20 + (50000-40000)*0.30 = 9000. But Test 1 (income=80000; brackets 18200@0, 45000@0.19, 120000@0.325 \u2192 14617.00) cannot be produced by that rule (gives 6650.00), nor by 'rate applies up to the listed threshold' (gives 16467.00), nor any other standard progressive-bracket interpretation of the given inputs. No consistent formula yields 14617.00 from these numbers.",
+    "suggested_amendment": "Pick one bracket semantics and apply it consistently. For example: 'each line gives a threshold T and the marginal rate r that applies to income in (T, next_T]; income at or below the smallest threshold is tax-free.' Then fix Test 1's expected output to 6650.00 (under that rule), or change the bracket inputs so the expected 14617.00 is actually derivable.",
+    "id": "FIN-021",
+    "category": "calculators-finance",
+    "raised_at": "2026-05-31T08:17:02.479201+00:00"
+  }
+]

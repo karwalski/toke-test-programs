@@ -1,0 +1,1 @@
+m=longestcollatz;f=longestcollatz(arr:@$i64):$i64{let maxlen=mut.0;let maxnum=mut.0;lp(let i=0;i<arr.len;i=i+1){let n=arr.get(i);let len=mut.1;let x=mut.n;lp(let j=0;j<1000;j=j+1){if(x=1){br};let y=x/2;if(y*2=x){x=y}el{x=3*x+1};len=len+1;};if(len>maxlen){maxlen=len;maxnum=n};};<maxnum};

@@ -1,0 +1,22 @@
+{
+  "id": "SYS-028",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "TRASH /work/a.txt\nTRASH /work/b.txt\nLIST\nRESTORE a.txt\nLIST\nEMPTY\n",
+      "expected_output": "Moved to trash: a.txt\nMoved to trash: b.txt\na.txt /work/a.txt 1\nb.txt /work/b.txt 2\nRestored to /work/a.txt\nb.txt /work/b.txt 2\nEmptied 1 items."
+    },
+    {
+      "input": "TRASH /work/x.txt\nTRASH /work/y.txt\nTRASH /work/z.txt\nLIST\nEMPTY\nLIST\n",
+      "expected_output": "Moved to trash: x.txt\nMoved to trash: y.txt\nMoved to trash: z.txt\nx.txt /work/x.txt 1\ny.txt /work/y.txt 2\nz.txt /work/z.txt 3\nEmptied 3 items.\n(empty)"
+    },
+    {
+      "input": "TRASH /work/only.txt\nRESTORE only.txt\nLIST\n",
+      "expected_output": "Moved to trash: only.txt\nRestored to /work/only.txt\n(empty)"
+    }
+  ],
+  "python": "import sys, os, json\n\n# Deterministic in-memory trash simulation.\n# Files are virtual: TRASH records the filepath; deletion time is a monotonic counter.\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    trash = {}  # name -> {'original_path':..., 'deleted_at':int}\n    counter = 0\n    out = []\n    for line in data:\n        line = line.rstrip('\\n')\n        if not line.strip():\n            continue\n        parts = line.split(' ', 1)\n        cmd = parts[0]\n        if cmd == 'TRASH':\n            path = parts[1].strip()\n            name = os.path.basename(path)\n            # handle collision by suffixing\n            final = name\n            i = 1\n            while final in trash:\n                final = name + '.' + str(i)\n                i += 1\n            counter += 1\n            trash[final] = {'original_path': path, 'deleted_at': counter}\n            out.append('Moved to trash: ' + final)\n        elif cmd == 'LIST':\n            if not trash:\n                out.append('(empty)')\n            else:\n                for n in sorted(trash.keys()):\n                    e = trash[n]\n                    out.append(n + ' ' + e['original_path'] + ' ' + str(e['deleted_at']))\n        elif cmd == 'RESTORE':\n            name = parts[1].strip()\n            if name in trash:\n                p = trash[name]['original_path']\n                del trash[name]\n                out.append('Restored to ' + p)\n            else:\n                out.append('Not found: ' + name)\n        elif cmd == 'EMPTY':\n            n = len(trash)\n            trash.clear()\n            out.append('Emptied ' + str(n) + ' items.')\n        else:\n            out.append('Unknown command')\n    sys.stdout.write('\\n'.join(out) + ('\\n' if out else ''))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:44:01.378646+00:00"
+}

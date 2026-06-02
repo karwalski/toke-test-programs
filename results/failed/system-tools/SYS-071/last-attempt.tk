@@ -1,0 +1,1 @@
+m=hashcheck;f=hashfile(filepath:$str):$str{let result=mut."";let content=mut.std.io:readfile(filepath);let length=content.len;lp(let i=0;i<length;i=i+1){let ch=content.get(i);let tmp=result+ch;result=tmp;};<result};f=hashmanifest(manifest

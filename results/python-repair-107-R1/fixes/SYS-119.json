@@ -1,0 +1,26 @@
+{
+  "id": "SYS-119",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "---\next4 737280 1 - Live 0x0000000000000000\nbtrfs 1245184 0 - Live 0x0000000000000000\nxfs 1564672 2 - Live 0x0000000000000000\nvfat 24576 1 - Live 0x0000000000000000\next2 86016 0 - Live 0x0000000000000000\n",
+      "expected_output": "ext4 720 1\nbtrfs 1216 0\nxfs 1528 2\nvfat 24 1\next2 84 0"
+    },
+    {
+      "input": "ext\n---\next4 737280 1 - Live 0x0000000000000000\nbtrfs 1245184 0 - Live 0x0000000000000000\nxfs 1564672 2 - Live 0x0000000000000000\nvfat 24576 1 - Live 0x0000000000000000\next2 86016 0 - Live 0x0000000000000000\n",
+      "expected_output": "ext4 720 1\next2 84 0"
+    },
+    {
+      "input": "btrfs\n---\next4 737280 1 - Live 0x0000000000000000\nbtrfs 1245184 0 - Live 0x0000000000000000\n",
+      "expected_output": "btrfs 1216 0"
+    },
+    {
+      "input": "xyz\n---\next4 737280 1 - Live 0x0000000000000000\n",
+      "expected_output": ""
+    }
+  ],
+  "python": "import sys\n\ndata = sys.stdin.read()\nparts = data.split('---\\n', 1)\nif len(parts) == 2:\n    header, body = parts[0], parts[1]\nelse:\n    header, body = '', parts[0]\n\nfilt = header.strip()\n\nout = []\nfor line in body.splitlines():\n    line = line.rstrip()\n    if not line:\n        continue\n    fields = line.split()\n    if len(fields) < 3:\n        continue\n    name = fields[0]\n    try:\n        size_bytes = int(fields[1])\n        use_count = int(fields[2])\n    except ValueError:\n        continue\n    if filt and filt not in name:\n        continue\n    size_kb = size_bytes // 1024\n    out.append(f'{name} {size_kb} {use_count}')\n\nprint('\\n'.join(out))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:44:17.951906+00:00"
+}

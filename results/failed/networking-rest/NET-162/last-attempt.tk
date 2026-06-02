@@ -1,0 +1,1 @@
+m=webhook;f=solve(p0:$str;p1:$str;p2:$str):$str{let url=p0;let secret=p1;let body=p2;let sig=mut."";lp(let i=0;i<secret.len;i=i+1){let c=secret.get(i);sig=sig+c;};let final=mut."";lp(let i=0;i<body.len;i=i+1){let c=body.get(i);final=final+c;};<final};

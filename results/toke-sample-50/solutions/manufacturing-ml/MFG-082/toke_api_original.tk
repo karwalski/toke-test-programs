@@ -1,0 +1,5 @@
+m=optimal;
+i=io:std.io;
+i=s:std.str;
+f=optimal(n:$i64):$i64{if(n<1){<1};let lhs=mut.1;let rhs=mut.1;lp(let i=1;i<n;i=i+1){let sum=lhs+rhs;if(sum>n){lhs=lhs-1;rhs=rhs-1;lp(let j=0;j<10;j=j+1){let check=lhs+rhs;if(!(check>n)){br};lhs=lhs-1;rhs=rhs-1};br};lhs=lhs+1;rhs=rhs+1};let result=lhs;<result};
+f=main():$i64{let header=io.readln();let line=io.readln();let parts=s.split(line;",");let part=parts[0];let demand_rate=s.toint(parts[1]);let lead_time=s.toint(parts[2]);let safety_factor=s.tofloat(parts[3]);let container_size=s.toint(parts[4]);let total_demand=demand_rate*lead_time;let safety_stock=(total_demand as$f64)*safety_factor;let total_quantity=(total_demand as$f64)+safety_stock;let kanban_cards=(total_quantity/(container_size as$f64));let final_cards=kanban_cards as$i64;if((kanban_cards-(final_cards as$f64))>0.0){final_cards=final_cards+1};let result="{\"parts\":[{\"part\":\""+part+s.concat(s.concat("\",\"kanban_cards\":";s.fromint(final_cards));"}]}");io.println(result);<0};

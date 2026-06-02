@@ -1,0 +1,1 @@
+m=sudoku;f=solve(p:$i64):$i64{let q=mut.p;let found=mut.false;lp(let row=0;row<9;row=row+1){lp(let col=0;col<9;col=col+1){if(q.get(row*9+col))=0){let candidate=mut.1;lp(let k=0;k<9;k=k+1){let cell=q.get(row*9+k));if(cell=candidate){candidate=candidate+1};};if(candidate<10){q.get(row*9+col))=candidate;found=true;};};};};if(found){solve(q)}el{<q}};f=issolved(p:$i64):bool{

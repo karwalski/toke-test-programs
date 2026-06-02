@@ -1,0 +1,1 @@
+m=compoundinterest;f=compoundinterest(stake:$f64;annualrate:$f64;compoundingperiod:$i64;duration:$i64):$f64{let r=annualrate/100.0;let n=duration*12;let p=stake;let result=mut.p;lp(let i=1;i<n+1;i=i+1){let interest=result*r/12.0;result=result+interest;};<result};

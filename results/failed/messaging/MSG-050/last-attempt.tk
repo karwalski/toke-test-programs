@@ -1,0 +1,1 @@
+m=contenttype;f=detectcontenttype(msg:$str):$str{let len=msg.len;if(len=0){<"empty"};let firstchar=msg.get(0);if(firstchar=47){<"url"};let hascode=mut.false;lp(let i=0;i<len;i=i+1){let ch=msg.get(i);if(ch=61){hascode=true}};if(hascode){<"code"};let haspip

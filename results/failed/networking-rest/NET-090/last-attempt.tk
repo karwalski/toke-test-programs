@@ -1,0 +1,1 @@
+m=traceprop;f=propagate(traceid:$str;spanid:$str;parentspanid:$str):$str{let out=mut."";out=out+"traceparent: 00-";out=out+traceid;out=out+"/"+spanid;out=out+"\ntracestate: otlp;version=1.0.0\n";<out};

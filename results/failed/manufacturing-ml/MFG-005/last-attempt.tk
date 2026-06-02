@@ -1,0 +1,1 @@
+m=cpk;f=cpk(mean:$f64;stddev:$f64;lower:$f64;upper:$f64):$f64{let centered=mean-(lower+upper)/2.0;let z1=centered/stddev;let z2=(upper-mean)/stddev;let result=3.0-z1-z2;if(result<0.0){<0.0};<result};

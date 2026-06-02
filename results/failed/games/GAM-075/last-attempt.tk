@@ -1,0 +1,1 @@
+m=crossword;f=solve(p:$str;q:$str):$str{let result=mut."";let words=mut.@();let current=mut."";lp(let i=0;i<p.len;i=i+1){let ch=p.get(i);if(ch=" "){if(!(current.len=0 as u64))){words=words+@(current);};current="";}el{current=current+ch;};}

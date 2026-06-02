@@ -1,0 +1,1 @@
+m=taskparse;f=extracttask(task:$str):$str{let idx=mut.0;lp(let i=0;i<task.len;i=i+1){if(task.get(i)as u8=45 as u8){idx=i;br};};let start=mut.idx;lp(let i=start;i<task.len;i=i+1){if(task.get(i)as u8=41 as u8){br};if(task.get(i)as u8=91 as u8){br};start=i+1;};let end=mut.start;lp(let i=end

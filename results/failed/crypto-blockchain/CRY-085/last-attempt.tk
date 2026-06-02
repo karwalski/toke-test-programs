@@ -1,0 +1,1 @@
+m=coinjoin;f=join(inputs:@$str;threshold:$i64):$str{let total=mut.0;let count=inputs.len;lp(let idx=0;idx<count;idx=idx+1){let val=inputs.get(idx);total=total+val;};let result=mut."";if(total>threshold){result="merged";}el{result="split";};<result};f=main():$void{let inputs=@("10";"20";"30");let threshold=60;let output=join(inputs;threshold);<output};

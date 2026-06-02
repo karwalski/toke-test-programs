@@ -1,0 +1,1 @@
+m=acf;f=autocorr(arr:@$f64;n:$i64;m:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<m;i=i+1){let idx=i+n;if(!(idx>arr.len as i64))){let val=arr.get(idx as u64);let other=arr.get(i as u64);sum=sum+val*other;};};let denom=mut.0.0;lp(let i=0;i<arr.len;i=i+1){let val=arr.get(i as u64));denom=denom+val*val;};let corr=mut.0.0;if(!(denom=0.0))){corr=sum/denom;};<corr};

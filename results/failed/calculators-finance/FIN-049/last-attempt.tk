@@ -1,0 +1,1 @@
+m=chisq;f=chisq(obs:$i64;exp:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<obs.len;i=i+1){let o=obs.get(i);let e=exp.get(i);let diff=o-e;let sq=diff*diff;sum=sum+sq};<sum};

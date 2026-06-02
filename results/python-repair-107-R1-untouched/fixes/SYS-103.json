@@ -1,0 +1,30 @@
+{
+  "id": "SYS-103",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "16\nall\n3\n42\n",
+      "expected_output": "odJFCrn*l+2edlBD\n#]d)z*1C5+Jau2RJ\ntBRnlWmTS]Hf6&pW"
+    },
+    {
+      "input": "8\nnumeric\n2\n123\n",
+      "expected_output": "04164106\n88550225"
+    },
+    {
+      "input": "12\nalpha\n4\n7\n",
+      "expected_output": "ujzPdeIgxLdG\nncfBAepfJBdK\nhoOOLdKLzdoc\nJisAjIhKtJRl"
+    },
+    {
+      "input": "10\nalnum\n2\n999\n",
+      "expected_output": "YRf53KKIFE\ni4ZPuPYP20"
+    },
+    {
+      "input": "6\nsymbols\n3\n1\n",
+      "expected_output": "%#($][\n]=&$]!\n=+![(*"
+    }
+  ],
+  "python": "import sys, random, string\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    length = int(data[0].strip())\n    charset = data[1].strip()\n    count = int(data[2].strip())\n    seed = int(data[3].strip()) if len(data) > 3 and data[3].strip() else 0\n    if charset == 'all':\n        chars = string.ascii_letters + string.digits + '!@#$%^&*()-_=+[]{}'\n    elif charset == 'alpha':\n        chars = string.ascii_letters\n    elif charset == 'numeric':\n        chars = string.digits\n    elif charset == 'alnum':\n        chars = string.ascii_letters + string.digits\n    elif charset == 'symbols':\n        chars = '!@#$%^&*()-_=+[]{}'\n    else:\n        chars = string.ascii_letters + string.digits\n    rng = random.Random(seed)\n    out = []\n    for _ in range(count):\n        out.append(''.join(rng.choice(chars) for _ in range(length)))\n    print('\\n'.join(out))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:52.115670+00:00"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "GAM-118",
+  "category": "games",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "1 0 0\n0 0 0\n0 0 9\n",
+      "expected_output": "1 6 7\n2 5 8\n3 4 9"
+    },
+    {
+      "input": "1 0 0 0\n0 0 0 0\n0 0 0 0\n0 0 0 16\n",
+      "expected_output": " 1  0  0  0\n 0  0  0  0\n 0  0  0  0\n 0  0  0 16"
+    },
+    {
+      "input": "0 0 0\n0 5 0\n0 0 0\n",
+      "expected_output": "1 6 7\n2 5 8\n3 4 9"
+    }
+  ],
+  "python": "import sys\n\ndef solve():\n    data = sys.stdin.read().split('\\n')\n    rows = [line for line in data if line.strip()]\n    grid = [list(map(int, r.split())) for r in rows]\n    n = len(grid)\n    total = n * n\n    # Find position of each anchor number\n    pos_of = {}\n    for i in range(n):\n        for j in range(n):\n            v = grid[i][j]\n            if v != 0:\n                pos_of[v] = (i, j)\n    # Find starting position (number 1) or any anchor to start backtracking\n    # We will place numbers 1..total in order\n    # If 1 is not given, try every cell as start\n    def neighbors(r, c):\n        for dr, dc in ((-1,0),(1,0),(0,-1),(0,1)):\n            nr, nc = r+dr, c+dc\n            if 0 <= nr < n and 0 <= nc < n:\n                yield nr, nc\n    \n    sol = [row[:] for row in grid]\n    \n    def backtrack(num, r, c):\n        # num is currently placed at (r,c); place num+1 next\n        if num == total:\n            return True\n        nxt = num + 1\n        if nxt in pos_of:\n            tr, tc = pos_of[nxt]\n            # must be adjacent\n            if abs(tr-r)+abs(tc-c) == 1 and sol[tr][tc] == nxt:\n                if backtrack(nxt, tr, tc):\n                    return True\n            return False\n        else:\n            for nr, nc in neighbors(r, c):\n                if sol[nr][nc] == 0:\n                    sol[nr][nc] = nxt\n                    if backtrack(nxt, nr, nc):\n                        return True\n                    sol[nr][nc] = 0\n            return False\n    \n    if 1 in pos_of:\n        r, c = pos_of[1]\n        backtrack(1, r, c)\n    else:\n        # try each empty cell as start\n        found = False\n        for i in range(n):\n            if found: break\n            for j in range(n):\n                if sol[i][j] == 0:\n                    sol[i][j] = 1\n                    if backtrack(1, i, j):\n                        found = True\n                        break\n                    sol[i][j] = 0\n        # also handle case where 1 not anchor but some other is\n    \n    out = []\n    width = len(str(total))\n    for row in sol:\n        out.append(' '.join(str(x).rjust(width) for x in row))\n    print('\\n'.join(out))\n\nsolve()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:59.035606+00:00"
+}

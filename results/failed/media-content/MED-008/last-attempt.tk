@@ -1,0 +1,1 @@
+m=flesch;f=flesch(text:$str):$str{let words=mut.0;let sentences=mut.0;let chars=mut.0;let n=text.len;lp(let i=0;i<n;i=i+1){let c=text.get(i);if(c=32){words=words+1};if(c=46){sentences=sentences+1};chars=chars+1;};if(sentences=0){<""};let avgwords=words as f64/sentences as f64;let avgchars=chars as f64/sentences as f64;let flesch=218.0-avgchars-avgwords;<flesch as$str}}

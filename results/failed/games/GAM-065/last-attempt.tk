@@ -1,0 +1,1 @@
+m=nonogram;f=solve(p:$str;q:$str):$str{let result=mut."";let rowlen=p.len;let currentstate=mut.q;let i=mut.0;lp(let idx=0;idx<rowlen;idx=idx+1){let cell=mut.currentstate.get(idx);if(cell=" "){let nextcell=currentstate.get(idx+1);if(nextcell="x"){result=result+"x"}el{result=result+" "};result=result+" "}el{result=result+cell};};<result};

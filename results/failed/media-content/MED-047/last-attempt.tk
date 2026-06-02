@@ -1,0 +1,1 @@
+m=sortlines;f=sortlines(n:$str):$str{let lines=n.split("\n");let m=lines.len;lp(let i=0;i<m;i=i+1){lp(let j=0;j+1<m;j=j+1){let lhs=lines.get(j);let rhs=lines.get(j+1);if(lhs>rhs){let tmp=lines.get(j);lines.get(j)=lines.get(j+1);lines.get(j+1)=tmp;};};};let result=mut."";lp(let i=0;i<m;i=i+1){if(i>0){result=result+"\n";};result=result+lines.get(i);};<result};

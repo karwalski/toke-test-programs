@@ -1,0 +1,26 @@
+{
+  "id": "SYS-053",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "/tmp/sys053_merged.txt\n/tmp/sys053_a.txt\n/tmp/sys053_b.txt",
+      "expected_output": "Merged: 2 files into /tmp/sys053_merged.txt. Total: 14 bytes."
+    },
+    {
+      "input": "/tmp/sys053_out.txt\n/tmp/sys053_nonexistent_xyz_12345",
+      "expected_output": "ERROR: not found: /tmp/sys053_nonexistent_xyz_12345"
+    },
+    {
+      "input": "/tmp/sys053_single.txt\n/tmp/sys053_a.txt",
+      "expected_output": "Merged: 1 files into /tmp/sys053_single.txt. Total: 7 bytes."
+    },
+    {
+      "input": "/tmp/sys053_three.txt\n/tmp/sys053_a.txt\n/tmp/sys053_b.txt\n/tmp/sys053_c.txt",
+      "expected_output": "Merged: 3 files into /tmp/sys053_three.txt. Total: 34 bytes."
+    }
+  ],
+  "python": "import sys, os\n\ndef setup():\n    files = {\n        '/tmp/sys053_a.txt': b'Hello, ',\n        '/tmp/sys053_b.txt': b'World!\\n',\n        '/tmp/sys053_c.txt': b'Third file contents.',\n    }\n    for p, data in files.items():\n        try:\n            with open(p, 'wb') as f:\n                f.write(data)\n        except Exception:\n            pass\n\ndef main():\n    setup()\n    data = sys.stdin.read().splitlines()\n    lines = [l for l in data if l.strip() != '']\n    if not lines:\n        return\n    out_path = lines[0]\n    inputs = lines[1:]\n    for p in inputs:\n        if not os.path.isfile(p):\n            print('ERROR: not found: ' + p)\n            return\n    total = 0\n    with open(out_path, 'wb') as out:\n        for p in inputs:\n            with open(p, 'rb') as f:\n                chunk = f.read()\n                out.write(chunk)\n                total += len(chunk)\n    print('Merged: {} files into {}. Total: {} bytes.'.format(len(inputs), out_path, total))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:18.444632+00:00"
+}

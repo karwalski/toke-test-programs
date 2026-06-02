@@ -1,0 +1,1 @@
+m=online;f=isactive(s:$str):$bool{let r=mut.false;if(s="idle"){r=false}el{if(s="active"){r=true}el{r=false}}};<r};f=revokesession(id:$str):$bool{let found=mut.false;let count=sessions.len;lp(let i=0;i<count;i=i+1){let s=sessions.get(i);if(s.id=id){sessions.remove(i);found=true}};<found};f=listactive(user:$str):$str{let r=mut.""

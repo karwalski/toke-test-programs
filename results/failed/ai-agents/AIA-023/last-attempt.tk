@@ -1,0 +1,1 @@
+m=queryexpander;f=expandquery(original:$str):$str{let keywords=mut.@();let current=mut."";lp(let i=0;i<original.len;i=i+1){let ch=original.get(i);if(ch=" "){if(!(current.len=0 as u64))){keywords=keywords+@(current);};current="";}el{current=current+ch;};}

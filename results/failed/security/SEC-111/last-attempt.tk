@@ -1,0 +1,1 @@
+m=dnsval;f=trim(s:$str):$str{let len=s.len;let start=mut.0;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(!(c=32)){start=i;i=len}};let end=mut.len;lp(let i=len-1;!(i<0);i=i-1){let c=s.get(i);if(!(c=32)){end=i;i=-1}};let result=mut."";lp(let i=start;i<end;i=i+1){result=result+s.get(i)};<result};f=split(s:$str;delim:$str):@$str{let parts=mut.@()

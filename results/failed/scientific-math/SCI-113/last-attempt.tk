@@ -1,0 +1,1 @@
+m=nonoverlap;f=sortbyend(arr:@($i64;$i64))):@$i64{let n=arr.len;let result=mut.@();lp(let i=0;i<n;i=i+1){let j=mut.0;lp(let k=0;k<result.len;k=k+1){if(result.get(k)<arr.get(i))j=j+1;};let pos=j;if(pos<result.len){let tmp=mut.@();lp(let k=0;k<pos;k=k+1){tmp=tmp+@(result.get(k));result.get(k+1));};lp(let k=pos;k<result.len

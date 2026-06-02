@@ -1,0 +1,22 @@
+{
+  "id": "MFG-118",
+  "category": "manufacturing-ml",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "temp,humidity,speed,defect_rate\n100,50,10,2\n105,51,10,4\n110,50,11,6\n115,52,10,8\n",
+      "expected_output": "{\"correlations\": [{\"variable\": \"temp\", \"r\": 1.0}, {\"variable\": \"humidity\", \"r\": 0.67}, {\"variable\": \"speed\", \"r\": 0.26}], \"likely_root_cause\": \"temp\"}"
+    },
+    {
+      "input": "pressure,flow,vibration,defect_rate\n10,5,1,1\n20,5,2,2\n30,5,3,3\n40,5,4,4\n50,5,5,5\n",
+      "expected_output": "{\"correlations\": [{\"variable\": \"pressure\", \"r\": 1.0}, {\"variable\": \"vibration\", \"r\": 1.0}, {\"variable\": \"flow\", \"r\": 0.0}], \"likely_root_cause\": \"pressure\"}"
+    },
+    {
+      "input": "a,b,c,defect_rate\n1,10,5,3\n2,9,6,5\n3,8,7,4\n4,7,8,6\n5,6,9,8\n",
+      "expected_output": "{\"correlations\": [{\"variable\": \"a\", \"r\": 0.9}, {\"variable\": \"b\", \"r\": -0.9}, {\"variable\": \"c\", \"r\": 0.9}], \"likely_root_cause\": \"a\"}"
+    }
+  ],
+  "python": "import sys, csv, json, math\n\ndef pearson(x, y):\n    n = len(x)\n    mx = sum(x)/n\n    my = sum(y)/n\n    num = sum((x[i]-mx)*(y[i]-my) for i in range(n))\n    dx = math.sqrt(sum((x[i]-mx)**2 for i in range(n)))\n    dy = math.sqrt(sum((y[i]-my)**2 for i in range(n)))\n    if dx == 0 or dy == 0:\n        return 0.0\n    return num/(dx*dy)\n\ndef main():\n    data = sys.stdin.read().strip().splitlines()\n    reader = csv.reader(data)\n    rows = list(reader)\n    header = rows[0]\n    body = [[float(v) for v in r] for r in rows[1:]]\n    defect_idx = header.index('defect_rate')\n    defects = [r[defect_idx] for r in body]\n    cors = []\n    for i, name in enumerate(header):\n        if i == defect_idx:\n            continue\n        col = [r[i] for r in body]\n        r = pearson(col, defects)\n        cors.append({'variable': name, 'r': round(r, 2)})\n    cors.sort(key=lambda x: abs(x['r']), reverse=True)\n    out = {'correlations': cors, 'likely_root_cause': cors[0]['variable']}\n    print(json.dumps(out))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:40:55.902602+00:00"
+}

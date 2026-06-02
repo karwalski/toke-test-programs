@@ -1,0 +1,1 @@
+m=conv;f=extractsubject(line:$str):$str{let len=line.len;let start=mut.0;lp(let i=0;i<len;i=i+1){let c=line.get(i);if(c=":"){start=i+1}};if(start=0){<line};let sub=line.substr(start;len);let hasre=sub.contains("Re:");let hasfwd=sub.contains("Fwd:");if(hasre){<sub.substr(3;sub.len)}};if(hasfwd){<sub.substr(3;sub.len)}}

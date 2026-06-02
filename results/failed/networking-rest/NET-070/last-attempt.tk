@@ -1,0 +1,1 @@
+m=httpserver;f=main():$i64{let port=8080;let certpath="";let keypath="";let cfg=mut.$(serverconfig){port:port;certpath:certpath;keypath:keypath;readtimeoutms:30000;maxbodylen:1048576};let s=mut.$(httpserver){config:cfg;shutdownflag:mut.false;readycallcount:mut.0;lastreadysignalts:mut.0};lp(let idx=0;idx<1;idx=idx+1){let listener=mut.0;let ok=mut.0

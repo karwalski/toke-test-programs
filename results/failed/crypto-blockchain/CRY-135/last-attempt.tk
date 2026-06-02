@@ -1,0 +1,1 @@
+m=keystore;f=solve(p0:$str;p1:$str):$str{let privkey=p0;let password=p1;let header="{\"type\":\"aes-256-cbc\",\"salt\":\"";let footer="\",\"iv\":\"";let body="\"}";let keystorereq=header+password+footer+password+body;let keystoreresult=keystorereq;let finaljson="{\"address\":\"0x00000000000000000000000000000000000000000000\",\"privateKey\":\""+keystoreresul+"\",\"publicKey

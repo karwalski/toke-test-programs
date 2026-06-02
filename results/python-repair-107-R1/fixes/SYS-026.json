@@ -1,0 +1,26 @@
+{
+  "id": "SYS-026",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "foo.txt\nbar.txt\nbaz.md\n---\n\\.txt$\n.log\nyes\n",
+      "expected_output": "RENAME foo.txt -> foo.log\nRENAME bar.txt -> bar.log\nSummary: 2 files renamed."
+    },
+    {
+      "input": "foo.txt\nbar.txt\nbaz.md\nfoo.log\n---\n\\.txt$\n.log\nno\n",
+      "expected_output": "RENAME bar.txt -> bar.log\nSummary: 1 files renamed."
+    },
+    {
+      "input": "report1.dat\nreport2.dat\nnotes.txt\n---\n^report\nfinal_report\nno\n",
+      "expected_output": "RENAME report1.dat -> final_report1.dat\nRENAME report2.dat -> final_report2.dat\nSummary: 2 files renamed."
+    },
+    {
+      "input": "a.txt\nb.txt\nc.log\n---\n\\.txt$\n.log\nyes\n",
+      "expected_output": "RENAME a.txt -> a.log\nRENAME b.txt -> b.log\nSummary: 2 files renamed."
+    }
+  ],
+  "python": "import sys, re\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    # Split on a line that is exactly '---'\n    try:\n        sep = data.index('---')\n    except ValueError:\n        print('Summary: 0 files renamed.')\n        return\n    files = data[:sep]\n    rest = data[sep+1:]\n    if len(rest) < 3:\n        print('Summary: 0 files renamed.')\n        return\n    pattern = rest[0]\n    replacement = rest[1]\n    dry_run = rest[2].strip().lower() == 'yes'\n    try:\n        rx = re.compile(pattern)\n    except re.error:\n        print('Summary: 0 files renamed.')\n        return\n    # Simulate filesystem state\n    existing = list(files)\n    existing_set = set(existing)\n    count = 0\n    out_lines = []\n    for name in files:\n        if not rx.search(name):\n            continue\n        new_name = rx.sub(replacement, name)\n        if new_name == name:\n            continue\n        # Collision check against current state (excluding the file itself)\n        others = set(existing_set)\n        others.discard(name)\n        if new_name in others:\n            continue\n        out_lines.append('RENAME {} -> {}'.format(name, new_name))\n        count += 1\n        if not dry_run:\n            existing_set.discard(name)\n            existing_set.add(new_name)\n            for i, n in enumerate(existing):\n                if n == name:\n                    existing[i] = new_name\n                    break\n    for line in out_lines:\n        print(line)\n    print('Summary: {} files renamed.'.format(count))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:36.425936+00:00"
+}

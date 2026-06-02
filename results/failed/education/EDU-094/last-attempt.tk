@@ -1,0 +1,1 @@
+m=topicfinder;f=findtopic(interests:@$str):$str{let maxcount=mut.0;let maxtopic=mut."";lp(let i=0;i<interests.len;i=i+1){let topic=interests.get(i);let count=mut.0;lp(let j=0;j<interests.len;j=j+1){if(interests.get(j)=topic){count=count+1};};if(count>maxcount){maxcount=count;maxtopic=topic};};<maxtopic};

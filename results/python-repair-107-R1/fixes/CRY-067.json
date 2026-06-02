@@ -1,0 +1,22 @@
+{
+  "id": "CRY-067",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "1\n0000000000000000000000000000000000000000000000000000000000000000\n3ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a\n1231006505\n1d00ffff\n2083236893",
+      "expected_output": "0100000000000000000000000000000000000000000000000000000000000000000000004a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b29ab5f49ffff001d1dac2b7c"
+    },
+    {
+      "input": "2\n00000000000000000000000000000000000000000000000000000000000000ff\nabcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789\n1000\n1d00ffff\n0",
+      "expected_output": "02000000ff000000000000000000000000000000000000000000000000000000000000008967452301efcdab8967452301efcdab8967452301efcdab8967452301efcdabe8030000ffff001d00000000"
+    },
+    {
+      "input": "536870912\n00000000000000000007878ec04bb2b2e12317804810f4c26033585b3f81ffaa\nbe117b2cb4f25c5fbfb22dafee68a98a1e89c75ddf01b8a82fc4dcc6a18f6d10\n1593475202\n170b3ce8\n3705286997",
+      "expected_output": "00000020aaff813f5b583360c2f41048801723e1b2b24bc08e8707000000000000000000106d8fa1c6dcc42fa8b801df5dc7891e8aa968eeaf2db2bf5f5cf2b42c7b11be8280fa5ee83c0b175531dadc"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    lines = [l.strip() for l in data if l.strip() != '']\n    version = int(lines[0])\n    prev_hash = lines[1]\n    merkle_root = lines[2]\n    timestamp = int(lines[3])\n    bits = lines[4]\n    nonce = int(lines[5])\n    out = b''\n    out += version.to_bytes(4, 'little', signed=False)\n    out += bytes.fromhex(prev_hash)[::-1]\n    out += bytes.fromhex(merkle_root)[::-1]\n    out += timestamp.to_bytes(4, 'little', signed=False)\n    out += bytes.fromhex(bits)[::-1]\n    out += nonce.to_bytes(4, 'little', signed=False)\n    print(out.hex())\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:12.221022+00:00"
+}

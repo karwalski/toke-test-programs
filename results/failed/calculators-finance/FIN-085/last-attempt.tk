@@ -1,0 +1,1 @@
+m=annuity;f=presentvalue(rate:$f64;periods:$i64):$f64{let sum=mut.0.0;lp(let idx=0;idx<periods;idx=idx+1){let payment=1.0;let term=rate/100.0;let exponent=idx as$f64;let factor=(1.0+term)*exponent;sum=sum+payment/factor;};<sum};

@@ -1,0 +1,9 @@
+{
+  "id": "MSG-032",
+  "category": "messaging",
+  "outcome": "failed",
+  "test_cases": [],
+  "python": "import sys, hmac, hashlib\n\ndef main():\n    data = sys.stdin.read().split()\n    ck = bytes.fromhex(data[0])\n    n = int(data[1])\n    out = []\n    for i in range(1, n+1):\n        new_ck = hmac.new(ck, b'\\x01', hashlib.sha256).digest()\n        mk = hmac.new(ck, b'\\x02', hashlib.sha256).digest()\n        out.append(f'step {i}: ck={new_ck.hex()} mk={mk.hex()}')\n        ck = new_ck\n    print('\\n'.join(out))\n\nmain()\n",
+  "reason": "non-zero exit (1) on input 'ab01cd23ef45678901234567890abcde01234567890abcdef01234567890abcde\\n3\\n': Traceback (most recent call last):\n  File \"/tmp/tmp6ivyyisc.py\", line 15, in <module>\n    main()\n  File \"/tmp/tmp6ivyyisc.py\", line 5, in main\n    ck = bytes.fromhex(data[0])\nValueError: non-hexadecim",
+  "validated_at": "2026-05-31T03:41:32.253658+00:00"
+}

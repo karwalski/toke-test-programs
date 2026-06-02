@@ -1,0 +1,1 @@
+m=gauss;f=gausselim(a:@$f64;n:$i64):@$f64{let m=mut.n;lp(let i=0;i<m;i=i+1){let maxidx=mut.i;let maxval=mut.a.get(i*n+i);lp(let j=i+1;j<m;j=j+1){let curr=a.get(j*n+i);if(curr>maxval){maxval=curr;maxidx=j;};};if(!(maxidx=i))){let tmp=mut.a;lp(let k=0;k<n;k=k+1){let tmpval=tmp.get(i*n+k);tmp.get(i*n+k)=tmp.get(maxidx*n+k);tmp.get(maxidx*n+k)=tmpval;};a=tmp;};let pivot=

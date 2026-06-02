@@ -1,0 +1,1 @@
+m=mastermind;f=evaluate(secret:$str;guess:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<guess.len;idx=idx+1){let g=guess.get(idx);let s=secret.get(idx);if(g=s){result=result+"B";i=i+1;}el{let found=mut.false;lp(let jdx=0;jdx<secret.len;jdx=jdx+1){let s2=secret.get(jdx);if(!(found)){if(g=s2){found=true;};};};if(found){result=result+"W";}el{};};};<result};

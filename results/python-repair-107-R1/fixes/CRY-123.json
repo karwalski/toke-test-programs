@@ -1,0 +1,22 @@
+{
+  "id": "CRY-123",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "{\"nonce\":0,\"gas_price\":20,\"gas_limit\":21000,\"to\":\"0x000000000000000000000000000000000000dead\",\"value\":1000,\"data\":\"\"}\n1",
+      "expected_output": "5f528e5fbc6188f5f666ce2d5d92e5b5975d753613c5eec9999ce377dac39bf7"
+    },
+    {
+      "input": "{\"nonce\":5,\"gas_price\":50,\"gas_limit\":50000,\"to\":\"0x00000000000000000000000000000000000000aa\",\"value\":0,\"data\":\"0xabcd\"}\n137",
+      "expected_output": "3d7e8d3672ee9b5f69721a9257db00b2fb8f88804e7bab692ee39d95bc47dc6a"
+    },
+    {
+      "input": "{\"nonce\":42,\"gas_price\":1000000000,\"gas_limit\":100000,\"to\":\"0xffffffffffffffffffffffffffffffffffffffff\",\"value\":123456789,\"data\":\"0xdeadbeef\"}\n5",
+      "expected_output": "19bb478a8fb7f4fd3f6d5e053a987c458348b3b109e98ef562eca5e0166d4e65"
+    }
+  ],
+  "python": "import sys, json\n\ndef keccak_f(state):\n    RC = [0x0000000000000001,0x0000000000008082,0x800000000000808A,0x8000000080008000,\n          0x000000000000808B,0x0000000080000001,0x8000000080008081,0x8000000000008009,\n          0x000000000000008A,0x0000000000000088,0x0000000080008009,0x000000008000000A,\n          0x000000008000808B,0x800000000000008B,0x8000000000008089,0x8000000000008003,\n          0x8000000000008002,0x8000000000000080,0x000000000000800A,0x800000008000000A,\n          0x8000000080008081,0x8000000000008080,0x0000000080000001,0x8000000080008008]\n    R = [[0,36,3,41,18],[1,44,10,45,2],[62,6,43,15,61],[28,55,25,21,56],[27,20,39,8,14]]\n    def rol(x,n): return ((x<<n)|(x>>(64-n)))&0xFFFFFFFFFFFFFFFF\n    A = [[state[x+5*y] for y in range(5)] for x in range(5)]\n    for rnd in range(24):\n        C = [A[x][0]^A[x][1]^A[x][2]^A[x][3]^A[x][4] for x in range(5)]\n        D = [C[(x-1)%5]^rol(C[(x+1)%5],1) for x in range(5)]\n        for x in range(5):\n            for y in range(5):\n                A[x][y] ^= D[x]\n        B = [[0]*5 for _ in range(5)]\n        for x in range(5):\n            for y in range(5):\n                B[y][(2*x+3*y)%5] = rol(A[x][y], R[x][y])\n        for x in range(5):\n            for y in range(5):\n                A[x][y] = B[x][y] ^ ((~B[(x+1)%5][y]) & B[(x+2)%5][y]) & 0xFFFFFFFFFFFFFFFF\n        A[0][0] ^= RC[rnd]\n    return [A[x][y] for y in range(5) for x in range(5)]\n\ndef keccak256(data):\n    rate = 136\n    state = [0]*25\n    # pad with 0x01 (Keccak original padding)\n    padded = data + b'\\x01'\n    while len(padded) % rate != 0:\n        padded += b'\\x00'\n    padded = padded[:-1] + bytes([padded[-1] | 0x80])\n    for i in range(0, len(padded), rate):\n        block = padded[i:i+rate]\n        for j in range(rate//8):\n            state[j] ^= int.from_bytes(block[j*8:(j+1)*8], 'little')\n        state = keccak_f(state)\n    out = b''\n    for j in range(4):\n        out += state[j].to_bytes(8, 'little')\n    return out\n\ndef rlp_encode_bytes(b):\n    if len(b) == 1 and b[0] < 0x80:\n        return b\n    if len(b) < 56:\n        return bytes([0x80+len(b)]) + b\n    l = len(b).to_bytes((len(b).bit_length()+7)//8, 'big')\n    return bytes([0xb7+len(l)]) + l + b\n\ndef rlp_encode_list(items):\n    payload = b''.join(items)\n    if len(payload) < 56:\n        return bytes([0xc0+len(payload)]) + payload\n    l = len(payload).to_bytes((len(payload).bit_length()+7)//8, 'big')\n    return bytes([0xf7+len(l)]) + l + payload\n\ndef encode_int(n):\n    if n == 0:\n        return rlp_encode_bytes(b'')\n    b = n.to_bytes((n.bit_length()+7)//8, 'big')\n    return rlp_encode_bytes(b)\n\ndef encode_hex(s):\n    if s.startswith('0x'):\n        s = s[2:]\n    if s == '':\n        return rlp_encode_bytes(b'')\n    if len(s) % 2 == 1:\n        s = '0' + s\n    return rlp_encode_bytes(bytes.fromhex(s))\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    tx = json.loads(lines[0])\n    chain_id = int(lines[1].strip())\n    items = [\n        encode_int(tx['nonce']),\n        encode_int(tx['gas_price']),\n        encode_int(tx['gas_limit']),\n        encode_hex(tx['to']),\n        encode_int(tx['value']),\n        encode_hex(tx['data']) if isinstance(tx['data'], str) else rlp_encode_bytes(b''),\n        encode_int(chain_id),\n        encode_int(0),\n        encode_int(0),\n    ]\n    rlp = rlp_encode_list(items)\n    h = keccak256(rlp)\n    print(h.hex())\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:29.933229+00:00"
+}

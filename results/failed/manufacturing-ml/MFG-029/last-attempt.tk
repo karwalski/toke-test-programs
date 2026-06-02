@@ -1,0 +1,1 @@
+m=movingavg;f=simplemovingavg(vals:@$f64;n:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<n;i=i+1){sum=sum+vals.get(i as u64));};<sum/(n as$f64))};f=weightedmovingavg(vals:@$f64;weights:@$f64):$f64{let sum=mut.0.0;let totalweight=mut.0.0;lp(let i=0;i<vals.len;i=i+1){let w=weights.get(i as u64));sum=sum+(vals.get(i as u64))*w);totalweight=totalweight+w;};<sum/totalweight}};

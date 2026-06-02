@@ -1,0 +1,1 @@
+m=codeanalyzer;f=countlines(filecontent:$str;ext:$str):$i64{let lines=filecontent.split("\n");let count=lines.len as i64;<count};f=countcomments(filecontent:$str;ext:$str):$i64{let count=mut.0;if(ext="py"){let lines=filecontent.split("\n");lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);if(line.len>0){if(line.get(0)="#"){count=count+1;};};};}el{if(ext="go

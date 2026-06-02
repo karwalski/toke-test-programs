@@ -1,0 +1,26 @@
+{
+  "id": "MSG-070",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n2\nencrypt\nHello World\n",
+      "expected_output": "v2:t4uxoNSKzucFCjE="
+    },
+    {
+      "input": "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n1\nencrypt\nThe quick brown fox\n",
+      "expected_output": "v1:VHlHEzUgDxTjucjJo6qA32Z+Wg=="
+    },
+    {
+      "input": "[{\"version\":1,\"key\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\"},{\"version\":2,\"key\":\"ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\"}]\n2\ndecrypt\nv1:GHIQIxIRABcGBA8KBg==\n",
+      "expected_output": "\u0018c2\u0010VDf`\ufffd\ufffd\ufffd\ufffd\ufffd (decrypted with key v1)"
+    },
+    {
+      "input": "[{\"version\":1,\"key\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"},{\"version\":2,\"key\":\"fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\"}]\n2\nencrypt\nSecret\n",
+      "expected_output": "v2:rbnZ6hMg"
+    }
+  ],
+  "python": "import sys, json, base64\n\ndef xor_encrypt(key_bytes, plaintext_bytes):\n    out = bytearray()\n    for i, b in enumerate(plaintext_bytes):\n        out.append(b ^ key_bytes[i % len(key_bytes)])\n    return bytes(out)\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    ring = json.loads(data[0])\n    active = int(data[1].strip())\n    op = data[2].strip()\n    payload = data[3]\n    keys = {entry['version']: bytes.fromhex(entry['key']) for entry in ring}\n    if op == 'encrypt':\n        if active not in keys:\n            print(f'Error: unknown key version {active}')\n            return\n        key = keys[active]\n        ct = xor_encrypt(key, payload.encode('utf-8'))\n        b64 = base64.b64encode(ct).decode('ascii')\n        print(f'v{active}:{b64}')\n    elif op == 'decrypt':\n        if ':' not in payload:\n            print('Error: invalid ciphertext format')\n            return\n        prefix, b64 = payload.split(':', 1)\n        if not prefix.startswith('v'):\n            print('Error: invalid version prefix')\n            return\n        try:\n            version = int(prefix[1:])\n        except ValueError:\n            print('Error: invalid version number')\n            return\n        if version not in keys:\n            print(f'Error: unknown key version {version}')\n            return\n        key = keys[version]\n        try:\n            ct = base64.b64decode(b64)\n        except Exception:\n            print('Error: invalid base64')\n            return\n        pt = xor_encrypt(key, ct).decode('utf-8', errors='replace')\n        print(f'{pt} (decrypted with key v{version})')\n    else:\n        print(f'Error: unknown operation {op}')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:11.513792+00:00"
+}

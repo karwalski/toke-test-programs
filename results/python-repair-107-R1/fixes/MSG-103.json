@@ -1,0 +1,22 @@
+{
+  "id": "MSG-103",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "1\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n",
+      "expected_output": "qr_payload: AeLYD3jXkCdVbWYZoUAGBau9ymu26yTggx4z7NVGb6X2\nnumeric_code: 10260 44495 29900 58078 37180 22982\nversion: 1\nfingerprint: e2d80f78d79027556d6619a1400605abbdca6bb6eb24e0831e33ecd5466fa5f6"
+    },
+    {
+      "input": "2\ndeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected_output": "qr_payload: Ag6U6Ye4dXI3PSr0n4mTifLW7RZFZhNE8k/51nGXh1nZ\nnumeric_code: 00659 54850 11670 30879 76973 49424\nversion: 2\nfingerprint: 0e94e987b87572373d2af49f899389f2d6ed1645661344f24ff9d671978759d9"
+    },
+    {
+      "input": "1\nffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n0000000000000000000000000000000000000000000000000000000000000000\n",
+      "expected_output": "qr_payload: AbupHKhdyRSy7D77nhbnJnv5GTsUNQ0g+6iotAZzCuMK\nnumeric_code: 08488 12976 27063 87478 56636 67679\nversion: 1\nfingerprint: bba91ca85dc914b2ec3efb9e16e7267bf9193b14350d20fba8a8b406730ae30a"
+    }
+  ],
+  "python": "import sys, hashlib, base64\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    version = int(data[0].strip())\n    key_a = data[1].strip()\n    key_b = data[2].strip()\n    keys = sorted([key_a, key_b])\n    a_bytes = bytes.fromhex(keys[0])\n    b_bytes = bytes.fromhex(keys[1])\n    combined = a_bytes + b_bytes\n    fp = hashlib.sha256(combined).digest()\n    fp_hex = fp.hex()\n    payload = bytes([version]) + fp\n    qr = base64.b64encode(payload).decode('ascii')\n    n = int(fp_hex, 16)\n    digits = str(n).zfill(78)[:30]\n    groups = ' '.join(digits[i:i+5] for i in range(0, 30, 5))\n    print(f\"qr_payload: {qr}\")\n    print(f\"numeric_code: {groups}\")\n    print(f\"version: {version}\")\n    print(f\"fingerprint: {fp_hex}\")\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:47.125955+00:00"
+}

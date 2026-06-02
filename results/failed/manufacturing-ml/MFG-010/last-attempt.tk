@@ -1,0 +1,1 @@
+m=ewma;f=nextval(chart:$chart;value:f32):$chart{let alpha=0.2;let current=chart.value;let diff=value-current;let delta=alpha*diff;let newval=current+delta;chart.value=newval;<chart};f=buildchart(initial:f32):$chart{let c=mut.$chart{value:initial};<c};f=main():$void{let initial=10.0;let chart=buildchart(initial);let next=nextval(chart;20.0));<next};

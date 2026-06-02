@@ -1,0 +1,67 @@
+m=secretscanner;
+i=io:std.io;
+i=s:std.str;
+i=fs:std.fs;
+
+f=checkline(line:$str;filename:$str;lineno:$i64):$bool{
+  let found=mut.false;
+  let patterns=@("apikey";"api_key";"password";"passwd";"secret";"token";"private";"key");
+  let idx=mut.0;
+  lp(idx<patterns.len){
+    let pattern=patterns.get(idx);
+    if(s.contains(line;pattern)){
+      let eqpos=s.indexof(line;"=");
+      if(eqpos>=0){
+        if(s.contains(line;"\"") || s.contains(line;"'")){
+          found=true;
+          io.println(s.concat("Found potential secret in ";filename));
+          io.println(s.concat("  Line ";s.fromint(lineno)));
+          io.println(s.concat("  Pattern: ";pattern))
+        }
+      }
+    };
+    idx=idx+1
+  };
+  <found
+}
+
+f=scanfile(path:$str):$bool{
+  let content=fs.read(path);
+  let lines=s.split(content;"\n");
+  let found=mut.false;
+  let idx=mut.0;
+  lp(idx<lines.len){
+    let line=lines.get(idx);
+    if(checkline(line;path;idx+1)){
+      found=true
+    };
+    idx=idx+1
+  };
+  <found
+}
+
+f=scandir(dirpath:$str):$void{
+  let entries=fs.listdir(dirpath);
+  let found=mut.false;
+  let idx=mut.0;
+  lp(idx<entries.len){
+    let entry=entries.get(idx);
+    let fullpath=s.concat(s.concat(dirpath;"/");entry);
+    let info=fs.stat(fullpath);
+    if(info.isfile){
+      if(scanfile(fullpath)){
+        found=true
+      }
+    };
+    idx=idx+1
+  };
+  if(!found){
+    io.println("(no secrets found)")
+  }
+}
+
+f=main():$i64{
+  let path=io.readln();
+  scandir(path);
+  <0
+}

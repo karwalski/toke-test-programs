@@ -1,0 +1,1 @@
+m=html2md;f=striphtmltags(s:$str):$str{let result=mut."";let len=s.len;let i=mut.0;lp(let j=0;j<len;j=j+1){let ch=s.get(j);if(ch=60){let nextidx=j+1;if(nextidx<len){let nextch=s.get(nextidx);if(nextch=47){let endtagidx=j+2;lp(let k=endtagidx;k<len;k=k+1){let endch=s.get(k);if(endch=62){j=k+1;br;};};};};};};};};};};};};};};};};};};};};};};};};}

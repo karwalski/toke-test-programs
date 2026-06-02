@@ -1,0 +1,1 @@
+m=par;f=classify(t:$str):$str{if(t="io:std.io"){<"input"};if(t="math:add"){<"math"};if(t="file:read"){<"file"};<"unknown"};f=canruninparallel(a:$str;b:$str):$bool{let at=classify(a);let bt=classify(b);if(at="math"){if(bt="math"){<true}}};if(at="file"){<false};if(bt="file"){<false};<true};f=main():$void{let a="math:add";let b="file:read";let r=canruninparallel(a;b);<r};

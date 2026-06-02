@@ -1,0 +1,1 @@
+m=textextract;f=extractmatches(text:$str;patterns:@($str;$str)):@($str;$str)){let results=mut.@();lp(let pi=0;pi<patterns.len;pi=pi+1){let pattern=patterns.get(pi);let regex=pattern.regex;let matches=regex.find(text);lp(let mi=0;mi<matches.len;mi=mi+1){let match=matches.get(mi);let result=$str(pattern.name)+":"+$str(match);results=results+@(result);};};<results};

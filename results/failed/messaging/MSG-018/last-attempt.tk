@@ -1,0 +1,1 @@
+m=matcher;f=matchmsg(topic:$str;msg:$str):$bool{let tparts=topic.split("/");let mparts=msg.split("/");if(tparts.len=mparts.len){let matched=mut.true;lp(let i=0;i<tparts.len;i=i+1){let tpart=tparts.get(i);let mpart=mparts.get(i);let iswild=tpart.len=1;if(!(iswild)){if(!(tpart=mpart)){matched=false;};};};<matched};el{<false}};

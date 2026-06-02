@@ -1,0 +1,1 @@
+m=camelcase;f=toCamelCase(s:$str):$str{let n=s.len;let result=mut."";let capitalizeNext=mut.false;lp(let idx=0;idx<n;idx=idx+1){let c=s.get(idx);if(c=95){capitalizeNext=true;}el{if(capitalizeNext){if(c>96){if(c<123){let upperC=c-32;result=result+(upperC as$str);}el{result=result+(c as$str);};};capitalizeNext=false;}el{result=result+(c as$str););};};<result};

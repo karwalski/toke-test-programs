@@ -1,0 +1,26 @@
+{
+  "id": "CRY-132",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "1\n1\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n",
+      "expected_output": "CANONICAL"
+    },
+    {
+      "input": "1\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n",
+      "expected_output": "MALLEABLE (normalized s = 1)"
+    },
+    {
+      "input": "abcdef\n7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n",
+      "expected_output": "CANONICAL"
+    },
+    {
+      "input": "deadbeef\n7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a1\nfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141\n",
+      "expected_output": "MALLEABLE (normalized s = 7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0)"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split()\n    r = int(data[0], 16)\n    s = int(data[1], 16)\n    n = int(data[2], 16)\n    half = n // 2\n    if s <= half:\n        print('CANONICAL')\n    else:\n        ns = n - s\n        print('MALLEABLE (normalized s = {:x})'.format(ns))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:12.389626+00:00"
+}

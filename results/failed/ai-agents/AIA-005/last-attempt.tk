@@ -1,0 +1,1 @@
+m=recover;f=extracterror(msg:$str):$str{let idx=mut.0;lp(let i=0;i<msg.len;i=i+1){if(msg.get(i)as u8=58 as u8){idx=i+1}};let err=mut."";lp(let i=idx;i<msg.len;i=i+1){err=err+msg.get(i)as$str};<err};f=parseobj

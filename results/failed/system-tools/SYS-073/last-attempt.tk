@@ -1,0 +1,34 @@
+Certainly! Below is a complete program that runs a command and prepends each output line with a timestamp (ms since start).
+
+```toke
+m=timestampprepend;
+
+f=runcommand(cmd:$str):$str{
+    let result=mut."";
+    let exitcode=mut.0;
+    let stdio=mut.@(0;0;0));
+
+    let handle=mut.@(0);
+    let flags=mut.0;
+    let mode=mut.0;
+    let resultval=mut.0;
+
+    let stdioin=mut.@(0);
+    let stdioout=mut.@(0);
+    let stdioerr=mut.@(0);
+
+    let handlein=mut.@(0);
+    let handleout=mut.@(0);
+    let handleerr=mut.@(0);
+
+    let flagsin=mut.0;
+    let flagsout=mut.0;
+    let flagserr=mut.0;
+
+    let modein=mut.0;
+    let modeout=mut.0;
+    let modeerr=mut.0;
+
+    let resultvalin=mut.0;
+    let resultvalout=mut.0;
+    let resultvalerr=mut.0;

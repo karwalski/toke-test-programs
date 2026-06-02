@@ -1,0 +1,30 @@
+{
+  "id": "SCI-029",
+  "category": "scientific-math",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "5 3 8 1 9 2",
+      "expected_output": "Heap after build: 9 5 8 1 3 2\nSorted: 1 2 3 5 8 9\nComparisons: 15"
+    },
+    {
+      "input": "1 2",
+      "expected_output": "Heap after build: 2 1\nSorted: 1 2\nComparisons: 1"
+    },
+    {
+      "input": "4 4 4 4",
+      "expected_output": "Heap after build: 4 4 4 4\nSorted: 4 4 4 4\nComparisons: 6"
+    },
+    {
+      "input": "10 9 8 7 6 5 4 3 2 1",
+      "expected_output": "Heap after build: 10 9 8 7 6 5 4 3 2 1\nSorted: 1 2 3 4 5 6 7 8 9 10\nComparisons: 35"
+    },
+    {
+      "input": "42",
+      "expected_output": "Heap after build: 42\nSorted: 42\nComparisons: 0"
+    }
+  ],
+  "python": "import sys\n\ncomparisons = 0\n\ndef sift_down(a, start, end):\n    global comparisons\n    root = start\n    while 2*root + 1 <= end:\n        child = 2*root + 1\n        swap = root\n        comparisons += 1\n        if a[swap] < a[child]:\n            swap = child\n        if child + 1 <= end:\n            comparisons += 1\n            if a[swap] < a[child+1]:\n                swap = child + 1\n        if swap == root:\n            return\n        a[root], a[swap] = a[swap], a[root]\n        root = swap\n\ndef heapsort(a):\n    n = len(a)\n    for start in range((n-2)//2, -1, -1):\n        sift_down(a, start, n-1)\n    heap_state = a[:]\n    for end in range(n-1, 0, -1):\n        a[0], a[end] = a[end], a[0]\n        sift_down(a, 0, end-1)\n    return heap_state, a\n\ndata = sys.stdin.read().split()\nnums = [int(x) for x in data]\nif not nums:\n    print('Heap after build: ')\n    print('Sorted: ')\n    print('Comparisons: 0')\nelse:\n    heap_state, sorted_arr = heapsort(nums[:])\n    print('Heap after build: ' + ' '.join(str(x) for x in heap_state))\n    print('Sorted: ' + ' '.join(str(x) for x in sorted_arr))\n    print('Comparisons: ' + str(comparisons))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:24.772049+00:00"
+}

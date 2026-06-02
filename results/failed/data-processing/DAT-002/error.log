@@ -1,0 +1,2 @@
+Test failures:
+Build failed: {"schema_version":"1.0","diagnostic_id":"D0001","error_code":"E9004","severity":"error","stage":"codegen","message":"unresolved stdlib call 'csv.split()' — module 'std.csv' is not imported","file":"/opt/toke-worker/solutions/data-processing/DAT-002/solution.tk","pos":{"offset":58,"line":1,"col":59},"span_start":58,"span_end":58,"context":[],"expected":"","got":"","fix":"add i=csv:std.csv; to imports","source_line":"m=csvtojson;f=csvtojson(csv:$str):$str{let lines=csv.split(\"\\n\");let headers=l

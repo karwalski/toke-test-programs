@@ -1,0 +1,1 @@
+m=mktest;f=mktest(arr:@$i64):$bool{let n=arr.len;if(n<2){<false};let m=mut.0;lp(let i=0;i+1<n;i=i+1){let diff=arr.get(i+1)-arr.get(i);if(diff>0){m=m+1};if(diff<0){m=m-1};};let result=mut.false;if(m>0){result=true};if(m<0){result=true};<result};

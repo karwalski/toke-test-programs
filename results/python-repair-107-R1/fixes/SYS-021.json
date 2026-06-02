@@ -1,0 +1,14 @@
+{
+  "id": "SYS-021",
+  "category": "system-tools",
+  "outcome": "failed",
+  "test_cases": [
+    {
+      "input": "5\n1 0 init\n2 1 systemd\n3 1 kthreadd\n4 2 bash\n5 2 sshd\n1\n",
+      "expected_output": "1 init\n  2 systemd\n    4 bash\n    5 sshd\n  3 kthreadd"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    if not data:\n        return\n    idx = 0\n    n = int(data[idx].strip()); idx += 1\n    procs = {}\n    children = {}\n    order = []\n    for _ in range(n):\n        parts = data[idx].split(None, 2); idx += 1\n        pid = int(parts[0])\n        ppid = int(parts[1])\n        name = parts[2] if len(parts) > 2 else ''\n        procs[pid] = (ppid, name)\n        children.setdefault(ppid, []).append(pid)\n        order.append(pid)\n    root = int(data[idx].strip())\n    if root not in procs:\n        print(f'ERROR: PID not found: {root}')\n        return\n    # iterative DFS with cycle detection\n    out = []\n    stack = [(root, 0, set())]\n    while stack:\n        pid, depth, visited = stack.pop()\n        if pid in visited:\n            continue\n        new_visited = visited | {pid}\n        name = procs[pid][1]\n        out.append('  ' * depth + f'{pid} {name}')\n        kids = sorted(children.get(pid, []))\n        for k in reversed(kids):\n            if k in procs and k not in new_visited:\n                stack.append((k, depth + 1, new_visited))\n    print('\\n'.join(out))\n\nmain()\n",
+  "reason": "non-zero exit (1) on input '3\\n10 0 root\\n20 10 child1\\n30 10 child2\\n40 20 grand1\\n50 40 ggrand\\n60 30 grand2\\n10\\n': Traceback (most recent call last):\n  File \"/tmp/tmp17tqiljp.py\", line 40, in <module>\n    main()\n  File \"/tmp/tmp17tqiljp.py\", line 20, in main\n    root = int(data[idx].strip())\nValueError: invalid li",
+  "validated_at": "2026-05-31T03:42:36.190472+00:00"
+}

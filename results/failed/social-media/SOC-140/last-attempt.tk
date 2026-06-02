@@ -1,0 +1,1 @@
+m=sub;f=sub(p:$str;q:$str):$str{let result=mut."";let pidx=mut.0;let qlen=q.len;lp(let idx=0;idx<p.len;idx=idx+1){let ch=p.get(idx);if(ch=q.get(pidx)){pidx=pidx+1;if(pidx=qlen){result=result+ch;pidx=0;};}el{result=result+ch;pidx=0;};};<result};

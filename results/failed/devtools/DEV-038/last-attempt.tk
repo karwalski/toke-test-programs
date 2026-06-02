@@ -1,0 +1,1 @@
+m=json2yaml;f=json2yaml(s:$str):$str{let result=mut."";let i=mut.0;let len=s.len;lp(let idx=0;idx<len;idx=idx+1){let ch=s.get(idx);if(ch="}"){result=result+"\n";i=0;}el{if(ch=","){result=result+"\n";i=0;}el{if(ch=" "){i=i+1;}el{result=result+ch;i=0;};};};};<result};f=main():$void{let json="{\"name\":\"Alice\",\"age\":30,\"city\":\"New York\"}";let yaml=json2yaml(json);<yaml};

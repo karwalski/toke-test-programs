@@ -1,0 +1,1 @@
+m=jsonparse;f=solve(p0:$str):$str{let result=mut."";let i=mut.0;let len=p0.len;let inkey=mut.false;lp(let idx=0;idx<len;idx=idx+1){let ch=p0.get(idx);if(ch=":"){inkey=true;result=result+ch;}el{if(ch=","){result=result+ch;}el{if(inkey){result=result+" "+ch;}el{result=result+ch;};};};};<result};

@@ -1,0 +1,22 @@
+{
+  "id": "SYS-082",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\n---\n2024-01-01T10:00:00 INFO start\n2024-01-01T10:05:00 INFO mid\n2024-01-01T10:10:00 INFO end\n---\n2024-01-01T10:02:00 WARN slow\n2024-01-01T10:05:00 INFO mid\n2024-01-01T10:07:00 ERROR fail\n  continuation of error\n",
+      "expected_output": "2024-01-01T10:00:00 INFO start\n2024-01-01T10:02:00 WARN slow\n2024-01-01T10:05:00 INFO mid\n2024-01-01T10:07:00 ERROR fail\n  continuation of error\n2024-01-01T10:10:00 INFO end"
+    },
+    {
+      "input": "\\d{4}-\\d{2}-\\d{2}\n---\n2023-06-15 event A\n2023-06-10 event B\n2023-06-20 event C\nextra context for C\n2023-06-10 event B\n",
+      "expected_output": "2023-06-10 event B\n2023-06-15 event A\n2023-06-20 event C\nextra context for C"
+    },
+    {
+      "input": "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\n---\n2024-12-31T23:59:59 year end\n2024-01-01T00:00:00 year start\n---\n2024-06-15T12:00:00 midyear\n---\n2024-01-01T00:00:00 year start\n2024-03-03T03:03:03 march\n",
+      "expected_output": "2024-01-01T00:00:00 year start\n2024-03-03T03:03:03 march\n2024-06-15T12:00:00 midyear\n2024-12-31T23:59:59 year end"
+    }
+  ],
+  "python": "import sys, re\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    if not data:\n        return\n    pattern = data[0]\n    rx = re.compile(pattern)\n    # Remaining lines: split by '---' separators into file groups\n    files = []\n    current = []\n    for line in data[1:]:\n        if line == '---':\n            if current:\n                files.append(current)\n                current = []\n        else:\n            current.append(line)\n    if current:\n        # strip trailing empty line from final split\n        while current and current[-1] == '':\n            current.pop()\n        if current:\n            files.append(current)\n    if not files and current == []:\n        pass\n\n    # Build entries: each entry is (timestamp_str, file_index, order_in_file, [lines])\n    # Lines without timestamp attach to previous entry in same file.\n    entries = []\n    for fi, lines in enumerate(files):\n        order = 0\n        cur_entry = None\n        for ln in lines:\n            m = rx.match(ln)\n            if m:\n                cur_entry = [m.group(0), fi, order, [ln]]\n                entries.append(cur_entry)\n                order += 1\n            else:\n                if cur_entry is not None:\n                    cur_entry[3].append(ln)\n                # else: orphan continuation before any timestamp - skip\n\n    # Dedupe: same timestamp + same block content\n    seen = set()\n    unique = []\n    for e in entries:\n        key = (e[0], tuple(e[3]))\n        if key in seen:\n            continue\n        seen.add(key)\n        unique.append(e)\n\n    # Stable sort by timestamp (string sort works for ISO formats)\n    unique.sort(key=lambda e: e[0])\n\n    out = []\n    for e in unique:\n        out.extend(e[3])\n    sys.stdout.write('\\n'.join(out))\n    if out:\n        sys.stdout.write('\\n')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:44:27.976994+00:00"
+}

@@ -1,0 +1,1 @@
+m=tableextract;f=extracttable(md:$str):$str{let lines=md.split("\n");let startidx=mut.0;let endidx=mut.0;let found=mut.false;lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);if(!(found)){if(line.contains("|")){startidx=idx;found=true;};};};let found2=mut.false;lp(let idx=startidx

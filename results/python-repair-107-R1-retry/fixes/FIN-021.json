@@ -1,0 +1,30 @@
+{
+  "id": "FIN-021",
+  "category": "calculators-finance",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "50000\n10000 0\n40000 0.20\n100000 0.30\n",
+      "expected_output": "2000.00"
+    },
+    {
+      "input": "80000\n18200 0\n45000 0.19\n120000 0.325\n",
+      "expected_output": "6650.00"
+    },
+    {
+      "input": "200000\n0 0.10\n50000 0.20\n100000 0.30\n150000 0.40\n",
+      "expected_output": "50000.00"
+    },
+    {
+      "input": "5000\n10000 0\n40000 0.20\n",
+      "expected_output": "0.00"
+    },
+    {
+      "input": "100000\n0 0.15\n",
+      "expected_output": "15000.00"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().strip().split('\\n')\n    income = float(data[0].strip())\n    brackets = []\n    for line in data[1:]:\n        line = line.strip()\n        if not line:\n            continue\n        parts = line.split()\n        t = float(parts[0])\n        r = float(parts[1])\n        brackets.append((t, r))\n    brackets.sort(key=lambda x: x[0])\n    tax = 0.0\n    for i, (t, r) in enumerate(brackets):\n        if i + 1 < len(brackets):\n            upper = brackets[i+1][0]\n        else:\n            upper = float('inf')\n        if income > t:\n            taxable = min(income, upper) - t\n            tax += taxable * r\n        else:\n            break\n    print(f'{tax:.2f}')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T08:50:03.594083+00:00"
+}

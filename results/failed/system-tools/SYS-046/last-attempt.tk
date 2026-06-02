@@ -1,0 +1,1 @@
+m=mountinfo;f=parsepart(line:$str):$str{let idx=line.find("=");if(idx<0){<""};let val=line.substr(idx+1;line.len());<val};f=getfield(line:$str;field:$i64):$str{let parts=line.split(" ");let count=parts.len();if(field<1){<""};if(field>count){<""};<parts.get((field-1)as u64))};f=extractfield(line:$str;field:$i64

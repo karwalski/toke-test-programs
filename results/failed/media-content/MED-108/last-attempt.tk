@@ -1,0 +1,1 @@
+m=countitems;f=countitems(s:$str):$i64{let n=s.len;let count=mut.0;let inlist=mut.false;lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=42){if(inlist){count=count+1;inlist=false;};}el{if(c=49){if(inlist){count=count+1;inlist=false;};inlist=true;}el{if(inlist){if(c=50){count=count+1;inlist=false;};};};};<count};

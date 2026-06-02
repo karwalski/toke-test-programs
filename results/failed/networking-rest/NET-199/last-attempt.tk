@@ -1,0 +1,1 @@
+m=prog;f=downstreammock():$str{<""};f=proxyserver(name:$str;downstream:$str):$str{<name};f=circuitbreakerproxy(servername:$str;downstreamurl:$str):$str{<servername};f=main():$i64{let downstream=downstreammock();let proxy=circuitbreakerproxy("my-proxy";"http://downstream");<0};

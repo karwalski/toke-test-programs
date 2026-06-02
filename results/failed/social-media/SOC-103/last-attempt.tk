@@ -1,0 +1,1 @@
+m=notif;f=filterbytype(notifs:@($str;$str));typ:$str):@$str{let result=mut.@();lp(let i=0;i<notifs.len;i=i+1){let n=notifs.get(i);let t=n.get(1);if(t=typ){result=result+@(n.get(0))};};<result};

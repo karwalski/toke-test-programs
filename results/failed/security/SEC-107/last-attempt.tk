@@ -1,0 +1,1 @@
+m=secpol;f=solve(left:$str;right:$str):$str{let pl=left;let sys=right;let gaps=mut."";let i=mut.0;lp(let idx=0;idx<pl.len;idx=idx+1){let c=pl.get(idx);if(c=";"){let r=pl.slice(i;idx);if(sys.find(r)=false){gaps=gaps+r+"\n";};i=idx+1;};};let r=pl.slice(i;pl.len);if(sys.find(r)=false){gaps=gaps+r+"\n";};<gaps};

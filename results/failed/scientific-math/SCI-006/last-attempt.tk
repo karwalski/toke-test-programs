@@ -1,0 +1,1 @@
+m=gquad;f=gquad(n:$i64;f:$f64):$f64{let x=mut.@();let w=mut.@();lp(let i=0;i<n;i=i+1){let j=i as$f64;let tmp1=j+0.5;let tmp2=tmp1/((2.0*j)+1.0)as$f64;let xj=tmp2;let wj=1.0/(xj+0.5))as$f64;let xtmp=xj;let wtmp=wj;x=x+@(xtmp);w=w+@(wtmp);};let result=mut.0.0;lp(let i=0;i<n;i=i+1){let xi=x.get(i);let wi=w.get(i);let fi=f(xi);let prod=fi*wi;let result=result+prod;};<result};

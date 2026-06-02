@@ -1,0 +1,9 @@
+Test failures:
+Build failed: /usr/bin/ld: /tmp/http-bbdc1a.o: in function `maybe_gzip_body':
+http.c:(.text+0x9fc6): undefined reference to `compressBound'
+/usr/bin/ld: http.c:(.text+0xa03c): undefined reference to `deflateInit2_'
+/usr/bin/ld: http.c:(.text+0xa06a): undefined reference to `deflate'
+/usr/bin/ld: http.c:(.text+0xa086): undefined reference to `deflateEnd'
+/usr/bin/ld: http.c:(.text+0xa0a5): undefined reference to `deflateEnd'
+/usr/bin/ld: /tmp/content-220fe1.o: in function `content_decompress_gzip':
+content.c:(

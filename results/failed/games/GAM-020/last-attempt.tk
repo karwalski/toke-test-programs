@@ -1,0 +1,1 @@
+m=recommend;f=recommend(score:$i64;categories:@$str):$str{let max=mut.0;let choice=mut."";lp(let i=0;i<categories.len;i=i+1){let cat=categories.get(i);let val=score;let cmp=val>max;if(cmp){max=val;choice=cat};};<choice};

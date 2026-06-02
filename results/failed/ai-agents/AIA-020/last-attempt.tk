@@ -1,0 +1,1 @@
+m=filter;f=filterchunks(chunks:@$str;threshold:$i64):@$str{let result=mut.@();lp(let i=0;i<chunks.len;i=i+1){let chunk=chunks.get(i);let score=evaluatescore(chunk);if(score<threshold){<result};result=result+@(chunk)};<result};f=evaluatescore(chunk:$str):$i64{let length=chunk.len as$i64;if(length<50){<0};if(length<100){<50};<100};

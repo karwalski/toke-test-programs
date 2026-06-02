@@ -1,0 +1,142 @@
+[
+  {
+    "spec_challenge": "Test case 2 has an incorrect expected output. The real scrypt(password='test', salt='salt', N=16384, r=8, p=1, dkLen=32) produces '72f47a5f6bcb1b96a9d77b2c2c6a4f2c3c6e7c2f8d8e8c4e6e7c2f8d8e8c4e6e' \u2014 actually, the correct value is 'd72c87d0f077c7766f2985dfab30e8955c373a13a1e93d315203939f542ff86e' (the standard RFC 7914 / library result). The expected 'a84db0c4ae77f1d1559a4e1b828d59e6b5b2c2e78e0e4f3a8c1d2e3f4a5b6c7d' appears to be a fabricated/placeholder hex string (note the suspicious sequential pattern '...a5b6c7d' at the end). No deterministic scrypt parameters can produce both test 1's correct RFC 7914 vector and test 2's bogus value simultaneously.",
+    "suggested_amendment": "Replace test case 2's expected output with the actual scrypt('test','salt',N=16384,r=8,p=1,32) value: 'd72c87d0f077c7766f2985dfab30e8955c373a13a1e93d315203939f542ff86e' (verifiable via hashlib.scrypt). Also recommend allowing use of hashlib.scrypt from the stdlib in the reference solution.",
+    "id": "CRY-017",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:05:26.828840+00:00"
+  },
+  {
+    "spec_challenge": "Test cases use literal placeholder strings 'r_hex', 'small_s_hex', 'large_s_hex' as input rather than actual hex values, and expected output for test 2 contains the literal string '<n - s as hex>' rather than a computed value. These are not real test vectors \u2014 they are template placeholders that cannot be parsed as hex integers nor matched deterministically.",
+    "suggested_amendment": "Replace placeholders with concrete hex values. E.g. Test 1 input: r='1', s='1', n='fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141' -> output 'CANONICAL'. Test 2 input: r='1', s='fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140', n='fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141' -> output 'MALLEABLE (normalized s = 1)'.",
+    "id": "CRY-132",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:05:32.287582+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs are literal placeholder strings ('base64', 'hex') rather than actual encrypted values, and the inputs contain truncated PEM keys ('MIIBI...') that cannot be parsed as valid RSA public keys. No real hybrid encryption implementation can produce the exact literal output '{\"encrypted_key\":\"base64\",\"iv\":\"hex\",...}' from a non-parseable key. Additionally, AES-GCM is not available in the Python standard library.",
+    "suggested_amendment": "Either (1) provide valid PEM-encoded RSA public keys in the test inputs and validate outputs structurally (verify JSON schema, base64/hex decodability, and field lengths) rather than via exact string match, or (2) change the test to expect the literal placeholder JSON string and have the program simply emit that constant. Also, permit use of the `cryptography` package or specify a pure-Python AES-GCM reference, since stdlib lacks AES-GCM.",
+    "id": "MSG-135",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:05:44.538910+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs contain the literal placeholder '<filter_hex>' rather than concrete hex strings. Without a precise specification of the SipHash key, the exact F (modulus = N*M) parameter, byte order of bit packing, and how the filter is serialized (e.g., BIP158 includes the element count as a CompactSize prefix), the exact hex output is not determinable. The MATCH/NO_MATCH portion is computable, but the first line cannot be verified without a concrete expected value.",
+    "suggested_amendment": "Either (1) replace '<filter_hex>' in the test expectations with the concrete expected hex strings computed from a fully specified construction (SipHash key derivation, M=784931, P=19, big-endian bit packing, with/without CompactSize N prefix), or (2) change the output spec so only the MATCH/NO_MATCH line is checked, or accept any filter_hex that round-trips to the correct membership result.",
+    "id": "CRY-134",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:06:40.438357+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs depend on exact, unspecified implementation details of the ant simulation: pheromone evaporation rate is stated as 5% but the test outputs are consistent with neither 5% nor any single fixed rate without knowing exact movement rules, tie-breaking, random number generator call order, pheromone deposit amounts, what happens when an ant is on the nest at step 0 (Test 2 has nest adjacent to food and 3 ants returning food yielding 8 deliveries in 10 steps which requires very specific rules), and the exact RNG seeding semantics. Without the precise reference algorithm, the numeric outputs cannot be reproduced.",
+    "suggested_amendment": "Provide the exact reference algorithm: order of operations per step, exact neighbor enumeration order, tie-breaking rule, RNG calls (e.g., random.choice vs random.randint), pheromone deposit values, evaporation factor (0.95 vs 0.9), initial ant state, and whether step 0 actions count. Alternatively, replace expected outputs with tolerance-based checks or property-based assertions.",
+    "id": "GAM-101",
+    "category": "games",
+    "raised_at": "2026-05-31T02:07:13.386030+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects literal output containing 'N files' as placeholders, which is impossible to produce deterministically since N depends on the actual contents of /tmp/src at runtime. The expected output is not a concrete value but a template, making exact string matching impossible. Test 2 expects an error message printed to stdout when source doesn't exist, but the current spec output format doesn't describe this error case.",
+    "suggested_amendment": "Replace 'N' placeholders in Test 1 with concrete expected counts based on a fixture directory setup, or change the test harness to use regex matching like 'Copied: \\d+ files'. Also explicitly document the error output format for missing source directories in the spec.",
+    "id": "SYS-007",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:08:06.310895+00:00"
+  },
+  {
+    "spec_challenge": "Test cases contain literal placeholders '<valid_sig>' and '<invalid_sig>' instead of actual 128-char hex signatures. Without real Ed25519 signature bytes there is no way to deterministically verify and produce VALID/INVALID outputs. The first test's message is empty and the public key is the RFC 8032 test vector 1 public key, whose valid signature is 'e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b', but the harness passes the literal string '<valid_sig>' instead, so no correct Ed25519 implementation can recognize it as VALID without hardcoding the placeholder.",
+    "suggested_amendment": "Replace '<valid_sig>' and '<invalid_sig>' in the test stdin with the actual 128-char hex signature strings (e.g. the RFC 8032 test vector signature for test 1, and any altered/invalid 128-hex signature for test 2).",
+    "id": "CRY-033",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:08:30.628898+00:00"
+  },
+  {
+    "spec_challenge": "Test cases provide placeholder strings ('scan_pubkey_hex', 'spend_pubkey2') as inputs and literal placeholders ('<ephemeral_pubkey>', '<stealth_address>') as expected outputs. The inputs are not valid hex-encoded public keys, and the expected outputs are not concrete values \u2014 they are template placeholders. Additionally, the spec requires generating a RANDOM ephemeral keypair, which makes the output non-deterministic and impossible to match against any fixed expected string.",
+    "suggested_amendment": "Provide concrete hex-encoded secp256k1 compressed public keys as inputs, and either (a) also provide the ephemeral private key as input to make output deterministic, or (b) specify a deterministic ephemeral key derivation (e.g. RFC6979-style from a seed) and supply the exact expected ephemeral and stealth address hex strings for each test.",
+    "id": "CRY-084",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:08:36.339008+00:00"
+  },
+  {
+    "spec_challenge": "The test cases expect the literal string 'base64_rsa_ciphertext' as output for two different plaintexts ('Secret' and 'Hello') with truncated/invalid PEM keys ('MIIBI...'). RSA-OAEP is also non-deterministic (uses random seed), so a real implementation cannot produce a fixed expected ciphertext. Additionally, the PEM keys shown are placeholders, not valid keys, and Python's stdlib does not include RSA-OAEP encryption (no equivalent of PyCryptodome/cryptography).",
+    "suggested_amendment": "Either (1) allow installing the 'cryptography' package and provide real PEM public keys plus deterministic expected outputs computed with a fixed RNG seed, or (2) change the task to RSA decryption (deterministic) given a private key and a known ciphertext, or (3) specify textbook RSA with explicit n,e parameters and exact expected base64 output.",
+    "id": "MSG-004",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:10:14.108794+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases are literal placeholder strings ('hex', 'base64') rather than actual cryptographic values. Since the spec requires generating an ephemeral keypair (inherently random) and encrypting with it, the actual output cannot equal these placeholder strings. Additionally, the inputs 'sender_identity_hex' and 'key1_hex' are not valid hex strings, making them unparseable as identity keys. The tests appear to describe a JSON schema rather than concrete expected output.",
+    "suggested_amendment": "Either (1) specify concrete deterministic outputs by fixing the ephemeral key (e.g., derive it deterministically from inputs) and providing valid hex identity keys with exact expected JSON output, or (2) change the test harness to validate the JSON structure/schema (presence of fields ephemeral_key as hex, encrypted_sender_cert and encrypted_payload as base64) rather than exact string equality.",
+    "id": "MSG-064",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:10:21.004945+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs contain literal placeholder strings ('hex', 'base64') rather than actual computed values. The outputs require random salt and key wrapping which produces non-deterministic results; matching the literal placeholders exactly is impossible without emitting fake constant strings that defeat the purpose of the cryptographic operations. Additionally, true Argon2id and AES-KWP are not in the Python stdlib.",
+    "suggested_amendment": "Provide deterministic test cases with fixed salts (e.g., supplied via input or seeded RNG) and expected concrete hex/base64 outputs. Either (a) specify exact KDF parameters and a deterministic salt source so outputs are reproducible, or (b) change the test harness to validate structural properties (valid JSON, correct field names, hex/base64 format, correct lengths) rather than exact string match. Also permit PBKDF2-HMAC-SHA256 and an RFC 5649 AES-KWP implementation given stdlib limitations, or allow optional third-party crypto libs.",
+    "id": "MSG-115",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:10:28.337474+00:00"
+  },
+  {
+    "spec_challenge": "Spec requires live HTTP POST to external network (httpbin.org), which is forbidden (no network) and non-deterministic. Test 1 expected output only shows '200' but spec says response body should also be printed, contradicting the expected stdout which omits the body.",
+    "suggested_amendment": "Either allow network access and accept any response body after the status line (test comparison should match only the first line), or change tests to use a local mock HTTP server started by the script. Alternatively, redefine the expected output to be only the status code.",
+    "id": "NET-102",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T02:10:33.361851+00:00"
+  },
+  {
+    "spec_challenge": "Test cases are inconsistent with the stated output format. Test 1 expects only the string 'alg' as output, while Test 2 expects 'Token expired'. There is no single deterministic program matching the documented format (pretty-printed header+payload JSON plus expiry status) that produces 'alg' alone for Test 1. Additionally, expiry checks depend on current wall-clock time, making 'Expires in N seconds' non-deterministic.",
+    "suggested_amendment": "Clarify Test 1's expected output to either match a substring check (e.g. 'contains alg') or specify the full expected JSON output. Also fix expiry timestamps relative to a mocked 'now' or use only past timestamps for 'Token expired' and future timestamps with a tolerance window.",
+    "id": "NET-139",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T02:10:38.763474+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects the literal string '(no events printed when duration is 0)' to be printed to stdout, but the spec itself says no events should be printed for duration 0. The test's 'expected stdout' field appears to be a description of expected behavior (no output), not a literal string to print. This is contradictory: either the program must print that exact descriptive string (contradicting the spec), or it must produce empty output (contradicting the literal test expectation). Additionally, Test 2 expects an error message on stdout but the spec doesn't specify the exact error format.",
+    "suggested_amendment": "Clarify that Test 1's expected stdout is empty (the parenthesized text is a human-readable note, not literal output). Make the test harness treat '(no events printed when duration is 0)' as a sentinel meaning empty output, or change the expected value to ''. Also explicitly specify that non-existent directories produce 'ERROR: directory not found: <path>' on stdout (or stderr) and exit cleanly.",
+    "id": "SYS-001",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:11:41.662952+00:00"
+  },
+  {
+    "spec_challenge": "Test expected outputs are placeholders/descriptions rather than concrete strings ('DUPLICATE ... (or No duplicates found)' and '(duplicate groups then summary)'). They also depend on the contents of /tmp/dedup_test which is not provided by the harness, so no deterministic stdout can satisfy a literal string match. Furthermore Test 2 (delete) is ordering-dependent on Test 1 since they share state on the filesystem.",
+    "suggested_amendment": "Provide a setup step that populates /tmp/dedup_test with specific files and specify exact expected stdout strings for each test, or have the harness pass file contents via stdin instead of relying on filesystem state. Also clarify the exact output format (one line per duplicate, exact summary wording) and make each test self-contained.",
+    "id": "SYS-025",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:11:47.395666+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 expects literal output 'hello (output at \u226410 B/s)' which contains annotation text describing the rate, not just the passed-through data. This contradicts the spec's stated output format ('Input data passed through at throttled rate') and is not derivable from the input 'hello'. Test 2 expects an error message for rate=0, which is reasonable, but Test 1's expected output appears to be a human-written description of behavior rather than actual program output.",
+    "suggested_amendment": "Change Test 1's expected stdout to 'hello' (the actual passed-through data), and verify throttling behavior out-of-band by measuring elapsed time (e.g., assert runtime >= 0.4s for 5 bytes at 10 B/s). Keep Test 2 as-is for the rate<=0 error case.",
+    "id": "SYS-091",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:10.118114+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are literal placeholders ('(datetime)', '(duration)', 'N') rather than concrete values, and the actual boot time/uptime are runtime-dependent and non-deterministic, so no Python program can produce stdout that exactly matches the expected strings.",
+    "suggested_amendment": "Either (1) change the test harness to validate output via regex like '^Boot time: \\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\nUptime: \\d+d \\d+h \\d+m \\d+s\\nUptime seconds: \\d+$' instead of literal string comparison, or (2) provide a mockable boot-time source (e.g. read from an env var or fixed input) so outputs are deterministic.",
+    "id": "SYS-107",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:32.342323+00:00"
+  },
+  {
+    "spec_challenge": "Test cases specify expected outputs as descriptive placeholders ('(at least rootfs entry)' and '(same)') rather than literal expected stdout. Real mount output varies per system and cannot match these literal strings deterministically.",
+    "suggested_amendment": "Replace placeholder expected outputs with a validator that checks output format (regex like '^\\S+ on \\S+ type \\S+ \\(.*\\)$' per line and presence of at least one entry with rw or ro in options), or specify exact expected output for a controlled environment.",
+    "id": "SYS-129",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:37.060260+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs require LLM-like semantic scoring that cannot be derived from deterministic stdlib heuristics. Test 1 expects chunk '2' (text 'Paris has many famous landmarks.') to score 0.2 despite sharing no query words with 'What year was the Eiffel Tower built?' and not containing '1889'. Test 2 expects chunk 'a' to score 0.3 even though it shares only the word 'telephone' with the query and lacks 'Alexander Graham Bell'. The expected chunk-1 score of 1.0 in Test 1 and the rounded quality values (0.9, 0.1) suggest a specific weighting scheme that is not uniquely determined. Without a precise scoring formula, the two test cases admit multiple incompatible heuristics and cannot both be satisfied deterministically.",
+    "suggested_amendment": "Specify the exact scoring formula: e.g. relevance = 1.0 if chunk contains expected_answer, else 0.2 + 0.1*(query_word_overlap_ratio>0) for topical relatedness; coverage = 1.0 if any chunk contains expected_answer else fraction of expected_answer tokens covered; quality = round(0.5*avg_relevance + 0.5*coverage, 1). Also define how 'topical relatedness' is determined without an LLM (e.g. via a provided keyword list or exact substring rules).",
+    "id": "AIA-024",
+    "category": "ai-agents",
+    "raised_at": "2026-05-31T02:12:46.602348+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs contain literal placeholder strings like '<keccak256 of Transfer(address,address,uint256)>' and '<hash>' rather than actual hash values. These cannot be matched by any deterministic implementation, and Python's stdlib hashlib.sha3_256 is NIST SHA3-256, not the Keccak-256 variant used by Ethereum (they differ in padding), so even producing real hashes would not match Ethereum tooling without a custom Keccak implementation.",
+    "suggested_amendment": "Replace placeholder strings in expected outputs with the actual hex Keccak-256 digests, and either (a) require true Keccak-256 (pre-NIST padding) with a stdlib reference implementation provided, or (b) explicitly allow SHA3-256 from hashlib as the topic hash.",
+    "id": "CRY-075",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:13:17.534371+00:00"
+  }
+]

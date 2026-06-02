@@ -1,0 +1,1 @@
+m=emoji;f=solve(p0:$str;p1:$str):$str{let msg=p0;let emoji=p1;let result=mut."";let len=msg.len;lp(let i=0;i<len;i=i+1){let ch=msg.get(i);if(ch=":"){let j=mut.i+1;lp(let k=j;k<len;k=k+1){let c=msg.get(k);if(c=":"){j=k+1}el{if(k=j){<result+emoji};j=k+1}};if(!(j<len)){}el{let c=msg.get(j);if(c=":"){<result+emoji};j=j

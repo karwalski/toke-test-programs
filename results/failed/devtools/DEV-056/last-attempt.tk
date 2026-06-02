@@ -1,0 +1,1 @@
+m=logfilter;f=solve(p0:$str;p1:$str):$str{let level=mut.0;if(p0="info"){level=1};if(p0="warn"){level=2};if(p0="error"){level=3};let minlevel=mut.0;if(p1="info"){minlevel=1};if(p1="warn"){minlevel=2};if(p1="error"){minlevel=3};if(!(level<minlevel)){<p0};<""};

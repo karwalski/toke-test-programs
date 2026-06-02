@@ -1,0 +1,1 @@
+m=main;f=main():$void{httpget("/hello");httpget("/ping");httpget("/unknown");};f=httpget(path:$str):$void{let result=mut."";if(path="/hello"){result="Hello"}el{if(path="/ping"){result="pong"}el{result="404"}}};

@@ -1,0 +1,6 @@
+{
+  "id": "MSG-135",
+  "category": "messaging",
+  "outcome": "unfixable",
+  "reason": "Python's standard library has no AES-GCM implementation nor RSA-OAEP encryption (only hashlib/hmac primitives), so a stdlib-only deterministic hybrid RSA-OAEP+AES-256-GCM encryptor cannot be implemented without reinventing both cryptographic primitives from scratch."
+}

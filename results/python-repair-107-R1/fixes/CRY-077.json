@@ -1,0 +1,22 @@
+{
+  "id": "CRY-077",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "alice\nCA\n0123456789abcdef\n2024-01-01T00:00:00Z\n2025-01-01T00:00:00Z\n",
+      "expected_output": "{\"fingerprint\":\"1697b14e0d319962b2dfb08acaed1c9027a527598e981d11da33c1060c36f6d3\",\"issuer\":\"CA\",\"public_key\":\"0123456789abcdef\",\"serial\":\"877cc0587bc8da22634b7f8d5b0ed1a3\",\"subject\":\"alice\",\"validity\":{\"not_after\":\"2025-01-01T00:00:00Z\",\"not_before\":\"2024-01-01T00:00:00Z\"}}"
+    },
+    {
+      "input": "bob\nCA\ndeadbeefcafe\n2024-06-01T00:00:00Z\n2024-12-31T23:59:59Z\n",
+      "expected_output": "{\"fingerprint\":\"44f304d789df5b24b3597cf568036f21420a8b2d2c0515d46d2d9665a186d65f\",\"issuer\":\"CA\",\"public_key\":\"deadbeefcafe\",\"serial\":\"5f3d4792189ff5f8e99e59ef4ce214e0\",\"subject\":\"bob\",\"validity\":{\"not_after\":\"2024-12-31T23:59:59Z\",\"not_before\":\"2024-06-01T00:00:00Z\"}}"
+    },
+    {
+      "input": "charlie.example.com\nRoot CA Inc\nabcdef0123456789abcdef0123456789\n2023-03-15T12:00:00Z\n2026-03-15T12:00:00Z\n",
+      "expected_output": "{\"fingerprint\":\"6d5ab2e45938631385c1bf4f15cf04d0ad9cbee1c6170f44dee6872ec28c56a2\",\"issuer\":\"Root CA Inc\",\"public_key\":\"abcdef0123456789abcdef0123456789\",\"serial\":\"bcd8e286f7d0f4129f74dbee8c16e2cb\",\"subject\":\"charlie.example.com\",\"validity\":{\"not_after\":\"2026-03-15T12:00:00Z\",\"not_before\":\"2023-03-15T12:00:00Z\"}}"
+    }
+  ],
+  "python": "import sys, json, hashlib, random\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    subject = lines[0]\n    issuer = lines[1]\n    public_key = lines[2]\n    not_before = lines[3]\n    not_after = lines[4]\n    # Deterministic serial: seeded by inputs\n    seed_material = '|'.join([subject, issuer, public_key, not_before, not_after])\n    rng = random.Random(seed_material)\n    serial = ''.join('{:02x}'.format(rng.randint(0,255)) for _ in range(16))\n    cert_fields = {\n        'subject': subject,\n        'issuer': issuer,\n        'public_key': public_key,\n        'validity': {'not_before': not_before, 'not_after': not_after},\n        'serial': serial\n    }\n    canonical = json.dumps(cert_fields, sort_keys=True, separators=(',', ':'))\n    fingerprint = hashlib.sha256(canonical.encode('utf-8')).hexdigest()\n    cert = dict(cert_fields)\n    cert['fingerprint'] = fingerprint\n    print(json.dumps(cert, sort_keys=True, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:07.261191+00:00"
+}

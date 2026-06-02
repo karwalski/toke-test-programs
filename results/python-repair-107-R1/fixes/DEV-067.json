@@ -1,0 +1,22 @@
+{
+  "id": "DEV-067",
+  "category": "devtools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "/tmp/devo67_a.go\n/tmp/devo67_b.go\n/tmp/devo67_c.py\n",
+      "expected_output": "go: 2 files, 0.04 KB\npy: 1 files, 0.01 KB"
+    },
+    {
+      "input": "/tmp/devo67_README.md\n",
+      "expected_output": "md: 1 files, 0.01 KB"
+    },
+    {
+      "input": "/tmp/devo67_noext\n/tmp/devo67_x.PY\n/tmp/devo67_y.py\n",
+      "expected_output": "py: 2 files, 0.24 KB\nno-ext: 1 files, 0.10 KB"
+    }
+  ],
+  "python": "import sys, os\nfrom collections import defaultdict\n\n# Create fixture files deterministically\nfixtures = {\n    '/tmp/devo67_a.go': b'package main\\n',           # 13 bytes\n    '/tmp/devo67_b.go': b'package main\\nfunc main(){}\\n', # 27 bytes\n    '/tmp/devo67_c.py': b'print(1)\\n',                # 9 bytes\n    '/tmp/devo67_README.md': b'# Hello\\nWorld\\n',     # 14 bytes\n    '/tmp/devo67_noext': b'x' * 100,                   # 100 bytes\n    '/tmp/devo67_x.PY': b'y' * 50,                     # 50 bytes\n    '/tmp/devo67_y.py': b'z' * 200,                    # 200 bytes\n}\nfor p, content in fixtures.items():\n    with open(p, 'wb') as f:\n        f.write(content)\n\npaths = [line.strip() for line in sys.stdin if line.strip()]\n\ncounts = defaultdict(int)\nsizes = defaultdict(int)\n\nfor p in paths:\n    base = os.path.basename(p)\n    if '.' in base and not base.startswith('.'):\n        ext = base.rsplit('.', 1)[1].lower()\n    elif '.' in base[1:]:\n        ext = base.rsplit('.', 1)[1].lower()\n    else:\n        ext = 'no-ext'\n    try:\n        sz = os.path.getsize(p)\n    except OSError:\n        sz = 0\n    counts[ext] += 1\n    sizes[ext] += sz\n\nitems = sorted(counts.items(), key=lambda x: (-x[1], x[0]))\nout = []\nfor ext, n in items:\n    kb = sizes[ext] / 1024.0\n    out.append(f'{ext}: {n} files, {kb:.2f} KB')\nprint('\\n'.join(out))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:39.618207+00:00"
+}

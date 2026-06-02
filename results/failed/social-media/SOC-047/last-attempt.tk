@@ -1,0 +1,1 @@
+m=main;f=removepost(bookmarks:@$str;postid:$str):@$str{let result=mut.@();lp(let i=0;i<bookmarks.len;i=i+1){let b=bookmarks.get(i);if(b=postid){<bookmarks};result=result+@(b)};<result};f=main():$void{let bookmarks=@("post1";"post2";"post3"));let postid="post2";let updated=removepost(bookmarks;postid));};

@@ -1,0 +1,26 @@
+{
+  "id": "SCI-072",
+  "category": "scientific-math",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "2\n2 1\n1 3\n100\n1e-8\n",
+      "expected_output": "Iteration 1: eigenvalue=3.600000\nIteration 2: eigenvalue=3.615385\nIteration 3: eigenvalue=3.617647\nIteration 4: eigenvalue=3.617978\nIteration 5: eigenvalue=3.618026\nIteration 6: eigenvalue=3.618033\nIteration 7: eigenvalue=3.618034\nIteration 8: eigenvalue=3.618034\nIteration 9: eigenvalue=3.618034\nIteration 10: eigenvalue=3.618034\nDominant eigenvalue: 3.618034\nEigenvector: 0.525744 0.850643"
+    },
+    {
+      "input": "2\n4 0\n0 2\n100\n1e-8\n",
+      "expected_output": "Iteration 1: eigenvalue=3.600000\nIteration 2: eigenvalue=3.882353\nIteration 3: eigenvalue=3.969231\nIteration 4: eigenvalue=3.992218\nIteration 5: eigenvalue=3.998049\nIteration 6: eigenvalue=3.999512\nIteration 7: eigenvalue=3.999878\nIteration 8: eigenvalue=3.999969\nIteration 9: eigenvalue=3.999992\nIteration 10: eigenvalue=3.999998\nIteration 11: eigenvalue=4.000000\nIteration 12: eigenvalue=4.000000\nIteration 13: eigenvalue=4.000000\nIteration 14: eigenvalue=4.000000\nIteration 15: eigenvalue=4.000000\nDominant eigenvalue: 4.000000\nEigenvector: 1.000000 0.000031"
+    },
+    {
+      "input": "3\n2 0 0\n0 3 0\n0 0 1\n100\n1e-8\n",
+      "expected_output": "Iteration 1: eigenvalue=2.571429\nIteration 2: eigenvalue=2.816327\nIteration 3: eigenvalue=2.916877\nIteration 4: eigenvalue=2.962159\nIteration 5: eigenvalue=2.982921\nIteration 6: eigenvalue=2.992348\nIteration 7: eigenvalue=2.996586\nIteration 8: eigenvalue=2.998480\nIteration 9: eigenvalue=2.999324\nIteration 10: eigenvalue=2.999699\nIteration 11: eigenvalue=2.999866\nIteration 12: eigenvalue=2.999941\nIteration 13: eigenvalue=2.999974\nIteration 14: eigenvalue=2.999988\nIteration 15: eigenvalue=2.999995\nIteration 16: eigenvalue=2.999998\nIteration 17: eigenvalue=2.999999\nIteration 18: eigenvalue=3.000000\nIteration 19: eigenvalue=3.000000\nIteration 20: eigenvalue=3.000000\nIteration 21: eigenvalue=3.000000\nIteration 22: eigenvalue=3.000000\nIteration 23: eigenvalue=3.000000\nDominant eigenvalue: 3.000000\nEigenvector: 0.000089 1.000000 0.000000"
+    },
+    {
+      "input": "3\n4 1 0\n1 3 1\n0 1 2\n200\n1e-10\n",
+      "expected_output": "Iteration 1: eigenvalue=4.627119\nIteration 2: eigenvalue=4.694118\nIteration 3: eigenvalue=4.717023\nIteration 4: eigenvalue=4.726010\nIteration 5: eigenvalue=4.729620\nIteration 6: eigenvalue=4.731073\nIteration 7: eigenvalue=4.731658\nIteration 8: eigenvalue=4.731893\nIteration 9: eigenvalue=4.731987\nIteration 10: eigenvalue=4.732025\nIteration 11: eigenvalue=4.732041\nIteration 12: eigenvalue=4.732047\nIteration 13: eigenvalue=4.732049\nIteration 14: eigenvalue=4.732050\nIteration 15: eigenvalue=4.732051\nIteration 16: eigenvalue=4.732051\nIteration 17: eigenvalue=4.732051\nIteration 18: eigenvalue=4.732051\nIteration 19: eigenvalue=4.732051\nIteration 20: eigenvalue=4.732051\nIteration 21: eigenvalue=4.732051\nIteration 22: eigenvalue=4.732051\nIteration 23: eigenvalue=4.732051\nIteration 24: eigenvalue=4.732051\nIteration 25: eigenvalue=4.732051\nDominant eigenvalue: 4.732051\nEigenvector: 0.788673 0.577353 0.211327"
+    }
+  ],
+  "python": "import sys, math\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    idx = 0\n    n = int(data[idx].strip()); idx += 1\n    A = []\n    for i in range(n):\n        row = list(map(float, data[idx].split())); idx += 1\n        A.append(row)\n    max_iter = int(data[idx].strip()); idx += 1\n    tol = float(data[idx].strip()); idx += 1\n\n    v = [1.0]*n\n    norm = math.sqrt(sum(x*x for x in v))\n    v = [x/norm for x in v]\n    prev_eig = 0.0\n    out_lines = []\n    eig = 0.0\n    for it in range(1, max_iter+1):\n        w = [sum(A[i][j]*v[j] for j in range(n)) for i in range(n)]\n        norm = math.sqrt(sum(x*x for x in w))\n        if norm == 0:\n            break\n        v_new = [x/norm for x in w]\n        eig = sum(v_new[i]*sum(A[i][j]*v_new[j] for j in range(n)) for i in range(n))\n        out_lines.append('Iteration {}: eigenvalue={:.6f}'.format(it, eig))\n        v = v_new\n        if abs(eig - prev_eig) < tol:\n            break\n        prev_eig = eig\n\n    # Sign convention: make first nonzero component positive\n    for x in v:\n        if abs(x) > 1e-12:\n            if x < 0:\n                v = [-y for y in v]\n            break\n\n    print('\\n'.join(out_lines))\n    print('Dominant eigenvalue: {:.6f}'.format(eig))\n    print('Eigenvector: ' + ' '.join('{:.6f}'.format(x) for x in v))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:45.625082+00:00"
+}

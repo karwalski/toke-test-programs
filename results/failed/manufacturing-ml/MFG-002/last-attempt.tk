@@ -1,0 +1,1 @@
+m=stddev;f=stddev(vals:@$f64):$f64{let n=vals.len;if(n<2){<0.0};let m=mut.0.0;lp(let i=0;i<n;i=i+1){m=m+vals.get(i)};let avg=m/n as$f64;let s=mut.0.0;lp(let i=0;i<n;i=i+1){let diff=vals.get(i)-avg;s=s+diff*diff};let var=s/n as$f64;let std=var/1.0;<std};

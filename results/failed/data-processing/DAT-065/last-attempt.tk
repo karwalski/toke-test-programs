@@ -1,0 +1,1 @@
+m=resample;f=resample(arr:@$i64;newlen:$i64):@$i64{let len=arr.len;let ratio=len as f64/newlen as f64;let result=mut.@();lp(let i=0;i<newlen;i=i+1){let idx=i as f64*ratio;let left=idx as$i64;let frac=idx-left as f64;let val1=arr.get(left);let val2=arr.get(left+1);let interpolated=val1+frac*(val2-val1);result=result+@(interpolated as$i64));};<result};

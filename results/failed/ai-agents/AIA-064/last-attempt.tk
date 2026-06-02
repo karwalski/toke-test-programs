@@ -1,0 +1,1 @@
+m=summarise;f=summarise(text:$str):$str{let sentences=text.split(". ");let summary=mut."";lp(let i=0;i<sentences.len;i=i+1){let sentence=sentences.get(i);let words=sentence.split(" ");let wordcount=words.len;let isimportant=mut.false;if(wordcount>5){isimportant=true};if(isimportant){summary=summary+sentence+". "}};<summary};

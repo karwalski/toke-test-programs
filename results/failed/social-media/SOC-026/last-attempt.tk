@@ -1,0 +1,1 @@
+m=accfib;f=fib(n:$i64):$i64{if(n<2){<n};let a=mut.0;let b=mut.1;lp(let idx=2;idx<n;idx=idx+1){let tmp=a+b;a=b;b=tmp};<b};f=accumulate(arr:@$i64):$i64{let r=mut.0;lp(let i=0;i<arr.len as$i64;i=i+1){r=r+fib(arr.get(i as u64))));};<r};

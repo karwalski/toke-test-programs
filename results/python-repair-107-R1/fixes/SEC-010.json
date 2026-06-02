@@ -1,0 +1,26 @@
+{
+  "id": "SEC-010",
+  "category": "security",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "generate\nsession-abc123\n",
+      "expected_output": "{\"expiresAt\": 1700003600, \"token\": \"9+oX2o9kXgMehJDR803UQRVpTynGMiQQ8tvc/Nshnv0=\"}"
+    },
+    {
+      "input": "generate\nsession-xyz789\n",
+      "expected_output": "{\"expiresAt\": 1700003600, \"token\": \"bIyG/DOMKWGGZb12oSt6xPRtZxJ+XL89h9vklp8zI6Q=\"}"
+    },
+    {
+      "input": "validate\nsession-abc123\ninvalid-token\n",
+      "expected_output": "INVALID: token mismatch"
+    },
+    {
+      "input": "validate\nsession-abc123\n",
+      "expected_output": "INVALID: missing token"
+    }
+  ],
+  "python": "import sys, hmac, hashlib, base64, json\n\nSECRET = b'fixed-secret-key-for-csrf-demo'\nFIXED_TS = 1700000000\nEXPIRY = 3600\n\ndef gen_token(session_id, ts):\n    msg = (session_id + str(ts)).encode('utf-8')\n    mac = hmac.new(SECRET, msg, hashlib.sha256).digest()\n    return base64.b64encode(mac).decode('ascii')\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    if not data:\n        print('INVALID: no input')\n        return\n    cmd = data[0].strip() if len(data) > 0 else ''\n    sid = data[1].strip() if len(data) > 1 else ''\n    if cmd == 'generate':\n        if not sid:\n            print('INVALID: missing session id')\n            return\n        token = gen_token(sid, FIXED_TS)\n        out = {'token': token, 'expiresAt': FIXED_TS + EXPIRY}\n        print(json.dumps(out, sort_keys=True))\n    elif cmd == 'validate':\n        if not sid:\n            print('INVALID: missing session id')\n            return\n        if len(data) < 3 or not data[2].strip():\n            print('INVALID: missing token')\n            return\n        provided = data[2].strip()\n        expected = gen_token(sid, FIXED_TS)\n        if hmac.compare_digest(provided, expected):\n            print('VALID')\n        else:\n            print('INVALID: token mismatch')\n    else:\n        print('INVALID: unknown command')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:43:36.449083+00:00"
+}

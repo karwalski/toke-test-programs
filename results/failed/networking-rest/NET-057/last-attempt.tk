@@ -1,0 +1,1 @@
+m=graphql;f=main():$void{http.post("/graphql";graphqlhandler);};f=graphqlhandler(req:i64):i64{let body=req.body;let query=parsejson(body);let op=operationtype(query);if(op="query"){let result=evaluatetree(buildparselet(query)));<jsonresponse(result)}el{if(op="mutation

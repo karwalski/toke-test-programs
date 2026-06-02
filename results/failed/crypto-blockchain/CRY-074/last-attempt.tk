@@ -1,0 +1,1 @@
+m=st;f=solve(p0:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<p0.len;idx=idx+1){let ch=p0.get(idx);if(ch=";"){let key=p0.substr(i;idx);let val=solve(key);result=result+key+"="+val+"\n";i=idx+1;}el{i=idx+1;};};if(!(i=p0.len))){let key=p0.substr(i;p0.len

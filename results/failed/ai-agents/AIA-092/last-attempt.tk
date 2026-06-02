@@ -1,0 +1,1 @@
+m=apidef;f=header():$str{<"Content-Type: application/json"};f=routeget(path:$str;resp:$str):$str{let r=mut."";r=r+header();r=r+"\n";r=r+"GET ";r=r+path;r=r+" HTTP/1.1";r=r+"\n";r=r+resp;r=r+"\n";<r};f=routeput(path:$str;body

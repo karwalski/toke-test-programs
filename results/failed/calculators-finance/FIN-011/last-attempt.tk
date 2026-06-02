@@ -1,0 +1,1 @@
+m=compoundinterest;f=compoundinterest(principal:$f64;rate:$f64;compfreq:$i64;time:$i64):$f64{let r=rate/100.0;let n=compfreq*time;let p=principal;let result=mut.p;lp(let i=1;i<n;i=i+1){result=result*(1.0+r/compfreq as$f64))};<result};

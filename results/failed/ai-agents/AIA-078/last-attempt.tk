@@ -1,0 +1,1 @@
+m=score;f=score(s:$str):$i64{let len=s.len;let hasmale=false;let hasfemale=false;let haschild=false;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(c="m"){hasmale=true};if(c="f"){hasfemale=true};if(c="c"){haschild=true};};let score=0;if(hasmale){score=score+1};if(hasfemale){score=score+1};if(haschild){score=score+1};if(len>0){score=score+1};<score};

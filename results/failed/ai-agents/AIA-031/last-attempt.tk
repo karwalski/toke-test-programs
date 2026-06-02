@@ -1,0 +1,1 @@
+m=classify;f=classify(input:$str):$str{let len=input.len;let hascomma=mut.false;lp(let i=0;i<len;i=i+1){let ch=input.get(i);if(ch=","){hascomma=true}};let num1=mut.0;let num2=mut.0;let mode=mut.0;if(hascomma){mode=1}el{if(len>0)){mode=2}el{mode=3}};let result=mut."";if(mode=1){num1=0;lp(let i=0;i<len;i=i+1){let ch=input.get(i);if(!(ch=",")){num1=num1+1}};num2

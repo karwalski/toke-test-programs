@@ -1,0 +1,54 @@
+m=rangeproof;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+i=rand:std.random;
+i=math:std.math;
+
+f=hash(value:$i64;salt:$i64):$i64{
+    let a=value*2654435761;
+    let b=salt*1597334677;
+    let c=(a+b)*1013904223;
+    <c
+}
+
+f=commitment(value:$i64;blinding:$i64):$i64{
+    <hash(value;blinding)
+}
+
+f=prove(value:$i64;bits:$i64):@($i64){
+    let commit=commitment(value;rand.int(1000000;9999999));
+    let proofs=mut.@();
+    
+    lp(let b=0;b<bits;b=b+1){
+        let bit=(value/(1<<b))%2;
+        let proof=hash(bit;b+commit);
+        proofs=@(proofs;proof)
+    };
+    
+    <@(commit;1)
+}
+
+f=main():$i64{
+    let value=s.toint(io.readln());
+    let bits=s.toint(io.readln());
+    let blindingstr=io.readln();
+    
+    let result=prove(value;bits);
+    let commit=result.get(0);
+    let valid=result.get(1);
+    
+    let output=s.concat("{\"commitment\":\"";s.fromint(commit));
+    output=s.concat(output;"\",\"range_bits\":");
+    output=s.concat(output;s.fromint(bits));
+    output=s.concat(output;",\"proof_valid\":");
+    if(valid=1){
+        output=s.concat(output;"true")
+    }el{
+        output=s.concat(output;"false")
+    };
+    output=s.concat(output;"}");
+    
+    io.println(output);
+    <0
+}

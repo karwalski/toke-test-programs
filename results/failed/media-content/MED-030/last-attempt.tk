@@ -1,0 +1,1 @@
+m=stripansi;f=stripansi(s:$str):$str{let result=mut."";let i=mut.0;let len=s.len;lp(let idx=0;idx<len;idx=idx+1){let ch=s.get(idx);if(ch="\033"){let j=mut.idx+1;lp(let k=j;k<len;k=k+1){let c=s.get(k);if(c="m"){idx=k;j=0;k=len};};};}el{result=result+ch};};<result};

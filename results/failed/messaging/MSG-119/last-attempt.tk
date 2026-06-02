@@ -1,0 +1,1 @@
+m=zkproof;f=hashfn(val:$str):$i64{let hash=mut.0;lp(let i=0;i<val.len;i=i+1){let charcode=val.get(i)as$i64;hash=hash+charcode;hash=hash-hash/1000*1000;};<hash};f=provefn(groupname:$str;membercount:$i64):$str{let step1=hashfn(groupname);let step2=step1+membercount;let proof=verifyfn(proof:$str;groupname:$str;membercount:$i64):$bool

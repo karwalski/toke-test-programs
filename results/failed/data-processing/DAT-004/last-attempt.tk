@@ -1,0 +1,1 @@
+m=jsonvalidator;f=validatejson(json:$str):$bool{let isvalid=mut.true;let len=json.len;let idx=mut.0;let instring=mut.false;lp(let i=0;i<len;i=i+1){let ch=json.get(i);if(ch as u8=34 as u8){if(instring){instring=false;}el{instring=true;};};if(!(instring)){if(ch as u8=123 as u8){if(!(isvalid)){<false};isvalid=false;};if(ch as u8=125

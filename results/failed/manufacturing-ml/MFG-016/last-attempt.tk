@@ -1,0 +1,1 @@
+m=rt;f=calcrt(stepcount:$i64;totaldefects:$i64):$f64{let yield=mut.1.0;let defrate=mut.0.0;if(stepcount>0){defrate=totaldefects as$f64/stepcount as$f64;yield=1.0-defrate};<yield};f=main():$i64{let stepcount=5;let totaldefects=2;let result=calcrt(stepcount;totaldefects);<0};

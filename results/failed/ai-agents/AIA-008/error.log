@@ -1,0 +1,8 @@
+Test failures:
+Build failed: /usr/bin/ld: /tmp/tkc_p1q8QK-8612e8.o: in function `csvparse_processrow':
+tkc_p1q8QK.ll:(.text+0x10): undefined reference to `tk_row_split_w'
+/usr/bin/ld: /tmp/tkc_p1q8QK-8612e8.o: in function `tk_main':
+tkc_p1q8QK.ll:(.text+0x93): undefined reference to `split'
+/usr/bin/ld: tkc_p1q8QK.ll:(.text+0xe8): undefined reference to `tk_row_split_w'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+{"schema_version":"1.0","diagnostic_id":"D0001","error_code":"E9003","severi

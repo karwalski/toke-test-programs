@@ -1,0 +1,65 @@
+[
+  {
+    "spec_challenge": "The expected outputs in the test cases contain literal placeholder strings '<sha256 of block content>' and '<sha256>' instead of actual SHA-256 hash values. No deterministic implementation can produce those literal placeholders as hash output for arbitrary inputs while also being a real SHA-256 hash. The current code already produces the correct SHA-256 hash, but the test harness compares against unfilled placeholders.",
+    "suggested_amendment": "Replace the placeholder strings in the test cases with the actual expected SHA-256 hex digests. For Test 1 with content '02024-01-01T00:00:00ZGenesis Block0000000000000000000000000000000000000000000000000000000000000000', the expected hash is '7f1180d24eefa49123067f5fa473a81b90ecafd2cd01ba386296c7b32d633742'. For Test 2, compute SHA-256 of '12024-01-01T00:01:00ZSecond Blockabc123' and substitute the resulting hex digest. Alternatively, have the test harness treat '<sha256...>' as a wildcard matching any 64-char hex string.",
+    "id": "CRY-044",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T04:19:08.865820+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs depend on a specific implementation of the diamond-square algorithm with a specific RNG sequence, traversal order, displacement initialization, and rounding strategy that is not specified. Test 2 even has size=3 which equals 2^1+1, yet the expected output shows asymmetric non-corner values (e.g. 145, 112, 115, 137) which cannot be reproduced without knowing the exact RNG call order and scaling factors used by the reference. Without the reference implementation details (initial displacement value, RNG type/seeding, iteration order, whether wrapping is used, rounding mode), the exact integer grids in the tests cannot be deterministically reproduced.",
+    "suggested_amendment": "Provide the exact reference algorithm pseudocode including: (1) which PRNG and how it is seeded, (2) initial corner values and initial displacement amplitude, (3) exact order of diamond and square steps and iteration order over cells, (4) how random samples are mapped to displacements, (5) rounding/clamping rule. Alternatively, relax tests to check statistical properties (range 0-255, corner equals 128, symmetry constraints) rather than exact integer values.",
+    "id": "GAM-130",
+    "category": "games",
+    "raised_at": "2026-05-31T04:20:59.469702+00:00"
+  },
+  {
+    "spec_challenge": "The expected output is mathematically inconsistent. The data points (temp, pressure, quality) are perfectly collinear: pressure = temp/2, and quality = temp - 15. The design matrix X^T X is singular, so OLS coefficients are not uniquely determined. The expected answer [0.33, 0.33] with intercept 35.0 implies quality \u2248 0.33*temp + 0.33*pressure + 35 = 0.33*temp + 0.33*(temp/2) + 35 = 0.495*temp + 35, which does not equal temp - 15 for the given data (e.g. at temp=100: 0.495*100+35 = 84.5, not 85). So neither does the model fit r_squared=1.0 exactly, nor is the OLS solution unique. Any deterministic OLS implementation will either fail (singular matrix) or return a different valid least-squares solution (such as [0.5, 0] or [1, 0]).",
+    "suggested_amendment": "Provide test data where the feature columns are linearly independent (non-collinear), so that the OLS normal equations have a unique solution. For example: 'temp,pressure,quality\\n100,50,85\\n110,60,92\\n120,55,95\\n130,70,103'. Alternatively, specify a tie-breaking rule (e.g. minimum-norm / pseudoinverse solution) and recompute the expected coefficients accordingly.",
+    "id": "MFG-022",
+    "category": "manufacturing-ml",
+    "raised_at": "2026-05-31T04:21:12.650313+00:00"
+  },
+  {
+    "spec_challenge": "Expected output values are mathematically inconsistent with the stated method. For the given input, Pearson correlation of temp vs defect_rate is exactly 1.0 (not 0.99), humidity is ~0.6708 (not 0.63), and speed is ~0.2582 (not 0.45). Additionally, the expected output is not sorted by |r| descending (speed at 0.45 comes before humidity at 0.63), contradicting the 'correlations ranked' requirement. No deterministic standard formula reproduces these specific numbers.",
+    "suggested_amendment": "Either (a) update the expected test output to reflect actual Pearson correlations rounded to 2 decimals and sorted by |r| descending: [{\"variable\":\"temp\",\"r\":1.0},{\"variable\":\"humidity\",\"r\":0.67},{\"variable\":\"speed\",\"r\":0.26}], or (b) specify the exact correlation algorithm (e.g. Spearman, partial correlation) and sort order that produces the expected numbers.",
+    "id": "MFG-118",
+    "category": "manufacturing-ml",
+    "raised_at": "2026-05-31T04:24:00.073496+00:00"
+  },
+  {
+    "spec_challenge": "The test cases' expected outputs are literal placeholder strings ('alice_pub_hex', 'bob_pub_hex', 'shared_secret_hex', 'aes_key_hex') rather than the actual computed hex values from the ECDH key exchange. No deterministic ECDH implementation can produce these literal strings as output for the given private key inputs. The current code appears to correctly implement P-256 ECDH but is marked as failing because it produces real hex values instead of the placeholder strings.",
+    "suggested_amendment": "Replace the expected outputs in the test cases with the actual computed hex values. For Test 1 with Alice priv c9afa9d8...0f6721 and Bob priv 60fc7b12...6c821a, the expected output should be the actual uncompressed public keys, shared secret x-coordinate, and SHA-256 of that x-coordinate (which can be computed by a reference implementation like the cryptography library's P-256 ECDH). The placeholder strings appear to be template artifacts that were never replaced with real test vectors.",
+    "id": "MSG-006",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:24:13.472173+00:00"
+  },
+  {
+    "spec_challenge": "The spec requires making real HTTP POST requests to external GraphQL endpoints (e.g. https://countries.trevorblades.com and http://localhost:8136/graphql). The test sandbox has no network access, the localhost service does not exist, and external endpoints return varying responses (e.g. Cloudflare 403 blocks) that cannot be predicted. The expected output '{' is only the first character, suggesting any JSON output starting with '{' should pass, but actual responses depend on live network state which is non-deterministic and unavailable.",
+    "suggested_amendment": "Either (1) provide a mock HTTP server fixture / stub the network layer so responses are deterministic, (2) change the test harness to only verify the request is well-formed JSON with the correct Content-Type header rather than checking the response, or (3) allow the program to print a stub JSON object like '{}' when the network is unreachable so the first character is always '{'.",
+    "id": "NET-125",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T04:24:25.804107+00:00"
+  },
+  {
+    "spec_challenge": "Expected output literally contains 'Comparisons: N' where N appears to be a placeholder, not an actual number. The test cases require outputting the literal string 'N' rather than computing the comparison count, which contradicts the spec's intent of reporting the actual number of comparisons performed.",
+    "suggested_amendment": "Replace 'N' in the expected outputs with the actual comparison counts (e.g. 'Comparisons: 6' for test 1), or change the output format to omit the comparison count entirely.",
+    "id": "SCI-033",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:25:28.134032+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases are literal placeholder strings ('(COPY/SKIP lines)', 'N copied', etc.) rather than concrete values. Without a defined filesystem state for /tmp/src and /tmp/dst, the actual COPY/SKIP/DELETE lines and counts cannot be deterministically produced to match a fixed expected string. The test harness appears to expect literal placeholder text, which no real directory-sync implementation would emit.",
+    "suggested_amendment": "Either (1) specify the exact contents of source and dest directories before each test and provide concrete expected outputs, or (2) have the harness set up a known filesystem fixture and validate output via a pattern/regex matcher (e.g., verifying line format and that counts are consistent) rather than exact string comparison.",
+    "id": "SYS-024",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:27:31.468778+00:00"
+  },
+  {
+    "spec_challenge": "Test cases specify expected outputs as descriptive placeholders ('(3 passwords of length 16 with mixed chars)') rather than concrete strings. Since the spec mandates cryptographically secure random generation, exact output cannot be deterministic or matched against a fixed string.",
+    "suggested_amendment": "Replace exact-string test expectations with property-based assertions (e.g., verify N lines of length L, each character from the requested charset). Alternatively, allow seeding the RNG via an input parameter for reproducible test outputs, while keeping secrets.SystemRandom as the default for production.",
+    "id": "SYS-103",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:27:36.915464+00:00"
+  }
+]

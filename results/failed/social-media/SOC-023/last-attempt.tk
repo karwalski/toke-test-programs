@@ -1,0 +1,1 @@
+m=post;f=schedule(title:$str;content:$str;publishat:i64):$str{let now=0;let diff=publishat-now;if(diff<0){<""};let result=mut.title;result=result+"\n";result=result+content;result=result+"\n";result=result+"Publish at: ";result=result+publishat as$str;<result};f=main():$void{let post=schedule("Future is now";"Write code now, schedule later";1699999999);<};

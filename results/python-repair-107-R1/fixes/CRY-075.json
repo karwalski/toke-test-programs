@@ -1,0 +1,22 @@
+{
+  "id": "CRY-075",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "{\"Transfer\":[\"address\",\"address\",\"uint256\"]}\nEMIT Transfer alice bob 100\n",
+      "expected_output": "[{\"topic\":\"ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\",\"data\":[\"alice\",\"bob\",\"100\"]}]"
+    },
+    {
+      "input": "{\"Mint\":[\"address\",\"uint256\"]}\nEMIT Mint alice 50\nEMIT Mint bob 30\n",
+      "expected_output": "[{\"topic\":\"0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885\",\"data\":[\"alice\",\"50\"]},{\"topic\":\"0f6798a560793a54c3bcfe86a93cde1e73087d944c0ea20544137d4121396885\",\"data\":[\"bob\",\"30\"]}]"
+    },
+    {
+      "input": "{\"Approval\":[\"address\",\"address\",\"uint256\"],\"Burn\":[\"address\",\"uint256\"]}\nEMIT Approval alice bob 42\nEMIT Burn carol 7\nEMIT Approval bob alice 1\n",
+      "expected_output": "[{\"topic\":\"8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\",\"data\":[\"alice\",\"bob\",\"42\"]},{\"topic\":\"cc16f5dbb4873280815c1ee09dbd06736cffcc184412cf7a71a0fdb75d397ca5\",\"data\":[\"carol\",\"7\"]},{\"topic\":\"8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\",\"data\":[\"bob\",\"alice\",\"1\"]}]"
+    }
+  ],
+  "python": "import sys, json\n\ndef keccak256(data: bytes) -> str:\n    # Keccak-f[1600] with rate=1088 bits (136 bytes), pre-NIST padding (0x01 ... 0x80)\n    RC = [0x0000000000000001,0x0000000000008082,0x800000000000808A,0x8000000080008000,\n          0x000000000000808B,0x0000000080000001,0x8000000080008081,0x8000000000008009,\n          0x000000000000008A,0x0000000000000088,0x0000000080008009,0x000000008000000A,\n          0x000000008000808B,0x800000000000008B,0x8000000000008089,0x8000000000008003,\n          0x8000000000008002,0x8000000000000080,0x000000000000800A,0x800000008000000A,\n          0x8000000080008081,0x8000000000008080,0x0000000080000001,0x8000000080008008]\n    R = [[0,36,3,41,18],[1,44,10,45,2],[62,6,43,15,61],[28,55,25,21,56],[27,20,39,8,14]]\n    def rol(x, n):\n        return ((x << n) | (x >> (64 - n))) & 0xFFFFFFFFFFFFFFFF\n    def keccak_f(state):\n        for rnd in range(24):\n            C = [state[x][0]^state[x][1]^state[x][2]^state[x][3]^state[x][4] for x in range(5)]\n            D = [C[(x-1)%5] ^ rol(C[(x+1)%5], 1) for x in range(5)]\n            for x in range(5):\n                for y in range(5):\n                    state[x][y] ^= D[x]\n            B = [[0]*5 for _ in range(5)]\n            for x in range(5):\n                for y in range(5):\n                    B[y][(2*x+3*y)%5] = rol(state[x][y], R[x][y])\n            for x in range(5):\n                for y in range(5):\n                    state[x][y] = B[x][y] ^ ((~B[(x+1)%5][y]) & B[(x+2)%5][y]) & 0xFFFFFFFFFFFFFFFF\n                    state[x][y] &= 0xFFFFFFFFFFFFFFFF\n            state[0][0] ^= RC[rnd]\n        return state\n    rate = 136\n    # padding\n    data = bytearray(data)\n    pad_len = rate - (len(data) % rate)\n    if pad_len == 1:\n        data.append(0x81)\n    else:\n        data.append(0x01)\n        data.extend(b'\\x00' * (pad_len - 2))\n        data.append(0x80)\n    state = [[0]*5 for _ in range(5)]\n    for i in range(0, len(data), rate):\n        block = data[i:i+rate]\n        for j in range(rate // 8):\n            lane = int.from_bytes(block[j*8:(j+1)*8], 'little')\n            x = j % 5\n            y = j // 5\n            state[x][y] ^= lane\n        state = keccak_f(state)\n    out = b''\n    for j in range(4):\n        x = j % 5\n        y = j // 5\n        out += state[x][y].to_bytes(8, 'little')\n    return out[:32].hex()\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    sigs = json.loads(data[0])\n    events = []\n    for line in data[1:]:\n        line = line.strip()\n        if not line:\n            continue\n        parts = line.split()\n        if parts[0] != 'EMIT':\n            continue\n        name = parts[1]\n        params = parts[2:]\n        types = sigs[name]\n        signature = name + '(' + ','.join(types) + ')'\n        topic = keccak256(signature.encode('utf-8'))\n        events.append({'topic': topic, 'data': params})\n    print(json.dumps(events, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:12.372936+00:00"
+}

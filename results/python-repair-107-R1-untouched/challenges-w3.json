@@ -1,0 +1,51 @@
+[
+  {
+    "spec_challenge": "The expected outputs require producing one specific canonical expression among many valid solutions. For '4 1 8 7', many expressions evaluate to 24 (e.g., '(4*(1+7))-8' = 24, '(8-4)*(7-1)' = 24), but the test demands exactly '(8 - 4) * (7 - 1)'. Without a specified canonical form / tie-breaking rule (operand order preference, parenthesization shape, operator priority), the solver cannot deterministically pick the expected string.",
+    "suggested_amendment": "Either (1) accept any valid expression by validating the output expression evaluates to 24 and uses each input number exactly once, or (2) specify a deterministic canonical form (e.g., lexicographically smallest expression, or a specific search order over permutations/operators/parenthesizations) so a unique expected string is well-defined.",
+    "id": "GAM-022",
+    "category": "games",
+    "raised_at": "2026-05-31T04:20:59.347392+00:00"
+  },
+  {
+    "spec_challenge": "Monte Carlo results depend on the exact RNG algorithm, seeding strategy, shuffle implementation, and order of dealing. The expected outputs (82.51%/0.46%/17.03% and 64.73%/0.51%/34.76%) correspond to a specific unspecified implementation. Without specifying the exact PRNG (e.g. Python's random.Random with a specified shuffle ordering and card encoding), it is impossible to reproduce these bit-exact percentages. The reference implementation produces 81.78%/0.54%/17.68% which is statistically consistent with the true equity but not bit-identical to the expected output.",
+    "suggested_amendment": "Either (a) specify the exact RNG procedure (e.g. 'use Python's random.Random(seed); represent the deck in a canonical order RANK x SUIT; for each trial draw needed cards via random.sample from the remaining deck in a specified order'), or (b) allow tolerance of +/- 1% on each percentage, or (c) replace Monte Carlo with exact enumeration over remaining community combinations so the output is deterministic and implementation-independent.",
+    "id": "GAM-064",
+    "category": "games",
+    "raised_at": "2026-05-31T04:22:15.743851+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are literal placeholder strings ('hex_share_1', etc.) rather than actual Shamir Secret Sharing shares. No deterministic algorithm using GF(256) Shamir's Secret Sharing can produce literal strings like 'hex_share_1' as share output. The test cases appear to be unfilled placeholder templates rather than real expected values.",
+    "suggested_amendment": "Either (1) replace the placeholder expected outputs with actual computed hex shares using a deterministic seed (e.g., specify that random coefficients must be derived deterministically from the secret via a documented PRNG), or (2) change the spec to literally output placeholder strings 'hex_share_i' for share i, with the final line stating 'reconstruction requires any K of N shares'.",
+    "id": "MSG-083",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:27:00.245069+00:00"
+  },
+  {
+    "spec_challenge": "Expected output literally contains 'Comparisons: N' where N appears to be a placeholder, not an actual number. Both test cases expect the literal string 'N' as the comparison count, which is inconsistent with the spec's request to count comparisons during heapsort. Hardcoding 'N' would match tests but contradicts the spec's intent.",
+    "suggested_amendment": "Replace 'N' in expected outputs with actual comparison counts (e.g., 15 for test 1, 1 for test 2), or change the output format to omit the comparisons line, or clarify that 'N' is a literal string placeholder.",
+    "id": "SCI-029",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:20.934389+00:00"
+  },
+  {
+    "spec_challenge": "Test case expected outputs contain literal descriptive placeholders like '(iterations converging to 1.414214)' and 'Root: 1.414214 (N iterations)' with literal 'N' instead of a numeric iteration count. These are not concrete expected outputs \u2014 they are human-readable descriptions. The actual program output (which is correct Newton-Raphson behavior matching the spec's stated format 'Iteration N: x=X.XXXXXX f(x)=X.XXXXXX') can never equal these placeholder strings via byte comparison.",
+    "suggested_amendment": "Replace test expected outputs with the exact concrete strings the iteration should produce. For test 1, expected stdout should be the full iteration trace ending in 'Root: 1.414214 (5 iterations)'; for test 2, the full trace ending with the actual iteration count. Alternatively, change the test harness to use a regex/substring match for 'Root: <value> (<int> iterations)' and verify convergence to the target value within tolerance.",
+    "id": "SCI-043",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:27.299217+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 has coefficients '4 -4 1' interpreted as a polynomial, but the expected minimum is x=2.000000 f(x)=0.000000. If coeffs are descending (4x^2-4x+1=(2x-1)^2), minimum is at x=0.5. If ascending (4-4x+x^2=(x-2)^2), minimum is at x=2. The spec doesn't specify coefficient ordering. Additionally, expected stdout literally contains the placeholder text '(iterations)' rather than actual iteration lines, making exact-match comparison impossible.",
+    "suggested_amendment": "Specify coefficient ordering (e.g., 'ascending powers: c0 + c1*x + c2*x^2 + ...') and provide concrete expected iteration output lines rather than placeholder text like '(iterations)'.",
+    "id": "SCI-069",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:32.658784+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects the literal placeholder string '(files with ages, STALE if > 24h)' as stdout, but this is a description, not actual expected output. Real output depends on the live contents and mtimes of /tmp on the test machine, which are non-deterministic and unknowable in advance. No program can produce both that literal placeholder for /tmp and the concrete error message for /nonexistent.",
+    "suggested_amendment": "Replace Test 1 with a deterministic fixture: either create a temp directory with known files and mtimes as part of the test harness setup, or change the expected output to a regex/structural matcher (e.g. lines matching '^<path>: \\d+d \\d+h \\d+m( \\[STALE\\])?$'). Also clarify the exact age format ('Xd Xh Xm' per spec vs. the abbreviated form), and clarify error-output channel (stdout vs stderr) and exit code on missing directory.",
+    "id": "SYS-044",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:28:09.544340+00:00"
+  }
+]

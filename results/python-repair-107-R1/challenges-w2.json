@@ -1,0 +1,156 @@
+[
+  {
+    "spec_challenge": "Test case 2's expected output is not a valid AES-256-CBC encryption of the given plaintext. The expected ciphertext '8b1a9953c4611296a827abf8c47804d7e3e8a1f2b5c4d6e7f8a9b0c1d2e3f4a5' is actually the SHA-1 hash of 'test' (8b1a9953c4611296a827abf8c47804d7) concatenated with arbitrary bytes - it does not correspond to any valid AES-256-CBC encryption with the given all-FF key and zero IV. The plaintext 'test data padding' is 17 bytes, which after PKCS7 padding becomes 32 bytes (2 blocks), and the correct AES-256-CBC ciphertext differs from the expected value. Additionally, test 1's expected output is only 16 bytes (32 hex chars) but 'hello world12345' is 16 bytes which after PKCS7 padding becomes 32 bytes producing 32-byte ciphertext (64 hex chars), not 16 bytes.",
+    "suggested_amendment": "Regenerate expected outputs by actually running AES-256-CBC with PKCS7 padding on the inputs. For test 1, 16-byte plaintext should produce 32-byte (64 hex char) ciphertext due to padding. For test 2, compute the actual AES-256-CBC ciphertext with the FF key and zero IV.",
+    "id": "CRY-021",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:05:21.839308+00:00"
+  },
+  {
+    "spec_challenge": "The test cases provide invalid/placeholder inputs that cannot actually be decrypted to the expected outputs. Test 1's ciphertext 'U2FsdGVkX1...' is truncated (literally ends with '...') and not valid base64. Test 2's ciphertext is the literal string 'base64_ciphertext' which is not valid base64 and certainly not a valid AES-CBC encryption of 'Test message' under the given key/IV. No correct AES-256-CBC implementation can produce the expected plaintexts from these inputs; the only way to 'pass' is to hardcode outputs based on the key, which is not a real implementation.",
+    "suggested_amendment": "Provide real test vectors: compute actual AES-256-CBC ciphertexts (with PKCS7 padding) for the chosen plaintexts using the specified keys and IVs, then base64-encode the full ciphertext. Include the complete base64 strings in the test cases rather than truncated/placeholder text.",
+    "id": "MSG-002",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:05:34.364310+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs literally contain the placeholder 'N KB' instead of computed numeric values, and the input file paths (/tmp/a.go etc.) are not guaranteed to exist on the test system, so file sizes cannot be deterministically computed. The tests are under-specified: either expected outputs must specify exact KB values for known-content fixture files, or the size field must be a literal placeholder.",
+    "suggested_amendment": "Either (1) have the harness create the input files with known sizes before running, and replace 'N KB' in expected outputs with exact rounded KB values, or (2) change the spec so the size column is a fixed placeholder like '0.00 KB' when files are inaccessible, and update expected outputs accordingly.",
+    "id": "DEV-067",
+    "category": "devtools",
+    "raised_at": "2026-05-31T02:07:48.403974+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are literal placeholder strings ('(matching .log files modified in last day)\\nN files found.' and '(files >= 1KB)\\nN files found.') rather than concrete deterministic outputs. The actual matching file paths and count depend entirely on the runtime contents of /tmp on the host running the test, which is non-deterministic and host-specific. No stdlib program can produce the literal placeholder text while also performing a real filesystem search as the spec describes; the two test expectations are descriptions, not real expected outputs.",
+    "suggested_amendment": "Replace the test cases with deterministic ones: have the test harness create a controlled temporary directory tree with known files (specific names, sizes, mtimes), pass that directory as the root in stdin, and specify the exact expected sorted file paths followed by 'N files found.' as the expected stdout. Alternatively, supply a synthetic in-memory filesystem description via stdin instead of relying on real disk state.",
+    "id": "SYS-036",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:09:20.734859+00:00"
+  },
+  {
+    "spec_challenge": "The spec requires Keccak-256 (the original Keccak submission used by Ethereum), but Python's standard library only provides SHA3-256 (the NIST FIPS-202 standardized version), which uses a different padding (0x06 vs 0x01) and therefore produces different digests. Without a third-party package (e.g., pycryptodome's keccak, pysha3, eth-hash) or a hand-written Keccak-f[1600] implementation, the correct Ethereum address cannot be derived. Additionally, Test 1's input 'pubkey_128_hex' is not a valid 128-hex-character public key and its expected output '0xCheckSummedAddress' is a literal placeholder rather than a real checksummed address, and Test 2's expected output is given only as '0x...', so the tests are under-specified and unverifiable.",
+    "suggested_amendment": "Either (a) allow a third-party Keccak library, or (b) include a pure-Python Keccak-256 implementation in the reference solution, and replace the placeholder test vectors with real (pubkey, expected EIP-55 address) pairs, e.g. using known Ethereum test vectors.",
+    "id": "CRY-042",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:09:34.747014+00:00"
+  },
+  {
+    "spec_challenge": "Test cases contain literal placeholder strings '<valid_base64_sig>' and '<sig>' instead of real Base64-encoded ECDSA signatures. There is no actual signature data to verify; '<valid_base64_sig>' is not valid Base64 and cannot be decoded into a 65-byte recoverable ECDSA signature. Without a real signature produced by the private key corresponding to address 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN signing 'hello', no correct implementation of Bitcoin signed-message verification can output VALID for Test 1.",
+    "suggested_amendment": "Replace the placeholder '<valid_base64_sig>' with a genuine Base64-encoded 65-byte Bitcoin signed-message signature (header byte 27-34 followed by 32-byte r and 32-byte s) generated by the private key whose P2PKH address is 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN signing the exact message 'hello'. For Test 2, supply any syntactically valid Base64 signature that does not verify against that address/message. Also clarify whether the message is hashed with or without a trailing newline.",
+    "id": "CRY-110",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:09:43.428808+00:00"
+  },
+  {
+    "spec_challenge": "The test cases reference filesystem paths (/tmp/a.py, /tmp/b.py, /tmp/unique.py) whose contents are not provided. The expected output hardcodes specific line numbers (a.py:5, b.py:10) and a 3-line duplicate block, but without knowing the file contents, no algorithm can deterministically produce these exact locations. The test is essentially checking hardcoded output rather than actual duplicate detection logic.",
+    "suggested_amendment": "Either (1) provide file contents inline via stdin instead of file paths, or (2) include a setup step that creates the referenced files with known content, or (3) change the test to provide source content directly so the detector's output is verifiable from the input alone.",
+    "id": "DEV-042",
+    "category": "devtools",
+    "raised_at": "2026-05-31T02:09:59.910740+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1's expected output is the literal descriptive string 'Valid solution grid with 1 at 8,0 and 41 at 4,4' rather than an actual 9x9 grid, while test case 2 expects a real solved grid. These are mutually incompatible output formats. Additionally, test case 2 provides a 3x3 input while the spec mandates a 9x9 grid. No single deterministic program can satisfy both tests.",
+    "suggested_amendment": "Make the grid size dynamic (NxN based on input). For each test case, specify the expected output as the actual solved grid (space-separated rows). Replace test 1's expected output with a concrete valid 9x9 Numbrix solution containing the anchors at the given positions, or use a validator-based test instead of exact string match.",
+    "id": "GAM-118",
+    "category": "games",
+    "raised_at": "2026-05-31T02:10:20.632477+00:00"
+  },
+  {
+    "spec_challenge": "The test cases use literal placeholder strings as both input and expected output. Input lines like 'alice_identity_key_hex' and 'key1_hex' are not valid hexadecimal, and the expected stdout is the literal string '{\"shared_secret\":\"hex\",\"session_key\":\"hex\",\"associated_data\":\"hex\"}' rather than actual computed hex values. No deterministic X3DH/HKDF computation can produce the literal word 'hex' as its output fields, so the spec is self-contradictory: it asks for cryptographic key derivation while the tests demand placeholder echoes.",
+    "suggested_amendment": "Replace the placeholder test cases with concrete hex inputs (e.g., 64-hex-char strings for each key) and provide the exact expected JSON output computed by a reference X3DH+HKDF-SHA256 implementation (specifying the simulated DH function, HKDF salt/info, and associated_data construction). Alternatively, if literal echoing is desired, change the spec to 'echo the literal placeholders' instead of describing X3DH.",
+    "id": "MSG-031",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:10:40.332386+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases use placeholder/illustrative key values (e.g., 'abcdef...', '123456...', 'hash1...', 'hash2...') rather than actual cryptographic hash outputs derived from the inputs. These values do not correspond to any deterministic key derivation function applied to the given inputs (initial secret 'ab01cd23ef45...' or all-zero secret). For example, 'abcdef...' is not the first 16 hex chars of HMAC-SHA256 or HKDF of any reasonable scheme over the given inputs. No stdlib KDF will produce these exact strings.",
+    "suggested_amendment": "Specify the exact key derivation scheme (e.g., 'message key = HMAC-SHA256(chain_key, msg_index).hex()[:16]', 'chain ratchet: chain_key = SHA256(chain_key)', 'epoch rotation: HKDF-Expand(epoch_key, info=b\"rotate\", length=32) using hashlib') and regenerate the expected outputs by actually running that algorithm on the given inputs, rather than using placeholder strings like 'abcdef...' and 'hash1...'.",
+    "id": "MSG-077",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:10:49.000112+00:00"
+  },
+  {
+    "spec_challenge": "The spec requires making live HTTP requests to external services (httpbin.org), which violates the 'no network' constraint of the test environment. Additionally, expected outputs only show partial lines (e.g. 'https://httpbin.org/get 200' without the body portion specified by the output format), making exact matching impossible since the format mandates '<url> <status> <first_100_chars_of_body>'. The expected outputs are also non-deterministic as they depend on live remote server responses.",
+    "suggested_amendment": "Either (1) change the test harness to use substring/prefix matching instead of exact match, and allow network access; or (2) replace the spec with a local mock: have the input include URL+canned-response pairs, or fetch from file:// URLs pointing to fixture files bundled with the test. Also clarify whether the body portion should be included when status-only matching is desired.",
+    "id": "NET-113",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T02:10:58.651044+00:00"
+  },
+  {
+    "spec_challenge": "Spec requires making real HTTP requests to live URLs (api.example.com, httpbin.org) to inspect response headers/bodies for deprecation signals. Sandbox forbids network access, and expected outputs depend on the current live state of those services, which is non-deterministic and unreproducible. Test 1 also expects only a single 'ACTIVE' line for two input URLs, which contradicts the 'Per URL' output rule.",
+    "suggested_amendment": "Either (a) provide mocked HTTP responses as part of stdin (e.g., URL followed by headers/body blocks) so the checker is pure-stdlib and deterministic, or (b) clarify Test 1's expected output to include one result line per URL ('ACTIVE\\nACTIVE'). Remove dependence on live network services.",
+    "id": "NET-173",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T02:11:12.671530+00:00"
+  },
+  {
+    "spec_challenge": "Test cases specify expected output as literal 'S(1.5) = X.XXXXXX' and 'S(0.5) = X.XXXXXX' with placeholder X's rather than concrete numeric values. There is no deterministic numeric target to match; the actual computed natural cubic spline values (0.500000 for test 1, 0.375000 for test 2) cannot equal a string containing literal 'X' characters.",
+    "suggested_amendment": "Replace the placeholder 'X.XXXXXX' in expected outputs with the actual computed values: Test 1 expected 'S(1.5) = 0.500000', Test 2 expected 'S(0.5) = 0.375000' (computed from natural cubic spline with second-derivative-zero boundary conditions). Alternatively, treat 'X.XXXXXX' as a regex/format pattern and have the test harness validate the output format rather than exact match.",
+    "id": "SCI-068",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T02:11:20.126907+00:00"
+  },
+  {
+    "spec_challenge": "Test cases are placeholders, not real data: test 1 input contains the literal string '<256_hex_encoded_bytes>' (not valid hex), and expected outputs are the literal strings 'quality' and 'entropy_per_bit' rather than actual JSON output values. These are template descriptions, not concrete test fixtures, so no deterministic program can both parse the bogus hex and emit the literal word 'quality' as full stdout while also being a meaningful randomness analyser.",
+    "suggested_amendment": "Replace placeholders with concrete fixtures: provide real hex strings of the stated lengths and specify either (a) the exact expected JSON output, or (b) that the expected stdout should merely *contain* the given key names. For example: 'expected stdout contains the substring \"quality\"' rather than equals 'quality'.",
+    "id": "SEC-080",
+    "category": "security",
+    "raised_at": "2026-05-31T02:11:54.943446+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expected output contains the literal placeholder 'deleteme.txt ... (list)' which is not a deterministic, well-defined string. Also it requires /tmp/deleteme.txt to pre-exist on the test system. Test 2 expects literally 'Emptied N items.' with N as the letter N, not a real count, which contradicts the spec text 'Emptied N items' where N should be an integer. The tests are placeholders rather than concrete expected outputs, so no deterministic program can match them.",
+    "suggested_amendment": "Provide concrete expected outputs with exact strings (e.g. fixed timestamp or wildcard regex), ensure the test harness creates /tmp/deleteme.txt before TRASH, and specify whether N is a literal or an integer count. Also clarify the exact LIST output format including how timestamps are rendered.",
+    "id": "SYS-028",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:26.800941+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases contain literal placeholders ('...' and 'N') rather than concrete strings, and depend on the contents/size of an external file (/tmp/big.bin) which is not provided. Test 2 expects a literal line '(chunks of up to 1024 bytes)' which is not described in the output format spec, and 'N' is never resolved to a number. The expected outputs are therefore non-deterministic and not exactly reproducible.",
+    "suggested_amendment": "Make the program self-contained: have stdin include the file contents (or size) directly, and specify exact, literal expected outputs without ellipses or unresolved placeholders. For example: line 1 = file size in bytes, line 2 = mode, and define the exact printed lines (one 'Created: name.NNN' per chunk followed by 'Done: K chunks created.').",
+    "id": "SYS-052",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:33.135107+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects literal output '(last 3 lines of file)' which is a placeholder description, not actual file content. The test references /tmp/test.log without specifying its contents, so no deterministic implementation can produce that exact string. Test 2's expected error message format is reasonable, but Test 1 is under-specified.",
+    "suggested_amendment": "Specify the exact contents of /tmp/test.log (or have the harness create it before running) and provide the literal expected output (e.g., the three actual last lines). Alternatively, change Test 1 to use a file the harness pre-populates with known content and list the exact expected stdout.",
+    "id": "SYS-081",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:38.044388+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs in test cases use literal ellipses ('...') as placeholders rather than concrete expected values, making exact string matching impossible. Additionally, swap usage and per-process VmSwap values are environment-dependent and non-deterministic, so no deterministic program can produce a fixed expected stdout. Test 2 also implies a special '(no process list)' literal when top_n=0, which conflicts with the format template in Test 1.",
+    "suggested_amendment": "Either (1) provide deterministic input data via stdin (e.g., supply swap totals and a list of processes after the top_n line) so output is fully determined by input, or (2) define the matcher as a regex/template check rather than exact equality, and explicitly specify the top_n=0 output as the literal string 'Swap total=<T> free=<F> used=<U> MB\\n(no process list)'.",
+    "id": "SYS-094",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:44.153276+00:00"
+  },
+  {
+    "spec_challenge": "Expected output is a placeholder template ('Battery: N% ... (or No battery found)') rather than a deterministic string. The test harness appears to do a literal string comparison, so no real battery readout (e.g. 'Battery: 53% DISCHARGING time_remaining=Unknown cycles=331') can ever match, and 'No battery found' also won't match the literal expected string. Additionally, battery state on the grader machine is environment-dependent and non-deterministic.",
+    "suggested_amendment": "Either (1) specify the expected output as a regex/pattern match like ^(Battery: \\d+% (CHARGING|DISCHARGING|FULL) time_remaining=(\\d+|Unknown)(min)? cycles=(\\d+|Unknown)|No battery found)$, or (2) make the input deterministic by feeding mock battery data via stdin and have the program format that, rather than querying the host system.",
+    "id": "SYS-101",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:12:50.579201+00:00"
+  },
+  {
+    "spec_challenge": "The test cases list the literal string 'shared_secret_hex' as the expected stdout for both tests, which is a placeholder rather than the actual expected hex output. The current code already correctly computes the ECDH shared secret on secp256k1 (verifiable: privA=1, pubB=2*G, so shared = 2*G, whose x-coordinate is c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5, matching the actual output). No Python program can produce the literal string 'shared_secret_hex' as output while also being a correct ECDH implementation.",
+    "suggested_amendment": "Replace the placeholder 'shared_secret_hex' in each test case with the actual expected 64-character hex x-coordinate. For Test 1 (privA=1, privB=2): 'c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5'. For Test 2 (privA=3, privB=5): compute x-coordinate of 15*G on secp256k1, which is 'd01115d548e7561b15c38f004d734633687cf4419620095bc5b0f47070afe85a'.",
+    "id": "CRY-035",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:13:34.296454+00:00"
+  },
+  {
+    "spec_challenge": "Expected output contains literal placeholders '<random>' for serial and '<sha256>' for fingerprint. The spec mandates a randomly generated serial number, which by definition cannot match a fixed expected string. Even with deterministic seeding, the expected outputs in the test cases are placeholder strings, not actual values, making exact stdout matching impossible.",
+    "suggested_amendment": "Either (1) provide a fixed serial number as additional input, or (2) change test verification from exact string match to JSON structural validation: verify fields exist, serial is a hex string of expected length, and fingerprint equals SHA-256 of the canonical JSON of the other fields.",
+    "id": "CRY-077",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:13:39.593680+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs are inconsistent and not reproducible by any single deterministic rule. Test 1 Pass 1 includes an empty bucket '[1:]' but Pass 2 omits the empty '[1:]' bucket between [2,802] and [4:45], and Pass 3 has no '...' suffix while Passes 1-2 do. Test 2 never shows empty buckets and never shows '...'. There is no consistent rule (e.g. 'show empty buckets only when followed by non-empty ones', 'show ... except on last pass') that simultaneously satisfies: Pass1 has '[1:]' shown, Pass2 omits the empty '[1:]' (since [2,802] then [4:45] skips bucket 3 with no marker, and bucket 1 between [2,802] and [4:45] would also be empty \u2014 actually bucket 1 is empty in Pass2 but not shown), and Pass3 omits the trailing '...'. The spec says 'Show non-empty buckets only' which directly contradicts Test 1 Pass 1 showing '[1:]'.",
+    "suggested_amendment": "Clarify the exact formatting rule: either always show all 10 buckets, always show only non-empty buckets (removing '[1:]' from Test 1 Pass 1), and specify whether the trailing ' ...' should appear after every pass or never. Provide a single consistent rule and regenerate the expected outputs accordingly.",
+    "id": "DAT-024",
+    "category": "data-processing",
+    "raised_at": "2026-05-31T02:13:48.419254+00:00"
+  }
+]

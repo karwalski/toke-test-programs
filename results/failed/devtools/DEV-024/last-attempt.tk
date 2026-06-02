@@ -1,0 +1,1 @@
+m=errorformatter;f=formaterror(filename:$str;line:$i64;col:$i64;msg:$str):$str{let out=mut."";out=out+filename;out=out+":";out=out+line as$str;out=out+":";out=out+col as$str;out=out+" error: ";out=out+msg;<out};f=main():$void{let filename="src/main.t";let line=10;let col=5;let msg="undefined variable 'x'";let formatted=formaterror(filename;line;col;msg);<formatted};

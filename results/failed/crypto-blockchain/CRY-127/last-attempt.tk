@@ -1,0 +1,1 @@
+m=timelock;f=checklock(action:$str;locked:$bool;untilts:$i64):$str{if(locked){let currentts=0;let diff=untilts-currentts;if(diff>0){<action};<""};<action};f=main():$void{let result=checklock("submit";true;1000));<void};

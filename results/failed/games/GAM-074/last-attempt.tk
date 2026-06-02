@@ -1,0 +1,1 @@
+m=snakesladders;f=playgame(startpos:$i64;dice1:$i64;dice2:$i64):$i64{let pos=mut.startpos;let roll1=dice1;let roll2=dice2;let total=roll1+roll2;let newpos=pos+total;let finalpos=mut.newpos;if(!(finalpos<100)){let overshoot=finalpos-100;let ladderstart=mut.1;lp(let idx=0;idx<100;idx=idx+1){if(idx=overshoot){ladderstart=idx};};let climb=ladderstart-overshoot;finalpos=climb}

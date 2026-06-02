@@ -1,0 +1,1 @@
+m=seq;f=extractseq(data:$str):$i64{let idx=mut.0;let len=data.len;lp(let i=0;i<len;i=i+1){let ch=data.get(i);if(ch=":"){idx=i;br};};<idx};f=buildresponse(seq:$i64):$str{<seq as$str}>;f=main():$void{let data="hello:world:10";let seq=extractseq(data);let response=buildresponse(seq);<};

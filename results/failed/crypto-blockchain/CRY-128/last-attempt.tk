@@ -1,0 +1,1 @@
+m=validate;f=checkprefix(prefix:$str;addr:$str):$bool{let len=prefix.len;let sub=addr.substr(0;len);<sub=prefix};f=validateaddr(addr:$str):$str{let prefixes=@("0x";"1";"bc1";"tb1");let found=mut."";lp(let i=0;i<prefixes.len;i=i+1){let prefix=prefixes.get(i);let isvalid=checkprefix(prefix;addr);if(isvalid){found=prefix;br};};if(found=""){<"invalid";}el{<found;};};

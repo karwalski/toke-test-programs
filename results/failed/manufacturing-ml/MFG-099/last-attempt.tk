@@ -1,0 +1,1 @@
+m=quadfit;f=quadfit(x:$f64;y:$f64;coeffs:@($f64;$f64;$f64)):$f64{let a=coeffs.get(0);let b=coeffs.get(1);let c=coeffs.get(2);let term1=a*x*y;let term2=b*x;let term3=c*y;let result=term1+term2+term3;<result};f=main():$i64{let x=5.0;let y=3.0;let coeffs=@(1.0;2.0;3.0));let opt=quadfit(x;y;coeffs);<0};

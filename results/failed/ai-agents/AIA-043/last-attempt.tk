@@ -1,0 +1,1 @@
+m=churnrisk;f=classifyrisk(interactions:$i64;avgresponse:$i64;daysactive:$i64):$str{if(daysactive<30){<"low"};let lowthresh=5;let medthresh=10;let highthresh=20;if(interactions<lowthresh){<"low"};if(interactions<medthresh){<"medium"};if(interactions<highthresh){<"high"};<"critical"};f=main():$void{let risk=classifyrisk(15;5;60;90);<risk;}

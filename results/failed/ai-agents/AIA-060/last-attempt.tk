@@ -1,0 +1,1 @@
+m=extract;f=extractvalue(s:$str):$str{let len=s.len;let start=mut.0;let end=mut.len;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(c=" "){start=i+1}el{if(start=0){start=i}}}};lp(let i=len-1;i>start;i=i-1){let c=s.get(i);if(c=" "){end=i}el{if(end=len){end=i+1}}}};let result=mut."";lp(let i=start;i<end;i=i+1){let c=s.get(i);result=result+c;};<result};f=extractlabel

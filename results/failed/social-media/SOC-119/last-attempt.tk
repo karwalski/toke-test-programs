@@ -1,0 +1,1 @@
+m=abnvl;f=isabnvl(likes:$i64;comments:$i64;shares:$i64):$bool{let tot=likes+comments+shares;if(tot<100){<false};let likepct=(likes as f64)/(tot as f64))*100.0;if(likepct>50.0){<true};<false};

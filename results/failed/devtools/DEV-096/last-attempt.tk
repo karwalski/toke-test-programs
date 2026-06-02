@@ -1,0 +1,1 @@
+m=missingtests;f=findmissingtests(sources:@$str;tests:@$str):@$str{let missing=mut.@();lp(let si=0;si<sources.len;si=si+1){let found=mut.false;lp(let ti=0;ti<tests.len;ti=ti+1){if(sources.get(si)=tests.get(ti))){found=true;};};if(!(found)){missing=missing+@(sources.get(si));};};<missing};

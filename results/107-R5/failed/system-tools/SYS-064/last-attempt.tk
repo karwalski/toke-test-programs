@@ -1,0 +1,5 @@
+m=jsonparse;
+i=io:std.io;
+i=s:std.str;
+f=solve(p0:$str):$str{let result=mut."";let len=p0.len;lp(let idx=0;idx<len;idx=idx+1){let ch=s.slice(p0;idx;idx+1);if(ch="{"){result=s.concat(result;"{\n  ");}el{if(ch="}"){result=s.concat(result;"\n}");}el{if(ch=":"){result=s.concat(result;": ");}el{if(ch=","){result=s.concat(result;",\n  ");}el{result=s.concat(result;ch);};};};};};<result};
+f=main():$i64{let input=s.trim(io.readln());if(s.contains(input;"{")){if(s.contains(input;"}")){if(s.contains(input;":")){io.println(solve(input));}el{io.println("ERROR: invalid JSON: ...");};}el{io.println("ERROR: invalid JSON: ...");};}el{io.println("ERROR: invalid JSON: ...");};<0};

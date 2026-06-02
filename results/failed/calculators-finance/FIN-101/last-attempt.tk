@@ -1,0 +1,1 @@
+m=gcdbezout;f=extgcd(a:$i64;b:$i64):$i64{let x=mut.0;let y=mut.1;let xprev=mut.1;let yprev=mut.0;let r=mut.a;let rprev=mut.b;lp(let cond=true;cond;cond=false){if(r=0){<rprev};let quotient=rprev/r;let remainder=rprev-quotient*r;rprev=r;r=remainder;xprev=x;x=yprev;y=xprev-quotient*xprev};<rprev};f=gcdbezout(a:$i64;b:$i64):$i64{let result=extgcd(a;b);<result};

@@ -1,0 +1,22 @@
+{
+  "id": "NET-143",
+  "category": "networking-rest",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "localhost\n7\nhello\nworld\n\n",
+      "expected_output": "hello\nworld\nConnection closed"
+    },
+    {
+      "input": "echo.example.com\n7\nping\n\n",
+      "expected_output": "ping\nConnection closed"
+    },
+    {
+      "input": "testhost\n12345\nfoo\nbar\nbaz\n\n",
+      "expected_output": "foo\nbar\nbaz\nConnection closed"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    if len(data) < 2:\n        return\n    host = data[0]\n    port = data[1]\n    messages = []\n    for line in data[2:]:\n        if line == '':\n            break\n        messages.append(line)\n    # Simulate an echo server offline: echo each message back\n    for m in messages:\n        print(m)\n    print('Connection closed')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:44.863814+00:00"
+}

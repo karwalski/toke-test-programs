@@ -1,0 +1,18 @@
+{
+  "id": "MSG-031",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+      "expected_output": "{\"shared_secret\": \"46e7a40d1c7b3cd811478b9b8cef201528eb0e14ba10d7584794f939998e5239f0917d3afb110a88e4e85a72665d520d684f82536605dd47d6ffcc17e9b0bc616b5b6d833434e4dd06b24408ba922d1b232e8dfb47b389c27c55b58681fdf299d2227e458684bf95a49511c2973a0fe1ebac7e67fe8407d164a8e82667e0b068\", \"session_key\": \"f95fe1b2bb964b4402dce50ed3841f11f8f88a63c61c11de744bf521b4920f02\", \"associated_data\": \"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeffedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\"}"
+    },
+    {
+      "input": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef\ncafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\nabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+      "expected_output": "{\"shared_secret\": \"74a09476dfee81566010dce337e1db3a7ac1f4b8d48a4d1299f84ed740da4df4ae1d0567b7b2987db7297e9048d46357166854ddf9b4755bb83c165d654b9bf9d5fafeaf0321807acd4c152781b481b8ea2527b58c6a28da445a028a11b8f239fe12178ff7ac9bd95988cea24f4ae90beec6b31b7a3dafc98226d6f5697ab188\", \"session_key\": \"037f76f9df38e7c88bec737e2162f0472f138de381a26ead8edb569ef2df0357\", \"associated_data\": \"deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe\"}"
+    }
+  ],
+  "python": "import sys, hashlib, hmac, json\n\ndef hkdf_extract(salt, ikm):\n    return hmac.new(salt, ikm, hashlib.sha256).digest()\n\ndef hkdf_expand(prk, info, length):\n    okm = b''\n    t = b''\n    i = 1\n    while len(okm) < length:\n        t = hmac.new(prk, t + info + bytes([i]), hashlib.sha256).digest()\n        okm += t\n        i += 1\n    return okm[:length]\n\ndef hkdf(salt, ikm, info, length):\n    return hkdf_expand(hkdf_extract(salt, ikm), info, length)\n\ndef sim_dh(k1, k2):\n    # Simulated DH: hash of sorted concatenation\n    a, b = sorted([k1, k2])\n    return hashlib.sha256(a + b).digest()\n\ndef main():\n    lines = sys.stdin.read().strip().split('\\n')\n    ik_a = bytes.fromhex(lines[0].strip())\n    ik_b = bytes.fromhex(lines[1].strip())\n    spk_b = bytes.fromhex(lines[2].strip())\n    opk_b = bytes.fromhex(lines[3].strip())\n\n    # X3DH: ephemeral key derived deterministically from inputs for reproducibility\n    ek_a = hashlib.sha256(b'EK_A' + ik_a + ik_b).digest()\n\n    dh1 = sim_dh(ik_a, spk_b)\n    dh2 = sim_dh(ek_a, ik_b)\n    dh3 = sim_dh(ek_a, spk_b)\n    dh4 = sim_dh(ek_a, opk_b)\n\n    shared_secret = dh1 + dh2 + dh3 + dh4\n\n    salt = b'\\x00' * 32\n    info = b'X3DH-SHA256'\n    session_key = hkdf(salt, shared_secret, info, 32)\n\n    associated_data = ik_a + ik_b\n\n    out = {\n        'shared_secret': shared_secret.hex(),\n        'session_key': session_key.hex(),\n        'associated_data': associated_data.hex()\n    }\n    print(json.dumps(out))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:52.049470+00:00"
+}

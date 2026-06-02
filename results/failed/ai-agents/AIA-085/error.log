@@ -1,0 +1,3 @@
+Test failures:
+Test 1: expected '{"fixed_code":"def fib(n, memo={}):\\n    if n <= 1:\\n        return n\\n    if n in memo:\\n        return memo[n]\\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\\n    return memo[n]","changes":[{"line":1,"old":"def fib(n):","new":"def fib(n, memo={}):"}],"explanation":"Added memoization to avoid exponential recursive calls that cause stack overflow for large n."}', got ''
+Test 2: expected '{"fixed_code":"items = [1, 2, 3]\\nitems = [x for x in items if x != 2]","changes":[{"line":2,"old":"for i in range(len(items)):","new":"items = [x for x in items if x != 2]"}],"explanation":"Replaced in-place removal during iteration with list comprehension to avoid index errors from shrinking list."}', got ''

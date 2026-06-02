@@ -1,0 +1,1 @@
+m=deepmerge;f=deepmerge(a:$str;b:$str):$str{let result=mut.a;let blen=b.len;lp(let bi=0;bi<blen;bi=bi+1){let ch=b.get(bi);let rlen=result.len;let found=mut.false;lp(let ri=0;ri<rlen;ri=ri+1){if(result.get(ri)=ch){found=true};};if(!(found)){result=result+ch};};<result};

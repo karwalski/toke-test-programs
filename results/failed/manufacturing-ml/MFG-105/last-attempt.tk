@@ -1,0 +1,1 @@
+m=toolwear;f=measurewear(toolid:$str;currentdate:i64):$i64{let wear=mut.0;let date=mut.currentdate;lp(let i=0;i<10;i=i+1){let check=mut.date-(i*30));if(check>0){wear=wear+1};};<wear};f=predictreplacement(toolid:$str;currentdate:i64;threshold:i64):$str{let wear=measurewear(toolid;currentdate));let remaining=10-wear;if(remaining<threshold){<toolid};<toolid};

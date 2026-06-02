@@ -1,0 +1,1 @@
+m=extractquotes;f=extractquotes(text:$str):@$str{let result=mut.@();let len=text.len;let i=mut.0;lp(let lv=0;true;lv=lv){if(!(i<len)){}el{let ch=text.get(i);if(ch=34){let start=i+1;let end=mut.len;lp(let j=start;j<end;j=j+1){let c=text.get(j);if(c=34){end=j;br};};let extracted=text.slice(start;end);result=result+@(extracted);i=end+1;};};<result};

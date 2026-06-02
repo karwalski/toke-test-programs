@@ -1,0 +1,1 @@
+m=resourcegame;f=playgame(n:$i64):$i64{let resources=mut.100;lp(let turn=0;turn<n;turn=turn+1){let action=mut."collect";let amount=mut.10;if(action="collect"){resources=resources+amount;}el{if(action="spend"){resources=resources-amount;}el{if(action="collectall"){resources=resources+amount;}el{if(action="rest"){resources=resources+amount;}el{}}}}}};let result=resources;<result;};

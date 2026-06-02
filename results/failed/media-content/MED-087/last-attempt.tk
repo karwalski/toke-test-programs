@@ -1,0 +1,1 @@
+m=acronym;f=acronym(s:$str):$str{let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=32){let j=i+1;let nextc=s.get(j);if(nextc>96){if(nextc<123){let up=nextc-32;result=result+(up as$str);i=j;}}}};<result};

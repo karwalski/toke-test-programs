@@ -1,0 +1,1 @@
+m=har;f=buildhar(version:$str;title:$str;url:$str):$str{let vpart="\"version\":\""+version+"\",";let tpart="\"title\":\""+title+"\",";let upart="\"url\":\""+url+"\",";let entrypart="{"+vpart+tpart+upart+"}";let res="{\"log\":{"+entrypart+"}}";<res};f=main():$i64{let version="1.0.0";let title="URL Fetch HAR";let url="https://example.com";let har=buildhar(version;title;url);<0};

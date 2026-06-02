@@ -1,0 +1,1 @@
+m=stripmd;i=io:std.io;i=s:std.str;f=stripmd(text:$str):$str{let result=s.builder();let idx=mut.0;let len=text.len;lp(idx<len){let ch=text.get(idx);if(ch=42){let cnt=mut.1;let start=idx;lp(idx+cnt<len){if(text.get(idx+cnt)!=42){br};cnt=cnt+1};idx=idx+cnt}el{s.add(result;ch);idx=idx+1}};s.build(result)};f=main():$i64{let line=io.readln();io.println(stripmd(line));<0}

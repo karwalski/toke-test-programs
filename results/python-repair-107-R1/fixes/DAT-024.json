@@ -1,0 +1,26 @@
+{
+  "id": "DAT-024",
+  "category": "data-processing",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "170 45 75 90 802 24 2 66",
+      "expected_output": "Pass 1 (ones): [0:170,90] [2:802,2] [4:24] [5:45,75] [6:66]\nPass 2 (tens): [0:802,2] [2:24] [4:45] [6:66] [7:170,75] [9:90]\nPass 3 (hundreds): [0:2,24,45,66,75,90] [1:170] [8:802]\nSorted: 2 24 45 66 75 90 170 802"
+    },
+    {
+      "input": "10 1 100",
+      "expected_output": "Pass 1 (ones): [0:10,100] [1:1]\nPass 2 (tens): [0:100,1] [1:10]\nPass 3 (hundreds): [0:1,10] [1:100]\nSorted: 1 10 100"
+    },
+    {
+      "input": "5 3 8 1 9 2 7 4 6",
+      "expected_output": "Pass 1 (ones): [1:1] [2:2] [3:3] [4:4] [5:5] [6:6] [7:7] [8:8] [9:9]\nSorted: 1 2 3 4 5 6 7 8 9"
+    },
+    {
+      "input": "999 1 50 500 5",
+      "expected_output": "Pass 1 (ones): [0:50,500] [1:1] [5:5] [9:999]\nPass 2 (tens): [0:500,1,5] [5:50] [9:999]\nPass 3 (hundreds): [0:1,5,50] [5:500] [9:999]\nSorted: 1 5 50 500 999"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    nums = [int(x) for x in data]\n    if not nums:\n        return\n    max_val = max(nums)\n    digit_names = ['ones','tens','hundreds','thousands','ten-thousands','hundred-thousands','millions','ten-millions','hundred-millions','billions']\n    pass_num = 0\n    exp = 1\n    arr = nums[:]\n    while exp <= max_val:\n        buckets = [[] for _ in range(10)]\n        for n in arr:\n            d = (n // exp) % 10\n            buckets[d].append(n)\n        parts = []\n        for i in range(10):\n            if buckets[i]:\n                parts.append('[' + str(i) + ':' + ','.join(str(x) for x in buckets[i]) + ']')\n        name = digit_names[pass_num] if pass_num < len(digit_names) else 'digit'+str(pass_num)\n        print('Pass ' + str(pass_num+1) + ' (' + name + '): ' + ' '.join(parts))\n        arr = []\n        for b in buckets:\n            arr.extend(b)\n        exp *= 10\n        pass_num += 1\n    print('Sorted: ' + ' '.join(str(x) for x in arr))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:46.487462+00:00"
+}

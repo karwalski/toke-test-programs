@@ -1,0 +1,1 @@
+m=hashpubkey;f=hashpubkey():$str{let pubkey=mut."";let c=mut.0;lp(let i=0;i<64;i=i+1){let ch=mut.std.stdin.readchar();if(ch=""){<""};pubkey=pubkey+ch;};let sha256=mut.std.crypto.sha256(pubkey);let ripemd160=mut.std.crypto.ripemd160(sha256);let result=mut.std.str.frombytes(ripemd160);<result};

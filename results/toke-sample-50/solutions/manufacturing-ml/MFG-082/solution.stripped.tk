@@ -1,0 +1,4 @@
+m=optimal;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{let header=io.readln();let line=io.readln();let parts=s.split(line;"_");if(parts.len>=5){let part=parts.get(0);let demandrate=s.toint(parts.get(1));let leadtime=s.toint(parts.get(2));let safetyfactor=s.tofloat(parts.get(3));let containersize=s.toint(parts.get(4));let totaldemand=demandrate*leadtime;let safetystock=(totaldemand as$f64)*safetyfactor;let totalquantity=(totaldemand as$f64)+safetystock;let kanbancards=totalquantity/(containersize as$f64);let finalcards=mut.kanbancards as$i64;if((kanbancards-(finalcards as$f64))>0.0){finalcards=finalcards+1};io.println("_"parts\"_"part\"_"\(part)\"_"kanban_cards\"_")}el{io.println("_"parts\"_")};<0}

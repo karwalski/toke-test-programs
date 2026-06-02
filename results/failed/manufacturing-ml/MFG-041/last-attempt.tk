@@ -1,0 +1,1 @@
+m=tt;f=calc(tot:$i64;cnt:$i64):$f64{let r=mut.0.0;if(cnt>0){r=tot as$f64/cnt as$f64};<r};f=compare(tgt:$f64;act:$f64):$str{let r=mut."";if(tgt>act){r="slow"}el{if(tgt<act){r="fast"}el{r="ok"}};<r};f=main():$i64{let t=calc(1000;10));let r=compare(t;900.0);<0};

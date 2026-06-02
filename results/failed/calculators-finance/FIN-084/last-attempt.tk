@@ -1,0 +1,1 @@
+m=futval;i=io:std.io;i=s:std.str;i=math:std.math;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=3){let pv=s.tofloat(parts.get(0));let rate=s.tofloat(parts.get(1));let years=s.tofloat(parts.get(2));let base=1.0+rate;let fv=pv*math.pow(base;years);io.println(s.format(fv;"%.2f"))}el{io.println("error")};<0}

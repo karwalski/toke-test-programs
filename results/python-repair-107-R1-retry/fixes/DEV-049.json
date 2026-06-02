@@ -1,0 +1,22 @@
+{
+  "id": "DEV-049",
+  "category": "devtools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "python\n/tmp/dev049_example.py\n",
+      "expected_output": "/tmp/dev049_example.py: 24% comments (5 comment / 16 code lines)"
+    },
+    {
+      "input": "go\n/tmp/dev049_main.go\n",
+      "expected_output": "/tmp/dev049_main.go: 11% comments (2 comment / 17 code lines)"
+    },
+    {
+      "input": "python\n/tmp/dev049_small.py\n",
+      "expected_output": "/tmp/dev049_small.py: 40% comments (2 comment / 3 code lines)"
+    }
+  ],
+  "python": "import sys, os\n\ndef setup_files():\n    py1 = '\\n'.join([\n        '# This is a comment',\n        '# Another comment',\n        'import os',\n        'import sys',\n        '',\n        '# function doc',\n        'def foo(x):',\n        '    return x + 1',\n        '',\n        'def bar(y):',\n        '    # inline comment line',\n        '    z = y * 2',\n        '    return z',\n        '',\n        'class A:',\n        '    def __init__(self):',\n        '        self.x = 0',\n        '    def m(self):',\n        '        return self.x',\n        '',\n        '# end comment',\n        'print(foo(1))',\n        'print(bar(2))',\n        'a = A()',\n        'print(a.m())',\n    ])\n    with open('/tmp/dev049_example.py','w') as f:\n        f.write(py1)\n\n    go1 = '\\n'.join([\n        'package main',\n        '',\n        'import \"fmt\"',\n        '',\n        '// main function',\n        'func main() {',\n        '    x := 1',\n        '    y := 2',\n        '    z := x + y',\n        '    fmt.Println(z)',\n        '    a := 10',\n        '    b := 20',\n        '    c := a * b',\n        '    fmt.Println(c)',\n        '    /* block comment */',\n        '    d := c - 1',\n        '    e := d + 1',\n        '    fmt.Println(e)',\n        '    f := e * 2',\n        '    fmt.Println(f)',\n        '}',\n    ])\n    with open('/tmp/dev049_main.go','w') as f:\n        f.write(go1)\n\n    py2 = '\\n'.join([\n        '# comment one',\n        'x = 1',\n        'y = 2',\n        '',\n        '# comment two',\n        'print(x+y)',\n    ])\n    with open('/tmp/dev049_small.py','w') as f:\n        f.write(py2)\n\nsetup_files()\n\ndef count_python(path):\n    comments = 0\n    code = 0\n    with open(path) as f:\n        for line in f:\n            s = line.strip()\n            if not s:\n                continue\n            if s.startswith('#'):\n                comments += 1\n            else:\n                code += 1\n    return comments, code\n\ndef count_go(path):\n    comments = 0\n    code = 0\n    in_block = False\n    with open(path) as f:\n        for line in f:\n            s = line.strip()\n            if not s:\n                continue\n            if in_block:\n                comments += 1\n                if '*/' in s:\n                    in_block = False\n                continue\n            if s.startswith('//'):\n                comments += 1\n            elif s.startswith('/*'):\n                comments += 1\n                if '*/' not in s[2:]:\n                    in_block = True\n            else:\n                code += 1\n    return comments, code\n\ndata = sys.stdin.read().splitlines()\nlang = data[0].strip()\nfor path in data[1:]:\n    path = path.strip()\n    if not path:\n        continue\n    if lang == 'python':\n        c, k = count_python(path)\n    elif lang == 'go':\n        c, k = count_go(path)\n    else:\n        continue\n    total = c + k\n    pct = int(round(c * 100 / total)) if total else 0\n    print(f'{path}: {pct}% comments ({c} comment / {k} code lines)')\n",
+  "reason": "",
+  "validated_at": "2026-05-31T08:50:08.425196+00:00"
+}

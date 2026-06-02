@@ -1,0 +1,1 @@
+m=jsonpretty;f=jsonpretty(s:$str):$str{let n=s.len;let result=mut."";let i=mut.0;let indent=mut.0;lp(let idx=0;idx<n;idx=idx+1){let ch=s.get(idx);if(ch=10){result=result+ch;i=0;indent=0}el{if(ch=123){result=result+ch;i=i+1;indent=indent+2}el{if(ch=125){result=result+ch;i=i+1;indent=indent-2}el{if(ch=91

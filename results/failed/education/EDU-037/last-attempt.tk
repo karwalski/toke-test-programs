@@ -1,0 +1,1 @@
+m=validate;f=validate(map:$str;required:$str):$bool{let valid=mut.true;let terms=map.split("->");lp(let i=0;i<terms.len;i=i+1){let t=terms.get(i);if(t.len=0){valid=false}};lp(let j=0;j<required.len;j=j+1){let r=required.get(j);if(r.len=0){valid=false}};<valid};

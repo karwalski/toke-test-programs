@@ -1,0 +1,1 @@
+m=smooth;f=smooth(arr:@$f64;n:$i64;m:$i64):@$f64{let result=mut.@();lp(let i=0;i<arr.len;i=i+1){let v=arr.get(i);let r=mut.0.0;if(i=0){r=v}el{let last=result.get(i-1));r=last+(v-last)/n};result=result+@(r)};<result};f=forecast(sm:@$f64;n:$i64;m:$i64):$f64{let len=sm.len;let last=sm.get(len-1));let next=last+(last-last/n)*n;<next};

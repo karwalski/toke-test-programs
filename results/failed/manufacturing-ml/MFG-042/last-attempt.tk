@@ -1,0 +1,1 @@
+m=histogram;f=buildhistogram(measurements:@$i64;bincount:$i64):$str{let minval=mut.0;let maxval=mut.0;lp(let i=0;i<measurements.len;i=i+1){let m=measurements.get(i);if(i=0){minval=m;maxval=m;}el{if(m<minval){minval=m;}el{if(m>maxval){maxval=m;};};};};let range=maxval-minval;let binwidth=range/bincount;let bins=mut.@();lp(let i=0;i<bincount;i=i+1){bins=bins+@(0);}

@@ -1,0 +1,546 @@
+[
+  {
+    "id": "AIA-083",
+    "category": "empty_output",
+    "expected_excerpt": "{\"comments\":[{\"line\":3,\"severity\":\"warning\",\"message\":\"filter() inside loop creates O(n*m) complexity\",\"suggestion\":\"Consider pre-computing or using a more efficient approach\"}]}",
+    "program_category": "ai-agents",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "CRY-053",
+    "category": "compile_fail",
+    "error_codes": [
+      "E4070"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E4070\",\"severity\":\"error\",\"stage\":\"type_check\",\"message\":\"cannot assign to immutable binding 'inputs'; declare with 'mut' to make mutable\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpslf5v_wd/solution.tk\",\"pos\":{\"offset\":5",
+    "program_category": "crypto-blockchain",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "CRY-080",
+    "category": "compile_fail",
+    "error_codes": [
+      "E1003"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E1003\",\"severity\":\"error\",\"stage\":\"lex\",\"message\":\"shift operator '<<' not available in v0.3 (deferred to v0.5); run `toke --migrate` to update\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp1nfqv1qw/solution.tk\",\"pos\":{\"off",
+    "program_category": "crypto-blockchain",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "CRY-119",
+    "category": "wrong_output",
+    "actual_excerpt": "8500000",
+    "expected_excerpt": "83646f67",
+    "program_category": "crypto-blockchain",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "CRY-124",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2004",
+      "E2004"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2004\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected '}', got end of file\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp3bzchpm1/solution.tk\",\"pos\":{\"offset\":521,\"line\":1,\"col\":522},\"span_start\":521,\"span_end\":521,",
+    "program_category": "crypto-blockchain",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-019",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2001",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2001\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"module declaration must appear first\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmps16e98kj/solution.tk\",\"pos\":{\"offset\":0,\"line\":1,\"col\":1},\"span_start\":0,\"span_end\":0,\"",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-020",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected ':', got '{'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp29np1jlz/solution.tk\",\"pos\":{\"offset\":60,\"line\":1,\"col\":61},\"span_start\":60,\"span_end\":60,\"context\":[]",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-038",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected '{', got 'if'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmps7mzkzar/solution.tk\",\"pos\":{\"offset\":411,\"line\":1,\"col\":412},\"span_start\":411,\"span_end\":411,\"contex",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-103",
+    "category": "wrong_output",
+    "actual_excerpt": "[database]",
+    "expected_excerpt": "{\"database\":{\"host\":\"localhost\",\"name\":\"mydb\",\"port\":\"5432\"},\"server\":{\"host\":\"0.0.0.0\",\"port\":\"8080\"}}",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-104",
+    "category": "build_fail",
+    "error_codes": [
+      "E9003"
+    ],
+    "error_excerpt": "Undefined symbols for architecture arm64:\n  \"_tk_json_object_w\", referenced from:\n      _props_parseprop in tkc_w9vNaE-ce8694.o\n      _props_parseprop in tkc_w9vNaE-ce8694.o\nld: symbol(s) not found for architecture arm64\nclang: error: linker command failed with exit code 1 (use -v to see invocation)",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-109",
+    "category": "empty_output",
+    "expected_excerpt": "No changes",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DAT-118",
+    "category": "build_fail",
+    "error_codes": [
+      "E9003"
+    ],
+    "error_excerpt": "Undefined symbols for architecture arm64:\n  \"_tk_json_object_w\", referenced from:\n      _extract_extractgroups in tkc_psaaQJ-5b9045.o\n      _tk_main in tkc_psaaQJ-5b9045.o\n  \"_tk_regex_compile_w\", referenced from:\n      _extract_extractgroups in tkc_psaaQJ-5b9045.o\n      _tk_main in tkc_psaaQJ-5b904",
+    "program_category": "data-processing",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DEV-084",
+    "category": "runner_error",
+    "program_category": "devtools",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DEV-101",
+    "category": "compile_fail",
+    "error_codes": [
+      "E4070"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E4070\",\"severity\":\"error\",\"stage\":\"type_check\",\"message\":\"cannot assign to immutable binding 'from'; declare with 'mut' to make mutable\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpvguyvqnr/solution.tk\",\"pos\":{\"offset\":650",
+    "program_category": "devtools",
+    "original_status": "WRONG_OUTPUT"
+  },
+  {
+    "id": "DEV-104",
+    "category": "compile_fail",
+    "error_codes": [
+      "E4070"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E4070\",\"severity\":\"error\",\"stage\":\"type_check\",\"message\":\"cannot assign to immutable binding 'statuslabel'; declare with 'mut' to make mutable\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp6384yclv/solution.tk\",\"pos\":{\"offs",
+    "program_category": "devtools",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DEV-110",
+    "category": "compile_fail",
+    "error_codes": [
+      "E4070"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E4070\",\"severity\":\"error\",\"stage\":\"type_check\",\"message\":\"cannot assign to immutable binding 'tests'; declare with 'mut' to make mutable\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpdpdqnc6_/solution.tk\",\"pos\":{\"offset\":53",
+    "program_category": "devtools",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "DEV-118",
+    "category": "build_fail",
+    "error_codes": [
+      "E2002",
+      "E9003"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"unexpected token in expression, got 'if'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpbqr8gmf5/solution.tk\",\"pos\":{\"offset\":16,\"line\":1,\"col\":17},\"span_start\":16,\"span_e",
+    "program_category": "devtools",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "EDU-042",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2003",
+      "E2002",
+      "E2003",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2003\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"missing semicolon\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp4eir5nxa/solution.tk\",\"pos\":{\"offset\":370,\"line\":1,\"col\":371},\"span_start\":370,\"span_end\":370,\"context\":[]",
+    "program_category": "education",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "EDU-050",
+    "category": "empty_output",
+    "expected_excerpt": "photosynthesis: 2\nosmosis: 1",
+    "program_category": "education",
+    "original_status": "WRONG_OUTPUT"
+  },
+  {
+    "id": "EDU-066",
+    "category": "build_fail",
+    "error_codes": [
+      "E9003"
+    ],
+    "error_excerpt": "Undefined symbols for architecture arm64:\n  \"_tk_json_array_w\", referenced from:\n      _tk_main in tkc_TzqBae-33004d.o\n  \"_tk_str_str_w\", referenced from:\n      _tk_main in tkc_TzqBae-33004d.o\n      _tk_main in tkc_TzqBae-33004d.o\nld: symbol(s) not found for architecture arm64\nclang: error: linker c",
+    "program_category": "education",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "EDU-102",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2004",
+      "E2004"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2004\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected '}', got end of file\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp6nv1l4_l/solution.tk\",\"pos\":{\"offset\":1048,\"line\":1,\"col\":1049},\"span_start\":1048,\"span_end\":1",
+    "program_category": "education",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "FIN-021",
+    "category": "wrong_output",
+    "actual_excerpt": "9000.00",
+    "expected_excerpt": "2000.00",
+    "program_category": "calculators-finance",
+    "original_status": "WRONG_OUTPUT"
+  },
+  {
+    "id": "FIN-054",
+    "category": "wrong_output",
+    "actual_excerpt": "1.0000\n0.0000\n0.0000",
+    "expected_excerpt": "1.0000\n0.0000\n1.0000",
+    "program_category": "calculators-finance",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "GAM-004",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected ')', got '&'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpyybouhut/solution.tk\",\"pos\":{\"offset\":75,\"line\":1,\"col\":76},\"span_start\":75,\"span_end\":75,\"context\":[]",
+    "program_category": "games",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "GAM-013",
+    "category": "output_close",
+    "actual_excerpt": "Move disk 1 from peg A to peg B\nMove disk 2 from peg A to peg C\nMove disk 1 from peg B to peg C\nMove disk 3 from peg A to peg B\nMove disk 1 from peg C to peg A\nMove disk 2 from peg C to peg B\nMove dis",
+    "expected_excerpt": "Move disk 1 from peg A to peg C\nMove disk 2 from peg A to peg B\nMove disk 1 from peg C to peg B\nMove disk 3 from peg A to peg C\nMove disk 1 from peg B to peg A\nMove disk 2 from peg B to peg C\nMove dis",
+    "program_category": "games",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "MED-078",
+    "category": "compile_fail",
+    "error_codes": [
+      "E4031"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E4031\",\"severity\":\"error\",\"stage\":\"type_check\",\"message\":\"type mismatch: cannot index into 'str'; expected array type\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpom2qq5ml/solution.tk\",\"pos\":{\"offset\":208,\"line\":1,\"col\":20",
+    "program_category": "media-content",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "MED-082",
+    "category": "wrong_output",
+    "actual_excerpt": "ttr: 1.000",
+    "expected_excerpt": "ttr: 0.250",
+    "program_category": "media-content",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "MED-084",
+    "category": "empty_output",
+    "expected_excerpt": "Line 1: repeated word \"the\"\nLine 2: repeated word \"bar\"",
+    "program_category": "media-content",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "MED-104",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2003",
+      "E2003",
+      "E2002",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected ')', got '&'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmptuz2nguz/solution.tk\",\"pos\":{\"offset\":254,\"line\":1,\"col\":255},\"span_start\":254,\"span_end\":254,\"context",
+    "program_category": "media-content",
+    "original_status": "BUILD_FAIL"
+  },
+  {
+    "id": "MSG-031",
+    "category": "build_fail",
+    "error_codes": [
+      "E9003"
+    ],
+    "error_excerpt": "Undefined symbols for architecture arm64:\n  \"_tk_json_empty_w\", referenced from:\n      _tk_main in tkc_BMHUqq-bc8fd3.o\nld: symbol(s) not found for architecture arm64\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error",
+    "program_category": "messaging",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "MSG-097",
+    "category": "compile_fail",
+    "error_codes": [
+      "E3011"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E3011\",\"severity\":\"error\",\"stage\":\"name_resolution\",\"message\":\"identifier 'json' is not declared\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmphhrddh2n/solution.tk\",\"pos\":{\"offset\":71,\"line\":1,\"col\":72},\"span_start\":71,\"spa",
+    "program_category": "messaging",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "MSG-129",
+    "category": "output_close",
+    "actual_excerpt": "binding_type: tls-unique\nbinding_data: application_session_key_hex\nchannel_binding_token: HMAC(app_key, binding_data) = hex\nverification: session bound to transport",
+    "expected_excerpt": "binding_type: tls-unique\nbinding_data: tls_finished_hex\nchannel_binding_token: HMAC(app_key, binding_data) = hex\nverification: session bound to transport",
+    "program_category": "messaging",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "NET-081",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2002",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2003",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"unexpected token in expression, got '<'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpb6r8fcwl/solution.tk\",\"pos\":{\"offset\":145,\"line\":8,\"col\":42},\"span_start\":145,\"span_",
+    "program_category": "networking-rest",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "NET-101",
+    "category": "wrong_output",
+    "actual_excerpt": "200",
+    "expected_excerpt": "404",
+    "program_category": "networking-rest",
+    "original_status": "BUILD_FAIL"
+  },
+  {
+    "id": "SCI-011",
+    "category": "runner_error",
+    "program_category": "scientific-math",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SCI-029",
+    "category": "wrong_output",
+    "actual_excerpt": "Heap after build: \nSorted: \nComparisons: 0",
+    "expected_excerpt": "Heap after build: 9 5 8 1 3 2\nSorted: 1 2 3 5 8 9\nComparisons: 15",
+    "program_category": "scientific-math",
+    "original_status": "WRONG_OUTPUT"
+  },
+  {
+    "id": "SCI-116",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2004",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002",
+      "E2002"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2002\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"expected ')', got '&'\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp5m9vzx_k/solution.tk\",\"pos\":{\"offset\":1200,\"line\":1,\"col\":1201},\"span_start\":1200,\"span_end\":1200,\"con",
+    "program_category": "scientific-math",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SEC-085",
+    "category": "wrong_output",
+    "actual_excerpt": "../none\n../../none\n../../../none\n../../../../none\n../../../../../none\n../../../../../../none\n../../../../../../../none\n../../../../../../../../none\n../../../../../../../../../none\n../../../../../../..",
+    "expected_excerpt": "[{\"description\": \"Single dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../etc/passwd\"}, {\"description\": \"Double dot-dot-slash traversal\", \"encoding\": \"none\", \"payload\": \"../../etc/passwd\"}",
+    "program_category": "security",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SEC-088",
+    "category": "wrong_output",
+    "actual_excerpt": "safe",
+    "expected_excerpt": "riskScore",
+    "program_category": "security",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SOC-075",
+    "category": "build_fail",
+    "error_codes": [
+      "E9003"
+    ],
+    "error_excerpt": "Undefined symbols for architecture arm64:\n  \"_tk_json_array_w\", referenced from:\n      _tk_main in tkc_NJnqpa-3889f6.o\n  \"_tk_json_field_w\", referenced from:\n      _tk_main in tkc_NJnqpa-3889f6.o\n      _tk_main in tkc_NJnqpa-3889f6.o\n      _tk_main in tkc_NJnqpa-3889f6.o\n      _tk_main in tkc_NJnqpa",
+    "program_category": "social-media",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SOC-116",
+    "category": "build_fail",
+    "error_codes": [
+      "E9003"
+    ],
+    "error_excerpt": "Undefined symbols for architecture arm64:\n  \"_tk_json_object_w\", referenced from:\n      _tk_main in tkc_dWbQOD-f2c80e.o\n      _tk_main in tkc_dWbQOD-f2c80e.o\n      _tk_main in tkc_dWbQOD-f2c80e.o\n  \"_tk_json_push_w\", referenced from:\n      _tk_main in tkc_dWbQOD-f2c80e.o\n      _tk_main in tkc_dWbQOD",
+    "program_category": "social-media",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SOC-131",
+    "category": "compile_fail",
+    "error_codes": [
+      "E3011"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E3011\",\"severity\":\"error\",\"stage\":\"name_resolution\",\"message\":\"identifier 'io' is not declared\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpo4fa2vs_/solution.tk\",\"pos\":{\"offset\":236,\"line\":1,\"col\":237},\"span_start\":236,\"sp",
+    "program_category": "social-media",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SYS-043",
+    "category": "compile_fail",
+    "error_codes": [
+      "E4070",
+      "E4070",
+      "E4070",
+      "E4070",
+      "E4070",
+      "E4070",
+      "E4070",
+      "E4070"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E4070\",\"severity\":\"error\",\"stage\":\"type_check\",\"message\":\"cannot assign to immutable binding 'result'; declare with 'mut' to make mutable\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmp_gx3gn9j/solution.tk\",\"pos\":{\"offset\":3",
+    "program_category": "system-tools",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SYS-079",
+    "category": "compile_fail",
+    "error_codes": [
+      "E2003",
+      "E2003",
+      "E2003"
+    ],
+    "error_excerpt": "{\"schema_version\":\"1.0\",\"diagnostic_id\":\"D0001\",\"error_code\":\"E2003\",\"severity\":\"error\",\"stage\":\"parse\",\"message\":\"missing semicolon\",\"file\":\"/var/folders/gf/4ylkzm4d3bg50537kywj3pph0000gp/T/tmpr9eao9_7/solution.tk\",\"pos\":{\"offset\":717,\"line\":28,\"col\":1},\"span_start\":717,\"span_end\":717,\"context\":[],",
+    "program_category": "system-tools",
+    "original_status": "COMPILE_FAIL"
+  },
+  {
+    "id": "SYS-091",
+    "category": "wrong_output",
+    "actual_excerpt": "h\ne\nl\nl\no",
+    "expected_excerpt": "hello",
+    "program_category": "system-tools",
+    "original_status": "RUN_FAIL"
+  }
+]

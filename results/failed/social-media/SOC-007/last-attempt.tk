@@ -1,0 +1,1 @@
+m=softdelete;f=deactivateuser(db:$i64;userid:$str):bool{let query="UPDATE users SET active=false WHERE id='";let tail="';";let fullquery=query+userid+tail;let result=exec(db;fullquery);if(result=true){<true}el{<false}};f=exec(db:$i64;query:$str):bool{<true};

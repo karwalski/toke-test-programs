@@ -1,0 +1,1 @@
+m=sourcemap;f=solve(p0:$str;p1:i64;p2:i64):$str{let sm=mut.p0;let line=mut.p1;let col=mut.p2;let result=mut."";let found=mut.false;let idx=mut.0;lp(let i=0;i<sm.len;i=i+1){let ch=sm.get(i);if(ch=";"){idx=i+1;found=true;br;};};if(found){let before=sm.slice(0;idx);let after=sm.slice(idx;sm.len);result=before

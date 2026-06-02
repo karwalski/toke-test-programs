@@ -1,0 +1,26 @@
+{
+  "id": "SYS-066",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "name,age\nalice,30\nbob,25",
+      "expected_output": "[{\"name\":\"alice\",\"age\":\"30\"},{\"name\":\"bob\",\"age\":\"25\"}]"
+    },
+    {
+      "input": "col\nonly one",
+      "expected_output": "[{\"col\":\"only one\"}]"
+    },
+    {
+      "input": "a,b,c\n1,2,3\n4,5,6",
+      "expected_output": "[{\"a\":\"1\",\"b\":\"2\",\"c\":\"3\"},{\"a\":\"4\",\"b\":\"5\",\"c\":\"6\"}]"
+    },
+    {
+      "input": "name,quote\nalice,\"hello, world\"\nbob,simple",
+      "expected_output": "[{\"name\":\"alice\",\"quote\":\"hello, world\"},{\"name\":\"bob\",\"quote\":\"simple\"}]"
+    }
+  ],
+  "python": "import sys, csv, json\ndata = sys.stdin.read()\nlines = data.splitlines()\nreader = csv.reader(lines)\nrows = list(reader)\nif not rows:\n    print('[]')\nelse:\n    header = rows[0]\n    out = []\n    for r in rows[1:]:\n        d = {}\n        for i, k in enumerate(header):\n            d[k] = r[i] if i < len(r) else ''\n        out.append(d)\n    print(json.dumps(out, separators=(',', ':')))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:37.468062+00:00"
+}

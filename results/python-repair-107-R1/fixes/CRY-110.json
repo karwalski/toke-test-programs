@@ -1,0 +1,22 @@
+{
+  "id": "CRY-110",
+  "category": "crypto-blockchain",
+  "outcome": "failed",
+  "test_cases": [
+    {
+      "input": "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN\nhello\nInvalidBase64!!!\n",
+      "expected_output": "INVALID"
+    },
+    {
+      "input": "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN\nhello\nIEsbXn3rL0Vp0qZJZ8m4LpAQK3sQbz3pZ8m4LpAQK3sQbz3pZ8m4LpAQK3sQbz3pZ8m4LpAQK3sQbz3pZ8m4LpAQK3sQbz==\n",
+      "expected_output": "INVALID"
+    },
+    {
+      "input": "1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN\nhello\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n",
+      "expected_output": "INVALID"
+    }
+  ],
+  "python": "import sys, base64, hashlib\n\n# secp256k1 parameters\nP = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F\nN = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141\nA = 0\nB = 7\nGx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798\nGy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8\n\ndef inv(a, m):\n    return pow(a, -1, m)\n\ndef ec_add(p, q):\n    if p is None: return q\n    if q is None: return p\n    x1,y1=p; x2,y2=q\n    if x1==x2 and (y1+y2)%P==0: return None\n    if p==q:\n        m=(3*x1*x1)*inv(2*y1,P)%P\n    else:\n        m=(y2-y1)*inv(x2-x1,P)%P\n    x3=(m*m-x1-x2)%P\n    y3=(m*(x1-x3)-y1)%P\n    return (x3,y3)\n\ndef ec_mul(k, p):\n    r=None; a=p\n    while k>0:\n        if k&1: r=ec_add(r,a)\n        a=ec_add(a,a)\n        k>>=1\n    return r\n\nG=(Gx,Gy)\n\ndef hash256(b):\n    return hashlib.sha256(hashlib.sha256(b).digest()).digest()\n\ndef ripemd160_sha256(b):\n    h=hashlib.new('ripemd160')\n    h.update(hashlib.sha256(b).digest())\n    return h.digest()\n\nB58=b'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'\n\ndef b58encode(b):\n    n=int.from_bytes(b,'big')\n    s=b''\n    while n>0:\n        n,r=divmod(n,58)\n        s=bytes([B58[r]])+s\n    pad=0\n    for c in b:\n        if c==0: pad+=1\n        else: break\n    return b'1'*pad+s\n\ndef pubkey_to_address(x,y,compressed=True):\n    if compressed:\n        prefix=b'\\x02' if y%2==0 else b'\\x03'\n        pub=prefix+x.to_bytes(32,'big')\n    else:\n        pub=b'\\x04'+x.to_bytes(32,'big')+y.to_bytes(32,'big')\n    h=ripemd160_sha256(pub)\n    payload=b'\\x00'+h\n    chk=hash256(payload)[:4]\n    return b58encode(payload+chk).decode()\n\ndef varint(n):\n    if n<0xfd: return bytes([n])\n    if n<=0xffff: return b'\\xfd'+n.to_bytes(2,'little')\n    if n<=0xffffffff: return b'\\xfe'+n.to_bytes(4,'little')\n    return b'\\xff'+n.to_bytes(8,'little')\n\ndef msg_hash(msg):\n    prefix=b'\\x18Bitcoin Signed Message:\\n'\n    mb=msg.encode()\n    data=prefix+varint(len(mb))+mb\n    return hash256(data)\n\ndef sqrt_mod(a,p):\n    return pow(a,(p+1)//4,p)\n\ndef recover_pubkey(sig, msg_h):\n    if len(sig)!=65: return None\n    header=sig[0]\n    if header<27 or header>34: return None\n    recid=(header-27)&3\n    compressed=(header-27)>=4\n    r=int.from_bytes(sig[1:33],'big')\n    s=int.from_bytes(sig[33:65],'big')\n    if r<=0 or r>=N or s<=0 or s>=N: return None\n    x=r+(recid//2)*N\n    if x>=P: return None\n    alpha=(x*x*x+B)%P\n    beta=sqrt_mod(alpha,P)\n    if (beta*beta)%P!=alpha: return None\n    if (beta%2)==(recid%2):\n        y=P-beta\n    else:\n        y=beta\n    R=(x,y)\n    e=int.from_bytes(msg_h,'big')\n    rinv=inv(r,N)\n    sR=ec_mul(s,R)\n    eG=ec_mul((-e)%N,G)\n    Q=ec_add(sR,eG)\n    if Q is None: return None\n    Q=(rinv*1%N, 0)\n    # actually: Q = rinv * (sR + eG)\n    sR=ec_mul(s,R)\n    eG=ec_mul((-e)%N,G)\n    sum_pt=ec_add(sR,eG)\n    if sum_pt is None: return None\n    Q=ec_mul(rinv,sum_pt)\n    if Q is None: return None\n    return Q, compressed\n\ndef main():\n    data=sys.stdin.read().split('\\n')\n    if len(data)<3:\n        print('INVALID'); return\n    addr=data[0].strip()\n    msg=data[1]\n    sig_b64=data[2].strip()\n    try:\n        sig=base64.b64decode(sig_b64,validate=True)\n    except Exception:\n        print('INVALID'); return\n    h=msg_hash(msg)\n    try:\n        res=recover_pubkey(sig,h)\n    except Exception:\n        print('INVALID'); return\n    if res is None:\n        print('INVALID'); return\n    (x,y),compressed=res\n    derived=pubkey_to_address(x,y,compressed)\n    print('VALID' if derived==addr else 'INVALID')\n\nmain()\n",
+  "reason": "all inputs produced identical output (looks hardcoded): 'INVALID'",
+  "validated_at": "2026-05-31T03:41:39.595096+00:00"
+}

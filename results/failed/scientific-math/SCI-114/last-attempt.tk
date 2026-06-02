@@ -1,0 +1,1 @@
+m=maxact;f=maxactivities(n:$i64;m:$i64):$i64{let count=mut.0;let i=mut.0;lp(let idx=0;idx<n;idx=idx+1){let start=n.get(idx);let j=mut.0;let found=mut.false;lp(let k=0;k<m;k=k+1){let end=m.get(k);if(!(end<start)){found=true};};if(found){count=count+1};};<count};

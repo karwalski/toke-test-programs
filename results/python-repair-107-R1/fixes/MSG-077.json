@@ -1,0 +1,9 @@
+{
+  "id": "MSG-077",
+  "category": "messaging",
+  "outcome": "failed",
+  "test_cases": [],
+  "python": "import sys, hmac, hashlib\n\ndef hkdf_expand(prk, info, length=32):\n    out = b''\n    t = b''\n    i = 1\n    while len(out) < length:\n        t = hmac.new(prk, t + info + bytes([i]), hashlib.sha256).digest()\n        out += t\n        i += 1\n    return out[:length]\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    interval = int(data[0].strip())\n    secret_hex = data[1].strip()\n    n = int(data[2].strip())\n    chain_key = bytes.fromhex(secret_hex)\n    epoch = 0\n    msg_in_epoch = 0\n    out_lines = []\n    for i in range(1, n+1):\n        # derive message key from chain_key via HMAC\n        msg_key = hmac.new(chain_key, b'msg' + str(msg_in_epoch).encode(), hashlib.sha256).hexdigest()\n        out_lines.append(f\"msg {i}: epoch={epoch}, key={msg_key[:16]}\")\n        # advance chain\n        chain_key = hashlib.sha256(chain_key + b'ratchet').digest()\n        msg_in_epoch += 1\n        if msg_in_epoch >= interval:\n            old_epoch = epoch\n            epoch += 1\n            chain_key = hkdf_expand(chain_key, b'rotate', 32)\n            msg_in_epoch = 0\n            out_lines.append(f\"[KEY ROTATION: epoch {old_epoch} -> {epoch}]\")\n    print('\\n'.join(out_lines))\n\nmain()\n",
+  "reason": "non-zero exit (1) on input '3\\nab01cd23ef45678901234567890abcde01234567890abcdef01234567890abcde\\n5\\n': Traceback (most recent call last):\n  File \"/tmp/tmprjt04dpx.py\", line 37, in <module>\n    main()\n  File \"/tmp/tmprjt04dpx.py\", line 18, in main\n    chain_key = bytes.fromhex(secret_hex)\nValueError: no",
+  "validated_at": "2026-05-31T03:42:51.750909+00:00"
+}

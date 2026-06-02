@@ -1,0 +1,1 @@
+m=httpjwt;f=main():$void{let port=8080;let cert="cert.pem";let key="key.pem";let srv=mut.http.server(port;cert;key));let api=mut.http.api(srv);let loginurl="https://example.com/login";let token=http.post(loginurl;"grant_type=password";"client_id=myapp";"username=user";"password=pass"));let protectedurl="https://example.com/protected";let resp=http.get(protectedurl;token));};

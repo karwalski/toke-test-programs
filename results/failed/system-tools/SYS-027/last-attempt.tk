@@ -1,0 +1,1 @@
+m=mv;f=solve(p0:$str;p1:$str;p2:$str):$str{let srcdir=p0;let destdir=p1;let pattern=p2;let result=mut."";let srclist=mut.@();let destlist=mut.@();lp(let idx=0;idx<1000;idx=idx+1){let fname=pattern;let fpath=srcdir+"/"+fname;let fexists=mut.false;lp(let i=0;i<1000;i=i+1){if(fpath=fname){fexists=true};};if(fexists){srclist=srclist+@(fname)};}

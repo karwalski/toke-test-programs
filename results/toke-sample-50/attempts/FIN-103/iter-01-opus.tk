@@ -1,0 +1,1 @@
+m=primecheck;i=io:std.io;i=s:std.str;i=math:std.math;f=isprime(n:$i64):$bool{if(n<2){<false};if(n=2){<true};let rem=n-n/2*2;if(rem=0){<false};let limit=math.sqrt(n as$f64)as$i64;let idx=mut.3;lp(idx<=limit){let r=n-n/idx*idx;if(r=0){<false};idx=idx+2};<true};f=main():$i64{let n=s.toint(io.readln());if(isprime(n)){io.println("PRIME")}el{io.println("COMPOSITE")};<0}

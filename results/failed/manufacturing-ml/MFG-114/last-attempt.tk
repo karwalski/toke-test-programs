@@ -1,0 +1,1 @@
+m=batchtracker;f=step(id:$str;name:$str;status:$str):$str{let out=mut."";out=out+id;out=out+"|";out=out+name;out=out+"|";out=out+status;<out};f=recordstep(batchid:$str;stepid:$str):$str{let entry=step(batchid;batchid+"-step";"pending");let out=mut.entry;<out};f=main():$i64{let batchid="batch-12345";let stepid="step-1";let result=recordstep(batchid;stepid);<0};

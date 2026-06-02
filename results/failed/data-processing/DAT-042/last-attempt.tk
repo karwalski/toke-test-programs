@@ -1,0 +1,1 @@
+m=decode;f=decode(s:$str):$str{let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let ch=s.get(i);if(ch>47){if(ch<58){let times=ch-48;let j=mut.i+1;lp(let k=0;k<times;k=k+1){if(j<n){result=result+s.get(j);j=j+1;};};i=j-1;}el{result=result+ch;};};<result};

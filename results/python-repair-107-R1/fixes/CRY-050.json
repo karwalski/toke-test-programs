@@ -1,0 +1,22 @@
+{
+  "id": "CRY-050",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "{\"from\":\"addr1\",\"to\":\"addr2\",\"amount\":100,\"nonce\":0}\n0000000000000000000000000000000000000000000000000000000000000001",
+      "expected_output": "{\"amount\":100,\"from\":\"addr1\",\"nonce\":0,\"signature\":\"11065adbf285a6a474284718d5e78bbb6166c98037c88a1233f0eb33546cad180d71beeb157786dcf486966f493b676ad013ab98176da8d7fd2a6bf735fecc2e\",\"to\":\"addr2\"}"
+    },
+    {
+      "input": "{\"from\":\"addr1\",\"to\":\"addr3\",\"amount\":50,\"nonce\":1}\nc9bdb83ce5e6e35f9e6c8f3e8e4c5b7a3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a",
+      "expected_output": "{\"amount\":50,\"from\":\"addr1\",\"nonce\":1,\"signature\":\"1d465ebf5c2fa01c3dc47477c1e3dab5e187912fc1dd7ed9a6ed638f52e8a35b49f13489bde57d3caee7a18d6ef4ae3b9017347657efc05fae1c68521e08cd01\",\"to\":\"addr3\"}"
+    },
+    {
+      "input": "{\"from\":\"alice\",\"to\":\"bob\",\"amount\":777,\"nonce\":42}\n0000000000000000000000000000000000000000000000000000000000000002",
+      "expected_output": "{\"amount\":777,\"from\":\"alice\",\"nonce\":42,\"signature\":\"39eff84b1e7e6fc809d8959b52768b46883b7738bc2677ad14ac841992ca27b3113bbc66786e0a07d132167bf4148bf8000dab5416ec0a3d16b9ee86ebad0a58\",\"to\":\"bob\"}"
+    }
+  ],
+  "python": "import sys, json, hashlib, hmac\n\n# secp256k1 parameters\nP = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F\nN = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141\nA = 0\nB = 7\nGx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798\nGy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8\n\ndef inv(a, m):\n    return pow(a, -1, m)\n\ndef point_add(p1, p2):\n    if p1 is None: return p2\n    if p2 is None: return p1\n    x1,y1 = p1; x2,y2 = p2\n    if x1 == x2:\n        if (y1 + y2) % P == 0:\n            return None\n        m = (3*x1*x1) * inv(2*y1, P) % P\n    else:\n        m = (y2 - y1) * inv(x2 - x1, P) % P\n    x3 = (m*m - x1 - x2) % P\n    y3 = (m*(x1 - x3) - y1) % P\n    return (x3, y3)\n\ndef scalar_mul(k, point):\n    result = None\n    addend = point\n    while k:\n        if k & 1:\n            result = point_add(result, addend)\n        addend = point_add(addend, addend)\n        k >>= 1\n    return result\n\ndef rfc6979_k(priv, msg_hash):\n    # RFC 6979 deterministic k generation\n    x = priv.to_bytes(32, 'big')\n    h1 = msg_hash\n    V = b'\\x01' * 32\n    K = b'\\x00' * 32\n    K = hmac.new(K, V + b'\\x00' + x + h1, hashlib.sha256).digest()\n    V = hmac.new(K, V, hashlib.sha256).digest()\n    K = hmac.new(K, V + b'\\x01' + x + h1, hashlib.sha256).digest()\n    V = hmac.new(K, V, hashlib.sha256).digest()\n    while True:\n        V = hmac.new(K, V, hashlib.sha256).digest()\n        k = int.from_bytes(V, 'big')\n        if 1 <= k < N:\n            return k\n        K = hmac.new(K, V + b'\\x00', hashlib.sha256).digest()\n        V = hmac.new(K, V, hashlib.sha256).digest()\n\ndef sign(priv, msg_hash):\n    z = int.from_bytes(msg_hash, 'big')\n    while True:\n        k = rfc6979_k(priv, msg_hash)\n        R = scalar_mul(k, (Gx, Gy))\n        r = R[0] % N\n        if r == 0: continue\n        s = (inv(k, N) * (z + r * priv)) % N\n        if s == 0: continue\n        # low-s\n        if s > N // 2:\n            s = N - s\n        return r, s\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    tx = json.loads(data[0])\n    priv_hex = data[1].strip()\n    priv = int(priv_hex, 16)\n    canonical = json.dumps(tx, sort_keys=True, separators=(',', ':'))\n    h = hashlib.sha256(canonical.encode()).digest()\n    r, s = sign(priv, h)\n    sig = r.to_bytes(32, 'big').hex() + s.to_bytes(32, 'big').hex()\n    tx['signature'] = sig\n    print(json.dumps(tx, sort_keys=True, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:40:32.071877+00:00"
+}

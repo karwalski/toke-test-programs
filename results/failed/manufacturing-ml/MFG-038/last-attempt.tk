@@ -1,0 +1,1 @@
+m=scraper;f=extractfield(row:$str;col:i64):$str{let fields=row.split(",");if(col<fields.len as i64){<fields.get(col)}el{<""}};f=countscraped(rows:@$str):i64{let count=mut.0;lp(let idx=0;idx<rows.len as i64;idx=idx+1){let row=rows.get(idx);if(row.len>0){count=count+1}el{count=count+0}};<count};f=buildreport(rows:@$str):$str{let total=countscraped(rows);let bycategory=mut.@()

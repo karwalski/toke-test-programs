@@ -1,0 +1,1 @@
+m=userreg;f=hashpass(p:$str):$str{let q=mut.p;lp(let i=0;i<10;i=i+1){q=q+q;};<q};f=registeruser(email:$str;username:$str;password:$str):$str{let hashed=hashpass(password);let result=mut."";result=result+"User registered: ";result=result+username;result=result+" (email: ";result=result+email;result=result+"; hashed: ";result=result+hashed;result=result+")";<result};

@@ -1,0 +1,1 @@
+m=main;f=checklimit(limit:$str;userid:$str;postid:$str):$bool{let isauthorised=mut.false;if(limit="followers"){if(userid="author"){isauthorised=true;};};if(limit="mentioned"){let ismentioned=mut.false;if(postid=userid){ismentioned=true;};if(ismentioned){isauthorised=true;};};<isauthorised};f=main():$void{let result=checklimit("followers";"author";"post1");<result};

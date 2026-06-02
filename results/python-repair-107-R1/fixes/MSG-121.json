@@ -1,0 +1,22 @@
+{
+  "id": "MSG-121",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456\nImportant agreement text\n{\"time\":\"2024-01-15T10:00:00Z\",\"ta_signature\":\"deadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234\"}",
+      "expected_output": "{\"content\":\"Important agreement text\",\"signer_sig\":\"10ceba6d3164682fdcbca45bddb7283212259706a23572817ac142cbf308caea\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"ta_sig\":\"deadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234\",\"combined_hash\":\"838007fe40e9243fe45862aa0de7e22a4ff49e5bdb256ddb3c14f8948ed035b3\"}"
+    },
+    {
+      "input": "ffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\nShort msg\n{\"time\":\"2024-06-01T00:00:00Z\",\"ta_signature\":\"1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\"}",
+      "expected_output": "{\"content\":\"Short msg\",\"signer_sig\":\"7ca80ebdcbfd1c31c1fc7d69bdd5d02edba9d4b9075dacf9ca433ac413cc44de\",\"timestamp\":\"2024-06-01T00:00:00Z\",\"ta_sig\":\"1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\",\"combined_hash\":\"5bb00b7ced15182f3eb1ad1e299c2c1d42b925e5dd96649f424ad661578c9e0a\"}"
+    },
+    {
+      "input": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nAnother test message with more content\n{\"time\":\"2025-03-20T12:34:56Z\",\"ta_signature\":\"abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789\"}",
+      "expected_output": "{\"content\":\"Another test message with more content\",\"signer_sig\":\"f4df44a904ebcd83cc125905ef9b883c1010de046aec1931ab8baf44c155f935\",\"timestamp\":\"2025-03-20T12:34:56Z\",\"ta_sig\":\"abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789\",\"combined_hash\":\"a46aab03895ad9d1fec11e0b7357a53aed51c353b59d8cdb217f0d5a3f449d00\"}"
+    }
+  ],
+  "python": "import sys, json, hmac, hashlib\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    priv_hex = data[0].strip()\n    message = data[1]\n    ta_json = json.loads(data[2])\n    timestamp = ta_json['time']\n    ta_sig = ta_json['ta_signature']\n    key = bytes.fromhex(priv_hex)\n    # signer signs content + timestamp\n    signer_payload = (message + '|' + timestamp).encode('utf-8')\n    signer_sig = hmac.new(key, signer_payload, hashlib.sha256).hexdigest()\n    # combined hash binds content, timestamp, signer_sig, ta_sig\n    combined_input = (message + '|' + timestamp + '|' + signer_sig + '|' + ta_sig).encode('utf-8')\n    combined_hash = hashlib.sha256(combined_input).hexdigest()\n    bundle = {\n        'content': message,\n        'signer_sig': signer_sig,\n        'timestamp': timestamp,\n        'ta_sig': ta_sig,\n        'combined_hash': combined_hash\n    }\n    print(json.dumps(bundle, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:21.120836+00:00"
+}

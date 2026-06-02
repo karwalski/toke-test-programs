@@ -1,0 +1,1 @@
+m=histogram;f=buildhistogram(data:@i64;bins:i64):$str{let minval=mut.0;let maxval=mut.0;let n=data.len;lp(let i=0;i<n;i=i+1){let v=data.get(i);if(i=0){minval=v;maxval=v;}el{if(v<minval){minval=v;}el{if(v>maxval){maxval=v;};};};};let range=maxval-minval;let binwidth=range/bins;let counts=mut.@(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0

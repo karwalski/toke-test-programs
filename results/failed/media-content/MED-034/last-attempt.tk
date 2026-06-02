@@ -1,0 +1,1 @@
+m=fmt;f=fmt(s:$str;mode:$i64):$str{let n=s.len;let r=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(mode=1){if(c=91){r=r+92 as$str;if(i+1<n){let c2=s.get(i+1);if(c2=109){i=i+1;r=r+109 as$str;}el{i=i+1;r=r+c2 as$str;};};}el{r=r+c as$str;};};<r};

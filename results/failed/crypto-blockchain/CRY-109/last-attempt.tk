@@ -1,0 +1,1 @@
+m=sign;f=signmsg(privkey:$str;msg:$str):$str{let keylen=privkey.len;let msglen=msg.len;let valid=mut.false;if(keylen=64){valid=true};if(!(valid=true)){<""};let sig=mut."";lp(let i=0;i<64;i=i+1){let bit=mut.0;if(i<msglen){let ch=msg.get(i);let val=ch as i64;let bit0=val-val/2*2;if(bit0=1){bit=1};};if(bit=1){sig=sig+"1"}el{sig=sig+"0"};};<sig};

@@ -1,0 +1,1 @@
+m=whitespacetohex;f=whitespacetohex(s:$str):$str{let n=s.len;let result=mut."";lp(let idx=0;idx<n;idx=idx+1){let c=s.get(idx);let isspace=mut.false;if(c=32){isspace=true};if(!(isspace)){result=result+c as$str};};<result};f=main():$i64{let input="  hello   world  ";let output=whitespacetohex(input);<0};

@@ -1,0 +1,22 @@
+{
+  "id": "CRY-044",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "0\n2024-01-01T00:00:00Z\nGenesis Block\n0000000000000000000000000000000000000000000000000000000000000000\n",
+      "expected_output": "{\"index\":0,\"timestamp\":\"2024-01-01T00:00:00Z\",\"data\":\"Genesis Block\",\"previous_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"hash\":\"7f1180d24eefa49123067f5fa473a81b90ecafd2cd01ba386296c7b32d633742\"}"
+    },
+    {
+      "input": "1\n2024-01-01T00:01:00Z\nSecond Block\nabc123\n",
+      "expected_output": "{\"index\":1,\"timestamp\":\"2024-01-01T00:01:00Z\",\"data\":\"Second Block\",\"previous_hash\":\"abc123\",\"hash\":\"d27d85faa36a532fb310ceb9f20b141f7305538d1d409836ff88125d577cf719\"}"
+    },
+    {
+      "input": "42\n2025-06-15T12:30:45Z\nHello, World!\ndeadbeefcafebabe\n",
+      "expected_output": "{\"index\":42,\"timestamp\":\"2025-06-15T12:30:45Z\",\"data\":\"Hello, World!\",\"previous_hash\":\"deadbeefcafebabe\",\"hash\":\"4f6cb1eeb71393ce5469d96bb021d323f9a689667ebb2bd3a504783912b98505\"}"
+    }
+  ],
+  "python": "import sys, hashlib, json\n\ndef main():\n    lines = sys.stdin.read().split('\\n')\n    index = int(lines[0].strip())\n    timestamp = lines[1].strip()\n    data = lines[2]\n    previous_hash = lines[3].strip()\n    content = str(index) + timestamp + data + previous_hash\n    h = hashlib.sha256(content.encode('utf-8')).hexdigest()\n    obj = {'index': index, 'timestamp': timestamp, 'data': data, 'previous_hash': previous_hash, 'hash': h}\n    print(json.dumps(obj, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:40:42.450957+00:00"
+}

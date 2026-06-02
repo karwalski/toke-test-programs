@@ -1,0 +1,1 @@
+m=filecrypt;f=encryptfile(pass:$str;inpath:$str;outpath:$str):$void{let key=hashpass(pass);let iv=geniv();let data=reafile(inpath);let enc=encrypt(data;key;iv);let meta=genmeta(pass;key;iv;data.len as i64);let out=meta+enc;writefile(outpath;out)};f=de

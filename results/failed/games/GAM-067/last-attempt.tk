@@ -1,0 +1,1 @@
+m=sg;f=sg(n:$i64):$i64{if(n<0){<0};if(n=0){<0};let m=mut.0;lp(let i=0;i<n;i=i+1){let tmp=sg(n-1-i);if(!(tmp=0)){<n-1-i};m=tmp};if(m=0){<n};<0};f=optimalmove(piles:@$i64):$str{let n=piles.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let s=sg(piles.get(i)));if(!(s=0)){<""};m=s};if(m=0){<""};<""};

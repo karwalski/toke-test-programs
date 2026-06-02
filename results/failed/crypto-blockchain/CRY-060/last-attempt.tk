@@ -1,0 +1,1 @@
+m=htlc;f=solve(p0:$str;p1:$str;p2:$str):$str{let x=p0;let y=p1;let action=p2;let result=mut."";if(action="claim"){let zor=mut.false;if(x=y){zor=true};if(zor){result="approved"}el{result="rejected"}}el{if(action="refund"){result="approved"}el{result="unknown action"}}};<result};

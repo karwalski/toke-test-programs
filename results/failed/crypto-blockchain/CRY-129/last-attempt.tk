@@ -1,0 +1,1 @@
+m=wrap;f=solve(p0:$i64;p1:$i64;p2:$i64):$i64{let supply=p0;let demand=p1;let limit=p2;let wrapped=mut.0;let remaining=mut.supply;if(demand>remaining){wrapped=remaining;remaining=0;}el{wrapped=demand;remaining=remaining-demand;};if(wrapped>limit){wrapped=limit;};<wrapped};

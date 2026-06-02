@@ -1,0 +1,22 @@
+{
+  "id": "SYS-037",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "error\n---\nfile1.log\nstart of log\nerror: disk full\nall good\nERROR: case test\nanother error here\n---\nno",
+      "expected_output": "file1.log:2:error: disk full\nfile1.log:5:another error here"
+    },
+    {
+      "input": "TODO\n---\nsrc/main.py|src/utils.py|README.md\n# main.py\ndef foo():\n    # TODO: implement\n    pass\n--FILE--\n# utils.py\ndef bar():\n    return 42\n# TODO refactor\n--FILE--\n# README\nNo todos here\n---\nyes",
+      "expected_output": "src/main.py:3:    # TODO: implement\nsrc/utils.py:4:# TODO refactor"
+    },
+    {
+      "input": "foo.*bar\n---\ntest.txt\nfoo and bar\nfoobar\nfoo bar baz\nbarfoo\nnothing\n---\nno",
+      "expected_output": "test.txt:1:foo and bar\ntest.txt:2:foobar\ntest.txt:3:foo bar baz"
+    }
+  ],
+  "python": "import sys, re\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    # Format: line 0 = pattern, then '---', then filenames (| separated), then '---', then content blocks split by --FILE--, then '---', then recursive flag\n    pattern = data[0]\n    # find separators\n    idx = 1\n    assert data[idx] == '---'\n    idx += 1\n    fnames = data[idx].split('|')\n    idx += 1\n    # collect content until next '---'\n    content_lines = []\n    while idx < len(data) and data[idx] != '---':\n        content_lines.append(data[idx])\n        idx += 1\n    # idx is at '---'\n    idx += 1\n    recursive = data[idx] if idx < len(data) else 'no'\n    # split content into files by --FILE-- separator\n    files = []\n    cur = []\n    for ln in content_lines:\n        if ln == '--FILE--':\n            files.append(cur)\n            cur = []\n        else:\n            cur.append(ln)\n    files.append(cur)\n    # pair filenames with files\n    regex = re.compile(pattern)\n    out = []\n    for fname, flines in zip(fnames, files):\n        for i, line in enumerate(flines, start=1):\n            if regex.search(line):\n                out.append(f'{fname}:{i}:{line}')\n    sys.stdout.write('\\n'.join(out))\n    if out:\n        sys.stdout.write('\\n')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:44:13.581793+00:00"
+}

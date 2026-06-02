@@ -1,0 +1,1 @@
+m=costcalc;f=compute_cost(plan:$str;pricing:$str):$f64{let total=mut.0.0;let tools=plan.split("->");lp(let i=0;i<tools.len;i=i+1){let t=tools.get(i);let cost=pricing.get(t);total=total+cost;};<total};f=main():$i64{let plan="analyze->compress->decompress";let pricing=@("analyze":0.01;"compress":0.005;"decompress":0.005));let cost=compute_cost(plan;pricing);<0};

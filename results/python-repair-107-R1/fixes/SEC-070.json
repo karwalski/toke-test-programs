@@ -1,0 +1,26 @@
+{
+  "id": "SEC-070",
+  "category": "security",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "Hello World",
+      "expected_output": "{\"counts\": {}, \"decodedData\": null, \"hiddenBits\": 0, \"hiddenChars\": 0, \"possibleEncoding\": null, \"totalChars\": 11, \"visibleChars\": 11}"
+    },
+    {
+      "input": "Normal text with no hidden content",
+      "expected_output": "{\"counts\": {}, \"decodedData\": null, \"hiddenBits\": 0, \"hiddenChars\": 0, \"possibleEncoding\": null, \"totalChars\": 34, \"visibleChars\": 34}"
+    },
+    {
+      "input": "Hi\u200b\u200d\u200d\u200b\u200d\u200b\u200b\u200bThere",
+      "expected_output": "{\"counts\": {\"ZWJ\": 3, \"ZWSP\": 5}, \"decodedData\": \"h\", \"hiddenBits\": 8, \"hiddenChars\": 8, \"possibleEncoding\": \"binary(ZWSP=0,ZWJ=1)\", \"totalChars\": 15, \"visibleChars\": 7}"
+    },
+    {
+      "input": "\ufeffStart of file",
+      "expected_output": "{\"counts\": {\"BOM\": 1}, \"decodedData\": null, \"hiddenBits\": 0, \"hiddenChars\": 1, \"possibleEncoding\": null, \"totalChars\": 14, \"visibleChars\": 13}"
+    }
+  ],
+  "python": "import sys, json\n\ndef main():\n    data = sys.stdin.read()\n    zw = {'\\u200b': 'ZWSP', '\\u200c': 'ZWNJ', '\\u200d': 'ZWJ', '\\ufeff': 'BOM', '\\u2060': 'WJ'}\n    total = len(data)\n    hidden_chars = [c for c in data if c in zw]\n    visible = total - len(hidden_chars)\n    counts = {}\n    for c in hidden_chars:\n        counts[zw[c]] = counts.get(zw[c], 0) + 1\n    possible_encoding = None\n    decoded = None\n    # Try binary decode using ZWSP=0, ZWJ=1\n    bits = []\n    for c in hidden_chars:\n        if c == '\\u200b':\n            bits.append('0')\n        elif c == '\\u200d':\n            bits.append('1')\n    hidden_bits = len(bits)\n    if hidden_bits > 0 and hidden_bits % 8 == 0:\n        possible_encoding = 'binary(ZWSP=0,ZWJ=1)'\n        try:\n            bs = ''.join(bits)\n            byts = bytes(int(bs[i:i+8], 2) for i in range(0, len(bs), 8))\n            s = byts.decode('utf-8')\n            if all(32 <= ord(ch) < 127 or ch in '\\n\\r\\t' for ch in s):\n                decoded = s\n        except Exception:\n            decoded = None\n    out = {\n        'totalChars': total,\n        'visibleChars': visible,\n        'hiddenChars': len(hidden_chars),\n        'hiddenBits': hidden_bits,\n        'counts': counts,\n        'possibleEncoding': possible_encoding,\n        'decodedData': decoded,\n    }\n    print(json.dumps(out, sort_keys=True))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:12.369879+00:00"
+}

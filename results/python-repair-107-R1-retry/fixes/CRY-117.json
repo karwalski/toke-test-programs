@@ -1,0 +1,26 @@
+{
+  "id": "CRY-117",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "transfer(address,uint256)\n0x1234567890abcdef1234567890abcdef12345678\n100\n",
+      "expected_output": "a9059cbb0000000000000000000000001234567890abcdef1234567890abcdef123456780000000000000000000000000000000000000000000000000000000000000064"
+    },
+    {
+      "input": "balanceOf(address)\n0xabcdefabcdefabcdefabcdefabcdefabcdefabcd\n",
+      "expected_output": "70a08231000000000000000000000000abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+    },
+    {
+      "input": "approve(address,uint256)\n0x0000000000000000000000000000000000000001\n1000000000000000000\n",
+      "expected_output": "095ea7b300000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000de0b6b3a7640000"
+    },
+    {
+      "input": "totalSupply()\n",
+      "expected_output": "18160ddd"
+    }
+  ],
+  "python": "import sys\n\ndef keccak256(data):\n    # Keccak-256 implementation\n    RC = [0x0000000000000001,0x0000000000008082,0x800000000000808A,0x8000000080008000,\n          0x000000000000808B,0x0000000080000001,0x8000000080008081,0x8000000000008009,\n          0x000000000000008A,0x0000000000000088,0x0000000080008009,0x000000008000000A,\n          0x000000008000808B,0x800000000000008B,0x8000000000008089,0x8000000000008003,\n          0x8000000000008002,0x8000000000000080,0x000000000000800A,0x800000008000000A,\n          0x8000000080008081,0x8000000000008080,0x0000000080000001,0x8000000080008008]\n    R = [[0,36,3,41,18],[1,44,10,45,2],[62,6,43,15,61],[28,55,25,21,56],[27,20,39,8,14]]\n    def rol(x,n): return ((x<<n)|(x>>(64-n)))&0xFFFFFFFFFFFFFFFF\n    rate = 136\n    state = [[0]*5 for _ in range(5)]\n    # padding: append 0x01, then 0x00*, then last byte |= 0x80\n    data = bytearray(data)\n    pad_len = rate - (len(data) % rate)\n    if pad_len == 1:\n        data.append(0x81)\n    else:\n        data.append(0x01)\n        data.extend([0]*(pad_len-2))\n        data.append(0x80)\n    for block_start in range(0, len(data), rate):\n        block = data[block_start:block_start+rate]\n        for i in range(rate//8):\n            lane = int.from_bytes(block[i*8:i*8+8], 'little')\n            x = i % 5\n            y = i // 5\n            state[x][y] ^= lane\n        # Keccak-f[1600]\n        for rnd in range(24):\n            C = [state[x][0]^state[x][1]^state[x][2]^state[x][3]^state[x][4] for x in range(5)]\n            D = [C[(x-1)%5] ^ rol(C[(x+1)%5],1) for x in range(5)]\n            for x in range(5):\n                for y in range(5):\n                    state[x][y] ^= D[x]\n            B = [[0]*5 for _ in range(5)]\n            for x in range(5):\n                for y in range(5):\n                    B[y][(2*x+3*y)%5] = rol(state[x][y], R[x][y])\n            for x in range(5):\n                for y in range(5):\n                    state[x][y] = B[x][y] ^ ((~B[(x+1)%5][y]) & B[(x+2)%5][y]) & 0xFFFFFFFFFFFFFFFF\n            state[0][0] ^= RC[rnd]\n    out = bytearray()\n    while len(out) < 32:\n        for i in range(rate//8):\n            x = i % 5\n            y = i // 5\n            out.extend(state[x][y].to_bytes(8,'little'))\n            if len(out) >= 32:\n                break\n    return bytes(out[:32])\n\ndef parse_sig(sig):\n    name, rest = sig.split('(', 1)\n    args = rest.rstrip(')')\n    if args == '':\n        return name, []\n    return name, args.split(',')\n\ndef encode_arg(t, v):\n    if t == 'address':\n        h = v.lower()\n        if h.startswith('0x'): h = h[2:]\n        return bytes.fromhex(h.rjust(64, '0'))\n    elif t.startswith('uint') or t.startswith('int'):\n        n = int(v)\n        if n < 0:\n            n = n & ((1<<256)-1)\n        return n.to_bytes(32, 'big')\n    elif t == 'bool':\n        return (1 if v.lower() in ('true','1') else 0).to_bytes(32,'big')\n    else:\n        raise ValueError('unsupported type: '+t)\n\ndef main():\n    lines = sys.stdin.read().split('\\n')\n    sig = lines[0].strip()\n    name, types = parse_sig(sig)\n    selector = keccak256(sig.encode())[:4]\n    out = selector\n    for i, t in enumerate(types):\n        v = lines[1+i].strip()\n        out += encode_arg(t, v)\n    print(out.hex())\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T08:50:14.239161+00:00"
+}

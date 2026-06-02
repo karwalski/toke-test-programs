@@ -1,0 +1,22 @@
+{
+  "id": "SYS-114",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "2024-01-15T10:00:05 event a\n2024-01-15T10:00:45 event b\n2024-01-15T10:02:10 event c\n2024-01-15T10:02:30 event d\n2024-01-15T10:02:55 event e\nno timestamp here\n2024-01-15T10:04:00 event f\n---\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nminute\n",
+      "expected_output": "2024-01-15T10:00 2\n2024-01-15T10:01 0\n2024-01-15T10:02 3\n2024-01-15T10:03 0\n2024-01-15T10:04 1"
+    },
+    {
+      "input": "2024-01-15T08:30:00 a\n2024-01-15T09:15:00 b\n2024-01-15T09:45:00 c\n2024-01-15T11:00:00 d\n2024-01-16T00:30:00 e\n---\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nhour\n",
+      "expected_output": "2024-01-15T08 1\n2024-01-15T09 2\n2024-01-15T10 0\n2024-01-15T11 1\n2024-01-15T12 0\n2024-01-15T13 0\n2024-01-15T14 0\n2024-01-15T15 0\n2024-01-15T16 0\n2024-01-15T17 0\n2024-01-15T18 0\n2024-01-15T19 0\n2024-01-15T20 0\n2024-01-15T21 0\n2024-01-15T22 0\n2024-01-15T23 0\n2024-01-16T00 1"
+    },
+    {
+      "input": "2024-03-01T12:00:00 x\n2024-03-01T12:00:00 y\n2024-03-01T12:00:03 z\n---\n\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\nsecond\n",
+      "expected_output": "2024-03-01T12:00:00 2\n2024-03-01T12:00:01 0\n2024-03-01T12:00:02 0\n2024-03-01T12:00:03 1"
+    }
+  ],
+  "python": "import sys, re\nfrom datetime import datetime, timedelta\n\ndata = sys.stdin.read()\nif '---\\n' in data:\n    log_part, cfg_part = data.split('---\\n', 1)\nelse:\n    parts = data.rsplit('\\n', 3)\n    log_part = ''\n    cfg_part = data\ncfg_lines = cfg_part.strip().split('\\n')\nregex = cfg_lines[0]\nbucket = cfg_lines[1].strip()\n\npat = re.compile(regex)\n\nformats = [\n    '%Y-%m-%dT%H:%M:%S',\n    '%Y-%m-%d %H:%M:%S',\n    '%Y-%m-%d',\n]\n\ndef parse_ts(s):\n    for f in formats:\n        try:\n            return datetime.strptime(s, f)\n        except ValueError:\n            pass\n    return None\n\ntimes = []\nfor line in log_part.splitlines():\n    m = pat.search(line)\n    if not m:\n        continue\n    dt = parse_ts(m.group(0))\n    if dt is None:\n        continue\n    times.append(dt)\n\nif not times:\n    sys.exit(0)\n\ndef truncate(dt, b):\n    if b == 'second':\n        return dt.replace(microsecond=0)\n    if b == 'minute':\n        return dt.replace(second=0, microsecond=0)\n    if b == 'hour':\n        return dt.replace(minute=0, second=0, microsecond=0)\n    raise ValueError\n\ndef step(b):\n    if b == 'second': return timedelta(seconds=1)\n    if b == 'minute': return timedelta(minutes=1)\n    if b == 'hour': return timedelta(hours=1)\n\ntrunc = [truncate(t, bucket) for t in times]\ncounts = {}\nfor t in trunc:\n    counts[t] = counts.get(t, 0) + 1\n\nstart = min(trunc)\nend = max(trunc)\ndelta = step(bucket)\n\nfmt = {'second': '%Y-%m-%dT%H:%M:%S', 'minute': '%Y-%m-%dT%H:%M', 'hour': '%Y-%m-%dT%H'}[bucket]\n\ncur = start\nout = []\nwhile cur <= end:\n    out.append(f\"{cur.strftime(fmt)} {counts.get(cur, 0)}\")\n    cur += delta\n\nprint('\\n'.join(out))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:33.093246+00:00"
+}

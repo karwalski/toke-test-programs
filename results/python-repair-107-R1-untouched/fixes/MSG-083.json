@@ -1,0 +1,22 @@
+{
+  "id": "MSG-083",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "deadbeefcafebabe1234567890abcdef\n5\n3\n",
+      "expected_output": "share 1: 2b7e28268a85a10a6a75eaa8ad1be7b3\nshare 2: d774564a05673702e20a7e9cc364f774\nshare 3: 22a7c083451c2cb69a4bc24cfed4dd28\nshare 4: 018f240e687061cce98e31cc92c81a4e\nshare 5: f45cb2c7280b7a7891cf8d1caf783012\nreconstruction requires any 3 of 5 shares"
+    },
+    {
+      "input": "0123456789abcdef\n3\n2\n",
+      "expected_output": "share 1: df87b451f2c054a2\nshare 2: a670bc0b7f7de475\nshare 3: 78d44d3d04167d38\nreconstruction requires any 2 of 3 shares"
+    },
+    {
+      "input": "ff\n4\n2\n",
+      "expected_output": "share 1: 0c\nshare 2: 02\nshare 3: f1\nshare 4: 1e\nreconstruction requires any 2 of 4 shares"
+    }
+  ],
+  "python": "import sys\n\ndef gf_mul(a, b):\n    r = 0\n    for _ in range(8):\n        if b & 1:\n            r ^= a\n        hi = a & 0x80\n        a = (a << 1) & 0xff\n        if hi:\n            a ^= 0x1b\n        b >>= 1\n    return r\n\ndef gf_pow(a, n):\n    r = 1\n    while n > 0:\n        if n & 1:\n            r = gf_mul(r, a)\n        a = gf_mul(a, a)\n        n >>= 1\n    return r\n\ndef gf_inv(a):\n    return gf_pow(a, 254)\n\n# Deterministic PRNG: seed from secret bytes using a simple LCG-like over GF(256)\nclass DetRand:\n    def __init__(self, seed_bytes):\n        # SHA-like simple mix using stdlib hashlib\n        import hashlib\n        h = hashlib.sha256(seed_bytes).digest()\n        self.buf = list(h)\n        self.idx = 0\n        self.h = hashlib.sha256(seed_bytes)\n    def next_byte(self):\n        if self.idx >= len(self.buf):\n            self.h.update(b'x')\n            self.buf = list(self.h.digest())\n            self.idx = 0\n        b = self.buf[self.idx]\n        self.idx += 1\n        return b\n\ndef eval_poly(coeffs, x):\n    # coeffs[0] = secret byte, coeffs[i] = coefficient of x^i in GF(256)\n    r = 0\n    for c in reversed(coeffs):\n        r = gf_mul(r, x) ^ c\n    return r\n\ndef main():\n    data = sys.stdin.read().split()\n    secret_hex = data[0]\n    N = int(data[1])\n    K = int(data[2])\n    secret = bytes.fromhex(secret_hex)\n    rng = DetRand(secret + bytes([N, K]))\n    # For each byte of secret, generate K-1 random coefficients\n    polys = []\n    for sb in secret:\n        coeffs = [sb]\n        for _ in range(K - 1):\n            coeffs.append(rng.next_byte())\n        polys.append(coeffs)\n    # Generate N shares at x=1..N\n    shares = []\n    for x in range(1, N + 1):\n        share_bytes = bytearray()\n        for poly in polys:\n            share_bytes.append(eval_poly(poly, x))\n        shares.append((x, bytes(share_bytes)))\n    out = []\n    for x, sb in shares:\n        out.append(f\"share {x}: {sb.hex()}\")\n    out.append(f\"reconstruction requires any {K} of {N} shares\")\n    print('\\n'.join(out))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:08.873606+00:00"
+}

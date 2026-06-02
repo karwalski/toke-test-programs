@@ -1,0 +1,1 @@
+m=password;f=passwordstrength(len:$i64;hasupper:$bool;hasdigit:$bool;hasspecial:$bool):$str{if(len<8){<"weak"};let count=mut.0;if(hasupper){count=count+1};if(hasdigit){count=count+1};if(hasspecial){count=count+1};if(!(len<12))el{if(!(count<2))el{<"weak"}el{<"medium"}};if(!(len<12)){if(count>3){<"strong"}el{<"medium"}}};

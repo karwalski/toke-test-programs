@@ -1,0 +1,1 @@
+m=hostvuln;f=solve(p0:$str):bool{let url=p0;let schemeend=mut.0;lp(let i=0;i<url.len;i=i+1){if(url.get(i)as u8=58 as u8){schemeend=i;br;};};let hoststart=mut.schemeend+1;lp(let i=hoststart;i<url.len;i=i+1){if(url.get(i)as u8=47 as u8){br;};};let pathstart=mut.url.len

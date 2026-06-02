@@ -1,0 +1,41 @@
+m=healthdashboard;
+i=j:std.json;
+i=s:std.str;
+i=io:std.io;
+
+f=main():$i64{
+  let input=io.readln();
+  let services=j.parse(input);
+  
+  io.println("Service Health Dashboard");
+  io.println("");
+  
+  let upcount=mut.0;
+  let total=mut.0;
+  
+  lp(let idx=0;idx<services.len;idx=idx+1){
+    let svc=services.get(idx);
+    let name=svc.get("service");
+    let status=svc.get("status");
+    let latency=svc.get("latency_ms");
+    let uptime=svc.get("uptime_pct");
+    
+    let statuslabel="[DOWN]";
+    if(status="UP"){
+      statuslabel="[UP]  ";
+      upcount=upcount+1
+    };
+    
+    let latencystr=s.concat(s.fromint(latency);"ms");
+    let uptimestr=s.concat(s.fromfloat(uptime);"% uptime");
+    
+    io.println(s.concat(statuslabel;s.concat(" ";s.concat(name;s.concat("    ";s.concat(latencystr;s.concat("   ";uptimestr)))))));
+    
+    total=total+1
+  };
+  
+  io.println("");
+  io.println(s.concat("All UP: ";s.concat(s.fromint(upcount);s.concat("/";s.fromint(total)))));
+  
+  <0
+}

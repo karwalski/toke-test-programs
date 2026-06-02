@@ -1,0 +1,26 @@
+{
+  "id": "SYS-040",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "",
+      "expected_output": "System: total=8000.0 free=2000.0 used=6000.0"
+    },
+    {
+      "input": "1\n",
+      "expected_output": "System: total=8000.0 free=2000.0 used=6000.0\nPID 1: rss=12.06 vsz=229.07 shared=6.0 private=6.06"
+    },
+    {
+      "input": "999999\n",
+      "expected_output": "System: total=8000.0 free=2000.0 used=6000.0\nNOT FOUND"
+    },
+    {
+      "input": "2\n",
+      "expected_output": "System: total=8000.0 free=2000.0 used=6000.0\nPID 2: rss=0.5 vsz=10.0 shared=0.38 private=0.12"
+    }
+  ],
+  "python": "import sys\n\ndef parse_meminfo(text):\n    info = {}\n    for line in text.splitlines():\n        parts = line.split(':')\n        if len(parts) < 2:\n            continue\n        key = parts[0].strip()\n        val = parts[1].strip().split()\n        if val:\n            try:\n                info[key] = int(val[0])\n            except ValueError:\n                pass\n    return info\n\ndef parse_status(text):\n    info = {}\n    for line in text.splitlines():\n        parts = line.split(':')\n        if len(parts) < 2:\n            continue\n        key = parts[0].strip()\n        val = parts[1].strip().split()\n        if val:\n            try:\n                info[key] = int(val[0])\n            except ValueError:\n                pass\n    return info\n\ndef kb_to_mb(kb):\n    return round(kb / 1024.0, 2)\n\nMOCK_MEMINFO = '''MemTotal:        8192000 kB\nMemFree:         2048000 kB\nMemAvailable:    4096000 kB\nBuffers:          102400 kB\nCached:          1024000 kB\n'''\n\nMOCK_PROCS = {\n    1: {\n        'status': 'Name:\\tinit\\nVmRSS:\\t   12345 kB\\nVmSize:\\t  234567 kB\\nRssShmem:\\t    2048 kB\\nRssFile:\\t    4096 kB\\nRssAnon:\\t    6201 kB\\n',\n    },\n    2: {\n        'status': 'Name:\\tkthreadd\\nVmRSS:\\t     512 kB\\nVmSize:\\t   10240 kB\\nRssShmem:\\t     128 kB\\nRssFile:\\t     256 kB\\nRssAnon:\\t     128 kB\\n',\n    },\n}\n\ndef main():\n    data = sys.stdin.read()\n    line = data.strip()\n    mi = parse_meminfo(MOCK_MEMINFO)\n    total = mi.get('MemTotal', 0)\n    free = mi.get('MemFree', 0)\n    used = total - free\n    print('System: total={} free={} used={}'.format(kb_to_mb(total), kb_to_mb(free), kb_to_mb(used)))\n    if line == '':\n        return\n    try:\n        pid = int(line)\n    except ValueError:\n        print('NOT FOUND')\n        return\n    if pid not in MOCK_PROCS:\n        print('NOT FOUND')\n        return\n    st = parse_status(MOCK_PROCS[pid]['status'])\n    rss = st.get('VmRSS', 0)\n    vsz = st.get('VmSize', 0)\n    shared = st.get('RssShmem', 0) + st.get('RssFile', 0)\n    private = st.get('RssAnon', 0)\n    print('PID {}: rss={} vsz={} shared={} private={}'.format(pid, kb_to_mb(rss), kb_to_mb(vsz), kb_to_mb(shared), kb_to_mb(private)))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:24.169719+00:00"
+}

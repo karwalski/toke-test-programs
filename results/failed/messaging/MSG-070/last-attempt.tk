@@ -1,0 +1,1 @@
+m=rot13;f=rot13(s:$str):$str{let n=s.len;let m=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);let z=mut.c;if(c>64){if(c<91){let x=c-65;let y=x+13;let b=y-y/26*26;let a=b+65;z=a;}el{if(c>96){if(c<123){let x=c-97;let y=x+13;let b=y-y/26*26;let a=b+97;z=a;}}}};m=z;};<m};

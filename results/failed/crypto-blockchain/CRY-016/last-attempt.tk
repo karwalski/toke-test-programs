@@ -1,0 +1,1 @@
+m=pbkdf2;f=solve(p0:$str;p1:$str;p2:i64):$str{let salt=p1;let iter=p2;let key=mut."";lp(let i=0;i<iter;i=i+1){let hash=mut."";let input=mut.key;salt;lp(let j=0;j<salt.len;j=j+1){input=input+salt.sub(j;1);};hash=hash+input;lp(let k=0;k<hash.len;k=k+1){input=input+hash.sub(k;1);};hash=hash+input;key=key+hash;};<key};

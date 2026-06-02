@@ -1,0 +1,1 @@
+m=conversation;f=init():$str{let state="idle";<state};f=onrecv(msg:$str):$str{let state="received";let response="ok";<response};f=onsend(msg:$str):$str{let state="sent";<state};f=onread(msg:$str):$str{let state="read";<state};

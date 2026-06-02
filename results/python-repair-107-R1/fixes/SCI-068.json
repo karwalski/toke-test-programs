@@ -1,0 +1,22 @@
+{
+  "id": "SCI-068",
+  "category": "scientific-math",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "4\n0 0\n1 1\n2 0\n3 1\n1.5\n",
+      "expected_output": "S(1.5) = 0.500000"
+    },
+    {
+      "input": "3\n0 0\n1 1\n2 0\n0.5\n",
+      "expected_output": "S(0.5) = 0.687500"
+    },
+    {
+      "input": "5\n0 0\n1 1\n2 4\n3 9\n4 16\n2.5\n0.5\n3.5\n",
+      "expected_output": "S(2.5) = 6.232143\nS(0.5) = 0.339286\nS(3.5) = 12.339286"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split()\n    idx = 0\n    n = int(data[idx]); idx += 1\n    xs = []\n    ys = []\n    for _ in range(n):\n        xs.append(float(data[idx])); idx += 1\n        ys.append(float(data[idx])); idx += 1\n    queries = []\n    while idx < len(data):\n        queries.append(float(data[idx])); idx += 1\n    # natural cubic spline\n    h = [xs[i+1]-xs[i] for i in range(n-1)]\n    # solve tridiagonal for M (second derivatives), M[0]=M[n-1]=0\n    # For i=1..n-2: h[i-1]*M[i-1] + 2*(h[i-1]+h[i])*M[i] + h[i]*M[i+1] = 6*((y[i+1]-y[i])/h[i] - (y[i]-y[i-1])/h[i-1])\n    M = [0.0]*n\n    if n >= 3:\n        a = [0.0]*(n-2)\n        b = [0.0]*(n-2)\n        c = [0.0]*(n-2)\n        d = [0.0]*(n-2)\n        for i in range(1, n-1):\n            k = i-1\n            a[k] = h[i-1] if i-1 > 0 else 0.0\n            b[k] = 2*(h[i-1]+h[i])\n            c[k] = h[i] if i < n-2 else 0.0\n            d[k] = 6*((ys[i+1]-ys[i])/h[i] - (ys[i]-ys[i-1])/h[i-1])\n        # Thomas algorithm\n        m = len(b)\n        cp = [0.0]*m\n        dp = [0.0]*m\n        cp[0] = c[0]/b[0]\n        dp[0] = d[0]/b[0]\n        for i in range(1, m):\n            denom = b[i] - a[i]*cp[i-1]\n            cp[i] = c[i]/denom if i < m-1 else 0.0\n            dp[i] = (d[i] - a[i]*dp[i-1])/denom\n        x_sol = [0.0]*m\n        x_sol[m-1] = dp[m-1]\n        for i in range(m-2, -1, -1):\n            x_sol[i] = dp[i] - cp[i]*x_sol[i+1]\n        for i in range(1, n-1):\n            M[i] = x_sol[i-1]\n    out = []\n    for q in queries:\n        # find interval\n        i = 0\n        if q <= xs[0]:\n            i = 0\n        elif q >= xs[-1]:\n            i = n-2\n        else:\n            lo, hi = 0, n-1\n            while lo+1 < hi:\n                mid = (lo+hi)//2\n                if xs[mid] <= q:\n                    lo = mid\n                else:\n                    hi = mid\n            i = lo\n        hi_ = h[i]\n        A = (xs[i+1]-q)/hi_\n        B = (q-xs[i])/hi_\n        y = A*ys[i] + B*ys[i+1] + ((A**3 - A)*M[i] + (B**3 - B)*M[i+1])*(hi_*hi_)/6.0\n        out.append(f\"S({q:g}) = {y:.6f}\")\n    print('\\n'.join(out))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:01.844397+00:00"
+}

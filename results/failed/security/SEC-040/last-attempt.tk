@@ -1,0 +1,1 @@
+m=cspscan;f=trim(s:$str):$str{let start=mut.0;lp(let i=0;i<s.len;i=i+1){let c=s.get(i);if(!(c=32 as u8))el{start=i+1};};let end=mut.s.len;lp(let i=end-1;!(i<start);i=i-1){let c=s.get(i);if(!(c=32 as u8))el{end=i+1};};<s.sub(start;end)};f=split(s:$str;delim:$str):@$str{let parts=mut.@()

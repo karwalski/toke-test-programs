@@ -1,0 +1,22 @@
+{
+  "id": "MSG-006",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721\n60fc7b12d663b64c1d62de0e2b263b34892a416b3697bd0a96c4e7ad4e6c821a\n",
+      "expected_output": "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299\n044d093b866a5bc9e1f97f95de9d005ce9843fa0e32b4586f7e4b504b87c810a29ba06b5826c4fcb35edfa6c6707b8043596d77b13ec558c2750fc96a3b3d52423\nca34be19a613804cfe421d961989ec1f0fb65f881ece0c7c8c84d121397bcdaa\n84f603a599f9e046e92e188bbdf578862a833e3adfa0db2aa469e9ecb72407a8"
+    },
+    {
+      "input": "ab12cd34ef56789012345678901234567890123456789012345678901234abcd\ndeadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef1234\n",
+      "expected_output": "044491633d71f2a5b9a12de562118352abd28a601c9e4c775643f8b7ec00bb4a71f3406d41c88ee6a05773bfa7e6832dd9b7afd7c22935dda88fe3d6c2a1dffa71\n04612bcbc5cb6da2c8bf0b841ab217ec3811d3766a2eb61ddcc429fa23d4e9615e0fb98d63425249a1bb52e47c61a555d6d9c9ccdc359de7c51c67b4db16d4c168\n5af4b791514b54a2f578f20e12c10d75cb9de07e5991bb954b95aa70fa42dd66\n9e9ddb7fa67fa5a1e31243ae066773bd871d68934914115654b26e9722535236"
+    },
+    {
+      "input": "0000000000000000000000000000000000000000000000000000000000000001\n0000000000000000000000000000000000000000000000000000000000000002\n",
+      "expected_output": "046b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c2964fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5\n047cf27b188d034f7e8a52380304b51ac3c08969e277f21b35a60b48fc4766997807775510db8ed040293d9ac69f7430dbba7dade63ce982299e04b79d227873d1\n7cf27b188d034f7e8a52380304b51ac3c08969e277f21b35a60b48fc47669978\n23775201799b2234a18e8071e409cec80d42632fe77534180afdc533c9b76f81"
+    }
+  ],
+  "python": "import sys, hashlib\n\np = 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff\na = -3 % p\nb = 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b\nGx = 0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296\nGy = 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5\nn = 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551\n\ndef inv(x, m):\n    return pow(x, -1, m)\n\ndef pt_add(P, Q):\n    if P is None: return Q\n    if Q is None: return P\n    x1,y1 = P; x2,y2 = Q\n    if x1 == x2:\n        if (y1 + y2) % p == 0:\n            return None\n        m = (3*x1*x1 + a) * inv(2*y1 % p, p) % p\n    else:\n        m = (y2 - y1) * inv((x2 - x1) % p, p) % p\n    x3 = (m*m - x1 - x2) % p\n    y3 = (m*(x1 - x3) - y1) % p\n    return (x3, y3)\n\ndef scalar_mul(k, P):\n    R = None\n    Q = P\n    while k > 0:\n        if k & 1:\n            R = pt_add(R, Q)\n        Q = pt_add(Q, Q)\n        k >>= 1\n    return R\n\ndef main():\n    lines = sys.stdin.read().strip().split('\\n')\n    a_priv = int(lines[0].strip(), 16)\n    b_priv = int(lines[1].strip(), 16)\n    if not (1 <= a_priv < n) or not (1 <= b_priv < n):\n        sys.exit(1)\n    G = (Gx, Gy)\n    A = scalar_mul(a_priv, G)\n    B = scalar_mul(b_priv, G)\n    S = scalar_mul(a_priv, B)\n    a_pub = '04' + format(A[0], '064x') + format(A[1], '064x')\n    b_pub = '04' + format(B[0], '064x') + format(B[1], '064x')\n    shared = format(S[0], '064x')\n    aes_key = hashlib.sha256(bytes.fromhex(shared)).hexdigest()\n    print(a_pub)\n    print(b_pub)\n    print(shared)\n    print(aes_key)\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:16.799643+00:00"
+}

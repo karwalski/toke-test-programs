@@ -1,0 +1,1 @@
+m=titlecase;f=titlecase(s:$str):$str{let n=s.len;let result=mut."";let capitalizenext=mut.true;lp(let i=0;i<n;i=i+1){let c=s.get(i);if(capitalizenext){if(c>96){if(c<123){let upper=c-32;result=result+(upper as$str);capitalizenext=false;}el{result=result+(c as$str));capitalizenext=false;}

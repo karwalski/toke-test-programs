@@ -1,0 +1,1 @@
+m=fetchall;f=fetch(url:$str):$str{let body=mut."";let status=mut."";let idx=mut.0;let n=url.len;lp(let i=0;i<n;i=i+1){let ch=url.get(i);if(ch=":"){idx=i+1;br;};};let host=mut."";lp(let i=idx;i<n;i=i+1){let ch=url.get(i);if(ch="/"){br;};host=host+ch;};let path

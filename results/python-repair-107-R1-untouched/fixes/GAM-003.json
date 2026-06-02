@@ -1,0 +1,26 @@
+{
+  "id": "GAM-003",
+  "category": "games",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "42",
+      "expected_output": "Player 1 wins after 1184 rounds"
+    },
+    {
+      "input": "7",
+      "expected_output": "Player 1 wins after 279 rounds"
+    },
+    {
+      "input": "1",
+      "expected_output": "Player 1 wins after 71 rounds"
+    },
+    {
+      "input": "100",
+      "expected_output": "Player 2 wins after 169 rounds"
+    }
+  ],
+  "python": "import random\nimport sys\nfrom collections import deque\n\ndef main():\n    data = sys.stdin.read().strip().split()\n    seed = int(data[0])\n    random.seed(seed)\n    # Build deck: suits S,H,D,C and ranks 2..A (values 2..14)\n    suits = ['S','H','D','C']\n    deck = [(r, s) for s in suits for r in range(2, 15)]\n    random.shuffle(deck)\n    # Deal first 26 to P1, next 26 to P2\n    p1 = deque(deck[:26])\n    p2 = deque(deck[26:])\n    rounds = 0\n    max_rounds = 100000\n    winner = None\n    while p1 and p2 and rounds < max_rounds:\n        rounds += 1\n        c1 = p1.popleft()\n        c2 = p2.popleft()\n        pile = [c1, c2]\n        while c1[0] == c2[0]:\n            # War: each places up to 3 face-down then 1 face-up\n            # If insufficient cards, player loses\n            if len(p1) < 4:\n                # P1 cannot war -> P2 wins all\n                # Move remaining of p1 and pile to p2\n                while p1:\n                    pile.append(p1.popleft())\n                for card in pile:\n                    p2.append(card)\n                break\n            if len(p2) < 4:\n                while p2:\n                    pile.append(p2.popleft())\n                for card in pile:\n                    p1.append(card)\n                break\n            for _ in range(3):\n                pile.append(p1.popleft())\n                pile.append(p2.popleft())\n            c1 = p1.popleft()\n            c2 = p2.popleft()\n            pile.append(c1)\n            pile.append(c2)\n        else:\n            # no break: normal compare\n            if c1[0] > c2[0]:\n                for card in pile:\n                    p1.append(card)\n            else:\n                for card in pile:\n                    p2.append(card)\n            continue\n        # if we broke out due to insufficient cards, loop will exit\n    if not p1:\n        winner = 2\n    elif not p2:\n        winner = 1\n    else:\n        # Stalemate; declare by card count\n        winner = 1 if len(p1) > len(p2) else 2\n    print(f\"Player {winner} wins after {rounds} rounds\")\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:40:51.620710+00:00"
+}

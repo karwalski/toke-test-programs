@@ -1,0 +1,1 @@
+m=depcheck;f=checkdeps(declared:@$str;used:@$str):@$str{let missing=mut.@();lp(let di=0;di<declared.len;di=di+1){let d=declared.get(di);let found=mut.false;lp(let ui=0;ui<used.len;ui=ui+1){let u=used.get(ui);if(u=d){found=true};};if(!(found)){missing=missing+@(d)};};<missing};f=main():$i64{let declared=@("log";"str");let used=@("str");let result=checkdeps(declared;used);<0};

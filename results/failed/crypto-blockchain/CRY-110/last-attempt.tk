@@ -1,0 +1,1 @@
+m=verify;f=verify(msg:$str;sig:$str;addr:$str):$str{let result=mut."INVALID";let msglen=msg.len;let siglen=sig.len;let addrlen=addr.len;if(!(msglen<100000)){}el{if(!(siglen<100000)){}el{if(!(addrlen<100000)){}el{let msghash=hash(msg);let sigval=parseint(sig);let threshold=100000000000000000000000000000000000000000000000000

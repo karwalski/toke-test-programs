@@ -1,0 +1,10 @@
+Certainly! Let's consider a small piece of code and refactor it for better readability and maintainability.
+
+### Original Code
+```toke
+m=accFactorial;f=factorial(n:$i64):$i64{if(n<1){<1};let result=mut.1;lp(let i=1;i<n;i=i+1){result=result*i};<result};f=accumulate(arr:@$i64):$i64{let r=mut.0;lp(let i=0;i<arr.len as$i64;i=i+1){r=r+factorial(arr.get(i as u64))));};<r};
+```
+
+### Refactored Code
+```toke
+m=accumulatefactorial;

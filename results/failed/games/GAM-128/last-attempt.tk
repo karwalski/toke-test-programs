@@ -1,0 +1,1 @@
+m=crossword;f=solve(p:$str;q:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<p.len;idx=idx+1){let ch=p.get(idx);if(ch=" "){result=result+" ";i=i+1;}el{if(i<q.len){let qc=q.get(i);if(qc=" "){i=i+1;}el{result=result+qc;i=i+1;};}el{result=result+ch;};};};<result};f=check(p:$str;q:$str):bool{let result=mut.true

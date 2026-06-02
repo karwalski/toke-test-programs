@@ -1,0 +1,1 @@
+m=detectlang;f=detectlang(snippet:$str):$str{let keywords=mut.@("m=";"f=";"t=";"i=";"if";"el";"lp";"br";"let";"mut";"as";"rt";"mt");let found=mut.@();lp(let idx=0;idx<keywords.len;idx=idx+1){let kw=keywords.get(idx);if(snippet.contains(kw)){found=found+kw}};if(found.len>0){<found.get(0)}el{<""}}

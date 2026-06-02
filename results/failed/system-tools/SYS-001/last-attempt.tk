@@ -1,0 +1,1 @@
+m=watchdir;i=fs:std.fs;i=time:std.time;f=watchloop(path:$str):$void{let h=fs.watch(path);lp(let idx=0;true;idx=idx+1){let e=h.next();if(e.kind="create"){let ts=time.now();let msg=time.format(ts);"file created:";msg;e.path};if(e.kind="modify"){let ts=time.now();let msg=time.format(ts);"file modified:";msg;e.path};if(e.kind="dele

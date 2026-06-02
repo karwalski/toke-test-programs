@@ -1,0 +1,26 @@
+{
+  "id": "SYS-081",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "/tmp/sys081_test_a.log\n3\n0\n",
+      "expected_output": "line3\nline4\nline5"
+    },
+    {
+      "input": "/tmp/sys081_nonexistent_xyz\n5\n0\n",
+      "expected_output": "ERROR: file not found: /tmp/sys081_nonexistent_xyz"
+    },
+    {
+      "input": "/tmp/sys081_test_b.log\n10\n0\n",
+      "expected_output": "only_one_line\ntwo"
+    },
+    {
+      "input": "/tmp/sys081_test_c.log\n2\n0\n",
+      "expected_output": "entry_19\nentry_20"
+    }
+  ],
+  "python": "import sys, os, time\n\ndef setup_files():\n    a = '/tmp/sys081_test_a.log'\n    with open(a, 'w') as f:\n        f.write('line1\\nline2\\nline3\\nline4\\nline5\\n')\n    b = '/tmp/sys081_test_b.log'\n    with open(b, 'w') as f:\n        f.write('only_one_line\\ntwo\\n')\n    c = '/tmp/sys081_test_c.log'\n    with open(c, 'w') as f:\n        for i in range(1, 21):\n            f.write(f'entry_{i}\\n')\n\ndef main():\n    setup_files()\n    data = sys.stdin.read().split('\\n')\n    path = data[0]\n    n = int(data[1])\n    follow = float(data[2])\n    if not os.path.exists(path):\n        print(f'ERROR: file not found: {path}')\n        return\n    with open(path, 'r') as f:\n        lines = f.readlines()\n    tail = lines[-n:] if n < len(lines) else lines\n    out = ''.join(tail)\n    if out.endswith('\\n'):\n        out = out[:-1]\n    if out:\n        print(out)\n    if follow > 0:\n        end_time = time.time() + follow\n        with open(path, 'r') as f:\n            f.seek(0, 2)\n            while time.time() < end_time:\n                line = f.readline()\n                if line:\n                    sys.stdout.write(line)\n                    sys.stdout.flush()\n                else:\n                    time.sleep(0.25)\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:44:09.108276+00:00"
+}

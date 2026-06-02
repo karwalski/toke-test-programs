@@ -1,0 +1,26 @@
+{
+  "id": "SCI-034",
+  "category": "scientific-math",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "ABC\nAABCAABCABC",
+      "expected_output": "Found at positions: 1 5 8\nComparisons: 13"
+    },
+    {
+      "input": "XY\nABC",
+      "expected_output": "NOT FOUND\nComparisons: 3"
+    },
+    {
+      "input": "AB\nABABABAB",
+      "expected_output": "Found at positions: 0 2 4 6\nComparisons: 8"
+    },
+    {
+      "input": "AAAA\nAAAAAAA",
+      "expected_output": "Found at positions: 0 1 2 3\nComparisons: 7"
+    }
+  ],
+  "python": "import sys\n\ndef compute_lps(p):\n    lps=[0]*len(p)\n    k=0\n    for i in range(1,len(p)):\n        while k>0 and p[k]!=p[i]:\n            k=lps[k-1]\n        if p[k]==p[i]:\n            k+=1\n        lps[i]=k\n    return lps\n\ndef kmp(text,pat):\n    positions=[]\n    comparisons=0\n    if not pat:\n        return positions,0,[]\n    lps=compute_lps(pat)\n    n=len(text); m=len(pat)\n    i=0; j=0\n    while i<n:\n        comparisons+=1\n        if text[i]==pat[j]:\n            i+=1; j+=1\n            if j==m:\n                positions.append(i-j)\n                j=lps[j-1]\n        else:\n            if j!=0:\n                j=lps[j-1]\n            else:\n                i+=1\n    return positions,comparisons,lps\n\ndata=sys.stdin.read().split('\\n')\npat=data[0] if len(data)>0 else ''\ntext=data[1] if len(data)>1 else ''\npositions,comparisons,lps=kmp(text,pat)\nif positions:\n    print('Found at positions: '+' '.join(str(x) for x in positions))\nelse:\n    print('NOT FOUND')\nprint('Comparisons: '+str(comparisons))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:16.061935+00:00"
+}

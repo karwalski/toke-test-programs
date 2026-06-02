@@ -1,0 +1,26 @@
+{
+  "id": "SYS-025",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "3\nfile1.txt|hello world\nfile2.txt|hello world\nfile3.txt|different content\nreport",
+      "expected_output": "DUPLICATE file2.txt (keeping file1.txt)\nSummary: 1 duplicate groups, 0 files removed"
+    },
+    {
+      "input": "4\na.txt|same\nb.txt|same\nc.txt|same\nd.txt|unique\ndelete",
+      "expected_output": "DUPLICATE b.txt (keeping a.txt)\nDUPLICATE c.txt (keeping a.txt)\nSummary: 1 duplicate groups, 2 files removed"
+    },
+    {
+      "input": "2\nonly.txt|alone\nother.txt|different\nreport",
+      "expected_output": "No duplicates found\nSummary: 0 duplicate groups, 0 files removed"
+    },
+    {
+      "input": "5\nz.txt|content1\ny.txt|content1\nx.txt|content2\nw.txt|content2\nv.txt|content3\ndelete",
+      "expected_output": "DUPLICATE x.txt (keeping w.txt)\nDUPLICATE z.txt (keeping y.txt)\nSummary: 2 duplicate groups, 2 files removed"
+    }
+  ],
+  "python": "import sys, hashlib\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    idx = 0\n    n = int(data[idx]); idx += 1\n    files = {}\n    for _ in range(n):\n        line = data[idx]; idx += 1\n        name, content = line.split('|', 1)\n        files[name] = content\n    action = data[idx].strip()\n\n    hashes = {}\n    for name in sorted(files.keys()):\n        h = hashlib.sha256(files[name].encode()).hexdigest()\n        hashes.setdefault(h, []).append(name)\n\n    groups = [g for g in hashes.values() if len(g) > 1]\n    groups.sort(key=lambda g: g[0])\n\n    removed = 0\n    if not groups:\n        print('No duplicates found')\n    else:\n        for g in groups:\n            keep = g[0]\n            for dup in g[1:]:\n                print(f'DUPLICATE {dup} (keeping {keep})')\n                if action == 'delete':\n                    removed += 1\n\n    if action == 'delete':\n        print(f'Summary: {len(groups)} duplicate groups, {removed} files removed')\n    else:\n        print(f'Summary: {len(groups)} duplicate groups, 0 files removed')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:10.629289+00:00"
+}

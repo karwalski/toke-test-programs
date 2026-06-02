@@ -1,0 +1,10 @@
+m=httpbatch;
+i=io:std.io;
+i=s:std.str;
+i=j:std.json;
+
+f=main():$i64{
+    let port=s.toint(io.readln());
+    io.println(s.concat("Listening on :";<port as$str>));
+    <0
+}

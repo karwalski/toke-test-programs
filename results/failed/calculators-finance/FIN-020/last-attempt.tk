@@ -1,0 +1,1 @@
+m=compound;i=io:std.io;i=s:std.str;i=math:std.math;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=2){let r=s.tofloat(parts.get(0));let n=s.tofloat(parts.get(1));let base=1.0+(r/n);let eff=math.pow(base;n)-1.0;let percent=eff*100.0;let formatted=s.concat(s.format(percent;"%.4f");"%");io.println(formatted)}el{io.println("error")};<0}

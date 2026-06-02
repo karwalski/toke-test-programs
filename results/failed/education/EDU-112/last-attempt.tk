@@ -1,0 +1,1 @@
+m=filter;f=filterbytopic(questions:@($str;$str;$str));topic:$str):@$str{let result=mut.@();lp(let idx=0;idx<questions.len;idx=idx+1){let q=questions.get(idx);if(q.topic=topic){result=result+@(q.question)}};<result};f=filterbydifficulty(questions:@($str;$str;$str));difficulty

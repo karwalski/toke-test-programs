@@ -1,0 +1,1 @@
+m=vote;f=castvote(pollid:$str;option:$str;voterid:$str):$str{let result=mut."";let len=pollid.len;lp(let i=0;i<len;i=i+1){result=result+pollid.charat(i);};result=result+" voted for ";let olen=option.len;lp(let j=0;j<olen;j=j+1){result=result+option.charat(j);};result=result+" by ";let vlen=voterid.len;lp(let k=0;k<vlen;k=k+1){result=result+voterid.charat(k);};<result};

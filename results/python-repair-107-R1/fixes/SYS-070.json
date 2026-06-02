@@ -1,0 +1,26 @@
+{
+  "id": "SYS-070",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "\\d+\nI have 3 cats and 12 dogs and 100 fish",
+      "expected_output": "3\n12\n100"
+    },
+    {
+      "input": "[a-z]+@[a-z]+\\.[a-z]+\nContact alice@example.com or bob@test.org for info",
+      "expected_output": "alice@example.com\nbob@test.org"
+    },
+    {
+      "input": "(\\w+)=(\\d+)\nfoo=1 bar=22 baz=333",
+      "expected_output": "foo\nbar\nbaz"
+    },
+    {
+      "input": "\\b[A-Z][a-z]+\\b\nAlice and Bob went to Paris with Charlie",
+      "expected_output": "Alice\nBob\nParis\nCharlie"
+    }
+  ],
+  "python": "import sys, re\ndata = sys.stdin.read().split('\\n', 1)\npattern = data[0]\ntext = data[1] if len(data) > 1 else ''\nregex = re.compile(pattern)\nfor m in regex.finditer(text):\n    if regex.groups >= 1:\n        print(m.group(1))\n    else:\n        print(m.group(0))\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:42.206241+00:00"
+}

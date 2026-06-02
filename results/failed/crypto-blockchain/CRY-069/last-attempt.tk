@@ -1,0 +1,1 @@
+m=hashrate;f=difficulty(val:$i64):$i64{if(val<0){<0};<val};f=blocktime(val:$i64):$i64{if(val<0){<0};<val};f=hashrate(difficulty:$i64;blocktime:$i64):$f64{let diff=difficulty as$f64;let bt=blocktime as$f64;let rate=diff/bt;<rate};f=main():$i64{let dif

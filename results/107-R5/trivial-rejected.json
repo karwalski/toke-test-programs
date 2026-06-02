@@ -1,0 +1,53 @@
+{
+  "rejected": [
+    {
+      "id": "NET-162",
+      "category": "networking-rest",
+      "reason": "io.println('Sent') \u2014 ignores all 4 stdin inputs (URL/secret/file/conc), no HTTP signing",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "NET-183",
+      "category": "networking-rest",
+      "reason": "io.println('Replaying') \u2014 no actual replay logic",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "SEC-070",
+      "category": "security",
+      "reason": "94-byte program with no logic",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "CRY-035",
+      "category": "crypto-blockchain",
+      "reason": "echoes spec's placeholder 'shared_secret_hex' \u2014 spec is broken",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "NET-136",
+      "category": "networking-rest",
+      "reason": "if/el branches both print 'BREAKING CHANGES' \u2014 no real diffing",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "NET-166",
+      "category": "networking-rest",
+      "reason": "always prints 'SERVING' for any non-empty input \u2014 no real gRPC",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "NET-200",
+      "category": "networking-rest",
+      "reason": "all service functions stub-return constants \u2014 runtest always true",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    },
+    {
+      "id": "SYS-108",
+      "category": "system-tools",
+      "reason": "prints literal labels '(listening TCP sockets)' / '(all TCP connections)' \u2014 no netstat",
+      "rejected_at": "2026-05-31T23:48:24.489851+00:00"
+    }
+  ],
+  "story": "107.R6"
+}

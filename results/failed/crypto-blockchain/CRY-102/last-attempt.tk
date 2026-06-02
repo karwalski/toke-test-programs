@@ -1,0 +1,1 @@
+m=validator;f=validate(stake:$i64;seed:$i64):$bool{let hash=mut.seed;lp(let i=0;i<stake;i=i+1){hash=hash+hash/2;};let result=hash-hash/2;if(result>stake){<true};<false};f=main():$void{let stake=100;let seed=42;let valid=validate(stake;seed);if(valid){let next=stake/2;let nextvalid=validate(next;seed);if(nextvalid){<void};<void};<void};

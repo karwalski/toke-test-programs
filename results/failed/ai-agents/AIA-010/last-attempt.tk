@@ -1,0 +1,1 @@
+m=checkperm;f=checkperm(tool:$str;userrole:$str;perms:@($str;$str))):$str{let allowed=mut.false;lp(let i=0;i<perms.len;i=i+1){let r=perms.get(i);if(r="*"){allowed=true};if(!(allowed)){if(r=userrole){let tools=r;allowed=true}}};if(!(allowed)){<deny;"user does not have permission for this tool"};<allow;"user has permission for this tool"};

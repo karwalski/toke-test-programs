@@ -1,0 +1,1 @@
+m=qr;f=abs(x:$f64):$f64{let tmp=mut.0.0;if(x<0.0){tmp=-x}el{tmp=x};<tmp};f=sign(x:$f64):$i64{let tmp=mut.0;if(x<0.0){tmp=-1}el{tmp=1};<tmp};f=dot(a:@$f64;b:@$f64):$f64{let tmp=mut.0.0;lp(let i=0;i<a.len;i=i+1){tmp=tmp+a.get(i)*b.get(i)};<tmp};f=norm(a:@$f64):$f64{let tmp=mut.0.0;lp(let i=0;i<a.len;i=i+1){tmp=tmp+a.get(i)*a.get(i)};<tmp};f=matmul

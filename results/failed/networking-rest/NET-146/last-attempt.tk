@@ -1,0 +1,2 @@
+m=main;f=main():$i64{let url=mut."";let boundary=mut."----toke";let body=mut."";let filepaths=mut.@();let i=mut.0;lp(let idx=0;idx<100;idx=idx+1){let c=mut.stdin.readchar();if(c=" "){i=i+1}el{if(i=0){url=url+c}el{if(i=1){boundary=boundary+c}el{body=body+c}}}}};let filecount=mut.0;let line=mut.stdin.readline();let inline=mut.true;lp(let idx=0;idx<100;idx=idx+1){if(inline){let c=line.readchar();if(c="
+"){inline=false}el{filepaths=filepaths+@(c)}}}el

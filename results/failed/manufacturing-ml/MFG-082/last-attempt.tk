@@ -1,0 +1,1 @@
+m=optimal;f=optimal(n:$i64):$i64{if(n<1){<1};let lhs=mut.1;let rhs=mut.1;lp(let i=1;i<n;i=i+1){let sum=lhs+rhs;if(sum>n){lhs=lhs-1;rhs=rhs-1;lp(let j=0;j<10;j=j+1){let check=lhs+rhs;if(!(check>n)){br};lhs=lhs-1;rhs=rhs-1};br};lhs=lhs+1;rhs=rhs+1};let result=lhs;<result};

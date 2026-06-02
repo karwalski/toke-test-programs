@@ -1,0 +1,1 @@
+m=dtv;f=solve(p0:$str):bool{let val=p0;let other=mut.false;if(val.len<3){other=true};if(!(other=true)){let c1=val.get(0);let c2=val.get(1);if(c1=46){if(c2=46){other=true}}}};if(other=true){<true};<false};f=main():$void{let input=std.io.read();let result=solve(input);if(result=true){std.io.print("vulnerable");}el{std.io.print("safe");};};

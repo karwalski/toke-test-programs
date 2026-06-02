@@ -1,0 +1,22 @@
+{
+  "id": "SYS-039",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "5\n5 15 25 35 45\n",
+      "expected_output": "CPU% histogram: 0-10%: 1, 10-20%: 1, 20-30%: 1, 30-40%: 1, 40-50%: 1, 50-60%: 0, 60-70%: 0, 70-80%: 0, 80-90%: 0, 90-100%: 0"
+    },
+    {
+      "input": "10\n0 9 10 19 20 50 75 99 100 100\n",
+      "expected_output": "CPU% histogram: 0-10%: 2, 10-20%: 2, 20-30%: 1, 30-40%: 0, 40-50%: 0, 50-60%: 1, 60-70%: 0, 70-80%: 1, 80-90%: 0, 90-100%: 3"
+    },
+    {
+      "input": "3\n100 0 50\n",
+      "expected_output": "CPU% histogram: 0-10%: 1, 10-20%: 0, 20-30%: 0, 30-40%: 0, 40-50%: 0, 50-60%: 1, 60-70%: 0, 70-80%: 0, 80-90%: 0, 90-100%: 1"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split()\n    if not data:\n        return\n    n = int(data[0])\n    samples = [float(x) for x in data[1:1+n]]\n    if len(samples) != n:\n        print('ERROR: sample count mismatch')\n        return\n    buckets = [0]*10\n    for s in samples:\n        if s < 0 or s > 100:\n            print(f'ERROR: sample out of range: {s}')\n            return\n        idx = int(s // 10)\n        if idx == 10:\n            idx = 9\n        buckets[idx] += 1\n    parts = []\n    for i in range(10):\n        parts.append(f'{i*10}-{(i+1)*10}%: {buckets[i]}')\n    print('CPU% histogram: ' + ', '.join(parts))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:41.972658+00:00"
+}

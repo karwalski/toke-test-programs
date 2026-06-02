@@ -1,0 +1,26 @@
+{
+  "id": "SYS-091",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "10\nhello",
+      "expected_output": "hello"
+    },
+    {
+      "input": "0\ntest",
+      "expected_output": "ERROR: rate must be > 0"
+    },
+    {
+      "input": "100\nThe quick brown fox jumps over the lazy dog.",
+      "expected_output": "The quick brown fox jumps over the lazy dog."
+    },
+    {
+      "input": "50\nabcdefghij",
+      "expected_output": "abcdefghij"
+    }
+  ],
+  "python": "import sys, time\n\ndef main():\n    data = sys.stdin.read()\n    if '\\n' in data:\n        first, rest = data.split('\\n', 1)\n    else:\n        first, rest = data, ''\n    try:\n        rate = int(first.strip())\n    except ValueError:\n        sys.stdout.write('ERROR: rate must be > 0')\n        return\n    if rate <= 0:\n        sys.stdout.write('ERROR: rate must be > 0')\n        return\n    payload = rest.encode('utf-8')\n    chunk = max(1, rate // 10) if rate >= 10 else 1\n    delay = chunk / rate\n    i = 0\n    out = sys.stdout.buffer\n    while i < len(payload):\n        piece = payload[i:i+chunk]\n        out.write(piece)\n        out.flush()\n        i += chunk\n        if i < len(payload):\n            time.sleep(delay)\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:48.868617+00:00"
+}

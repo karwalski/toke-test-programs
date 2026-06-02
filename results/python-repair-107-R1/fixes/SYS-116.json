@@ -1,0 +1,22 @@
+{
+  "id": "SYS-116",
+  "category": "system-tools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "ssh.service\nnonexistent.service\n",
+      "expected_output": "ssh.service: active sub=running pid=579\nnonexistent.service: not-found sub=dead pid=-"
+    },
+    {
+      "input": "cron.service\nfoo.bar.baz\n",
+      "expected_output": "cron.service: active sub=running pid=391\nfoo.bar.baz: not-found sub=dead pid=-"
+    },
+    {
+      "input": "systemd-journald.service\n",
+      "expected_output": "systemd-journald.service: active sub=running pid=127"
+    }
+  ],
+  "python": "import sys, subprocess, shutil\n\ndef get_status(unit):\n    if not shutil.which('systemctl'):\n        return ('N/A', 'N/A', '-')\n    try:\n        r = subprocess.run(['systemctl', 'show', unit, '--property=ActiveState,SubState,MainPID,LoadState'], capture_output=True, text=True, timeout=5)\n    except Exception:\n        return ('N/A', 'N/A', '-')\n    if r.returncode != 0 and not r.stdout:\n        return ('N/A', 'N/A', '-')\n    props = {}\n    for line in r.stdout.splitlines():\n        if '=' in line:\n            k, v = line.split('=', 1)\n            props[k] = v\n    load = props.get('LoadState', '')\n    active = props.get('ActiveState', 'N/A')\n    sub = props.get('SubState', 'N/A')\n    pid = props.get('MainPID', '0')\n    if load == 'not-found':\n        return ('not-found', 'dead', '-')\n    if pid == '0' or pid == '':\n        pid = '-'\n    if not active:\n        active = 'N/A'\n    if not sub:\n        sub = 'N/A'\n    return (active, sub, pid)\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    out = []\n    for line in data:\n        unit = line.strip()\n        if not unit:\n            continue\n        a, s, p = get_status(unit)\n        out.append(f'{unit}: {a} sub={s} pid={p}')\n    print('\\n'.join(out))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:42:50.423623+00:00"
+}

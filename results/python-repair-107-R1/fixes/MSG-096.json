@@ -1,0 +1,22 @@
+{
+  "id": "MSG-096",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "photo.jpg\n245760\nimage/jpeg\nabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected_output": "{\"content_hash\":\"abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\",\"encrypted_metadata\":\"egEjDuXOo45sRmddq9ulgHVMaw35zO/DI04sCuyJ981oTiQA7ISnn2REZxo=\",\"key_hash\":\"4884fdaafea47c29fea7159d0daddd9c085d6200e1359e85bb81736af6b7c837\",\"size\":245760}"
+    },
+    {
+      "input": "doc.pdf\n1024\napplication/pdf\n1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n",
+      "expected_output": "{\"content_hash\":\"1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff\",\"encrypted_metadata\":\"hf7c8RoxXHGTuZiiVDBdc9Cs3v5UeBB9l7Hfukx2U2COsNP7FyBbf5DzyvwQdk8=\",\"key_hash\":\"8d2e4d6374b604562a5d8c04a4dfc035fa499ec7ad373bd48bd2bd62ca75c3b5\",\"size\":1024}"
+    },
+    {
+      "input": "report.txt\n42\ntext/plain\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\nffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n",
+      "expected_output": "{\"content_hash\":\"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\",\"encrypted_metadata\":\"hN2ZlpOakZ6Smt3F3Y2aj5CNi9GLh4vd092SlpKa3cXdi5qHi9CPk56Wkd2C\",\"key_hash\":\"af9613760f72635fbdb44a5a0a63c39f12af30f950a6ee5c971be188e89c4051\",\"size\":42}"
+    }
+  ],
+  "python": "import sys, json, hashlib, base64\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    filename = lines[0]\n    size = int(lines[1])\n    mime = lines[2]\n    content_hash = lines[3]\n    key_hex = lines[4]\n    key = bytes.fromhex(key_hex)\n    plain = json.dumps({\"filename\": filename, \"mime\": mime}, sort_keys=True, separators=(',', ':')).encode('utf-8')\n    out = bytes(plain[i] ^ key[i % len(key)] for i in range(len(plain)))\n    enc_b64 = base64.b64encode(out).decode('ascii')\n    key_hash = hashlib.sha256(key).hexdigest()\n    result = {\"encrypted_metadata\": enc_b64, \"content_hash\": content_hash, \"size\": size, \"key_hash\": key_hash}\n    print(json.dumps(result, sort_keys=True, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:40.353747+00:00"
+}

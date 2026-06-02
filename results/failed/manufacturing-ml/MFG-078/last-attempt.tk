@@ -1,0 +1,1 @@
+m=abs;f=abs(x:$i64):$i64{if(x<0){<x*-1};<x};f=truepos(x:$i64;y:$i64;nominal:$i64):$i64{let dx=x-nominal;let dy=y-nominal;let pos=mut.0;if(dx>0){pos=pos+dx*100};if(dx<0){pos=pos+dx*-100};if(dy>0){pos=pos+dy*10};if(dy<0){pos=pos+dy*-10};<pos};

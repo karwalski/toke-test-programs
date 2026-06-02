@@ -1,0 +1,1 @@
+m=workflow;f=nextstate(current:$str;event:$str):$str{if(current="pending"){if(event="approved"){<current="approved"}el{if(event="rejected"){<current="rejected"}el{<current}}}}el{if(current="approved"){<current}el{if(current="rejected"){<current}el{<current}}}}};

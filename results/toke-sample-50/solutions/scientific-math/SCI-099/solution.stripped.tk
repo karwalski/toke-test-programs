@@ -1,0 +1,26 @@
+m=twinprimes;
+i=io:std.io;
+i=s:std.str;
+f=isprime(n:$i64):$bool{
+  if(n<2){<false};
+  if(n=2){<true};
+  if(n-(n/2*2)=0){<false};
+  lp(let k=3;k*k<=n;k=k+2){
+    if(n-(n/k*k)=0){<false}
+  };
+  <true
+};
+f=main():$i64{
+  let n=s.toint(io.readln());
+  let count=mut.0;
+  lp(let p=2;p<=n-2;p=p+1){
+    if(isprime(p)){
+      if(isprime(p+2)){
+        io.println("_");
+        count=count+1
+      }
+    }
+  };
+  io.println("_");
+  <0
+}

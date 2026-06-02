@@ -1,0 +1,19 @@
+To solve this problem, we need to calculate the probability that at least two people in a group of \( N \) share a birthday. This is a classic problem in combinatorics and probability.
+
+The steps to solve this problem are as follows:
+
+1. Calculate the probability that all \( N \) people have different birthdays.
+2. Subtract this probability from 1 to get the probability that at least two people share a birthday.
+
+Let's write the Python code to compute this probability.
+
+```python
+import sympy as sp
+
+# Define the variable N
+N = sp.symbols('N', integer=True)
+
+# Calculate the probability that all N people have different birthdays
+prob_different_birthdays = sp.prod([sp.Rational(365 - i, 365)), for i in range(N)])
+
+# C

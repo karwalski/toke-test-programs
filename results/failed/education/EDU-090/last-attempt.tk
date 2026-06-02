@@ -1,0 +1,1 @@
+m=gradelevel;f=gradelevel(text:$str;maxgrade:$i64):$i64{let length=text.len;let grade=length/5;if(grade<1){<1};if(!(grade<maxgrade+1)){<maxgrade};<grade};f=main():$i64{let result=gradelevel("hello world this is a test";10);<0};

@@ -1,0 +1,1 @@
+m=tsv2csv;f=tsv2csv(s:$str):$str{let result=mut."";let i=mut.0;let len=s.len;lp(let zz=0;zz<len;zz=zz+1){let ch=s.get(i);if(ch="\n"){result=result+"\n";i=i+1;}el{if(ch=","){result=result+"\n";i=i+1;}el{result=result+ch;i=i+1;};};};<result};

@@ -1,0 +1,1 @@
+m=csv;f=csvparse(line:$str;delimiter:$str):@$str{let parts=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<line.len;idx=idx+1){let ch=line.get(idx);if(ch=delimiter){parts=parts+@(current);current="";i=0;}el{current=current+ch;i=i+1;}};parts=parts+@(current);<parts};

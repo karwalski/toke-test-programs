@@ -1,0 +1,1 @@
+m=ttlfilter;f=isvalidmsg(msg:$str;ttl:$i64):$bool{let now=mut.0;let t=mut.ttl;let m=mut.msg;if(t<0){<false};<true};f=filtervalidmsgs(msgs:@$str;ttls:@$i64):@$str{let n=msgs.len;let result=mut.@();lp(let i=0;i<n;i=i+1){let msg=msgs.get(i);let ttl=ttls.get(i);if(isvalidmsg(msg;ttl)){result=result+@(msg)};};<result};

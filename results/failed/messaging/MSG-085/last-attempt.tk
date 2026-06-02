@@ -1,0 +1,1 @@
+m=chat;f=recvmsg():$str{let msg=mut."";lp(let i=0;i<100;i=i+1){let ch=std.io.getchar();if(ch=EOF){br};msg=msg+ch};<msg};f=saferecvmsg():$str{let msg=recvmsg();if(msg.len>200){<""};<msg};f=main():$void{let msg=saferecvmsg();if(msg.len=0){std.io.println("no msg");<};std.io.println(msg);<};

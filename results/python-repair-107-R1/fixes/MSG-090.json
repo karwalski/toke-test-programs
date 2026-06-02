@@ -1,0 +1,22 @@
+{
+  "id": "MSG-090",
+  "category": "messaging",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\n2024-01-15T10:00:00Z\n",
+      "expected_output": "{\"msg_hash\":\"abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\",\"recipient_sig\":\"2e1c54e7622b4e262103ae38476ecbea2d7bf4abe3fec41ae6bcf85cfb52b387\",\"timestamp\":\"2024-01-15T10:00:00Z\",\"receipt_hash\":\"ca88516edfb701ef09e73eb07e787d40ac76f51cddcb97f1bebcf6edbd31e10e\"}"
+    },
+    {
+      "input": "0000000000000000000000000000000000000000000000000000000000000000\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n2024-06-01T12:00:00Z\n",
+      "expected_output": "{\"msg_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"recipient_sig\":\"2472e0dfeb95a1362d02611cf55e60a0d1f3f34522961d5ff2e343c05971062c\",\"timestamp\":\"2024-06-01T12:00:00Z\",\"receipt_hash\":\"024368a1ff29880922cb9a5360c648a7a1d576cfb24262f76aaa7c5b67afd8bf\"}"
+    },
+    {
+      "input": "deadbeefcafebabe1122334455667788deadbeefcafebabe1122334455667788\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n2025-03-20T08:30:45Z\n",
+      "expected_output": "{\"msg_hash\":\"deadbeefcafebabe1122334455667788deadbeefcafebabe1122334455667788\",\"recipient_sig\":\"806e2ab1e56e868f6877af4e224aa685b56e83b9b54b001eb629e81bd1970fc0\",\"timestamp\":\"2025-03-20T08:30:45Z\",\"receipt_hash\":\"7af4dd3c76449931a4686dff0826cba41c7cbc0a00062c16a79fafcb5bafb9c7\"}"
+    }
+  ],
+  "python": "import sys, hmac, hashlib, json\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    msg_hash = data[0].strip()\n    priv_key_hex = data[1].strip()\n    timestamp = data[2].strip()\n    priv_key = bytes.fromhex(priv_key_hex)\n    sig_input = (msg_hash + timestamp).encode('utf-8')\n    recipient_sig = hmac.new(priv_key, sig_input, hashlib.sha256).hexdigest()\n    prev_receipt_hash = '0' * 64\n    chain_input = (msg_hash + recipient_sig + timestamp + prev_receipt_hash).encode('utf-8')\n    receipt_hash = hashlib.sha256(chain_input).hexdigest()\n    receipt = {\n        'msg_hash': msg_hash,\n        'recipient_sig': recipient_sig,\n        'timestamp': timestamp,\n        'receipt_hash': receipt_hash\n    }\n    print(json.dumps(receipt, separators=(',', ':'), sort_keys=False))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:59.896802+00:00"
+}

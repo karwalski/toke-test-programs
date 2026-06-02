@@ -1,0 +1,1 @@
+m=encoding;f=detectencoding(s:$str):$str{let len=s.len;let allutf8=mut.true;lp(let i=0;i<len;i=i+1){let c=s.get(i);let cval=c as i64;if(cval<0){allutf8=false};if(cval>127){allutf8=false}};if(allutf8){<s}el{let alllatin1

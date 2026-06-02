@@ -1,0 +1,6 @@
+{
+  "id": "CRY-033",
+  "category": "crypto-blockchain",
+  "outcome": "unfixable",
+  "reason": "Python's standard library does not include Ed25519 signature verification (no ed25519 in hashlib/hmac/secrets), so a stdlib-only reference implementation would require implementing RFC 8032 Ed25519 from scratch including SHA-512, scalar arithmetic, and Edwards curve point operations, which exceeds the 200-line limit and the spirit of 'stdlib module' usage."
+}

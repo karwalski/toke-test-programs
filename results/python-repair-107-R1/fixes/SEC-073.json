@@ -1,0 +1,26 @@
+{
+  "id": "SEC-073",
+  "category": "security",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "HMAC-SHA256\nsecretkey123\nhello world\n",
+      "expected_output": "{\"algorithm\": \"HMAC-SHA256\", \"keyBits\": 96, \"keyType\": \"HMAC\", \"message_hash\": \"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\", \"signature_hex_prefix\": \"62e36a36ecf3013d\", \"valid\": true}"
+    },
+    {
+      "input": "HMAC-SHA256\nanotherkey\nThe quick brown fox jumps over the lazy dog\n",
+      "expected_output": "{\"algorithm\": \"HMAC-SHA256\", \"keyBits\": 80, \"keyType\": \"HMAC\", \"message_hash\": \"d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592\", \"signature_hex_prefix\": \"df1c07aad46b19b9\", \"valid\": true}"
+    },
+    {
+      "input": "HMAC-SHA512\nmypassword\ntest message\n",
+      "expected_output": "{\"algorithm\": \"HMAC-SHA512\", \"keyBits\": 80, \"keyType\": \"HMAC\", \"message_hash\": \"950b2a7effa78f51a63515ec45e03ecebe50ef2f1c41e69629b50778f11bc080002e4db8112b59d09389d10f3558f85bfdeb4f1cc55a34217af0f8547700ebf3\", \"signature_hex_prefix\": \"16032b34039c285e\", \"valid\": true}"
+    },
+    {
+      "input": "SHA256\n\nhello world\n",
+      "expected_output": "{\"algorithm\": \"SHA256\", \"keyBits\": 0, \"keyType\": \"none\", \"message_hash\": \"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\", \"signature_hex_prefix\": \"b94d27b9934d3e08\", \"valid\": true}"
+    }
+  ],
+  "python": "import sys, hmac, hashlib, json, base64\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    algo = data[0].strip()\n    key = data[1] if len(data) > 1 else ''\n    message = data[2] if len(data) > 2 else ''\n    \n    result = {}\n    result['algorithm'] = algo\n    \n    if algo == 'HMAC-SHA256':\n        h = hmac.new(key.encode('utf-8'), message.encode('utf-8'), hashlib.sha256)\n        sig = h.hexdigest()\n        result['keyType'] = 'HMAC'\n        result['keyBits'] = len(key) * 8\n        result['message_hash'] = hashlib.sha256(message.encode('utf-8')).hexdigest()\n        result['signature_hex_prefix'] = sig[:16]\n        result['valid'] = True\n    elif algo == 'HMAC-SHA512':\n        h = hmac.new(key.encode('utf-8'), message.encode('utf-8'), hashlib.sha512)\n        sig = h.hexdigest()\n        result['keyType'] = 'HMAC'\n        result['keyBits'] = len(key) * 8\n        result['message_hash'] = hashlib.sha512(message.encode('utf-8')).hexdigest()\n        result['signature_hex_prefix'] = sig[:16]\n        result['valid'] = True\n    elif algo == 'SHA256':\n        digest = hashlib.sha256(message.encode('utf-8')).hexdigest()\n        result['keyType'] = 'none'\n        result['keyBits'] = 0\n        result['message_hash'] = digest\n        result['signature_hex_prefix'] = digest[:16]\n        result['valid'] = True\n    else:\n        result['valid'] = False\n        result['keyType'] = 'unknown'\n        result['keyBits'] = 0\n        result['message_hash'] = ''\n        result['signature_hex_prefix'] = ''\n    \n    print(json.dumps(result, sort_keys=True))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:54.852153+00:00"
+}

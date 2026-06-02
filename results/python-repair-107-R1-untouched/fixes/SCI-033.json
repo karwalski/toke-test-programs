@@ -1,0 +1,30 @@
+{
+  "id": "SCI-033",
+  "category": "scientific-math",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "5 3 1 4 2",
+      "expected_output": "Sorted: 1 2 3 4 5\nGaps used: 4 1\nComparisons: 6"
+    },
+    {
+      "input": "10 9 8 7 6 5 4 3 2 1",
+      "expected_output": "Sorted: 1 2 3 4 5 6 7 8 9 10\nGaps used: 4 1\nComparisons: 21"
+    },
+    {
+      "input": "1",
+      "expected_output": "Sorted: 1\nGaps used: \nComparisons: 0"
+    },
+    {
+      "input": "2 1",
+      "expected_output": "Sorted: 1 2\nGaps used: 1\nComparisons: 1"
+    },
+    {
+      "input": "7 3 9 1 5 8 2 6 4",
+      "expected_output": "Sorted: 1 2 3 4 5 6 7 8 9\nGaps used: 4 1\nComparisons: 21"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split()\n    if not data:\n        print('Sorted: ')\n        print('Gaps used: ')\n        print('Comparisons: 0')\n        return\n    a = [int(x) for x in data]\n    n = len(a)\n    # Build Knuth gaps: h = 3h+1 while h < n/3 (Knuth uses h <= n/3 typically; standard: largest h with h < n/3)\n    gaps = []\n    h = 1\n    while h < n:\n        gaps.append(h)\n        h = 3*h + 1\n    # Use gaps in decreasing order, but only those satisfying Knuth condition h <= n/3 (actually standard is h < n)\n    # Per spec: 'h = 3h+1 up to n/3'. For n=5, gaps up to floor(5/3)=1, so just [1]. But spec example shows '4 1'.\n    # So interpretation: generate while h < n (i.e., h up to n-1 ish), then use in decreasing order.\n    # For n=5: 1,4,13 -> stop at 13 (>=5). Used: 4,1. Matches.\n    # For n=10: 1,4,13 -> stop. Used: 4,1. Matches.\n    used_gaps = list(reversed(gaps))\n    comparisons = 0\n    for gap in used_gaps:\n        for i in range(gap, n):\n            temp = a[i]\n            j = i\n            while j >= gap:\n                comparisons += 1\n                if a[j-gap] > temp:\n                    a[j] = a[j-gap]\n                    j -= gap\n                else:\n                    break\n            a[j] = temp\n    print('Sorted: ' + ' '.join(str(x) for x in a))\n    print('Gaps used: ' + ' '.join(str(g) for g in used_gaps))\n    print('Comparisons: ' + str(comparisons))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T04:41:36.782289+00:00"
+}

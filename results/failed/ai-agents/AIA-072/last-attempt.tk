@@ -1,0 +1,1 @@
+m=summaryeval;f=checkfaithfulness(summary:$str;source:$str):$bool{let summarywords=summary.split(" ");let sourcewords=source.split(" ");let found=mut.false;lp(let i=0;i<sourcewords.len;i=i+1){if(sourcewords.get(i)=summarywords.get(0)){found=true;};};<found};f=checkcoverage

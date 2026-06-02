@@ -1,0 +1,22 @@
+{
+  "id": "GAM-088",
+  "category": "games",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "228\nACT\nCAT\nBAT\nBUS\nDOG",
+      "expected_output": "ACT\nBAT\nCAT"
+    },
+    {
+      "input": "4663\nGOOD\nHOME\nINNS\nFOOD\nHELP",
+      "expected_output": "GOOD\nHOME"
+    },
+    {
+      "input": "5683\nLOVE\nKOVE\nJOVE\nMOVE\nHATE",
+      "expected_output": "JOVE\nKOVE\nLOVE"
+    }
+  ],
+  "python": "import sys\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    if not data:\n        return\n    digits = data[0].strip()\n    words = [w.strip() for w in data[1:] if w.strip()]\n    mapping = {\n        'A':'2','B':'2','C':'2',\n        'D':'3','E':'3','F':'3',\n        'G':'4','H':'4','I':'4',\n        'J':'5','K':'5','L':'5',\n        'M':'6','N':'6','O':'6',\n        'P':'7','Q':'7','R':'7','S':'7',\n        'T':'8','U':'8','V':'8',\n        'W':'9','X':'9','Y':'9','Z':'9'\n    }\n    matches = []\n    for w in words:\n        wu = w.upper()\n        if len(wu) != len(digits):\n            continue\n        if all(c in mapping for c in wu) and ''.join(mapping[c] for c in wu) == digits:\n            matches.append(wu)\n    matches = sorted(set(matches))\n    print('\\n'.join(matches))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T08:50:21.691452+00:00"
+}

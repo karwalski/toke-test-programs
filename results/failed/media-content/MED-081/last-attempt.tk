@@ -1,0 +1,1 @@
+m=avg;f=avg(sentences:@$str):f64{let total=mut.0;let count=sentences.len;lp(let i=0;i<count;i=i+1){let s=sentences.get(i);let w=s.split(" ");total=total+w.len;};if(count=0){<0.0};let avg=total as f64/(count as f64);<avg};f=min(sentences:@$str):$str{let n=sentences.len;if(n=0){<""};let m=mut.sentences.get(0);lp(let i=1;i<n;i=i+1){let s=sentences.get(i);if(s<m){m=s};};<m};f=max

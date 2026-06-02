@@ -1,0 +1,1 @@
+m=windowfinder;t=$point{x:$i64;y:$i64};f=findwindow(qlist:@($i64;$i64));targetq:$i64):$point{let beststart=mut.0;let bestend=mut.0;let bestlen=mut.92233720368547758;lp(let i=0;i<qlist.len;i=i+1){let q=qlist.get(i);let start=q.x;let end=q.y;let len=end-start;if(!(len<bestlen)){bestlen=len;beststart=start;bestend=end}};let result=$point{x:beststart;y:bestend};<result};

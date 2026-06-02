@@ -1,0 +1,22 @@
+{
+  "id": "CRY-025",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "0000000000000000000000000000000000000000000000000000000000000001\n000000000000000000000002\ntest",
+      "expected_output": "96f0fa29482546300c8c2fc3b7fac934340a417b"
+    },
+    {
+      "input": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\naaaaaaaaaaaaaaaaaaaaaaaa\nhello world",
+      "expected_output": "dea01e74b8d3eb41412cb17fe9cb9b68c21929b1e467340e002805"
+    },
+    {
+      "input": "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f\n070000004041424344454647\nLadies and Gentlemen of the class of '99",
+      "expected_output": "d31a8d34648e60db7b86afbc53ef7ec2a4aded51296e08fea9e2b5a736ee62d63dbea45e8ca967122eb838bb957e60b8f30a8bc490057bad"
+    }
+  ],
+  "python": "import sys, struct\n\ndef rotl32(x, n):\n    return ((x << n) & 0xffffffff) | (x >> (32 - n))\n\ndef quarter_round(s, a, b, c, d):\n    s[a] = (s[a] + s[b]) & 0xffffffff; s[d] ^= s[a]; s[d] = rotl32(s[d], 16)\n    s[c] = (s[c] + s[d]) & 0xffffffff; s[b] ^= s[c]; s[b] = rotl32(s[b], 12)\n    s[a] = (s[a] + s[b]) & 0xffffffff; s[d] ^= s[a]; s[d] = rotl32(s[d], 8)\n    s[c] = (s[c] + s[d]) & 0xffffffff; s[b] ^= s[c]; s[b] = rotl32(s[b], 7)\n\ndef chacha20_block(key, counter, nonce):\n    constants = [0x61707865, 0x3320646e, 0x79622d32, 0x6b206574]\n    key_words = list(struct.unpack('<8I', key))\n    nonce_words = list(struct.unpack('<3I', nonce))\n    state = constants + key_words + [counter] + nonce_words\n    working = state[:]\n    for _ in range(10):\n        quarter_round(working, 0, 4, 8, 12)\n        quarter_round(working, 1, 5, 9, 13)\n        quarter_round(working, 2, 6, 10, 14)\n        quarter_round(working, 3, 7, 11, 15)\n        quarter_round(working, 0, 5, 10, 15)\n        quarter_round(working, 1, 6, 11, 12)\n        quarter_round(working, 2, 7, 8, 13)\n        quarter_round(working, 3, 4, 9, 14)\n    out = [(working[i] + state[i]) & 0xffffffff for i in range(16)]\n    return struct.pack('<16I', *out)\n\ndef chacha20_encrypt(key, counter, nonce, plaintext):\n    out = bytearray()\n    for i in range(0, len(plaintext), 64):\n        block = chacha20_block(key, counter + i // 64, nonce)\n        chunk = plaintext[i:i+64]\n        out.extend(b ^ k for b, k in zip(chunk, block))\n    return bytes(out)\n\ndef poly1305_key_gen(key, nonce):\n    return chacha20_block(key, 0, nonce)[:32]\n\ndef poly1305_mac(msg, key):\n    r = int.from_bytes(key[:16], 'little')\n    r &= 0x0ffffffc0ffffffc0ffffffc0fffffff\n    s = int.from_bytes(key[16:32], 'little')\n    p = (1 << 130) - 5\n    acc = 0\n    for i in range(0, len(msg), 16):\n        chunk = msg[i:i+16]\n        n = int.from_bytes(chunk + b'\\x01', 'little') if len(chunk) == 16 else int.from_bytes(chunk + b'\\x01' + b'\\x00' * (15 - len(chunk)), 'little')\n        acc = (acc + n) % p\n        acc = (acc * r) % p\n    acc = (acc + s) & ((1 << 128) - 1)\n    return acc.to_bytes(16, 'little')\n\ndef pad16(x):\n    if len(x) % 16 == 0:\n        return b''\n    return b'\\x00' * (16 - len(x) % 16)\n\ndef chacha20_poly1305_encrypt(key, nonce, plaintext, aad=b''):\n    otk = poly1305_key_gen(key, nonce)\n    ciphertext = chacha20_encrypt(key, 1, nonce, plaintext)\n    mac_data = aad + pad16(aad) + ciphertext + pad16(ciphertext)\n    mac_data += struct.pack('<Q', len(aad)) + struct.pack('<Q', len(ciphertext))\n    tag = poly1305_mac(mac_data, otk)\n    return ciphertext + tag\n\ndef main():\n    data = sys.stdin.read().split('\\n')\n    key = bytes.fromhex(data[0].strip())\n    nonce = bytes.fromhex(data[1].strip())\n    plaintext = '\\n'.join(data[2:])\n    if plaintext.endswith('\\n'):\n        plaintext = plaintext[:-1]\n    pt_bytes = plaintext.encode('utf-8')\n    result = chacha20_poly1305_encrypt(key, nonce, pt_bytes)\n    print(result.hex())\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:40:26.922113+00:00"
+}

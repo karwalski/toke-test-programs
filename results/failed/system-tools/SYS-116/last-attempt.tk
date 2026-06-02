@@ -1,0 +1,1 @@
+m=systemdstatus;f=isemptystr(s:$str):$bool{let slen=s.len;if(slen=0){<true};<false};f=getactivestate(line:$str):$str{let len=line.len;let i=mut.0;lp(let idx=0;idx<len;idx=idx+1){let ch=line.get(idx);if(ch=" "){i=idx+1;};};let result=mut."";lp(let idx=i;idx<len;idx=idx+1){let ch=line.get(idx);if(ch=" "){br};result=result+ch;};<result};f=getsub

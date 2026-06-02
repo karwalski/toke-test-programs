@@ -1,0 +1,93 @@
+[
+  {
+    "spec_challenge": "The test cases use non-hex strings ('ciphertext', 'valid_tag', 'invalid_tag') as inputs for fields specified as hex-encoded, and expect the plaintext 'hello' to be returned despite the key/nonce being all zeros and the ciphertext literally being the ASCII string 'ciphertext'. There is no actual AES-256-GCM key/nonce/ciphertext/tag combination matching these inputs that would decrypt to 'hello' \u2014 the test cases are not real cryptographic vectors but rather mock placeholders. A correct AES-256-GCM implementation cannot satisfy these tests; only a hardcoded mock that checks for the literal string 'valid_tag' vs 'invalid_tag' could.",
+    "suggested_amendment": "Provide real AES-256-GCM test vectors: a valid 64-hex-char key, 24-hex-char nonce, hex-encoded ciphertext, and 32-hex-char tag computed by an actual AES-256-GCM encryption of 'hello'. For example, use NIST GCM test vectors or generate vectors with Python's cryptography library, then provide the hex-encoded values along with the expected plaintext output.",
+    "id": "CRY-024",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:05:22.758357+00:00"
+  },
+  {
+    "spec_challenge": "Test expected outputs are literal placeholder strings ('v2:base64_ciphertext' and 'Hello World (decrypted with key v1)') rather than actual computable values. The key hex values in inputs are also placeholders ('aabb...', 'ccdd...') which are not valid hex. Additionally, the decrypt test provides 'base64_ciphertext' as a literal placeholder, not real base64, making it impossible to decrypt. No real cryptographic implementation can produce these exact placeholder strings deterministically.",
+    "suggested_amendment": "Provide concrete, valid hex key values (e.g., 64-character hex strings for AES-256), specify the exact encryption algorithm and mode (with deterministic IV or specified IV), and provide actual computed base64 ciphertexts as expected outputs. For the decrypt test, supply a real ciphertext that was encrypted with v1's key so it can be decrypted to 'Hello World'. Also clarify the exact output format string for decryption (e.g., '{plaintext} (decrypted with key v{version})').",
+    "id": "MSG-070",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:05:45.538677+00:00"
+  },
+  {
+    "spec_challenge": "Test cases use placeholder literals like '<base64key>' and '<expected_hash>' rather than real values, and reference files (/tmp/backup.enc, /tmp/corrupted.enc) that do not exist in the test environment. The expected stdout is the single word 'decryptable' / 'integrityValid' rather than a JSON document as specified in the output format. It is impossible to deterministically produce stdout equal to the bare string 'decryptable' while also producing the JSON object the spec mandates, and the placeholders cannot be decoded as real base64 keys or matched against a real SHA-256 hash.",
+    "suggested_amendment": "Replace placeholders with concrete fixture files and real base64 keys/hashes (e.g. generate a known AES-256-GCM ciphertext at /tmp/backup.enc and a corrupted variant at /tmp/corrupted.enc), and change the expected stdout to either the full JSON document or use a substring/contains assertion explicitly. Also specify exact ciphertext framing (e.g. 'IV(12) || ciphertext || tag(16)' for GCM, or 'IV(16) || ciphertext || HMAC(32)' for CBC) so the verifier is well-defined.",
+    "id": "SEC-075",
+    "category": "security",
+    "raised_at": "2026-05-31T02:05:54.068404+00:00"
+  },
+  {
+    "spec_challenge": "Evaluating summary faithfulness, coverage, and conciseness requires natural-language understanding (semantic equivalence, paraphrase detection, contradiction detection, hallucination detection) that cannot be performed by stdlib Python. The expected outputs are specific calibrated scores (e.g., 1.0, 0.9, 0.9, 0.93 and 0.3, 0.5, 0.7, 0.4) with hand-authored issue strings like 'Changed cat to dog (unfaithful)' and 'Added eating food (hallucination)' that depend on LLM-style reasoning. Two test cases are insufficient to reverse-engineer a deterministic heuristic that would generalize, and the exact issue text cannot be produced without semantic comparison.",
+    "suggested_amendment": "Either (a) provide a deterministic algorithm specification (exact formulas for each score and exact rules for issue strings), or (b) restrict the task to lexical overlap metrics (e.g., ROUGE-style token recall/precision) with tolerance-based test assertions instead of exact string matches, or (c) supply a fixed lookup table mapping known (source, summary) pairs to expected outputs.",
+    "id": "AIA-072",
+    "category": "ai-agents",
+    "raised_at": "2026-05-31T02:10:17.239281+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 contains placeholder strings 'private_d_hex' and 'cipher_hex' which are not valid hex integers, making it impossible to perform RSA decryption as specified. Additionally, n=0xb3510a2b with expected plaintext 42 has no deterministic d/c pair derivable from the inputs. Test 2 is valid (0x151b^0x2aab mod 0xffff = 7), but Test 1 cannot be solved by any RSA implementation since the inputs are non-numeric placeholders.",
+    "suggested_amendment": "Replace Test 1 with a valid test case using actual hex values for n, d, and ciphertext such that pow(c, d, n) == 42. For example: n=0xb3510a2b, choose valid e/d pair and compute c=pow(42, e, n), then provide c and d in hex.",
+    "id": "CRY-029",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:10:22.845950+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs contain the literal placeholder string '<hex sig>' rather than an actual deterministic signature. The private key input is also the literal string 'private_key_hex' which is not valid hex. Additionally, the Python standard library does not include secp256k1 ECDSA support, so even with a real key the required signature cannot be computed using stdlib only.",
+    "suggested_amendment": "Either (1) replace the placeholder '<hex sig>' in expected outputs with concrete signature hex computed from a specified valid 64-char hex private key using a deterministic algorithm implementable in stdlib (e.g., RFC6979 deterministic ECDSA with secp256k1 implemented manually, or switch to HMAC-SHA256 over canonical JSON), and (2) provide actual valid hex private keys in the test inputs.",
+    "id": "CRY-050",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T02:10:28.335931+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases contain literal placeholder strings ('base64', 'abcdef...', 'sha256_of_key') rather than actual computed values. Test 1 expects content_hash to be 'abcdef...' (literally truncated with ellipsis) while the input hash is the full 64-char hex string. Test 2 expects key_hash='sha256_of_key' but the input key 'key_hex' isn't even valid hex. These expected outputs are illustrative schema examples, not deterministic computable outputs, so no implementation can pass both tests.",
+    "suggested_amendment": "Replace the expected stdout strings with the actual deterministic values: compute encrypted_metadata as base64(XOR(json(filename,mime),key)), echo content_hash verbatim, size as integer, and key_hash as sha256(key_bytes).hexdigest(). Also ensure inputs use valid hex strings so bytes.fromhex() succeeds.",
+    "id": "MSG-096",
+    "category": "messaging",
+    "raised_at": "2026-05-31T02:13:17.795579+00:00"
+  },
+  {
+    "spec_challenge": "The spec requires real HTTP network requests to httpbin.org and localhost:8089, but the sandbox has no network access and no local server. Test 1 expects '200' (single line) for two URLs, and Test 2 also expects '200' for two URLs \u2014 both outputs are inconsistent with the spec's stated 'Status per URL' format, making the expected behavior ambiguous. Additionally, real network calls are non-deterministic and forbidden.",
+    "suggested_amendment": "Either (1) remove the network requirement and have the program simulate cookie storage from a scripted input transcript (Set-Cookie headers provided inline), or (2) clarify expected output to be a single '200' regardless of URL count, or (3) provide a mock server fixture. Recommended: change input to include simulated HTTP responses so the cookie jar logic can be tested offline deterministically.",
+    "id": "NET-134",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T02:13:29.613362+00:00"
+  },
+  {
+    "spec_challenge": "The spec requires sending an actual HTTP OPTIONS request to external/remote URLs (httpbin.org and localhost:8083), but the expected output for both test cases is simply 'Allow:' regardless of what the real server returns. This is contradictory: either the program must perform a real network request (in which case the output depends on the live server's response and cannot be deterministically 'Allow:' for httpbin.org, which actually returns method lists and CORS headers), or it must not perform a network request (in which case the spec's core requirement is violated). Additionally, the test harness sandbox cannot reach external networks reliably, and localhost:8083 is not guaranteed to be running.",
+    "suggested_amendment": "Either (1) change the expected outputs to allow any output beginning with 'Allow:' and match against a regex/prefix, OR (2) specify that on network failure the program should print exactly 'Allow:' and run the tests in an offline environment, OR (3) provide a mock HTTP server fixture with deterministic responses and update expected outputs to match that fixture's actual headers.",
+    "id": "NET-177",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T02:13:41.371453+00:00"
+  },
+  {
+    "spec_challenge": "The test cases are under-specified and contradictory with the stated output format. The spec says output must be JSON with fields {valid, algorithm, keyType, keyBits, message_hash, signature_hex_prefix}, but the expected stdout for both tests is the literal string 'valid' \u2014 not JSON. Additionally, the tests reference placeholder '<hex_sig>' rather than actual signatures, and depend on real PEM key files at /tmp/pubkey.pem and /tmp/ec_pubkey.pem that aren't provided. Real RSA/ECDSA/Ed25519 signature verification also cannot be performed using only the Python stdlib (no asymmetric crypto primitives are exposed).",
+    "suggested_amendment": "Either (1) allow a crypto library like 'cryptography' to be used, or (2) provide concrete test fixtures (actual PEM keys and real hex signatures) AND clarify the expected stdout \u2014 either the full JSON object with exact expected field values, or just a single keyword like 'valid'/'invalid'. Also specify whether key files will be staged before the test runs.",
+    "id": "SEC-073",
+    "category": "security",
+    "raised_at": "2026-05-31T02:14:12.291884+00:00"
+  },
+  {
+    "spec_challenge": "The two test cases require outputs that are mere substrings ('../../' and '%2e%2e') rather than complete JSON arrays. No single deterministic program that outputs a JSON array of payload objects (as the spec requires) can have stdout exactly equal to '../../' or '%2e%2e'. The expected stdout values are incompatible with the specified JSON-array output format.",
+    "suggested_amendment": "Either (1) change the output format spec to a newline-separated list of payloads and make the test expectations be the full multi-line output, or (2) keep JSON output and change tests to check that the expected substring appears within the produced JSON (substring match) rather than exact stdout equality.",
+    "id": "SEC-085",
+    "category": "security",
+    "raised_at": "2026-05-31T02:14:17.846978+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs in the test cases are literal placeholder strings like 'OS: (name and version)' rather than real system values. Since the spec also requires values to come from the actual system (not hardcoded), no real implementation can produce stdout that byte-matches the placeholder text. The tests are under-specified: they describe a shape but assert it as literal text.",
+    "suggested_amendment": "Replace exact-match test cases with a regex/format validator, e.g. assert stdout matches r'^OS: .+\\nKernel: .+\\nHostname: \\S+\\nCPUs: \\d+\\nRAM: \\d+ GB$', and verify each field against the runner's own platform/os/socket queries instead of comparing to a fixed string.",
+    "id": "SYS-020",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:14:43.659277+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects literal output 'CPU% histogram: 0-10%: N, ...' which contains the placeholder 'N' rather than a concrete integer count. Real CPU sampling of PID 1 cannot produce that literal string, and the expected output is not a deterministic, computable value. Test 1 is under-specified: it shows a format template, not an actual expected output to match against.",
+    "suggested_amendment": "Either (a) change Test 1's expected output to a regex/format check (e.g. matches r'^CPU% histogram: 0-10%: \\d+, 10-20%: \\d+, ..., 90-100%: \\d+$' with bucket counts summing to samples), or (b) make the program deterministic by mocking CPU samples (e.g. accept sample values from stdin) so the expected output is a fixed string.",
+    "id": "SYS-039",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T02:14:49.884595+00:00"
+  }
+]

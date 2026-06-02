@@ -1,0 +1,58 @@
+[
+  {
+    "spec_challenge": "Test 1's expected output contains 65 hex characters for the uint256 argument (value 100) instead of 64: '...00000000000000000000000000000000000000000000000000000000000000064'. A correct ABI encoding pads to exactly 32 bytes (64 hex chars), which would be '...0000000000000000000000000000000000000000000000000000000000000064'. The expected string has an extra '0' nibble, making the total calldata length not a multiple of 32 bytes. Test 2 is correctly 4+32 bytes. The two tests are inconsistent with the stated spec.",
+    "suggested_amendment": "Fix Test 1's expected stdout to 'a9059cbb0000000000000000000000001234567890abcdef1234567890abcdef12345678000000000000000000000000000000000000000000000000000000000000064' so each argument is exactly 64 hex characters (32 bytes) as required by ABI encoding.",
+    "id": "CRY-117",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T08:15:14.772215+00:00"
+  },
+  {
+    "spec_challenge": "The expected discounted payback values in the test cases cannot be reproduced by any standard discounted payback formula. For Test 1 (investment=10000, r=0.10, cf=[3000,4000,5000,6000]): discounting at (1+r)^t gives DCFs [2727.27, 3305.79, 3756.57, 4098.08] with cumulative [2727.27, 6033.06, 9789.63, 13887.71]. Recovery occurs in year 4; standard interpolation gives 3 + (10000-9789.63)/4098.08 = 3.05, not the expected 3.15. Trying alternative conventions (exponent t-1, mid-year, continuous compounding, undiscounted interpolation in discounted recovery year, discounting investment, etc.) none produce 3.15 for Test 1 AND 2.72 for Test 2 simultaneously. The expected outputs appear inconsistent with any deterministic discounted-payback formula.",
+    "suggested_amendment": "Specify the exact discounted-payback formula (discount factor convention, indexing, and interpolation method) and recompute the expected outputs. For example, using DCF_t = CF_t/(1+r)^t and linear interpolation, Test 1 should expect 3.05 and Test 2 should expect 2.74.",
+    "id": "FIN-108",
+    "category": "calculators-finance",
+    "raised_at": "2026-05-31T08:18:19.728695+00:00"
+  },
+  {
+    "spec_challenge": "Test cases use inconsistent or unspecified bracket semantics. Test 2 (income=50000; brackets 10000@0, 40000@0.20, 100000@0.30 \u2192 9000.00) is consistent with the rule 'rate listed with threshold T applies to income between T and the next threshold': (40000-10000)*0.20 + (50000-40000)*0.30 = 9000. But Test 1 (income=80000; brackets 18200@0, 45000@0.19, 120000@0.325 \u2192 14617.00) cannot be produced by that rule (gives 6650.00), nor by 'rate applies up to the listed threshold' (gives 16467.00), nor any other standard progressive-bracket interpretation of the given inputs. No consistent formula yields 14617.00 from these numbers.",
+    "suggested_amendment": "Pick one bracket semantics and apply it consistently. For example: 'each line gives a threshold T and the marginal rate r that applies to income in (T, next_T]; income at or below the smallest threshold is tax-free.' Then fix Test 1's expected output to 6650.00 (under that rule), or change the bracket inputs so the expected 14617.00 is actually derivable.",
+    "id": "FIN-021",
+    "category": "calculators-finance",
+    "raised_at": "2026-05-31T08:17:02.479201+00:00"
+  },
+  {
+    "spec_challenge": "The spec says percentage = comment_lines / (comment_lines + code_lines) * 100, but test 1 expects 25% for 5 comments and 20 code lines, which is 5/20 = 25% (ratio of comments to code), not 5/25 = 20% (the spec formula). Test 2 expects 10% for 2 and 18, which is closer to 2/(2+18)=10% than 2/18=11%. The two test cases use inconsistent formulas, and the spec contradicts test 1.",
+    "suggested_amendment": "Pick one definition: either percentage = comment_lines / code_lines * 100 (giving 25% and ~11%) or comment_lines / (comment_lines + code_lines) * 100 (giving 20% and 10%), and update both the spec wording and the test cases to be consistent.",
+    "id": "DEV-049",
+    "category": "devtools",
+    "raised_at": "2026-05-31T08:15:45.348856+00:00"
+  },
+  {
+    "spec_challenge": "The task requires true semantic similarity (e.g., understanding that 'reset my password' \u2248 'change my password' should score 0.9, while 'Do you ship internationally?' vs 'How long does shipping take?' should score only 0.4 despite sharing the word 'ship'). This requires an LLM or pretrained semantic embedding model, neither of which is available in the Python standard library. Lexical methods like SequenceMatcher, token overlap, or TF-IDF cannot reliably produce these exact expected similarity values (0.9 and 0.4) for these specific test cases without hardcoding. Additionally, only 2 test cases are provided, making the expected similarity scale under-specified.",
+    "suggested_amendment": "Either (1) provide a deterministic similarity algorithm specification (e.g., Jaccard token similarity with specified stopword list and rounding rules) along with more test cases to validate it, or (2) allow tolerance ranges for similarity values and only assert the boolean is_duplicate/duplicate_of fields, or (3) permit use of an offline embedding model bundled with the runtime.",
+    "id": "AIA-045",
+    "category": "ai-agents",
+    "raised_at": "2026-05-31T08:13:23.400011+00:00"
+  },
+  {
+    "spec_challenge": "Test 1's expected output violates the stated resource capacity constraint: it schedules t1 (cpu=2), t2 (cpu=2), and t3 (cpu=1) all starting at time 0 with a cpu capacity of 3, requiring 5 cpu units simultaneously (1000ms-2000ms still needs 4). No valid schedule respecting capacity can achieve makespan=2000; the optimal makespan is 3000. Additionally, the reported resource_utilisation=0.83 cannot be reproduced by any consistent formula that also yields 1.0 for test 2 given the schedules shown. The two tests are mutually inconsistent regarding both the constraint-checking rule and the utilisation formula.",
+    "suggested_amendment": "Either (a) revise Test 1's expected output to a feasible schedule, e.g. {t1:0-1000,t3:0-1000,t2:1000-3000}, total_duration_ms=3000, with a clearly defined utilisation formula such as sum(duration*need)/(capacity*makespan)=7000/9000\u22480.78; or (b) explicitly specify that resource capacity is only checked per-task (need<=capacity) rather than aggregated, and provide a deterministic algorithm specification (ordering, packing rule, utilisation formula) so reference outputs are reproducible.",
+    "id": "AIA-127",
+    "category": "ai-agents",
+    "raised_at": "2026-05-31T08:14:34.904509+00:00"
+  },
+  {
+    "spec_challenge": "Test cases are mutually inconsistent. Test 2 expects population variance (divide by n): var([1,2,3])=2/3\u22480.666667, but the spec mandates sample covariance (n-1) which would give 1.0. Test 1's expected values (0.000492, -0.000108) cannot be reproduced by either sample or population covariance on the given inputs; sample covariance on rows [0.05,0.02,-0.01,0.03] and [0.02,0.01,0.03,-0.01] yields (0.000625, -0.000175, 0.000292) and population yields (0.000469, -0.000131, 0.000219). No single consistent divisor or mean choice produces both expected outputs.",
+    "suggested_amendment": "Recompute expected outputs consistently. Using sample covariance (n-1): Test 1 should be '0.000625 -0.000175\\n-0.000175 0.000292', Test 2 should be '1.000000 1.000000\\n1.000000 1.000000'. Alternatively, if population covariance is desired, update both tests and the spec accordingly.",
+    "id": "FIN-127",
+    "category": "calculators-finance",
+    "raised_at": "2026-05-31T08:19:55.202648+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 input '228' maps to letters from keys 2,2,8. 'ABU' = A(2)+B(2)+U(8) = '228' which legitimately matches, but expected output excludes ABU while including ACT, BAT, CAT. There is no stated rule (e.g., common-word filter, length restriction, or exclusion list) that would deterministically drop ABU but keep the others. The mapping rule as specified produces ABU as a valid match.",
+    "suggested_amendment": "Either (a) remove ABU from the test 1 dictionary, (b) add a rule such as 'only output words that appear in a provided common-words list', or (c) clarify the filtering criterion that distinguishes ABU from ACT/BAT/CAT.",
+    "id": "GAM-088",
+    "category": "games",
+    "raised_at": "2026-05-31T08:21:22.438266+00:00"
+  }
+]

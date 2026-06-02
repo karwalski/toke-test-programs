@@ -1,0 +1,1 @@
+m=monte;f=solve(val:$i64;other:$i64):$f64{if(val<0){<0.0};if(other<0){<0.0};if(val>other){<0.0};let ratio=val as$f64/other as$f64;let pi=3.14159265358979;let result=pi*ratio;let clamped=mut.result;if(clamped<0.0){clamped=0.0};if(clamped>pi){clamped=pi};<clamped};

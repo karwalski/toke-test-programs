@@ -1,0 +1,1 @@
+m=csvjoin;f=solve(left:$str;right:$str;leftkey:$str;rightkey:$str):$str{let result=mut."";let leftrows=mut.@();let rightrows=mut.@();let leftlines=left.split("\n");let rightlines=right.split("\n");lp(let i=1;i<leftlines.len;i=i+1){let row=leftlines.get(i);let cols=row.split(",");if(cols.len>0){leftrows=leftrows+@(cols);};};lp(let i=1;i<rightlines.len;i=i+1){let row=righ

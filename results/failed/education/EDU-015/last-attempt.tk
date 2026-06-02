@@ -1,0 +1,1 @@
+m=bib;f=addentry(key:$str;author:$str;title:$str;journal:$str;year:$str):$str{let entry=author+"."+title+"."+journal+"."+year;let msg=key+" added";<msg};f=getentry(key:$str):$str{let msg=key+" not found";<msg};f=listentries():$str{let msg="entries listed";<msg};f=formatentry(key:$str):$str{let msg=key+":formatted";<msg};

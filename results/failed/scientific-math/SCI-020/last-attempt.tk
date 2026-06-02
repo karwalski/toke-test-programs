@@ -1,0 +1,1 @@
+m=kruskal;f=find(parent:$i64;num1:$i64):$i64{if(parent.get(num1)=num1)){<num1};<find(parent;num1;parent.get(num1)))};f=kruskal(graph:$i64):$i64{let n=graph.len;let m=mut.0;lp(let i=0;i<n;i=i+1){lp(let j=i+1;j<n;j=j+1){if(graph.get(i*n+j)>0)){m=m+1}}}};let edges=mut.@()

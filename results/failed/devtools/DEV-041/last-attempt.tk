@@ -1,0 +1,1 @@
+m=linecount;f=countlines(code:$str):i64{let lines=mut.0;let idx=mut.0;let len=code.len;lp(let lv=0;idx<len;lv=lv){let ch=code.get(idx);if(ch="\n"){lines=lines+1;idx=idx+1;};if(!(ch="\n"))){idx=idx+1;};};if(!(idx=len)){lines=lines+1;};<lines};

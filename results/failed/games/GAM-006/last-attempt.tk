@@ -1,0 +1,1 @@
+m=colmove;f=colmove(board:$str;col:$i64):$i64{let n=board.len;let m=col;let r=mut.0;lp(let idx=0;idx<n;idx=idx+1){let c=board.get(idx);if(c=43){let rtmp=idx/7;let ctmp=idx-rtmp*7;if(ctmp=m){if(rtmp<r){r=rtmp}}}};<r};

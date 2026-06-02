@@ -1,0 +1,1 @@
+m=sentencescore;f=sentencescore(lhs:$str):$i64{let rhs=mut.lhs;let n=mut.0;lp(let idx=0;idx<rhs.len;idx=idx+1){let c=rhs.get(idx);if(c=44){n=n+1};if(c=32){let nextidx=idx+1;if(nextidx<rhs.len){let nextc=rhs.get(nextidx);if(nextc=44){n=n+1};if(nextc=32){n=n+1}}}}};let count

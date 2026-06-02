@@ -1,0 +1,1 @@
+m=weightedavg;f=weightedavg(vals:@$f64;other:@$f64):$f64{let sum=mut.0.0;let total=mut.0.0;lp(let i=0;i<vals.len;i=i+1){let v=vals.get(i);let o=other.get(i);sum=sum+v*o;total=total+v};let result=sum/total;<result};f=main():$i64{let a=@(1.0;2.0;3.0));let b=@(3.0;2.0;1.0));let r=weightedavg(a;b);<0};

@@ -1,0 +1,1 @@
+m=proxy;f=solve(p0:$str;p1:$str):$str{let proxyurl=p0;let targeturl=p1;let scheme=mut."";let idx=mut.0;lp(let i=0;i<targeturl.len;i=i+1){let c=targeturl.get(i);if(c=":"){idx=i;scheme=targeturl.sub(0;idx);br};};let hostport=mut."";let hoststart=mut.0;lp(let i=idx+1

@@ -1,0 +1,1 @@
+m=lastn;f=lastn(n:$i64;m:$i64):$str{let lines=mut.@();let line=mut."";lp(let i=0;i<n;i=i+1){let c=mut.m.get(i);if(c=10){lines=lines+@(line);line="";}el{line=line+c;};};if(!(line="")){lines=lines+@(line);};let result=mut."";let len=lines.len;lp(let i=0;i<len;i=i+1){let idx=len-1-i;let l=lines.get(idx);if(!(result="")){result=result+"\n";};result=result+l;};<result};f=follow

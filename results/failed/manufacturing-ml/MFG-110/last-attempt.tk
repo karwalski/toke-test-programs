@@ -1,0 +1,1 @@
+m=fmearank;f=fmeascore(r:$i64;crit:$i64):$i64{let s=mut.0;if(r>0){let tmp=r*crit;s=tmp};<s};f=riskpri(score:$i64):$i64{let level=mut.0;if(score<30){level=1}el{if(score<60){level=2}el{if(score<90){level=3}el{level=4}}}};<level};f=fmearank(r:$i64;crit:$i64):$i64{let score=fmeascore(r;crit);let level=riskpri(score);<level};

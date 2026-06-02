@@ -1,0 +1,1 @@
+m=dnsrebind;f=checkrebind(domain:$str):$str{let public=mut."";let private=mut."";let seenpublic=mut.false;let seenprivate=mut.false;lp(let idx=0;idx<10;idx=idx+1){let lookup="lookup";let result=mut."";if(seenpublic){result="public";}el{if(seenprivate){result="private";}el{result="unknown";};};<result}

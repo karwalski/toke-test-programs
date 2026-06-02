@@ -1,0 +1,26 @@
+{
+  "id": "CRY-080",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "42\n8\ndeadbeefcafebabe\n",
+      "expected_output": "{\"commitment\":\"7ef7478a597c2361fd3cfd338aa30a6f07a32c6e440c0bf8eefde5c6ac549c50\",\"range_bits\":8,\"bit_commitments\":[\"aa0836b8f42e96e73faf1b3543ff7342eab7fb9307124381fade6f964df9cf4d\",\"3366ce05c0c19623892f4bd936ca2ef77de04091a49d5b36bd4e997dd4be6edb\",\"26b05175668fc575b883645f44c4bcdf55b80fb257c0fb471bab322313790ec8\",\"5e4c2894bbafd1f1e43a9c5663c174f2de279a62fe26eaa751a69acddf3391b5\",\"b0f9a637d006c1f0a167fd53d4bf02e8b1d8900b0b01e4f13a7f182411879fe2\",\"8fa2d72f907832d6eb624b94b78425e233493689225f12cb702a24d542da5c04\",\"2cd2492b9d2ba468b6816922383056504ff454ace9020e70ea26b315383e4153\",\"94d8bb8b19f468086d5447692596ea230896d229a200d7d3b4f8dc0cf982008a\"],\"proof_valid\":true}"
+    },
+    {
+      "input": "300\n8\ndeadbeefcafebabe\n",
+      "expected_output": "{\"error\":\"Value 300 not in range [0, 256)\"}"
+    },
+    {
+      "input": "1023\n10\n0123456789abcdef\n",
+      "expected_output": "{\"commitment\":\"39a866d24a1977b3446417294fc6b24c5b9289219929f29c4a0f575656345a24\",\"range_bits\":10,\"bit_commitments\":[\"c94cef108f24445fdae0a3a6dcc132ae619982adaf9988d41ee6e66ab56b9f56\",\"1ac6f4052990977cf0f18b66c7de282a3bdc21d36a015f9d2fc1325fd5b295a5\",\"93e057253841e57b9be7018709503b60fff5802604fc552abdfdb5c3c7ce278e\",\"296b878e6257987d8269d6dc43a2e093cf430dffb17a6146b83b2134a8c92bf5\",\"7a90446ac4d147e28bbca5122fe58d8a74fd1425a0d63c2bad2ae87841116465\",\"22a8a2ccb067e89738c6b0a7d63ea758f5e6cee4690f7c253158b44f32994ea6\",\"298f484d4d17d7589a7f78817d0f59bf5638487a969fd4a8c8a325ba4eab51b8\",\"c673b3d87f82d9af926fbf36ef40ab38af080c1837d026e273f270ddb7cbbeba\",\"fea6bc3378decf96c4bfb74f2d9fced0b4c2c04fd93df0bd62dc3a1fc81de2cd\",\"adb9004676a6ae4480f56730da7b80166a9a8ab9cb58ec66dfd081d878cd2fe4\"],\"proof_valid\":true}"
+    },
+    {
+      "input": "0\n4\nff\n",
+      "expected_output": "{\"commitment\":\"ac30a0ef79cd0b6f9bfafcd3049f3b29dab4e4036224a38f346f462ba56ada4d\",\"range_bits\":4,\"bit_commitments\":[\"a476bf4614b7f4c1c99252ee7080bb7101a99be0c2ae118c2d386a6c000711b7\",\"b928fcd132a96b71a80de3dfd8b8e7492266e7a06fa07fd2edaa736365d81772\",\"6e83b03a287aae74b83d69fc54b8d3903e2588cd265a0e03a80672a1f4efb81e\",\"09a650f2d6bcaaad5525429ffc7e7b36afce7bd6af956130691b4c393f69eb80\"],\"proof_valid\":true}"
+    }
+  ],
+  "python": "import sys, json, hashlib\n\ndef main():\n    data = sys.stdin.read().splitlines()\n    value = int(data[0].strip())\n    n = int(data[1].strip())\n    blinding_hex = data[2].strip()\n    upper = 1 << n\n    if value < 0 or value >= upper:\n        print(json.dumps({\"error\": f\"Value {value} not in range [0, {upper})\"}, separators=(',', ':')))\n        return\n    try:\n        r_bytes = bytes.fromhex(blinding_hex)\n    except ValueError:\n        r_bytes = blinding_hex.encode()\n    # Pedersen-like commitment: H(value || blinding)\n    h = hashlib.sha256()\n    h.update(value.to_bytes(32, 'big'))\n    h.update(r_bytes)\n    commitment = h.hexdigest()\n    bit_commitments = []\n    for i in range(n):\n        bit = (value >> i) & 1\n        bh = hashlib.sha256()\n        bh.update(bytes([bit]))\n        bh.update(i.to_bytes(4, 'big'))\n        bh.update(r_bytes)\n        bit_commitments.append(bh.hexdigest())\n    out = {\n        \"commitment\": commitment,\n        \"range_bits\": n,\n        \"bit_commitments\": bit_commitments,\n        \"proof_valid\": True\n    }\n    print(json.dumps(out, separators=(',', ':')))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:05.162454+00:00"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "CRY-017",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "password\nNaCl\n",
+      "expected_output": "a8430d7e581f9ca03c952df506ac66c757899d67a21d71c0f1900bd778ac1d14"
+    },
+    {
+      "input": "test\nsalt\n",
+      "expected_output": "72f47a5f6bcb1b96a9d77b2c2f1463395d4a3a325fada6290fc0fef7bcddb58e"
+    },
+    {
+      "input": "hello\nworld\n",
+      "expected_output": "112191f6cf9a48ad3d20bdb2ed4c9754ca31aebd62f5ad15cb9c5303a17063c8"
+    }
+  ],
+  "python": "import sys, hashlib\ndata = sys.stdin.read().split('\\n')\npwd = data[0].encode()\nsalt = data[1].encode()\nkey = hashlib.scrypt(pwd, salt=salt, n=16384, r=8, p=1, dklen=32)\nprint(key.hex())\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:40:10.912409+00:00"
+}

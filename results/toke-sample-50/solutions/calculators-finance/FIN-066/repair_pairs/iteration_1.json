@@ -1,0 +1,6 @@
+{
+  "iteration": 1,
+  "broken_source": "m=cagr;f=cagr(val:$i64;other:$i64;y:$i64):$f64{if(val=other){<1.0};let growth=other-val;let annual=growth/y;let result=annual as$f64;<result};f=main():$i64{let v=1000;let t=2000;let y=5;let r=cagr(v;t;y);<0};",
+  "error": "Test failures:\nTest results: 0/2 PASS, 2 FAIL\n  Test 1: WRONG_OUTPUT (exit=0)\n    expected: '14.87%'\n    got:      ''\n  Test 2: WRONG_OUTPUT (exit=0)\n    expected: '17.46%'\n    got:      ''",
+  "fixed_source": "m=cagr;i=io:std.io;i=s:std.str;i=math:std.math;f=main():$i64{let line=io.readln();let parts=s.split(line;\" \");if(parts.len>=3){let beginning=s.tofloat(parts.get(0));let ending=s.tofloat(parts.get(1));let years=s.tofloat(parts.get(2));let ratio=ending/beginning;let exponent=1.0/years;let growth=math.pow(ratio;exponent)-1.0;let percent=growth*100.0;io.println(s.concat(s.format(percent;\"%.2f\");\"%\"))};<0}"
+}

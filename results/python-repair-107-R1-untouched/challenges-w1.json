@@ -1,0 +1,44 @@
+[
+  {
+    "spec_challenge": "The expected output is not a valid 6x10 pentomino tiling. The first row 'XXXXUUUVVV' has 10 characters but the X pentomino does not have 4 cells in a row (X is a plus-sign shape with 5 cells). Subsequent rows have only 9 characters ('FFNNNTWWY' = 9, etc.), so the board is not 6x10. Also, letters 'B' and 'C' appear, which are not among the standard 12 pentominoes (F I L N P T U V W X Y Z). The expected output is therefore inconsistent with both the spec and the rules of pentomino tiling, making it impossible to produce deterministically from a valid solver.",
+    "suggested_amendment": "Either (1) provide a genuinely valid 6x10 pentomino tiling as the expected output using only the 12 standard letters F I L N P T U V W X Y Z with each row exactly 10 characters, or (2) specify which non-standard pieces 'B' and 'C' represent and provide a consistent, geometrically valid expected tiling. Alternatively, accept any valid tiling by validating the output programmatically rather than requiring an exact string match.",
+    "id": "GAM-119",
+    "category": "games",
+    "raised_at": "2026-05-31T04:21:04.903917+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs in the test cases are literal placeholder strings ('base64', 'hex', 'hex') rather than actual computed values. AES-256-GCM with a random nonce produces non-deterministic ciphertext/tag/nonce, so no implementation can match the literal placeholders. Additionally, the spec mandates a random nonce per message, which is inherently non-deterministic.",
+    "suggested_amendment": "Either (1) specify a deterministic nonce derivation (e.g., HKDF from key+AD+plaintext) and provide exact expected ciphertext/nonce/tag hex values for each test, or (2) change the test harness to validate the JSON structure and verify decryption correctness rather than requiring exact string matches.",
+    "id": "MSG-033",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:23:08.971669+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 has an expected stdout literally containing the placeholder text '(Q rows)\\n\\n(R rows with R upper triangular)' instead of actual numeric values. This is not a concrete expected output \u2014 it's a description. The current code produces a correct, well-formatted QR decomposition (Q orthonormal, R upper triangular with positive diagonal), but no implementation can match the literal placeholder string. Test 2 has concrete expected output and the current code already satisfies it.",
+    "suggested_amendment": "Replace Test 1's expected stdout with the actual numeric QR decomposition values, e.g. '0.894427 -0.447214\\n0.447214 0.894427\\n\\n13.416408 29.068884\\n0.000000 172.177234', or specify the check as a tolerance-based validator that verifies Q^T Q = I and R upper-triangular with positive diagonal and Q*R = A, rather than exact string match.",
+    "id": "SCI-013",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:23:19.453639+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 expected output 'Found at positions: 1 4 7' is mathematically wrong. Pattern 'ABC' in text 'AABCAABCABC' (indices 0-10) occurs at positions 1 (ABC), 5 (ABC), and 8 (ABC), not 1, 4, 7. Position 4 is 'AABC' starting char 'A' followed by 'A', not 'ABC'. Additionally, 'Comparisons: N' uses literal 'N' rather than an integer, which contradicts the spec asking to count comparisons. Both test cases have these inconsistencies.",
+    "suggested_amendment": "Fix expected outputs: Test 1 should be 'Found at positions: 1 5 8\\nComparisons: <actual_count>' and Test 2 should be 'NOT FOUND\\nComparisons: <actual_count>'. Either specify a deterministic comparison-counting rule and provide correct integer counts, or remove the comparisons line from the output format.",
+    "id": "SCI-034",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:23:29.710522+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are literal placeholder strings like '(current username)' and '(current PATH value)' rather than the actual environment variable values. No deterministic stdlib implementation can produce those literal strings when expanding ${USER} or $PATH, since real expansion yields the actual env var contents (e.g. 'matthew.watt', '/usr/bin:...').",
+    "suggested_amendment": "Either (1) change the expected outputs to the actual expanded values for the test environment (e.g. 'Hello ' + os.environ['USER']), or (2) provide explicit env var values in the test input/setup and use those known values in expected output, e.g. set USER=alice in test harness and expect 'Hello alice'.",
+    "id": "SYS-034",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:24:28.730624+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are placeholder descriptions ('(running containers or No containers found)') rather than concrete strings, making them impossible to match exactly. Additionally, the task requires invoking the Docker CLI and querying live container state, which is non-deterministic and depends on the host environment (Docker may not be installed in the test sandbox at all).",
+    "suggested_amendment": "Either (1) redefine the test to accept any output that is either the literal 'No containers found' or one-or-more lines matching the format 'NAME IMAGE STATUS PORTS CPU% MEM_MB' (i.e. validate by regex rather than exact string match), or (2) supply mock 'docker' output via stdin / a fixture file so the program's behavior is deterministic and reproducible without a real Docker daemon.",
+    "id": "SYS-105",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:24:34.607774+00:00"
+  }
+]

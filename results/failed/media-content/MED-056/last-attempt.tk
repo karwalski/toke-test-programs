@@ -1,0 +1,1 @@
+m=roman;f=toroman(n:$i64):$str{let values=@(1000;900;500;400;100;90;50;40;10;9;5;4;1));let symbols=@(1000;900;500;400;100;90;50;40;10;9;5;4;1));let result=mut."";let num=mut.n;lp(let i=0;i<values.len;i=i+1){let val=values.get(i);lp(let j=0;!(num<val);j=j+1){result=result+symbols.get(i);num=num-val;};};<result};f=toroman2

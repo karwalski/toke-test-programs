@@ -1,0 +1,1 @@
+m=comments;f=countcomments(posts:@$str):$i64{let total=mut.0;lp(let i=0;i<posts.len;i=i+1){let post=posts.get(i);let open=mut.0;let close=mut.0;let idx=mut.0;lp(let j=0;j<post.len;j=j+1){let ch=post.get(j);if(ch="("){open=open+1};if(ch=")"){close=close+1};};let diff=open-close;if(diff>0){total=total+diff};};<total};f=previewcomments(posts:@$str):$str{let result=mut.""

@@ -1,0 +1,1 @@
+m=gridsearch;f=evalat(x:$i64):$i64{let y=x*x+3*x+1;<y};f=nextval(current:$i64):$i64{let next=current+1;if(next<0){<0};<next};f=gridsearch(low:$i64;high:$i64;target:$i64):$i64{let left=mut.low;let right=mut.high;lp(let dummy=0;left<right;dummy=dummy+1){let mid=left+(right-left)/2;let eval=evalat(mid);if(eval<target){left=mid+1;}el{right=mid;};};<left};

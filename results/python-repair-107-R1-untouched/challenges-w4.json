@@ -1,0 +1,23 @@
+[
+  {
+    "spec_challenge": "The expected outputs depend on a specific dice-roll sequence that cannot be reproduced from Python's random.seed() with standard randint calls. For seed=42, the expected rolls are [6,5,3,5,4,4,3,2,3,1], but Python's random module with seed(42) produces a different sequence regardless of how dice are batched. The spec does not define the exact PRNG algorithm/order required to generate these specific values.",
+    "suggested_amendment": "Specify the exact dice generation algorithm (e.g., 'use a linear congruential generator with parameters X' or provide the explicit roll sequence per seed), or change the expected outputs to match Python's random.seed()+randint(1,6) sequence.",
+    "id": "GAM-126",
+    "category": "games",
+    "raised_at": "2026-05-31T04:21:44.193013+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs in test cases use placeholder strings like '(iterations)' and 'Eigenvector: ...' rather than concrete expected text. Test 1 does not specify the exact eigenvector values and Test 2's iteration lines are unspecified, so exact-match testing cannot succeed deterministically.",
+    "suggested_amendment": "Provide the exact expected stdout for each test case, including the precise iteration lines (or specify they are ignored), and the exact final eigenvector formatting (e.g. for test 1: '0.525731 0.850651' with a defined precision). Alternatively, define a tolerance-based comparison mode in the harness.",
+    "id": "SCI-072",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:24:52.287702+00:00"
+  },
+  {
+    "spec_challenge": "The spec says keys must be in same order as header (name,age), but expected output orders them alphabetically (age,name). These requirements are contradictory.",
+    "suggested_amendment": "Either change expected output to '[{\"name\":\"alice\",\"age\":\"30\"},{\"name\":\"bob\",\"age\":\"25\"}]' to match header order, or change constraint to require keys sorted alphabetically (use json.dumps(..., sort_keys=True)).",
+    "id": "SYS-066",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:26:09.894854+00:00"
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "id": "DEV-127",
+  "category": "devtools",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "{\"dependencies\":{\"express\":\"4.18.0\",\"lodash\":\"4.17.21\"},\"files\":{\"app.js\":\"const express = require('express');\\nconst app = express();\\napp.listen(3000);\"}}",
+      "expected_output": "UNUSED: lodash"
+    },
+    {
+      "input": "{\"dependencies\":{\"react\":\"18.0.0\",\"react-dom\":\"18.0.0\"},\"files\":{\"index.js\":\"import React from 'react';\\nimport ReactDOM from 'react-dom/client';\"}}",
+      "expected_output": "ALL DEPENDENCIES USED"
+    },
+    {
+      "input": "{\"dependencies\":{\"@types/node\":\"18.0.0\",\"typescript\":\"5.0.0\",\"unused-pkg\":\"1.0.0\"},\"files\":{\"main.ts\":\"import * as ts from 'typescript';\\nimport { readFileSync } from '@types/node';\"}}",
+      "expected_output": "UNUSED: unused-pkg"
+    },
+    {
+      "input": "{\"dependencies\":{\"axios\":\"1.0.0\",\"chalk\":\"5.0.0\",\"dotenv\":\"16.0.0\"},\"files\":{\"server.js\":\"const x = 1;\",\"readme.md\":\"require('axios')\"}}",
+      "expected_output": "UNUSED: axios\nUNUSED: chalk\nUNUSED: dotenv"
+    },
+    {
+      "input": "{\"dependencies\":{\"lodash\":\"4.0.0\"},\"files\":{\"a.js\":\"const _ = require('lodash/get');\\nconst y = require('lodash');\"}}",
+      "expected_output": "ALL DEPENDENCIES USED"
+    }
+  ],
+  "python": "import sys, json, re\n\ndef main():\n    data = sys.stdin.read()\n    obj = json.loads(data)\n    deps = obj.get('dependencies', {})\n    files = obj.get('files', {})\n    \n    # Collect imported packages from .js and .ts files\n    imported = set()\n    req_re = re.compile(r'''require\\s*\\(\\s*['\"]([^'\"]+)['\"]\\s*\\)''')\n    imp_re = re.compile(r'''import\\s+(?:[^'\"`;]+\\s+from\\s+)?['\"]([^'\"]+)['\"]''')\n    imp_side = re.compile(r'''import\\s+['\"]([^'\"]+)['\"]''')\n    \n    for path, content in files.items():\n        if not (path.endswith('.js') or path.endswith('.ts')):\n            continue\n        for m in req_re.finditer(content):\n            imported.add(m.group(1))\n        for m in imp_re.finditer(content):\n            imported.add(m.group(1))\n        for m in imp_side.finditer(content):\n            imported.add(m.group(1))\n    \n    def normalize(pkg):\n        # Strip scope per spec: 'Ignore scoped package scope (@org) in check'\n        if pkg.startswith('@'):\n            parts = pkg.split('/', 1)\n            if len(parts) == 2:\n                return parts[1]\n            return pkg\n        return pkg\n    \n    # For each dep, check if any imported string prefix-matches\n    unused = []\n    for dep in deps:\n        dep_norm = normalize(dep)\n        found = False\n        for imp in imported:\n            imp_norm = normalize(imp)\n            # Prefix match: imp_norm == dep_norm or starts with dep_norm + '/'\n            if imp_norm == dep_norm or imp_norm.startswith(dep_norm + '/'):\n                found = True\n                break\n        if not found:\n            unused.append(dep)\n    \n    if not unused:\n        print('ALL DEPENDENCIES USED')\n    else:\n        for u in sorted(unused):\n            print(f'UNUSED: {u}')\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:27.488341+00:00"
+}

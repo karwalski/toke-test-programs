@@ -1,0 +1,1 @@
+m=extractvars;f=solve(p0:$str):@$str{let result=mut.@();let s=p0;let n=s.len;let i=mut.0;lp(let idx=0;idx<n;idx=idx+1){let ch=s.get(idx);if(ch="$"){let j=mut.idx+1;lp(let k=j;k<n;k=k+1){let c=s.get(k);if(c=";"){j=k+1;};};let varname=s.slice(j;idx);result=result+@(varname);};};<result};

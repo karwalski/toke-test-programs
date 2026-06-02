@@ -1,0 +1,1 @@
+m=derive;f=derive(path:$str;n:$i64):@$str{let parts=path.split("/");let account=parts.get(3);let chain=parts.get(4);let base=account+"/"+chain+"/0/0/";let result=mut.@();lp(let i=0;i<n;i=i+1){let idx=i as$str;let addr=base+idx;result=result+@(addr);};<result};

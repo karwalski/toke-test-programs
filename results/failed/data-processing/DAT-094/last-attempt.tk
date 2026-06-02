@@ -1,0 +1,1 @@
+m=phone;f=stripnonnumeric(s:$str):$str{let r=mut."";let n=s.len;lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c>47){if(c<58){r=r+c}}}};<r};f=extractcountrycode(s:$str):$str{let n=s.len;if(n<3){<""};let c=s.get(0);if(c>49){if(c<58){<c}}};f=extractareacode(s:$str):$str{let n=s.len;if(n<6){<""};let c=s.get(3);if(c>47){if(c<58){<c}}};f=formatnumber(s:$str):$str{let n=s.len;let r=mut.""

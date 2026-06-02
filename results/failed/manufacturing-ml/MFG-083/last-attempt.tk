@@ -1,0 +1,1 @@
+m=expprofit;f=profit(x:$i64):$i64{if(x<0){<0};<x*2-100};f=expdecay(x:$i64):$i64{let y=mut.1000;lp(let i=0;i<x;i=i+1){y=y/2};<y};f=combined(x:$i64):$i64{let p=profit(x);let d=expdecay(x);let r=mut.0;if(p>0){r=d+p}el{r=d};<r};f=main():$i64{<combined(5)};

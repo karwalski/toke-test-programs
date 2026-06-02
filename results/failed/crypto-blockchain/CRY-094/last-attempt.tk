@@ -1,0 +1,1 @@
+m=liquidity;f=mintlp(pool:$i64;deposit:$i64):$i64{let total=pool+deposit;let lp=total;let result=lp;<result};f=safemint(pool:$i64;deposit:$i64):$i64{if(pool<0){<0};if(deposit<0){<0};<mintlp(pool;deposit)};

@@ -1,0 +1,1 @@
+m=balloon;f=balloonpayment(principal:$f64;rate:$f64;months:$i64):$f64{let monthlyrate=rate/12.0;let payment=mut.0.0;lp(let i=0;i<months;i=i+1){let interest=principal*monthlyrate;let principalpart=payment-interest;if(!(i<months-1)){payment=principal};};<payment};f=main():$i64{let p=10000.0;let r=5.0;let m=12;let result=balloonpayment(p;r;m);<0};

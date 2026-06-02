@@ -1,0 +1,1 @@
+m=abtest;f=runtest(aconv:$i64;atotal:$i64;bconv:$i64;btotal:$i64):$str{let arate=aconv as$f64/atotal as$f64;let brate=bconv as$f64/btotal as$f64;let diff=arate-brate;let z=diff/0.01;let p=1.0-0.5*exp(-z*z/2.0);let result=mut."";if(p<0.05){result="significant";}el{result="not significant";};<result};

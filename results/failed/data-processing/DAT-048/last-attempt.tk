@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^\\+?[0-9]{1,15}$"
+    },
+    "address": {
+      "type": "string"
+    },
+    "zip": {
+      "type": "string",
+      "pattern": "^[0-9]{5}(-[0-9]{4})?)?$"
+    },
+    "country": {
+      "type": "string"
+    },
+    "gender": {
+      "type": "string",
+      "enum": ["male", "female", "other"]
+    },
+    "maritalstatus": {
+      "type": "string",
+      "enum": ["single", "married", "divorced", "widowed"]
+    },
+    "children

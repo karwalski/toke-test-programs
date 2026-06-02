@@ -1,0 +1,219 @@
+[
+  {
+    "spec_challenge": "The expected output is not a valid 6x10 pentomino tiling. The first row 'XXXXUUUVVV' has 10 characters but the X pentomino does not have 4 cells in a row (X is a plus-sign shape with 5 cells). Subsequent rows have only 9 characters ('FFNNNTWWY' = 9, etc.), so the board is not 6x10. Also, letters 'B' and 'C' appear, which are not among the standard 12 pentominoes (F I L N P T U V W X Y Z). The expected output is therefore inconsistent with both the spec and the rules of pentomino tiling, making it impossible to produce deterministically from a valid solver.",
+    "suggested_amendment": "Either (1) provide a genuinely valid 6x10 pentomino tiling as the expected output using only the 12 standard letters F I L N P T U V W X Y Z with each row exactly 10 characters, or (2) specify which non-standard pieces 'B' and 'C' represent and provide a consistent, geometrically valid expected tiling. Alternatively, accept any valid tiling by validating the output programmatically rather than requiring an exact string match.",
+    "id": "GAM-119",
+    "category": "games",
+    "raised_at": "2026-05-31T04:21:04.903917+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs in the test cases are literal placeholder strings ('base64', 'hex', 'hex') rather than actual computed values. AES-256-GCM with a random nonce produces non-deterministic ciphertext/tag/nonce, so no implementation can match the literal placeholders. Additionally, the spec mandates a random nonce per message, which is inherently non-deterministic.",
+    "suggested_amendment": "Either (1) specify a deterministic nonce derivation (e.g., HKDF from key+AD+plaintext) and provide exact expected ciphertext/nonce/tag hex values for each test, or (2) change the test harness to validate the JSON structure and verify decryption correctness rather than requiring exact string matches.",
+    "id": "MSG-033",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:23:08.971669+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 has an expected stdout literally containing the placeholder text '(Q rows)\\n\\n(R rows with R upper triangular)' instead of actual numeric values. This is not a concrete expected output \u2014 it's a description. The current code produces a correct, well-formatted QR decomposition (Q orthonormal, R upper triangular with positive diagonal), but no implementation can match the literal placeholder string. Test 2 has concrete expected output and the current code already satisfies it.",
+    "suggested_amendment": "Replace Test 1's expected stdout with the actual numeric QR decomposition values, e.g. '0.894427 -0.447214\\n0.447214 0.894427\\n\\n13.416408 29.068884\\n0.000000 172.177234', or specify the check as a tolerance-based validator that verifies Q^T Q = I and R upper-triangular with positive diagonal and Q*R = A, rather than exact string match.",
+    "id": "SCI-013",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:23:19.453639+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 expected output 'Found at positions: 1 4 7' is mathematically wrong. Pattern 'ABC' in text 'AABCAABCABC' (indices 0-10) occurs at positions 1 (ABC), 5 (ABC), and 8 (ABC), not 1, 4, 7. Position 4 is 'AABC' starting char 'A' followed by 'A', not 'ABC'. Additionally, 'Comparisons: N' uses literal 'N' rather than an integer, which contradicts the spec asking to count comparisons. Both test cases have these inconsistencies.",
+    "suggested_amendment": "Fix expected outputs: Test 1 should be 'Found at positions: 1 5 8\\nComparisons: <actual_count>' and Test 2 should be 'NOT FOUND\\nComparisons: <actual_count>'. Either specify a deterministic comparison-counting rule and provide correct integer counts, or remove the comparisons line from the output format.",
+    "id": "SCI-034",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:23:29.710522+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are literal placeholder strings like '(current username)' and '(current PATH value)' rather than the actual environment variable values. No deterministic stdlib implementation can produce those literal strings when expanding ${USER} or $PATH, since real expansion yields the actual env var contents (e.g. 'matthew.watt', '/usr/bin:...').",
+    "suggested_amendment": "Either (1) change the expected outputs to the actual expanded values for the test environment (e.g. 'Hello ' + os.environ['USER']), or (2) provide explicit env var values in the test input/setup and use those known values in expected output, e.g. set USER=alice in test harness and expect 'Hello alice'.",
+    "id": "SYS-034",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:24:28.730624+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are placeholder descriptions ('(running containers or No containers found)') rather than concrete strings, making them impossible to match exactly. Additionally, the task requires invoking the Docker CLI and querying live container state, which is non-deterministic and depends on the host environment (Docker may not be installed in the test sandbox at all).",
+    "suggested_amendment": "Either (1) redefine the test to accept any output that is either the literal 'No containers found' or one-or-more lines matching the format 'NAME IMAGE STATUS PORTS CPU% MEM_MB' (i.e. validate by regex rather than exact string match), or (2) supply mock 'docker' output via stdin / a fixture file so the program's behavior is deterministic and reproducible without a real Docker daemon.",
+    "id": "SYS-105",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:24:34.607774+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs (47 rounds for seed 42, 31 rounds for seed 7) depend on an unspecified exact simulation of War: shuffle algorithm details (random.shuffle vs others), deck representation/ordering before shuffle, card-dealing strategy (alternating vs split-half), order in which won cards are appended (winner's then loser's? card1 then card2?), number of face-down cards in a war (commonly 3, sometimes 1), tie-break rules for repeated war ties, and what counts as a 'round'. There is no canonical specification; without knowing the exact reference algorithm that produced 47/31, the outputs cannot be reproduced reliably.",
+    "suggested_amendment": "Pin down the simulation precisely: (1) initial deck order (e.g., suits S,H,D,C and ranks 2..A), (2) shuffle method (random.seed(seed); random.shuffle(deck)), (3) dealing method (first 26 to P1, next 26 to P2), (4) round mechanics including append order (e.g., winner appends card1 then card2 to bottom of their pile), (5) war rules (number of face-down cards, behavior on insufficient cards, behavior on repeated ties), and (6) definition of 'round' (does a war count as 1 round or multiple). Provide a reference implementation alongside the spec.",
+    "id": "GAM-003",
+    "category": "games",
+    "raised_at": "2026-05-31T04:20:15.660547+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs contain literal placeholder strings ('hex', 'hex', 'base64') rather than actual encrypted values. Since salt and nonce must be random 16-byte and 12-byte values respectively, and encrypted_data is derived from them, the actual output can never equal these placeholder strings. The tests appear to be schema/template descriptions rather than concrete expected outputs.",
+    "suggested_amendment": "Change test validation to parse the output as JSON and verify: (1) 'salt' is a valid 32-char hex string, (2) 'nonce' is a valid hex string, (3) 'encrypted_data' is valid base64, (4) 'key_params' matches the expected object exactly. Alternatively, allow a fixed seed/salt/nonce to be supplied via input so outputs are deterministic.",
+    "id": "MSG-044",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:26:25.598922+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects the literal string 'Comparisons: N' instead of an actual count, while Test 2 expects 'Comparisons: 1'. Test 1's expected output is inconsistent \u2014 it appears the placeholder 'N' was never replaced with the actual expected comparison count (which is 10 for input '5 3 8 1 9 2'). The two test cases are mutually contradictory regarding the Comparisons line format.",
+    "suggested_amendment": "Update Test 1's expected output to 'Sorted: 1 2 3 5 8 9\\nMerge depth: 3\\nComparisons: 10' so both tests consistently expect the actual integer comparison count.",
+    "id": "SCI-027",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:31.610155+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs literally contain the placeholder strings '(divided diff table)' and '(table)' instead of the actual numerical divided difference table. The spec text says 'Show divided difference table' but the test cases expect the literal placeholder text, making the requirement contradictory. Additionally test 1 expects p(3)=27 for points (1,1),(2,8),(4,64) which fit y=x^3 exactly giving 27, but test 2 expects p(1)=5 for points (0,1),(2,9) which is linear y=1+4x giving 5 \u2014 these are computable, but the table format is undefined.",
+    "suggested_amendment": "Either (a) specify the exact format of the divided difference table in the output and update test cases to include actual numbers, or (b) explicitly state that the literal string '(divided diff table)' / '(table)' should be printed as a placeholder header before the query results.",
+    "id": "SCI-067",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:49.369511+00:00"
+  },
+  {
+    "spec_challenge": "The test cases have placeholder/non-deterministic expected outputs ('X.XXXX', 'X.XX', '...') that cannot be matched by any deterministic program. Additionally, Test 1 expects route '0 1 2 3 4 0' which contradicts the spec's instruction to 'try all start nodes, report best' \u2014 if all start nodes are tried, the output route may not begin with the user-supplied start node 0, and even starting from 0 the nearest-neighbour route is '0 1 2 4 3 0' or '0 4 1 2 3 0' depending on tie-breaking, not '0 1 2 3 4 0'. Furthermore, the spec says the third line should be 'Approximation ratio vs lower bound: X.XX' but Test 1's expected output uses 'Approximation ratio: X.XX'.",
+    "suggested_amendment": "Replace placeholders in test cases with exact numeric values, clarify whether output route must start at the user-supplied start node or the best-found start node, specify tie-breaking rules for nearest neighbour, define the MST lower bound precisely (e.g. Prim's algorithm on complete Euclidean graph), and fix the inconsistent label ('Approximation ratio' vs 'Approximation ratio vs lower bound').",
+    "id": "SCI-081",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:56.778891+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs contain literal 'N' placeholders rather than actual numeric values, making it impossible to produce matching output deterministically. Test 1 expects exactly 'System: total=N free=N used=N' with the letter N, not real memory values. Additionally, memory values depend on the host system at runtime and cannot be predicted by the test harness.",
+    "suggested_amendment": "Either (1) specify the test harness uses regex/pattern matching where 'N' means 'any number', or (2) mock the memory sources (e.g., provide /proc/meminfo content via stdin) so outputs are deterministic. Also clarify exact formatting (integer vs 2dp float, since spec says rounded to 2dp but example shows 'N').",
+    "id": "SYS-040",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:28:31.529642+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs require producing one specific canonical expression among many valid solutions. For '4 1 8 7', many expressions evaluate to 24 (e.g., '(4*(1+7))-8' = 24, '(8-4)*(7-1)' = 24), but the test demands exactly '(8 - 4) * (7 - 1)'. Without a specified canonical form / tie-breaking rule (operand order preference, parenthesization shape, operator priority), the solver cannot deterministically pick the expected string.",
+    "suggested_amendment": "Either (1) accept any valid expression by validating the output expression evaluates to 24 and uses each input number exactly once, or (2) specify a deterministic canonical form (e.g., lexicographically smallest expression, or a specific search order over permutations/operators/parenthesizations) so a unique expected string is well-defined.",
+    "id": "GAM-022",
+    "category": "games",
+    "raised_at": "2026-05-31T04:20:59.347392+00:00"
+  },
+  {
+    "spec_challenge": "Monte Carlo results depend on the exact RNG algorithm, seeding strategy, shuffle implementation, and order of dealing. The expected outputs (82.51%/0.46%/17.03% and 64.73%/0.51%/34.76%) correspond to a specific unspecified implementation. Without specifying the exact PRNG (e.g. Python's random.Random with a specified shuffle ordering and card encoding), it is impossible to reproduce these bit-exact percentages. The reference implementation produces 81.78%/0.54%/17.68% which is statistically consistent with the true equity but not bit-identical to the expected output.",
+    "suggested_amendment": "Either (a) specify the exact RNG procedure (e.g. 'use Python's random.Random(seed); represent the deck in a canonical order RANK x SUIT; for each trial draw needed cards via random.sample from the remaining deck in a specified order'), or (b) allow tolerance of +/- 1% on each percentage, or (c) replace Monte Carlo with exact enumeration over remaining community combinations so the output is deterministic and implementation-independent.",
+    "id": "GAM-064",
+    "category": "games",
+    "raised_at": "2026-05-31T04:22:15.743851+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs are literal placeholder strings ('hex_share_1', etc.) rather than actual Shamir Secret Sharing shares. No deterministic algorithm using GF(256) Shamir's Secret Sharing can produce literal strings like 'hex_share_1' as share output. The test cases appear to be unfilled placeholder templates rather than real expected values.",
+    "suggested_amendment": "Either (1) replace the placeholder expected outputs with actual computed hex shares using a deterministic seed (e.g., specify that random coefficients must be derived deterministically from the secret via a documented PRNG), or (2) change the spec to literally output placeholder strings 'hex_share_i' for share i, with the final line stating 'reconstruction requires any K of N shares'.",
+    "id": "MSG-083",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:27:00.245069+00:00"
+  },
+  {
+    "spec_challenge": "Expected output literally contains 'Comparisons: N' where N appears to be a placeholder, not an actual number. Both test cases expect the literal string 'N' as the comparison count, which is inconsistent with the spec's request to count comparisons during heapsort. Hardcoding 'N' would match tests but contradicts the spec's intent.",
+    "suggested_amendment": "Replace 'N' in expected outputs with actual comparison counts (e.g., 15 for test 1, 1 for test 2), or change the output format to omit the comparisons line, or clarify that 'N' is a literal string placeholder.",
+    "id": "SCI-029",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:20.934389+00:00"
+  },
+  {
+    "spec_challenge": "Test case expected outputs contain literal descriptive placeholders like '(iterations converging to 1.414214)' and 'Root: 1.414214 (N iterations)' with literal 'N' instead of a numeric iteration count. These are not concrete expected outputs \u2014 they are human-readable descriptions. The actual program output (which is correct Newton-Raphson behavior matching the spec's stated format 'Iteration N: x=X.XXXXXX f(x)=X.XXXXXX') can never equal these placeholder strings via byte comparison.",
+    "suggested_amendment": "Replace test expected outputs with the exact concrete strings the iteration should produce. For test 1, expected stdout should be the full iteration trace ending in 'Root: 1.414214 (5 iterations)'; for test 2, the full trace ending with the actual iteration count. Alternatively, change the test harness to use a regex/substring match for 'Root: <value> (<int> iterations)' and verify convergence to the target value within tolerance.",
+    "id": "SCI-043",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:27.299217+00:00"
+  },
+  {
+    "spec_challenge": "Test case 1 has coefficients '4 -4 1' interpreted as a polynomial, but the expected minimum is x=2.000000 f(x)=0.000000. If coeffs are descending (4x^2-4x+1=(2x-1)^2), minimum is at x=0.5. If ascending (4-4x+x^2=(x-2)^2), minimum is at x=2. The spec doesn't specify coefficient ordering. Additionally, expected stdout literally contains the placeholder text '(iterations)' rather than actual iteration lines, making exact-match comparison impossible.",
+    "suggested_amendment": "Specify coefficient ordering (e.g., 'ascending powers: c0 + c1*x + c2*x^2 + ...') and provide concrete expected iteration output lines rather than placeholder text like '(iterations)'.",
+    "id": "SCI-069",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:27:32.658784+00:00"
+  },
+  {
+    "spec_challenge": "Test 1 expects the literal placeholder string '(files with ages, STALE if > 24h)' as stdout, but this is a description, not actual expected output. Real output depends on the live contents and mtimes of /tmp on the test machine, which are non-deterministic and unknowable in advance. No program can produce both that literal placeholder for /tmp and the concrete error message for /nonexistent.",
+    "suggested_amendment": "Replace Test 1 with a deterministic fixture: either create a temp directory with known files and mtimes as part of the test harness setup, or change the expected output to a regex/structural matcher (e.g. lines matching '^<path>: \\d+d \\d+h \\d+m( \\[STALE\\])?$'). Also clarify the exact age format ('Xd Xh Xm' per spec vs. the abbreviated form), and clarify error-output channel (stdout vs stderr) and exit code on missing directory.",
+    "id": "SYS-044",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:28:09.544340+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs depend on a specific dice-roll sequence that cannot be reproduced from Python's random.seed() with standard randint calls. For seed=42, the expected rolls are [6,5,3,5,4,4,3,2,3,1], but Python's random module with seed(42) produces a different sequence regardless of how dice are batched. The spec does not define the exact PRNG algorithm/order required to generate these specific values.",
+    "suggested_amendment": "Specify the exact dice generation algorithm (e.g., 'use a linear congruential generator with parameters X' or provide the explicit roll sequence per seed), or change the expected outputs to match Python's random.seed()+randint(1,6) sequence.",
+    "id": "GAM-126",
+    "category": "games",
+    "raised_at": "2026-05-31T04:21:44.193013+00:00"
+  },
+  {
+    "spec_challenge": "Expected outputs in test cases use placeholder strings like '(iterations)' and 'Eigenvector: ...' rather than concrete expected text. Test 1 does not specify the exact eigenvector values and Test 2's iteration lines are unspecified, so exact-match testing cannot succeed deterministically.",
+    "suggested_amendment": "Provide the exact expected stdout for each test case, including the precise iteration lines (or specify they are ignored), and the exact final eigenvector formatting (e.g. for test 1: '0.525731 0.850651' with a defined precision). Alternatively, define a tolerance-based comparison mode in the harness.",
+    "id": "SCI-072",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:24:52.287702+00:00"
+  },
+  {
+    "spec_challenge": "The spec says keys must be in same order as header (name,age), but expected output orders them alphabetically (age,name). These requirements are contradictory.",
+    "suggested_amendment": "Either change expected output to '[{\"name\":\"alice\",\"age\":\"30\"},{\"name\":\"bob\",\"age\":\"25\"}]' to match header order, or change constraint to require keys sorted alphabetically (use json.dumps(..., sort_keys=True)).",
+    "id": "SYS-066",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:26:09.894854+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases contain literal placeholder strings '<sha256 of block content>' and '<sha256>' instead of actual SHA-256 hash values. No deterministic implementation can produce those literal placeholders as hash output for arbitrary inputs while also being a real SHA-256 hash. The current code already produces the correct SHA-256 hash, but the test harness compares against unfilled placeholders.",
+    "suggested_amendment": "Replace the placeholder strings in the test cases with the actual expected SHA-256 hex digests. For Test 1 with content '02024-01-01T00:00:00ZGenesis Block0000000000000000000000000000000000000000000000000000000000000000', the expected hash is '7f1180d24eefa49123067f5fa473a81b90ecafd2cd01ba386296c7b32d633742'. For Test 2, compute SHA-256 of '12024-01-01T00:01:00ZSecond Blockabc123' and substitute the resulting hex digest. Alternatively, have the test harness treat '<sha256...>' as a wildcard matching any 64-char hex string.",
+    "id": "CRY-044",
+    "category": "crypto-blockchain",
+    "raised_at": "2026-05-31T04:19:08.865820+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs depend on a specific implementation of the diamond-square algorithm with a specific RNG sequence, traversal order, displacement initialization, and rounding strategy that is not specified. Test 2 even has size=3 which equals 2^1+1, yet the expected output shows asymmetric non-corner values (e.g. 145, 112, 115, 137) which cannot be reproduced without knowing the exact RNG call order and scaling factors used by the reference. Without the reference implementation details (initial displacement value, RNG type/seeding, iteration order, whether wrapping is used, rounding mode), the exact integer grids in the tests cannot be deterministically reproduced.",
+    "suggested_amendment": "Provide the exact reference algorithm pseudocode including: (1) which PRNG and how it is seeded, (2) initial corner values and initial displacement amplitude, (3) exact order of diamond and square steps and iteration order over cells, (4) how random samples are mapped to displacements, (5) rounding/clamping rule. Alternatively, relax tests to check statistical properties (range 0-255, corner equals 128, symmetry constraints) rather than exact integer values.",
+    "id": "GAM-130",
+    "category": "games",
+    "raised_at": "2026-05-31T04:20:59.469702+00:00"
+  },
+  {
+    "spec_challenge": "The expected output is mathematically inconsistent. The data points (temp, pressure, quality) are perfectly collinear: pressure = temp/2, and quality = temp - 15. The design matrix X^T X is singular, so OLS coefficients are not uniquely determined. The expected answer [0.33, 0.33] with intercept 35.0 implies quality \u2248 0.33*temp + 0.33*pressure + 35 = 0.33*temp + 0.33*(temp/2) + 35 = 0.495*temp + 35, which does not equal temp - 15 for the given data (e.g. at temp=100: 0.495*100+35 = 84.5, not 85). So neither does the model fit r_squared=1.0 exactly, nor is the OLS solution unique. Any deterministic OLS implementation will either fail (singular matrix) or return a different valid least-squares solution (such as [0.5, 0] or [1, 0]).",
+    "suggested_amendment": "Provide test data where the feature columns are linearly independent (non-collinear), so that the OLS normal equations have a unique solution. For example: 'temp,pressure,quality\\n100,50,85\\n110,60,92\\n120,55,95\\n130,70,103'. Alternatively, specify a tie-breaking rule (e.g. minimum-norm / pseudoinverse solution) and recompute the expected coefficients accordingly.",
+    "id": "MFG-022",
+    "category": "manufacturing-ml",
+    "raised_at": "2026-05-31T04:21:12.650313+00:00"
+  },
+  {
+    "spec_challenge": "Expected output values are mathematically inconsistent with the stated method. For the given input, Pearson correlation of temp vs defect_rate is exactly 1.0 (not 0.99), humidity is ~0.6708 (not 0.63), and speed is ~0.2582 (not 0.45). Additionally, the expected output is not sorted by |r| descending (speed at 0.45 comes before humidity at 0.63), contradicting the 'correlations ranked' requirement. No deterministic standard formula reproduces these specific numbers.",
+    "suggested_amendment": "Either (a) update the expected test output to reflect actual Pearson correlations rounded to 2 decimals and sorted by |r| descending: [{\"variable\":\"temp\",\"r\":1.0},{\"variable\":\"humidity\",\"r\":0.67},{\"variable\":\"speed\",\"r\":0.26}], or (b) specify the exact correlation algorithm (e.g. Spearman, partial correlation) and sort order that produces the expected numbers.",
+    "id": "MFG-118",
+    "category": "manufacturing-ml",
+    "raised_at": "2026-05-31T04:24:00.073496+00:00"
+  },
+  {
+    "spec_challenge": "The test cases' expected outputs are literal placeholder strings ('alice_pub_hex', 'bob_pub_hex', 'shared_secret_hex', 'aes_key_hex') rather than the actual computed hex values from the ECDH key exchange. No deterministic ECDH implementation can produce these literal strings as output for the given private key inputs. The current code appears to correctly implement P-256 ECDH but is marked as failing because it produces real hex values instead of the placeholder strings.",
+    "suggested_amendment": "Replace the expected outputs in the test cases with the actual computed hex values. For Test 1 with Alice priv c9afa9d8...0f6721 and Bob priv 60fc7b12...6c821a, the expected output should be the actual uncompressed public keys, shared secret x-coordinate, and SHA-256 of that x-coordinate (which can be computed by a reference implementation like the cryptography library's P-256 ECDH). The placeholder strings appear to be template artifacts that were never replaced with real test vectors.",
+    "id": "MSG-006",
+    "category": "messaging",
+    "raised_at": "2026-05-31T04:24:13.472173+00:00"
+  },
+  {
+    "spec_challenge": "The spec requires making real HTTP POST requests to external GraphQL endpoints (e.g. https://countries.trevorblades.com and http://localhost:8136/graphql). The test sandbox has no network access, the localhost service does not exist, and external endpoints return varying responses (e.g. Cloudflare 403 blocks) that cannot be predicted. The expected output '{' is only the first character, suggesting any JSON output starting with '{' should pass, but actual responses depend on live network state which is non-deterministic and unavailable.",
+    "suggested_amendment": "Either (1) provide a mock HTTP server fixture / stub the network layer so responses are deterministic, (2) change the test harness to only verify the request is well-formed JSON with the correct Content-Type header rather than checking the response, or (3) allow the program to print a stub JSON object like '{}' when the network is unreachable so the first character is always '{'.",
+    "id": "NET-125",
+    "category": "networking-rest",
+    "raised_at": "2026-05-31T04:24:25.804107+00:00"
+  },
+  {
+    "spec_challenge": "Expected output literally contains 'Comparisons: N' where N appears to be a placeholder, not an actual number. The test cases require outputting the literal string 'N' rather than computing the comparison count, which contradicts the spec's intent of reporting the actual number of comparisons performed.",
+    "suggested_amendment": "Replace 'N' in the expected outputs with the actual comparison counts (e.g. 'Comparisons: 6' for test 1), or change the output format to omit the comparison count entirely.",
+    "id": "SCI-033",
+    "category": "scientific-math",
+    "raised_at": "2026-05-31T04:25:28.134032+00:00"
+  },
+  {
+    "spec_challenge": "The expected outputs in the test cases are literal placeholder strings ('(COPY/SKIP lines)', 'N copied', etc.) rather than concrete values. Without a defined filesystem state for /tmp/src and /tmp/dst, the actual COPY/SKIP/DELETE lines and counts cannot be deterministically produced to match a fixed expected string. The test harness appears to expect literal placeholder text, which no real directory-sync implementation would emit.",
+    "suggested_amendment": "Either (1) specify the exact contents of source and dest directories before each test and provide concrete expected outputs, or (2) have the harness set up a known filesystem fixture and validate output via a pattern/regex matcher (e.g., verifying line format and that counts are consistent) rather than exact string comparison.",
+    "id": "SYS-024",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:27:31.468778+00:00"
+  },
+  {
+    "spec_challenge": "Test cases specify expected outputs as descriptive placeholders ('(3 passwords of length 16 with mixed chars)') rather than concrete strings. Since the spec mandates cryptographically secure random generation, exact output cannot be deterministic or matched against a fixed string.",
+    "suggested_amendment": "Replace exact-string test expectations with property-based assertions (e.g., verify N lines of length L, each character from the requested charset). Alternatively, allow seeding the RNG via an input parameter for reproducible test outputs, while keeping secrets.SystemRandom as the default for production.",
+    "id": "SYS-103",
+    "category": "system-tools",
+    "raised_at": "2026-05-31T04:27:36.915464+00:00"
+  }
+]

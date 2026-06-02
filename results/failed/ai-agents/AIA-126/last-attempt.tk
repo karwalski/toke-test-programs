@@ -1,0 +1,1 @@
+m=goalbreak;f=breakgoal(g:$str;maxwords:$i64):$str{let words=g.split(" ");let result=mut."";let current=mut.0;lp(let i=0;i<words.len;i=i+1){let w=words.get(i);if(current<w.len as i64){result=w;current=w.len as i64;if(current>maxwords){<result};};};<result};f=main():$void{let g="write a program that uses string manipulation";let b=breakgoal(g;5);<b};

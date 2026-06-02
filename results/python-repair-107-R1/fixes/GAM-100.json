@@ -1,0 +1,22 @@
+{
+  "id": "GAM-100",
+  "category": "games",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "42",
+      "expected_output": "D....CCCCC\nD..B......\nD..B......\n...B...P..\n...B...P..\n..........\n..........\n..........\n...SSS....\n.........."
+    },
+    {
+      "input": "1",
+      "expected_output": ".......B..\n.......B..\n.......B..\n.......B..\n..........\n..........\n......SSS.\n....PPD...\n......D...\nCCCCC.D..."
+    },
+    {
+      "input": "12345",
+      "expected_output": "..........\n..........\n..........\n..........\n......DDD.\nCSSS......\nC....B....\nC....B....\nC....B....\nC....B..PP"
+    }
+  ],
+  "python": "import sys, random\n\ndef main():\n    seed = int(sys.stdin.read().strip())\n    rng = random.Random(seed)\n    ships = [('C',5),('B',4),('D',3),('S',3),('P',2)]\n    grid = [['.']*10 for _ in range(10)]\n    for letter, size in ships:\n        while True:\n            orient = rng.choice(['H','V'])\n            if orient == 'H':\n                r = rng.randint(0,9)\n                c = rng.randint(0,10-size)\n                if all(grid[r][c+i]=='.' for i in range(size)):\n                    for i in range(size):\n                        grid[r][c+i] = letter\n                    break\n            else:\n                r = rng.randint(0,10-size)\n                c = rng.randint(0,9)\n                if all(grid[r+i][c]=='.' for i in range(size)):\n                    for i in range(size):\n                        grid[r+i][c] = letter\n                    break\n    print('\\n'.join(''.join(row) for row in grid))\n\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:41:21.932297+00:00"
+}

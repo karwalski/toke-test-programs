@@ -1,0 +1,1 @@
+m=encrypt;f=solve(p0:$str;p1:$str):$str{let msg=p0;let key=p1;let msglen=msg.len;let keylen=key.len;let msgint=mut.0;let keyint=mut.0;lp(let i=0;i<msglen;i=i+1){let ch=msg.get(i);let chint=ch as i64;msgint=msgint+chint;};lp(let i=0;i<keylen;i=i+1){let ch=key.get(i);let chint=ch as i64;keyint=keyint+chint;};let result

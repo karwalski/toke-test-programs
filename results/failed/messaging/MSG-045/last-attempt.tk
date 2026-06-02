@@ -1,0 +1,1 @@
+m=backuprestore;f=restore(data:$str;backup:$str):$str{let b=mut.backup;let d=mut.data;let len=mut.b.len;let i=mut.0;lp(let idx=0;idx<len;idx=idx+1){let ch=b.get(idx);if(ch="$"){let j=mut.idx+1;lp(let k=j;k<len;k=k+1){let c=b.get(k);if(c="$"){let tmp=b.sub(j;k);d=d+tmp;j=k+1;k=len;};};};};<d};

@@ -1,0 +1,1 @@
+m=conn;f=solve(p0:$str;p1:$str):$str{let num1=mut.0;let num2=mut.0;let len1=p0.len;let len2=p1.len;lp(let i=0;i<len1;i=i+1){let c=p0.get(i);if(c="a"){num1=num1+1};};lp(let i=0;i<len2;i=i+1){let c=p1.get(i);if(c="a"){num2=num2+1};};let ratio1=num1 as$f64/len1 as$f64;let ratio2=num2 as$f64/len2 as$f64;let avg=(ratio1+ratio2)/2.0;let result=mut.""

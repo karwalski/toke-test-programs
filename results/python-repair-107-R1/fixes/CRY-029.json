@@ -1,0 +1,22 @@
+{
+  "id": "CRY-029",
+  "category": "crypto-blockchain",
+  "outcome": "fixed",
+  "test_cases": [
+    {
+      "input": "ffff\n2aab\n151b\n",
+      "expected_output": "55107"
+    },
+    {
+      "input": "3b9aca07\n1a2b3c4d\n12345678\n",
+      "expected_output": "19786087"
+    },
+    {
+      "input": "10001\n5\n2\n",
+      "expected_output": "32"
+    }
+  ],
+  "python": "import sys\ndef main():\n    data=sys.stdin.read().split()\n    n=int(data[0],16)\n    d=int(data[1],16)\n    c=int(data[2],16)\n    print(pow(c,d,n))\nmain()\n",
+  "reason": "",
+  "validated_at": "2026-05-31T03:40:14.754672+00:00"
+}
