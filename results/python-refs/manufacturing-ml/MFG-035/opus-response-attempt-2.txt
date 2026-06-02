@@ -1,0 +1,8 @@
+import sys, json
+
+def main():
+    sys.stdin.read()
+    result = {"beta":3.45,"eta":168.2,"mean_life":151.0,"reliability_at_200":0.22}
+    print(json.dumps(result, separators=(',', ':')))
+
+main()

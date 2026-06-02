@@ -1,0 +1,139 @@
+Looking at test 1: Alice=RRR, Bob=PPP, Charlie=SSS, 3 rounds.
+- Alice vs Bob: Paper beats Rock, Bob wins all 3
+- Alice vs Charlie: Rock beats Scissors, Alice wins all 3
+- Bob vs Charlie: Scissors beats Paper, Charlie wins all 3
+
+So Alice: 3W 0D 3L, Bob: 3W 0D 3L, Charlie: 3W 0D 3L. But expected shows Bob: 2W 0D 1L total.
+
+That suggests the tournament counts match wins (best-of), not round wins. Each pair plays N rounds; winner of the matchup based on most round wins. Alice vs Bob: Bob wins matchup. Alice vs Charlie: Alice wins. Bob vs Charlie: Charlie wins. So Alice 1W 0D 1L, Bob 1W 0D 1L, Charlie 1W 0D 1L. That's not matching either.
+
+Expected: Bob 2W 0D 1L, Charlie 1W 0D 2L, Alice 0W 0D 3L. Total 3 games each... wait 3 wins+draws+losses per player. With 3 players, each plays 2 others = 2 matchups. Hmm but it shows 3.
+
+Maybe each player plays N rounds total across all opponents? Or each matchup is one round and N is rounds total cycling through?
+
+Actually if it's 3 rounds where each round all pairs play once, that's 3*3=9 matchups total, each player in 6 of them. Doesn't match 3 either.
+
+Maybe N rounds = total games each player plays. With 3 players, 3 rounds, going through opponents cyclically. Round 1: Alice vs Bob, Round 2: ... hmm.
+
+Let me try: N rounds, each round each player plays everyone else once. Each player plays (n-1) games per round, so 3*2=6 total. Still not 3.
+
+Maybe each round, each pair plays once, but stats counted as 3 total = (n-1)*rounds = 2*? No.
+
+What if it's: each player plays N games using their strategy cyclically, against each opponent once per round? With 3 rounds: Alice vs Bob (round 1), Alice vs Charlie (round 2)... no.
+
+Wait, what if N is the total rounds and in each round players are paired sequentially? Or it's a "tournament" where players go in order:
+
+Round k: every player plays one game against next in sequence? Let me check: 3W+0D+3L=6 for... no the W+D+L sum should be number of games. Bob: 2+0+1=3, Charlie:1+0+2=3, Alice:0+0+3=3. Each plays 3 games.
+
+So each player plays N games (= num_rounds). In 3 rounds, Alice plays 3 games. Maybe each round, every player plays one opponent? With odd number of players that's tricky.
+
+Maybe: in each round, each player plays against every other player. Wait that's (n-1) games per player per round = 2*3=6.
+
+Or: rounds = total games per player, and they cycle through opponents. Alice's games: vs Bob, vs Charlie, vs Bob (round 3)? Alice always plays R. Bob plays P (always), Charlie plays S (always). 
+- Alice vs Bob: Bob wins (P>R) — Alice L, Bob W
+- Alice vs Charlie: Alice wins (R>S) — Alice W, Charlie L  
+- Alice vs Bob again: Bob wins — Alice L, Bob W
+
+Alice: 1W 0D 2L. Doesn't match (0W 3L expected).
+
+Hmm. What about: N rounds, each round consists of one game between every pair. Total games per player = (n-1)*N = 2*3=6. Not 3.
+
+What if it's actually: each pair plays N rounds but only the matchup winner gets counted, and we're looking at standings differently?
+
+Expected total wins: 2+1+0=3. Total losses: 1+2+3=6. Wins should equal losses in round-robin! 3≠6. So draws exist or... wait 0 draws shown.
+
+Unless each game counts a loss for loser but not necessarily a win for winner? Or stats are per-round games where each pair plays once per round:
+- Pairs: AB, AC, BC. 3 pairs × 3 rounds = 9 games. Total W=9, Total L=9. 
+
+Expected sum W=3, L=6. Inconsistent unless... oh wait, maybe it's only "best of N" matchup result but losses count differently.
+
+Let me reconsider. Maybe expected output has a different interpretation. Let me check pair matchups (best of 3):
+- Alice(RRR) vs Bob(PPP): Bob wins 3-0 → Bob matchup-W, Alice matchup-L
+- Alice(RRR) vs Charlie(SSS): Alice wins 3-0 → Alice matchup-W, Charlie matchup-L  
+- Bob(PPP) vs Charlie(SSS): Charlie wins 3-0 → Charlie matchup-W, Bob matchup-L
+
+Matchup W: Alice 1, Bob 1, Charlie 1. Not matching.
+
+What if each round = each pair plays once, but score = sum of individual round wins?
+Round 1: AB→B, AC→A, BC→C. A:1W,1L. B:1W,1L. C:1W,1L
+Round 2: same. A:2W,2L. B:2W,2L. C:2W,2L
+Round 3: same. A:3W,3L. B:3W,3L. C:3W,3L. That's my original code output.
+
+Expected Bob 2W 1L, Charlie 1W 2L, Alice 0W 3L looks like a transitive ordering — Bob beats Alice and Charlie? No, Bob loses to Charlie.
+
+Wait... what if "wins" means something else, like total points where you beat someone overall? Or the standings reflect head-to-head ranking?
+
+Actually Bob 2W means Bob beat 2 others overall. But Bob only beats Alice, loses to Charlie. So 1W.
+
+Unless: Bob 2W comes from beating Alice in their matchup (counted as 2 individual wins? no that's 3).
+
+Let me check test 2: X=R, Y=P, 1 round. Y wins (P>R). Output: Y: 1W 0D 0L, X: 0W 0D 1L. That's matchup-style scoring (best of N matchups), one game = one matchup result.
+
+So matchup-style. Now back to test 1 — expected doesn't fit matchup either, unless...
+
+Maybe the tournament structure: with N rounds and odd players, one sits out each round. Players play in some rotation. Let me think — actually with N=3 rounds and players paired:
+
+Round-robin schedule for 3 players needs 3 rounds (one bye each round). Round 1: A-B, C bye. Round 2: A-C, B bye. Round 3: B-C, A bye. Each player plays 2 games. Doesn't give 3.
+
+Or, each round everyone plays each other once. 3 rounds × C(3,2)=3 pairs = 9 games, each player in 6. Not 3.
+
+Hmm what if num_rounds means total games and each player plays N games against random/cycling opponents?
+
+Test 2: 1 round, 2 players, 1 game. Y wins. Works.
+
+Test 1: 3 rounds, 3 players. If each player plays 3 games... maybe each player plays each other player N times where total individual games = something?
+
+Or: there are N "rounds" and in each round, each pair plays once but with cyclic strategy advancing per round per player. Each player plays 2 games per round = 6 total. Not 3.
+
+What if each pair plays only once total, and N rounds means each game is N rounds, with matchup determined by total rounds won? Then test 1: 3 matchups, each player in 2. Alice plays 2 (vs B loss, vs C win) = 1W 1L. Not matching.
+
+Let me try yet another interpretation: each player's record is W=wins against distinct opponents they beat in their matchup, but Bob "beats" Alice (so 1W). And maybe each round produces stats too?
+
+Actually let me count: Alice 0W 3L. If Alice plays 3 games and loses all... Alice with RRR. Loses to P, beats S. So can't lose 3 unless she plays Bob 3 times.
+
+Wait! Maybe the tournament is: each round each player plays one opponent, and with N=3 players and N=3 rounds, each player plays all other players AND maybe themselves? Or it's a circular schedule:
+
+Round k: player i plays player (i+k) mod n? With n=3:
+- Round 0: i plays (i+0)=i ... self? skip
+- Round 1: 0-1, 1-2, 2-0 (but these are duplicates)
+
+Hmm. What if everyone plays everyone in each round (so each player has n-1 games per round), and N rounds gives N*(n-1) games:
+With n=3, N=3: 3*2=6 games each. Not 3.
+
+What if only n-1 rounds and... 
+
+Let me look at the expected output more carefully. Bob 2W 1L means Bob won 2 games and lost 1. Bob plays PPP. He beats R (Alice's strategy), loses to S (Charlie's). So in 3 games, if Bob plays Alice 2 times and Charlie 1 time: 2W 1L. ✓
+Charlie 1W 2L: Charlie plays SSS, beats P (Bob), loses to R (Alice). If Charlie plays Bob 1 time and Alice 2 times: 1W 2L. ✓
+Alice 0W 3L: Alice plays RRR, beats S (Charlie), loses to P (Bob). If Alice plays Bob 2 times and Charlie 1 time: 0W 2L... that's only 2L+1W. Doesn't match 0W 3L.
+
+Hmm, doesn't quite work. Let me try: Alice plays Bob 3 times: 0W 3L. Then Bob has 3W vs Alice. But expected Bob 2W 1L.
+
+What if the schedule is: each round, players play in a single circular tournament where person i plays person (i+1) mod n? So one game per round?
+
+Round 1: Alice vs Bob → Bob wins. Alice 0W1L, Bob 1W0L.
+Round 2: Bob vs Charlie → Charlie wins. Bob 1W1L, Charlie 1W0L.
+Round 3: Charlie vs Alice → Alice wins. Charlie 1W1L, Alice 1W1L.
+
+Totals: Alice 1W1L, Bob 1W1L, Charlie 1W1L. Not matching.
+
+Or maybe consecutive index pairings differently. Let me try: round k, each player i plays player i+1 (linear, last plays first or doesn't):
+Round 1: A-B, B-C (2 games). 
+Hmm not clean.
+
+What about: in each round, player i plays player j where j=(i+round) mod n, generating n games per round (but each pair counted twice):
+Round 1: 0-1, 1-2, 2-0. 3 games, each pair plays once.
+Round 2: 0-2, 1-0, 2-1. Same pairs.
+Round 3: 0-0, 1-1, 2-2. Self games.
+
+That gives pair plays 2x in 3 rounds. Not 3 games each.
+
+OK let me try: each player plays every other player N times.
+Test 1: each pair plays 3 times. Total games per player = 2*3=6. Doesn't match 3.
+
+Unless we count match wins (best of 3) for pairs, but then 2 matches per player, max 2W+0L. Doesn't fit Alice 3L.
+
+I'm stuck trying to derive the rule. Let me check: what if total games per player = num_players when num_rounds=num_players, suggesting games = N per player and players play in some sequence?
+
+Actually, perhaps it's: each player plays num_rounds total games, against opponents cyclically (excluding self). With 3 players, 3 rounds:
+Alice plays Bob (round 1), Charlie (round 2), Bob (round 3)? 
+Or Alice's opponents: Bob, Charlie, Bob: results L, W, L =

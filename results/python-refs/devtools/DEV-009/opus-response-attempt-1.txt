@@ -1,0 +1,36 @@
+import json
+import re
+import sys
+
+def main():
+    data = sys.stdin.read()
+    # Split only on first newline to preserve source code
+    if '\n' in data:
+        first_line, rest = data.split('\n', 1)
+    else:
+        first_line, rest = data, ''
+    
+    rules = json.loads(first_line)
+    source_lines = rest.split('\n') if rest else []
+    
+    violations = []
+    
+    for line_num, line in enumerate(source_lines, 1):
+        line_violations = []
+        for rule in rules:
+            rule_id = rule['id']
+            pattern = rule['pattern']
+            message = rule['message']
+            severity = rule['severity']
+            
+            if re.search(pattern, line):
+                line_violations.append((line_num, rule_id, severity, message))
+        
+        line_violations.sort(key=lambda x: (x[0], x[1]))
+        violations.extend(line_violations)
+    
+    for ln, rid, sev, msg in violations:
+        print(f"line {ln}: [{sev}] {rid} - {msg}")
+
+if __name__ == "__main__":
+    main()

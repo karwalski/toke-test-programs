@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "175: 1x100 3x25\n999: 9x100 3x25 2x10 4x1",
+  "stderr": "  File \"/tmp/tmp83eqh58g.py\", line 1\n    For 999: expected is 9x100 + 3x25 + 2x10 + 4x1 = 900+75+20+4 = 999. But available is 100:5. Expected uses 9x100 but only 5 available. Wait, expected says \"9x100\" \u2014 let me recount: 9*100=900, 3*25=75, 2*10=20, 4*1=4, total=999. But only 5x100 available...\n                         ^\nSyntaxError: invalid decimal literal\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp83eqh58g.py\", line 1\n    For 999: expected is 9x100 + 3x25 + 2x10 + 4x1 = 900+75+20+4 = 999. But available is 100:5. Expected uses 9x100 but only 5 available. Wait, expected says \"9x100\" \u2014 let me recount: 9*100=900, 3*25=75, 2*10=20, 4*1=4, total=999. But only 5x100 available...\n                         ^\nSyntaxError: invalid decimal literal\n",
+      "actual": "",
+      "expected": "175: 1x100 3x25\n999: 9x100 3x25 2x10 4x1"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp83eqh58g.py\", line 1\n    For 999: expected is 9x100 + 3x25 + 2x10 + 4x1 = 900+75+20+4 = 999. But available is 100:5. Expected uses 9x100 but only 5 available. Wait, expected says \"9x100\" \u2014 let me recount: 9*100=900, 3*25=75, 2*10=20, 4*1=4, total=999. But only 5x100 available...\n                         ^\nSyntaxError: invalid decimal literal\n",
+      "actual": "",
+      "expected": "Cannot make amount"
+    }
+  ],
+  "repaired_at": "2026-05-31T08:20:20.805365+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 2
+}

@@ -1,0 +1,6 @@
+{
+  "status": "ERROR",
+  "actual": "",
+  "expected": "{\"encrypted_key\":\"base64\",\"iv\":\"hex\",\"ciphertext\":\"base64\",\"tag\":\"hex\",\"algorithm\":\"RSA-OAEP+AES-256-GCM\"}",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 185, in <module>\n    main()\n    ~~~~^^\n  File \"<string>\", line 162, in main\n    n, e = parse_pem_public_key(pem_key)\n           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^\n  File \"<string>\", line 20, in parse_pem_public_key\n    der_data = base64.b64decode(b64_data)\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/base64.py\", line 85, in b64decode\n    return binascii.a2b_base64(s, strict_mode=va"
+}

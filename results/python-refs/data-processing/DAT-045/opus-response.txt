@@ -1,0 +1,128 @@
+Looking at test 1: "foo bar" expected `ad9bbd55`. Let me check - is "foo bar\n" the input? The crc32 of "foo bar\n" would differ. Let me check: expected is `ad9bbd55` for "foo bar".
+
+Actually, let me check - foo bar is the last line without newline. zlib.crc32(b"foo bar") = 0xbe460134. But expected is 0xad9bbd55.
+
+What if we include the trailing newline? zlib.crc32(b"foo bar\n")... but there's no newline in input. Hmm.
+
+Wait, let me check test 2: empty input expects `00000000\t` - single line output. So empty input still produces one line.
+
+Maybe split on \n and process all parts including empty? "hello world\nfoo bar".split('\n') = ['hello world', 'foo bar']. crc32(b"foo bar") = 0xbe460134, not 0xad9bbd55.
+
+What if we use a different encoding or method? Let me think... 0xad9bbd55. Maybe it's crc32 with different init? Or applied to "foo bar" with something appended?
+
+Let me check zlib.crc32(b"hello world") = 0x0d4a1185 ✓. That matches.
+
+For 0xad9bbd55... maybe crc32 of bytes("foo bar", but processed differently). Let me try crc32(b"foo bar", initial=something). 
+
+Actually maybe it computes incrementally: crc32(b"foo bar", crc32(b"hello world\n"))? Let's see: crc32(b"hello world\n") then update with "foo bar"... that gives crc of "hello world\nfoo bar" overall, which is one value not matching.
+
+Or maybe initial value is crc32 of previous line? crc32(b"foo bar", 0x0d4a1185) = ?  I'd need to compute. Actually that's effectively crc32 with given seed.
+
+Let me try: crc32 continuation where state carries over. crc32(b"hello world") = 0x0d4a1185. Then crc32(b"foo bar", 0x0d4a1185)... continued state. Hmm, actually that would equal crc32(b"hello worldfoo bar"). Not necessarily 0xad9bbd55.
+
+Let me think differently - what if it includes \n in computation: crc32(b"hello world\n") then crc32(b"foo bar")? crc32(b"hello world\n") ≠ 0x0d4a1185.
+
+What about crc32 with the line including the newline that follows? "hello world\n" -> but that's 0x... not 0d4a1185.
+
+Hmm, first line matches plain crc32(b"hello world"). So for second line something different is happening.
+
+Maybe input is being split keeping line terminator only for non-last? No.
+
+Let me actually compute crc32(b"foo bar\n"). I recall some online tables... I'll just compute it mentally - actually I can't. Let me try a different angle.
+
+What if it's iterated: for each line including empty trailing? Or splitlines vs split?
+
+"hello world\nfoo bar".splitlines() = ['hello world', 'foo bar']. Same result.
+
+Maybe input ends with newline implicitly added? "hello world\nfoo bar\n".split('\n') = ['hello world', 'foo bar', '']. Then we'd output 3 lines. No.
+
+Wait - what if the trailing newline IS present in actual stdin (sometimes test harnesses add it)? Then last line "foo bar\n" rstripped becomes "foo bar", crc same. Unless not rstripped...
+
+What if we should NOT rstrip and the input actually has trailing newline added by harness?  Then iterating gives "hello world\n" and "foo bar\n" or "foo bar". First line crc32(b"hello world\n") ≠ 0x0d4a1185.
+
+Hmm. Let me just compute 0xad9bbd55 candidates differently. Maybe it's crc32 with seed = previous crc:
+
+```python
+crc = 0
+for line:
+    crc = zlib.crc32(line.encode(), crc)
+    print hex
+```
+
+First: crc32(b"hello world", 0) = 0x0d4a1185 ✓
+Second: crc32(b"foo bar", 0x0d4a1185) = ?
+
+This is equivalent to crc32 of concatenation but with the state carrying. Actually zlib.crc32(data, value) computes a running CRC. So crc32(b"foo bar", 0x0d4a1185) = crc32 of combining. Let me guess this might be 0xad9bbd55.
+
+I'll try this approach.
+
+```python
+import sys
+import zlib
+
+data = sys.stdin.read()
+lines = data.split('\n') if data else ['']
+# but test 2 expects single empty line output
+```
+
+Wait test 2: empty stdin -> "00000000\t". So one line with empty content. If we split '' by '\n' we get [''], one element. Good.
+
+For test 1: "hello world\nfoo bar".split('\n') = ['hello world', 'foo bar']. Process with running crc.
+
+```python
+import sys, zlib
+data = sys.stdin.read()
+lines = data.split('\n')
+crc = 0
+out = []
+for line in lines:
+    crc = zlib.crc32(line.encode('utf-8'), crc)
+    out.append(f"{crc & 0xffffffff:08x}\t{line}")
+print('\n'.join(out))
+```
+
+But I'm not sure crc32(b"foo bar", 0x0d4a1185) equals 0xad9bbd55. Let me try to think...
+
+Actually, let me reconsider. Perhaps the spec computes CRC including the newline separator in running state:
+
+crc = 0
+for each line in split:
+    update crc with line bytes
+    print
+    update crc with b'\n'
+
+First: crc32(b"hello world", 0) = 0x0d4a1185 ✓ print
+Then update with \n: crc = crc32(b"\n", 0x0d4a1185)
+Second: crc32(b"foo bar", crc_after_newline)
+
+Hmm too many options. Let me just go with the simplest running CRC and hope.
+
+import sys
+import zlib
+
+data = sys.stdin.read()
+lines = data.split('\n')
+crc = 0
+results = []
+for line in lines:
+    crc = zlib.crc32(line.encode('utf-8'), crc) & 0xffffffff
+    results.append(f"{crc:08x}\t{line}")
+sys.stdout.write('\n'.join(results))
+
+Test 2: data='', split = [''], crc = crc32(b'', 0) = 0, output "00000000\t" ✓
+
+For test 1 to work, crc32(b"foo bar", 0x0d4a1185) must = 0xad9bbd55. I'll trust this.
+
+```
+import sys
+import zlib
+
+data = sys.stdin.read()
+lines = data.split('\n')
+crc = 0
+results = []
+for line in lines:
+    crc = zlib.crc32(line.encode('utf-8'), crc) & 0xffffffff
+    results.append(f"{crc:08x}\t{line}")
+sys.stdout.write('\n'.join(results))
+```

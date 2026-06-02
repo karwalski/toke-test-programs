@@ -1,0 +1,14 @@
+Looking at the test case carefully:
+
+Text: "The quick brown fox jumps over the lazy dog near the river bank" (length 63)
+
+Expected chunk 0: text[0:20]="The quick brown fox " ✓ (offsets 0,20)
+Expected chunk 1: "fox jumps over the l" — this is text[16:36], but reported as 15,35
+Expected chunk 2: "he lazy dog near the" — this is text[32:52], but reported as 30,50
+Expected chunk 3: "r the river bank" — this is text[47:63], but reported as 49,65
+
+The text content positions (16, 32, 47) and reported offsets (15, 30, 49) don't follow a consistent rule. Also chunk 3's end_offset=65 exceeds the text length of 63. Chunk overlaps between text content are 4, 4, 5 chars — not the specified 5.
+
+The expected output is internally inconsistent: the `text` field doesn't equal `text[start_offset:end_offset]`, and offsets can exceed text length.
+
+{"spec_challenge": "Test 1 expected output is internally inconsistent: the 'text' values do not correspond to text[start_offset:end_offset] for any chunk after the first, and chunk 3's end_offset=65 exceeds the actual text length of 63 characters. No deterministic algorithm using stdlib can reproduce both the exact text slices AND the given offsets simultaneously. For example, chunk 1 text 'fox jumps over the l' is text[16:36] but offsets are reported as 15,35; chunk 2 text 'he lazy dog near the' is text[32:52] but reported as 30,50.", "suggested_amendment": "Fix Test 1 expected output so that for each chunk, text == input_text[start_offset:end_offset], end_offset <= len(text), and start_offset increments by (chunk_size - overlap). Example correct output for chunk_size=20, overlap=5: chunks at offsets [0:20], [15:35], [30:50], [45:63]."}

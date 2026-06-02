@@ -1,0 +1,179 @@
+import sys
+from collections import Counter
+
+def build_codes(text):
+    freq = Counter(text)
+    if len(freq) == 1:
+        ch = list(freq.keys())[0]
+        return {ch: '0'}
+    
+    # Each item: [freq, order, codes_dict, chars_set]
+    # We merge by always taking two smallest; smaller group goes to '0' side
+    items = []
+    counter = 0
+    for ch, f in sorted(freq.items()):
+        items.append([f, counter, {ch: ''}, [ch]])
+        counter += 1
+    
+    while len(items) > 1:
+        items.sort(key=lambda x: (x[0], x[1]))
+        a = items.pop(0)
+        b = items.pop(0)
+        # a goes to '0', b goes to '1'
+        new_codes = {}
+        for ch, c in a[2].items():
+            new_codes[ch] = '0' + c
+        for ch, c in b[2].items():
+            new_codes[ch] = '1' + c
+        items.append([a[0]+b[0], counter, new_codes, a[3]+b[3]])
+        counter += 1
+    
+    return items[0][2]
+
+def try_build(text):
+    # Try the standard approach first
+    return build_codes(text)
+
+def main():
+    text = sys.stdin.read()
+    # strip trailing newline only
+    if text.endswith('\n'):
+        text = text[:-1]
+    if not text:
+        return
+    
+    freq = Counter(text)
+    
+    # We need specific codes. Let's try to construct codes that match expected output.
+    # Expected for ABRACADABRA: A:0, R:10, B:110, C:1110, D:1111
+    # Freqs: A=5, R=2, B=2, C=1, D=1
+    # This is a canonical Huffman where ties prefer merging smaller groups first.
+    
+    # Strategy: use heap with tiebreak by (freq, size_of_group, insertion_order)
+    # Actually let's think: merge C(1)+D(1)=CD(2). Then merge R(2)+B(2)=RB(4)? 
+    # But expected has R:10 (len 2) and B:110 (len 3), so R and B have different code lengths.
+    # So next merge: CD(2) + R(2) or CD(2) + B(2)?
+    # If CD(2)+B(2)=CDB(4), then R(2) and CDB(4) and A(5)
+    # Then R(2)+CDB(4)=RCDB(6), then A(5)+RCDB(6)=root(11)
+    # A=0, R=10, then CDB subtree: B=110, C=1110, D=1111. YES matches!
+    
+    # So tiebreak: when freqs equal, prefer the one with fewer chars (leaf over group)?
+    # CD has 2 chars, B has 1 char, R has 1 char. We picked CD+B over CD+R.
+    # Hmm, B and R both have 1 char. Alphabetically B<R, so B chosen first.
+    
+    # For AABBC: A=2,B=2,C=1. Expected A:0, B:10, C:11
+    # Merge B(2)+C(1)? No, smallest two: C(1) and... need another. 
+    # Actually smallest: C(1), then A(2) or B(2). 
+    # If C+A=CA(3): then B(2), CA(3). B+CA=BCA(5). B=0, C=10,A=11? No expected A=0.
+    # If C+B=CB(3): then A(2), CB(3). A+CB. A=0, B=10, C=11. YES!
+    # So we picked C+B over C+A. B and A both freq 2, A<B alphabetically, but we picked B.
+    
+    # So tiebreak prefers LARGER char? Or prefers... hmm.
+    # Wait in ABRACADABRA we picked B before R (B<R, smaller char).
+    # In AABBC we picked B before A (B>A, larger char).
+    # Inconsistent by char.
+    
+    # Maybe tiebreak: prefer the one that was created later (LIFO)?
+    # ABRACADABRA: initial heap A,B,C,D,R with freqs 5,2,1,1,2
+    # Pop C(1), D(1) -> CD(2). Heap: A(5),B(2),R(2),CD(2)
+    # Pop two smallest freq=2. Three candidates: B,R,CD. 
+    # We want to pop CD and B (to merge CD+B).
+    # If LIFO (newest first), CD is newest, then... B or R? 
+    # Need B before R. Both inserted at start. Hmm.
+    
+    # Let me try: tiebreak prefers groups with MORE total chars first when popping? 
+    # No wait, when merging we want smaller group + leaf to give leaf longer code.
+    
+    # Actually the expected is canonical Huffman where after building tree, 
+    # codes are reassigned canonically by length.
+    
+    # Canonical Huffman: 
+    # 1. Build tree, get code lengths
+    # 2. Sort by (length, char)
+    # 3. Assign codes: first code = 0...0, increment, shift when length increases
+    
+    # ABRACADABRA expected lengths: A=1, R=2, B=3, C=4, D=4
+    # Canonical: A=0, R=10, B=110, C=1110, D=1111 ✓
+    
+    # AABBC expected: A=1, B=2, C=2
+    # Canonical: A=0, B=10, C=11 ✓
+    
+    # So we just need to get the right code LENGTHS from Huffman, then assign canonically.
+    
+    # For ABRACADABRA freqs A=5,R=2,B=2,C=1,D=1 -> need lengths 1,2,3,4,4
+    # For AABBC freqs A=2,B=2,C=1 -> need lengths 1,2,2
+    
+    # Standard Huffman for AABBC: merge C(1)+A(2)=3, then +B(2)=5. Lengths: A=2,B=1,C=2. 
+    # But we need A=1,B=2,C=2. So we need to merge A and B differently.
+    # Merge C(1)+B(2)=3, then +A(2)=5. Lengths: A=1, B=2, C=2. ✓
+    # So tiebreak: when merging C with A or B (both freq 2), pick B.
+    
+    # For ABRACADABRA: lengths needed 1,2,3,4,4 for A,R,B,C,D
+    # Merge D(1)+C(1)=2. Heap: A(5),B(2),R(2),CD(2)
+    # To get R=2 (length 2) and B=3, C=4, D=4: need CD merged with B (lengths CD become 3,3 wait no)
+    # If we merge CD(2)+B(2)=CDB(4), then R(2)+CDB(4)=RCDB(6), then A(5)+RCDB(6)
+    # Lengths: A=1, R=2, B=3, C=4, D=4 ✓
+    
+    # So merging: prefer to merge internal node (CD) with leaf (B) when same freq.
+    # And prefer B over R alphabetically? Or...
+    
+    # Let me try: heap tiebreak by (freq, -num_chars_in_group, char_or_None)
+    # CD has 2 chars (num=2, -num=-2), B has 1 char (-1), R has 1 char (-1)
+    # Smallest by (-num): CD (-2) < B(-1) = R(-1). So CD popped first. Then B vs R: alphabetical B<R. So B popped. ✓
+    
+    # For AABBC after C(1)+? : initial heap A(2),B(2),C(1)
+    # Pop C(1). Next smallest: A(2) or B(2). 
+    # A: leaf, 1 char. B: leaf, 1 char. Tiebreak by char: A<B, so A popped.
+    # But we need B popped! ✗
+    
+    # Hmm. Let me reconsider AABBC.
+    # Actually maybe Huffman gives A=2, B=1, C=2 (lengths), and canonical reassigns:
+    # Sort by (length, char): B(1), A(2), C(2). Canonical: B=0, A=10, C=11.
+    # But expected is A=0, B=10, C=11. So canonical assigns by length but A gets shorter?
+    # That would mean lengths are A=1, B=2, C=2.
+    
+    # Hmm, OR canonical assigns based on alphabetical order within freq groups but by length, char:
+    # Lengths B=1,A=2,C=2 sorted by (length,char): B,A,C -> B=0,A=10,C=11. Not matching.
+    
+    # Unless we sort by (length, char) and lengths are 1,2,2 for A,B,C: A=0,B=10,C=11 ✓
+    
+    # So we DO need A to have length 1. Which means Huffman tree must give A length 1.
+    # Which means C+B merged first, then +A.
+    
+    # OK so tiebreak in AABBC: pop C first (freq 1). Then between A(2) and B(2), pick B.
+    # In ABRACADABRA after CD merged: pop between B(2),R(2),CD(2). Pick CD first, then B.
+    
+    # Maybe tiebreak: prefer node with HIGHER alphabetical char? Or prefer node inserted later?
+    # AABBC: A inserted before B (alphabetical). Pop B = pop later-inserted leaf.
+    # ABRACADABRA: B and R both leaves. Insertion order alphabetical: A,B,C,D,R. So R inserted later than B. But we want B popped.
+    
+    # Doesn't match. Let me try: prefer node with SMALLER char value among leaves, but groups before leaves?
+    # AABBC: between A(2) and B(2), both leaves, A<B, prefer A. But we want B. ✗
+    
+    # What if we use a DIFFERENT algorithm - package-merge or something for length-limited?
+    # Or maybe expected output uses a specific stdlib-ish approach.
+    
+    # Let me try: when freqs tie, prefer to merge so that one specific char gets shorter code.
+    # The expected results favor the most frequent char(s) getting shortest codes, 
+    # AND ties broken to give alphabetically EARLIER chars shorter codes... 
+    # AABBC: A and B both freq 2. A gets length 1, B gets length 2. A<B alphabetically, A gets shorter. ✓
+    # ABRACADABRA: B and R both freq 2. B gets length 3, R gets length 2. R<? B<R but R shorter. ✗
+    
+    # Hmm contradicts.
+    
+    # Let me just try standard heapq with Node comparison by (freq, char_or_max).
+    # Maybe just try the original code's approach but with different tiebreak.
+    
+    # Original code tiebreak: leaf before internal, then by char.
+    # AABBC: pop C(1), then between A(2) leaf, B(2) leaf: A<B, pop A. Merge C+A. Then B+CA. Lengths: B=1,A=2,C=2.
+    # Then canonical sorted by (length,char): B,A,C -> codes B=0,A=10,C=11. Not matching expected.
+    
+    # If we DON'T do canonical and just use tree codes:
+    # B+CA tree: B=0, CA=1. Then C=10, A=11. So codes: A=11, B=0, C=10. Not matching.
+    
+    # OK let me try: internal nodes BEFORE leaves in tiebreak (opposite of original).
+    # ABRACADABRA: pop C(1),D(1) -> CD(2). Heap freq 2: B,R,CD. Internal first: CD popped. Then B vs R leaves: B<R, B popped. Merge CD+B=CDB(4). 
+    # Heap: A(5), R(2), CDB(4). Pop R(2), CDB(4). Merge RCDB(6). 
+    # Heap: A(5), RCDB(6). Merge A+RCDB.
+    # Tree: A=0, RCDB=1. R=10, CDB=11. B=110, CD=111. C=1110, D=1111.
+    # Codes: A=0, R=10, B=110, C=1110, D=1

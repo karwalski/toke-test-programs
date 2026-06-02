@@ -1,0 +1,21 @@
+import sys
+
+data = sys.stdin.read()
+# Preserve trailing newline behavior; expected outputs have no trailing newline
+lines = data.split('\n')
+
+out_lines = []
+for line in lines:
+    fields = line.split('\t')
+    new_fields = []
+    for f in fields:
+        if '"' in f:
+            f = f.replace('"', '""')
+            new_fields.append('"' + f + '"')
+        elif ',' in f:
+            new_fields.append('"' + f + '"')
+        else:
+            new_fields.append(f)
+    out_lines.append(','.join(new_fields))
+
+sys.stdout.write('\n'.join(out_lines))

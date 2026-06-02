@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "latencies: [50ms, 80ms, 200ms, 600ms]\np50: 140ms (target: 100ms) BREACH\np95: 500ms (target: 500ms) OK\np99: 580ms (target: 2000ms) OK\nSLA compliance: 2/3 targets met (66.7%)",
+  "stderr": "  File \"/tmp/tmpywdy6v2k.py\", line 10\n    - p50: 0.5*3 = 1.5 \u2192 80 + 0.5*(200-80) = 140 \u2713\n                       ^\nSyntaxError: invalid character '\u2192' (U+2192)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpywdy6v2k.py\", line 10\n    - p50: 0.5*3 = 1.5 \u2192 80 + 0.5*(200-80) = 140 \u2713\n                       ^\nSyntaxError: invalid character '\u2192' (U+2192)\n",
+      "actual": "",
+      "expected": "latencies: [50ms, 80ms, 200ms, 600ms]\np50: 140ms (target: 100ms) BREACH\np95: 500ms (target: 500ms) OK\np99: 580ms (target: 2000ms) OK\nSLA compliance: 2/3 targets met (66.7%)"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpywdy6v2k.py\", line 10\n    - p50: 0.5*3 = 1.5 \u2192 80 + 0.5*(200-80) = 140 \u2713\n                       ^\nSyntaxError: invalid character '\u2192' (U+2192)\n",
+      "actual": "",
+      "expected": "latencies: [30ms, 40ms]\np50: 35ms (target: 50ms) OK\np95: 39ms (target: 200ms) OK\np99: 40ms (target: 1000ms) OK\nSLA compliance: 3/3 targets met (100.0%)"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:09:46.317663+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

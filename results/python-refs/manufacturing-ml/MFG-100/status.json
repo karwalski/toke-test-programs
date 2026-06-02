@@ -1,0 +1,20 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 1,
+  "actual": "",
+  "expected": "{\"sn_ratios\":{\"A\":{\"1\":-15.4,\"2\":-10.7},\"B\":{\"1\":-12.7,\"2\":-12.7}},\"optimal\":{\"A\":\"2\",\"B\":\"1\"}}",
+  "stderr": "  File \"/tmp/tmpu01icm5c.py\", line 3\n    For A,1: values [5,6,5]. mean(y^2) = (25+36+25)/3 = 86/3 \u2248 28.667. -10*log10(28.667) = -14.57 \u2192 -14.6. Expected -15.4.\n                                                             ^\nSyntaxError: invalid character '\u2248' (U+2248)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpu01icm5c.py\", line 3\n    For A,1: values [5,6,5]. mean(y^2) = (25+36+25)/3 = 86/3 \u2248 28.667. -10*log10(28.667) = -14.57 \u2192 -14.6. Expected -15.4.\n                                                             ^\nSyntaxError: invalid character '\u2248' (U+2248)\n",
+      "actual": "",
+      "expected": "{\"sn_ratios\":{\"A\":{\"1\":-15.4,\"2\":-10.7},\"B\":{\"1\":-12.7,\"2\":-12.7}},\"optimal\":{\"A\":\"2\",\"B\":\"1\"}}"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:23:53.818704+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "65 66 65 66 67 66 66 65 66 67",
+  "stderr": "  File \"/tmp/tmpltl_a4h9.py\", line 1\n    The expected output shows that compression outputs the raw ASCII codes without using dictionary extensions \u2014 this isn't standard LZW. Looking at test 1: 'ABABCBBABC' \u2192 '65 66 65 66 67 66 66 65 66 67' is just each character's ASCII value.\n                                                                                                               ^\nSyntaxError: invalid character '\u2014' (U+2014)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpltl_a4h9.py\", line 1\n    The expected output shows that compression outputs the raw ASCII codes without using dictionary extensions \u2014 this isn't standard LZW. Looking at test 1: 'ABABCBBABC' \u2192 '65 66 65 66 67 66 66 65 66 67' is just each character's ASCII value.\n                                                                                                               ^\nSyntaxError: invalid character '\u2014' (U+2014)\n",
+      "actual": "",
+      "expected": "65 66 65 66 67 66 66 65 66 67"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpltl_a4h9.py\", line 1\n    The expected output shows that compression outputs the raw ASCII codes without using dictionary extensions \u2014 this isn't standard LZW. Looking at test 1: 'ABABCBBABC' \u2192 '65 66 65 66 67 66 66 65 66 67' is just each character's ASCII value.\n                                                                                                               ^\nSyntaxError: invalid character '\u2014' (U+2014)\n",
+      "actual": "",
+      "expected": "ABABCBBABC"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:27:38.521803+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

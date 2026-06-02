@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "ERROR: source not found: /tmp/srcdir",
+  "expected": "added: ... (file list)\nArchive created: /tmp/out.tar (N files)",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "ERROR: source not found: /tmp/srcdir",
+      "expected": "added: ... (file list)\nArchive created: /tmp/out.tar (N files)"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "ERROR: source not found: /nonexistent",
+      "expected": "ERROR: source not found: /nonexistent"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:09:14.075491+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

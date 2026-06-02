@@ -1,0 +1,120 @@
+import sys
+
+def main():
+    data = sys.stdin.read().split('\n')
+    first_line = data[0].strip().split()
+    window_size = int(first_line[0])
+    alpha = float(first_line[1])
+    
+    values = []
+    for line in data[1:]:
+        line = line.strip()
+        if line:
+            values.append(float(line))
+    
+    # Compute EMA starting from index window_size-1
+    # Test 1: window=3, alpha=0.5, values=[10,20,30,40,50]
+    # Expected EMA at i=2: 27.50, i=3: 33.75, i=4: 41.88
+    # Initial EMA at i=2 = SMA of first window = 20, then 27.50?
+    # 0.5*30 + 0.5*20 = 25, not 27.50
+    # Try: EMA[2] = alpha*v[2] + (1-alpha)*SMA = 0.5*30 + 0.5*20 = 25, no
+    # Try: start EMA = v[0]=10, EMA[1] = 0.5*20+0.5*10=15, EMA[2]=0.5*30+0.5*15=22.5, no
+    # Expected 27.50. Try seed with v[window-1]: EMA[2]=30? then output at i=2 is something
+    # Maybe output EMA at i=2 = alpha*v[2]+(1-alpha)*v[1] = 0.5*30+0.5*20=25, no
+    # 27.50 = ? 0.5*30 + 0.5*25 = 27.5. So prev EMA = 25 = avg(20,30)? 
+    # Test2: window=2, alpha=0.3, values=[5,10,15]
+    # EMA at i=1: 8.00. 0.3*10+0.7*x=8 -> 0.7x=5 -> x=7.14, no
+    # Or just first valid EMA = SMA, then continue
+    # i=1 (window=2): SMA=7.5, EMA=8.00? Not SMA.
+    # 0.3*10+0.7*5 = 3+3.5 = 6.5, no
+    # 0.3*5+0.7*10 = 1.5+7 = 8.5, no
+    # alpha*prev + (1-alpha)*curr = 0.3*5+0.7*10 = 8.5, no
+    # Try: EMA = (1-alpha)*current + alpha*prev: same as above
+    # 8.00 exactly. (5+10)/... weighted? 
+    # WMA at i=1 = (1*5+2*10)/3 = 25/3 = 8.33 ✓
+    # EMA 8.00: maybe seed = average of all prior then EMA?
+    # Or: EMA[1] = alpha*v[1] + (1-alpha)*v[0]*something
+    # 0.3*10 + 0.7*?=8 -> ?=5/0.7=7.14
+    # Try sum: alpha*v1 + alpha*(1-alpha)*v0 + ... no normalization
+    # 0.3*10+0.3*0.7*5 = 3+1.05=4.05
+    # 0.3*15+0.3*0.7*10+0.3*0.49*5 = 4.5+2.1+0.735=7.335
+    # Hmm. EMA[2]=12.10: 0.3*15+0.7*8 = 4.5+5.6=10.1, no
+    # 0.3*15+0.7*y=12.10 -> y= (12.10-4.5)/0.7 = 10.857
+    # Or y=ema_prev: 12.10 = a*15+(1-a)*prev, with a=0.3 prev=10.857
+    # Test1: EMA[2]=27.5, EMA[3]=33.75, EMA[4]=41.88
+    # 33.75 = 0.5*40+0.5*27.5 = 20+13.75 = 33.75 ✓
+    # 41.88 = 0.5*50+0.5*33.75 = 25+16.875 = 41.875 ✓
+    # So EMA recurrence works with alpha=0.5. Need EMA[2]=27.5.
+    # EMA[2] = 0.5*30 + 0.5*prev = 27.5 -> prev=25 = (10+20+30)/... or avg(20,30)
+    # avg of values[0:2]=15, avg values[1:3]=25 ✓ - SMA of previous window ending at i=1? No window=3.
+    # Actually 25 = (20+30)/2. Hmm.
+    # Or seed = sum of first window-1 values / something
+    # values[0]+values[1] = 30, /... 
+    # Test2: EMA[1]=8. 0.3*10+0.7*prev=8 -> prev=10/1.4... =7.14
+    # Hmm doesn't match similar pattern.
+    # Wait: EMA[2]=12.10 = 0.3*15+0.7*8 = 4.5+5.6=10.1 ≠ 12.10
+    # So recurrence isn't simple. Let me recheck.
+    # 12.10: try 0.3*15+0.7*ema[1], if ema[1]=12.857: 4.5+9=13.5 no
+    # alpha*current + (1-alpha)*prev where prev includes... 
+    # Maybe it's WMA-like? WMA[2]=(1*10+2*15)/3=40/3=13.33 ✓
+    # EMA[2]=12.10. (0.3*15+0.7*0.3*10+0.7^2*0.3*5)/(0.3+0.21+0.147)? 
+    # num = 4.5+2.1+0.735=7.335, denom=0.657, = 11.16, no
+    # Try without normalization but including all: 4.5+2.1+0.735=7.335
+    # Hmm
+    # Try EMA[i] = alpha*v[i] + (1-alpha)*EMA[i-1] with EMA[-1]=0 or v[0]
+    # EMA[0]=0.3*5+0.7*0=1.5; EMA[1]=0.3*10+0.7*1.5=3+1.05=4.05; EMA[2]=0.3*15+0.7*4.05=4.5+2.835=7.335
+    # No.
+    # EMA[0]=v[0]=5; EMA[1]=0.3*10+0.7*5=8.5; EMA[2]=0.3*15+0.7*8.5=4.5+5.95=10.45. Not 12.10.
+    # Hmm 8.5 vs 8.00. Close but not.
+    # Maybe formula is (1-alpha)*current + alpha*prev?
+    # EMA[0]=5; EMA[1]=0.7*10+0.3*5=7+1.5=8.5. Same.
+    # alpha*prev + (1-alpha)*current: same thing.
+    # 
+    # Test1 with EMA[0]=10: EMA[1]=0.5*20+0.5*10=15; EMA[2]=0.5*30+0.5*15=22.5. Got 22.5, expected 27.5.
+    # Maybe seed is different. EMA[2]=27.5 needs prev=25.
+    # 25 = (10+20+30)/... no. 25=(20+30)/2.
+    # If seed EMA[window-2]=avg of first window-1: (10+20)/2=15, then EMA[2]=0.5*30+0.5*15=22.5. No.
+    # If seed EMA[window-1]=SMA at that point: EMA[2]=20, then for next: EMA[3]=0.5*40+0.5*20=30, but expected 33.75.
+    # 
+    # Try: EMA seeded at index 0 with v[0]=10, but only output starting from window-1, and use the values formula differently. EMA[2]=27.5.
+    # What if EMA[i] = alpha*v[i] + (1-alpha)*v[i-1] for the first valid one? 0.5*30+0.5*20=25. No.
+    # EMA[2] from test2 i=2: 12.10. 0.3*15+0.7*v[1]=4.5+7=11.5. No.
+    # 0.3*15+0.7*WMA[1]= 0.3*15+0.7*8.33=4.5+5.833=10.33. No.
+    # 0.3*15+0.7*SMA[2 in test2]=0.3*15+0.7*12.5=4.5+8.75=13.25. No.
+    # 
+    # Test2 EMA values: null, 8.00, 12.10
+    # Test1: null, null, 27.50, 33.75, 41.88
+    # Test1: 33.75=0.5*40+0.5*27.5 ✓; 41.88≈0.5*50+0.5*33.75=41.875 ✓
+    # Test2: 12.10=0.3*15+0.7*?  -> ?=10.857. Not 8.00.
+    # 12.10=? Let me check: maybe 0.3*15+0.7*8.00 = 4.5+5.6=10.10. Hmm expected 12.10.
+    # Wait maybe I misread. "12.10" - yes.
+    # alpha*8+(1-alpha)*15 with alpha=0.3: 2.4+10.5=12.90. No.
+    # (1-alpha)*8+alpha*15 = 5.6+4.5=10.10. 
+    # Hmm. 12.10 = ?  0.7*15+0.3*?=12.10 -> ?=(12.10-10.5)/0.3=5.33
+    # 0.7*15+0.3*5=10.5+1.5=12.0. Close to 12.10 but not exact.
+    # 0.7*15+0.3*8=10.5+2.4=12.9
+    # Hmm.
+    # Let me try EMA formula: EMA = alpha*current + (1-alpha)*previous_EMA where previous_EMA seed = first value's SMA
+    # Test2: seed at i=0 EMA=5. EMA[1]=0.3*10+0.7*5=8.5. Not 8.00.
+    # 
+    # Maybe alpha definition flipped: EMA = (1-alpha)*current + alpha*prev_EMA, seed=v[0]
+    # Test2: EMA[0]=5; EMA[1]=0.7*10+0.3*5=7+1.5=8.5. Same.
+    # 
+    # Maybe seed = 0: EMA[0]=0.3*5=1.5, EMA[1]=0.3*10+0.7*1.5=4.05. No.
+    # Test1: maybe EMA at i=window-1 uses sum(values[0:window])*alpha?
+    # 0.5*(10+20+30)=30. Then EMA[3]=0.5*40+0.5*30=35. Not 33.75.
+    # 
+    # Different: SMA of first window then EMA. SMA[2]=20=EMA[2]? But expected 27.5.
+    # 
+    # Try: EMA[2] in test1 = 27.5. Let's reverse: 27.5 with alpha=0.5 from values [10,20,30]
+    # 27.5 = 0.5*30 + 0.25*20 + 0.125*10 + 0.125*? Well sum of weights 0.5+0.25+0.125=0.875
+    # Normalized: (15+5+1.25)/0.875 = 21.25/0.875=24.29. No.
+    # Not normalized: 15+5+1.25=21.25. No.
+    # 27.5 = 0.5*30+0.5*0.5*20+0.5*0.5*0.5*10+... = 15+5+1.25+0.3125=21.5625 (sum to infinity with init 0)
+    # 
+    # 27.5 = sum w_i * v_i. 30*a + 20*b + 10*c = 27.5
+    # Try a=0.75, b=0.25, c=0: 22.5+5=27.5 ✓!
+    # So weights 0.75, 0.25, 0 for [30,20,10]? That's alpha*(2-alpha)=0.75 and alpha^2*... no
+    # 0.75 = 1-0.5^2 = 0.75. Or 1-(1-alpha)^2 for newest 2? Hmm
+    # Weights: newest=0.75, second=0.25, oldest=0. 0.75+0.25=1.
+    # 0.

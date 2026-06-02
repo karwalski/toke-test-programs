@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"findings\": []}",
+  "expected": "A03",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"findings\": []}",
+      "expected": "A03"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"findings\": [{\"owasp_id\": \"A02\", \"title\": \"Cryptographic Failures\", \"severity\": \"Medium\", \"evidence\": \"Plaintext HTTP used instead of HTTPS\", \"remediation\": \"Use HTTPS/TLS for all communications\"}, {\"owasp_id\": \"A05\", \"title\": \"Security Misconfiguration\", \"severity\": \"Medium\", \"evidence\": \"Missing security headers: x-frame-options, content-security-policy, strict-transport-security\", \"remediation\": \"Implement security headers and harden server configuration\"}]}",
+      "expected": "findings"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:31.865208+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

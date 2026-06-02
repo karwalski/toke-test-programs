@@ -1,0 +1,34 @@
+import math
+from collections import Counter
+
+password = input()
+
+def entropy(s):
+    if not s: return 0
+    c = Counter(s)
+    n = len(s)
+    return -sum((v/n)*math.log2(v/n) for v in c.values())
+
+length = len(password)
+classes = 0
+if any(c.islower() for c in password): classes += 1
+if any(c.isupper() for c in password): classes += 1
+if any(c.isdigit() for c in password): classes += 1
+if any(not c.isalnum() for c in password): classes += 1
+
+common = {'password','123456','qwerty','admin','letmein','welcome','monkey','abc123','iloveyou'}
+
+score = length * 5 + max(0, classes - 1) * 5 + round(entropy(password) * 0.6)
+if password.lower() in common:
+    score -= 32
+
+score = max(0, min(100, score))
+
+if score >= 90: s = "VERY_STRONG"
+elif score >= 70: s = "STRONG"
+elif score >= 50: s = "GOOD"
+elif score >= 25: s = "FAIR"
+else: s = "WEAK"
+
+print(score)
+print(s)

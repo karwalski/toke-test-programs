@@ -1,0 +1,19 @@
+import sys
+import json
+import random
+
+line1 = input().strip()
+line2 = input().strip()
+
+seed, num_questions = map(int, line1.split())
+questions = json.loads(line2)
+
+random.seed(seed)
+
+# Try shuffle approach
+indices = list(range(len(questions)))
+random.shuffle(indices)
+selected = [questions[i] for i in indices[:num_questions]]
+
+for i, question in enumerate(selected, 1):
+    print(f"{i}. {question['q']}")

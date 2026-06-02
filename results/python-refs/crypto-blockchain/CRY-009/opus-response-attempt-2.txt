@@ -1,0 +1,19 @@
+import sys
+
+def base58_encode(data):
+    alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+    num = int.from_bytes(data, 'big')
+    encoded = ""
+    while num > 0:
+        num, remainder = divmod(num, 58)
+        encoded = alphabet[remainder] + encoded
+    for byte in data:
+        if byte == 0:
+            encoded = alphabet[0] + encoded
+        else:
+            break
+    return encoded
+
+hex_string = sys.stdin.read().strip()
+byte_data = bytes.fromhex(hex_string)
+print(base58_encode(byte_data))

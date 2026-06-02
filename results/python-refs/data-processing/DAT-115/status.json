@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "Total rows: 5\nExact duplicates: 2\nDuplicate rows:\n  (1,Alice,a@x.com) x2\n  (2,Bob,b@x.com) x2\nColumn duplication: id 80.0%, name 80.0%, email 80.0%",
+  "expected": "Total rows: 5\nExact duplicates: 2\nDuplicate rows:\n  (1,Alice,a@x.com) x2\n  (2,Bob,b@x.com) x2\nColumn duplication: name 60.0%, email 60.0%, id 60.0%",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "Total rows: 5\nExact duplicates: 2\nDuplicate rows:\n  (1,Alice,a@x.com) x2\n  (2,Bob,b@x.com) x2\nColumn duplication: id 80.0%, name 80.0%, email 80.0%",
+      "expected": "Total rows: 5\nExact duplicates: 2\nDuplicate rows:\n  (1,Alice,a@x.com) x2\n  (2,Bob,b@x.com) x2\nColumn duplication: name 60.0%, email 60.0%, id 60.0%"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "Total rows: 3\nExact duplicates: 0\nNo duplicates found",
+      "expected": "Total rows: 3\nExact duplicates: 0\nNo duplicates found"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:07:02.820392+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

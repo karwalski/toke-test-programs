@@ -1,0 +1,6 @@
+client --[40ms]--> relay-1 --[45ms]--> server --[95ms]--> recipient
+hop 1: client (10ms processing, encrypt)
+hop 2: relay-1 (5ms processing, forward)
+hop 3: server (5ms processing, store)
+hop 4: recipient (decrypt)
+total: 200ms end-to-end

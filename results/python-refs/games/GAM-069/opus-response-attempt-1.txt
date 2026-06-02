@@ -1,0 +1,91 @@
+Looking at expected output for Test 1, move 1: P1 pit 0 has 4 stones, after move: P1=`0 4 4 4 4 4`, P2=`5 5 5 5 4 4`, stores `1 0`.
+
+Starting from pit 0 with 4 stones, going to pits 1,2,3,4 — but expected shows pits 1-4 unchanged at 4. Instead P2 pits 0-3 get +1 and store gets +1. So sowing goes: store first, then P2 side starting from P2[0]?
+
+Wait, expected P1=`0 4 4 4 4 4` (pit 0 emptied, others unchanged), store1=1, P2=`5 5 5 5 4 4` (P2[0..3] +1).
+
+So 4 stones from pit 0 went to: store(1) + P2[0..3](4 stones)... that's 5 stones, but we only have 4.
+
+Hmm. Let me reread. Move 6: P1 pit 5 has 4 stones. Expected: P1=`4 4 4 4 4 0`, P2=`5 5 5 5 5 5`, stores `1 0`. So 4 stones from pit 5 → store(1) + P2[0..3](4)... = 5. Still off.
+
+Wait P2=`5 5 5 5 5 5` is all 5s = 6 stones added. Plus store 1 = 7. From 4 stones? No.
+
+Let me recount: original P2 was `4 4 4 4 4 4`. New P2 `5 5 5 5 5 5` means all 6 got +1 = 6 stones. Store +1. Total 7 from 4 stones. Impossible from move 6 alone.
+
+Unless move 6 is the last one printed and the format... let me check move 5: pit 4 has 4 stones → P1=`4 4 4 4 0 4`, P2=`5 5 5 5 5 4`, store 1 0. So 4 stones distributed: P1[5]+1, store+1, P2[0..3]+1+1+1... wait P2 went from `4 4 4 4 4 4` to `5 5 5 5 5 4`. That's P2[0..4]+1 = 5 stones. Plus P1[5]+1 and store+1 = 7. From 4? No.
+
+Wait, P1[5] in expected move 5 is 4, original is 4, so unchanged. P1 row: `4 4 4 4 0 4`. Pit 4 emptied. So stones go: P1[5]+1, store+1, P2[0]+1, P2[1]+1 = 4 stones. P2 result should be `5 5 4 4 4 4`. But expected is `5 5 5 5 5 4`.
+
+Hmm, expected P2 is reversed maybe? `5 5 5 5 5 4` reading right-to-left is `4 5 5 5 5 5`. So P2[5]=4 unchanged, P2[4..0]=5. That means sowing into P2[0] first then P2[1]... no wait.
+
+Actually in Kalah, P2's pits are arranged opposite. P1 sows pit 4 → P1[5], P1_store, P2[5], P2[4]. If P2 is displayed as P2[0]...P2[5] but the physical opposite-to-P1[0] is P2[5]... Let me check: pit 4 (4 stones) → P1[5], store, P2[5], P2[4]. P2 result: `4 4 4 4 5 5`. Still not matching.
+
+Let me try: maybe P2 displayed in reverse order. Original P2 `4 4 4 4 4 4` (symmetric so doesn't matter). After move 5: `5 5 5 5 5 4`. The 4 is at position 5. If display is reversed, real P2[0]=4, P2[1..5]=5... 
+
+Move 1: pit 0, 4 stones → P1[1..4]+1. Expected P1 `0 4 4 4 4 4` means P1[1..4] unchanged. So stones don't go to P1[1..4]. Expected has store=1 and P2[0..3]+1 (`5 5 5 5 4 4`).
+
+Maybe sowing skips own pits going to store directly? Or move number = pit index from right?
+
+Move 1 = pit 5 (rightmost)? Pit 5 has 4 stones → store, P2[5], P2[4], P2[3]. Result P1=`4 4 4 4 4 0`, P2=`4 4 4 5 5 5`, store=1. Expected for Move 1: P1=`0 4 4 4 4 4`, P2=`5 5 5 5 4 4`, store 1 0.
+
+What if P2 is shown reversed? Reversed `5 5 5 5 4 4` → `4 4 5 5 5 5`. P2[0,1]=4, P2[2..5]=5. From pit 5: store, P2[5], P2[4], P2[3] → P2=`4 4 4 5 5 5`. Close but P2[2] expected 5.
+
+Hmm what about pit 0 with display reversed for P1? Move 1 = pit 5 in display = pit 0 in actual? P1 reversed `0 4 4 4 4 4` → `4 4 4 4 4 0`. So actual P1[5]=0. Pit 5 has 4 stones → store(1), P2[5], P2[4], P2[3]. P2 result `4 4 4 5 5 5`, reversed display `5 5 5 4 4 4`. Expected `5 5 5 5 4 4`. Doesn't match.
+
+Let me try Move 6 carefully: pit 5 with 4 stones, expected P2=`5 5 5 5 5 5` all 5s. That requires 6 stones into P2. Maybe rules: when emptying a pit, if last stone lands in own empty pit, capture? Or just a buggy spec?
+
+Looking at move 6: stones from pit 5(=4) → P1_store, P2[0], P2[1], P2[2] in standard counterclockwise where P2 is laid out 0→5 after P1 store. Result: store=1, P2=`5 5 5 4 4 4`. Expected `5 5 5 5 5 5`. Different.
+
+Hmm what if last seed in store gives extra turn AND auto-plays? No that's complex.
+
+What if move 6 sows: P1_store, P2[0..5]? That's 7 positions for 4 stones. No.
+
+Let me look again. Move 6 final state P2=`5 5 5 5 5 5` (all +1 = 6 stones added) and store=1. Total 7 stones. Original pit 5 had 4. So 3 extra came from... where? P1 pits maybe? P1 expected `4 4 4 4 4 0` — only pit 5 changed (emptied). So 4 stones turned into 7? Impossible.
+
+Unless input is being read differently. "4 4 4 4 4 4\n4 4 4 4 4 4\n0 0\n1" — what if stores are part of pits, or numbers represent something else?
+
+Looking at move 5 carefully: P1=`4 4 4 4 0 4`, P2=`5 5 5 5 5 4`, store `1 0`. From pit 4, 4 stones. Total change: P1[4]: -4, P1[5]: 0, store1: +1, P2: +5 (positions 0-4), total = +1+5 = +6, but lost 4 from pit 4 = net +2. Hmm.
+
+Actually let me recount expected P2 move 5: `5 5 5 5 5 4`. Originals all 4. Diff: +1 +1 +1 +1 +1 +0 = +5. Plus store +1 = +6. From pit 4 lost 4. Net +2 stones in system. Should be 0.
+
+The expected outputs seem inconsistent with standard Kalah. Let me check the moves progression — maybe each move builds on the previous?
+
+Move 1: P1=`0 4 4 4 4 4` P2=`5 5 5 5 4 4` store `1 0`. Pit 0 emptied, +5 stones added elsewhere. 4 stones from pit 0 → store(+1), P2[0]+1, P2[1]+1, P2[2]+1, P2[3]+1 = 5 positions. But pit 0 only had 4!
+
+Unless... pit 0 had 4, and it sows starting AT pit 0's neighbor going through store + P2... that's standard. 4 stones = pit1, pit2, pit3, pit4. But pits 1-4 are unchanged.
+
+What if direction is different - sowing goes from pit 0 backwards? Pit 0 → store directly? In some Kalah variants, P1's store is to the LEFT of pit 0? No, sowing is counterclockwise.
+
+What if "pit 0" in input is actually the rightmost pit (closest to store)? So input order is reversed. P1 input `4 4 4 4 4 4` - doesn't matter symmetric. Move 1 = leftmost pit in display = input index 5 (or 0 from right). With 4 stones, sow → store, P2[5]_display, P2[4]_display, P2[3]_display. If P2 display also reversed (P2 input index 5 = P2 display 0): Result P2 display: indices 0,1,2 get +1 = `5 5 5 4 4 4`. Expected `5 5 5 5 4 4`. Still off by one.
+
+Maybe stones include the source pit itself? Or sowing of 4 stones lands in 5 positions due to bug in spec?
+
+Let me check Move 1 stones: 4 stones placed in: store(1) + P2[0..3](4) = 5 stones. Source had 4 — off by 1.
+
+Move 5: pit 4 with 4 stones. Placed in: store(1) + P2[0..4](5) = 6 stones. Off by 2.
+
+Move 6: pit 5 with 4 stones. Placed in: store(1) + P2[0..5](6) = 7 stones. Off by 3.
+
+Pattern! The number placed = 4 + move_index_offset. Or: stones_in_pit + (move_number - 1)?
+
+Move 1: 4 stones+1=5 placed (no, +1)
+Move 2: pit 1 has 4 stones. Expected P1=`4 0 4 4 4 4` P2=`5 5 5 5 4 4` store `1 0`. Same P2/store as Move 1! Only pit 1 emptied. So 4 stones from pit 1, but P2 and store same as move 1. 4 stones placed in store+4 P2 positions = 5 stones. Off by 1.
+
+Move 3: pit 2, 4 stones. P1=`4 4 0 4 4 4`, P2=`5 5 5 5 4 4`, store 1. Same: off by 1.
+Move 4: pit 3, 4 stones. P1=`4 4 4 0 4 4`, P2=`5 5 5 5 4 4`, store 1. Off by 1.
+Move 5: pit 4, 4 stones. P2=`5 5 5 5 5 4`. Off by 2.
+Move 6: pit 5, 4 stones. P2=`5 5 5 5 5 5`. Off by 3.
+
+So consistently more stones placed than available. This looks like a buggy reference, but I need to match it.
+
+Pattern: For moves 1-4 (pit 0-3), sows: store + P2[0..3]. For move 5 (pit 4): store + P2[0..4]. For move 6 (pit 5): store + P2[0..5].
+
+So sowing path always includes store + P2 pits from 0 up to max(3, pit_index). Hmm.
+
+Actually maybe: P1 sows starting from its OWN store, going around, but doesn't replenish own pits at all. From pit i with n stones: store(1), then P2[0], P2[1], ... until stones run out, but minimum 4 P2 pits filled?
+
+Move 1 pit 0, 4 stones → store + P2[0..3]: place 5 stones (one extra somewhere)
+Move 5 pit 4, 4 stones → store + P2[0..4]: place 6 stones
+Move 6 pit 5, 4 stones → store + P2[0..5]: place 7 stones
+
+Number placed for move i (1-indexed) = max(5, i+1)? Move 1=5, 2=5, 3=5, 4=5, 5=6, 6=

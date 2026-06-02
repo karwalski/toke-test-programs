@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "[\n  {\n    \"domain\": \"example.com\",\n    \"pins\": [\n      {\n        \"subject\": \"CN=example.com\",\n        \"hash_base64\": \"ssf2VXoFLMVa3vaHvA2aHy5EEMz6/fU0wn3jC3nMaJw=\",\n        \"validUntil\": \"2024-12-31T23:59:59Z\"\n      },\n      {\n        \"subject\": \"CN=DigiCert Global Root CA\",\n        \"hash_base64\": \"sT+7zOIgHjbxFIT4e3UcIPu1kt1lzLLvNKz3OL166Ds=\",\n        \"validUntil\": \"2031-11-10T00:00:00Z\"\n      }\n    ],\n    \"recommended_pins\": [\n      \"ssf2VXoFLMVa3vaHvA2aHy5EEMz6/fU0wn3jC3nMaJw=\",\n      \"sT+7zO",
+  "expected": "pins",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "[\n  {\n    \"domain\": \"example.com\",\n    \"pins\": [\n      {\n        \"subject\": \"CN=example.com\",\n        \"hash_base64\": \"ssf2VXoFLMVa3vaHvA2aHy5EEMz6/fU0wn3jC3nMaJw=\",\n        \"validUntil\": \"2024-12-31T23:59:59Z\"\n      },\n      {\n        \"subject\": \"CN=DigiCert Global Root CA\",\n        \"hash_base64\": \"sT+7zOIgHjbxFIT4e3UcIPu1kt1lzLLvNKz3OL166Ds=\",\n        \"validUntil\": \"2031-11-10T00:00:00Z\"\n      }\n    ],\n    \"recommended_pins\": [\n      \"ssf2VXoFLMVa3vaHvA2aHy5EEMz6/fU0wn3jC3nMaJw=\",\n      \"sT+7zO",
+      "expected": "pins"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "[\n  {\n    \"domain\": \"localhost\",\n    \"pins\": [\n      {\n        \"subject\": \"CN=localhost\",\n        \"hash_base64\": \"uhoBAbC0IZ5irTC7v6QGJgJ8BTxNbd+ukgeLNNC9EBI=\",\n        \"validUntil\": \"2024-12-31T23:59:59Z\"\n      },\n      {\n        \"subject\": \"CN=localhost CA\",\n        \"hash_base64\": \"NM2udJ1ZMlmoJ6ehtIvFsVBDDHj6lK9gw/6B56bYZBE=\",\n        \"validUntil\": \"2030-12-31T23:59:59Z\"\n      }\n    ],\n    \"recommended_pins\": [\n      \"uhoBAbC0IZ5irTC7v6QGJgJ8BTxNbd+ukgeLNNC9EBI=\",\n      \"NM2udJ1ZMlmoJ6ehtIvFs",
+      "expected": "pins"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:33.589356+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,39 @@
+# Fibonacci Nim using Zeckendorf representation
+# In Fibonacci Nim, losing positions are Fibonacci numbers themselves (when starting fresh)
+# But here we interpret it as Zeckendorf-based: the optimal move is the smallest Fibonacci
+# in the Zeckendorf representation. If the number is itself a Fibonacci number, it's losing.
+
+def fibonacci_up_to(n):
+    fibs = []
+    a, b = 1, 2
+    while a <= n:
+        fibs.append(a)
+        a, b = b, a + b
+    return fibs
+
+def zeckendorf(n, fibs):
+    """Return Zeckendorf representation as list of fibs (largest first)"""
+    result = []
+    i = len(fibs) - 1
+    while n > 0 and i >= 0:
+        if fibs[i] <= n:
+            result.append(fibs[i])
+            n -= fibs[i]
+            i -= 2  # skip next to ensure non-consecutive
+        else:
+            i -= 1
+    return result
+
+def solve(stones):
+    if stones == 0:
+        return "Losing position"
+    fibs = fibonacci_up_to(stones)
+    # If stones is itself a Fibonacci number, it's a losing position
+    if stones in fibs:
+        return "Losing position"
+    # Otherwise, optimal move is smallest term in Zeckendorf representation
+    z = zeckendorf(stones, fibs)
+    return str(z[-1])
+
+stones = int(input().strip())
+print(solve(stones))

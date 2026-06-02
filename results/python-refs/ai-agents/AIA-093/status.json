@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "{\"sql\":\"SELECT * FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY;\",\"explanation\":\"Selects all columns from users table where the account was created within the last 30 days.\"}",
+  "expected": "{\"sql\":\"SELECT * FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY;\",\"explanation\":\"Selects all columns from users table where the account was created within the last 30 days.\"}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"sql\":\"SELECT * FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY;\",\"explanation\":\"Selects all columns from users table where the account was created within the last 30 days.\"}",
+      "expected": "{\"sql\":\"SELECT * FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY;\",\"explanation\":\"Selects all columns from users table where the account was created within the last 30 days.\"}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"sql\":\"SELECT c.name, SUM(o.amount) AS total_revenue FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.name;\",\"explanation\":\"Joins customers with their orders and sums the order amounts per customer.\"}",
+      "expected": "{\"sql\":\"SELECT c.name, SUM(o.amount) AS total_revenue FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.name;\",\"explanation\":\"Joins customers with their orders and sums the order amounts per customer.\"}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:14.552323+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

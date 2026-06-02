@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "COMMAND: remind, args: {time: \"10m\", message: \"Take a break\"}, flags: [--repeat]\nNOT_A_COMMAND\nERROR: unknown command \"unknown\"",
+  "expected": "COMMAND: remind, args: {time: \"10m\", message: \"Take a break\"}, flags: [--repeat]\nNOT_A_COMMAND\nERROR: unknown command \"unknown\"",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "COMMAND: remind, args: {time: \"10m\", message: \"Take a break\"}, flags: [--repeat]\nNOT_A_COMMAND\nERROR: unknown command \"unknown\"",
+      "expected": "COMMAND: remind, args: {time: \"10m\", message: \"Take a break\"}, flags: [--repeat]\nNOT_A_COMMAND\nERROR: unknown command \"unknown\""
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "COMMAND: help, args: {}, flags: []\nERROR: \"help\" takes 0 arguments, got 1",
+      "expected": "COMMAND: help, args: {}, flags: []\nERROR: \"help\" takes 0 arguments, got 1"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:08:12.273751+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

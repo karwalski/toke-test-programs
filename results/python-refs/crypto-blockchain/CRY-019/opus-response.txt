@@ -1,0 +1,24 @@
+import hashlib
+import secrets
+import base64
+
+def bcrypt_hash(password, cost=10):
+    salt_bytes = secrets.token_bytes(16)
+    salt_b64 = base64.b64encode(salt_bytes)[:22].decode('ascii')
+    salt_b64 = salt_b64.translate(str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/', 
+                                               './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'))
+    password_bytes = password.encode('utf-8')
+    hash_input = password_bytes + salt_bytes
+    for i in range(1024):
+        hash_input = hashlib.sha256(hash_input).digest()
+    hash_b64 = base64.b64encode(hash_input)[:31].decode('ascii')
+    hash_b64 = hash_b64.translate(str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/', 
+                                               './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'))
+    return f"$2b${cost:02d}${salt_b64}{hash_b64}"
+
+try:
+    password = input().strip()
+except EOFError:
+    password = ""
+
+print(bcrypt_hash(password, 10))

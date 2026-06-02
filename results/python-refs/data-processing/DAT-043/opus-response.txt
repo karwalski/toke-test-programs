@@ -1,0 +1,157 @@
+import sys
+from collections import Counter
+
+def build_codes(text):
+    freq = Counter(text)
+    if len(freq) == 1:
+        char = list(freq.keys())[0]
+        return {char: '0'}
+    
+    # Use a list of (freq, chars_set, codes_dict) and merge by always picking
+    # two smallest. To match expected output, we need a specific tie-breaking.
+    # Expected for ABRACADABRA: freq A=5, B=2, R=2, C=1, D=1
+    # Codes: A=0, R=10, B=110, C=1110, D=1111
+    # This means tree: A on one side, rest forms unbalanced chain
+    # Merge order: C+D -> CD(2), CD+B -> CDB(4)... wait B=2, R=2
+    # Actually: C(1)+D(1)=CD(2), then CD(2)+B(2)=CDB(4)... 
+    # then CDB(4) vs R(2) vs A(5): pick R(2) and... we need another size 2
+    # Hmm, R(2)+CD(2)... let me reconsider
+    # 
+    # Try: C(1)+D(1)=2[CD], then R(2)+CD(2)=4[RCD]... but then B(2)+RCD(4)=6, A(5)+BRCD(6)=11
+    # A=0, BRCD=1, B=10, RCD=11, R=110, CD=111, C=1110, D=1111 ✓
+    # 
+    # So tie-breaking: when freqs equal, prefer leaf (single char) over internal
+    # C(1)+D(1): both leaves, merge -> CD(2)
+    # heap: B(2,leaf), R(2,leaf), CD(2,internal), A(5,leaf)
+    # pick two smallest: leaves preferred -> B and R? But expected merges R with CD first
+    # 
+    # Let me re-examine. If we pick B(2) and R(2): get BR(4)
+    # then heap: CD(2), BR(4), A(5)
+    # pick CD(2) and BR(4) -> CDBR(6)
+    # then A(5)+CDBR(6)=11, A=0, CDBR=1
+    # then CD=10, BR=11, C=100,D=101,B=110,R=111
+    # That gives: A=0, C=100, D=101, B=110, R=111 - matches the failing output!
+    # 
+    # So we need to prefer internal nodes over leaves for tie-break? Or order matters differently
+    # 
+    # Try: prefer internal (CD) over leaves when equal freq
+    # heap: B(2,L), R(2,L), CD(2,I), A(5,L)
+    # pick two smallest preferring internal: CD and then B or R?
+    # CD(2,I) and B(2,L)? or CD(2,I) and R(2,L)?
+    # 
+    # If we pick CD and R: CDR(4)
+    # heap: B(2), CDR(4), A(5)
+    # pick B(2) and CDR(4) -> BCDR(6)
+    # A(5)+BCDR(6)=11, A=0, BCDR=1
+    # B=10, CDR=11, C=110,D=111... no wait CDR splits to CD and R
+    # Actually depends on which is left/right
+    # 
+    # We want: A=0, R=10, B=110, C=1110, D=1111
+    # So tree: root -> A(0), X(1); X -> R(10), Y(11); Y -> B(110), Z(111); Z -> C(1110), D(1111)
+    # 
+    # Build bottom up: Z=C+D(2), Y=B+Z(2+2=4), X=R+Y(2+4=6), root=A+X(5+6=11)
+    # 
+    # Merge sequence:
+    # 1. C(1)+D(1)=Z(2)  [smallest two]
+    # 2. Now heap: B(2),R(2),Z(2),A(5). Pick B(2)+Z(2)=Y(4)
+    #    So we pick B over R when both are 2, and Z (internal,2) over... no Z is picked
+    #    Pick B and Z: means we skipped R
+    # 3. Heap: R(2),Y(4),A(5). Pick R(2)+Y(4)=X(6)
+    # 4. A(5)+X(6)=root
+    # 
+    # So in step 2: among B(2,leaf), R(2,leaf), Z(2,internal), we pick B and Z
+    # Maybe ordering is: leaves first alphabetically, then internals?
+    # B < R alphabetically, Z is internal
+    # If sorted: B, R, Z -> pick B and R. But we picked B and Z.
+    # If sorted: B, Z, R -> pick B and Z. ✓
+    # So internal nodes come between... hmm
+    # 
+    # Or maybe: pick first by freq, then by insertion order (FIFO for ties)?
+    # Insertion order initially: A,B,R,C,D (from Counter on ABRACADABRA)
+    # Counter preserves insertion: A,B,R,C,D
+    # After step 1: heap had A,B,R,C,D, popped C,D, pushed Z
+    # Remaining: A,B,R,Z (Z inserted last)
+    # FIFO order by freq=2: B,R,Z. Pick B and R. But we need B and Z.
+    # 
+    # Maybe LIFO? Z,R,B -> pick Z and R. No, need B and Z.
+    # 
+    # Let me try: count order is different. Counter('ABRACADABRA'):
+    # A:5, B:2, R:2, C:1, D:1
+    # 
+    # What if we sort initially by (freq, char)?
+    # Initial: C(1),D(1),B(2),R(2),A(5)
+    # Pop C,D, push Z(2). Heap: B(2),R(2),Z(2),A(5)
+    # By (freq, ???): need to pick B and Z
+    # 
+    # What if Z is treated as having "char" = combined string "CD"?
+    # Then sort: B(2,"B"), R(2,"R"), Z(2,"CD")
+    # "CD" < "R"? Yes. So order: B, CD, R
+    # Pick B and CD(=Z) ✓
+    # 
+    # Step 3: heap: R(2,"R"), Y(4,"BCD"), A(5,"A")
+    # Pop R and Y -> X(6, "RBCD" or "BCDR")
+    # Step 4: A(5) and X(6) -> root
+    # A=0, X=1 (A < X's combined "BCDR"? "A" < "BCDR" yes)
+    # 
+    # Within X: R vs Y(BCD). "R" vs "BCD": "BCD" < "R", so Y=10, R... wait we need R=10
+    # 
+    # Hmm. Let me think about left/right assignment.
+    # When merging two nodes, smaller becomes left (0), larger becomes right (1)?
+    # Step 4: A(5) vs X(6): A smaller -> A=0, X=1 ✓
+    # Step 3: R(2) vs Y(4): R smaller -> R=0 within X, so R=10 ✓
+    #   Y=1 within X, so Y=11
+    # Step 2: B(2) vs Z(2): equal freq. B < "CD"? Compare "B" vs "CD": "B"<"CD" -> B=0, Z=1
+    #   So B=110, Z=111 ✓
+    # Step 1: C(1) vs D(1): C < D -> C=0, D=1
+    #   C=1110, D=1111 ✓
+    # 
+    # So the rule: nodes have a "label" (char for leaf, concatenation for internal,
+    # OR maybe just the min char in subtree). Compare by (freq, label).
+    # When merging, smaller goes left.
+    
+    nodes = []
+    counter = 0
+    for char, f in freq.items():
+        nodes.append([f, char, char, None, None])  # freq, label, char, left, right
+    
+    while len(nodes) > 1:
+        nodes.sort(key=lambda x: (x[0], x[1]))
+        a = nodes.pop(0)
+        b = nodes.pop(0)
+        # a is smaller (left=0), b is larger (right=1)
+        merged = [a[0]+b[0], a[1]+b[1], None, a, b]
+        nodes.append(merged)
+    
+    root = nodes[0]
+    codes = {}
+    def walk(node, code):
+        if node[2] is not None:
+            codes[node[2]] = code if code else '0'
+        else:
+            walk(node[3], code+'0')
+            walk(node[4], code+'1')
+    walk(root, '')
+    return codes
+
+def main():
+    text = sys.stdin.read()
+    # strip trailing newline only
+    if text.endswith('\n'):
+        text = text[:-1]
+    
+    if not text:
+        return
+    
+    codes = build_codes(text)
+    sorted_codes = sorted(codes.items(), key=lambda x: (len(x[1]), x[0]))
+    for char, code in sorted_codes:
+        print(f"{char}: {code}")
+    
+    encoded = ''.join(codes[c] for c in text)
+    print(f"Encoded: {encoded}")
+    
+    ratio = len(encoded) / (len(text) * 8)
+    print(f"Ratio: {ratio:.2f}")
+
+if __name__ == "__main__":
+    main()

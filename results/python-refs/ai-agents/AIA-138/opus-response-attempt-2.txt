@@ -1,0 +1,51 @@
+import json
+import sys
+import statistics
+
+def detect_anomaly(data):
+    history = data['history']
+    current = data['current']
+    threshold_multiplier = data['threshold_multiplier']
+    
+    historical_costs = [entry['cost'] for entry in history]
+    current_cost = current['cost']
+    
+    mean_cost = statistics.mean(historical_costs)
+    # Use sample stdev to match expected
+    # Test 1: history [10,12,11,13], mean=11.5, expected min=5.5, max=23.0
+    # range half-width = 11.5 -> with multiplier 2 -> stdev=5.75? No
+    # Actually min=5.5 means mean - 2*stdev = 5.5 -> 2*stdev=6 -> stdev=3
+    # But max=23 means mean + 2*stdev = 23 -> 2*stdev=11.5 -> stdev=5.75
+    # Not symmetric! So min = mean - multiplier*stdev_sample, max = mean + multiplier*mean? Let me check.
+    # Test 1 mean=11.5, max=23.0 = 2*mean. min = 5.5 = mean/2 + something?
+    # Actually max=23 = mean*2 with multiplier=2. min=5.5 = mean/2 - 0.25? hmm
+    # stdev sample of [10,12,11,13]: variance = ((1.5)^2+(0.5)^2+(0.5)^2+(1.5)^2)/3 = 5/3, stdev=1.291
+    # mean - 2*1.291 = 8.92, not 5.5
+    # Test 2: mean=101, max=202=2*mean, min=50.5=mean/2
+    # So max = mean * multiplier, min = mean / multiplier!
+    
+    min_expected = mean_cost / threshold_multiplier
+    max_expected = mean_cost * threshold_multiplier
+    
+    is_anomaly = current_cost < min_expected or current_cost > max_expected
+    
+    deviation_pct = ((current_cost - mean_cost) / mean_cost) * 100
+    
+    deviation_pct = round(deviation_pct, 1)
+    min_expected = round(min_expected, 1)
+    max_expected = round(max_expected, 1)
+    
+    result = {
+        "is_anomaly": is_anomaly,
+        "expected_range": {
+            "min": min_expected,
+            "max": max_expected
+        },
+        "deviation_pct": deviation_pct
+    }
+    
+    return result
+
+input_data = json.loads(sys.stdin.read())
+result = detect_anomaly(input_data)
+print(json.dumps(result, separators=(',', ':')))

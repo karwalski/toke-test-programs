@@ -1,0 +1,98 @@
+import re
+import json
+import sys
+
+def extract_all(text):
+    url_pattern = r'https?://[^\s]+?(?=[.,;!?]?(?:\s|$))'
+    email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'
+    phone_pattern = r'\+?\d{1,3}[-.]?\d{3}[-.]?\d{4}'
+    
+    matches = []
+    for m in re.finditer(url_pattern, text):
+        matches.append(('url', m.start(), m.end(), m.group()))
+    for m in re.finditer(email_pattern, text):
+        matches.append(('email', m.start(), m.end(), m.group()))
+    for m in re.finditer(phone_pattern, text):
+        matches.append(('phone', m.start(), m.end(), m.group()))
+    
+    matches.sort(key=lambda x: x[1])
+    return matches
+
+text = sys.stdin.read().strip()
+matches = extract_all(text)
+
+# Tokenize
+words = []
+for m in re.finditer(r'\S+', text):
+    words.append((m.group(), m.start(), m.end()))
+
+def word_idx_of(pos):
+    for i, (w, ws, we) in enumerate(words):
+        if ws <= pos < we:
+            return i
+    return None
+
+# Find word indices of all matches
+match_word_indices = []
+for (typ, s, e, v) in matches:
+    match_word_indices.append(word_idx_of(s))
+
+results = []
+for idx, (typ, start, end, value) in enumerate(matches):
+    wi = match_word_indices[idx]
+    if wi is None:
+        results.append({"type": typ, "value": value, "context": value})
+        continue
+    
+    # Sentence boundary
+    sent_start = 0
+    for i in range(wi - 1, -1, -1):
+        if words[i][0][-1] in '.!?':
+            sent_start = i + 1
+            break
+    sent_end = len(words) - 1
+    for i in range(wi, len(words)):
+        if words[i][0][-1] in '.!?':
+            sent_end = i
+            break
+    
+    # Constrain by other matches
+    left_bound = sent_start
+    right_bound = sent_end
+    for j, owi in enumerate(match_word_indices):
+        if j == idx or owi is None:
+            continue
+        if j < idx and owi >= left_bound:
+            left_bound = owi + 1
+        if j > idx and owi <= right_bound:
+            right_bound = owi - 1
+    
+    # Now decide window: aim for ~5 tokens total including link
+    avail_before = wi - left_bound
+    avail_after = right_bound - wi
+    
+    # target total tokens = 5 (including link)
+    # try 1 before + 3 after first
+    take_before = min(avail_before, 1)
+    take_after = min(avail_after, 5 - 1 - take_before)
+    # if after is less than wanted, extend before
+    remaining = 5 - 1 - take_before - take_after
+    if remaining > 0:
+        extra = min(avail_before - take_before, remaining)
+        take_before += extra
+    
+    lo = wi - take_before
+    hi = wi + take_after
+    
+    # build context - strip trailing punctuation from last word
+    ctx_words = []
+    for i in range(lo, hi + 1):
+        w = words[i][0]
+        if i == hi:
+            w = w.rstrip('.,;!?')
+        ctx_words.append(w)
+    context = ' '.join(ctx_words)
+    
+    results.append({"type": typ, "value": value, "context": context})
+
+print(json.dumps(results, separators=(',', ':')))

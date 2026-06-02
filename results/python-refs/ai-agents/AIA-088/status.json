@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "actual": "def merge_sort(arr):\n    \"\"\"Sort an array using the merge sort algorithm.\n\n    Args:\n        arr: List of comparable elements to sort.\n\n    Returns:\n        A new sorted list.\n    \"\"\"\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)",
+  "expected": "def merge_sort(arr):\n    \"\"\"Sort an array using the merge sort algorithm.\n\n    Args:\n        arr: List of comparable elements to sort.\n\n    Returns:\n        A new sorted list.\n    \"\"\"\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)",
+  "stderr": ""
+}

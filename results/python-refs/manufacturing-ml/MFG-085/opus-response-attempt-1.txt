@@ -1,0 +1,34 @@
+import sys
+import json
+
+def calculate_acf(data, max_lag):
+    n = len(data)
+    mean = sum(data) / n
+    
+    denom = sum((x - mean) ** 2 for x in data)
+    
+    acf = []
+    for lag in range(max_lag + 1):
+        if lag == 0:
+            acf.append(1.0)
+        else:
+            num = sum((data[i] - mean) * (data[i + lag] - mean) for i in range(n - lag))
+            val = num / denom if denom != 0 else 0
+            acf.append(round(val, 2))
+    return acf
+
+lines = [l.strip() for l in sys.stdin if l.strip()]
+max_lag = int(lines[0])
+values = []
+for line in lines[1:]:
+    values.extend(float(x) for x in line.split(','))
+
+n = len(values)
+acf = calculate_acf(values, max_lag)
+
+import math
+threshold = 2 / math.sqrt(n)
+significant_lags = [i for i, v in enumerate(acf) if abs(v) > threshold]
+
+result = {"acf": acf, "significant_lags": significant_lags}
+print(json.dumps(result, separators=(',', ':')))

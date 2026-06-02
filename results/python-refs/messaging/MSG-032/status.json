@@ -1,0 +1,6 @@
+{
+  "status": "ERROR",
+  "actual": "",
+  "expected": "step 1: ck=new_chain_key_hex mk=message_key_hex\nstep 2: ck=new_chain_key_hex mk=message_key_hex\nstep 3: ck=new_chain_key_hex mk=message_key_hex",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 25, in <module>\n    derive_keys(chain_key_hex, num_keys)\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<string>\", line 5, in derive_keys\n    chain_key = bytes.fromhex(chain_key_hex)\nValueError: fromhex() arg must contain an even number of hexadecimal digits\n"
+}

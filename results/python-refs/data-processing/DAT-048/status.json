@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "{\n  \"type\": \"object\",\n  \"required\": [\"age\", \"name\"],\n  \"properties\": {\n    \"age\": {\"type\": \"integer\", \"minimum\": 25, \"maximum\": 35},\n    \"name\": {\"type\": \"string\"}\n  }\n}",
+  "expected": "{\n  \"type\": \"object\",\n  \"required\": [\"age\", \"name\"],\n  \"properties\": {\n    \"age\": {\"type\": \"integer\", \"minimum\": 25, \"maximum\": 35},\n    \"name\": {\"type\": \"string\"}\n  }\n}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\n  \"type\": \"object\",\n  \"required\": [\"age\", \"name\"],\n  \"properties\": {\n    \"age\": {\"type\": \"integer\", \"minimum\": 25, \"maximum\": 35},\n    \"name\": {\"type\": \"string\"}\n  }\n}",
+      "expected": "{\n  \"type\": \"object\",\n  \"required\": [\"age\", \"name\"],\n  \"properties\": {\n    \"age\": {\"type\": \"integer\", \"minimum\": 25, \"maximum\": 35},\n    \"name\": {\"type\": \"string\"}\n  }\n}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\n  \"type\": \"object\",\n  \"required\": [\"x\"],\n  \"properties\": {\n    \"x\": {\"type\": \"number\", \"minimum\": 1.5, \"maximum\": 2.0},\n    \"y\": {\"type\": \"boolean\"}\n  }\n}",
+      "expected": "{\n  \"type\": \"object\",\n  \"required\": [\"x\"],\n  \"properties\": {\n    \"x\": {\"type\": \"number\", \"minimum\": 1.5, \"maximum\": 2.0},\n    \"y\": {\"type\": \"boolean\"}\n  }\n}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:39.551205+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,65 @@
+import sys
+import random
+
+data = sys.stdin.read().split('\n')
+sample_rate = float(data[0].strip())
+seed = int(data[1].strip())
+log_lines = data[2:]
+# Remove trailing empty line if present from final newline
+if log_lines and log_lines[-1] == '':
+    log_lines.pop()
+
+random.seed(seed)
+
+# Try different sampling strategies to match expected output
+# Test 1: rate=0.5, seed=42, lines=[line1,line2,line3,line4] -> [line1,line3]
+# Test 2: rate=1.0, seed=0, lines=[A,B] -> [A,B]
+
+out = []
+for line in log_lines:
+    if random.random() < sample_rate:
+        out.append(line)
+
+# Check if matches; if not try alternative
+# With seed=42: random.random() values
+# Let's just use this and see - but we know it fails test 1
+# Try: random.random() <= sample_rate, or generate first then compare
+# Actually try reverse: r > (1-rate) -> r > 0.5
+# Or use random.sample style
+
+# Let me try: for each line, keep if random.random() < sample_rate
+# but use a fresh approach - generate all randoms first
+random.seed(seed)
+randoms = [random.random() for _ in log_lines]
+# seed 42: first randoms are approximately 0.6394, 0.0250, 0.275, 0.2232
+# We want line1 and line3 kept => indices 0 and 2
+# 0.6394 < 0.5? No. So < doesn't work for keeping line1.
+# Try > : 0.6394>0.5 yes, 0.0250>0.5 no, 0.2750>0.5 no, 0.2232>0.5 no -> only line1
+# Try >= 0.5 same
+# Hmm. Try 1-r < rate: 1-0.6394=0.36<0.5 yes, 1-0.025=0.975<0.5 no, 1-0.275=0.725<0.5 no
+# Only line1 again.
+
+# Maybe shuffle approach? random.sample of indices
+# Or: keep if hash-based
+# Try: random.random() < sample_rate but with seed reseeded per line with seed+index?
+out = []
+for i, line in enumerate(log_lines):
+    random.seed(seed + i)
+    if random.random() < sample_rate:
+        out.append(line)
+# seed=42: random.random() = 0.6394 -> no
+# seed=43: ? 
+# unlikely to work cleanly
+
+# Try sampling k = round(len*rate) items via random.sample sorted indices
+random.seed(seed)
+k = round(len(log_lines) * sample_rate)
+# test1: k = round(2) = 2, sample 2 from [0,1,2,3]
+# random.sample with seed 42: ?
+if k > 0 and log_lines:
+    indices = sorted(random.sample(range(len(log_lines)), k))
+    result = [log_lines[i] for i in indices]
+else:
+    result = []
+
+print('\n'.join(result))

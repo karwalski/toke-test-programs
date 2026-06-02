@@ -1,0 +1,115 @@
+Let me analyze. With dt=1, results diverge. Need smaller dt. Let me try dt=0.01 with 100 sub-steps per step.
+
+Test 1: prey=100, pred=10, α=1.1, β=0.4, γ=0.4, δ=0.1
+Try sub-steps. Let me compute with dt=0.1, 10 substeps:
+Each substep: prey += 0.1*(1.1*prey - 0.4*prey*pred); pred += 0.1*(0.1*prey*pred - 0.4*pred)
+
+Step 1: start 100,10
+- s1: dprey=0.1*(110-400)=-29, dpred=0.1*(100-4)=9.6 → 71, 19.6
+- s2: dprey=0.1*(1.1*71 - 0.4*71*19.6)=0.1*(78.1-556.64)=-47.85, that's diverging too.
+
+Try dt=0.01:
+Sub 1: dprey=0.01*(110-400)=-2.9, dpred=0.01*(100-4)=0.96 → 97.1, 10.96
+...this gets tedious. Let me code it and test mentally with dt=0.01.
+
+Actually let me check the expected: step1 goes 100→73, 10→14. So prey drops 27, pred rises 4.
+
+With dt=0.1, 10 substeps - let me simulate more carefully:
+p=100, q=10
+i=1: dp=0.1*(110-0.4*1000)=0.1*(-290)=-29; dq=0.1*(0.1*1000-4)=0.1*96=9.6
+p=71, q=19.6
+i=2: dp=0.1*(78.1-0.4*71*19.6)=0.1*(78.1-556.64)=-47.85
+That's already too much.
+
+Try dt=0.01:
+After 100 iterations... need to code it.
+
+```python
+import sys
+
+line = input().strip()
+parts = line.split()
+prey_0 = int(parts[0])
+pred_0 = int(parts[1])
+alpha = float(parts[2])
+beta = float(parts[3])
+gamma = float(parts[4])
+delta = float(parts[5])
+steps = int(parts[6])
+
+prey = float(prey_0)
+pred = float(pred_0)
+
+print(f"0 {prey_0} {pred_0}")
+
+dt = 0.01
+sub = 100
+
+for step in range(1, steps + 1):
+    for _ in range(sub):
+        dprey = alpha * prey - beta * prey * pred
+        dpred = delta * prey * pred - gamma * pred
+        prey += dt * dprey
+        pred += dt * dpred
+    print(f"{step} {round(prey)} {round(pred)}")
+```
+
+Let me verify test 1 mentally via reasoning... Actually let me just trust this and check test 2 conceptually:
+Test 2: 50, 5, α=1.0, β=0.1, γ=0.5, δ=0.1
+dp/dt = 50 - 0.1*50*5 = 50-25=25; dq/dt = 0.1*250-2.5 = 22.5
+With dt=1 we'd get 75, 27.5 — wrong. Expected 44, 7.
+
+Hmm, prey decreases from 50 to 44. So at t=0 derivative is +25 (prey increasing)... but expected says it decreased. That's strange.
+
+Wait, let me reconsider. Maybe equations are written differently. Lotka-Volterra:
+dx/dt = αx - βxy
+dy/dt = δxy - γy
+
+With x=50, y=5: dx/dt = 50 - 25 = 25 (positive!). But expected drops to 44.
+
+Maybe sign convention different? Or it does many iterations and oscillates back?
+
+Test 2 with dt=0.01, 100 substeps per unit:
+Start 50, 5. After one full step (t=1), let's see... prey grows initially then crashes as predators grow. Let me think about period. With α=1, γ=0.5, period ~ 2π/√(αγ) ≈ 8.9. So t=1 isn't a full period.
+
+Actually let me try: pred is growing fast. Let me try dt=0.001:
+At small t, prey grows from 25/sec, pred grows from 22.5/sec. Both grow. As pred grows, prey's β*x*y term grows fast and overtakes.
+
+Let me try with simpler approach - what if dt is not 1 but smaller, with output every "1 unit" of time, where 1 unit corresponds to N substeps...
+
+Let me just submit dt=0.01 version and reason that's likely intended.
+
+Hmm but if dx/dt starts at +25, prey grows. Within fraction of time, the cross term grows. Let me estimate: at t, roughly y ~ 5*e^((δx-γ)t) ≈ 5*e^4.5t for small t. So y doubles in ~0.15. By y=10, dx/dt = 50 - 50 = 0. By y=20, dx/dt = 50-100=-50. So crash happens.
+
+Possible 44 at t=1 makes sense. Let me commit.
+
+```python
+import sys
+
+line = input().strip()
+parts = line.split()
+prey_0 = int(parts[0])
+pred_0 = int(parts[1])
+alpha = float(parts[2])
+beta = float(parts[3])
+gamma = float(parts[4])
+delta = float(parts[5])
+steps = int(parts[6])
+
+prey = float(prey_0)
+pred = float(pred_0)
+
+print(f"0 {prey_0} {pred_0}")
+
+dt = 0.01
+sub = 100
+
+for step in range(1, steps + 1):
+    for _ in range(sub):
+        p, q = prey, pred
+        dprey = alpha * p - beta * p * q
+        dpred = delta * p * q - gamma * q
+        prey = p + dt * dprey
+        pred = q + dt * dpred
+    print(f"{step} {round(prey)} {round(pred)}")
+```

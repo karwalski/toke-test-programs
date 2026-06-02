@@ -1,0 +1,59 @@
+import sys
+
+def solve(length, clues, state):
+    arrangements = []
+    
+    def backtrack(pos, clue_idx, current):
+        if clue_idx == len(clues):
+            result = current + ['O'] * (length - len(current))
+            # check compat
+            for i, c in enumerate(result):
+                if state[i] != '.' and state[i] != c:
+                    return
+            arrangements.append(result)
+            return
+        
+        clue_size = clues[clue_idx]
+        remaining = sum(clues[clue_idx+1:]) + (len(clues) - clue_idx - 1)
+        max_start = length - clue_size - remaining
+        
+        for start in range(pos, max_start + 1):
+            new_current = current + ['O'] * (start - pos) + ['X'] * clue_size
+            if clue_idx < len(clues) - 1:
+                new_current = new_current + ['O']
+            # partial check
+            ok = True
+            for i, c in enumerate(new_current):
+                if state[i] != '.' and state[i] != c:
+                    ok = False
+                    break
+            if ok:
+                backtrack(len(new_current), clue_idx + 1, new_current)
+    
+    if not clues:
+        arr = ['O'] * length
+        for i, c in enumerate(arr):
+            if state[i] != '.' and state[i] != c:
+                return '.' * length
+        return ''.join(arr)
+    
+    backtrack(0, 0, [])
+    
+    if not arrangements:
+        return '.' * length
+    
+    result = []
+    for i in range(length):
+        cells = set(arr[i] for arr in arrangements)
+        if len(cells) == 1:
+            result.append(cells.pop())
+        else:
+            result.append('.')
+    return ''.join(result)
+
+length = int(input())
+clues_line = input().strip()
+clues = list(map(int, clues_line.split())) if clues_line else []
+state = input().strip()
+
+print(solve(length, clues, state))

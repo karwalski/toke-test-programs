@@ -1,0 +1,67 @@
+import json
+import sys
+import re
+
+def categorize(text, is_inline):
+    u = text.upper()
+    m = re.match(r'^TODO\s*:?\s*(.*)', text, re.IGNORECASE)
+    if m:
+        return 'todo', m.group(1).strip()
+    m = re.match(r'^FIXME\s*:?\s*(.*)', text, re.IGNORECASE)
+    if m:
+        return 'fixme', m.group(1).strip()
+    if is_inline:
+        return 'inline', text
+    return 'documentation', text
+
+def extract(code, language):
+    lang = language.lower()
+    # Determine comment markers
+    if lang in ('python', 'ruby', 'perl', 'bash', 'sh'):
+        markers = ['#']
+        block = None
+    else:
+        markers = ['//']
+        block = ('/*', '*/')
+    
+    lines = code.split('\n')
+    comments = []
+    
+    in_block = False
+    block_start_line = 0
+    block_content = []
+    
+    for i, line in enumerate(lines, 1):
+        # handle line comments
+        idx = -1
+        marker_used = None
+        for m in markers:
+            j = line.find(m)
+            if j != -1 and (idx == -1 or j < idx):
+                idx = j
+                marker_used = m
+        
+        if idx != -1:
+            before = line[:idx]
+            after = line[idx + len(marker_used):]
+            text = after.strip()
+            is_inline = before.strip() != ''
+            if text:
+                ctype, ctext = categorize(text, is_inline)
+                comments.append({
+                    "type": ctype,
+                    "text": ctext,
+                    "line_number": i
+                })
+    
+    return comments
+
+def main():
+    data = json.loads(sys.stdin.read())
+    code = data['code']
+    language = data['language']
+    result = extract(code, language)
+    print(json.dumps(result, separators=(',', ':')))
+
+if __name__ == "__main__":
+    main()

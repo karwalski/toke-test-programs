@@ -1,0 +1,36 @@
+import json
+import sys
+
+def serialize_agent_state(data):
+    key_mapping = {'user': 'u', 'context': 'c', 'turn': 't', 'metadata': 'm'}
+    compact_data = {}
+    for key, value in data.items():
+        compact_data[key_mapping.get(key, key)] = value
+    return json.dumps(compact_data, separators=(',', ':'))
+
+def deserialize_agent_state(serialized_string):
+    reverse_mapping = {'u': 'user', 'c': 'context', 't': 'turn', 'm': 'metadata'}
+    compact_data = json.loads(serialized_string)
+    full_data = {}
+    for key, value in compact_data.items():
+        full_data[reverse_mapping.get(key, key)] = value
+    return full_data
+
+def main():
+    input_data = json.loads(sys.stdin.read().strip())
+    action = input_data['action']
+    data = input_data['data']
+    
+    if action == 'serialise':
+        result = serialize_agent_state(data)
+        size_bytes = len(result.encode('utf-8'))
+        output = {'result': result, 'size_bytes': size_bytes}
+    elif action == 'deserialise':
+        result = deserialize_agent_state(data)
+        size_bytes = len(data.encode('utf-8'))
+        output = {'result': result, 'size_bytes': size_bytes}
+    
+    print(json.dumps(output, separators=(',', ':')))
+
+if __name__ == '__main__':
+    main()

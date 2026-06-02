@@ -1,0 +1,71 @@
+import sys
+
+def extract_words_from_grid(grid):
+    words = []
+    rows = len(grid)
+    cols = max((len(r) for r in grid), default=0)
+    
+    for i in range(rows):
+        current_word = ""
+        for j in range(cols):
+            ch = grid[i][j] if j < len(grid[i]) else '#'
+            if ch != '#':
+                current_word += ch
+            else:
+                if len(current_word) >= 2:
+                    words.append(current_word)
+                current_word = ""
+        if len(current_word) >= 2:
+            words.append(current_word)
+    
+    for j in range(cols):
+        current_word = ""
+        for i in range(rows):
+            ch = grid[i][j] if j < len(grid[i]) else '#'
+            if ch != '#':
+                current_word += ch
+            else:
+                if len(current_word) >= 2:
+                    words.append(current_word)
+                current_word = ""
+        if len(current_word) >= 2:
+            words.append(current_word)
+    
+    return words
+
+def main():
+    data = sys.stdin.read().split('\n')
+    
+    blank_line_idx = -1
+    for i, line in enumerate(data):
+        if line == "":
+            blank_line_idx = i
+            break
+    
+    if blank_line_idx == -1:
+        grid_lines = data
+        word_list = []
+    else:
+        grid_lines = data[:blank_line_idx]
+        word_list = [l for l in data[blank_line_idx + 1:] if l]
+    
+    grid = [list(line) for line in grid_lines]
+    
+    extracted_words = extract_words_from_grid(grid)
+    
+    valid_words = set(word_list)
+    
+    invalid_words = []
+    seen = set()
+    for w in extracted_words:
+        if w not in valid_words and w not in seen:
+            invalid_words.append(w)
+            seen.add(w)
+    
+    if not invalid_words:
+        print("Valid")
+    else:
+        print("Invalid: " + ", ".join(invalid_words))
+
+if __name__ == "__main__":
+    main()

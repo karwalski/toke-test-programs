@@ -1,0 +1,36 @@
+import sys
+
+def main():
+    data = sys.stdin.read().split('\n')
+    idx = 0
+    grid_size = int(data[idx].strip()); idx += 1
+    cards = list(map(int, data[idx].split())); idx += 1
+    
+    total = grid_size * grid_size
+    matched = [False] * total
+    score = 0
+    
+    while idx < len(data):
+        line = data[idx].strip()
+        idx += 1
+        if not line:
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        p1, p2 = int(parts[0]), int(parts[1])
+        if p1 == p2:
+            continue
+        if matched[p1] or matched[p2]:
+            continue
+        if cards[p1] == cards[p2]:
+            matched[p1] = True
+            matched[p2] = True
+            score += 1
+    
+    remaining = sum(1 for m in matched if not m)
+    print(f"Score: {score}")
+    print(f"Remaining: {remaining}")
+
+if __name__ == "__main__":
+    main()

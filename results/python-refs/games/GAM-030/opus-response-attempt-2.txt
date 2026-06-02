@@ -1,0 +1,75 @@
+import sys
+
+def get_piece_shape(piece_type):
+    shapes = {
+        'I': [(0,0), (1,0), (2,0), (3,0)],
+        'O': [(0,0), (0,1), (1,0), (1,1)],
+        'T': [(0,1), (1,0), (1,1), (1,2)],
+        'S': [(0,1), (0,2), (1,0), (1,1)],
+        'Z': [(0,0), (0,1), (1,1), (1,2)],
+        'J': [(0,0), (1,0), (2,0), (2,1)],
+        'L': [(0,1), (1,1), (2,0), (2,1)]
+    }
+    return shapes[piece_type]
+
+def can_place_piece(board, piece_shape, start_row, start_col):
+    rows = len(board)
+    cols = len(board[0]) if rows > 0 else 0
+    for dr, dc in piece_shape:
+        r = start_row + dr
+        c = start_col + dc
+        if r < 0 or r >= rows or c < 0 or c >= cols:
+            return False
+        if board[r][c] == 'X':
+            return False
+    return True
+
+def solve():
+    data = sys.stdin.read().split('\n')
+    lines = []
+    i = 0
+    while i < len(data) and data[i] != '':
+        lines.append(data[i])
+        i += 1
+    i += 1
+    piece_line = ''
+    while i < len(data):
+        if data[i].strip():
+            piece_line = data[i].strip()
+            break
+        i += 1
+    
+    piece_info = piece_line.split()
+    piece_type = piece_info[0]
+    column = int(piece_info[1])
+    
+    board = lines
+    piece_shape = get_piece_shape(piece_type)
+    
+    if not board:
+        print("Invalid")
+        return
+    
+    rows = len(board)
+    cols = len(board[0]) if rows > 0 else 0
+    
+    max_col_needed = column + max(dc for dr, dc in piece_shape)
+    if max_col_needed >= cols or column < 0:
+        print("Invalid")
+        return
+    
+    max_dr = max(dr for dr, dc in piece_shape)
+    
+    # Find the lowest (largest) row where piece can be placed
+    best = -1
+    for row in range(rows - max_dr, -1, -1):
+        if can_place_piece(board, piece_shape, row, column):
+            best = row
+            break
+    
+    if best < 0:
+        print("Invalid")
+    else:
+        print(best)
+
+solve()

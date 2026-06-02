@@ -1,0 +1,143 @@
+import sys
+
+def read_input():
+    data = sys.stdin.read().split('\n')
+    blank_idx = -1
+    for i, line in enumerate(data):
+        if line == '':
+            blank_idx = i
+            break
+    
+    if blank_idx == -1:
+        grid = data
+        words = []
+    else:
+        grid = data[:blank_idx]
+        words = [w for w in data[blank_idx + 1:] if w != '']
+    
+    return grid, words
+
+def find_slots(grid):
+    rows = len(grid)
+    cols = max(len(r) for r in grid) if rows > 0 else 0
+    grid = [r.ljust(cols, '#') for r in grid]
+    slots = []
+    
+    for r in range(rows):
+        start = None
+        for c in range(cols):
+            if grid[r][c] != '#':
+                if start is None:
+                    start = c
+            else:
+                if start is not None and c - start >= 2:
+                    slots.append(('H', r, start, c - 1))
+                start = None
+        if start is not None and cols - start >= 2:
+            slots.append(('H', r, start, cols - 1))
+    
+    for c in range(cols):
+        start = None
+        for r in range(rows):
+            if grid[r][c] != '#':
+                if start is None:
+                    start = r
+            else:
+                if start is not None and r - start >= 2:
+                    slots.append(('V', start, c, r - 1))
+                start = None
+        if start is not None and rows - start >= 2:
+            slots.append(('V', start, c, rows - 1))
+    
+    return slots, grid
+
+def get_slot_positions(slot):
+    direction = slot[0]
+    if direction == 'H':
+        _, r, start_c, end_c = slot
+        return [(r, c) for c in range(start_c, end_c + 1)]
+    else:
+        _, start_r, c, end_r = slot
+        return [(r, c) for r in range(start_r, end_r + 1)]
+
+def can_place_word(grid, slot, word):
+    positions = get_slot_positions(slot)
+    if len(word) != len(positions):
+        return False
+    for i, (r, c) in enumerate(positions):
+        ch = grid[r][c]
+        if ch != '?' and ch != word[i]:
+            return False
+    return True
+
+def place_word(grid, slot, word):
+    positions = get_slot_positions(slot)
+    new_grid = [list(row) for row in grid]
+    for i, (r, c) in enumerate(positions):
+        new_grid[r][c] = word[i]
+    return [''.join(row) for row in new_grid]
+
+def solve(grid, slots, words, used_words, slot_idx):
+    if slot_idx == len(slots):
+        # Check no remaining ?
+        if any('?' in row for row in grid):
+            return None
+        return grid
+    slot = slots[slot_idx]
+    for word in words:
+        if word in used_words:
+            continue
+        if can_place_word(grid, slot, word):
+            new_grid = place_word(grid, slot, word)
+            used_words.add(word)
+            result = solve(new_grid, slots, words, used_words, slot_idx + 1)
+            if result is not None:
+                return result
+            used_words.discard(word)
+    return None
+
+def solve_allow_reuse(grid, slots, words, slot_idx):
+    if slot_idx == len(slots):
+        if any('?' in row for row in grid):
+            return None
+        return grid
+    slot = slots[slot_idx]
+    for word in words:
+        if can_place_word(grid, slot, word):
+            new_grid = place_word(grid, slot, word)
+            result = solve_allow_reuse(new_grid, slots, words, slot_idx + 1)
+            if result is not None:
+                return result
+    return None
+
+def main():
+    grid, words = read_input()
+    
+    if not grid:
+        print("No solution")
+        return
+    
+    slots, grid = find_slots(grid)
+    
+    if not slots:
+        if all('?' not in row for row in grid):
+            for row in grid:
+                print(row)
+        else:
+            print("No solution")
+        return
+    
+    result = solve(grid, slots, words, set(), 0)
+    
+    if result is None:
+        # Try without uniqueness constraint
+        result = solve_allow_reuse(grid, slots, words, 0)
+    
+    if result is None:
+        print("No solution")
+    else:
+        for row in result:
+            print(row)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,7 @@
+: Test 1's expected output is literally the placeholder string "(diff lines or 'No differences')" - it's not a concrete expected output. Test 2 expects "No differences". Since /tmp/c1.json and /tmp/c2.json don't exist (no setup specified), both files read as empty dicts, yielding "No differences" - which matches Test 2 but not the placeholder Test 1.
+
+The current code already outputs "No differences" for Test 2. The issue is Test 1's expected output is a meta-description, not an actual string. Given the harness might be lenient or the test might just need any valid output...
+
+Actually, looking again - if both files don't exist, both return {} and output "No differences". The expected for Test 1 is the literal string "(diff lines or 'No differences')" which seems like a placeholder. This looks like a spec issue.
+
+{"spec_challenge": "Test 1's expected stdout is the literal placeholder string \"(diff lines or 'No differences')\" rather than a concrete expected output. The test files /tmp/c1.json and /tmp/c2.json are not specified to exist with any particular content, so the actual diff cannot be deterministically computed or matched against the placeholder.", "suggested_amendment": "Provide concrete fixture file contents for /tmp/c1.json and /tmp/c2.json (e.g., via a setup step that writes known JSON), and replace the placeholder expected output with the exact expected diff lines (e.g., '+ new_key: value\\n- old_key: value\\n~ changed_key: old -> new')."}

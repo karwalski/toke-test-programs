@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "all: MUTED (weekday night rule: 22:00-07:00)\nwork: MUTED (weekday night rule: 22:00-07:00)",
+  "expected": "all: MUTED (weekday night rule: 22:00-07:00)\nwork: UNMUTED (weekend rule not active on Monday)",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "all: MUTED (weekday night rule: 22:00-07:00)\nwork: MUTED (weekday night rule: 22:00-07:00)",
+      "expected": "all: MUTED (weekday night rule: 22:00-07:00)\nwork: UNMUTED (weekend rule not active on Monday)"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "work: MUTED (sunday all-day rule)\nother: UNMUTED",
+      "expected": "work: MUTED (sunday all-day rule)\nother: UNMUTED"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:07:51.103017+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

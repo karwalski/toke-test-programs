@@ -1,0 +1,88 @@
+<think>
+Need to find logic that produces: Test1: 100 spins, bet=1, seed=42 → payout 87. Test2: 10 spins, bet=5, seed=1 → payout 35.
+
+7 symbols: cherry lemon orange plum bell bar sevens. Three of a kind pays 10x bet.
+
+Let me try: random.seed(seed), each spin pick 3 symbols, if all same add 10*bet.
+
+Test2: 10 spins, bet=5. Payout 35... but 10*5=50, can't get 35 from multiples of 50. So three-of-a-kind isn't the only payout, or it's not 10x.
+
+Hmm. 35 = 7*5. Maybe per-spin payout varies. Or maybe payouts include partial wins.
+
+Let me think: Test1 payout=87 with bet=1, 100 spins. Test2 payout=35 with bet=5.
+
+35/5 = 7, 87/1 = 87. So in 10 spins we got 7 units of bet, in 100 spins 87 units.
+
+Maybe payout per spin depends on symbols differently. Let me think of common slot scheme:
+- 3 of a kind: 10x
+- 2 of a kind: some
+- 1 cherry: 1x?
+
+Need to simulate. Let me try: symbols list as given order ['cherry','lemon','orange','plum','bell','bar','sevens'].
+
+Use random.randint(0,6) for each reel. Compute payout: 3-same = 10*bet, 2-same = 2*bet, else 0?
+
+Test2: seed=1, 10 spins. Let me mentally try... actually I should think about what could give specific numbers.
+
+Let me try: only 3 of a kind = 10*bet. Probability ~ 1/49. In 100 spins expect ~2 hits ⇒ 20 payout. Got 87. Too high.
+
+What if 2 of a kind also pays? With 7 symbols, P(at least 2 same) = 1 - 6*5/49 = 1 - 30/49 = 19/49 ≈ 0.39. So ~39 hits in 100. 
+
+Maybe: 3-same = 10*bet, 2-same = 1*bet. Then 87 with bet=1 means: 10*a + b = 87 where a is 3-same count, b is 2-same count.
+
+Possibilities: a=8, b=7; a=7,b=17; a=6,b=27; a=5,b=37; etc. With ~2 expected 3-same and ~39 2-same, a=2,b=67 → 87. Yes!
+
+Test2: 10 spins, bet=5. 10*5*a + 5*b = 35 ⇒ 50a+5b=35 ⇒ 10a+b=7. So a=0, b=7. 7 two-of-a-kind in 10 spins. Possible.
+
+Let me try to verify with actual simulation logic. Let me write it.
+
+```python
+import random
+line = input().split()
+spins, bet, seed = int(line[0]), int(line[1]), int(line[2])
+random.seed(seed)
+symbols = ['cherry','lemon','orange','plum','bell','bar','sevens']
+total = 0
+for _ in range(spins):
+    r = [random.choice(symbols) for _ in range(3)]
+    if r[0]==r[1]==r[2]:
+        total += 10*bet
+    elif r[0]==r[1] or r[1]==r[2] or r[0]==r[2]:
+        total += bet
+print(f"Total payout: {total}")
+print(f"Net: {total - spins*bet}")
+```
+
+I can't easily verify without running. Let me think about what random.choice does — uses random() * len. The sequence depends on the symbol list.
+
+Actually, let me think differently. Without being able to run, I'll have to make my best guess. Let me try this version and hope.
+
+Actually I should consider other possibilities too. Maybe each reel uses random.randint(0,6) or random.choice. Maybe weighted.
+
+Let me also consider: payout could be only 10x for 3-same, no 2-same payout. Then test1 = 87 means 8.7 three-of-a-kind which isn't integer. So that's wrong.
+
+If 3-same=10x and 2-same=1x with bet=1, total = 10a+b. For test2 bet=5: 50a+5b. 35=5b with a=0, b=7. Plausible.
+
+Let me try the code above.
+
+Hmm wait, "Three of a kind pays 10x bet" is explicitly stated. The 2-of-a-kind isn't but it makes the math work.
+
+Let me just submit this and see. Actually, I need to choose carefully. Let me also try with random.randint(0,6) instead, or with different orderings.
+
+I'll go with random.choice and the symbol list in spec order.
+</think>
+
+import random
+line = input().split()
+spins, bet, seed = int(line[0]), int(line[1]), int(line[2])
+random.seed(seed)
+symbols = ['cherry','lemon','orange','plum','bell','bar','sevens']
+total = 0
+for _ in range(spins):
+    r = [random.choice(symbols) for _ in range(3)]
+    if r[0]==r[1]==r[2]:
+        total += 10*bet
+    elif r[0]==r[1] or r[1]==r[2] or r[0]==r[2]:
+        total += bet
+print(f"Total payout: {total}")
+print(f"Net: {total - spins*bet}")

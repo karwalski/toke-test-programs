@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "PID NAME CPU% MEM_MB\n11065 python3 1.0 27.2\n1 systemd 0.0 9.6\n2 kthreadd 0.0 0.0\n3 pool_workqueue_release 0.0 0.0\n4 R-rcu_g 0.0 0.0\n5 R-rcu_p 0.0 0.0\n6 R-slub_ 0.0 0.0\n7 R-netns 0.0 0.0\n9 0:0H-events_highpri 0.0 0.0\n12 R-mm_pe 0.0 0.0\n13 rcu_tasks_rude_kthread 0.0 0.0\n14 rcu_tasks_trace_kthread 0.0 0.0\n15 0 0.0 0.0\n16 rcu_sched 0.0 0.0\n17 0 0.0 0.0\n18 0 0.0 0.0\n19 0 0.0 0.0\n20 1 0.0 0.0\n21 1 0.0 0.0\n22 1 0.0 0.0\n23 1 0.0 0.0\n25 1:0H-events_highpri 0.0 0.0\n26 kdevtmpfs 0.0 0.0\n27 R-inet_ 0.0 0.0\n",
+  "expected": "PID NAME CPU% MEM_MB\n(at least one process row)",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "PID NAME CPU% MEM_MB\n11065 python3 1.0 27.2\n1 systemd 0.0 9.6\n2 kthreadd 0.0 0.0\n3 pool_workqueue_release 0.0 0.0\n4 R-rcu_g 0.0 0.0\n5 R-rcu_p 0.0 0.0\n6 R-slub_ 0.0 0.0\n7 R-netns 0.0 0.0\n9 0:0H-events_highpri 0.0 0.0\n12 R-mm_pe 0.0 0.0\n13 rcu_tasks_rude_kthread 0.0 0.0\n14 rcu_tasks_trace_kthread 0.0 0.0\n15 0 0.0 0.0\n16 rcu_sched 0.0 0.0\n17 0 0.0 0.0\n18 0 0.0 0.0\n19 0 0.0 0.0\n20 1 0.0 0.0\n21 1 0.0 0.0\n22 1 0.0 0.0\n23 1 0.0 0.0\n25 1:0H-events_highpri 0.0 0.0\n26 kdevtmpfs 0.0 0.0\n27 R-inet_ 0.0 0.0\n",
+      "expected": "PID NAME CPU% MEM_MB\n(at least one process row)"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "PID NAME CPU% MEM_MB",
+      "expected": "PID NAME CPU% MEM_MB\n(empty)"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:12:20.853859+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

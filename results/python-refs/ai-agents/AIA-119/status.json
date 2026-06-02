@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "{\"selected_branch\":\"escalate\",\"condition_met\":\"status == error AND retries >= 3\",\"fallback\":false}",
+  "expected": "{\"selected_branch\":\"escalate\",\"condition_met\":\"status == error AND retries >= 3\",\"fallback\":false}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"selected_branch\":\"escalate\",\"condition_met\":\"status == error AND retries >= 3\",\"fallback\":false}",
+      "expected": "{\"selected_branch\":\"escalate\",\"condition_met\":\"status == error AND retries >= 3\",\"fallback\":false}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"selected_branch\":\"review\",\"condition_met\":\"score >= 70\",\"fallback\":false}",
+      "expected": "{\"selected_branch\":\"review\",\"condition_met\":\"score >= 70\",\"fallback\":false}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:06:05.125493+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

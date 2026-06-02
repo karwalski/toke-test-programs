@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "GDPR DATA EXPORT: alice\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Alice\n  email: alice@test.com\n  joined: 2023-01-01\nMESSAGES SENT (1):\n  [2024-01-15T10:00:00Z] to bob: Hi\nMESSAGES RECEIVED (1):\n  [2024-01-15T10:01:00Z] from bob: Hey\nDATA CATEGORIES: profile, messages, metadata",
+  "expected": "GDPR DATA EXPORT: alice\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Alice\n  email: alice@test.com\n  joined: 2023-01-01\nMESSAGES SENT (1):\n  [2024-01-15T10:00:00Z] to bob: Hi\nMESSAGES RECEIVED (1):\n  [2024-01-15T10:01:00Z] from bob: Hey\nDATA CATEGORIES: profile, messages, metadata",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "GDPR DATA EXPORT: alice\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Alice\n  email: alice@test.com\n  joined: 2023-01-01\nMESSAGES SENT (1):\n  [2024-01-15T10:00:00Z] to bob: Hi\nMESSAGES RECEIVED (1):\n  [2024-01-15T10:01:00Z] from bob: Hey\nDATA CATEGORIES: profile, messages, metadata",
+      "expected": "GDPR DATA EXPORT: alice\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Alice\n  email: alice@test.com\n  joined: 2023-01-01\nMESSAGES SENT (1):\n  [2024-01-15T10:00:00Z] to bob: Hi\nMESSAGES RECEIVED (1):\n  [2024-01-15T10:01:00Z] from bob: Hey\nDATA CATEGORIES: profile, messages, metadata"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "GDPR DATA EXPORT: bob\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Bob\n  joined: 2024-01-01\nMESSAGES SENT (0):\n  (none)\nMESSAGES RECEIVED (1):\n  [2024-01-01T00:00:00Z] from alice: Test\nDATA CATEGORIES: profile, messages, metadata",
+      "expected": "GDPR DATA EXPORT: bob\ngenerated: [timestamp]\n---\nPROFILE:\n  name: Bob\n  joined: 2024-01-01\nMESSAGES SENT (0):\n  (none)\nMESSAGES RECEIVED (1):\n  [2024-01-01T00:00:00Z] from alice: Test\nDATA CATEGORIES: profile, messages, metadata"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:23:55.051694+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

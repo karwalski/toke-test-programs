@@ -1,0 +1,16 @@
+Testing
+VULNERABLE - Jinja2 detected - Payload: {{7*7}} - Evidence: 49
+SAFE - Payload: {{config}}
+SAFE - Payload: {{''.__class__.__mro__[2]}}
+VULNERABLE - Twig detected - Payload: {{7*7}} - Evidence: 49
+VULNERABLE - Twig detected - Payload: {{_self}} - Evidence: _self
+VULNERABLE - Twig detected - Payload: {{dump(app)}} - Evidence: app
+VULNERABLE - Freemarker detected - Payload: ${7*7} - Evidence: 49
+VULNERABLE - Freemarker detected - Payload: ${7*'7'} - Evidence: 7777777
+SAFE - Payload: <#assign ex="freemarker.template.utility.Execute"?new()> ${ex("id")}
+VULNERABLE - Pebble detected - Payload: {{7*7}} - Evidence: 49
+VULNERABLE - Pebble detected - Payload: {{ beans }} - Evidence: beans
+VULNERABLE - Pebble detected - Payload: {% set cmd = 'id' %}{{ cmd }} - Evidence: id
+VULNERABLE - Jinja2/Twig detected - Payload: {{7+7}} - Evidence: 14
+VULNERABLE - Freemarker detected - Payload: ${3*3} - Evidence: 9
+SAFE - Payload: {{'test'.toUpperCase()}}

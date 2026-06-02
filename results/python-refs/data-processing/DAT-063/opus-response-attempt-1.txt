@@ -1,0 +1,75 @@
+import sys
+import statistics
+
+def detect_outliers_iqr(values, threshold):
+    outliers = []
+    sorted_v = sorted(values)
+    n = len(sorted_v)
+    # Use median-based quartiles (Tukey's hinges)
+    def median(lst):
+        m = len(lst)
+        s = sorted(lst)
+        if m % 2 == 1:
+            return s[m//2]
+        return (s[m//2 - 1] + s[m//2]) / 2
+    
+    if n % 2 == 0:
+        lower = sorted_v[:n//2]
+        upper = sorted_v[n//2:]
+    else:
+        lower = sorted_v[:n//2]
+        upper = sorted_v[n//2+1:]
+    
+    q1 = median(lower)
+    q3 = median(upper)
+    iqr = q3 - q1
+    
+    lower_bound = q1 - threshold * iqr
+    upper_bound = q3 + threshold * iqr
+    
+    for i, value in enumerate(values):
+        if value < lower_bound or value > upper_bound:
+            outliers.append((i, value))
+    
+    return outliers
+
+def detect_outliers_zscore(values, threshold):
+    outliers = []
+    mean = statistics.mean(values)
+    stdev = statistics.stdev(values)
+    
+    for i, value in enumerate(values):
+        z_score = abs((value - mean) / stdev)
+        if z_score > threshold:
+            outliers.append((i, value))
+    
+    return outliers
+
+data = sys.stdin.read().split('\n')
+method = data[0].strip()
+threshold = float(data[1].strip())
+
+values = []
+# Collect remaining values - could be space-separated on one line or one per line
+for line in data[2:]:
+    line = line.strip()
+    if not line:
+        continue
+    for tok in line.split():
+        values.append(float(tok))
+
+if method == "iqr":
+    outliers = detect_outliers_iqr(values, threshold)
+elif method == "zscore":
+    outliers = detect_outliers_zscore(values, threshold)
+else:
+    outliers = []
+
+out_lines = []
+for index, value in outliers:
+    if value == int(value):
+        out_lines.append(f"Index {index}: {int(value)} (outlier)")
+    else:
+        out_lines.append(f"Index {index}: {value} (outlier)")
+
+print('\n'.join(out_lines))

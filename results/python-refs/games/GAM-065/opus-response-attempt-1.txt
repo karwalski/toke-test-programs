@@ -1,0 +1,57 @@
+import sys
+
+def generate_arrangements(clues, length):
+    if not clues:
+        return [['O'] * length]
+    
+    arrangements = []
+    
+    def backtrack(pos, clue_idx, current):
+        if clue_idx == len(clues):
+            result = current + ['O'] * (length - len(current))
+            if len(result) == length:
+                arrangements.append(result)
+            return
+        
+        clue_size = clues[clue_idx]
+        remaining_clues = clues[clue_idx+1:]
+        min_space_needed = sum(remaining_clues) + len(remaining_clues)
+        
+        max_start = length - clue_size - min_space_needed
+        
+        for start in range(pos, max_start + 1):
+            new_current = current + ['O'] * (start - pos) + ['X'] * clue_size
+            if clue_idx < len(clues) - 1:
+                new_current = new_current + ['O']
+            backtrack(len(new_current), clue_idx + 1, new_current)
+    
+    backtrack(0, 0, [])
+    return arrangements
+
+def is_compatible(arrangement, current_state):
+    for arr_cell, curr_cell in zip(arrangement, current_state):
+        if curr_cell != '.' and arr_cell != curr_cell:
+            return False
+    return True
+
+def solve_nonogram_row(length, clues, current_state):
+    all_arrangements = generate_arrangements(clues, length)
+    compatible = [a for a in all_arrangements if is_compatible(a, current_state)]
+    
+    result = ['.'] * length
+    for i in range(length):
+        if compatible:
+            first = compatible[0][i]
+            if all(arr[i] == first for arr in compatible):
+                result[i] = first
+    return ''.join(result)
+
+data = sys.stdin.read().split('\n')
+length = int(data[0])
+clues_line = data[1].strip() if len(data) > 1 else ''
+clues = list(map(int, clues_line.split())) if clues_line else []
+current_state = data[2].strip() if len(data) > 2 else '.' * length
+if len(current_state) < length:
+    current_state = current_state + '.' * (length - len(current_state))
+
+print(solve_nonogram_row(length, clues, current_state))

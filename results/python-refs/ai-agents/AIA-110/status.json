@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"result\":\"{\\\"u\\\":\\\"Alice\\\",\\\"c\\\":[\\\"hello\\\",\\\"how are you\\\"],\\\"t\\\":3,\\\"m\\\":{\\\"lang\\\":\\\"en\\\"}}\",\"size_bytes\":84}",
+  "expected": "{\"result\":\"{\\\"u\\\":\\\"Alice\\\",\\\"c\\\":[\\\"hello\\\",\\\"how are you\\\"],\\\"t\\\":3,\\\"m\\\":{\\\"lang\\\":\\\"en\\\"}}\",\"size_bytes\":62}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"result\":\"{\\\"u\\\":\\\"Alice\\\",\\\"c\\\":[\\\"hello\\\",\\\"how are you\\\"],\\\"t\\\":3,\\\"m\\\":{\\\"lang\\\":\\\"en\\\"}}\",\"size_bytes\":84}",
+      "expected": "{\"result\":\"{\\\"u\\\":\\\"Alice\\\",\\\"c\\\":[\\\"hello\\\",\\\"how are you\\\"],\\\"t\\\":3,\\\"m\\\":{\\\"lang\\\":\\\"en\\\"}}\",\"size_bytes\":62}"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"result\":{\"user\":\"Bob\",\"context\":[],\"turn\":1,\"metadata\":{}},\"size_bytes\":31}",
+      "expected": "{\"result\":{\"user\":\"Bob\",\"context\":[],\"turn\":1,\"metadata\":{}},\"size_bytes\":30}"
+    }
+  ],
+  "repaired_at": "2026-05-31T08:14:16.732471+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 2
+}

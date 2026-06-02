@@ -1,0 +1,63 @@
+import sys
+
+def solve():
+    data = sys.stdin.read().split('\n')
+    if not data:
+        return
+    masked = data[0]
+    wrong = set(data[1].split()) if len(data) > 1 and data[1].strip() else set()
+    dictionary = [l.strip() for l in data[2:] if l.strip()]
+    
+    known = set(c for c in masked if c != '_')
+    L = len(masked)
+    
+    possible = []
+    for word in dictionary:
+        word = word.upper()
+        if len(word) != L:
+            continue
+        ok = True
+        for i in range(L):
+            if masked[i] == '_':
+                if word[i] in known or word[i] in wrong:
+                    ok = False
+                    break
+            else:
+                if word[i] != masked[i]:
+                    ok = False
+                    break
+        if not ok:
+            continue
+        if any(c in wrong for c in word):
+            continue
+        possible.append(word)
+    
+    used = known | wrong
+    # Count total occurrences
+    total_counts = {}
+    # Count word occurrences (in how many words)
+    word_counts = {}
+    for word in possible:
+        for c in word:
+            if c not in used:
+                total_counts[c] = total_counts.get(c, 0) + 1
+        for c in set(word):
+            if c not in used:
+                word_counts[c] = word_counts.get(c, 0) + 1
+    
+    if not total_counts:
+        return
+    
+    n = len(possible)
+    # Try to find letter not in all words first (max info)
+    not_in_all = {c: v for c, v in total_counts.items() if word_counts.get(c, 0) < n}
+    
+    if not_in_all:
+        # pick by total count, tiebreak reverse alphabetical
+        best = max(not_in_all.keys(), key=lambda c: (not_in_all[c], c))
+    else:
+        best = max(total_counts.keys(), key=lambda c: (total_counts[c], c))
+    
+    print(best)
+
+solve()

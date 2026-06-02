@@ -1,0 +1,7 @@
+INCONSISTENCY:
+  A thinks 4,5 unacked; B has acked 4,5
+  A.recv_counter(3) != B.sent_counter(3) OK
+ACTIONS:
+  A: mark 4,5 as acked
+  B: no action needed
+RECONCILED: counters aligned

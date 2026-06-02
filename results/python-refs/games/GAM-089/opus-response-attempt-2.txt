@@ -1,0 +1,64 @@
+import sys
+from collections import deque
+
+def flood_fill(grid, start_row, start_col):
+    if not grid:
+        return 0
+    rows = len(grid)
+    cols = max(len(r) for r in grid)
+    # Pad rows to same length with spaces
+    grid = [r.ljust(cols) for r in grid]
+    
+    if start_row < 0 or start_row >= rows or start_col < 0 or start_col >= cols:
+        return 0
+    
+    target_char = grid[start_row][start_col]
+    
+    visited = set()
+    queue = deque([(start_row, start_col)])
+    visited.add((start_row, start_col))
+    
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    count = 0
+    
+    while queue:
+        row, col = queue.popleft()
+        count += 1
+        for dr, dc in directions:
+            nr, nc = row + dr, col + dc
+            if (nr, nc) in visited:
+                continue
+            if 0 <= nr < rows and 0 <= nc < cols:
+                if grid[nr][nc] == target_char:
+                    visited.add((nr, nc))
+                    queue.append((nr, nc))
+    return count
+
+data = sys.stdin.read().split('\n')
+
+start_row = start_col = None
+grid_end_idx = len(data)
+
+for i in range(len(data) - 1, -1, -1):
+    line = data[i].strip()
+    if not line:
+        continue
+    parts = line.split()
+    if len(parts) == 2 and all(p.lstrip('-').isdigit() for p in parts):
+        start_row, start_col = int(parts[0]), int(parts[1])
+        grid_end_idx = i
+        break
+
+grid_lines = []
+for i in range(grid_end_idx):
+    line = data[i]
+    if line == '':
+        if grid_lines:
+            break
+        continue
+    grid_lines.append(line)
+
+if start_row is None or start_col is None:
+    print(0)
+else:
+    print(flood_fill(grid_lines, start_row, start_col))

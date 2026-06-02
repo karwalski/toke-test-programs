@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"anomalies\": [{\"type\": \"port_scan\", \"severity\": \"high\", \"src_ip\": \"10.0.0.1\", \"evidence\": \"Scanned 2 ports within 60s\", \"timestamp\": \"2025-01-01T00:00:00Z\"}], \"summary\": {\"total_connections\": 2, \"total_anomalies\": 1, \"anomaly_types\": {\"port_scan\": 1, \"data_exfiltration\": 0, \"beaconing\": 0}}}",
+  "expected": "anomalies",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"anomalies\": [{\"type\": \"port_scan\", \"severity\": \"high\", \"src_ip\": \"10.0.0.1\", \"evidence\": \"Scanned 2 ports within 60s\", \"timestamp\": \"2025-01-01T00:00:00Z\"}], \"summary\": {\"total_connections\": 2, \"total_anomalies\": 1, \"anomaly_types\": {\"port_scan\": 1, \"data_exfiltration\": 0, \"beaconing\": 0}}}",
+      "expected": "anomalies"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"anomalies\": [], \"summary\": {\"total_connections\": 1, \"total_anomalies\": 0, \"anomaly_types\": {\"port_scan\": 0, \"data_exfiltration\": 0, \"beaconing\": 0}}}",
+      "expected": "summary"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:48.701848+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

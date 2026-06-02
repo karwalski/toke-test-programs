@@ -1,0 +1,65 @@
+Looking at expected output: cp=1.52, cpk=1.45. With sample std giving 1.47/1.41 and pop std giving 1.55/1.49, neither matches.
+
+Let me try: (n-1) std but the expected std=0.11. Sample std: variance = sum/(n-1). Let me compute mean=10.02, deviations squared sum... values: 10.0,10.1,10.2,9.9,10.0,10.1,9.8,10.0,10.1,10.0, mean=10.02.
+Devs²: 0.0004, 0.0064, 0.0324, 0.0144, 0.0004, 0.0064, 0.0484, 0.0004, 0.0064, 0.0004 = 0.116
+sample var = 0.116/9 = 0.01289, std=0.1135 → 0.11
+pop var = 0.0116, std=0.1077 → 0.11
+
+cp with sample std 0.1135: 1/(6*0.1135)=1.468 → 1.47
+cp with pop std 0.1077: 1/(6*0.1077)=1.548 → 1.55
+
+Expected 1.52... maybe they use std rounded to 0.11? 1/(6*0.11)=1.515 → 1.52. Yes!
+cpk: min((10.5-10.02)/0.33, (10.02-9.5)/0.33) = min(1.4545, 1.5758) = 1.45 ✓
+
+Also expected output doesn't include pp, ppk. And ppm uses different calc giving 0.
+
+For ppm with std=0.11: z_upper=(10.5-10.02)/0.11=4.36, very small. int gives 0. z_lower=(9.5-10.02)/0.11=-4.73, also ~0.
+
+So: round std first, then use rounded std for everything, and don't include pp/ppk.
+
+```python
+import sys, json, math
+
+def erf(x):
+    a1,a2,a3,a4,a5,p = 0.254829592,-0.284496736,1.421413741,-1.453152027,1.061405429,0.3275911
+    sign = 1 if x >= 0 else -1
+    x = abs(x)
+    t = 1.0/(1.0+p*x)
+    y = 1.0-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*math.exp(-x*x)
+    return sign*y
+
+def ncdf(z):
+    return 0.5*(1+erf(z/math.sqrt(2)))
+
+def main():
+    lines = [l.strip() for l in sys.stdin if l.strip()]
+    lsl, usl = map(float, lines[0].split(','))
+    measurements = list(map(float, lines[1].split(',')))
+    n = len(measurements)
+    mean = sum(measurements)/n
+    variance = sum((x-mean)**2 for x in measurements)/(n-1)
+    std = math.sqrt(variance)
+    std_r = round(std, 2)
+    min_val = min(measurements)
+    max_val = max(measurements)
+    cp = (usl-lsl)/(6*std_r)
+    cpk = min((usl-mean)/(3*std_r), (mean-lsl)/(3*std_r))
+    z_upper = (usl-mean)/std_r
+    z_lower = (lsl-mean)/std_r
+    ppm_above = int((1-ncdf(z_upper))*1000000)
+    ppm_below = int(ncdf(z_lower)*1000000)
+    result = {
+        "n": n,
+        "mean": round(mean,2),
+        "std": std_r,
+        "min": min_val,
+        "max": max_val,
+        "cp": round(cp,2),
+        "cpk": round(cpk,2),
+        "ppm_above": ppm_above,
+        "ppm_below": ppm_below
+    }
+    print(json.dumps(result, separators=(',',':')))
+
+main()
+```

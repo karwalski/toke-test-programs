@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "layer 3 (outermost, for relay1):\n  next_hop: relay2\n  encrypted: base64\nlayer 2 (for relay2):\n  next_hop: relay3\n  encrypted: base64\nlayer 1 (for relay3):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Anonymous message",
+  "expected": "layer 3 (outermost, for relay1):\n  next_hop: relay2\n  encrypted: base64\nlayer 2 (for relay2):\n  next_hop: relay3\n  encrypted: base64\nlayer 1 (for relay3):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Anonymous message",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "layer 3 (outermost, for relay1):\n  next_hop: relay2\n  encrypted: base64\nlayer 2 (for relay2):\n  next_hop: relay3\n  encrypted: base64\nlayer 1 (for relay3):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Anonymous message",
+      "expected": "layer 3 (outermost, for relay1):\n  next_hop: relay2\n  encrypted: base64\nlayer 2 (for relay2):\n  next_hop: relay3\n  encrypted: base64\nlayer 1 (for relay3):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Anonymous message"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "layer 1 (outermost, for relay1):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Hello",
+      "expected": "layer 1 (outermost, for r1):\n  next_hop: recipient\n  encrypted: base64\nlayer 0 (for recipient):\n  plaintext: Hello"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:23.622793+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

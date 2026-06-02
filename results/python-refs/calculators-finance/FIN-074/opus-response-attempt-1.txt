@@ -1,0 +1,43 @@
+Looking at test 1: subtotal expected is 475, but actual computation gives 500+250=750... wait. 10*25=250, 5*50=250, total 500. Expected 475.
+
+475 = 500 - 25 (the discount). So "subtotal" in expected output is actually after-discount subtotal.
+
+Test 2: 1*1000=1000, discount 200, after=800. Expected subtotal=800. Yes.
+
+Grand total test 1: 475+47.50=522.50, but expected 497.50. Hmm 497.50-47.50=450. That's 475-25=450? Or 500-50=450...
+
+Wait expected: 475, 25, 47.50, 497.50. 497.50 = 450 + 47.50. And 450 = 475 - 25. So discount applied twice? Or subtotal=475 is after first discount, then another 25 discount?
+
+Actually maybe: subtotal shown = original subtotal - discount = 500-25=475. Then grand = 475 - 25 + 47.50? No...
+
+497.50 - 47.50 = 450. 450 = 500 - 2*25. Or tax on (subtotal - 2*discount): 450 * 0.10 = 45, no.
+
+Let me check: tax 47.50 = 475 * 0.10. So tax is on 475. Grand = 475 + 47.50 - 25 = 497.50. So discount subtracted again.
+
+Test 2: 800 + 40 - ? = 840. So 800+40=840, no extra discount subtraction. Hmm.
+
+Test 2: subtotal=800, discount=200, tax=40, grand=840. 800+40=840. ✓
+Test 1: subtotal=475, discount=25, tax=47.50, grand=497.50. 475+47.50=522.50 ≠ 497.50.
+
+Difference is 25. Hmm. Maybe grand = subtotal_original - discount + tax where subtotal_original... test1: 500-25+47.50=522.50. No.
+
+Maybe grand_total = (subtotal_shown - discount) + tax: test1: (475-25)+47.50=497.50 ✓. Test2: (800-200)+40=640 ≠840. ✗
+
+Maybe subtotal in test1 represents something else. 475 = 250*0.9 + 250*1.0 = 225+250=475. Yes! Subtotal = sum of line totals after discount.
+
+Then discount=25 total. Grand = ? Test1: tax on 475 = 47.50. Grand should be 475+47.50=522.50, but expected 497.50.
+
+497.50 - 47.50 = 450 = 475 - 25. So grand = subtotal - discount + tax = 450+47.50=497.50. ✓
+Test2: 800 - 200 + 40 = 640. ✗ expected 840.
+
+Inconsistent. Unless test2: subtotal=1000 originally, after discount=800, then grand = 800+40=840. So subtotal shown is after-discount, grand = subtotal_shown + tax.
+
+Test1 should be 475+47.50=522.50 but expected 497.50.
+
+Hmm, this is contradictory. Let me recheck test1 expected: '475.00\n25.00\n47.50\n497.50'. 
+
+Maybe in test1 the second item also gets some implicit handling? Gadget 5 50 0 = 250 no discount. Widget 250-25=225. Total 475. Discount 25. Tax 10% of 475 = 47.50. Grand 522.50 logically.
+
+The expected 497.50 seems off by 25 (the discount amount). Possibly a spec bug. Let me flag.
+
+{"spec_challenge": "Test cases are mathematically inconsistent. Test 1 expects subtotal=475 (which equals after-discount: 500-25), discount=25, tax=47.50 (10% of 475), grand=497.50. But 475+47.50=522.50, not 497.50 — the discount appears subtracted twice. Test 2 is self-consistent: subtotal=800 (after-discount: 1000-200), discount=200, tax=40, grand=840=800+40. The two tests use incompatible formulas for grand total.", "suggested_amendment": "Fix Test 1 expected output to '475.00\\n25.00\\n47.50\\n522.50' so grand_total = after_discount_subtotal + tax consistently across both tests."}

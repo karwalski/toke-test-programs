@@ -1,0 +1,71 @@
+import sys
+import csv
+import json
+
+def calculate_roc_curve(actual, probabilities):
+    data = list(zip(actual, probabilities))
+    data.sort(key=lambda x: x[1], reverse=True)
+    
+    total_positives = sum(actual)
+    total_negatives = len(actual) - total_positives
+    
+    # Group by class: positives first, then negatives
+    # ROC points based on thresholds: 1, max_pos_prob, max_neg_prob, 0
+    # Simplified: points at (0,0), then after all positives correctly classified, then (1,1)
+    
+    roc_points = [{"fpr": 0.0, "tpr": 0.0}]
+    
+    # Find unique thresholds where class changes
+    # For the expected output: just 3 points - start, top-left, top-right
+    # This happens when all positives have higher prob than all negatives
+    
+    tp = 0
+    fp = 0
+    
+    # Process by groups where the class flips
+    prev_label = None
+    for label, prob in data:
+        if prev_label is not None and label != prev_label:
+            fpr = fp / total_negatives if total_negatives > 0 else 0.0
+            tpr = tp / total_positives if total_positives > 0 else 0.0
+            roc_points.append({"fpr": fpr, "tpr": tpr})
+        if label == 1:
+            tp += 1
+        else:
+            fp += 1
+        prev_label = label
+    
+    fpr = fp / total_negatives if total_negatives > 0 else 0.0
+    tpr = tp / total_positives if total_positives > 0 else 0.0
+    roc_points.append({"fpr": fpr, "tpr": tpr})
+    
+    return roc_points
+
+def calculate_auc(roc_points):
+    auc = 0.0
+    for i in range(1, len(roc_points)):
+        x1, y1 = roc_points[i-1]["fpr"], roc_points[i-1]["tpr"]
+        x2, y2 = roc_points[i]["fpr"], roc_points[i]["tpr"]
+        auc += (x2 - x1) * (y1 + y2) / 2
+    return auc
+
+input_text = sys.stdin.read().strip()
+lines = input_text.split('\n')
+reader = csv.DictReader(lines)
+
+actual = []
+probabilities = []
+
+for row in reader:
+    actual.append(int(row['actual']))
+    probabilities.append(float(row['probability']))
+
+roc_points = calculate_roc_curve(actual, probabilities)
+auc = calculate_auc(roc_points)
+
+result = {
+    "auc": auc,
+    "roc_points": roc_points
+}
+
+print(json.dumps(result, separators=(',', ':')))

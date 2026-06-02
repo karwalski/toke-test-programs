@@ -1,0 +1,6 @@
+{
+  "status": "WRONG_OUTPUT",
+  "actual": "chain:\n  [0] genesis: 0000...0000\n  [1] First message -> hash: sha256(0000...0000 || msg1)\n  [2] Second message -> hash: sha256(d1bc...b7d9 || msg2)\n  [3] Third message -> hash: sha256(f31f...8ad4 || msg3)\nverification: INTACT (3 messages, no breaks)",
+  "expected": "chain:\n  [0] genesis: 0000...0000\n  [1] First message -> hash: sha256(0000...0000 || msg1)\n  [2] Second message -> hash: sha256(hash1 || msg2)\n  [3] Third message -> hash: sha256(hash2 || msg3)\nverification: INTACT (3 messages, no breaks)",
+  "stderr": ""
+}

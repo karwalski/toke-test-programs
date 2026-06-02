@@ -1,0 +1,18 @@
+import math
+
+def main():
+    line1 = input().strip()
+    line2 = input().strip()
+    s1 = [float(x) for x in line1.split(',')]
+    s2 = [float(x) for x in line2.split(',')]
+    n1, n2 = len(s1), len(s2)
+    m1 = sum(s1)/n1
+    m2 = sum(s2)/n2
+    v1 = sum((x-m1)**2 for x in s1)/(n1-1)
+    v2 = sum((x-m2)**2 for x in s2)/(n2-1)
+    sp2 = ((n1-1)*v1 + (n2-1)*v2) / (n1+n2-2)
+    se = math.sqrt(sp2*(1/n1 + 1/n2))
+    t = (m1-m2)/se
+    print(f"{t:.4f}")
+
+main()

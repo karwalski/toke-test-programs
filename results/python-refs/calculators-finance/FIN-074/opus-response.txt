@@ -1,0 +1,36 @@
+Looking at test 1: subtotal expected 475.00, but actual total of line items is 10*25 + 5*50 = 250 + 250 = 500. Expected subtotal 475 = 500 - 25 (discount already applied). So "Subtotal" means after discount.
+
+Test 2: 1*1000=1000, discount 200, expected subtotal 800. Confirms.
+
+Grand total test 1: 475 + 47.50 = 522.50, but expected 497.50. Hmm. 497.50 = 475 + 22.50. Tax = 47.50 though. Wait: 522.50 - 497.50 = 25. So grand total = subtotal + tax - discount? 475 + 47.50 - 25 = 497.50. Yes.
+
+Test 2: 800 + 40 - 0? = 840. But discount is 200, 800+40-200=640. Doesn't match. Expected 840 = 800+40.
+
+Hmm inconsistent. Let me reconsider test 1. Maybe subtotal=475, discount=25, tax=47.50, grand=497.50. 475+47.50=522.50 ≠ 497.50. 
+
+Wait: tax 47.50 on what? 475*0.10=47.50. So tax is on subtotal (after discount). Grand = 475+47.50 = 522.50, not 497.50.
+
+Maybe grand total = subtotal - discount + tax? Where subtotal = 475 already after discount. Then 475-25+47.50 = 497.50! Yes.
+
+Test 2: 800 - 200 + 40 = 640. But expected 840. Doesn't work.
+
+Hmm. Test 2 grand 840 = 800 + 40. Test 1 grand 497.50 = 450 + 47.50 where 450 = 475-25.
+
+Let me check if test 1 expected might use different logic. Subtotal pre-discount=500, discount=25, after=475, tax=47.50 → 522.50. Expected 497.50 = 475 - 25 + 47.50 or 450+47.50.
+
+Actually 497.50 = 500 - 25 - 25 + 47.50? Or maybe an extra discount applied. 25 extra? Looking: Widget qty10 price25 disc10% = 250, disc=25. Gadget 5*50=250, disc=0. Total disc=25. 
+
+What if grand_total = subtotal_after_discount + tax - discount again? 475+47.50-25=497.50 ✓
+Test 2: 800+40-200=640 ✗
+
+This is inconsistent. Let me try: in test 1 if subtotal shown = 475 means after-discount, discount=25 shown separately, tax on (subtotal-discount)? 450*0.1=45, not 47.50.
+
+What if test 1 subtotal=475 is pre-something... 475 = 500*0.95. If discount were 5%? No.
+
+Let me try grand_total computed differently per test... maybe grand = after_discount + tax - second_discount where double discount only on items having discount. Test 1: 250 had 10% discount, applied twice? 250*0.9*0.9=202.5, +250=452.5, tax 45.25, grand 497.75. Close but no.
+
+Try: subtotal=475, discount=25 is listed but already subtracted, tax on 475 = 47.50, grand = 475 - 25 + 47.50 = 497.50. For test 2: 800 - 200 + 40 = 640 ≠ 840.
+
+The tests genuinely contradict. Let me flag.
+
+{"spec_challenge": "The two test cases are mutually inconsistent. Test 1 expects subtotal=475.00 (post-discount: 500-25), discount=25.00, tax=47.50 (=475*0.10), grand=497.50. But 475+47.50=522.50, not 497.50; 497.50 would require grand=subtotal-discount+tax=475-25+47.50. Test 2 expects subtotal=800.00 (post-discount: 1000-200), discount=200.00, tax=40.00 (=800*0.05), grand=840.00=800+40. Applying test 1's formula to test 2 gives 800-200+40=640≠840. No single consistent formula for grand_total satisfies both cases.", "suggested_amendment": "Fix test 1 expected output to '475.00\\n25.00\\n47.50\\n522.50' so that grand_total = subtotal_after_discount + tax consistently across both tests."}

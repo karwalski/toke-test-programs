@@ -1,0 +1,113 @@
+The expected address `1LqBGSKauBjvYM2aWc9F3hBkcNGgz8iA5q` is the well-known first address for the `abandon abandon ... about` test vector at path m/44'/0'/0'/0/0. The current code produces a different address, which strongly suggests a bug in the secp256k1 arithmetic (specifically the point doubling step has wrong order of operations causing intermediate overflow issues, though Python ints handle that). Let me re-examine...
+
+Actually the code looks mostly correct. The known correct address for that mnemonic at m/44'/0'/0'/0/0 IS `1LqBGSKauBjvYM2aWc9F3hBkcNGgz8iA5q`. Let me check the point doubling formula carefully.
+
+In `secp256k1_point_add`, doubling: `s = (3*x1*x1 * pow(2*y1, P-2, P)) % P`. The `3*x1*x1` part isn't reduced mod P, but multiplication with the inverse and final mod handles it. That should be fine.
+
+Wait - looking more carefully, the issue might be that when `pow(2*y1, P-2, P)` is computed but `2*y1` could be larger than P. Python's pow handles this fine.
+
+Let me check `pow(x2-x1, P-2, P)` - if x2-x1 is negative, Python's pow with modulus handles negative bases correctly in Python 3.8+. This should work.
+
+The bug might be more subtle. Let me rewrite using a cleaner secp256k1 implementation.
+
+```python
+import hashlib
+import hmac
+import sys
+
+P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
+N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
+Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
+G = (Gx, Gy)
+
+def inv(a, n=P):
+    return pow(a % n, -1, n)
+
+def point_add(p, q):
+    if p is None: return q
+    if q is None: return p
+    x1, y1 = p
+    x2, y2 = q
+    if x1 == x2:
+        if (y1 + y2) % P == 0:
+            return None
+        # doubling
+        s = (3 * x1 * x1) * inv(2 * y1) % P
+    else:
+        s = (y2 - y1) * inv(x2 - x1) % P
+    x3 = (s * s - x1 - x2) % P
+    y3 = (s * (x1 - x3) - y1) % P
+    return (x3, y3)
+
+def scalar_mult(k, point=G):
+    k = k % N
+    if k == 0:
+        return None
+    result = None
+    addend = point
+    while k:
+        if k & 1:
+            result = point_add(result, addend)
+        addend = point_add(addend, addend)
+        k >>= 1
+    return result
+
+def pbkdf2_sha512(password, salt, iterations=2048, dklen=64):
+    return hashlib.pbkdf2_hmac('sha512', password, salt, iterations, dklen)
+
+def hmac_sha512(key, data):
+    return hmac.new(key, data, hashlib.sha512).digest()
+
+def ser_p(point):
+    x, y = point
+    prefix = b'\x02' if y % 2 == 0 else b'\x03'
+    return prefix + x.to_bytes(32, 'big')
+
+def derive_child(parent_key, parent_chain, index):
+    if index >= 0x80000000:
+        data = b'\x00' + parent_key + index.to_bytes(4, 'big')
+    else:
+        point = scalar_mult(int.from_bytes(parent_key, 'big'))
+        data = ser_p(point) + index.to_bytes(4, 'big')
+    I = hmac_sha512(parent_chain, data)
+    IL, IR = I[:32], I[32:]
+    parent_int = int.from_bytes(parent_key, 'big')
+    child_int = (int.from_bytes(IL, 'big') + parent_int) % N
+    return child_int.to_bytes(32, 'big'), IR
+
+B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+def base58_encode(data):
+    leading = 0
+    for b in data:
+        if b == 0: leading += 1
+        else: break
+    num = int.from_bytes(data, 'big')
+    out = ''
+    while num > 0:
+        num, r = divmod(num, 58)
+        out = B58[r] + out
+    return '1' * leading + out
+
+def privkey_to_address(priv):
+    point = scalar_mult(int.from_bytes(priv, 'big'))
+    pub = ser_p(point)
+    h = hashlib.new('ripemd160', hashlib.sha256(pub).digest()).digest()
+    versioned = b'\x00' + h
+    checksum = hashlib.sha256(hashlib.sha256(versioned).digest()).digest()[:4]
+    return base58_encode(versioned + checksum)
+
+def main():
+    mnemonic = sys.stdin.read().strip()
+    seed = pbkdf2_sha512(mnemonic.encode('utf-8'), b'mnemonic')
+    I = hmac_sha512(b'Bitcoin seed', seed)
+    key, chain = I[:32], I[32:]
+    for idx in [44 + 0x80000000, 0 + 0x80000000, 0 + 0x80000000, 0]:
+        key, chain = derive_child(key, chain, idx)
+    for i in range(5):
+        ck, _ = derive_child(key, chain, i)
+        print(f"m/44'/0'/0'/0/{i}: {privkey_to_address(ck)}")
+
+main()
+```

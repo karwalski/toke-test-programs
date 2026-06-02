@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "(iterations converging to 1.414214)\nRoot: 1.414214 (N iterations)",
+  "stderr": "  File \"/tmp/tmp5sdtbagk.py\", line 1\n    The polynomial input is \"-2 0 1\" meaning x\u00b2-2, with root \u221a2\u22481.414214. The coefficients order in failing code: for \"-2 0 1\", treats -2 as x\u00b2, 0 as x, 1 as constant \u2192 -2x\u00b2+1, which has different root. Need to reverse: coefficients given as ascending powers (c0 + c1*x + c2*x\u00b2...).\n                                              ^\nSyntaxError: invalid character '\u00b2' (U+00B2)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp5sdtbagk.py\", line 1\n    The polynomial input is \"-2 0 1\" meaning x\u00b2-2, with root \u221a2\u22481.414214. The coefficients order in failing code: for \"-2 0 1\", treats -2 as x\u00b2, 0 as x, 1 as constant \u2192 -2x\u00b2+1, which has different root. Need to reverse: coefficients given as ascending powers (c0 + c1*x + c2*x\u00b2...).\n                                              ^\nSyntaxError: invalid character '\u00b2' (U+00B2)\n",
+      "actual": "",
+      "expected": "(iterations converging to 1.414214)\nRoot: 1.414214 (N iterations)"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp5sdtbagk.py\", line 1\n    The polynomial input is \"-2 0 1\" meaning x\u00b2-2, with root \u221a2\u22481.414214. The coefficients order in failing code: for \"-2 0 1\", treats -2 as x\u00b2, 0 as x, 1 as constant \u2192 -2x\u00b2+1, which has different root. Need to reverse: coefficients given as ascending powers (c0 + c1*x + c2*x\u00b2...).\n                                              ^\nSyntaxError: invalid character '\u00b2' (U+00B2)\n",
+      "actual": "",
+      "expected": "ERROR: f(a) and f(b) must have opposite signs"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:08:00.208611+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

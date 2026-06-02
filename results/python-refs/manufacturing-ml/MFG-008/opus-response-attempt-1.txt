@@ -1,0 +1,16 @@
+mr_bar = 0.2, ucl = 0.65. 0.65/0.2 = 3.25... Let me check: with rounded mr_bar=0.2, 3.267*0.2=0.6534→0.65. So round mr_bar first then compute ucl.
+
+import sys
+import json
+
+input_data = sys.stdin.read().strip()
+measurements = [float(x) for x in input_data.split(',')]
+
+moving_ranges = [abs(measurements[i] - measurements[i-1]) for i in range(1, len(measurements))]
+mr_bar = round(sum(moving_ranges) / len(moving_ranges), 2)
+
+ucl = round(3.267 * mr_bar, 2)
+lcl = round(0 * mr_bar, 2)
+
+result = {"mr_bar": mr_bar, "ucl": ucl, "lcl": lcl}
+print(json.dumps(result, separators=(',', ':')))

@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "Max flow: 23\nFlow on edges: ...",
+  "stderr": "  File \"/tmp/tmpeziym97y.py\", line 1\n    The bug: when reading edges, if there's a reverse edge already (like `2 1 4` after `1 2 10`), setting capacity[u][v] overwrites. But actually the issue is the residual graph initialization \u2014 when building, we set graph[u][v] = capacity[u][v], but for reverse edges in input both exist. Actually the real bug: BFS uses `graph[u]` which is a defaultdict \u2014 iterating creates issues? No.\n                                         ^\nSyntaxError: unterminated string",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpeziym97y.py\", line 1\n    The bug: when reading edges, if there's a reverse edge already (like `2 1 4` after `1 2 10`), setting capacity[u][v] overwrites. But actually the issue is the residual graph initialization \u2014 when building, we set graph[u][v] = capacity[u][v], but for reverse edges in input both exist. Actually the real bug: BFS uses `graph[u]` which is a defaultdict \u2014 iterating creates issues? No.\n                                         ^\nSyntaxError: unterminated string",
+      "actual": "",
+      "expected": "Max flow: 23\nFlow on edges: ..."
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpeziym97y.py\", line 1\n    The bug: when reading edges, if there's a reverse edge already (like `2 1 4` after `1 2 10`), setting capacity[u][v] overwrites. But actually the issue is the residual graph initialization \u2014 when building, we set graph[u][v] = capacity[u][v], but for reverse edges in input both exist. Actually the real bug: BFS uses `graph[u]` which is a defaultdict \u2014 iterating creates issues? No.\n                                         ^\nSyntaxError: unterminated string",
+      "actual": "",
+      "expected": "Max flow: 20\n..."
+    }
+  ],
+  "repaired_at": "2026-05-31T04:26:46.748711+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

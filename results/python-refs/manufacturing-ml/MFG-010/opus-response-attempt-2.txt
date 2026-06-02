@@ -1,0 +1,30 @@
+import sys
+import json
+import math
+
+lines = sys.stdin.read().strip().split('\n')
+lambda_val, target = map(float, lines[0].split(','))
+measurements = list(map(float, lines[1].split(',')))
+
+ewma = []
+current_ewma = target
+
+for measurement in measurements:
+    current_ewma = lambda_val * measurement + (1 - lambda_val) * current_ewma
+    ewma.append(round(current_ewma, 2))
+
+L = 3
+sigma = 1
+steady_state_factor = math.sqrt(lambda_val / (2 - lambda_val))
+control_limit_range = L * sigma * steady_state_factor
+
+ucl = round(target + control_limit_range, 2)
+lcl = round(target - control_limit_range, 2)
+
+result = {
+    "ewma": ewma,
+    "ucl": ucl,
+    "lcl": lcl
+}
+
+print(json.dumps(result, separators=(',', ':')))

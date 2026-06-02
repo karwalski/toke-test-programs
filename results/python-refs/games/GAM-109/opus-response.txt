@@ -1,0 +1,124 @@
+import sys
+
+def main():
+    data = sys.stdin.read().split('\n')
+    # Remove trailing empty lines
+    while data and data[-1] == '':
+        data.pop()
+    
+    # Parse board - lines until we hit a single-char color line
+    # Board lines contain '.' or color letters, all same width
+    # Find board: consecutive lines starting from top
+    # Strategy: first line determines board width
+    if not data:
+        print("Invalid: input error")
+        return
+    
+    board_width = len(data[0])
+    board = []
+    i = 0
+    while i < len(data) and len(data[i]) == board_width and all(c == '.' or c.isalpha() for c in data[i]):
+        # but a single letter line could match if board_width==1
+        # Stop when we find the player color line (single char)
+        board.append(list(data[i]))
+        i += 1
+    
+    # The next line should be the player color (single character)
+    # But our loop may have eaten it. Let's redo: assume board is square or detect by player color line
+    # Actually, the placement line is "row col" - has space and digits
+    # The piece lines contain X and .
+    # Player color is single uppercase letter
+    
+    # Restart parsing
+    board = []
+    i = 0
+    # Board lines: width == board_width, contain only '.' and letters, length > 1 typically
+    # Player color line: length 1
+    while i < len(data):
+        line = data[i]
+        if len(line) == 1 and line.isalpha():
+            break
+        if len(line) == board_width and all(c == '.' or (c.isalpha() and c.isupper()) for c in line):
+            board.append(list(line))
+            i += 1
+        else:
+            break
+    
+    if i >= len(data):
+        print("Invalid: input error")
+        return
+    
+    player_color = data[i]
+    i += 1
+    
+    # Piece lines: contain X and .
+    piece = []
+    while i < len(data):
+        line = data[i]
+        if all(c in 'X.' for c in line) and len(line) > 0 and ' ' not in line:
+            # Could be piece, but make sure it's not placement
+            # placement has digits and space
+            piece.append(list(line))
+            i += 1
+        else:
+            break
+    
+    if i >= len(data):
+        print("Invalid: input error")
+        return
+    
+    placement = data[i].split()
+    row, col = int(placement[0]), int(placement[1])
+    
+    board_height = len(board)
+    bw = len(board[0]) if board else 0
+    
+    piece_positions = []
+    for r in range(len(piece)):
+        for c in range(len(piece[r])):
+            if piece[r][c] == 'X':
+                piece_positions.append((r, c))
+    
+    board_positions = []
+    for pr, pc in piece_positions:
+        br, bc = row + pr, col + pc
+        if br < 0 or br >= board_height or bc < 0 or bc >= bw:
+            print("Invalid: out of bounds")
+            return
+        board_positions.append((br, bc))
+    
+    for br, bc in board_positions:
+        if board[br][bc] != '.':
+            print("Invalid: overlap")
+            return
+    
+    # Check edge sharing with same color
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    for br, bc in board_positions:
+        for dr, dc in directions:
+            nr, nc = br + dr, bc + dc
+            if 0 <= nr < board_height and 0 <= nc < bw:
+                if board[nr][nc] == player_color:
+                    print("Invalid: shares edge with same colour")
+                    return
+    
+    # Check corner touching
+    corners = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    touches_corner = False
+    for br, bc in board_positions:
+        for dr, dc in corners:
+            nr, nc = br + dr, bc + dc
+            if 0 <= nr < board_height and 0 <= nc < bw:
+                if board[nr][nc] == player_color:
+                    touches_corner = True
+                    break
+        if touches_corner:
+            break
+    
+    if not touches_corner:
+        print("Invalid: no corner touch")
+        return
+    
+    print("Valid")
+
+main()

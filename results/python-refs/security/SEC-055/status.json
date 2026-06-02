@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"domain\":\"rebind.example.com\",\"lookupResults\":[{\"timestamp\":1780193498,\"ip\":\"192.168.1.1\",\"isPrivate\":true},{\"timestamp\":1780193499,\"ip\":\"8.8.8.8\",\"isPrivate\":false},{\"timestamp\":1780193500,\"ip\":\"192.168.1.1\",\"isPrivate\":true},{\"timestamp\":1780193501,\"ip\":\"8.8.8.8\",\"isPrivate\":false},{\"timestamp\":1780193502,\"ip\":\"192.168.1.1\",\"isPrivate\":true}],\"rebindingRisk\":\"high\",\"evidence\":[\"Domain resolves to both public and private IPs\",\"RFC 1918 private addresses detected\"]}",
+  "expected": "rebindingRisk",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"domain\":\"rebind.example.com\",\"lookupResults\":[{\"timestamp\":1780193498,\"ip\":\"192.168.1.1\",\"isPrivate\":true},{\"timestamp\":1780193499,\"ip\":\"8.8.8.8\",\"isPrivate\":false},{\"timestamp\":1780193500,\"ip\":\"192.168.1.1\",\"isPrivate\":true},{\"timestamp\":1780193501,\"ip\":\"8.8.8.8\",\"isPrivate\":false},{\"timestamp\":1780193502,\"ip\":\"192.168.1.1\",\"isPrivate\":true}],\"rebindingRisk\":\"high\",\"evidence\":[\"Domain resolves to both public and private IPs\",\"RFC 1918 private addresses detected\"]}",
+      "expected": "rebindingRisk"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"domain\":\"example.com\",\"lookupResults\":[{\"timestamp\":1780193498,\"ip\":\"93.184.216.34\",\"isPrivate\":false},{\"timestamp\":1780193499,\"ip\":\"93.184.216.34\",\"isPrivate\":false},{\"timestamp\":1780193500,\"ip\":\"93.184.216.34\",\"isPrivate\":false},{\"timestamp\":1780193501,\"ip\":\"93.184.216.34\",\"isPrivate\":false},{\"timestamp\":1780193502,\"ip\":\"93.184.216.34\",\"isPrivate\":false}],\"rebindingRisk\":\"low\",\"evidence\":[]}",
+      "expected": "rebindingRisk"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:38.793102+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

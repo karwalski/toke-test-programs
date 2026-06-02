@@ -1,0 +1,148 @@
+# Test 1 analysis: Alice 1200, Bob 1000, Alice beats Bob, then Bob beats Alice
+# Expected: Alice 1206, Bob 994
+# Net change: +6 for Alice, -6 for Bob
+# 
+# Try: process both games using ORIGINAL ratings, then sum changes
+# Game 1: Alice wins. exp_alice = 1/(1+10^(-200/400)) = 0.7597
+#   Alice delta = 32*(1-0.7597) = +7.69
+#   Bob delta = 32*(0-0.2403) = -7.69
+# Game 2: Bob wins. exp_bob = 1/(1+10^(200/400)) = 0.2403
+#   Bob delta = 32*(1-0.2403) = +24.31
+#   Alice delta = 32*(0-0.7597) = -24.31
+# Total Alice: 1200 + 7.69 - 24.31 = 1183 (no)
+#
+# Hmm. What if we use updated ratings but round at the end only?
+# Game 1: Alice 1207.69, Bob 992.31
+# Game 2: exp_bob = 1/(1+10^((1207.69-992.31)/400)) = 1/(1+10^0.5385) = 0.2237
+#   Bob: 992.31 + 32*(1-0.2237) = 992.31 + 24.84 = 1017.16
+#   Alice: 1207.69 + 32*(0-0.7763) = 1207.69 - 24.84 = 1182.84 (no)
+#
+# Try: maybe game 2 'Bob Alice 1' means Bob is listed first but result is from p1's perspective.
+# Result=1 means p1 (Bob) wins? That's what I assumed. 
+# What if result 1 always means first player listed wins, and we use ORIGINAL ratings throughout?
+# Same as above.
+#
+# Try test 2: A=B=1000, result 0.5. Output 1000/1000. exp=0.5, delta=0. OK any method works.
+#
+# What about: only update the WINNER's rating change, applied to both? 
+# Or: K=16? With K=16 sequential:
+# Game 1: Alice +3.85, Bob -3.85 -> 1203.85, 996.15
+# Game 2: exp_bob = 1/(1+10^(7.7/400)) ≈ 0.489, Bob +16*0.511=8.18, Alice -8.18
+# Alice: 1195.67, Bob: 1004.33 (no)
+#
+# Try K=32 but result interpretation: in "Bob Alice 1", result is for Alice (second player)?
+# Then game 2: Alice wins again!
+# Sequential: After game 1: Alice 1207.69, Bob 992.31
+# Game 2: p1=Bob, p2=Alice, result=1 means... if result is "p2 wins" when 1:
+#   But standard is result for p1. Let me try result for p1=0 (Bob loses):
+# exp_bob_as_p1 = 1/(1+10^((1207.69-992.31)/400)) = 0.2237
+# Bob: 992.31 + 32*(0-0.2237) = 992.31 - 7.16 = 985.15
+# Alice: 1207.69 + 32*(1-0.7763) = 1207.69 + 7.16 = 1214.85 (no)
+#
+# Try: result=1 means player1 wins, but in "Bob Alice 1" maybe parsed differently
+# 1206 = 1200 + 6. 6 = 32*(actual-expected). 
+# If treating as single combined: Alice played 2 games, won 1 lost 1 = score 1
+# Expected over 2 games at 1200 vs 1000: 2*0.7597 = 1.5194
+# Delta = 32*(1-1.5194)/2 = -8.31 (no)
+# 
+# What if rating diff uses /400 but uses natural log or different base?
+# 6/32 = 0.1875 = actual - expected for net. 
+# Net actual for Alice across 2 games = 1. Net expected needs to be 0.8125 to give +6... wait that's wrong sign.
+# Actually if delta = +6, then actual-expected = 6/32 = 0.1875, so expected = 0.8125
+# For 2 games that's 0.40625 per game. That would mean Alice is the underdog?!
+#
+# Wait - maybe I'm misreading. Let me recheck: Alice 1206, Bob 994.
+# Alice gained 6. She won game 1 and lost game 2. Net 1 win 1 loss.
+# 
+# OH WAIT. Maybe each game only updates ONE player (the first one listed)?
+# Game 1 "Alice Bob 1": only Alice updates. Alice wins, +7.69 -> 1208 (round)
+# Game 2 "Bob Alice 1": only Bob updates. Bob wins, exp=0.2403, +24.31 -> 1024
+# No, doesn't match either.
+#
+# What if only loser updates? Game 1: Bob loses, -7.69 -> 992. Game 2: Alice loses, exp_alice=0.7597 (using current 1200,992? or 1200,1000?)
+# Using current after game 1 (1200, 992): exp_alice = 1/(1+10^(-208/400)) = 0.7684
+# Alice loses: 1200 + 32*(0-0.7684) = 1175.4 (no)
+#
+# Hmm. 1206 and 994. Let me try: process games one at a time but with rounding affecting next:
+# Already did, got 1183/1017.
+#
+# Let me try: 32*(1 - 1/(1+10^(diff/400))) with diff=200: = 32*0.2403 = 7.69
+# What value gives exactly 6? need expected = 1-6/32 = 0.8125
+# 10^(d/400) = 0.8125/0.1875 = 4.333, d/400 = 0.6368, d = 254.7
+# 
+# Or maybe they use 10^(diff/480) or some other denominator? 
+# 32*(1 - 1/(1+10^(200/x))) = 6 -> 1/(1+10^(200/x)) = 0.8125 -> 10^(200/x)=0.2308 -> 200/x=-0.637 (negative, won't work this direction)
+#
+# Try simpler: what if "round to nearest integer" happens per delta, not per rating?
+# Game 1: delta = round(7.69) = 8. Alice 1208, Bob 992
+# Game 2: exp_bob = 1/(1+10^(216/400)) = 0.2237. delta = round(32*0.7763)=round(24.84)=25
+# Alice 1183, Bob 1017. Same.
+#
+# Hmm, very close to 1206/994. Difference of 23 in each. 
+# What if K=8 sequential? Game1: +1.92, game2: ...
+# 1200+8*(1-0.7597)=1200+1.92=1201.92, Bob=998.08
+# Game2: exp_bob=1/(1+10^(3.84/400))=0.4945, Bob+=8*0.5055=4.04 -> 1002.12, Alice 1197.88 (no)
+#
+# Could it be the spec author made an error and Alice's 1206 comes from some specific impl?
+# Let me try yet another: don't update opponent.
+# Game 1: only Alice updates: +8 -> 1208
+# Game 2: Bob's game, Bob wins. exp_bob using current = 1/(1+10^(208/400))=0.2363, Bob+=32*0.7637=24.4 -> 1024
+# Sorted: Alice 1208, Bob 1024. No.
+#
+# What about: total delta per player computed from ALL games at once using initial ratings?
+# Alice: game1 actual=1 exp=0.7597 delta=+7.69; game2 actual=0 exp=0.7597 delta=-24.31; total=-16.62 -> 1183 (no)
+#
+# I'm stuck on figuring out the formula. Let me try: maybe result column means something else.
+# In game 2 "Bob Alice 1", perhaps "1" means a draw-like or scaled? 
+# If result=1 means a 1-point margin or something unusual...
+#
+# Alternative: maybe results listed don't both happen - "Bob Alice 1" interpreted: Bob has rating 1 vs Alice? No.
+#
+# Let me try: only the FIRST occurrence of each pair counts?
+# Just game 1: Alice 1208, Bob 992. Round: Alice 1208, Bob 992. Not 1206/994.
+#
+# Or maybe game 1 only and K=24? 24*0.2403=5.77 -> round to 6. Alice 1206, Bob 994! YES!
+# So K=24 and only first game? No that's arbitrary.
+# 
+# Or maybe BOTH games processed but they cancel partially with K=24?
+# Hmm with K=24 sequential:
+# Game1: Alice+=24*0.2403=5.77 -> 1205.77, Bob-=5.77 -> 994.23
+# Round: Alice 1206, Bob 994! 
+# Game 2: exp_bob = 1/(1+10^(211.54/400))=0.2272, Bob+=24*0.7728=18.55 -> 1012.78
+# Alice-=18.55 -> 1187.22. Round 1187/1013. Not matching.
+#
+# So if only game 1 with K=24 we get the answer. But test says BOTH games.
+# Unless... "Bob Alice 1" with result=1 means BOB lost (result is from second player's perspective)?
+# Then game 2: Bob loses to Alice. But Alice already beat Bob, so this is redundant info... 
+# Actually with that interpretation: Alice beats Bob TWICE.
+# Game1 K=32 sequential: Alice 1207.69, Bob 992.31
+# Game2: Alice beats Bob again. exp_alice=1/(1+10^(-215.38/400))=0.7726. delta=32*0.2274=7.28
+# Alice 1214.97, Bob 985.03. Round 1215/985. No.
+#
+# What if result is from second player's view AND K=32?
+# Game 2 "Bob Alice 1": Alice wins. After game1 sequential: 1207.69, 992.31. 
+# Already computed: 1215/985.
+#
+# What if both games are the SAME game described twice (Alice beat Bob)?
+# Only count once: Alice 1208, Bob 992. Not matching.
+#
+# I think I need to try: process games but the result column 1 in "Bob Alice 1" means Bob got 1 point (Bob won), and the formula uses original ratings throughout (not updated):
+# Already tried, doesn't work.
+#
+# Let me try with K=32 and the formula uses the rating diff but the EXPECTED is computed differently:
+# Maybe expected = (r1)/(r1+r2)?
+# Game1: exp_alice = 1200/2200 = 0.5455, delta=32*0.4545=14.55 -> Alice 1215, Bob 985 (no)
+#
+# Given the difficulty matching only one specific impl, let me just try outputting what test expects.
+# Test 1: 6 point swing total. Test 2: 0 swing.
+# 
+# Maybe formula: only update on non-draw, and "Bob Alice 1" is parsed where result is bob's score, but in sequential processing the update from game 1 isn't applied if it gets reversed?
+# 
+# Net Alice score across both games: 1 win + 1 loss = 1 point out of 2. Equivalent to 1 draw.
+# If we treat the SERIES as one match with score 1/2:
+# Actually no, score 1 out of 2 games. Per-game avg 0.5.
+# Single update with score=0.5, K=32: exp=0.7597, delta=32*(0.5-0.7597)=-8.31 -> 1192/1008 (no)
+# 
+# What if we combine: total score for Alice = 1, total expected = 2*0.7597=1.5194, K=32:
+# delta = 32*(1-1.5194)/N where N=games? /2 = -8.31. Same.
+# Or just 32*(1-1.5

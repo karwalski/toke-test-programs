@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "{\"retained\":[\"c\",\"a\"],\"evicted\":[\"b\"],\"scoring\":[{\"id\":\"c\",\"combined_score\":0.94},{\"id\":\"a\",\"combined_score\":0.78},{\"id\":\"b\",\"combined_score\":0.14}]}",
+  "expected": "{\"retained\":[\"c\",\"a\"],\"evicted\":[\"b\"],\"scoring\":[{\"id\":\"c\",\"combined_score\":0.93},{\"id\":\"a\",\"combined_score\":0.77},{\"id\":\"b\",\"combined_score\":0.13}]}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"retained\":[\"c\",\"a\"],\"evicted\":[\"b\"],\"scoring\":[{\"id\":\"c\",\"combined_score\":0.94},{\"id\":\"a\",\"combined_score\":0.78},{\"id\":\"b\",\"combined_score\":0.14}]}",
+      "expected": "{\"retained\":[\"c\",\"a\"],\"evicted\":[\"b\"],\"scoring\":[{\"id\":\"c\",\"combined_score\":0.93},{\"id\":\"a\",\"combined_score\":0.77},{\"id\":\"b\",\"combined_score\":0.13}]}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"retained\":[\"x\"],\"evicted\":[],\"scoring\":[{\"id\":\"x\",\"combined_score\":1.0}]}",
+      "expected": "{\"retained\":[\"x\"],\"evicted\":[],\"scoring\":[{\"id\":\"x\",\"combined_score\":1.0}]}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:26.140770+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

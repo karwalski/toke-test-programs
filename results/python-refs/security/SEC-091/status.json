@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "BLOCKED\nGET /admin (user): BLOCKED (403/401)\nGET /admin (none): BLOCKED (403/401)\nPOST /admin (user): BLOCKED (403/401)\nPOST /admin (none): BLOCKED (403/401)\nDELETE /admin (user): BLOCKED (403/401)\nDELETE /admin (none): BLOCKED (403/401)\nGET /users/delete-all (user): BLOCKED (403/401)\nGET /users/delete-all (none): BLOCKED (403/401)\nPOST /users/delete-all (user): BLOCKED (403/401)\nPOST /users/delete-all (none): BLOCKED (403/401)\nDELETE /users/delete-all (user): BLOCKED (403/401)\nDELETE /users/del",
+  "expected": "BLOCKED",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "BLOCKED\nGET /admin (user): BLOCKED (403/401)\nGET /admin (none): BLOCKED (403/401)\nPOST /admin (user): BLOCKED (403/401)\nPOST /admin (none): BLOCKED (403/401)\nDELETE /admin (user): BLOCKED (403/401)\nDELETE /admin (none): BLOCKED (403/401)\nGET /users/delete-all (user): BLOCKED (403/401)\nGET /users/delete-all (none): BLOCKED (403/401)\nPOST /users/delete-all (user): BLOCKED (403/401)\nPOST /users/delete-all (none): BLOCKED (403/401)\nDELETE /users/delete-all (user): BLOCKED (403/401)\nDELETE /users/del",
+      "expected": "BLOCKED"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "BLOCKED\nGET /admin/users (user): BLOCKED (403/401)\nGET /admin/users (none): BLOCKED (403/401)\nPOST /admin/users (user): BLOCKED (403/401)\nPOST /admin/users (none): BLOCKED (403/401)\nDELETE /admin/users (user): BLOCKED (403/401)\nDELETE /admin/users (none): BLOCKED (403/401)\nGET /internal/config (user): BLOCKED (403/401)\nGET /internal/config (none): BLOCKED (403/401)\nPOST /internal/config (user): BLOCKED (403/401)\nPOST /internal/config (none): BLOCKED (403/401)\nDELETE /internal/config (user): BLOC",
+      "expected": "Summary:"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:50.956042+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

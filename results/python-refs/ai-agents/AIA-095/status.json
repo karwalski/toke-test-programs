@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "{\"type\":\"feat\",\"scope\":\"auth\",\"subject\":\"added token validation\",\"body\":null}",
+  "expected": "{\"type\":\"feat\",\"scope\":\"auth\",\"subject\":\"add token validation before processing requests\",\"body\":\"Adds a guard clause to verify token presence and validity before proceeding with authentication flow.\"}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"type\":\"feat\",\"scope\":\"auth\",\"subject\":\"added token validation\",\"body\":null}",
+      "expected": "{\"type\":\"feat\",\"scope\":\"auth\",\"subject\":\"add token validation before processing requests\",\"body\":\"Adds a guard clause to verify token presence and validity before proceeding with authentication flow.\"}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"type\":\"docs\",\"scope\":null,\"subject\":\"fix development start command in README\",\"body\":null}",
+      "expected": "{\"type\":\"docs\",\"scope\":null,\"subject\":\"fix development start command in README\",\"body\":null}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:25.578744+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

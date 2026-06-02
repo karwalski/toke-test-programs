@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "{\"updated_memory\":{\"Alice\":[\"works at Meta\",\"lives in New York\"]},\"new_facts\":[{\"entity\":\"Alice\",\"fact\":\"lives in New York\"}],\"updated_facts\":[{\"entity\":\"Alice\",\"old\":\"works at Google\",\"new\":\"works at Meta\"}]}",
+  "expected": "{\"updated_memory\":{\"Alice\":[\"works at Meta\",\"lives in New York\"]},\"new_facts\":[{\"entity\":\"Alice\",\"fact\":\"lives in New York\"}],\"updated_facts\":[{\"entity\":\"Alice\",\"old\":\"works at Google\",\"new\":\"works at Meta\"}]}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"updated_memory\":{\"Alice\":[\"works at Meta\",\"lives in New York\"]},\"new_facts\":[{\"entity\":\"Alice\",\"fact\":\"lives in New York\"}],\"updated_facts\":[{\"entity\":\"Alice\",\"old\":\"works at Google\",\"new\":\"works at Meta\"}]}",
+      "expected": "{\"updated_memory\":{\"Alice\":[\"works at Meta\",\"lives in New York\"]},\"new_facts\":[{\"entity\":\"Alice\",\"fact\":\"lives in New York\"}],\"updated_facts\":[{\"entity\":\"Alice\",\"old\":\"works at Google\",\"new\":\"works at Meta\"}]}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"updated_memory\":{\"Bob\":[\"has a dog named Max\"]},\"new_facts\":[{\"entity\":\"Bob\",\"fact\":\"has a dog named Max\"}],\"updated_facts\":[]}",
+      "expected": "{\"updated_memory\":{\"Bob\":[\"has a dog named Max\"]},\"new_facts\":[{\"entity\":\"Bob\",\"fact\":\"has a dog named Max\"}],\"updated_facts\":[]}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:06:24.694198+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "",
+  "expected": "line 1: [warn] no-console - No console.log",
+  "stderr": "Traceback (most recent call last):\n  File \"/tmp/tmpwarq4w5b.py\", line 18, in main\n    rules, end = decoder.raw_decode(data, idx)\n  File \"/usr/lib/python3.10/json/decoder.py\", line 353, in raw_decode\n    obj, end = self.scan_once(s, idx)\njson.decoder.JSONDecodeError: Invalid \\escape: line 1 column 39 (char 38)\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/tmpwarq4w5b.py\", line 57, in <module>\n    main()\n  File \"/tmp/tmpwarq4w",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"/tmp/tmpwarq4w5b.py\", line 18, in main\n    rules, end = decoder.raw_decode(data, idx)\n  File \"/usr/lib/python3.10/json/decoder.py\", line 353, in raw_decode\n    obj, end = self.scan_once(s, idx)\njson.decoder.JSONDecodeError: Invalid \\escape: line 1 column 39 (char 38)\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/tmpwarq4w5b.py\", line 57, in <module>\n    main()\n  File \"/tmp/tmpwarq4w",
+      "actual": "",
+      "expected": "line 1: [warn] no-console - No console.log"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "line 1: [error] no-todo - Unresolved TODO",
+      "expected": "line 1: [error] no-todo - Unresolved TODO"
+    }
+  ],
+  "repaired_at": "2026-05-31T08:16:27.852233+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 2
+}

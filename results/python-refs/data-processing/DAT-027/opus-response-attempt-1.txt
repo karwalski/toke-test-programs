@@ -1,0 +1,51 @@
+import sys
+
+def merge_two_runs(run1, run2):
+    merged = []
+    i, j = 0, 0
+    while i < len(run1) and j < len(run2):
+        if run1[i] <= run2[j]:
+            merged.append(run1[i]); i += 1
+        else:
+            merged.append(run2[j]); j += 1
+    merged.extend(run1[i:])
+    merged.extend(run2[j:])
+    return merged
+
+lines = []
+for line in sys.stdin:
+    lines.append(line.strip())
+
+numbers = list(map(int, lines[0].split()))
+k = int(lines[1])
+
+io_ops = 0
+# Phase 1: read all elements, write them into sorted runs
+io_ops += len(numbers)  # reads
+runs = []
+for i in range(0, len(numbers), k):
+    chunk = sorted(numbers[i:i+k])
+    runs.append(chunk)
+io_ops += len(numbers)  # writes
+
+for i, run in enumerate(runs):
+    print(f"Run {i+1}: [{','.join(map(str, run))}]")
+
+pass_num = 1
+while len(runs) > 1:
+    new_runs = []
+    for i in range(0, len(runs), 2):
+        if i + 1 < len(runs):
+            merged = merge_two_runs(runs[i], runs[i+1])
+            new_runs.append(merged)
+            io_ops += len(runs[i]) + len(runs[i+1])
+            io_ops += len(merged)
+        else:
+            new_runs.append(runs[i])
+    runs = new_runs
+    print(f"Merge pass {pass_num}: " + " ".join([f"[{','.join(map(str, r))}]" for r in runs]))
+    pass_num += 1
+
+sorted_result = runs[0]
+print(f"I/O ops: {io_ops}")
+print(f"Sorted: {' '.join(map(str, sorted_result))}")

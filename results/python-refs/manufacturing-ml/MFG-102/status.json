@@ -1,0 +1,20 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 1,
+  "actual": "",
+  "expected": "{\"t_squared\":[0.0,0.5,0.5,0.0,20.0],\"ucl\":10.65,\"out_of_control\":[4]}",
+  "stderr": "  File \"/tmp/tmp50a2lgi3.py\", line 9\n    Actually, let me compute: var(x1) = ((0.4)\u00b2 + (0.3)\u00b2 + (0.5)\u00b2 + (0.4)\u00b2 + (1.6)\u00b2)/4 = (0.16+0.09+0.25+0.16+2.56)/4 = 3.22/4 = 0.805\n                                              ^\nSyntaxError: invalid character '\u00b2' (U+00B2)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp50a2lgi3.py\", line 9\n    Actually, let me compute: var(x1) = ((0.4)\u00b2 + (0.3)\u00b2 + (0.5)\u00b2 + (0.4)\u00b2 + (1.6)\u00b2)/4 = (0.16+0.09+0.25+0.16+2.56)/4 = 3.22/4 = 0.805\n                                              ^\nSyntaxError: invalid character '\u00b2' (U+00B2)\n",
+      "actual": "",
+      "expected": "{\"t_squared\":[0.0,0.5,0.5,0.0,20.0],\"ucl\":10.65,\"out_of_control\":[4]}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:04.544336+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,153 @@
+Looking at the test: "Alice   Smith   030" - positions: "Alice" 0-4, then spaces, "Smith" is at position 8, not 5. Let me count: A(0)l(1)i(2)c(3)e(4) (5) (6) (7)S(8)m(9)i(10)t(11)h(12) (13)... 
+
+Wait, schema says last starts at 5 width 8. "Alice   Smith   030" — chars 5-12 = "   Smith", rstrip = "   Smith" wait no, rstrip removes trailing. So "   Smith" stays. But expected is "Smith".
+
+Hmm, maybe we need to strip both sides? Let me check test 2: "ABC1234567890", code 0-2 = "ABC", value 3-12 = "1234567890". That works either way.
+
+For test 1, to get "Smith" from positions 5-12 ("   Smith"), we'd need lstrip or full strip. Let me use .strip().
+
+Also age 13 width 3: positions 13,14,15. "Alice   Smith   030" length is 19. chars 13-15 = "   ". That gives empty. But expected "030".
+
+So the data must be fixed width but the schema positions seem off unless we treat them differently. Let me recount "Alice   Smith   030": A-l-i-c-e (5 chars) then "   " (3 spaces) = 8, then Smith (5) = 13, then "   " (3) = 16, then "030" = 19. 
+
+So Smith is at 8-12, 030 is at 16-18. Schema says last at 5 width 8: 5-12 = "   Smith" — strip gives "Smith" ✓. Age at 13 width 3: 13-15 = "   " — that's spaces not "030".
+
+Hmm. Unless width means something else. last start=5 width=8 means chars 5..12 (8 chars). Then age start should be 13. But "030" is at 16-18.
+
+Wait maybe positions are 1-indexed despite spec saying 0-indexed? last start=5 (1-idx) width=8 means chars 4-11 = "e   Smit"... no.
+
+Maybe start is cumulative field index? Or maybe widths overlap/separators? Let me try: treat as sequential, ignore start, use width. first width 5 = "Alice", last width 8 = "   Smith" strip = "Smith", age width 3 = "   " no.
+
+Try: first 5 chars "Alice", then skip to position based on next start. Hmm.
+
+Actually wait — what if data has different spacing? Let me check exact input: 'Alice   Smith   030' — 3 spaces between. But maybe parsing as: skip 3 separator chars between fields, with start being field-index based? 
+
+Let me try widths summing: 5+8+3=16, but data is 19 chars. Difference 3 = 2 separators. So maybe space-separated with given widths? No, that's not fixed width.
+
+Maybe start positions are wrong in spec and we should use cumulative widths only:
+- first: 0..4 = "Alice"
+- last: 5..12 = "   Smith" -> strip "Smith" 
+- age: 13..15 = "   " -> ""
+
+Doesn't work. Need age=030 at end. Length 19, age width 3, so age at 16-18.
+
+What if we right-align and the data ends where it ends? Take last `width` chars from position... no.
+
+Let me try: take from start, then strip both sides:
+- last 5..12: "   Smith" → "Smith" ✓
+- age 13..15: "   " → "" ✗
+
+Unless start values are wrong. What if "start" is actually start of next data after this one... no.
+
+Maybe test1 string actually has different spaces. Let me recount: "Alice   Smith   030" — A(1)l(2)i(3)c(4)e(5)space(6)space(7)space(8)S... so 0-indexed: Smith starts at 8. 
+
+What if the schema means: last starts at index 5 in the **trimmed/tokenized** sense? No.
+
+Maybe width is misinterpreted - perhaps "width" includes separator before. Hmm.
+
+Let me try: extract from start to start+width but also lstrip:
+- last "   Smith" strip → "Smith" ✓
+- age start=13: data[13:16] = "   " → "" ✗
+
+I think the spec test is just inconsistent with description. But maybe data should be read differently — perhaps the data line has the values left-padded? Like "Alice", then last is padded to width 8 right-aligned: "   Smith", then age: "030".
+
+So actual layout: first(0-4)="Alice", last(5-12)="   Smith", age(13-15)="030". That means data length should be 16: "Alice   Smith030". But actual is "Alice   Smith   030" (19 chars).
+
+Wait, maybe there are NO extra spaces and I'm miscounting. "Alice   Smith   030" — let me be careful. In Python source 'Alice   Smith   030' — between Alice and Smith there are 3 spaces, between Smith and 030 there are 3 spaces.
+
+Alice=5, +3=8, Smith=5 (ends at 13), +3=16, 030=3 (ends at 19). Total 19.
+
+For age to be "030" at start 13 width 3, age would be 13-15 = "  0"... no wait position 13 is " " (space after Smith). 
+
+What if schema starts are 0-indexed but I'm miscounting? Position 13: A=0,l=1,i=2,c=3,e=4, =5, =6, =7,S=8,m=9,i=10,t=11,h=12, =13, =14, =15,0=16,3=17,0=18. So data[13:16]="   ", data[16:19]="030".
+
+Hmm — but schema says age 13 width 3. Unless... what if the schema actually represents end positions where age "starts after position 13" meaning width 3 from the right side?
+
+Or maybe I should re-parse the schema: "age 13 3" - what if 13 is width and 3 is... no.
+
+Let me look at test 2: "code 0 3, value 3 10" data "ABC1234567890" (13 chars). code 0:3="ABC", value 3:13="1234567890" ✓. That's consistent with 0-indexed start+width.
+
+For test 1, lengths 5+8+3=16 but data is 19. Difference 3. So 3 extra spaces somewhere.
+
+Wait! Maybe my counting of input string is wrong. Let me look again: `'Alice   Smith   030'`. Could those be tabs or different? The problem says spaces. But what if it's actually `'Alice   Smith030'` with embedded? No the spec is clear.
+
+Actually re-reading: 'Alice   Smith   030\nBob     Jones   025'. Bob has 5 spaces (Bob is 3 chars, needs to fill width 5, so "Bob  " then last width 8 starts at 5).
+
+"Bob     Jones   025": B=0,o=1,b=2, =3, =4, =5,J=6... wait Bob is 3 chars and field first width is 5, so "Bob  " (Bob+2 spaces) fills 0-4. Then last at 5-12 width 8 = "  Jones " or "   Jones"? Jones=5 chars, padded to 8.
+
+Let me count "Bob     Jones   025": B,o,b, , , , , ,J,o,n,e,s, , , ,0,2,5. That's B(0)o(1)b(2) (3) (4) (5) (6) (7)J(8)o(9)... so Jones starts at position 8. With 5 spaces between Bob and Jones.
+
+So both data lines have Smith/Jones starting at position 8, not at the field boundary 5. Unless schema is wrong and last should be "5 8" interpreted differently.
+
+OH WAIT. What if it's `name start_inclusive end_exclusive` not width? Let me check:
+- first 0 5: chars 0-4 = "Alice" ✓ (start=0, end=5)
+- last 5 8: chars 5-7 = "   "? No that doesn't work either.
+
+Or start/end where second number is end:
+- first 0..5 (5 chars) = "Alice" ✓
+- last 5..8: that's only 3 chars "   " ✗
+
+What if numbers are 1-indexed?
+- first 0 5 → cols 0-5? 
+- last 5 8 → cols 5-8?
+
+Hmm. Let me try treating second value as ending position:
+- first start=0 end=5: data[0:5]="Alice" 
+- last start=5 end=...? if 8 is something else
+
+Actually I bet the schema means "name, start_position, end_position" but spec called it width. Test 2:
+- code 0 3: data[0:3]="ABC" ✓
+- value 3 10: if interpreted as start=3 width=10, data[3:13]="1234567890" ✓. If start=3 end=10, data[3:10]="1234567" ✗.
+
+So test 2 confirms width. Test 1 just seems broken... unless data is meant to be interpreted differently.
+
+Wait, let me look at expected output once more: `{"first":"Alice","last":"Smith","age":"030"}`. The result has all three correct values. The data string MUST contain these in some parseable way.
+
+What if we should strip whitespace WITHIN the data line first, treating multiple spaces as separators? But that's not fixed-width.
+
+Or what if the schema positions should be applied to a "compacted" version? Like, the start values reference position in a normalized form?
+
+Or - radical idea - what if we treat data as fields and split by multiple spaces, then assign in order based on schema?
+
+Test 1 data "Alice   Smith   030" split → ["Alice","Smith","030"]. Schema has 3 fields → assign. ✓
+Test 2 data "ABC1234567890" split → ["ABC1234567890"]. Schema has 2 fields. ✗
+
+Hmm doesn't work for test 2.
+
+What if we use widths only (cumulative), ignoring start?
+Test 2: first 3 chars "ABC", next 10 "1234567890" ✓
+Test 1: first 5 "Alice", next 8 "   Smith" strip="Smith", next 3 "   " strip="" ✗
+
+Strip approach + cumulative widths fails for age.
+
+Unless... data line is longer than sum of widths and the LAST field reads to end?
+
+Test 1: widths 5+8+3=16, data length 19. If last field reads remaining: would be "   030" strip "030" ✓!
+Test 2: widths 3+10=13, data length 13. Last field reads "1234567890" ✓.
+
+But what about middle fields if there's excess? Maybe distribute: trim left padding from each field?
+
+Actually here's an idea: use width but also lstrip the field, and if there's leftover data shift subsequent fields? No too complex.
+
+Simpler: use start positions but interpret them as "skip leading whitespace before field". 
+
+Or: read each field using width, but allow shifting if value has trailing content from next field.
+
+Hmm, let me reconsider. What if data uses widths but with separators between fields? Like 1 space separator? Then:
+- field1 width 5 at 0-4
+- separator at 5
+- field2 width 8 at 6-13... let's check: data[6:14]="  Smith " strip "Smith" ✓
+- separator at 14
+- field3 width 3 at 15-17: data[15:18]=" 03" no
+
+That doesn't work either. 
+
+What if the actual rule is: use start+width but if field is all whitespace, look ahead/right-justify?
+
+Look — maybe the simplest interpretation that works for both tests: extract data[start:start+width], strip both sides. For age field where data[13:16]="   ", we'd get "" not "030".
+
+I think test 1 might just have a typo in the spec but we need to make it work. Let me try this strategy: for each field, take data[start:start+width].strip(); if empty and there's more data, ??? 
+
+Actually wait — let me carefully recount "Alice   Smith   030". Maybe it's NOT 3 spaces. What if it's: Alice (5) + 3 spaces (8) + Smith (13) + 3 spaces (16) + 030 (19). For age start=13 to work with width=3 to give "030"... we'd need 030 at position 13. So data would be "Alice...Smith030" total 16 chars.
+
+Hmm but spec clearly shows '   030' with spaces. Let me look at exact spec string in test 1:

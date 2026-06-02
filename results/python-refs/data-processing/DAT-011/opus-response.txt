@@ -1,0 +1,186 @@
+Looking at test 1: "Alice   Smith   030" — "Alice" is 0-4 (5 chars), then "   Smith   " would be positions 5-15, but schema says last is at 5 width 8, age at 13 width 3.
+
+Position 5-12 (width 8): "   Smith" — but expected is "Smith". So we need to strip both sides, or lstrip too.
+
+Wait, let me recount: "Alice   Smith   030"
+- 0:A 1:l 2:i 3:c 4:e 5:(space) 6:(space) 7:(space) 8:S 9:m 10:i 11:t 12:h 13:(space) 14:(space) 15:(space) 16:0 17:3 18:0
+
+Hmm, age start=13 width=3 → positions 13-15 = "   " (spaces). But expected "030".
+
+So the field positions are based on stripped/trimmed field count, not literal. Actually maybe fields are 5+8+3=16 chars, and "Alice   Smith   030" — Alice(5) + "   Smith"(8) + "   "... no.
+
+Wait maybe: "Alice" padded to 5, then "Smith" but with padding... Let me think. If last is start=5 width=8, that's "   Smith" (right-aligned? need lstrip). Then age start=13 width=3 = positions 13,14,15 = "   ".
+
+But expected age is "030". So input must be "Alice   Smith   030" where age is at position 16? Or maybe widths include separator differently.
+
+Let me count actual string: "Alice" = 5 chars, then "   " 3 spaces, "Smith" 5 chars, "   " 3 spaces, "030" 3 chars. Total = 5+3+5+3+3 = 19.
+
+For last to be "Smith" at start=5 width=8: positions 5-12 = "   Smith" → needs lstrip too. For age at start=13 width=3: positions 13-15 = "   ". Not "030".
+
+Hmm, expected age is "030" which is at positions 16-18. So start=13 is wrong for that... unless start means something else. Or maybe schema indicates widths after previous field's actual width.
+
+Actually wait — maybe the input data has different spacing. Let me re-read: `'Alice   Smith   030'`. That's literal. Maybe positions are 1-indexed? Spec says 0-indexed.
+
+Let me try: if "last" is 5 width 8 → "   Smith" (8 chars from pos 5). strip = "Smith". ✓
+If "age" is 13 width 3 → from pos 13, 3 chars. "Alice   Smith   030"[13:16] = let me count carefully.
+
+"Alice   Smith   030"
+ 0123456789...
+
+A(0)l(1)i(2)c(3)e(4) (5) (6) (7)S(8)m(9)i(10)t(11)h(12) (13) (14) (15)0(16)3(17)0(18)
+
+So [13:16] = "   ". Not "030".
+
+This seems contradictory. Unless the data line is meant differently. Maybe schema's width for last is 8 means it ends at 13, but the data actually has last="Smith   " padded. Then age would start at 13.
+
+Test 2: "code 0 3, value 3 10" with "ABC1234567890" → code="ABC"(0:3), value="1234567890"(3:13). Works.
+
+For test 1 to work, the data must align: first(0:5)="Alice", last(5:13), age(13:16)="030". So last is "   Smith" - but wait, expected "Smith". If we strip both sides, "   Smith".strip() = "Smith". ✓
+
+But age at [13:16] from "Alice   Smith   030" must be "030". Let me recount the string... maybe I'm miscounting spaces.
+
+'Alice   Smith   030' — between Alice and Smith there are 3 spaces, between Smith and 030 there are 3 spaces.
+
+Alice = 5 chars (0-4), 3 spaces (5-7), Smith = 5 chars (8-12), 3 spaces (13-15), 030 (16-18).
+
+So [13:16]="   ". Expected "030".
+
+Unless the input string actually has different spacing. Let me look at the raw spec: `'Alice   Smith   030'`. Perhaps there are more/fewer spaces than I'm counting.
+
+For age to be "030" at start=13: 0 must be at position 13. So Alice + spaces + Smith + spaces = 13 chars. 5+?+5+?=13. With last starting at 5 width 8: last field is 8 chars = "   Smith" no wait. If last="Smith" is 5 chars but width=8 then 3 spaces padding. If spacing between Alice and Smith is, say, 3 spaces → positions 5,6,7 are spaces, Smith at 8-12, then positions 13-... so last field [5:13] = "   Smith". Then age starts at 13. For "030" to be at 13, no spaces between Smith and 030.
+
+But the spec clearly shows "   030" with spaces. Unless those spaces are tabs or it's actually different.
+
+Hmm wait, let me look again: `'Alice   Smith   030\nBob     Jones   025'`. Bob is 3 chars, then 5 spaces, Jones 5 chars, 3 spaces, 025.
+
+For Bob: first(0:5)="Bob  " (Bob + 2 spaces), then last(5:13). Position 5 onwards: "   Jones   025"[0:8] = "   Jones". strip="Jones" ✓. Then age[13:16] = "   ". Not "025".
+
+So either the test is broken or... actually let me just count chars in 'Bob     Jones   025':
+B(0)o(1)b(2) (3) (4) (5) (6) (7)J(8)o(9)n(10)e(11)s(12) (13) (14) (15)0(16)2(17)5(18)
+
+Same problem. age at [13:16] = "   ".
+
+Unless the strip should make us look further? Or maybe the intent is each "width" is the visible width but separators are extra?
+
+Actually maybe the parser should be: extract from start to start+width but skip separator spaces. Or fields are space-separated and start/width describe their position in a stripped sense.
+
+Let me try: split by columns where each column starts at `start`. Take from start to next field's start (or end of line), then strip.
+
+first: [0:5] = "Alice", strip = "Alice" ✓
+last: [5:13] = "   Smith", strip = "Smith" ✓  
+age: [13:] = "   030", strip = "030" ✓
+
+YES! That works for test 1. For Bob: age [13:] = "   025", strip = "025" ✓.
+
+Test 2: code [0:3] = "ABC", value [3:] = "1234567890". Strip → "1234567890" ✓.
+
+So the approach: extract from start to next field's start (ignore width for boundary, but use it... or just use it as boundary anyway but strip). Actually simpler: extract from start to start+width, then if there's more in that field consumed by next field's start, extend.
+
+Wait, in test 1: last has width 8, so [5:13]. age starts at 13. That matches. age has width 3, [13:16] = "   ". But we need "   030" → [13:19].
+
+So the fix: take field as [start : next_start] (or end of line for last field), then strip. Ignore width for boundaries.
+
+Or: use start+width but for last field extend to end of line, AND strip both sides.
+
+Test 1 age is last field. start=13, end of line=19. [13:19]="   030", strip="030" ✓.
+Test 2 value is last field. start=3, end=13. [3:13]="1234567890" ✓.
+
+What about non-last fields? Use width normally with strip both sides.
+
+```python
+import sys, json
+
+data = sys.stdin.read().split('\n')
+schema = []
+i = 0
+while i < len(data) and data[i].strip():
+    parts = data[i].split()
+    schema.append((parts[0], int(parts[1]), int(parts[2])))
+    i += 1
+i += 1
+results = []
+while i < len(data):
+    line = data[i]
+    if line == '' and i == len(data)-1:
+        i += 1
+        continue
+    rec = {}
+    for j, (name, start, width) in enumerate(schema):
+        if j == len(schema)-1:
+            val = line[start:].strip()
+        else:
+            val = line[start:start+width].strip()
+        rec[name] = val
+    print(json.dumps(rec, separators=(',',':')))
+    i += 1
+```
+
+Hmm but test 1 line 1 last field [5:13]="   Smith", strip="Smith" ✓. Good.
+
+Let me make sure no trailing newline issue.
+
+```python
+import sys
+import json
+
+lines = sys.stdin.read().split('\n')
+schema = []
+i = 0
+while i < len(lines) and lines[i].strip():
+    parts = lines[i].split()
+    schema.append((parts[0], int(parts[1]), int(parts[2])))
+    i += 1
+i += 1
+
+out = []
+while i < len(lines):
+    line = lines[i]
+    if not line:
+        i += 1
+        continue
+    rec = {}
+    for j, (name, start, width) in enumerate(schema):
+        if j == len(schema) - 1:
+            val = line[start:].strip()
+        else:
+            val = line[start:start+width].strip()
+        rec[name] = val
+    out.append(json.dumps(rec, separators=(',', ':')))
+    i += 1
+
+print('\n'.join(out))
+```
+
+This should work.
+
+```python
+import sys
+import json
+
+lines = sys.stdin.read().split('\n')
+schema = []
+i = 0
+while i < len(lines) and lines[i].strip():
+    parts = lines[i].split()
+    schema.append((parts[0], int(parts[1]), int(parts[2])))
+    i += 1
+i += 1
+
+out = []
+while i < len(lines):
+    line = lines[i]
+    if not line:
+        i += 1
+        continue
+    rec = {}
+    for j, (name, start, width) in enumerate(schema):
+        if j == len(schema) - 1:
+            val = line[start:].strip()
+        else:
+            val = line[start:start+width].strip()
+        rec[name] = val
+    out.append(json.dumps(rec, separators=(',', ':')))
+    i += 1
+
+print('\n'.join(out))
+```

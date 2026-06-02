@@ -1,0 +1,46 @@
+Looking at test 1: grid is 4x4, 16 cards. 4 pairs matched = 8 cards. Remaining should be 8 but expected is 0. So "Remaining" means remaining pairs/cards still to match after considering... wait, expected is 0 meaning all matched. But only 4 pairs flipped out of 8 pairs in grid.
+
+Wait, the grid has values 1,2,3,4,4,3,2,1,5,6,5,6,7,8,7,8 - that's 8 pairs. Only 4 flips done. Expected Remaining: 0?
+
+Let me reconsider. Maybe "Remaining" means remaining flip attempts or something. Or maybe Remaining = total_cards/2 - score... 16/2 - 4 = 4. No.
+
+Maybe Remaining counts unmatched pairs that the player hasn't found. But expected is 0 in both cases. In test 2: 2x2=4 cards, 2 pairs, 2 flips both matched. Remaining=0 makes sense.
+
+In test 1: 4 matches out of... hmm. Maybe Remaining = unmatched cards minus... or maybe Remaining just always reflects pairs not flipped at all = 0 if score equals number of flip pairs given? No.
+
+Actually maybe "Remaining" = unmatched flip attempts = total flips - score. Test1: 4-4=0. Test2: 2-2=0. Yes!
+
+```python
+import sys
+
+def main():
+    data = sys.stdin.read().split('\n')
+    grid_size = int(data[0].strip())
+    cards = list(map(int, data[1].split()))
+    
+    matched = [False] * (grid_size * grid_size)
+    score = 0
+    flips = 0
+    
+    for line in data[2:]:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        pos1, pos2 = int(parts[0]), int(parts[1])
+        flips += 1
+        if (not matched[pos1] and not matched[pos2] and 
+            pos1 != pos2 and cards[pos1] == cards[pos2]):
+            matched[pos1] = True
+            matched[pos2] = True
+            score += 1
+    
+    remaining = flips - score
+    print(f"Score: {score}")
+    print(f"Remaining: {remaining}")
+
+if __name__ == "__main__":
+    main()
+```

@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "DICT:\n  D1=Hello, how are you\n  D2=today?\n  D3=doing\nCOMPRESSED:\n  {D1} {D3} {D2}\n  {D1} feeling {D2}\n  I am {D3} great, how are you?\nSavings: 5%",
+  "expected": "DICT:\n  D1=Hello, how are you\n  D2=today?\nCOMPRESSED:\n  {D1} doing {D2}\n  {D1} feeling {D2}\n  I am doing great, how are you?\nSavings: 23%",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "DICT:\n  D1=Hello, how are you\n  D2=today?\n  D3=doing\nCOMPRESSED:\n  {D1} {D3} {D2}\n  {D1} feeling {D2}\n  I am {D3} great, how are you?\nSavings: 5%",
+      "expected": "DICT:\n  D1=Hello, how are you\n  D2=today?\nCOMPRESSED:\n  {D1} doing {D2}\n  {D1} feeling {D2}\n  I am doing great, how are you?\nSavings: 23%"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "DICT:\n  D1=abc abc\n  D2=def def\nCOMPRESSED:\n  {D1} abc\n  {D2} def\nSavings: 0%",
+      "expected": "DICT:\n  D1=abc\n  D2=def\nCOMPRESSED:\n  {D1} {D1} {D1}\n  {D2} {D2} {D2}\nSavings: 25%"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:08:33.515432+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

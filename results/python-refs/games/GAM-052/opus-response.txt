@@ -1,0 +1,41 @@
+Looking at the tests:
+- 10 → 2
+- 1 → 1
+- 3 → "Losing position"
+
+Standard Fibonacci Nim losing positions are Fibonacci numbers themselves (1,2,3,5,8...). But test 2 says 1→1 and test 3 says 3→"Losing position". And test 1: 10→2.
+
+Zeckendorf: 10 = 8+2, smallest term is 2. 1 = 1, smallest term is 1 but it's "1". 3 = 3 (single Fib), so losing.
+
+So rule: if Zeckendorf has single term AND stones != 1, losing. Otherwise take smallest Zeckendorf term.
+
+Wait, 1 is also single term Fibonacci. But output is "1". Let me reconsider - maybe if stones==1, take 1. Otherwise if single Fib term, losing position.
+
+Actually maybe: if Zeckendorf representation has only one term and that term equals stones > 1, it's losing. For 1, take 1 (winning - takes all).
+
+Let me check: 1 - take 1 → 0, opponent can't move, you win. So 1 is winning. 3 - can take 1,2, or 3. Take 3 → opponent loses... unless rule is can't take whole pile. In Fibonacci Nim (Zeckendorf game), first player can take any amount except whole pile, then subsequent moves bounded by 2x previous.
+
+But spec is simpler. Let me just match: smallest Zeckendorf term, and if that equals stones and stones > 1, losing.
+
+```python
+def zeckendorf(n):
+    fibs = [1, 2]
+    while fibs[-1] < n:
+        fibs.append(fibs[-1] + fibs[-2])
+    result = []
+    for f in reversed(fibs):
+        if f <= n:
+            result.append(f)
+            n -= f
+    return result
+
+n = int(input().strip())
+if n == 0:
+    print("Losing position")
+else:
+    z = zeckendorf(n)
+    if len(z) == 1 and n > 1:
+        print("Losing position")
+    else:
+        print(min(z))
+```

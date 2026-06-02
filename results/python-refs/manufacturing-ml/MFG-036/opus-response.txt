@@ -1,0 +1,50 @@
+import sys
+import json
+import math
+
+def main():
+    data = sys.stdin.read().strip().split('\n')
+    sample_rate = int(data[0].split(',')[1])
+    
+    if len(data) > 1 and ',' in data[1]:
+        amplitudes = [float(x) for x in data[1].split(',')]
+    else:
+        amplitudes = [float(x) for x in data[1:]]
+    
+    N = len(amplitudes)
+    
+    # DFT
+    magnitudes = []
+    for k in range(N):
+        real = 0.0
+        imag = 0.0
+        for n in range(N):
+            angle = -2 * math.pi * k * n / N
+            real += amplitudes[n] * math.cos(angle)
+            imag += amplitudes[n] * math.sin(angle)
+        magnitudes.append(math.sqrt(real*real + imag*imag) * 2 / N)
+    
+    half_N = N // 2
+    mags = magnitudes[:half_N]
+    freqs = [i * sample_rate / N for i in range(half_N)]
+    
+    if len(mags) > 1:
+        max_mag = max(mags[1:])
+    else:
+        max_mag = 0
+    
+    threshold = max_mag * 0.1
+    dominant_freqs = []
+    dominant_mags = []
+    for i in range(1, len(mags)):
+        if mags[i] > threshold:
+            dominant_freqs.append(round(freqs[i], 2))
+            dominant_mags.append(round(mags[i], 2))
+    
+    result = {
+        "dominant_frequencies": dominant_freqs,
+        "magnitudes": dominant_mags
+    }
+    print(json.dumps(result, separators=(',', ':')))
+
+main()

@@ -1,0 +1,53 @@
+# Test 1: 1000, 0.05, 0.06, 5 -> expected 4.4651
+# Let me check: coupon=50, y=0.06, n=5
+# PVs: 50/1.06^t for t=1..5, plus 1000/1.06^5
+# t=1: 47.1698, t=2: 44.4998, t=3: 41.9810, t=4: 39.6047, t=5: 37.3629
+# face: 747.2582
+# price = 957.876
+# weighted = 47.17 + 89.00 + 125.94 + 158.42 + 186.81 + 5*747.26 = 4343.39
+# mac = 4343.39/957.88 = 4.534... matches actual not expected
+#
+# Expected 4.4651 - let me try semi-annual? periods=5 might mean years with semi-annual
+# Or coupon paid at different freq. Try: coupon_rate/2, yield/2, periods*2
+# coupon=25, y=0.03, n=10
+# Then duration in periods / 2 = years
+# Let me compute: PV of 25 over 10 periods at 3%, plus 1000 at period 10
+# price = 25 * (1-1.03^-10)/0.03 + 1000/1.03^10
+# = 25*8.5302 + 744.094 = 213.255 + 744.094 = 957.349
+# weighted sum t*PV: this would give duration in half-years
+# Then /2 for years, then modified = mac/(1+y/2)
+#
+# Test2: 1000 0.08 0.10 10 -> expected 7.0436
+# Semi: c=40, y=0.05, n=20
+# Actually let me just try semi-annual assumption
+
+import sys
+
+line = input().strip()
+face_value, coupon_rate, yield_rate, periods = line.split()
+face_value = float(face_value)
+coupon_rate = float(coupon_rate)
+yield_rate = float(yield_rate)
+periods = int(periods)
+
+# Try semi-annual
+c = face_value * coupon_rate / 2
+y = yield_rate / 2
+n = periods * 2
+
+total_pv = 0
+weighted = 0
+for t in range(1, n+1):
+    pv = c / ((1+y)**t)
+    total_pv += pv
+    weighted += t * pv
+pv_face = face_value / ((1+y)**n)
+total_pv += pv_face
+weighted += n * pv_face
+
+mac_periods = weighted / total_pv
+mac_years = mac_periods / 2
+mod = mac_years / (1 + y)
+
+print(f"{mac_years:.4f}")
+print(f"{mod:.4f}")

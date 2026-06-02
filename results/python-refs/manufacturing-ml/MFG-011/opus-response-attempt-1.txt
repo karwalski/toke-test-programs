@@ -1,0 +1,46 @@
+import sys
+import csv
+import json
+import math
+
+csv_reader = csv.DictReader(sys.stdin)
+data = list(csv_reader)
+
+measurements = {}
+for row in data:
+    operator = row['operator']
+    part = row['part']
+    m = float(row['measurement'])
+    measurements.setdefault(operator, {}).setdefault(part, []).append(m)
+
+# repeatability
+operator_ranges = []
+for op in measurements:
+    for part in measurements[op]:
+        pm = measurements[op][part]
+        if len(pm) > 1:
+            operator_ranges.append(max(pm) - min(pm))
+
+avg_range = sum(operator_ranges) / len(operator_ranges) if operator_ranges else 0
+repeatability = avg_range / 1.414
+
+operator_averages = []
+for op in measurements:
+    vals = []
+    for part in measurements[op]:
+        vals.extend(measurements[op][part])
+    operator_averages.append(sum(vals)/len(vals))
+
+op_range = max(operator_averages) - min(operator_averages) if len(operator_averages) > 1 else 0
+reproducibility = op_range / 1.414
+
+grr = math.sqrt(repeatability**2 + reproducibility**2)
+grr_percent = grr * 100
+
+result = {
+    "repeatability": round(repeatability, 2),
+    "reproducibility": round(reproducibility, 2),
+    "grr_percent": round(grr_percent, 2)
+}
+
+print(json.dumps(result, separators=(',', ':')))

@@ -1,0 +1,59 @@
+# Test 1: Alice 1200, Bob 1000
+# Alice Bob 1: Alice wins. Expected_alice = 1/(1+10^(-200/400)) = 1/(1+10^-0.5) = 0.7597
+# Change = 32*(1-0.7597) = 7.69 -> Alice 1207.69, Bob 992.31
+# Bob Alice 1: Bob wins. Expected_bob = 1/(1+10^((1207.69-992.31)/400)) = 1/(1+10^0.5384) = 0.2236
+# Change = 32*(1-0.2236) = 24.84 -> Bob 1017.16, Alice 1182.85
+# That gives 1183/1017 but expected is 1206/994
+# 
+# Expected: Alice 1206, Bob 994. Difference is 12 from start. 
+# If we apply both games using ORIGINAL ratings (not updated):
+# Game 1: Alice wins, change = +7.69 for Alice, -7.69 for Bob
+# Game 2: Bob wins, expected_bob = 1/(1+10^(200/400)) = 0.2403, change = 32*(1-0.2403) = 24.31, -24.31 for Alice
+# Alice: 1200 + 7.69 - 24.31 = 1183.38, Bob: 1000 - 7.69 + 24.31 = 1016.62
+# Still not matching.
+#
+# Try: just apply each game independently with original ratings, accumulate? No same.
+# 
+# Try: 1206 - 1200 = 6, 994 - 1000 = -6. So net change is ±6.
+# What gives 6? K*(actual - expected) summed.
+# Game 1 Alice: actual=1, expected=0.7597, delta=+7.69
+# Game 2 Alice: actual=0, expected=0.7597 (using original), delta=-24.31
+# Total: -16.62. No.
+# 
+# What if K=32 but result is (wins - losses)/2 averaged? Net result for Alice: 1 win, 1 loss = 0.5 each averaged? 
+# 2 games, score 1, expected 2*0.7597=1.5194, delta = 32*(1-1.5194) = -16.62. No.
+# 
+# Hmm. 6 = 32*(1-x), x = 26/32 = 0.8125. expected = 0.8125 means rating diff = 400*log10(0.8125/0.1875)=400*log10(4.333)=254.6
+# 
+# Maybe sequential but round after each game?
+import sys
+
+def main():
+    data = sys.stdin.read().split('\n')
+    ratings = {}
+    i = 0
+    while i < len(data) and data[i].strip():
+        parts = data[i].split()
+        ratings[parts[0]] = int(parts[1])
+        i += 1
+    i += 1
+    while i < len(data):
+        line = data[i].strip()
+        i += 1
+        if not line:
+            continue
+        parts = line.split()
+        p1, p2 = parts[0], parts[1]
+        result = float(parts[2])
+        r1, r2 = ratings[p1], ratings[p2]
+        exp1 = 1/(1+10**((r2-r1)/400))
+        exp2 = 1/(1+10**((r1-r2)/400))
+        new1 = r1 + 32*(result - exp1)
+        new2 = r2 + 32*((1-result) - exp2)
+        ratings[p1] = round(new1)
+        ratings[p2] = round(new2)
+    
+    for player, rating in sorted(ratings.items(), key=lambda x: (-x[1], x[0])):
+        print(f"{player}: {int(rating)}")
+
+main()

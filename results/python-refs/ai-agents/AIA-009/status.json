@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "[{\"call\":{\"tool\":\"api_a\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"api_a\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"api_b\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"api_a\"},\"execute_at_ms\":60000}]",
+  "stderr": "  File \"/tmp/tmp3q0ew7gp.py\", line 5\n    So the rate limit is \"N calls per minute window\" (sliding/fixed). First 2 api_a calls go at 0 (within the limit of 2/min), the 3rd api_a must wait 60000ms. The api_b appears reordered to position 3, but its call comes after the first two api_a calls in output... \n                                                                                                                                   ^\nSyntaxError: invalid decimal literal\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp3q0ew7gp.py\", line 5\n    So the rate limit is \"N calls per minute window\" (sliding/fixed). First 2 api_a calls go at 0 (within the limit of 2/min), the 3rd api_a must wait 60000ms. The api_b appears reordered to position 3, but its call comes after the first two api_a calls in output... \n                                                                                                                                   ^\nSyntaxError: invalid decimal literal\n",
+      "actual": "",
+      "expected": "[{\"call\":{\"tool\":\"api_a\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"api_a\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"api_b\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"api_a\"},\"execute_at_ms\":60000}]"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmp3q0ew7gp.py\", line 5\n    So the rate limit is \"N calls per minute window\" (sliding/fixed). First 2 api_a calls go at 0 (within the limit of 2/min), the 3rd api_a must wait 60000ms. The api_b appears reordered to position 3, but its call comes after the first two api_a calls in output... \n                                                                                                                                   ^\nSyntaxError: invalid decimal literal\n",
+      "actual": "",
+      "expected": "[{\"call\":{\"tool\":\"x\"},\"execute_at_ms\":0},{\"call\":{\"tool\":\"x\"},\"execute_at_ms\":60000}]"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:02.234503+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

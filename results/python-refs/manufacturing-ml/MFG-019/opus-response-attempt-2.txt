@@ -1,0 +1,61 @@
+import sys
+import json
+
+def main():
+    measurements = []
+    for line in sys.stdin:
+        line = line.strip()
+        if line:
+            measurements.append(float(line))
+    
+    if len(measurements) == 0:
+        print('{"violations":[]}')
+        return
+    
+    n = len(measurements)
+    mean = sum(measurements) / n
+    
+    # Use standard deviation
+    if n >= 2:
+        variance = sum((x - mean) ** 2 for x in measurements) / n
+        std_dev = variance ** 0.5
+    else:
+        std_dev = 0
+    
+    ucl = mean + 3 * std_dev
+    lcl = mean - 3 * std_dev
+    ucl_2 = mean + 2 * std_dev
+    lcl_2 = mean - 2 * std_dev
+    ucl_1 = mean + std_dev
+    lcl_1 = mean - std_dev
+    
+    violations = []
+    
+    for i, value in enumerate(measurements):
+        if value > ucl or value < lcl:
+            violations.append({"rule": "1_beyond_3sigma", "index": i})
+    
+    for i in range(2, len(measurements)):
+        window = measurements[i-2:i+1]
+        above = sum(1 for v in window if v > ucl_2)
+        below = sum(1 for v in window if v < lcl_2)
+        if above >= 2 or below >= 2:
+            violations.append({"rule": "2_of_3_beyond_2sigma", "index": i})
+    
+    for i in range(4, len(measurements)):
+        window = measurements[i-4:i+1]
+        above = sum(1 for v in window if v > ucl_1)
+        below = sum(1 for v in window if v < lcl_1)
+        if above >= 4 or below >= 4:
+            violations.append({"rule": "4_of_5_beyond_1sigma", "index": i})
+    
+    for i in range(7, len(measurements)):
+        window = measurements[i-7:i+1]
+        if all(v > mean for v in window) or all(v < mean for v in window):
+            violations.append({"rule": "8_same_side", "index": i})
+    
+    result = {"violations": violations}
+    print(json.dumps(result, separators=(',', ':')))
+
+if __name__ == "__main__":
+    main()

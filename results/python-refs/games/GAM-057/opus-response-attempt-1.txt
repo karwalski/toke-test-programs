@@ -1,0 +1,61 @@
+import sys
+
+def play_game(move1, move2):
+    if move1 == move2:
+        return 0
+    elif (move1 == 'R' and move2 == 'S') or \
+         (move1 == 'P' and move2 == 'R') or \
+         (move1 == 'S' and move2 == 'P'):
+        return 1
+    else:
+        return -1
+
+def main():
+    lines = []
+    for line in sys.stdin:
+        line = line.strip()
+        if line:
+            lines.append(line)
+    
+    num_rounds = int(lines[-1])
+    
+    players = []
+    strategies = []
+    for i in range(len(lines) - 1):
+        parts = lines[i].split()
+        players.append(parts[0])
+        strategies.append(parts[1])
+    
+    n_players = len(players)
+    stats = [[0, 0, 0] for _ in range(n_players)]
+    
+    for i in range(n_players):
+        for j in range(i + 1, n_players):
+            for round_num in range(num_rounds):
+                move1 = strategies[i][round_num % len(strategies[i])]
+                move2 = strategies[j][round_num % len(strategies[j])]
+                result = play_game(move1, move2)
+                if result == 1:
+                    stats[i][0] += 1
+                    stats[j][2] += 1
+                elif result == 0:
+                    stats[i][1] += 1
+                    stats[j][1] += 1
+                else:
+                    stats[i][2] += 1
+                    stats[j][0] += 1
+    
+    results = []
+    for i in range(n_players):
+        wins, draws, losses = stats[i]
+        results.append((i, wins, draws, losses))
+    
+    results.sort(key=lambda x: (-x[1], x[3], players[x[0]]))
+    
+    out = []
+    for rank, (player_idx, wins, draws, losses) in enumerate(results, 1):
+        out.append(f"{rank}. {players[player_idx]}: {wins}W {draws}D {losses}L")
+    print('\n'.join(out))
+
+if __name__ == "__main__":
+    main()

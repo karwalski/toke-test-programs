@@ -1,0 +1,47 @@
+import sys
+import json
+
+input_line = sys.stdin.read().strip()
+raw = input_line.split(',')
+values = []
+for x in raw:
+    f = float(x)
+    if f.is_integer():
+        values.append(int(f))
+    else:
+        values.append(f)
+
+sorted_values = sorted(values)
+n = len(sorted_values)
+
+def percentile(data, p):
+    n = len(data)
+    pos = p * (n + 1) - 1
+    lower = int(pos)
+    frac = pos - lower
+    if lower < 0:
+        return data[0]
+    if lower + 1 < len(data):
+        return data[lower] + frac * (data[lower + 1] - data[lower])
+    return data[lower]
+
+q1 = percentile(sorted_values, 0.25)
+q3 = percentile(sorted_values, 0.75)
+iqr = q3 - q1
+
+lower_bound = q1 - 1.5 * iqr
+upper_bound = q3 + 1.5 * iqr
+
+outliers = []
+for i, value in enumerate(values):
+    if value < lower_bound or value > upper_bound:
+        outliers.append({"index": i, "value": value})
+
+result = {
+    "q1": q1,
+    "q3": q3,
+    "iqr": iqr,
+    "outliers": outliers
+}
+
+print(json.dumps(result, separators=(',', ':')))

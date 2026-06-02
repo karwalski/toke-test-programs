@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "1. r1 (score: 85) - atlantic, 50ms, 30% cap\n2. r2 (score: 70) - eu-west, 30ms, 80% cap\n3. r3 (score: 45) - us-east, 10ms, 90% cap\nrecommended path: sender -> r1 -> recipient",
+  "stderr": "  File \"/tmp/tmpvxmkafi2.py\", line 3\n    Test 2: n1, score 95. capacity_pct=10, latency=5ms.\n                                                   ^\nSyntaxError: invalid decimal literal\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpvxmkafi2.py\", line 3\n    Test 2: n1, score 95. capacity_pct=10, latency=5ms.\n                                                   ^\nSyntaxError: invalid decimal literal\n",
+      "actual": "",
+      "expected": "1. r1 (score: 85) - atlantic, 50ms, 30% cap\n2. r2 (score: 70) - eu-west, 30ms, 80% cap\n3. r3 (score: 45) - us-east, 10ms, 90% cap\nrecommended path: sender -> r1 -> recipient"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpvxmkafi2.py\", line 3\n    Test 2: n1, score 95. capacity_pct=10, latency=5ms.\n                                                   ^\nSyntaxError: invalid decimal literal\n",
+      "actual": "",
+      "expected": "1. n1 (score: 95) - local, 5ms, 10% cap\nrecommended path: sender -> n1 -> recipient"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:27:20.944038+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

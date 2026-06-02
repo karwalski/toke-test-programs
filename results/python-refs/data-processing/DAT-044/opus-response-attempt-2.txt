@@ -1,0 +1,110 @@
+The bit string is '01101001110011111101100'. Let me trace:
+- A=0, R=10, B=110, C=1110, D=1111
+- 0=A, 110=B, 10=R... wait '0110100...' parse: 0(A) 110(B)... but issue is char 'B' has code 110, and we have 'B' key with code starting with same prefix.
+
+The issue: parsing "B: 110" — char[:idx]="B", code="110". That's fine. Let me check: input "01101001110011111101100"
+- 0 → A
+- 1,1,0 → 110 = B ✓
+- 1,0 → 10 = R... 
+
+Wait expected is ABRACADABRA. Let me recount: 0|110|10|0|1110|0|1111|110|10|0 = A B R A C A D B R A. But expected ABRACADABRA needs ...D|A|B|R|A. So after D(1111) we need 0(A) then 110(B). Bits: 0 1101001110 0 1111 1101100. After "01101001110 0 1111" = ABRACAD, remaining = "1101100". That's 110(B) 1(?) 100... hmm.
+
+Wait full: 01101001110011111101100. Length 23. ABRACADABRA = A(1)B(3)R(2)A(1)C(4)A(1)D(4)A(1)B(3)R(2)A(1) = 23. ✓
+
+A=0, B=110, R=10, A=0, C=1110, A=0, D=1111, A=0, B=110, R=10, A=0
+= 0 110 10 0 1110 0 1111 0 110 10 0 = "01101001110011110110100"
+
+But input is "01101001110011111101100". Different! Let me compare:
+Mine: 01101001110011110110100
+Inp:  01101001110011111101100
+
+Position 15: mine=0, inp=1. So input has "11111" where mine has "11110". Hmm.
+
+Actually maybe input is parsed differently. After ABRACAD (0 110 10 0 1110 0 1111) = 15 bits "011010011100 1111"... let me redo: 0+110+10+0+1110+0+1111 = "0"+"110"+"10"+"0"+"1110"+"0"+"1111" = "011010011100" + "1111" — wait that's 0,110,10,0,1110,0,1111 = 1+3+2+1+4+1+4=16 bits = "0110100111001111".
+
+Input first 16: "0110100111001111" ✓. Remaining 7 bits: "1101100" = 110(B) 1100... 1=?,100=?. Hmm 1 isn't a code. But 11=?, 110(B)0... 
+
+Wait remaining "1101100": 110=B, then "1100" → 1=?, no code starts... 11=no, 110(B), then "0"=A. But that gives BBA not BRA.
+
+Hmm. Unless greedy means longest match? Let me try: "1101100" — longest prefix that's a code: 110=B (1110,1111 don't match since next is 0). Then "1100": 1=no,11=no,110=B,1100=no. So 110=B then "0"=A. = BBA.
+
+But expected BRA. So input might have a typo, but we need to match expected. Let me re-examine input string character by character: '01101001110011111101100'
+
+0-1-1-0-1-0-0-1-1-1-0-0-1-1-1-1-1-1-0-1-1-0-0
+
+Positions 0-15: 0110100111001111 = ABRACAD (16 bits used: 0,110,10,0,1110,0,1111). Wait let me redo: 0(A,1) 110(B,4) 10(R,6) 0(A,7) 1110(C,11) 0(A,12) 1111(D,16). Yes 16 bits.
+
+Remaining from pos 16: "1101100" (7 bits). Need ABRA = 0,110,10,0 = "0110100" (7 bits). But we have "1101100". These don't match!
+
+So the test input genuinely cannot decode to ABRACADABRA with greedy. Unless... wait maybe I miscount the input. Let me count chars: '01101001110011111101100'
+
+0,1,1,0,1,0,0,1,1,1,0,0,1,1,1,1,1,1,0,1,1,0,0 = 23 chars.
+
+Hmm. Let me try different parse: maybe D parses earlier. 
+0=A,110=B,10=R,0=A,1110=C,0=A — now bits 12-22 = "11111101100"  (11 bits). Need ADABRA = 1111,0,110,10,0 = 1+1+1+1+1=actually 4+1+3+2+1=11 bits = "11110110100". But actual is "11111101100". Different.
+
+So input doesn't decode to ABRACADABRA via straightforward greedy. Maybe the spec input has 5 ones somewhere intentional? Let me look: "11111" appears - that's D(1111)+something. 
+
+Wait - maybe D=1111 then 1=start of next. "11111101100" → 1111(D), then "1101100" → 110(B),1100... 1=no... hmm same issue.
+
+Let me try assuming input is "01101001110011110110100" (corrected). That would decode properly. But the test has "01101001110011111101100".
+
+Hmm wait, let me recount input from spec: '01101001110011111101100'. Maybe I'm miscounting. Let me split: 0110 1001 1100 1111 1101 100. That's 4+4+4+4+4+3=23.
+
+0110|1001|1100|1111|1101|100
+
+Decode: 0=A, 110=B, then "1001110011111101100"
+1=?, 10=R, then "01110011111101100"
+0=A, 1110=C, "011111101100"
+0=A, 1111=D, "1101100"... same as before, BBA.
+
+I think the test case input is buggy. But I need to make it pass. Let me look more carefully... 
+
+Oh! Maybe I'm misreading. Let me copy: `01101001110011111101100`. Count 1s after position 12:
+After "0110100111 00" (12 chars), we have "11111101100" (11 chars).
+
+Hmm, what if I read as: 0,110,10,0,1110,0,11,11,1,101,100... no, 11 isn't a code.
+
+Actually, wait. What if the original is supposed to be `0110100111001111` + `0110100` = ABRACAD + ABRA. Then full = "01101001110011110110100". But spec shows "01101001110011111101100". 
+
+These differ at positions 15-22:
+"01101001110011110110100"
+"01101001110011111101100"
+                ^^   ^
+Position 15: 0 vs 1, position 16: 1 vs 1, pos 17: 1 vs 1, pos 18: 0 vs 0... let me align:
+
+mine: 0 1 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 1 1 0 1 0 0
+inp:  0 1 1 0 1 0 0 1 1 1 0 0 1 1 1 1 1 1 0 1 1 0 0
+
+Pos 16: mine=0, inp=1
+Pos 17: mine=1, inp=1  
+Pos 18: mine=1, inp=0
+Pos 19: mine=0, inp=1
+Pos 20: mine=1, inp=1
+Pos 21: mine=0, inp=0
+Pos 22: mine=0, inp=0
+
+So input differs. The input cannot greedily decode to ABRACADABRA.
+
+This is a spec issue. Let me flag it.
+
+Actually wait, let me try once more. What if the test wants us to output ABRACADABRA regardless? No that's silly.
+
+Let me try: input = "01101001110011111101100"
+0=A
+1101=? not a code. 
+Greedy longest-match: 0=A, then start at pos 1: try 1,11,110(=B),1101(no). So 110=B, pos 4.
+Pos 4: 1,10(=R). At pos 4 bit is '1', pos 5 '0', so 10=R. pos 6.
+Pos 6: '0'=A. pos 7.
+Pos 7: 1,11,111,1110=C. pos 11.
+Pos 11: '0'=A. pos 12.
+Pos 12: 1,11,111,1111=D. pos 16.
+Pos 16: '1',11,111,1111=D. pos 20.
+Pos 20: '1',10? bit 20='1',21='1',22='0'... 11=no, 110=B. pos 23.
+Result: A B R A C A D D B. That's 9 chars, not 11.
+
+Hmm. So input genuinely doesn't work.
+
+I'll challenge the spec.
+
+{"spec_challenge": "Test 1 input bit string '01101001110011111101100' cannot be greedily decoded to 'ABRACADABRA' with the given Huffman codes. Correct encoding of ABRACADABRA would be '01101001110011110110100' (A=0,B=110,R=10,A=0,C=1110,A=0,D=1111,A=0,B=110,R=10,A=0). The provided bit string decodes to ABRACADD... and has an extra/wrong bits.", "suggested_amendment": "Change Test 1 input bit string from '01101001110011111101100' to '01101001110011110110100' so it correctly encodes 'ABRACADABRA' under the given code table."}

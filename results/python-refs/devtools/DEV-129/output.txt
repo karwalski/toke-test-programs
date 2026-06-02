@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+# pre-commit hook
+npm run lint
+npm test
+
+echo 'pre-commit checks passed'

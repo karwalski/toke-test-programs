@@ -1,0 +1,42 @@
+import json
+import sys
+
+def schedule_tool_calls():
+    input_data = json.loads(sys.stdin.read().strip())
+    
+    calls = input_data['calls']
+    rate_limits = input_data['rate_limits']
+    
+    # Window-based: each tool can make N calls per 60000ms window
+    # Track timestamps of recent calls per tool
+    from collections import defaultdict, deque
+    history = defaultdict(deque)
+    
+    # Process tools in order they first appear, scheduling each tool's calls independently at earliest time
+    # Then output in original order
+    
+    # Per-tool: schedule calls. The Nth call (0-indexed) for tool with limit L:
+    # if N < L: execute_at = 0
+    # else: execute_at = (N // L) * 60000... no wait
+    # Test 1: api_a limit 2, 3 calls -> [0, 0, 60000]
+    # Test 2: x limit 1, 2 calls -> [0, 60000]
+    # So per tool, calls i: execute_at = (i // L) * 60000
+    
+    tool_counts = defaultdict(int)
+    scheduled_calls = []
+    
+    for call in calls:
+        tool = call['tool']
+        limit = rate_limits[tool]
+        n = tool_counts[tool]
+        execute_time = (n // limit) * 60000
+        scheduled_calls.append({
+            "call": call,
+            "execute_at_ms": execute_time
+        })
+        tool_counts[tool] += 1
+    
+    print(json.dumps(scheduled_calls, separators=(',', ':')))
+
+if __name__ == "__main__":
+    schedule_tool_calls()

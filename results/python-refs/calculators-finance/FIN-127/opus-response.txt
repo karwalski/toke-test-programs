@@ -1,0 +1,156 @@
+Let me check test 1:
+Asset 1: 0.05, 0.02, -0.01, 0.03, mean = 0.0225
+Asset 2: 0.02, 0.01, 0.03, -0.01, mean = 0.0125
+
+Var(1) with n-1=3: ((0.0275)² + (-0.0025)² + (-0.0325)² + (0.0075)²)/3
+= (0.000756 + 0.0000063 + 0.001056 + 0.0000563)/3 = 0.001875/3 = 0.000625
+
+But expected is 0.000492. Let me try n-1=4... no wait, dividing by n: 0.001875/4 = 0.000469. Not that either.
+
+Hmm. Let me try with different mean. What if means are computed differently?
+
+Expected 0.000492. 0.000492 * 3 = 0.001476. 0.000492 * 4 = 0.001969.
+
+What if it's something like sum(x²)/n - mean²? Let me try: sum of asset1 squared = 0.0025+0.0004+0.0001+0.0009 = 0.0039. /4 = 0.000975. minus 0.0225² = 0.000506. Close-ish to 0.000492 but not exact.
+
+What about sum(x²)/(n-1) - n/(n-1)*mean²? That's the same as sample variance = 0.000625.
+
+Let me try: 0.0039/4 - 0.0225² = 0.000975 - 0.00050625 = 0.00046875. No.
+
+What if they use n in denominator AND population formula: sum((x-m)²)/n = 0.001875/4 = 0.00046875. No.
+
+Hmm, 0.000492 — let me try without subtracting the mean for cross-asset, divided by n-1:
+sum(asset1*asset2) = 0.001 + 0.0002 - 0.0003 - 0.0003 = 0.0006. /3 = 0.0002. /4 = 0.00015. No.
+
+Let me check the second test: assets [1,2,3] and [4,5,6]. Mean1=2, Mean2=5. 
+Var = ((1)²+(0)²+(1)²)/2 = 1. But expected 0.666667 = 2/3. So they divide by n, not n-1! 2/3 ≈ 0.6667.
+
+Wait, but spec says "divide by n-1". Test 2 with n=3: divide by n-1=2 → 1.0. But expected 0.666667 = 2/3 = sum/3 = divided by n.
+
+So test 2 uses population (divide by n). Let me check test 1 with population: 0.001875/4 = 0.00046875. Not 0.000492 either.
+
+Hmm. 0.000492. Let me recompute means. Asset1: (0.05+0.02-0.01+0.03)/4 = 0.09/4 = 0.0225. Correct.
+
+What if mean is across all data? All values: 0.05,0.02,-0.01,0.03,0.02,0.01,0.03,-0.01. Sum=0.14. Mean=0.0175.
+
+Var asset1 with this mean, /(n-1)=3:
+(0.05-0.0175)² + (0.02-0.0175)² + (-0.01-0.0175)² + (0.03-0.0175)²
+= 0.001056 + 0.00000625 + 0.000756 + 0.000156 = 0.001975
+/3 = 0.000658. No.
+
+/4 = 0.000494. Close to 0.000492! Let me be more precise.
+0.0325² = 0.00105625
+0.0025² = 0.00000625
+0.0275² = 0.00075625
+0.0125² = 0.00015625
+Sum = 0.001975
+/4 = 0.00049375 ≈ 0.000494. Expected 0.000492. Off by a tiny bit.
+
+Hmm close but not exact. Let me try sample (n-1=3) with global mean: 0.001975/3 = 0.000658. No.
+
+What about mean across rows? Let me try yet another formula. What if mean is from all data and divide by N*M-1 = 7?
+0.001975 + variance from asset 2:
+Asset 2 deviations from 0.0175: 0.0025, -0.0075, 0.0125, -0.0275
+Squared: 0.00000625, 0.00005625, 0.00015625, 0.00075625 = 0.000975
+Total sum sq = 0.00295. /7 = 0.000421. No.
+
+Let me check expected diagonal of test1: 0.000492 and 0.000292.
+Asset2 variance check with mean=0.0125, n-1=3: 
+0.0075²+(-0.0025)²+0.0175²+(-0.0225)² = 0.000056+0.0000063+0.000306+0.000506 = 0.000875
+/3 = 0.000292. ✓ Matches!
+
+So asset 2 with its own mean and n-1 gives 0.000292. So sample covariance works for asset 2 diagonal.
+
+But asset 1 should be 0.000625 with sample. Expected 0.000492. Strange.
+
+Wait let me recompute. Asset 1: 0.05, 0.02, -0.01, 0.03. Sum = 0.09. Mean = 0.0225.
+Deviations: 0.0275, -0.0025, -0.0325, 0.0075.
+Squared: 0.00075625, 0.00000625, 0.00105625, 0.00005625
+Sum = 0.001875. /3 = 0.000625.
+
+But test1 only checks the off-diagonals and asset2 var matches. Let me check off-diagonal expected -0.000108.
+
+Cov(1,2): sum of dev1*dev2 / (n-1)
+dev1: 0.0275, -0.0025, -0.0325, 0.0075
+dev2: 0.0075, -0.0025, 0.0175, -0.0225
+products: 0.00020625, 0.00000625, -0.00056875, -0.00016875
+sum = -0.000525. /3 = -0.000175. But expected -0.000108.
+
+So expected uses something giving cov -0.000108 = -0.000525/n where n is... -0.000525/(-0.000108) ≈ 4.86. Hmm.
+
+Or different mean? Let me try -0.000108 * something. -0.000108 * 3 = -0.000324. -0.000108*4=-0.000432.
+
+Actually, wait. 0.000492 / 0.000292 = 1.685. Hmm.
+
+Let me reconsider. What if the values are interpreted differently? Maybe the format is different — each column is an asset? Let me transpose.
+
+Test 1 transposed: each row of input has 4 values. If those are time points and each line is one time period with multiple assets... no, spec says "one line per asset".
+
+Wait test 2: lines are [1,2,3] and [4,5,6]. If transposed (each col is asset), we have assets [1,4],[2,5],[3,6] - 3 assets of 2 periods each. Sample cov needs n-1=1. Asset1 var: ((1-2.5)²+(4-2.5)²)/1 = 4.5. Not 0.6667.
+
+Let me try test 1 differently: what if there are 4 assets each with 2 periods (transposed)?
+Assets: [0.05,0.02], [0.02,0.01], [-0.01,0.03], [0.03,-0.01]
+Means: 0.035, 0.015, 0.01, 0.01
+Var asset1: ((0.015)²+(-0.015)²)/1 = 0.00045. Not 0.000492.
+
+Hmm. Let me try yet another interpretation. What if cov is computed pairwise on shifted data, like log returns of returns?
+
+Actually, let me try test 2 more carefully. Expected: all entries 0.666667.
+[1,2,3] and [4,5,6]. 
+Mean1=2, Mean2=5. dev1=[-1,0,1], dev2=[-1,0,1].
+Cov(1,2) = sum dev1*dev2 = 1+0+1=2. /3=0.667 (population). /2=1 (sample).
+
+So test 2 uses POPULATION (divide by n). And var = 2/3 = 0.667.
+
+But test 1 asset2 var = 0.000292 = 0.000875/3 = /(n-1). Let me check population: 0.000875/4 = 0.000219. Not 0.000292. So test 1 uses sample, test 2 uses population? Contradiction unless... 
+
+Wait test 2 n=3, n-1=2. Sample = 2/2 = 1. Pop = 2/3 = 0.667. Test 2 result matches pop.
+Test 1 n=4, n-1=3. Asset2 sample = 0.000875/3 = 0.000292. ✓ But pop = 0.000219.
+
+These are inconsistent... unless the divisor varies. Let me check: test 1 divisor 3 (=n-1=3), test 2 divisor 3 (=n=3). So divisor = 3 in both cases?? Just coincidence?
+
+Let me retry test 1 cov with divisor and see: cov(1,2) sum = -0.000525. /3 = -0.000175. Still not -0.000108.
+
+Hmm. Maybe I'm miscalculating. Let me redo dev1*dev2:
+dev1 = [0.05-0.0225, 0.02-0.0225, -0.01-0.0225, 0.03-0.0225] = [0.0275, -0.0025, -0.0325, 0.0075]
+dev2 = [0.02-0.0125, 0.01-0.0125, 0.03-0.0125, -0.01-0.0125] = [0.0075, -0.0025, 0.0175, -0.0225]
+products: 
+0.0275*0.0075 = 0.00020625
+-0.0025*-0.0025 = 0.00000625
+-0.0325*0.0175 = -0.00056875
+0.0075*-0.0225 = -0.00016875
+Sum = 0.00020625+0.00000625-0.00056875-0.00016875 = -0.000525
+
+-0.000108 * 3 = -0.000324. Not -0.000525.
+-0.000108 * 4 = -0.000432. 
+-0.000108 * 4.86 = -0.000525. So divisor ≈ 4.86. Weird.
+
+Let me check: what if data is interpreted as (a,b),(c,d) pairs not single values per period... like the test1 inputs have some grouping?
+
+Hmm what if the input is treated as one matrix where rows are observations? Test 1 has 2 lines with 4 values each. So we have 2 observations of 4 variables. Cov matrix would be 4x4. But expected is 2x2. So no.
+
+What if it's 2 assets with 4 obs each, but the output is just a 2x2... which it is. So that interpretation is right.
+
+Maybe expected is wrong? Let me try a totally different formula. What about correlation matrix? Correlation = cov / (std1 * std2).
+std1 (sample) = sqrt(0.000625) = 0.025
+std2 (sample) = sqrt(0.000292) = 0.01708
+correlation = -0.000175/(0.025*0.01708) = -0.000175/0.000427 = -0.41. Not -0.000108.
+
+What if mean is computed differently? Like median?
+Asset1 sorted: -0.01, 0.02, 0.03, 0.05. Median = 0.025.
+dev: 0.025, -0.005, -0.035, 0.005. Sq: 0.000625, 0.000025, 0.001225, 0.000025 = 0.0019. /3=0.000633. No.
+
+What if asset1 is interpreted as multiple sub-series? Hmm.
+
+Let me try: variance computed via numpy.cov which uses n-1 by default. For test 2:
+np.cov([[1,2,3],[4,5,6]]) gives [[1,1],[1,1]]. But expected is 0.667. So they use bias=True (divide by n).
+
+For test 1 with bias=True (divide by n=4):
+var1 = 0.001875/4 = 0.000469
+var2 = 0.000875/4 = 0.000219
+cov = -0.000525/4 = -0.000131
+
+But expected is 0.000492, 0.000292, -0.000108. Not matching.
+
+With ddof=1 (divide by n-1=3):
+var1=0.000625, var2=0.

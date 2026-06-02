@@ -1,0 +1,20 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 1,
+  "actual": "{\"users\":[{\"id\":2,\"username\":\"bob\",\"verified\":true,\"followers\":2500,\"bio\":\"Mobile developer\"},{\"id\":10,\"username\":\"topdev\",\"verified\":true,\"followers\":5000,\"bio\":\"Senior developer\"}],\"total\":2}",
+  "expected": "{\"users\":[{\"id\":10,\"username\":\"topdev\",\"verified\":true,\"followers\":5000,\"bio\":\"Senior developer\"}],\"total\":1}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"users\":[{\"id\":2,\"username\":\"bob\",\"verified\":true,\"followers\":2500,\"bio\":\"Mobile developer\"},{\"id\":10,\"username\":\"topdev\",\"verified\":true,\"followers\":5000,\"bio\":\"Senior developer\"}],\"total\":2}",
+      "expected": "{\"users\":[{\"id\":10,\"username\":\"topdev\",\"verified\":true,\"followers\":5000,\"bio\":\"Senior developer\"}],\"total\":1}"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:27:25.408558+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

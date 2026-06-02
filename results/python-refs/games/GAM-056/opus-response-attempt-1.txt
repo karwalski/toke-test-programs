@@ -1,0 +1,23 @@
+import sys
+
+def evaluate_guess(secret_str, guess_str):
+    bulls = 0
+    cows = 0
+    for i in range(4):
+        if secret_str[i] == guess_str[i]:
+            bulls += 1
+    for i, digit in enumerate(guess_str):
+        if digit in secret_str and secret_str[i] != digit:
+            cows += 1
+    return bulls, cows
+
+lines = []
+for line in sys.stdin:
+    s = line.strip()
+    if s:
+        lines.append(s)
+
+secret = lines[0]
+for guess in lines[1:]:
+    bulls, cows = evaluate_guess(secret, guess)
+    print(f"{bulls}A{cows}B")

@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+import sys
+import csv
+import random
+from io import StringIO
+
+def parse_strategy_line(line):
+    parts = line.split()
+    strategy = parts[0]
+    if strategy == 'systematic':
+        seed = int(parts[2]) if len(parts) > 2 else None
+        return strategy, {'k': int(parts[1])}, seed
+    elif strategy == 'stratified':
+        return strategy, {'n': int(parts[1]), 'column': parts[2]}, int(parts[3]) if len(parts) > 3 else None
+    elif strategy == 'reservoir':
+        return strategy, {'k': int(parts[1])}, int(parts[2]) if len(parts) > 2 else None
+    return strategy, {}, None
+
+def systematic_sampling(data, k):
+    if k <= 0 or len(data) == 0:
+        return []
+    header = data[0]
+    rows = data[1:]
+    result = [header]
+    for i in range(0, len(rows), k):
+        result.append(rows[i])
+    return result
+
+def stratified_sampling(data, n, column, seed):
+    if seed is not None:
+        random.seed(seed)
+    strata = {}
+    header = data[0]
+    col_index = header.index(column)
+    for row in data[1:]:
+        sv = row[col_index]
+        strata.setdefault(sv, []).append(row)
+    result = [header]
+    for sv, sd in strata.items():
+        sample_size = min(n, len(sd))
+        result.extend(random.sample(sd, sample_size))
+    return result
+
+def reservoir_sampling(data, k, seed):
+    if seed is not None:
+        random.seed(seed)
+    if len(data) <= 1:
+        return data
+    header = data[0]
+    rows = data[1:]
+    if k >= len(rows):
+        return data
+    sampled = random.sample(rows, k)
+    return [header] + sampled
+
+def main():
+    text = sys.stdin.read()
+    lines = text.split('\n')
+    strategy, params, seed = parse_strategy_line(lines[0])
+    csv_lines = lines[1:]
+    csv_input = StringIO('\n'.join(csv_lines))
+    reader = csv.reader(csv_input)
+    data = [r for r in reader if r]
+    if strategy == 'systematic':
+        result = systematic_sampling(data, params['k'])
+    elif strategy == 'stratified':
+        result = stratified_sampling(data, params['n'], params['column'], seed)
+    elif strategy == 'reservoir':
+        result = reservoir_sampling(data, params['k'], seed)
+    else:
+        result = data
+    output = StringIO()
+    writer = csv.writer(output, lineterminator='\n')
+    for row in result:
+        writer.writerow(row)
+    sys.stdout.write(output.getvalue().rstrip('\n'))
+
+if __name__ == '__main__':
+    main()

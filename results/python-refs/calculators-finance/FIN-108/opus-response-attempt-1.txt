@@ -1,0 +1,103 @@
+# Test 1: simple=2.60 means after year 2, cumulative=7000, need 3000 more, year 3 cf=5000, 3000/5000=0.6 -> 2.60 ✓
+# Test 1 discounted: expected 3.15
+# year1: 3000/1.1 = 2727.27, cum=2727.27
+# year2: 4000/1.21 = 3305.79, cum=6033.06
+# year3: 5000/1.331 = 3756.57, cum=9789.63
+# year4: 6000/1.4641 = 4098.08, cum=13887.71
+# Need 10000. After year 3: 9789.63, need 210.37 more. 210.37/4098.08 = 0.0513 -> 3.05
+# But expected 3.15. Hmm. Maybe interpolation uses (remaining/dcf) where remaining from cumulative after this year?
+# Or maybe: years_before_full_recovery + |negative_cum|/cash_flow_year (undiscounted)?
+# year3 cum = 9789.63, deficit = 210.37, undiscounted cf year4=6000: 210.37/6000=0.035 -> 3.04 no
+# Try: discount rate applied differently. year0 indexing?
+# year0: 3000/1=3000, cum=3000
+# year1: 4000/1.1=3636.36, cum=6636.36
+# year2: 5000/1.21=4132.23, cum=10768.59
+# Need 10000. After year1(idx): 6636.36, deficit=3363.64, /4132.23 = 0.814. i=2, so 2+0.814=2.81 no
+# Try formula: simple uses end-of-year, expected 3.15 suggests payback after 3 full years + 0.15
+# 0.15 * something = 210.37? 210.37/0.15 = 1402... no
+# Maybe expected uses cumulative including overshoot then formula years + (next_year_dcf - overshoot)/next_year_dcf?
+# After year3: overshoot would be... no it hasn't recovered. After year4: cum=13887.71, overshoot=3887.71
+# 4 - 3887.71/4098.08 = 4 - 0.9487 = 3.05. Same answer.
+# Hmm what gives 3.15? Maybe they discount differently: cf/(1+r)^(year-1)?
+# year1: 3000/1=3000, year2: 4000/1.1=3636.36, year3: 5000/1.21=4132.23, year4: 6000/1.331=4508.64
+# cum: 3000, 6636.36, 10768.59. Recovers in year3. deficit after year2 = 3363.64. 3363.64/4132.23=0.814. result=2+0.814=2.81
+# Not 3.15 either.
+# Test 2: 5000, 0.05, [2000]*4. Simple: after 2 years 4000, need 1000, /2000=0.5 -> 2.50 ✓
+# Discounted expected 2.72:
+# y1: 2000/1.05=1904.76, y2: 2000/1.1025=1814.06, y3: 2000/1.157625=1727.68, y4: 1645.40
+# cum: 1904.76, 3718.82, 5446.50. Recovers year3. deficit after y2=1281.18. 1281.18/1727.68=0.7416. result=2+0.7416=2.74
+# Expected 2.72. Close but not match.
+# Try year-1 exponent:
+# y1: 2000, y2: 1904.76, y3: 1814.06, y4: 1727.68
+# cum: 2000, 3904.76, 5718.82. deficit after y2=1095.24. /1814.06=0.6037. result=2.60. No.
+# Try: discount each cash flow at mid-year? cf/(1+r)^(year-0.5)
+# y1: 2000/1.05^0.5=1951.80, y2:1858.86, y3:1770.34, y4:1685.99
+# cum: 1951.80, 3810.66, 5581.00. deficit after y2=1189.34. /1770.34=0.6718. =2.67. No.
+# What gives 2.72? 2 + 0.72 -> deficit/dcf = 0.72
+# After y2 deficit = X, dcf_y3 = Y, X/Y = 0.72
+# If cum after y2 is 5000-0.72*dcf_y3...
+# Maybe they use a different formula entirely. Let me try: payback = last_full_year + unrecovered/next_year_cashflow (undiscounted)
+# Test2: 2 + 1281.18/2000 = 2.6406. No.
+# Or unrecovered_discounted / undiscounted_next: 1281.18/2000=0.64. No.
+# Let me try: discount factor uses continuous? e^(-rt)
+import math
+# Test2: y1: 2000*e^-0.05=1902.46, y2:1809.67, y3:1721.42, y4:1637.46
+# cum: 1902.46, 3712.13, 5433.55. deficit after y2 = 1287.87. /1721.42=0.7481. =2.75. No.
+# Test1 with continuous: y1:3000*e^-.1=2714.51, y2:4000*e^-.2=3274.92, y3:5000*e^-.3=3704.09, y4:6000*e^-.4=4021.97
+# cum: 2714.51, 5989.43, 9693.52, 13715.49. deficit after y3=306.48. /4021.97=0.0762. =3.08. No.
+# Maybe they use formula: years + (investment - cum_at_year_n) where year of recovery, but they include the recovery year in cum first?
+# Test1 discounted: cum after y4=13887.71. years_to_recover=4. 4 - (13887.71-10000)/4098.08 = 4 - 0.9487 = 3.05. Same.
+# What if formula: n + remaining/dcf where n is the recovery year (1-indexed)? Then test1: 3+210.37/4098.08=3.05. Test2: 3+1281.18/1727.68=3.74. No matches.
+# Maybe initial investment is also discounted? Or there's a sign issue.
+# Test2 expected 2.72: try discounted CF using NPV formulation with year 0 cf=-5000
+# What if discount rate for simple payback applied to investment? 5000*1.05=5250? 
+# After y2=4000, deficit=1250. /2000=0.625. =2.625. No.
+# Maybe simple_payback uses interpolation on cumulative crossing investment differently.
+# Let me check: maybe expected uses (deficit/cf_next_year) for SIMPLE and same divisor for discounted but with cumulative undiscounted?
+# Test1: simple deficit after y2=3000, cf3=5000, 3000/5000=0.6 -> 2.60 ✓
+# Test1 discounted: maybe years_full + unrecovered_simple/dcf_next?
+# After y3 simple cum = 12000 (already recovered). 
+# Let me try: discounted simple_cumulative method?
+# Actually let me reread the problem. "Interpolate within the year payback occurs"
+# Maybe the discounted version: continue discounting AFTER finding year, but interp differently
+# Test1 discounted exp 3.15: 3 + 0.15 = need fraction 0.15
+# 0.15 = ? If we use dcf for year 4 = 4098.08, 0.15*4098.08=614.71. Hmm
+# 0.15 = (10000-discounted_cum_at_year_3)/(undiscounted_cf_year_4)? 210.37/6000=0.035. No
+# 0.15 = remaining_at_year_3_simple / something? simple cum at y3=12000. Already past. 
+# What about: cumulative discounted with negative? sum dcf - investment per year
+# y0:-10000, y1:-10000+2727.27=-7272.73, y2:-3966.94, y3:-210.37, y4:3887.71
+# crosses 0 between y3 and y4. interpolate: 3 + 210.37/(210.37+3887.71)? = 3+0.0513=3.05. Same.
+# OR linear interp by year: 3 + 210.37/4098.08 = 3.05
+# I really can't see how to get 3.15. Let me check if maybe the test expects different exponent.
+# 3.15: deficit/dcf = 0.15. If dcf_y4 was computed at rate^something... 
+# What if discount_rate=0.10 is actually 10% and they compound it differently per period?
+# (1.10)^4 = 1.4641. 6000/1.4641=4098.08. Same.
+# Try: discount cash flow by (1+r)^year - 1 (annuity-like)? No, doesn't make sense.
+# What if they discount the deficit too? "remaining/dcf" but remaining is the undiscounted deficit
+# Test1: undiscounted cum after y3=12000, already past. No.
+# After y2 discounted cum = 6033.06, undiscounted deficit using investment-discounted_cum applied as... hmm
+# Maybe: simple_payback computed first, then discounted = simple * (1+r)?  2.60*1.10=2.86. No.
+# Test2: 2.50*1.05=2.625. No. 2.50*1.0884... no.
+# 2.72/2.50=1.088. 3.15/2.60=1.2115. Not consistent.
+# 3.15-2.60=0.55, 2.72-2.50=0.22. ratio: 0.55/2.60=0.21, 0.22/2.50=0.088. Not obvious.
+# Let me search: maybe formula uses (years_before_recovery) + (deficit_discounted_after_prior_year)/(cash_flow_undiscounted_in_recovery_year * discount_factor_at_prior_year)
+# Test1: 2 + (10000-6033.06)/(5000/1.21) = 2 + 3966.94/4132.23 = 2+0.96=2.96. No.
+# Try: 2 + (10000-6033.06)/(undiscounted_cf3) = 2 + 3966.94/5000=2.79. No
+# What if the discounted payback recovery year is determined differently - using undiscounted but interp using discounted?
+# Test1: undisc recovers in year 3 (cum=12000). deficit after y2 (undisc)=3000. Interp with discounted: 3000/dcf_y3=3000/3756.57=0.7986. =2.80. No.
+# Hmm, 3.15 in test 1... let me compute (10000-9789.63)/(some value)=0.15
+# 210.37/0.15 = 1402.47. What's 1402.47? Not matching any obvious value.
+# Or maybe years_recovery is counted from year 1 not 0: result = 3 + 0.15. 0.15=210.37/divisor. divisor=1402.47
+# 1402.47 looks like... 6000 * 0.10 * something? 1402/6000=0.234. No.
+# Maybe: discounted payback uses CUMULATIVE discount factor on deficit?
+# After y3: cum=9789.63, deficit=210.37. Apply discount: 210.37 * 1.331 = 280.00? /something?
+# 280/some=0.15. some=1866.67. Hmm 5000*1.10/... no.
+# I think I should try: discounting includes year 0 (so year index starts at 0)
+# y0: 3000/1=3000, y1:4000/1.10=3636.36, y2:5000/1.21=4132.23, y3:6000/1.331=4508.64
+# cum: 3000, 6636.36, 10768.59, 15277.23
+# Recovers in index 2 (3rd cf). deficit after idx 1 = 10000-6636.36=3363.64. /4132.23=0.814.
+# If indexed result = 2+0.814 = 2.81. No.
+# If they say "year 3" = 3 + ... no recovery is in 3rd year so 2+frac... 
+# Maybe result = (i+1) + fraction? = 3+0.814=3.814. No.
+# I'm stuck. Let me reconsider: maybe expected output for test1 is actually 3.05 and test was copied wrong... but I must match.
+# Try: discounted_pay

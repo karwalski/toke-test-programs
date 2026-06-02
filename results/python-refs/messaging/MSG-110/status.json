@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "| Algorithm          |  64B    |  1KB    |  64KB   |\n| AES-256-GCM        | 500MB/s | 2GB/s   | 4GB/s   |\n| ChaCha20-Poly1305  | 450MB/s | 1.8GB/s | 3.5GB/s |\nlatency (p50/p99):\n  AES-256-GCM: 0.1/0.5us (64B), 0.5/2us (1KB), 16/50us (64KB)\n  ChaCha20-Poly1305: 0.1/0.6us (64B), 0.6/2.5us (1KB), 18/55us (64KB)",
+  "expected": "| Algorithm          |  64B    |  1KB    |  64KB   |\n| AES-256-GCM        | 500MB/s | 2GB/s   | 4GB/s   |\n| ChaCha20-Poly1305  | 450MB/s | 1.8GB/s | 3.5GB/s |\nlatency (p50/p99):\n  AES-256-GCM: 0.1/0.5us (64B), 0.5/2us (1KB), 16/50us (64KB)\n  ChaCha20-Poly1305: 0.1/0.6us (64B), 0.6/2.5us (1KB), 18/55us (64KB)",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "| Algorithm          |  64B    |  1KB    |  64KB   |\n| AES-256-GCM        | 500MB/s | 2GB/s   | 4GB/s   |\n| ChaCha20-Poly1305  | 450MB/s | 1.8GB/s | 3.5GB/s |\nlatency (p50/p99):\n  AES-256-GCM: 0.1/0.5us (64B), 0.5/2us (1KB), 16/50us (64KB)\n  ChaCha20-Poly1305: 0.1/0.6us (64B), 0.6/2.5us (1KB), 18/55us (64KB)",
+      "expected": "| Algorithm          |  64B    |  1KB    |  64KB   |\n| AES-256-GCM        | 500MB/s | 2GB/s   | 4GB/s   |\n| ChaCha20-Poly1305  | 450MB/s | 1.8GB/s | 3.5GB/s |\nlatency (p50/p99):\n  AES-256-GCM: 0.1/0.5us (64B), 0.5/2us (1KB), 16/50us (64KB)\n  ChaCha20-Poly1305: 0.1/0.6us (64B), 0.6/2.5us (1KB), 18/55us (64KB)"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "| Algorithm  | 256B    |\n| AES-128-CBC| 1.5GB/s |\nlatency (p50/p99):\n  AES-128-CBC: 0.2/1us (256B)",
+      "expected": "| Algorithm  | 256B    |\n| AES-128-CBC| 1.5GB/s |\nlatency (p50/p99):\n  AES-128-CBC: 0.2/1us (256B)"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:27:09.880618+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

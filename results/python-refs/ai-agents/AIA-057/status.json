@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "{\"arguments_for\":[{\"claim\":\"increases productivity\",\"evidence\":\"studies show 13% improvement\"},{\"claim\":\"saves commute time\",\"evidence\":\"averaging 40 minutes per day\"}],\"arguments_against\":[{\"claim\":\"reduces team cohesion\",\"evidence\":\"spontaneous collaboration decreases\"}]}",
+  "expected": "{\"arguments_for\":[{\"claim\":\"increases productivity\",\"evidence\":\"studies show 13% improvement\"},{\"claim\":\"saves commute time\",\"evidence\":\"averaging 40 minutes per day\"}],\"arguments_against\":[{\"claim\":\"reduces team cohesion\",\"evidence\":\"spontaneous collaboration decreases\"}]}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"arguments_for\":[{\"claim\":\"increases productivity\",\"evidence\":\"studies show 13% improvement\"},{\"claim\":\"saves commute time\",\"evidence\":\"averaging 40 minutes per day\"}],\"arguments_against\":[{\"claim\":\"reduces team cohesion\",\"evidence\":\"spontaneous collaboration decreases\"}]}",
+      "expected": "{\"arguments_for\":[{\"claim\":\"increases productivity\",\"evidence\":\"studies show 13% improvement\"},{\"claim\":\"saves commute time\",\"evidence\":\"averaging 40 minutes per day\"}],\"arguments_against\":[{\"claim\":\"reduces team cohesion\",\"evidence\":\"spontaneous collaboration decreases\"}]}"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"arguments_for\":[],\"arguments_against\":[{\"claim\":\"reduce emissions\",\"evidence\":null},{\"claim\":\"battery production has environmental costs\",\"evidence\":null}]}",
+      "expected": "{\"arguments_for\":[{\"claim\":\"reduce emissions\",\"evidence\":null}],\"arguments_against\":[{\"claim\":\"battery production has environmental costs\",\"evidence\":null}]}"
+    }
+  ],
+  "repaired_at": "2026-05-31T08:14:03.930616+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 2
+}

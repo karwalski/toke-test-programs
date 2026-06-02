@@ -1,0 +1,17 @@
+import sys
+import zlib
+
+data = sys.stdin.read()
+if data == '':
+    print('00000000\t')
+    sys.exit(0)
+
+lines = data.split('\n')
+if lines and lines[-1] == '':
+    lines = lines[:-1]
+
+out = []
+for line in lines:
+    crc = zlib.crc32(line.encode('utf-8')) & 0xffffffff
+    out.append(f"{crc:08x}\t{line}")
+print('\n'.join(out))

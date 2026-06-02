@@ -1,0 +1,42 @@
+import sys
+
+def solve():
+    lines = sys.stdin.read().split('\n')
+    chips_data = lines[0].split()
+    chips = []
+    for chip_info in chips_data:
+        denom, count = chip_info.split(':')
+        chips.append([int(denom), int(count)])
+    chips.sort(reverse=True)
+    
+    outputs = []
+    cannot = False
+    for i in range(1, len(lines)):
+        if not lines[i].strip():
+            continue
+        amount = int(lines[i].strip())
+        # Greedy
+        remaining = amount
+        used = []
+        for j, (denom, available) in enumerate(chips):
+            if remaining == 0:
+                break
+            use = min(remaining // denom, available)
+            if use > 0:
+                used.append((denom, use))
+                remaining -= use * denom
+        if remaining > 0:
+            cannot = True
+            outputs.append("Cannot make amount")
+        else:
+            parts = [f"{amount}:"]
+            for denom, use in used:
+                parts.append(f"{use}x{denom}")
+            outputs.append(" ".join(parts))
+    
+    if cannot:
+        print("Cannot make amount")
+    else:
+        print("\n".join(outputs))
+
+solve()

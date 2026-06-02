@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"severity_score\": 10, \"cvss_estimate\": 9.8, \"affected_components\": [\"AdminPanel v2.3\"], \"public_exploit_likely\": true, \"recommended_mitigations\": [\"Avoid unsafe deserialization\", \"Restrict input and apply patches\", \"Require authentication\", \"Update affected software\"], \"escalation_required\": true}",
+  "expected": "severity_score",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"severity_score\": 10, \"cvss_estimate\": 9.8, \"affected_components\": [\"AdminPanel v2.3\"], \"public_exploit_likely\": true, \"recommended_mitigations\": [\"Avoid unsafe deserialization\", \"Restrict input and apply patches\", \"Require authentication\", \"Update affected software\"], \"escalation_required\": true}",
+      "expected": "severity_score"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"severity_score\": 6, \"cvss_estimate\": 6.1, \"affected_components\": [\"WebApp\"], \"public_exploit_likely\": false, \"recommended_mitigations\": [\"Apply output encoding and CSP\", \"Update affected software\"], \"escalation_required\": false}",
+      "expected": "severity_score"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:14:34.841775+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

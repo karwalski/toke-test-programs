@@ -1,0 +1,117 @@
+Looking at test 1:
+- Chunk 0: 0-20 "The quick brown fox "
+- Chunk 1: 15-35 "fox jumps over the l" — text[15:35]. Let me check: "The quick brown fox jumps over the lazy dog near the river bank". text[15]='f'? Let me count: T(0)h(1)e(2) (3)q(4)u(5)i(6)c(7)k(8) (9)b(10)r(11)o(12)w(13)n(14) (15)f(16)... So text[15]=' ', not 'f'. But expected starts with "fox".
+
+So expected start_offset=15 but text starts at 16. Hmm. Or maybe offsets are off. Let me check chunk 3: start=49, end=65. text length: "The quick brown fox jumps over the lazy dog near the river bank" = 63 chars. But end=65? That's beyond length.
+
+So the expected output has weird offsets that don't match the actual text positions. The text content is correct but offsets seem to advance by chunk_size-overlap+something.
+
+Chunk 0: start=0, end=20, text=text[0:20]
+Chunk 1: start=15, end=35, text="fox jumps over the l" = text[16:36]
+Chunk 2: start=30, end=50, text="he lazy dog near the" = text[32:52]? Let me check text[32]: positions... f(16)o(17)x(18) (19)j(20)u(21)m(22)p(23)s(24) (25)o(26)v(27)e(28)r(29) (30)t(31)h(32)e(33)... text[32]='h', text[32:52]="he lazy dog near the"? t(31)h(32)e(33) (34)l(35)a(36)z(37)y(38) (39)d(40)o(41)g(42) (43)n(44)e(45)a(46)r(47) (48)t(49)h(50)e(51) (52)... yes text[32:52]="he lazy dog near the". ✓
+
+Chunk 3: start=49, end=65, text="r the river bank". text[49]='h'? No, t(49)? Let me recount. Position 48=' ', 49='t', 50='h', 51='e', 52=' ', 53='r', 54='i'... So "r the river bank" starts at... we need 'r' then ' the river bank'. text[47]='r', text[47:63]="r the river bank". Length 16.
+
+So actual text slices are [0:20], [16:36], [32:52], [47:63]. Differences: 16, 16, 15. And step = chunk_size - overlap = 15.
+
+Hmm, but offsets reported are 0, 15, 30, 49. The reported offsets advance by 15, 15, 19. Weird.
+
+Wait — maybe the algorithm skips a leading space? Each chunk after first starts at start+1 if text[start]==' '? Chunk 1: nominal start=15, text[15]=' ', skip → 16. Chunk 2: nominal start=30, text[30]=' ', skip → 31? But actual is 32. Hmm.
+
+Let me re-examine chunk 2 text: "he lazy dog near the". Actually maybe I miscounted. Let me redo: "The quick brown fox jumps over the lazy dog near the river bank"
+```
+T0 h1 e2  3 q4 u5 i6 c7 k8  9 b10 r11 o12 w13 n14  15 f16 o17 x18  19 j20 u21 m22 p23 s24  25 o26 v27 e28 r29  30 t31 h32 e33  34 l35 a36 z37 y38  39 d40 o41 g42  43 n44 e45 a46 r47  48 t49 h50 e51  52 r53 i54 v55 e56 r57  58 b59 a60 n61 k62
+```
+Length = 63.
+
+Chunk 2 text "he lazy dog near the": h-e-space-l-a-z-y-space-d-o-g-space-n-e-a-r-space-t-h-e = 20 chars. Starts at h32? text[32:52] = "he lazy dog near the". ✓ start_offset reported = 30.
+
+Chunk 3 text "r the river bank" = 16 chars. r-space-t-h-e-space-r-i-v-e-r-space-b-a-n-k. text[47:63]. ✓ start_offset reported=49, end_offset=65.
+
+Actual slice positions: 0, 16, 32, 47. The reported "start_offset" values: 0, 15, 30, 49. The reported "end_offset" values: 20, 35, 50, 65.
+
+Hmm so reported start_offset = previous_reported_start + (chunk_size - overlap) = 0, 15, 30, 45... but chunk 3 is 49 not 45.
+
+Last chunk start 49 vs previous 30: diff=19. End: 50 → 65, diff=15.
+
+Actually wait — maybe the algorithm strips leading/trailing whitespace from each chunk? Chunk 1 naive text[15:35]=" fox jumps over the " — stripped on left = "fox jumps over the " (19 chars). But expected is "fox jumps over the l" (20 chars). So it strips left and extends?
+
+text[15:35] = " fox jumps over the ". Strip leading space: take text[16:36] = "fox jumps over the l". So actual slice [16:36]. ✓
+text[30:50] = " the lazy dog near t". Strip leading space: text[31:51]="the lazy dog near th"? No expected is "he lazy dog near the" = text[32:52]. Strip two leading? text[30]=' ', text[31]='t', text[32]='h'.
+
+Hmm that's stripping 2 chars. Or maybe: start advances by chunk_size-overlap=15, but then we skip until we're not in the middle of a word?
+
+Chunk 1 nominal start=15 (space). Move forward past space → 16 ('f'), word start. ✓
+Chunk 2 nominal start=30 (space). Move forward past space → 31 ('t'). But actual is 32. 
+
+Or move forward past space AND past start of word until... no.
+
+Maybe: skip leading whitespace AND first character? Or find next word boundary after?
+
+Chunk 1: pos 15=' '. Next non-space=16='f'. Use 16. ✓
+Chunk 2: pos 30=' '. Next non-space=31='t'. But used 32.
+
+What about chunk 3: nominal start = previous_actual + step = 32+15 = 47. text[47]='r' (end of 'near'). Used 47. ✓
+
+So chunk 1 starts where chunk 0 step suggests: 0+15=15, then skip space→16.
+Chunk 2 from chunk 1 actual: 16+15=31='t', but used 32.
+Chunk 3 from chunk 2 actual: 32+15=47='r', used 47.
+
+Hmm inconsistent. Let me look at reported start_offsets again: 0,15,30,49.
+
+Differences in reported: 15,15,19. The last 19 might be related to text near end.
+
+Wait maybe reported start_offset is just the previous start_offset + step (15), regardless. So 0,15,30,45. But chunk 3 reports 49. Hmm.
+
+End_offsets: 20, 35, 50, 65. Always start+20=start+chunk_size. So end is start+20.
+
+Chunk 3: start=49, end=65, but text length is only 16, so text[49:65] would be... well text only has 63 chars. text[49:65]="he river bank" (only 14 chars from pos 49). But actual text shown "r the river bank" = 16 chars = text[47:63].
+
+So reported offsets are NOT actual text positions. They seem fabricated.
+
+Looking at totals: end_offset 65 vs actual length 63. Difference 2. start_offset 49 vs actual start 47. Difference 2.
+
+Pattern: reported = actual + 2? For chunk 3 yes. For chunk 2: actual start 32, reported 30. Difference -2. For chunk 1: actual 16, reported 15. Difference -1. For chunk 0: actual 0, reported 0.
+
+Hmm strange. Let me think differently. Maybe the algorithm is correct but with stripping that I need to discover.
+
+Actually, what if the algorithm is: take chunk text[start:start+chunk_size], then strip leading whitespace. The reported start_offset is the NOMINAL start (before strip), end_offset is nominal start + chunk_size.
+
+Chunk 0: nominal start=0, text[0:20]="The quick brown fox " (no leading space, no strip). start=0, end=20. ✓
+Chunk 1: nominal start=15, text[15:35]=" fox jumps over the ". Strip leading→"fox jumps over the " (19 chars). Doesn't match expected "fox jumps over the l" (20 chars).
+
+So not just strip. Maybe strip leading AND extend to fill chunk_size?
+
+Chunk 1: nominal start=15. text[15]=' '. Skip to 16. Take text[16:16+20]=text[16:36]="fox jumps over the l" (20 chars). Reported start=15 (nominal), end=35 (nominal). ✓
+Chunk 2: nominal start = nominal_prev + step = 15+15=30. text[30]=' '. Skip to 31. text[31:51]="the lazy dog near th". But expected is "he lazy dog near the" (text[32:52]). ✗
+
+Hmm. Unless step is computed differently. Maybe step uses actual start: 16+15=31. text[31]='t', no skip. text[31:51]="the lazy dog near th". Still not matching.
+
+Let me try: skip multiple leading whitespace chars... no there's only one space.
+
+What if the rule is: each chunk starts where previous chunk's overlap region begins, but advancing past word boundary?
+
+Or maybe overlap is computed differently. Let me check overlap between chunks:
+Chunk 0 text: "The quick brown fox " ends at actual pos 20
+Chunk 1 text: "fox jumps over the l" starts at actual pos 16
+Overlap region: actual 16-20 = "fox " (4 chars)
+
+Chunk 1 ends actual 36, Chunk 2 starts actual 32. Overlap "the " or text[32:36]="he l"... wait text[32:36]="he l". Chunk 1 text "fox jumps over the l" — last 4 chars="he l". Chunk 2 text "he lazy dog near the" — first 4 chars="he l". Overlap is 4 chars.
+
+Chunk 2 ends actual 52, Chunk 3 starts actual 47. Overlap text[47:52]="r the". Chunk 2 last 5 chars="r the"? "he lazy dog near the" — last 5 chars=" the"... wait length 20. chars 15-19: 'r',' ','t','h','e'. Yes "r the". Chunk 3 first 5 chars="r the". Overlap=5.
+
+Specified overlap=5. So overlaps are 4,4,5. Inconsistent.
+
+This is really strange. Let me look at the expected output once more very carefully:
+
+```
+[{"chunk_id":0,"text":"The quick brown fox ","start_offset":0,"end_offset":20},
+ {"chunk_id":1,"text":"fox jumps over the l","start_offset":15,"end_offset":35},
+ {"chunk_id":2,"text":"he lazy dog near the","start_offset":30,"end_offset":50},
+ {"chunk_id":3,"text":"r the river bank","start_offset":49,"end_offset":65}]
+```
+
+Chunk 1 text "fox jumps over the l" — 20 chars. If start_offset=15 and we want text[15:35] to equal this, that would need text[15]='f'. Let me recount text very carefully.
+
+"The quick brown fox jumps over the lazy dog near the river bank"
+T(0)h(1)e(2) (3)q(4)u(5)i(6)c(7)k(8) (9)b(10)r(11)o(12)w(13)n(14) (15)f(16)o(17)x(18) (19)j(20)u(21)m(22)p(23)s(24) (25)o(26)v(27)e(28)r(29) (30)t(31)h(32)e(33) (34)l(35)a(36)z

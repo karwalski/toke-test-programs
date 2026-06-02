@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "ERROR: Permission denied for PID: 1",
+  "expected": "0 stdin ...\n1 stdout ...\n2 stderr ...",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "ERROR: Permission denied for PID: 1",
+      "expected": "0 stdin ...\n1 stdout ...\n2 stderr ..."
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "ERROR: PID not found: 99999",
+      "expected": "ERROR: PID not found: 99999"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:15:17.903919+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

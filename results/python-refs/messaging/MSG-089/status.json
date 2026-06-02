@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "RENEGOTIATION:\n1. Suspend message delivery (5 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. Re-encrypt 5 pending messages\n7. Resume delivery\nnew_session: {key_hex, established_at}",
+  "expected": "RENEGOTIATION:\n1. Suspend message delivery (5 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. Re-encrypt 5 pending messages\n7. Resume delivery\nnew_session: {key_hex, established_at}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "RENEGOTIATION:\n1. Suspend message delivery (5 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. Re-encrypt 5 pending messages\n7. Resume delivery\nnew_session: {key_hex, established_at}",
+      "expected": "RENEGOTIATION:\n1. Suspend message delivery (5 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. Re-encrypt 5 pending messages\n7. Resume delivery\nnew_session: {key_hex, established_at}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "RENEGOTIATION:\n1. Suspend message delivery (0 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. No pending messages to re-encrypt\n7. Resume delivery\nnew_session: {key_hex, established_at}",
+      "expected": "RENEGOTIATION:\n1. Suspend message delivery (0 pending)\n2. Generate new ephemeral key\n3. Send renegotiation request\n4. Await acknowledgement\n5. Derive new session key\n6. No pending messages to re-encrypt\n7. Resume delivery\nnew_session: {key_hex, established_at}"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:23:46.254482+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

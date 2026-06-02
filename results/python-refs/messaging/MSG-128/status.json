@@ -1,0 +1,6 @@
+{
+  "status": "WRONG_OUTPUT",
+  "actual": "m1: HOT (17 days old, < 30 days)\nm2: COLD (92 days old, 90-365 days... exceeds, PURGE)\nm3: PURGE (517 days old, > 365 days)\nm4: PURGE (882 days old, > 365 days)",
+  "expected": "m1: HOT (17 days old, < 30 days)\nm2: WARM (92 days old, 30-90 days)\nm3: COLD (517 days old, 90-365 days... exceeds, PURGE)\nm4: PURGE (882 days old, > 365 days)",
+  "stderr": ""
+}

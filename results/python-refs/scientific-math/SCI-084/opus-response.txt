@@ -1,0 +1,3 @@
+The expected output shows that compression outputs the raw ASCII codes without using dictionary extensions — this isn't standard LZW. Looking at test 1: 'ABABCBBABC' → '65 66 65 66 67 66 66 65 66 67' is just each character's ASCII value.
+
+{"spec_challenge": "The expected output for test 1 ('65 66 65 66 67 66 66 65 66 67' for input 'ABABCBBABC') is simply the ASCII code of each character, not actual LZW compression. Standard LZW would produce '65 66 256 67 66 257 66 67'. The expected output contradicts the spec's description of LZW compression.", "suggested_amendment": "Either (1) fix the expected output for test 1 to '65 66 256 67 66 257 66 67' to reflect true LZW compression, or (2) change the spec description to indicate per-character ASCII encoding rather than LZW."}

@@ -1,0 +1,61 @@
+import os
+import sys
+
+def detect_package_type(package_path):
+    if os.path.isfile(os.path.join(package_path, 'package.json')):
+        return 'node'
+    elif os.path.isfile(os.path.join(package_path, 'go.mod')):
+        return 'go'
+    elif os.path.isfile(os.path.join(package_path, 'setup.py')):
+        return 'python'
+    return None
+
+def find_packages(root_path):
+    packages = []
+    if not os.path.isdir(root_path):
+        return packages
+    
+    seen = set()
+    
+    for item in os.listdir(root_path):
+        item_path = os.path.join(root_path, item)
+        if not os.path.isdir(item_path):
+            continue
+        
+        package_type = detect_package_type(item_path)
+        if package_type:
+            key = (item, item)
+            if key not in seen:
+                seen.add(key)
+                packages.append((item, package_type, item))
+        
+        try:
+            for sub in os.listdir(item_path):
+                sub_path = os.path.join(item_path, sub)
+                if not os.path.isdir(sub_path):
+                    continue
+                package_type = detect_package_type(sub_path)
+                if package_type:
+                    rel = os.path.join(item, sub)
+                    key = (sub, rel)
+                    if key not in seen:
+                        seen.add(key)
+                        packages.append((sub, package_type, rel))
+        except (PermissionError, OSError):
+            pass
+    
+    return packages
+
+try:
+    root_path = input().strip()
+except EOFError:
+    root_path = ''
+
+packages = find_packages(root_path)
+packages.sort(key=lambda x: x[0])
+
+if not packages:
+    print("No packages detected")
+else:
+    for package_name, package_type, relative_path in packages:
+        print(f"{package_name}: {package_type} ({relative_path})")

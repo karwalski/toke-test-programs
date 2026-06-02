@@ -1,0 +1,215 @@
+Looking at Test 1: pattern `_A_`, wrong `B C D`, words filtered: CAT (has C-wrong), HAT, BAT (has B-wrong), MAT. So HAT and MAT remain.
+
+Letters: H, T from HAT; M, T from MAT. Counts: H=1, T=2, M=1. Max is T, but expected M.
+
+Need tiebreaker. Maybe alphabetical? H,M,T sorted gives H. Hmm. Maybe we should pick a letter that appears in maximum number of words but break ties alphabetically? T appears in 2, others 1. Still T.
+
+Wait, maybe T shouldn't count because... no, T isn't a wrong guess or known letter.
+
+Perhaps it counts unique letters per word (not duplicates) and ties broken... Let me reconsider. Maybe the filter should also exclude letters that would be at known positions. In HAT and MAT, A is the known letter at position 1. T at position 2 - if T were the answer, all remaining words have T, so guessing T is "useless" because it doesn't narrow down. Better to guess M which splits.
+
+Actually a common heuristic: pick letter present in most words but not in all... no, you want most words.
+
+Maybe the answer prefers letters at unknown positions only, and counts position-wise? Or maybe excludes letters that appear in every remaining word?
+
+Test 2: `_____`, words HELLO, APPLE (WORLD has no... wait length 5 all match, no wrong guesses). All three: HELLO, WORLD, APPLE. Letter counts (unique per word):
+- HELLO: H,E,L,O
+- WORLD: W,O,R,L,D
+- APPLE: A,P,L,E
+
+L: 3, E: 2, O: 2, others 1. L wins. Expected L. ✓
+
+Test 1: HAT, MAT. Unique letters:
+- HAT: H,A,T
+- MAT: M,A,T
+T:2, H:1, M:1, A excluded (known). Still T wins.
+
+Unless we exclude known letters AND letters that appear in all words. T appears in all → exclude. Then H=1, M=1, tie → alphabetical → H. Not M.
+
+Hmm. Maybe pick last alphabetically? M > H. Yes! Reverse alphabetical tiebreak gives M.
+
+Test 2: L is unique winner, no tiebreak needed.
+
+Let me try: exclude letters appearing in ALL remaining words, tiebreak by reverse alphabetical.
+
+```python
+import sys
+
+def solve():
+    lines = sys.stdin.read().split('\n')
+    masked = lines[0]
+    wrong = set(lines[1].split()) if len(lines) > 1 and lines[1] else set()
+    dictionary = [l.strip() for l in lines[2:] if l.strip()]
+    
+    known = set(c for c in masked if c != '_')
+    L = len(masked)
+    
+    possible = []
+    for word in dictionary:
+        if len(word) != L:
+            continue
+        ok = True
+        for i in range(L):
+            if masked[i] == '_':
+                if word[i] in known or word[i] in wrong:
+                    ok = False; break
+            else:
+                if word[i] != masked[i]:
+                    ok = False; break
+        if not ok: continue
+        if any(c in wrong for c in word): continue
+        possible.append(word)
+    
+    used = known | wrong
+    counts = {}
+    for word in possible:
+        for c in set(word):
+            if c not in used:
+                counts[c] = counts.get(c, 0) + 1
+    
+    n = len(possible)
+    # exclude letters in all words
+    filtered = {c: v for c, v in counts.items() if v < n}
+    if not filtered:
+        filtered = counts
+    
+    best = max(filtered.keys(), key=lambda c: (filtered[c], c))
+    print(best)
+
+solve()
+```
+
+Test 1: possible=[HAT,MAT], n=2. Counts: H=1,T=2,M=1. Filter v<2: H=1,M=1. Max by (count, letter): M. ✓
+Test 2: possible=[HELLO,WORLD,APPLE], n=3. L=3,E=2,O=2,H=1,W=1,R=1,D=1,A=1,P=1. Filter v<3: all except L. Max E or O... E=2,O=2. Max by (2,'O') > (2,'E') → O. But expected L!
+
+So tiebreak filter doesn't work for test 2. Let me reconsider.
+
+Test 2: L appears in all 3 words. If we don't exclude, L=3 wins. So don't exclude.
+
+Back to original: Test 1 T=2 wins but expected M. 
+
+What if when one letter appears in ALL remaining words, that's the answer (since it's guaranteed)? Test 2: L in all 3 → L. ✓
+Test 1: no letter in all → pick highest count? T=2, but only 2 words so T is in all! Wait HAT and MAT both have T. Yes T in all.
+
+Hmm both have a letter in all. Test 2 prefer L, Test 1 prefer M (not the all-letter).
+
+```python
+import sys
+
+def solve():
+    data = sys.stdin.read().split('\n')
+    masked = data[0]
+    wrong = set(data[1].split()) if len(data) > 1 and data[1] else set()
+    dictionary = [l.strip() for l in data[2:] if l.strip()]
+    
+    known = set(c for c in masked if c != '_')
+    L = len(masked)
+    
+    possible = []
+    for word in dictionary:
+        if len(word) != L: continue
+        ok = True
+        for i in range(L):
+            if masked[i] == '_':
+                if word[i] in known or word[i] in wrong:
+                    ok = False; break
+            else:
+                if word[i] != masked[i]:
+                    ok = False; break
+        if not ok: continue
+        if any(c in wrong for c in word): continue
+        possible.append(word)
+    
+    used = known | wrong
+    counts = {}
+    for word in possible:
+        for c in set(word):
+            if c not in used:
+                counts[c] = counts.get(c, 0) + 1
+    
+    # Sort by count desc, then letter desc
+    best = max(counts.keys(), key=lambda c: (counts[c], c))
+    print(best)
+
+solve()
+```
+
+Test 1: H=1,T=2,M=1. Max (count,letter): T. Wrong.
+Test 2: L=3,E=2,O=2,... Max: L. ✓
+
+Need T excluded from test 1. T is at a non-underscore... no T is at position 2 (underscore). 
+
+Wait—the masked word `_A_` has A at position 1. In HAT and MAT, position 2 is T. Since T is at the same position in all candidates, guessing T reveals nothing new about the word structure? But guessing T as a hangman letter would still reveal it...
+
+Actually in hangman strategy, you want to maximize info. If T is in all remaining words at the same position, guessing T gives 100% hit but no narrowing. Best to guess M (splits 50/50).
+
+Standard hangman strategy: pick letter that appears in the most words but is NOT in all words (to maximize information). But test 2 contradicts: L is in all 3 words.
+
+Unless in test 2 the words are checked differently. Let me recount: HELLO has L (twice), WORLD has L, APPLE has L. Yes L in all 3.
+
+Maybe: pick letter with highest total occurrence count (not word count)?
+Test 1: HAT,MAT. H=1,T=2,M=1,A=2(excluded). T=2 still wins.
+Test 2: HELLO(H=1,E=1,L=2,O=1), WORLD(W,O,R,L,D), APPLE(A,P=2,L,E). L total = 2+1+1=4. E=1+1=2. O=1+1=2. Total L wins. ✓
+
+Test 1 still T. 
+
+Hmm, what if T isn't counted because... position-based: only count letters at underscore positions? 
+Test 1: underscores at pos 0,2. HAT has H@0, T@2. MAT has M@0, T@2. Count: H=1, T=2, M=1. Same.
+
+What if we count letters ONLY at positions where they vary across words?
+Test 1: pos 0 varies (H/M), pos 2 doesn't (both T). So only count pos 0 letters: H=1, M=1. Tie → reverse alpha → M. ✓
+Test 2: all underscores, all positions probably vary. Just count all: L=3 wins (or 4 with dups). ✓
+
+That seems contrived but works. Let me verify test 2 positions:
+- pos 0: H,W,A — varies
+- pos 1: E,O,P — varies
+- pos 2: L,R,P — varies
+- pos 3: L,L,L — same! all L
+- pos 4: O,D,E — varies
+
+So pos 3 has L in all words. If we exclude same-letter positions: L would only count at pos 2 (HELLO has L at pos 2 and 3, WORLD has L at pos 3, APPLE has L at pos 2 and 3).
+
+Count letters at varying positions (unique per word):
+- HELLO at varying pos (0,1,2,4): H,E,L,O
+- WORLD at varying pos (0,1,2,4): W,O,R,D  
+- APPLE at varying pos (0,1,2,4): A,P,P,E
+
+L=1, E=2, O=2, H=1, W=1, R=1, D=1, A=1, P=1(or 2). Max E or O → tiebreak reverse alpha → O. Not L.
+
+Doesn't work either. 
+
+Let me try simpler: maybe tiebreak is just alphabetical FIRST among letters with max count, but somehow T isn't max in test 1.
+
+What if we count words containing letter, excluding letters that are "forced" (at the same position in all)?
+
+Actually, let me just look at expected: Test 1 → M. M appears once. H also once. Why M not H?
+
+Maybe alphabetical order is reversed (Z to A) when counts tie. Test 1: among letters not in all words (H, M; T excluded), max alpha M > H → M. ✓
+Test 2: L in all words — but L is expected. So this rule breaks for test 2.
+
+Unless test 2: L appears multiple times and only L meets the threshold. With L being in all 3 words AND most frequent overall — maybe rule is: exclude all-words letters only if there are other candidates? Test 1 excludes T, picks M. Test 2 if exclude L, then E=2,O=2 tied — pick reverse alpha O. Not L.
+
+I'm stuck on a clean rule. Let me look at test 2 once more. Words: HELLO, WORLD, APPLE. Maybe a word doesn't match? No wrong guesses, all length 5.
+
+What if the algorithm just counts total letter occurrences (with duplicates) in all matching words, tiebreak by reverse alphabetical?
+
+Test 1: HAT,MAT. H=1,A=2(known excl),T=2,M=1. Max T. Wrong.
+
+What if known letters DON'T exclude — wait we want to exclude.
+
+What if T is in wrong_guesses somehow? No, wrong is B C D.
+
+What if known includes position-known letters only and we ALSO exclude letters that appear in every candidate word as a kind of "already known"?
+
+Test 1: T in every candidate → treat as known. Remaining: H,M. Tiebreak reverse alpha → M. ✓
+Test 2: L in every candidate → treat as known. Remaining: E=2,O=2,H,W,R,D,A,P. Tiebreak: O > E reverse alpha → O. Expected L. ✗
+
+Argh.
+
+Wait, what about test 2 — maybe I'm miscounting matching words. Let me re-examine: no wrong guesses, length 5. HELLO=5, WORLD=5, APPLE=5. All match. Yes.
+
+What if pattern `_____` means we just want highest frequency letter, and L appears 4 times total (HELLO=2, WORLD=1, APPLE=1)? L=4, others less. Total count wins.
+
+For test 1: H=1, T=2, M=1. T highest.
+
+Combine: total count primary, but exclude letters that are at fixed non-underscore positions in the pattern... A is at p

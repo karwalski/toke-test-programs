@@ -1,0 +1,142 @@
+# Test 1: mean=70, raw stddev sqrt(200)=14.142...
+# 80: z=10/14.142=0.7071, 75+0.7071*10=82.07 but expected 79.0
+# Try sample stddev (n-1): sqrt(250)=15.811, z=10/15.811=0.6325, 75+6.325=81.3 no
+# Expected 79.0 for 80. 79-75=4. So z*10=4, z=0.4. (80-70)/x=0.4, x=25
+# Check 90: 85.9-75=10.9, z=1.09, (90-70)/1.09=18.35 hmm not 25
+# 60: 65.2-75=-9.8, z=-0.98, (60-70)/-0.98=10.2
+# Not linear scaling. Let me reconsider.
+# Maybe rank-based? Sort: 50,60,70,80,90 ranks
+# Or maybe using percentile via normal CDF inverse?
+# 80 is at rank 4 of 5. Percentile = (rank-0.5)/n = 3.5/5 = 0.7
+# inv_norm(0.7) = 0.5244, *10+75 = 80.24 no
+# Try (rank)/(n+1): 4/6=0.6667, inv=0.4307, *10+75=79.3 close to 79.0
+# 90: 5/6=0.8333, inv=0.9674, *10+75=84.67 not 85.9
+# Try rank/n: 80 is rank 4, 4/5=0.8, inv=0.8416, *10+75=83.4 no
+# Hmm. Let me try: sort scores, assign z = inv_norm((i+0.5)/n)
+# 50:0.1->-1.28, 60:0.3->-0.524, 70:0.5->0, 80:0.7->0.524, 90:0.9->1.28
+# Adjusted: 75-12.8=62.2, 75-5.24=69.76, 75, 80.24, 87.8
+# Expected sorted: 58.3, 65.2, 72.1, 79.0, 85.9
+# diffs: 58.3-75=-16.7, 65.2-75=-9.8, 72.1-75=-2.9, 79-75=4, 85.9-75=10.9
+# z values: -1.67, -0.98, -0.29, 0.4, 1.09
+# These look like inv_norm of what? 
+# norm.cdf(-1.67)=0.0475, cdf(-0.98)=0.1635, cdf(-0.29)=0.386, cdf(0.4)=0.655, cdf(1.09)=0.862
+# Differences: 0.0475, 0.116, 0.222, 0.269, 0.207... not uniform
+# 
+# Hmm. Let me check: maybe they used n-1 in stddev calc differently.
+# raw mean=70, sum sq dev=1000, var(n)=200, var(n-1)=250
+# Using stddev=sqrt(250)≈15.811
+# z for 80: 10/15.811=0.6325, *10+75=81.32 no
+# 
+# What if target stddev gets divided? Or mean shifted?
+# Expected mean of outputs: (79+72.1+65.2+85.9+58.3)/5 = 360.5/5 = 72.1
+# Not 75. Interesting!
+# Expected stddev? values: 79,72.1,65.2,85.9,58.3, mean=72.1
+# devs: 6.9, 0, -6.9, 13.8, -13.8. sum sq = 47.61+0+47.61+190.44+190.44=476.1
+# var=95.22, stddev=9.758. Not exactly 10.
+# Hmm sample var = 476.1/4 = 119.025, stddev=10.91. Not exact either.
+# 
+# Wait, let me look at the pattern: 79, 72.1, 65.2 differ by 6.9 each. 85.9-79=6.9. Linear!
+# 80->79, 70->72.1, 60->65.2, 90->85.9, 50->58.3
+# 80->79: -1; 70->72.1: +2.1; 60->65.2: +5.2; 90->85.9: -4.1; 50->58.3: +8.3
+# Diffs between consecutive sorted: 65.2-58.3=6.9, 72.1-65.2=6.9, 79-72.1=6.9, 85.9-79=6.9
+# So output is linear with slope 6.9/10 = 0.69 per raw point
+# 80*0.69 = 55.2, +? = 79, so +23.8
+# 70*0.69=48.3, +23.8=72.1 ✓
+# 60*0.69=41.4+23.8=65.2 ✓
+# So adjusted = 0.69*raw + 23.8
+# What's 0.69? target_stddev / raw_stddev_something. 10/0.69=14.49... 
+# Hmm 0.69 = ? Maybe 10/sqrt(210)? sqrt(210)=14.49. Yes!
+# Wait raw variance n=5: 200, n-1: 250. What gives 14.49?
+# Or 0.69 directly: maybe stddev computed wrong. sum sq = 1000. 1000/x where sqrt(x/...)
+# 10/0.69 = 14.4928. 14.4928^2 = 210. So variance 210? Where does 210 come from?
+# Hmm. Or maybe it's not stddev based.
+# 
+# 0.69 ≈ correlation? Actually let me check: maybe rounded somewhere
+# slope exactly: (85.9-58.3)/(90-50) = 27.6/40 = 0.69 exactly
+# intercept: 79 - 0.69*80 = 79-55.2 = 23.8
+# new_mean = 0.69*70 + 23.8 = 48.3+23.8 = 72.1
+# So target_mean of 75 is NOT achieved. Output mean = 72.1.
+# 
+# Maybe they're using statistics.stdev (sample, n-1):
+# stdev = sqrt(1000/4) = sqrt(250) = 15.811
+# scale = 10/15.811 = 0.6325. Not 0.69.
+# 
+# pstdev = sqrt(200) = 14.142, scale=0.7071. Not 0.69.
+# 
+# What gives 0.69 = 10/14.4928? 14.4928 = sqrt(210). Variance 210.
+# sum((x-70)^2) = 100+0+100+400+400 = 1000. 1000/x=210 -> x≈4.76. Not standard.
+# 
+# Hmm, maybe formula: stddev computed including something else.
+# 
+# Maybe they want: keep zero point as min? 
+# Let me try: z based on (score - min)/(max-min)?
+# 80: (80-50)/40 = 0.75. Hmm.
+# 
+# Actually, let me reverse-engineer differently. The relationship is linear with slope 0.69.
+# 0.69 = 69/100. Maybe target_stddev/something.
+# 
+# Try Test 2: single value 70, target 70 5 -> output 70.0. Stddev 0 case, just outputs mean. OK any formula works if stddev=0 -> output target_mean.
+# 
+# Back to test 1. What if there's a typo and the test expected uses different formula? Let me check if slope corresponds to some specific computation.
+# 0.69 ... could be related to range method: stddev ≈ range/d2 where d2 for n=5 is 2.326
+# range=40, est_stddev = 40/2.326 = 17.196. 10/17.196 = 0.5815. No.
+# 
+# Hmm, what about MAD (mean absolute deviation)?
+# MAD = (10+0+10+20+20)/5 = 60/5 = 12. stddev_est = 1.2533*MAD = 15.04. No.
+# 
+# Or median absolute deviation = 10. *1.4826 = 14.826. 10/14.826=0.6745. Close to 0.69 but not exact.
+# 
+# Actually 14.4914 ≈ sqrt(2)*sqrt(105)? Let's see if it's sqrt(1050/5)=sqrt(210). 
+# Sum of squares of values: 80^2+70^2+60^2+90^2+50^2 = 6400+4900+3600+8100+2500 = 25500
+# 25500/5 = 5100. sqrt(5100)=71.4. mean^2=4900. 5100-4900=200=var.
+# 
+# I cannot figure out the formula. Let me look more carefully.
+# slope 0.69, intercept 23.8. new_mean = 72.1, not 75.
+# Difference: 75-72.1 = 2.9. Hmm.
+# 
+# Wait! What if intercept = target_mean - slope*raw_mean, but slope is something specific?
+# slope = (output_mean_shift)/(input)... 
+# 
+# Actually, let me check: maybe they compute target as keeping median or something?
+# Median of raw = 70, median of output = 72.1. Not preserved.
+# 
+# What if mean is biased by initial offset? Like cumulative...
+# 
+# I'm stuck. Given the test pattern slope=0.69, intercept=23.8, and we don't know the formula, but maybe it's: scale = target_stddev / something_weird.
+# 
+# Let me try: what if they use range-based normalization but with normal scaling?
+# Or what if they accidentally normalize by sqrt(sum_sq) not sqrt(variance)?
+# sqrt(sum of (x-mean)^2) = sqrt(1000) = 31.62. 10/31.62 = 0.316. No.
+# 
+# sqrt(sum of x^2) = sqrt(25500) = 159.7. No.
+# 
+# What about: scale = target_stddev / max(abs(x-mean))? max = 20, 10/20=0.5. No.
+# 
+# Let me try: pre-scale by some factor.
+# 0.69 = 10/14.4928. Hmm what if 14.4928 = stdev + something?
+# pstdev=14.142, +0.35? sample stdev 15.811, -1.32?
+# 
+# Actually: (pstdev + sstdev)/2 = (14.142+15.811)/2 = 14.977. Close to 14.49 but not exact.
+# 
+# What if they compute stddev as sqrt(sum/(n-0.5))? 1000/4.5=222.2, sqrt=14.907. No.
+# 1000/4.76=210. n-0.24? weird.
+# 
+# Wait let me check: 10/0.69 exactly = 14.4927... What if scale is exactly 0.69 because of rounding of stddev to integer 14? No, 10/14=0.714.
+# 
+# Let me check if maybe the formula uses log or sqrt of scores.
+# Actually wait - what if it's an EMA / running calculation?
+# Let me compute running mean and stddev as we go.
+# 
+# Scores in order: 80, 70, 60, 90, 50
+# After processing each, maintain running stats? 
+# But output for first score has to consider what?
+# 
+# Maybe: for each score, z = (score - target_mean)/(running_stddev_so_far)? No, we don't have target stddev source.
+# 
+# Hmm, let me check if output(i) is computed using running mean/stddev up to position i:
+# Position 1: 80. running mean=80, stddev=0. Special case.
+# 
+# Or running including all? No that's the global.
+# 
+# I think I need to flag this as impossible to determine.
+{"spec_challenge": "Cannot reverse-engineer the formula from test cases. Standard z-score normalization (using either population stddev sqrt(200)≈14.142 or sample stddev sqrt(250)≈15.811) produces outputs that don't match expected. Expected outputs follow linear relation adjusted = 0.69*raw + 23.8, giving slope 10/sqrt(210) and an output mean of 72.1 (not the target 75). No standard statistical method (pstdev, stdev, MAD, range/d2, median absolute deviation) produces the divisor sqrt(210)≈14.493 used here, and the output mean doesn't equal target_mean as the spec states.", "suggested_amendment": "Either (

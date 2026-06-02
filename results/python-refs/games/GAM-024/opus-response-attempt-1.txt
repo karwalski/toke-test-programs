@@ -1,0 +1,35 @@
+Looking at the test cases, I need to figure out the guess selection strategy.
+
+Test 1: secret=1234
+- 1122 → 1B0W? Let me check: positions: 1=1✓, 1≠2, 2≠3, 2≠4. Bulls=1. Remaining guess digits {1,2}, secret digits {2,3,4}. Cows=1. Hmm expected says 1B0W.
+
+Wait, let me recheck. Guess "1122" vs secret "1234":
+- pos 0: 1==1 ✓ bull
+- pos 1: 1 vs 2
+- pos 2: 2 vs 3
+- pos 3: 2 vs 4
+Bulls=1. Non-bull guess: [1,2,2], non-bull secret: [2,3,4]. Common: one '2'. Cows=1.
+
+But expected is "1122 1B0W". That contradicts standard Mastermind. Unless the response calculation is different... Maybe they don't count cows for repeated digits in guess?
+
+Test 2: secret=6666, guess "5566" → expected 0B2W. Standard: bulls=0, non-bull guess [5,5,6,6] vs secret [6,6,6,6], cows=min(2,4)=2. ✓
+
+Test 2: "5665" vs "6666": pos: 5≠6, 6==6, 6==6, 5≠6. Bulls=2. Expected 0B2W. That's wrong by standard rules!
+
+Hmm, the expected says 0B2W but standard gives 2B2W. Let me re-examine... Maybe the "response" shown is computed against a different reference, not the secret.
+
+Wait — maybe this is Knuth's algorithm where the response shown is actually against the *previous guess being eliminated* or something? Or maybe responses are cumulative/different?
+
+Actually looking more carefully at test 2: secret=6666, why would Knuth make 6 guesses? Knuth guarantees ≤5. Something's odd.
+
+Let me check if response is computed against first guess "1122" instead of secret:
+- "3344" vs "1122": 0B0W ✓
+- "5566" vs "1122": 0B0W ✗ (expected 0B2W)
+
+Against "1234"? "5566" vs "1234": 0B0W ✗.
+
+Maybe response is between consecutive guesses? "3344" vs "1122": 0B0W ✓. "5566" vs "3344": 0B0W ✗.
+
+The expected outputs seem inconsistent with any standard scoring. I'll flag this.
+
+{"spec_challenge": "Expected outputs contain responses inconsistent with standard Mastermind scoring. E.g., Test 1 expects '1122 1B0W' for secret 1234, but 1122 vs 1234 yields 1 bull and 1 cow (the '2'). Test 2 expects '5665 0B2W' for secret 6666, but 5665 vs 6666 has 2 bulls (positions 1,2). Also Test 2 uses 6 guesses while Knuth guarantees ≤5. The expected outputs appear hand-fabricated and not derivable from any consistent scoring/algorithm.", "suggested_amendment": "Regenerate test cases by actually running Knuth's minimax algorithm with standard Mastermind bull/cow scoring (bulls = exact position matches; cows = additional digit matches in wrong position, counted with multiplicity min(guess_count, secret_count) excluding bulls)."}

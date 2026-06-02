@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\n  \"image\": \"nginx:latest\",\n  \"findings\": [\n    {\n      \"severity\": \"HIGH\",\n      \"category\": \"user_permissions\",\n      \"description\": \"Container runs as root user\",\n      \"layer\": \"base\"\n    },\n    {\n      \"severity\": \"LOW\",\n      \"category\": \"network_exposure\",\n      \"description\": \"Port 80/tcp exposed\",\n      \"layer\": \"config\"\n    },\n    {\n      \"severity\": \"LOW\",\n      \"category\": \"network_exposure\",\n      \"description\": \"Port 443/tcp exposed\",\n      \"layer\": \"config\"\n    },\n    {\n      \"se",
+  "expected": "findings",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\n  \"image\": \"nginx:latest\",\n  \"findings\": [\n    {\n      \"severity\": \"HIGH\",\n      \"category\": \"user_permissions\",\n      \"description\": \"Container runs as root user\",\n      \"layer\": \"base\"\n    },\n    {\n      \"severity\": \"LOW\",\n      \"category\": \"network_exposure\",\n      \"description\": \"Port 80/tcp exposed\",\n      \"layer\": \"config\"\n    },\n    {\n      \"severity\": \"LOW\",\n      \"category\": \"network_exposure\",\n      \"description\": \"Port 443/tcp exposed\",\n      \"layer\": \"config\"\n    },\n    {\n      \"se",
+      "expected": "findings"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\n  \"image\": \"alpine:latest\",\n  \"findings\": [\n    {\n      \"severity\": \"HIGH\",\n      \"category\": \"user_permissions\",\n      \"description\": \"Container runs as root user\",\n      \"layer\": \"base\"\n    }\n  ],\n  \"riskScore\": 8,\n  \"recommendations\": [\n    \"Run container with non-root user (USER directive)\"\n  ]\n}",
+      "expected": "riskScore"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:28:08.970214+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

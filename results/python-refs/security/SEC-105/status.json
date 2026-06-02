@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "timing_ns, correctly_rejected\n1467621, True\n1379184, True\n1406556, True\n1644393, False\n\nTiming Analysis:\nGuess                timing_ns    Rejected\n--------------------------------------------------\npassword             1467621      True\npassword1            1379184      True\npassword12           1406556      True\npassword123          1644393      False",
+  "expected": "timing_ns",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "timing_ns, correctly_rejected\n1467621, True\n1379184, True\n1406556, True\n1644393, False\n\nTiming Analysis:\nGuess                timing_ns    Rejected\n--------------------------------------------------\npassword             1467621      True\npassword1            1379184      True\npassword12           1406556      True\npassword123          1644393      False",
+      "expected": "timing_ns"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "timing_ns, correctly_rejected\n1567621, True\n1429184, False\n\nTiming Analysis:\nGuess                timing_ns    Rejected\n--------------------------------------------------\ninvalid              1567621      True\nsecret               1429184      False",
+      "expected": "timing_ns"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:10:58.541495+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

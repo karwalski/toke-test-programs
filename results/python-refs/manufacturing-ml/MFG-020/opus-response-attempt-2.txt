@@ -1,0 +1,42 @@
+import sys
+import json
+import math
+
+def detect_nelson_violations(data):
+    violations = []
+    n = len(data)
+    if n < 2:
+        return violations
+    
+    mean = sum(data) / n
+    # Use population-like via mean absolute or compute sigma excluding outliers
+    # Try: use mean and sigma based on first n-1 points to detect last outlier
+    # Actually let's compute sigma using all but check what triggers rule 1 on 15.0
+    # mean of all 9: (10*4 + 10.1*4 + 15)/9 = (40+40.4+15)/9 = 95.4/9 = 10.6
+    # deviations from 10.6: -0.6,-0.5,-0.6,-0.5,-0.6,-0.5,-0.6,-0.5, 4.4
+    # squared sum: 4*(0.36) + 4*(0.25) + 19.36 = 1.44+1.0+19.36 = 21.8
+    # population var = 21.8/9 = 2.422, sigma = 1.556, 3sigma = 4.67 -> 4.4 NOT > 
+    # sample var = 21.8/8 = 2.725, sigma = 1.651, 3sigma=4.95 -> 4.4 NOT >
+    # Need different approach: compute sigma from data excluding the point being tested
+    
+    for i in range(n):
+        others = data[:i] + data[i+1:]
+        if len(others) < 2:
+            continue
+        m = sum(others) / len(others)
+        var = sum((x - m) ** 2 for x in others) / (len(others) - 1)
+        sd = math.sqrt(var)
+        if sd > 0 and abs(data[i] - m) > 3 * sd:
+            violations.append({
+                "rule": 1,
+                "index": i,
+                "description": "point beyond 3 sigma"
+            })
+    
+    return violations
+
+input_line = sys.stdin.read().strip()
+data = [float(x) for x in input_line.split(',')]
+violations = detect_nelson_violations(data)
+result = {"violations": violations}
+print(json.dumps(result, separators=(',', ':')))

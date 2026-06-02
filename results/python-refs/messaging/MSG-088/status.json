@@ -1,0 +1,6 @@
+{
+  "status": "WRONG_OUTPUT",
+  "actual": "AUDIT LOG:\n[10:00:00] encrypt m1 with k1: OK\n[10:00:01] decrypt m1 with k1: OK\n[10:00:02] decrypt m2 with k2: FAILED\n---\noperations: decrypt=2, encrypt=1\nsuccess rate: 66.7% (2/3)\nkeys used: k1=2, k2=1",
+  "expected": "AUDIT LOG:\n[10:00:00] encrypt m1 with k1: OK\n[10:00:01] decrypt m1 with k1: OK\n[10:00:02] decrypt m2 with k2: FAILED\n---\noperations: encrypt=1, decrypt=2\nsuccess rate: 66.7% (2/3)\nkeys used: k1=2, k2=1",
+  "stderr": ""
+}

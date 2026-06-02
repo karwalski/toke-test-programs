@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "serialized: hex_encoded_state (N bytes)\nfields: dh_pair(64B), root_key(32B), chains(64B), counters(8B)",
+  "expected": "serialized: hex_encoded_state (N bytes)\nfields: dh_pair(64B), root_key(32B), chains(64B), counters(8B)",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "serialized: hex_encoded_state (N bytes)\nfields: dh_pair(64B), root_key(32B), chains(64B), counters(8B)",
+      "expected": "serialized: hex_encoded_state (N bytes)\nfields: dh_pair(64B), root_key(32B), chains(64B), counters(8B)"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"dh_pair\":{\"public\":\"pub_hex\",\"private\":\"priv_hex\"},\"root_key\":\"rk_hex\",\"chain_key_send\":\"cks_hex\",\"chain_key_recv\":\"ckr_hex\",\"msg_number\":42,\"prev_chain_length\":10}",
+      "expected": "{\"dh_pair\":{\"public\":\"pub_hex\",\"private\":\"priv_hex\"},\"root_key\":\"rk_hex\",\"chain_key_send\":\"cks_hex\",\"chain_key_recv\":\"ckr_hex\",\"msg_number\":42,\"prev_chain_length\":10}"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:23:13.666690+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

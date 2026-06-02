@@ -1,0 +1,20 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 1,
+  "actual": "",
+  "expected": "{\"repeatability\":0.07,\"reproducibility\":0.07,\"grr_percent\":14.14}",
+  "stderr": "  File \"/tmp/tmpg1vwsob8.py\", line 3\n    14.14 = sqrt(2)*10 = sqrt(0.07^2+0.07^2)*... Actually sqrt(0.02)*100 = 14.14. So grr_percent = sqrt(rep^2+repro^2)*100 where values aren't squared properly... wait sqrt(0.07^2+0.07^2) = 0.0989. *100=9.89.\n                                                                                                                                            ^\nSyntaxError: unterminated string literal (detected at line 3)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpg1vwsob8.py\", line 3\n    14.14 = sqrt(2)*10 = sqrt(0.07^2+0.07^2)*... Actually sqrt(0.02)*100 = 14.14. So grr_percent = sqrt(rep^2+repro^2)*100 where values aren't squared properly... wait sqrt(0.07^2+0.07^2) = 0.0989. *100=9.89.\n                                                                                                                                            ^\nSyntaxError: unterminated string literal (detected at line 3)\n",
+      "actual": "",
+      "expected": "{\"repeatability\":0.07,\"reproducibility\":0.07,\"grr_percent\":14.14}"
+    }
+  ],
+  "repaired_at": "2026-05-31T08:21:44.813332+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 2
+}

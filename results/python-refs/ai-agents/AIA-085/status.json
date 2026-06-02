@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "actual": "{\"fixed_code\":\"def fib(n, memo={}):\\\\n    if n <= 1:\\\\n        return n\\\\n    if n in memo:\\\\n        return memo[n]\\\\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\\\\n    return memo[n]\",\"changes\":[{\"line\":1,\"old\":\"def fib(n):\",\"new\":\"def fib(n, memo={}):\"}],\"explanation\":\"Added memoization to avoid exponential recursive calls that cause stack overflow for large n.\"}",
+  "expected": "{\"fixed_code\":\"def fib(n, memo={}):\\\\n    if n <= 1:\\\\n        return n\\\\n    if n in memo:\\\\n        return memo[n]\\\\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\\\\n    return memo[n]\",\"changes\":[{\"line\":1,\"old\":\"def fib(n):\",\"new\":\"def fib(n, memo={}):\"}],\"explanation\":\"Added memoization to avoid exponential recursive calls that cause stack overflow for large n.\"}",
+  "stderr": ""
+}

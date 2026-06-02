@@ -1,0 +1,73 @@
+import sys
+
+def solve_skyscraper():
+    data = sys.stdin.read().split('\n')
+    n = int(data[0])
+    top_clues = list(map(int, data[1].split()))
+    bottom_clues = list(map(int, data[2].split()))
+    left_clues = list(map(int, data[3].split()))
+    right_clues = list(map(int, data[4].split()))
+    
+    grid = [[0]*n for _ in range(n)]
+    
+    def count_visible(line):
+        count = 0
+        max_h = 0
+        for h in line:
+            if h > max_h:
+                count += 1
+                max_h = h
+        return count
+    
+    def check_row(r):
+        row = grid[r]
+        if left_clues[r] != 0 and count_visible(row) != left_clues[r]:
+            return False
+        if right_clues[r] != 0 and count_visible(row[::-1]) != right_clues[r]:
+            return False
+        return True
+    
+    def check_col(c):
+        col = [grid[r][c] for r in range(n)]
+        if top_clues[c] != 0 and count_visible(col) != top_clues[c]:
+            return False
+        if bottom_clues[c] != 0 and count_visible(col[::-1]) != bottom_clues[c]:
+            return False
+        return True
+    
+    def solve(pos):
+        if pos == n * n:
+            return True
+        row = pos // n
+        col = pos % n
+        
+        row_used = set(grid[row][:col])
+        col_used = set(grid[r][col] for r in range(row))
+        
+        for h in range(1, n+1):
+            if h in row_used or h in col_used:
+                continue
+            grid[row][col] = h
+            
+            ok = True
+            # If row complete, check row clues
+            if col == n - 1:
+                if not check_row(row):
+                    ok = False
+            # If column complete, check column clues
+            if ok and row == n - 1:
+                if not check_col(col):
+                    ok = False
+            
+            if ok and solve(pos + 1):
+                return True
+            grid[row][col] = 0
+        return False
+    
+    if solve(0):
+        for row in grid:
+            print(' '.join(map(str, row)))
+    else:
+        print("No solution found")
+
+solve_skyscraper()

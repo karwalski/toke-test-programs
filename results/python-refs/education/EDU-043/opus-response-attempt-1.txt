@@ -1,0 +1,118 @@
+# Test: mean=70, std=sqrt(200)=14.142
+# Expected for 80: 79.0 -> z = (80-70)/14.142 = 0.7071, 75+0.7071*10 = 82.07 (got)
+# Expected 79.0, so different. Let's check sample stddev (n-1): sqrt(250)=15.811
+# z = 10/15.811 = 0.6325, 75+6.325 = 81.32. Still not 79.
+# Try (80-70)/sqrt(?) * 10 + 75 = 79 -> (10/s)*10 = 4 -> s=25
+# Hmm. Check 70: (70-70)*x+75 = 75 but expected 72.1. So target_mean isn't just added.
+# Maybe scores aren't normalized by their own mean. Maybe target is applied differently.
+# Score 70 -> 72.1, 80->79.0, 60->65.2, 90->85.9, 50->58.3
+# Differences from raw: -7.9, -1.0, +5.2, -4.1, +8.3
+# Adjusted mean = (72.1+79.0+65.2+85.9+58.3)/5 = 360.5/5 = 72.1
+# Hmm not 75. Adjusted std? values - 72.1: 0, 6.9, -6.9, 13.8, -13.8
+# variance = (0+47.61+47.61+190.44+190.44)/5 = 476.1/5 = 95.22, std=9.758
+# Not 10 either. Try n-1: 476.1/4=119.025, std=10.91. Not 10.
+# Raw mean=70, raw std (pop)=sqrt(200)=14.142, sample=sqrt(250)=15.811
+# z for 80 pop: 0.7071. (79-75)/10 = 0.4. ratio 0.4/0.7071=0.5657
+# z for 90 pop: 1.4142. (85.9-75)/10=1.09. ratio=0.7707
+# z for 60 pop: -0.7071. (65.2-75)/10=-0.98. ratio=1.386
+# Not linear. So maybe percentile-based (rank to normal quantile)?
+# 5 scores ranked: 50(1),60(2),70(3),80(4),90(5)
+# Percentile (i-0.5)/n: 0.1,0.3,0.5,0.7,0.9
+# Inverse normal CDF: -1.2816, -0.5244, 0, 0.5244, 1.2816
+# *10 + 75: 62.18, 69.76, 75, 80.24, 87.82. Not matching.
+# Try i/(n+1): 1/6,2/6,3/6,4/6,5/6 = 0.1667,0.333,0.5,0.667,0.833
+# Inv: -0.9674,-0.4307,0,0.4307,0.9674
+# *10+75: 65.33, 70.69, 75, 79.31, 84.67. Not match.
+# Expected sorted: 58.3, 65.2, 72.1, 79.0, 85.9
+# Differences: 6.9 each! Arithmetic progression with diff 6.9, mean 72.1
+# Hmm, 72.1 mean not 75. Why?
+# Maybe scores are kept in original order but adjusted... let me check pattern
+# Raw: 80,70,60,90,50 -> 79.0,72.1,65.2,85.9,58.3
+# diff: -1, 2.1, 5.2, -4.1, 8.3
+# What if formula: target_mean + (raw - raw_mean) * (target_std/raw_std) but with raw_std using N-1 and something else
+# (80-70)*k + c = 79; (70-70)*k+c=72.1 -> c=72.1; (60-70)*k+72.1=65.2 -> k=0.69
+# Check 90: 20*0.69+72.1=85.9 ✓; 50: -20*0.69+72.1=58.3 ✓
+# So formula: adjusted = 72.1 + (raw-70)*0.69
+# Why 72.1 and 0.69? 
+# 0.69 = target_std/raw_std? 10/0.69=14.49. raw std pop=14.14. Close but not exact.
+# Maybe it's 10/sqrt(210)? sqrt(210)=14.49. Where does 210 come from?
+# variance: sum((x-mean)^2)/(n-1) with bias? sum=1000, /n=200, /(n-1)=250
+# Hmm 1000/210? No.
+# k=0.69 exactly. 10*0.069. Or 69/100.
+# What about c=72.1? Maybe weighted: 0.7*raw_mean + 0.3*target_mean? 0.7*70+0.3*75=71.5. No.
+# target_mean - something. 75-2.9=72.1. 
+# Maybe shrinkage toward raw_mean based on sample size?
+# c = (n*raw_mean + target_mean)/(n+1)? (5*70+75)/6=425/6=70.83. No.
+# c = raw_mean + (target_mean-raw_mean)*factor. 72.1 = 70+5*factor -> factor=0.42
+# k = target_std/raw_std * factor? 14.14*0.69=9.76. Not 10.
+# 0.69 and 0.42... Maybe these come from n=5: 0.69 ≈ ? 
+# Let me try: assume formula is z-score with n-1 std then scale, but blend with raw
+# Actually let me try: maybe they use sample std (n-1) but apply differently
+# sample std = sqrt(1000/4) = sqrt(250) = 15.811
+# z for 80 = 10/15.811 = 0.6325
+# 75 + 0.6325*10 = 81.32. No.
+# What if it's just blend: adjusted = 0.69*raw + (1-0.69)*something
+# 0.69*80 + 0.31*x = 79 -> x = (79-55.2)/0.31 = 76.77
+# 0.69*70 + 0.31*x = 72.1 -> x = (72.1-48.3)/0.31 = 76.77 ✓
+# 0.69*60 + 0.31*x = 65.2 -> x = (65.2-41.4)/0.31 = 76.77 ✓
+# So adjusted = 0.69*raw + 0.31*76.77
+# Where 76.77 = ? Hmm and 0.69, 0.31
+# 76.77... 0.31*76.77 = 23.8. 
+# Let me think: adjusted_i = a*raw_i + b. With a=0.69, b=23.8.
+# Linear regression toward target?
+# new_mean = a*raw_mean + b = 0.69*70 + 23.8 = 48.3+23.8 = 72.1
+# new_std = a*raw_std = 0.69*14.142 = 9.76 (close to 10 but not exact)
+# Or 0.69*sqrt(250) = 10.91. No.
+# Hmm, what if a = target_std / (raw_std + something)?
+# 10/0.69 = 14.4928. Hmm 14.4928^2 = 210. Where 210?
+# n*(n-1) = 20. n^2-1=24. Hmm.
+# Actually wait. Let me try the formula where they normalize with n+? denominators
+# variance computed as sum/(n+something)?
+# sum sq = 1000. 1000/x = 14.4928^2 = 210. So x = 4.7619 ≈ 100/21.
+# Hmm weird. Let me try another approach.
+# What if they use Bessel correction differently or rank-based?
+# Let me check test 2: single score 70 -> 70.0. With target 70,5. std undefined.
+# Maybe they round in a specific way. Let me just see if 0.69 = some specific ratio.
+# 0.69 = 69/100. Or could be 0.690...
+# Actually let me recompute more precisely:
+# k from (90-70)*k + 72.1 = 85.9 -> 20k = 13.8 -> k = 0.690
+# 0.690 exactly. And 72.1 - 70 = 2.1; (75-70)*? = 2.1 -> 0.42
+# 0.42 and 0.69... ratio 0.42/0.69 = 0.6087. Hmm.
+# What if formula is: new = raw + (target_mean - raw_mean) * 0.42 + (raw - raw_mean) * (0.69 - 1)?
+# new - raw = 2.1 - 0.31*(raw-70)
+# For raw=80: 2.1 - 3.1 = -1.0 ✓
+# For raw=70: 2.1 - 0 = 2.1 ✓
+# So new = raw + 2.1 - 0.31*(raw-70)
+# Equivalently: new = 0.69*raw + 0.31*70 + 2.1 = 0.69*raw + 21.7 + 2.1 = 0.69*raw + 23.8
+# = 0.69*raw + 0.31*76.77
+# Hmm 76.77 = (target_mean - 0.69*raw_mean)/0.31? = (75-48.3)/0.31 = 86.13. No that's different.
+# Wait: new_mean should equal target_mean if formula is bell curve. But new_mean = 72.1 ≠ 75. So this isn't a clean bell curve.
+# Unless the spec is buggy. Let me see... maybe they sort then... 
+# Maybe there's a typo or different rounding. Let me check if maybe expected used different formula.
+# Maybe the "stddev" used is calculated using N+1?
+# variance = 1000/(n+1) = 1000/6 = 166.67, std=12.91
+# z for 80 = 10/12.91 = 0.7746
+# 75+7.746=82.75. No.
+# Or maybe both mean and std blend with target. Let me try:
+# adjusted = target_mean + (raw - raw_mean) * target_std / raw_std_sample
+# with sample std (n-1): sqrt(250)=15.811
+# 75 + 10*10/15.811 = 75+6.325 = 81.32. No.
+# Hmm 0.69 keeps appearing. Let me try: maybe std uses n-1 AND target uses sample-like
+# Actually 0.690 = 10/14.4928. 14.4928 = sqrt(210). 
+# What if variance = (1000 + 50)/? Where 50 = something
+# Or variance = sum(x^2)/n - mean^2 with sum(x^2) corrected
+# sum(x^2) = 6400+4900+3600+8100+2500 = 25500
+# 25500/5 - 70^2 = 5100 - 4900 = 200. Same.
+# n+1 in denominator of mean too? (50+60+70+80+90)/(5+1)=350/6=58.33. No.
+# Let me try shifting: maybe k = target_std / sqrt(variance + target_std^2/n)?
+# sqrt(200 + 100/5) = sqrt(220) = 14.83. 10/14.83 = 0.674. Close but not 0.69.
+# sqrt(200 + 10) = sqrt(210) = 14.49. 10/14.49 = 0.690 ✓!
+# So variance_used = 200 + 10 = raw_var + target_std?? That's weird dimensionally.
+# Hmm but 10 = target_std. Or maybe + target_std^2/target_std = target_std...
+# Or var + something_else = 210. 
+# Test: what mean shift? new_mean = 72.1. target=75, raw=70. shift = 2.1.
+# 2.1 = (75-70)*0.42 = 5*0.42. Or = 5 - 2.9. Or = (target_mean - raw_mean) * raw_std/something
+# Let me try: adjusted = w*((raw-raw_mean)*target_std/raw_std + target_mean) + (1-w)*raw
+# = w*target_mean + w*(raw-raw_mean)*target_std/raw_std + (1-w)*raw
+# For raw=70: w*75 + 0 + (1-w)*70 = 72.1 -> 70+5w=72.1 -> w=0.42
+# For raw=80: 0.42*75 + 0.42*(10)*10/14.142 

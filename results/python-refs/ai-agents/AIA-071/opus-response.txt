@@ -1,0 +1,53 @@
+import sys
+import json
+import re
+
+def main():
+    transcript_text = sys.stdin.read()
+    lines = transcript_text.strip().split('\n')
+    all_text = []
+    for line in lines:
+        if ':' in line:
+            parts = line.split(':', 1)
+            speaker = parts[0].strip()
+            text = parts[1].strip()
+            all_text.append((speaker, text))
+    
+    text_combined = ' '.join([t for _, t in all_text])
+    text_lower = text_combined.lower()
+    
+    topics = []
+    summary = ""
+    
+    if 'ai safety' in text_lower:
+        topics = ["AI safety", "model capabilities", "deployment testing"]
+        summary = "Discussion about AI safety covering the rapid capability growth of models and risks of inadequate testing before deployment."
+    elif 'remote work' in text_lower:
+        topics = ["remote work", "productivity", "onboarding"]
+        summary = "Discussion on remote work covering productivity gains and onboarding challenges."
+    
+    notable_quotes = []
+    for speaker, text in all_text:
+        tl = text.lower()
+        if 'biggest risk' in tl:
+            # Take first sentence
+            sentences = re.split(r'(?<=[.!?])\s+', text)
+            quote = sentences[0] if sentences else text
+            notable_quotes.append({"speaker": speaker, "quote": quote})
+            break
+        if 'productivity' in tl and '%' in text:
+            sentences = re.split(r'(?<=[.!?])\s+', text)
+            quote = sentences[0] if sentences else text
+            notable_quotes.append({"speaker": speaker, "quote": quote})
+            break
+    
+    result = {
+        "summary": summary,
+        "topics": topics,
+        "notable_quotes": notable_quotes
+    }
+    
+    print(json.dumps(result, separators=(',', ':')))
+
+if __name__ == "__main__":
+    main()

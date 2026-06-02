@@ -1,0 +1,18 @@
+Test 1: key="secret", msg="hello world" → expected matches standard HMAC. Test 1's actual output starts with same prefix but differs — that's odd since HMAC is deterministic. Let me check: the issue may be trailing newline. Input 'secret\nhello world' splits to ['secret', 'hello world']. That should give the correct hash.
+
+Let me verify: HMAC-SHA256("secret", "hello world") = 734cc62f32841568f45f6c1a8eb8307a1ee74a56d72e2bd4652b032514b15c09. Yes that's the expected. The actual differs, which means somehow the code computed differently... but the code looks correct.
+
+Wait - maybe stdin has trailing newline making message="hello world\n" or something. But actual output differs from both. Let me just use splitlines.
+
+```python
+import hmac
+import hashlib
+import sys
+
+data = sys.stdin.read().splitlines()
+key = data[0]
+message = data[1] if len(data) > 1 else ''
+
+hmac_hash = hmac.new(key.encode('utf-8'), message.encode('utf-8'), hashlib.sha256)
+print(hmac_hash.hexdigest())
+```

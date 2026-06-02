@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 1,
+  "total": 2,
+  "actual": "{\"merged_state\":{\"status\":\"complete\",\"count\":10},\"conflicts\":[{\"key\":\"status\",\"resolution\":\"complete\",\"reason\":\"Latest timestamp (a2 at 110) wins for conflicting scalar\"},{\"key\":\"count\",\"resolution\":10,\"reason\":\"Latest timestamp (a2 at 110) wins for conflicting scalar\"}]}",
+  "expected": "{\"merged_state\":{\"status\":\"complete\",\"count\":10},\"conflicts\":[{\"key\":\"status\",\"resolution\":\"complete\",\"reason\":\"Latest timestamp (a2 at 110) wins for conflicting scalar\"}]}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"merged_state\":{\"status\":\"complete\",\"count\":10},\"conflicts\":[{\"key\":\"status\",\"resolution\":\"complete\",\"reason\":\"Latest timestamp (a2 at 110) wins for conflicting scalar\"},{\"key\":\"count\",\"resolution\":10,\"reason\":\"Latest timestamp (a2 at 110) wins for conflicting scalar\"}]}",
+      "expected": "{\"merged_state\":{\"status\":\"complete\",\"count\":10},\"conflicts\":[{\"key\":\"status\",\"resolution\":\"complete\",\"reason\":\"Latest timestamp (a2 at 110) wins for conflicting scalar\"}]}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"merged_state\":{\"items\":[\"x\",\"y\"]},\"conflicts\":[{\"key\":\"items\",\"resolution\":\"merged arrays\",\"reason\":\"Concurrent array updates combined\"}]}",
+      "expected": "{\"merged_state\":{\"items\":[\"x\",\"y\"]},\"conflicts\":[{\"key\":\"items\",\"resolution\":\"merged arrays\",\"reason\":\"Concurrent array updates combined\"}]}"
+    }
+  ],
+  "repaired_at": "2026-05-31T08:14:39.390711+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 2
+}

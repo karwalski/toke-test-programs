@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "[{\"type\":\"url\",\"value\":\"https://example.com\",\"context\":\"Visit https://example.com for more info\"},{\"type\":\"email\",\"value\":\"support@example.com\",\"context\":\"more info or email support@example.com\"},{\"type\":\"phone\",\"value\":\"+1-555-0123\",\"context\":\"support@example.com. Call us at +1-555-0123\"}]",
+  "expected": "[{\"type\":\"url\",\"value\":\"https://example.com\",\"context\":\"Visit https://example.com for more info\"},{\"type\":\"email\",\"value\":\"support@example.com\",\"context\":\"email support@example.com\"},{\"type\":\"phone\",\"value\":\"+1-555-0123\",\"context\":\"Call us at +1-555-0123\"}]",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "[{\"type\":\"url\",\"value\":\"https://example.com\",\"context\":\"Visit https://example.com for more info\"},{\"type\":\"email\",\"value\":\"support@example.com\",\"context\":\"more info or email support@example.com\"},{\"type\":\"phone\",\"value\":\"+1-555-0123\",\"context\":\"support@example.com. Call us at +1-555-0123\"}]",
+      "expected": "[{\"type\":\"url\",\"value\":\"https://example.com\",\"context\":\"Visit https://example.com for more info\"},{\"type\":\"email\",\"value\":\"support@example.com\",\"context\":\"email support@example.com\"},{\"type\":\"phone\",\"value\":\"+1-555-0123\",\"context\":\"Call us at +1-555-0123\"}]"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "[{\"type\":\"url\",\"value\":\"http://docs.test.io/api\",\"context\":\"Check http://docs.test.io/api and http://docs.test.io/guide for\"},{\"type\":\"url\",\"value\":\"http://docs.test.io/guide\",\"context\":\"Check http://docs.test.io/api and http://docs.test.io/guide for\"}]",
+      "expected": "[{\"type\":\"url\",\"value\":\"http://docs.test.io/api\",\"context\":\"Check http://docs.test.io/api and\"},{\"type\":\"url\",\"value\":\"http://docs.test.io/guide\",\"context\":\"http://docs.test.io/guide for documentation\"}]"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:06:02.534578+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

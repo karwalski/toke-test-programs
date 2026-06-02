@@ -1,0 +1,52 @@
+import csv
+import json
+import sys
+
+def main():
+    reader = csv.DictReader(sys.stdin)
+    data = list(reader)
+    
+    for row in data:
+        for key in row:
+            row[key] = float(row[key])
+    
+    param_name = list(data[0].keys())[0]
+    quality_cols = [col for col in data[0].keys() if col != param_name]
+    
+    threshold = 85
+    
+    valid_rows = []
+    for row in data:
+        if all(row[q] >= threshold for q in quality_cols):
+            valid_rows.append(row)
+    
+    if valid_rows:
+        param_values = [row[param_name] for row in valid_rows]
+        min_param = min(param_values)
+        max_param = max(param_values)
+        best_row = max(valid_rows, key=lambda r: sum(r[qual] for qual in quality_cols))
+        best_param = best_row[param_name]
+    else:
+        param_values = [row[param_name] for row in data]
+        min_param = min(param_values)
+        max_param = max(param_values)
+        best_row = max(data, key=lambda r: sum(r[qual] for qual in quality_cols))
+        best_param = best_row[param_name]
+    
+    raw = len(valid_rows) / len(data) if data else 0.0
+    robustness = round(raw, 2)
+    # Format with at least 2 decimals
+    rob_str = f"{robustness:.2f}"
+    
+    result_str = (
+        '{"optimal_window":{' + 
+        f'"{param_name}":{{"min":{int(min_param)},"max":{int(max_param)}}}' +
+        '},"best_point":{' +
+        f'"{param_name}":{int(best_param)}' +
+        '},"robustness":' + rob_str + '}'
+    )
+    
+    print(result_str)
+
+if __name__ == "__main__":
+    main()

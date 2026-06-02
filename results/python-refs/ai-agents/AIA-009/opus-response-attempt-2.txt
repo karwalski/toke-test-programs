@@ -1,0 +1,28 @@
+import json
+import sys
+from collections import defaultdict
+
+def schedule_tool_calls():
+    input_data = json.loads(sys.stdin.read().strip())
+    
+    calls = input_data['calls']
+    rate_limits = input_data['rate_limits']
+    
+    tool_counts = defaultdict(int)
+    scheduled = []
+    
+    for idx, call in enumerate(calls):
+        tool = call['tool']
+        limit = rate_limits[tool]
+        n = tool_counts[tool]
+        execute_time = (n // limit) * 60000
+        scheduled.append((execute_time, idx, call))
+        tool_counts[tool] += 1
+    
+    scheduled.sort(key=lambda x: (x[0], x[1]))
+    
+    result = [{"call": c, "execute_at_ms": t} for t, _, c in scheduled]
+    print(json.dumps(result, separators=(',', ':')))
+
+if __name__ == "__main__":
+    schedule_tool_calls()

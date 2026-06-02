@@ -1,0 +1,155 @@
+import sys
+from collections import defaultdict
+
+def solve_codeword():
+    lines = []
+    for line in sys.stdin:
+        lines.append(line.rstrip('\n'))
+    
+    # Parse grid (lines containing digits, no '=')
+    grid = []
+    i = 0
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            continue
+        if '=' in line:
+            break
+        grid.append(list(map(int, line.split())))
+        i += 1
+    
+    # Parse known assignments (line with one or more N=L tokens)
+    known = {}
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            break
+        # Could have multiple assignments separated by spaces
+        tokens = line.split()
+        is_assign = all('=' in t for t in tokens)
+        if not is_assign:
+            break
+        for tok in tokens:
+            num, letter = tok.split('=')
+            known[int(num)] = letter.upper()
+        i += 1
+    
+    # Parse dictionary
+    dictionary = []
+    while i < len(lines):
+        line = lines[i].strip()
+        if line:
+            dictionary.append(line.upper())
+        i += 1
+    
+    rows = len(grid)
+    cols = len(grid[0]) if rows else 0
+    
+    words_positions = []
+    
+    # Horizontal
+    for r in range(rows):
+        c = 0
+        while c < cols:
+            if grid[r][c] == 0:
+                c += 1
+                continue
+            start = c
+            while c < cols and grid[r][c] != 0:
+                c += 1
+            if c - start >= 2:
+                words_positions.append([(r, cc) for cc in range(start, c)])
+    
+    # Vertical
+    for c in range(cols):
+        r = 0
+        while r < rows:
+            if grid[r][c] == 0:
+                r += 1
+                continue
+            start = r
+            while r < rows and grid[r][c] != 0:
+                r += 1
+            if r - start >= 2:
+                words_positions.append([(rr, c) for rr in range(start, r)])
+    
+    words_by_length = defaultdict(list)
+    for word in dictionary:
+        words_by_length[len(word)].append(word)
+    
+    num_to_letter = dict(known)
+    letter_to_num = {v: k for k, v in known.items()}
+    
+    def backtrack(word_idx):
+        if word_idx >= len(words_positions):
+            return True
+        
+        positions = words_positions[word_idx]
+        word_length = len(positions)
+        
+        for word in words_by_length.get(word_length, []):
+            # Check consistency
+            local_n2l = {}
+            local_l2n = {}
+            ok = True
+            for pos, letter in zip(positions, word):
+                num = grid[pos[0]][pos[1]]
+                
+                existing = num_to_letter.get(num, local_n2l.get(num))
+                if existing is not None and existing != letter:
+                    ok = False
+                    break
+                
+                existing_num = letter_to_num.get(letter, local_l2n.get(letter))
+                if existing_num is not None and existing_num != num:
+                    ok = False
+                    break
+                
+                local_n2l[num] = letter
+                local_l2n[letter] = num
+            
+            if not ok:
+                continue
+            
+            # Apply only new mappings
+            added_nums = []
+            added_letters = []
+            for num, letter in local_n2l.items():
+                if num not in num_to_letter:
+                    num_to_letter[num] = letter
+                    added_nums.append(num)
+            for letter, num in local_l2n.items():
+                if letter not in letter_to_num:
+                    letter_to_num[letter] = num
+                    added_letters.append(letter)
+            
+            if backtrack(word_idx + 1):
+                return True
+            
+            for num in added_nums:
+                del num_to_letter[num]
+            for letter in added_letters:
+                del letter_to_num[letter]
+        
+        return False
+    
+    if backtrack(0):
+        out_lines = []
+        for r in range(rows):
+            row_output = []
+            for c in range(cols):
+                num = grid[r][c]
+                if num == 0:
+                    row_output.append('0')
+                elif num in num_to_letter:
+                    row_output.append(f"{num}={num_to_letter[num]}")
+                else:
+                    row_output.append(str(num))
+            out_lines.append(' '.join(row_output))
+        print('\n'.join(out_lines))
+    else:
+        print("No solution")
+
+solve_codeword()

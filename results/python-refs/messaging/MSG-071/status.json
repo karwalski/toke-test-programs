@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "partition 0: [msg1 (user:alice), msg3 (user:alice)]\npartition 1: []\npartition 2: [msg2 (user:bob)]\npartition 3: []",
+  "expected": "partition 0: []\npartition 1: [msg2 (user:bob)]\npartition 2: [msg1 (user:alice), msg3 (user:alice)]\npartition 3: []",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "partition 0: [msg1 (user:alice), msg3 (user:alice)]\npartition 1: []\npartition 2: [msg2 (user:bob)]\npartition 3: []",
+      "expected": "partition 0: []\npartition 1: [msg2 (user:bob)]\npartition 2: [msg1 (user:alice), msg3 (user:alice)]\npartition 3: []"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "partition 0: []\npartition 1: [X (a), Y (b)]",
+      "expected": "partition 0: [X (a)]\npartition 1: [Y (b)]"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:07:35.045245+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,42 @@
+import sys
+
+def main():
+    keypad = {
+        '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',
+        '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'
+    }
+    
+    lines = []
+    for line in sys.stdin:
+        lines.append(line.strip())
+    
+    phone_digits = lines[0]
+    dictionary_words = lines[1:]
+    
+    def word_to_digits(word):
+        result = ''
+        for ch in word.lower():
+            found = False
+            for digit, letters in keypad.items():
+                if ch in letters:
+                    result += digit
+                    found = True
+                    break
+            if not found:
+                return None
+        return result
+    
+    matching_words = []
+    for word in dictionary_words:
+        if len(word) != len(phone_digits):
+            continue
+        d = word_to_digits(word)
+        if d == phone_digits:
+            matching_words.append(word.upper())
+    
+    matching_words.sort()
+    for word in matching_words:
+        print(word)
+
+if __name__ == "__main__":
+    main()

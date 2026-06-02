@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "m1 history:\n  v1 (10:00): Hello world\n  v2 (10:01): Hello World! [changed: 'w'->'W', added '!']\n  v3 (10:02): Hello World! How are you? [added ' How are you?']",
+  "expected": "m1 history:\n  v1 (10:00): Hello world\n  v2 (10:01): Hello World! [changed: 'w'->'W', added '!']\n  v3 (10:02): Hello World! How are you? [added ' How are you?']",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "m1 history:\n  v1 (10:00): Hello world\n  v2 (10:01): Hello World! [changed: 'w'->'W', added '!']\n  v3 (10:02): Hello World! How are you? [added ' How are you?']",
+      "expected": "m1 history:\n  v1 (10:00): Hello world\n  v2 (10:01): Hello World! [changed: 'w'->'W', added '!']\n  v3 (10:02): Hello World! How are you? [added ' How are you?']"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "a history:\n  v1 (09:00): test\n  v2 (09:01): testing [added 'ing']",
+      "expected": "a history:\n  v1 (09:00): test\n  v2 (09:01): testing [added 'ing']"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:08:45.464867+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

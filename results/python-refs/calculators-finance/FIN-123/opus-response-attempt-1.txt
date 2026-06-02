@@ -1,0 +1,147 @@
+Let me analyze test 1: prices = [10,11,12,13,14,13,12,11,10,9], short=3, long=5.
+
+Indices 0-9. Short MA needs i>=2, long MA needs i>=4.
+
+i=4: short=(12+13+14)/3=13, long=(10+11+12+13+14)/5=12. short>long
+i=5: short=(13+14+13)/3=13.33, long=(11+12+13+14+13)/5=12.6. short>long
+i=6: short=(14+13+12)/3=13, long=(12+13+14+13+12)/5=12.8. short>long
+i=7: short=(13+12+11)/3=12, long=(13+14+13+12+11)/5=12.6. short<long → DEATH at 7
+
+But expected is 6. Hmm. Let me check i=6 differently — maybe it's counting from index 1 not 0? Or maybe at i=6 short went below.
+
+Wait expected says index 6 for DEATH_CROSS. Let me reconsider — maybe the index reported is the prior index, or perhaps they use a different MA window definition (look-ahead).
+
+Test 2: prices=[5,6,7,8,9,10,11,12], short=2, long=4. Expected: 3 GOLDEN_CROSS.
+
+i=3: short=(7+8)/2=7.5, long=(5+6+7+8)/4=6.5. short>long. First valid index for both is i=3. So at i=3 we have golden cross detected (no previous to compare though).
+
+So they're outputting at the first index where it's true, even without prior comparison. Let me check test 1 with this logic:
+
+i=4 (first valid): short=13, long=12. short>long → would be golden, not death.
+i=5: short>long
+i=6: short=13, long=12.8 → short>long  
+i=7: short=12, long=12.6 → short<long → DEATH at 7
+
+Still 7. But expected 6.
+
+Maybe MA uses different window. Like long_period uses prices[i-long+1 .. i] but short uses [i-short .. i-1]? Or centered?
+
+Let me try: short MA at i uses prices ending at i, long MA uses prices ending at i. What if short uses period elements ending at i+1 (i.e., includes future)? Or what about using window of last N including i but indexed differently.
+
+Try: at i=6, short MA = avg of prices[5,6,7] but i=6 means we only know up to... no.
+
+What if the index reported is i-1? Then test 2 DEATH at i=7 → reports 6. ✓
+Test 2 GOLDEN at i=4 → reports 3. Let me check test 2: i=3 is first valid. At i=3 short=7.5, long=6.5. i=4: short=8.5, long=7.5. So if first detection is at i=4 with prior at i=3 (both short>long, no cross). Hmm doesn't work for "cross".
+
+Let me try: report i-1 where i is the detection point.
+Test 1: at i=7, short<long but at i=6, short>long. So cross detected at i=7, report 7-1=6. ✓
+Test 2: at i=3, short>long. There's no prior. But if we say i=3 is first, report 3? Or maybe at i=4 cross detected (with i=3 prior having short>long too)... no.
+
+Hmm. Maybe golden cross uses first-valid index reporting (no -1), but death uses -1? Unlikely.
+
+Let me reconsider test 2. What if periods are inclusive differently: short_period=2 at i means avg(prices[i-1], prices[i])? That's what I had. At i=2: short=(6+7)/2=6.5, long needs i>=3.
+
+What if long_period=4 means avg of prices[i-3..i] requires i>=3. At i=3: long=(5+6+7+8)/4=6.5, short=(7+8)/2=7.5. short>long, first crossing → GOLDEN at 3. ✓
+
+For test 1: first valid is i=4. short=13, long=12, short>long. So this would be GOLDEN at 4, not DEATH at 6.
+
+Unless we only report when there's an actual cross (state change), and assume initial state. Hmm.
+
+Maybe: report the index just BEFORE the cross is confirmed (i-1).
+Test 1: cross confirmed at i=7 (short went below). Report 6. ✓
+Test 2: cross confirmed at i=4? At i=3 short>long (7.5>6.5), at i=4 short>long (8.5>7.5). No cross at i=4. 
+
+Hmm what if for test 2, the "initial" state is short<long, so going short>long at i=3 is a golden cross, reported as i=3? That matches!
+
+So rule: at first valid index for both MAs, assume prior state was opposite. Then report index where cross occurs, but for death cross subtract 1? No that's weird.
+
+Or: report i-1 always, where i is detection index.
+Test 2: detected at i=3 (first valid, short>long, assume previous short<long) → report 3-1=2. ✗
+
+What if test 2 reports i=3 because that's where it crossed (initial state assumption), and test 1 reports i=6 because... Let me recompute test 1 with assumption that "i" means the index of the LAST price in the window where short crosses.
+
+Actually maybe period meaning differs. What if "short_period 3" means look at last 3 differences/prices but the MA position is at the center or start?
+
+Let me try: MA at index i represents prices[i:i+period]. So you need i+period <= len.
+Test 2: short MA at i = avg(prices[i], prices[i+1]).
+- i=0: (5+6)/2=5.5, long needs prices[0..3] avg=6.5. short<long
+- i=1: (6+7)/2=6.5, long=(6+7+8+9)/4=7.5. short<long
+- i=2: (7+8)/2=7.5, long=(7+8+9+10)/4=8.5. short<long
+- i=3: (8+9)/2=8.5, long=(8+9+10+11)/4=9.5. short<long
+- i=4: (9+10)/2=9.5, long=(9+10+11+12)/4=10.5. short<long
+
+That doesn't work either.
+
+Let me try yet another interpretation. What if at index i, MA is over prices[i-period+1..i] but we compare against prev MAs, and the cross is reported at i-1?
+
+Test 1: cross at i=7 (short went from >= to <), report i-1=6. ✓
+Test 2: at i=4, prev_short=7.5 prev_long=6.5 (short>long), curr_short=8.5 curr_long=7.5 (short>long). No cross. We need a cross detected to report. The first time both MAs exist is i=3, can't compare to previous. So no cross detected → no output. But expected is "3 GOLDEN_CROSS".
+
+Special case: at first valid i, if short>long emit GOLDEN at i, if short<long emit DEATH at i. Then continue tracking crosses normally, reporting at i-1?
+
+Test 2: i=3 first valid, short>long → GOLDEN at 3. ✓
+Test 1: i=4 first valid, short=13>long=12 → would emit GOLDEN at 4. But expected output has only DEATH at 6, no GOLDEN. ✗
+
+Hmm conflicting.
+
+Maybe the rule: emit only crosses (transitions). Initial state is assumed: short<long (so first transition to short>long is golden). Then index reported is i-1.
+
+Test 1: assume initial short<long. At i=4 short>long → GOLDEN, report i-1=3. But expected has no golden. ✗
+
+Or initial state matches what's seen at first valid index, no initial cross. Then track changes, report at... 
+
+Test 1: i=4 short>long (state: above). i=5 above. i=6 above. i=7 below. Cross at i=7. Report i-1=6. ✓ (matches DEATH at 6)
+Test 2: i=3 short>long (state: above). i=4,5,6,7 above. No cross. But expected GOLDEN at 3. ✗
+
+So test 2 wants the initial state recorded as a cross at the first valid index. Test 1 doesn't.
+
+Unless... the initial state is short<long always assumed? Test 2: i=3 first detection, short>long → cross from below, GOLDEN at i=3 (no -1). Test 1: i=4 first detection short>long → would be GOLDEN at 4 too. But test 1 expects no GOLDEN.
+
+What if initial state defaults to "below" for ascending series and... no that's silly.
+
+Wait — what if the rule looks at PRICE relative to MA, not short MA vs long MA? Let me reread spec. "Golden cross: short MA crosses above long MA". OK that's clear.
+
+Let me try: short and long MAs both indexed differently. What if long_MA at index i uses prices[i-long_period..i-1] (excluding current)?
+
+Test 1, long_period=5 means prices[i-5..i-1]:
+- i=5: long=(10+11+12+13+14)/5=12, short(3)=(12+13+14)/3=13 if short uses [i-3..i-1]=[2,3,4]=(12+13+14)/3=13. short>long.
+- i=6: long=(11+12+13+14+13)/5=12.6, short=(13+14+13)/3=13.33. short>long
+- i=7: long=(12+13+14+13+12)/5=12.8, short=(14+13+12)/3=13. short>long
+- i=8: long=(13+14+13+12+11)/5=12.6, short=(13+12+11)/3=12. short<long → DEATH at 8
+
+Not 6 either.
+
+Let me try short uses [i-short+1..i], long uses [i-long..i-1]:
+i=4: short=(12+13+14)/3=13, long=(prices 0-3)/4... no long is 5.
+
+I'm spinning. Let me try a totally different approach: what's the difference between expected (6) and what current code gives (7)? It's reporting one earlier. Maybe the spec just wants i-1.
+
+For test 2 expected 3: current code with prev tracking would not emit anything at i=3 (no prior). What if at first valid index, if short>long we emit GOLDEN, and the indexing is i (not i-1)?
+
+Combined rule: report the index just BEFORE the cross confirmation. For initial detection at first valid index where there's no prior, report that index directly. For actual crosses, report i-1.
+
+Test 1: no initial emit (or maybe initial emit at i=4 GOLDEN? But not in expected). Then at i=7 detect death cross, report 6.
+
+For initial state to NOT emit in test 1 but emit in test 2... what's different? Test 2 first valid is i=3, where short>long. Test 1 first valid is i=4 where short>long. Same situation.
+
+Unless the rule is "emit cross only if it's the first valid index AND there's a sign change from comparing with... something". 
+
+Hmm let me look at test 2 more carefully. Maybe I'm miscomputing.
+
+Test 2: short_period=2, long_period=4, prices=[5,6,7,8,9,10,11,12].
+
+First valid for short: i=1. First valid for long: i=3.
+
+If we calculate short and long from index 1 onwards but long is None until i=3:
+- i=1: short=5.5, long=None
+- i=2: short=6.5, long=None
+- i=3: short=7.5, long=6.5. short>long.
+
+At i=3, short_ma just became defined. prev_short was 6.5, prev_long was None. With prev_long None, we can't compare. But if we treat prev state... 
+
+What if at i=3 we compare short_MA(now)=7.5 vs long_MA(now)=6.5 and short_MA(prev)=6.5 vs long_MA(prev_could_be)=... if we computed long_MA at i=2 using available data (less than period): (5+6+7)/3=6. Then prev_short=6.5, prev_long=6, short>long. So no cross.
+
+What if at i=2 we compute long_MA without enough data as average of all available: short=6.5, "long"=(5+6+7)/3=6. short>long. At i=3, short=7.5, long=6.5, short>long. No cross.
+
+What if at i=1, short=5.5, long=(5+6)/2=5.5. equal.
+At i=2, short=6.5, long=(5

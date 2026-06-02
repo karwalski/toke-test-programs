@@ -1,0 +1,149 @@
+Let me analyze Test 1:
+- Text: 'The cat sat on the mat. It was a nice day.'
+- 2 sentences, 10 words
+- Complex words (3+ syllables): 0
+- Fog = 0.4 * (10/2 + 100*0/10) = 0.4 * 5 = 2.0
+
+Expected is 1.6. Hmm. 0.4 * 4 = 1.6, so words/sentences = 4. That's 8 words / 2 sentences. Maybe "a" is excluded? Or single-letter words excluded? Without "a" and... let me count: The, cat, sat, on, the, mat, It, was, a, nice, day = 11 words. Hmm.
+
+If we count 8 words/2 sentences = 4. Excluding "a", "It"? Or maybe count syllables-based... Let me try: maybe one-syllable common words excluded? Or maybe they split differently.
+
+Wait, maybe complex words count differently. Let me try: 8/2 = 4, 0.4*4=1.6. So 8 words. Removing "a" and "It"? Or removing "the" duplicates?
+
+Actually: "The cat sat on the mat" = 6 words, "It was a nice day" = 5 words = 11. To get 8: remove articles? "the, the, a" = 3 → 8. Yes! Articles (a, an, the) excluded.
+
+Test 2: "The obfuscation of parliamentary procedures represents a significant challenge." 
+Words: The, obfuscation, of, parliamentary, procedures, represents, a, significant, challenge = 9
+Without articles (The, a): 7 words, 1 sentence.
+Complex: obfuscation(4), parliamentary(5), procedures(3), represents(3), significant(4), challenge(2?) = 5 complex
+Fog = 0.4 * (7/1 + 100*5/7) = 0.4 * (7 + 71.43) = 0.4 * 78.43 = 31.4. Not 17.
+
+Let me try without article exclusion for test 2:
+9 words, 1 sentence, complex count?
+obfuscation=4, parliamentary=5, procedures=3, represents=3, significant=4, challenge: chal-lenge=2
+So 5 complex. Fog = 0.4*(9 + 100*5/9) = 0.4*(9+55.56)= 0.4*64.56 = 25.8. Not 17.
+
+Hmm. Expected 17.0. 17/0.4 = 42.5. So (w/s) + 100*(c/w) = 42.5.
+If 9 words, 1 sentence: 100*c/9 = 33.5 → c = 3.015. So 3 complex words.
+If 7 words (no articles): 100*c/7 = 35.5 → c=2.48. Not clean.
+
+Try 3 complex words with 9 words: 9 + 33.33 = 42.33, *0.4 = 16.93 ≈ 16.9. Close to 17.0 but rounds to 16.9.
+
+Try with rounding: 0.4*(9 + 100*3/9) = 0.4*42.333 = 16.933 → "16.9".
+
+What gives exactly 17.0? 42.5/0.4. Or 100*c/w + w/s = 42.5.
+8 words, 1 sent, c=? 8+100c/8=42.5 → c=2.76. No.
+10 words: 10+10c=42.5 → c=3.25. No.
+
+Try: 9 words, c=3, but different syllable for challenge. cha-llenge=2 silent e? My counter: 'challenge' has vowels a,e,e → groups: a, e (after ll), and then trailing e. With silent e rule (count>1, ends with e): 3-1=2. OK.
+
+What if represents is 3: re-pre-sents = 3. Procedures: pro-ce-dures = 3, silent e → 2? Let me check my counter: p-r-o-c-e-d-u-r-e-s. vowels: o,e,u,e. groups: o, e, u, e = 4. Ends with 's' not 'e'. So 4 syllables. Hmm but actually "procedures" pronounced pro-ce-dures = 3.
+
+Let me recount with the existing code for test 2:
+- The: e = 1 syllable
+- obfuscation: o,u,a,io → o,u,a,io. Groups: o (b), u (f-vowel? f no), then back. Let me: o-b-f-u-s-c-a-t-i-o-n. Vowels positions: o, u, a, i, o. Adjacent? i,o are adjacent → one group. So: o, u, a, io = 4. ends 'n'. = 4. Complex.
+- of: o = 1
+- parliamentary: a,i,a,e,a,y. p-a-r-l-i-a-m-e-n-t-a-r-y. vowels a,i,a,e,a,y → groups: a, ia, e, a, y = 5. Complex.
+- procedures: o,e,u,e → 4 groups, ends 's'. = 4. Complex.
+- represents: e,e,e → r-e-p-r-e-s-e-n-t-s = e,e,e = 3 groups. =3. Complex.
+- a: =1
+- significant: i,i,i,a → s-i-g-n-i-f-i-c-a-n-t = 4 groups = 4. Complex.
+- challenge: a,e,e → c-h-a-l-l-e-n-g-e = a, e, e = 3, ends 'e' and >1 → 2. Not complex.
+
+So 5 complex words, 9 words, 1 sentence. Code gives 0.4*(9 + 500/9) = 25.82 → 25.8. But actual output was 'fog: 2.2'? Wait the failure showed test 1 output 2.2.
+
+Wait the failure shows test 1 gave 2.2, not 2.0. Let me recount test 1: "The cat sat on the mat. It was a nice day."
+- The=1, cat=1, sat=1, on=1, the=1, mat=1, It=1, was=1, a=1, nice: i,e → 2, silent e >1 → 1. day: a,y → 2? d-a-y: a,y adjacent? a is vowel, y is vowel, adjacent → 1 group = 1.
+
+So all 1 syllable, 0 complex. 11 words, 2 sentences. 0.4*(11/2 + 0) = 0.4*5.5=2.2. Matches!
+
+Expected 1.6 = 0.4*4 = 0.4*(8/2). So 8 words, 2 sentences. Excluding articles "The", "the", "a" → 11-3=8. ✓
+
+For test 2 expected 17.0:
+Without articles: 7 words, 1 sentence, complex words among non-articles.
+Non-articles: obfuscation(4✓), of, parliamentary(5✓), procedures(4✓), represents(3✓), significant(4✓), challenge(2).
+"of" - 1 syllable. So 5 complex, 7 words.
+Fog = 0.4*(7 + 500/7) = 0.4*(7+71.43)= 0.4*78.43 = 31.37. Not 17.
+
+Hmm. What if articles only excluded from word count denominator? Or only from numerator?
+
+Let me try: total_words=9 (with articles), but sentences/complex calc differently.
+17/0.4 = 42.5. 
+
+What if words excludes articles but complex denominator uses all?
+7 words / 1 sent = 7. 100 * complex / total_all = 100*5/9 = 55.56. Sum=62.56*0.4=25.0. No.
+
+What if simpler syllable count for challenge: cha-llen-ge = 3? Then complex=6.
+9 words, 1 sent, 6 complex: 0.4*(9 + 600/9) = 0.4*(9+66.67)=0.4*75.67=30.27. No.
+
+What about words/sentences=9, complex/words such that 9 + 100c/w = 42.5.
+What if syllables differ for some? Let me try if obfuscation = 3 (ob-fus-cation, but cation=2): hmm.
+
+Let me try: maybe only obfuscation, parliamentary, significant are complex (3 of them).
+9 words: 0.4*(9 + 300/9) = 0.4*(9+33.33)=0.4*42.33=16.93→16.9. Close to 17.0.
+
+If we use round-half-up or different formatting? 16.93 rounds to 16.9 in Python.
+
+What if 0.4*42.5 exactly = 17.0? Need w/s + 100c/w = 42.5.
+With 1 sentence: w + 100c/w = 42.5.
+w=9, c=3: 9+33.33=42.33. Close.
+w=10, c=3: 10+30=40.
+w=8, c=3: 8+37.5=45.5.
+
+What if formula uses (complex/words)*100 but rounded differently, or words counted differently?
+
+Let me try: 9+100*3/9 round to "17.0" if we use round() with different mode? 16.93 → no.
+
+What if it's c=3 and we round up? Maybe ceiling? Or what if the result is 17 due to integer arithmetic somewhere?
+
+Actually: 0.4 * (9 + 100*3//9) = 0.4 * (9 + 33) = 0.4*42 = 16.8. No.
+
+What about 0.4 * round(9 + 100*3/9) = 0.4*42 = 16.8. No.
+
+Let me try w=10, c=3: 0.4*(10+30)=16.0. No.
+
+Hmm. What if all 6 are complex (including challenge=3)?
+9 words, 6 complex: 0.4*(9+66.67)=30.27. No.
+
+What words might give exactly 17.0?
+42.5 with 1 sentence: w + 100c/w = 42.5
+Try w=8, c can be: 100c/8 = 34.5 → c=2.76. Not int.
+w=6, c=2: 6 + 33.33=39.33. No.
+w=4, c=1: 4+25=29.
+w=2, c=1: 2+50=52.
+
+Maybe 2 sentences? "The obfuscation of parliamentary procedures represents a significant challenge." Just 1 sentence.
+
+Maybe the score uses words=non-article AND complex includes specific count.
+Test 1: 8 words, 0 complex, 2 sents = 0.4*4=1.6 ✓
+Test 2: words=?, sents=1, complex=?
+Need w + 100c/w = 42.5
+w=7, c=2: 7+28.57=35.57. No.
+w=7, c=3: 7+42.86=49.86. No.
+w=8, c=3: 8+37.5=45.5. *0.4 = 18.2.
+
+Hmm what if "of" also excluded as preposition? Or maybe stop words?
+With stop words removed [The, of, a]: obfuscation, parliamentary, procedures, represents, significant, challenge = 6 words.
+Complex: 5 (excluding challenge).
+0.4*(6 + 500/6) = 0.4*(6+83.33)=0.4*89.33=35.7. No.
+
+What if percent is not multiplied by 100? 0.4*(w/s + c/w) ?
+Test 1: 0.4*(8/2 + 0/8) = 1.6 ✓
+Test 2: 0.4*(w/1 + c/w) = 17 → w + c/w = 42.5
+w=42, c=21: but only 9 words. Hmm.
+
+Different word count? Letter count? Char count?
+"The obfuscation of parliamentary procedures represents a significant challenge." — 78 chars including spaces and period. 70 letters.
+
+What if w/s means syllables/sentences?
+Test 1 syllables: 11 (all 1-syllable). 11/2 = 5.5. 0.4*5.5=2.2. No.
+
+What if expected output uses a different definition?
+
+Let me try: maybe complex_words counts toward word count too but differently. Or maybe formula uses log somehow.
+
+Actually I wonder if the answer is simply: count "hard" syllables in some other way.
+
+Let me look at "17.0" pattern. 17.0/0.4 = 42.5 exactly. So we need exactly 42.5.
+w/s + 100*c/w = 42.5
+With 1 sentence: w +

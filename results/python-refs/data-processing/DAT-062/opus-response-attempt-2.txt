@@ -1,0 +1,147 @@
+Let me analyze the test cases carefully.
+
+Test 1: window=3, alpha=0.5, values=[10,20,30,40,50]
+- i=2: SMA=20, EMA=27.50, WMA=23.33
+- i=3: SMA=30, EMA=33.75, WMA=33.33
+- i=4: SMA=40, EMA=41.88, WMA=43.33
+
+WMA[2] = (1*10+2*20+3*30)/(1+2+3) = 140/6 = 23.33 ✓
+WMA[3] = (1*20+2*30+3*40)/6 = 200/6 = 33.33 ✓
+WMA[4] = (1*30+2*40+3*50)/6 = 260/6 = 43.33 ✓
+
+EMA: 33.75 = 0.5*40+0.5*27.5 ✓; 41.875 = 0.5*50+0.5*33.75 ✓
+EMA[2]=27.5 from values [10,20,30] with alpha=0.5.
+
+Try EMA[i] = alpha*v[i] + (1-alpha)*EMA[i-1], starting from i=1 with EMA[0]=v[0]:
+EMA[0]=10, EMA[1]=0.5*20+0.5*10=15, EMA[2]=0.5*30+0.5*15=22.5. No.
+
+Try start EMA at window-1 = SMA, then recur:
+EMA[2]=20, EMA[3]=0.5*40+0.5*20=30. No (expected 33.75).
+
+27.5 = 0.75*30+0.25*20. Test2 EMA[1]=8.00 with alpha=0.3, values [5,10]: 
+0.3*10+0.7*?=8 → ?=20/3.5... no. Try 0.7*10+0.3*?=8 → ?=10/3. no. 
+8 = a*10+b*5. a=0.6,b=0.4 → 6+2=8 ✓. Weights 0.6,0.4.
+Test1 27.5: weights for [30,20,10] = 0.75,0.25,0. 
+
+Hmm test2 weights sum to 1 with both nonzero, test1 oldest is 0. 
+
+Try: EMA = sum(alpha*(1-alpha)^k * v[i-k]) for k=0..i, plus (1-alpha)^(i+1)*0... 
+Test2: alpha=0.3, EMA[1] = 0.3*10+0.3*0.7*5 = 3+1.05=4.05. No.
+
+What if EMA[i] = alpha*v[i] + (1-alpha)*v[i-1] only (just 2 terms)?
+Test2 EMA[1]: 0.3*10+0.7*5=8.5. No.
+0.7*10+0.3*5=8.5. No.
+
+8.00 = ? Maybe 0.3*5+0.7*10 with swapped: =1.5+7=8.5. Close to 8 but no.
+
+Let me try: EMA[i] = (alpha*v[i] + (1-alpha)*SMA[i]):
+Test2 i=1: 0.3*10+0.7*7.5=3+5.25=8.25. No.
+0.7*10+0.3*7.5=7+2.25=9.25. No.
+
+EMA[i] = alpha*SMA[i] + (1-alpha)*v[i]:
+Test2 i=1: 0.3*7.5+0.7*10=2.25+7=9.25. No.
+
+EMA[1]=8.00 exactly. (5+10)*?... 8 = 0.8*10 = 8. Or sum/something.
+Maybe SMA-based: (5*1+10*?)/(1+?)... 
+
+Let me check: maybe the values were misread? "8.00\t8.33" - SMA=7.50, EMA=8.00, WMA=8.33. 
+
+8 = 0.3*10+0.7*y → y=7.14
+12.10 = 0.3*15+0.7*y → y=10.857
+
+Is 7.14 ≈ something? 10/1.4 = 7.14. 
+10.857 = 76/7. 
+
+Check ratio: EMA[2]/EMA[1] relationship. If EMA[2]=0.3*15+0.7*EMA[1]_modified...
+
+Let me try EMA[i] = alpha*v[i] + (1-alpha)*EMA[i-1] but EMA seed at i=window-1 starts as v[window-1]:
+Test2 window=2: EMA[1]=v[1]=10. Then EMA[2]=0.3*15+0.7*10=4.5+7=11.5. Expected 12.10. No.
+
+Maybe seed = avg first window then recur from there, but report differently.
+Test2: SMA[1]=7.5. EMA[1]=7.5? No, expected 8.
+
+Let me try: at first valid position, EMA = alpha*v[i] + (1-alpha)*SMA[i]. Then continue with normal recurrence.
+Test2 i=1: 0.3*10+0.7*7.5=3+5.25=8.25. Still not 8.
+
+What about EMA[i] = (alpha*v[i] + sum of v[i-k])/(window)?  
+Test2 i=1: (0.3*10+5)/2=4. No.
+
+8 = (5+10+?)/3? = (15+9)/3 → ?=9. Hmm.
+8 = exponentially weighted: 0.3 and 0.7? 0.3*5+0.7*10=8.5. swap: 0.7*5+0.3*10=6.5.
+
+Wait - maybe alpha applies differently. What if EMA[i] = (1-alpha)^... Let me try alpha as smoothing where EMA[1] = (v[0]+v[1]*alpha)/(1+alpha)?
+Test2: (5+10*0.3)/1.3 = 8/1.3 = 6.15. No.
+(v[0]*alpha+v[1])/(1+alpha) = (1.5+10)/1.3=8.85. No.
+(v[0]+v[1])/2 weighted: nope.
+
+8 = 5*0.4+10*0.6. With alpha=0.3 how to get 0.4,0.6? Maybe weights based on position with alpha: w[k]=alpha^(n-k)... 
+For window=2, weights: 5: alpha^1=0.3, 10: alpha^0=1. Normalized: 5*0.3/1.3+10*1/1.3 = 1.5/1.3+10/1.3=11.5/1.3=8.846. No.
+
+Try w[k] = (1-alpha)^(n-1-k): for n=2, k=0: 0.7, k=1: 1. (5*0.7+10*1)/1.7=13.5/1.7=7.94. Close to 8!
+Hmm 7.94 not 8.00.
+
+(5*0.7+10)/(1.7)=13.5/1.7≈7.941. Not 8 exactly.
+
+Let me try: weights alpha^position from oldest. v[0]=5, v[1]=10. weight v[1]=alpha=0.3? no.
+
+Hmm, what about: EMA computed cumulatively from start but only output after window:
+Test2 alpha=0.3, EMA[0]=5, EMA[1]=0.3*10+0.7*5=8.5. Output starts at 1: 8.5. Expected 8.00. No.
+
+Could the expected output use different formula? Try EMA[i] = alpha*EMA[i-1]+(1-alpha)*v[i] with EMA[0]=v[0]:
+Test2: EMA[0]=5, EMA[1]=0.3*5+0.7*10=1.5+7=8.5. Same.
+
+EMA[0]=0: EMA[1]=0.3*0+0.7*10=7. No.
+EMA[0]=v[0]*(1-alpha): EMA[0]=3.5, EMA[1]=0.3*10+0.7*3.5=5.45. No.
+
+I'm stuck deriving the EMA formula. Let me check if maybe there's a typo and try matching test1 only:
+Test1: EMA values 27.50, 33.75, 41.88
+33.75 = 0.5*40+0.5*27.5
+41.875 = 0.5*50+0.5*33.75
+27.5 needs prev = 25.
+
+25 in test1: maybe sum first 2 vals / something? (10+20)/... or v[1]+v[0]/2 = 25. Or v[1]*1.25=25. 
+
+25 = SMA over [20,30] = 25. That's "SMA of window ending at i-1" where window=2? But window is 3.
+
+Hmm: 25 = (20+30)/2. That's the SMA at i=2 if window were 2. Or could be (v[i-1]+v[i])/2 = 25. 
+
+Let's test theory: seed EMA[window-1] = (v[window-2]+v[window-1])/2 then standard recurrence:
+Test1: EMA[2] = 0.5*30 + 0.5*((20+30)/2) = 15+12.5=27.5 ✓!
+Test2 window=2: EMA[1] = 0.5*v[1]+0.5*... wait alpha=0.3.
+EMA[1] = 0.3*10+0.7*((5+10)/2)=3+5.25=8.25. Expected 8.00. ✗
+
+Doesn't match test2. Hmm.
+
+Let me try: EMA[i] = alpha*v[i] + (1-alpha)*((sum of last `window` values)/window) for FIRST valid, then recur.
+Test1 i=2: 0.5*30+0.5*((10+20+30)/3)=15+10=25. No expected 27.5.
+
+Try seed=last value before output starts:
+Test1: window=3, seed EMA[1]=v[1]=20? Then EMA[2]=0.5*30+0.5*20=25. No.
+
+What if EMA recurrence uses ALL prior values and accumulates?
+Test1: EMA[0]=10, EMA[1]=0.5*20+0.5*10=15, EMA[2]=22.5, EMA[3]=31.25, EMA[4]=40.625. Not matching.
+
+Let me check test2 [5,10,15] alpha=0.3:
+If EMA[2]=12.10 and EMA[1]=8.00 with recurrence 0.3*15+0.7*8 = 4.5+5.6=10.10. Not 12.10.
+
+So maybe NOT simple recurrence in test2 either. Let me try formula:
+EMA[i] = alpha*v[i] + (1-alpha)*v[i-1] + further terms?
+Test2 EMA[1]: 0.3*10+0.7*5=8.5. No.
+EMA[2]: 0.3*15+0.7*10=11.5. No.
+
+EMA[i] = alpha*current + alpha*(1-alpha)*prev + ... not normalized:
+Test2 EMA[1]=0.3*10+0.3*0.7*5=3+1.05=4.05. No.
+
+EMA[i] sum with full weight 1 for v[i] not alpha:
+EMA[i] = v[i]+(1-alpha)*v[i-1]+(1-alpha)^2*v[i-2]+... / sum_weights
+Test2 EMA[1] = (10+0.7*5)/(1+0.7) = 13.5/1.7 = 7.94. Close to 8 but not exact.
+
+Test1 EMA[2] = (30+0.5*20+0.25*10)/(1+0.5+0.25)= (30+10+2.5)/1.75=42.5/1.75=24.29. No.
+
+OK trying different: EMA[i] = alpha^0*v[i] + alpha^1*v[i-1]+... weighted by alpha not (1-alpha):
+Test1 EMA[2] = (30+0.5*20+0.25*10)/(1.75) same. No.
+Without normalize: 30+10+2.5=42.5. No.
+
+Look at test1 EMA[2]=27.5 vs values [10,20,30]. 27.5 = (30*3+20*2+10*0.5)/(3+2+0.5)... random.
+
+27.5 = 27.5. 30*0.5 + 20*0.5 + 10*0.25? = 15+10+2.5=27.5! Weights 0.5, 0.5,

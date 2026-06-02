@@ -1,0 +1,185 @@
+Looking at the test cases:
+
+Test 1: window=2, "the cat sat on the mat the cat ate"
+Expected: the,cat=3, cat,sat=1, cat,ate=1, sat,on=1, on,the=1, mat,the=1
+
+Test 2: window=1, "a b a b a"
+Expected: a,b=4
+
+For test 2 with window=1: pairs are (a,b),(b,a),(a,b),(b,a) = 4 adjacent pairs. So window=1 means only adjacent (distance 1). Each pair counted once per occurrence (not divided by 2).
+
+For test 1 with window=2: Let me check "the cat" occurrences. Positions: the(0) cat(1) sat(2) on(3) the(4) mat(5) the(6) cat(7) ate(8).
+Adjacent (the,cat) pairs within window 2:
+- the(0)-cat(1): dist 1 ✓
+- cat(1)-sat(2): dist 1
+- the(4)-mat(5): dist 1
+- the(6)-cat(7): dist 1
+- cat(7)-ate(8): dist 1
+
+With window=2, also distance 2:
+- the(0)-sat(2)
+- cat(1)-on(3)
+- sat(2)-the(4)
+- on(3)-mat(5)
+- the(4)-the(6)
+- mat(5)-cat(7)
+- the(6)-ate(8)
+
+Hmm, expected only shows 6 pairs. Let me count (the,cat): positions of "the": 0,4,6; positions of "cat": 1,7. Pairs within window 2:
+- 0-1: dist 1 ✓
+- 4-7: dist 3 ✗
+- 6-7: dist 1 ✓
+Only 2... but expected is 3.
+
+Wait, maybe window means something else. Let me try: window=2 means look ahead 2 positions. With window=1, "a b a b a" - looking at adjacent only gives 4 (a-b, b-a, a-b, b-a). That works.
+
+For window=2, only count forward pairs at distance ≤ window? Then (the,cat):
+- 0→1: ✓
+- 6→7: ✓
+That's 2, not 3.
+
+Hmm. Maybe expected output is just wrong/inconsistent. Let me look at test 1 expected pairs more carefully: only 6 pairs but with window=2 there should be many more.
+
+Expected pairs: the-cat(3), cat-sat(1), cat-ate(1), sat-on(1), on-the(1), mat-the(1).
+
+These all look like adjacent pairs only! Let me count adjacent pairs:
+- the-cat (0-1): 1
+- cat-sat (1-2): 1
+- sat-on (2-3): 1
+- on-the (3-4): 1
+- the-mat (4-5): 1
+- mat-the (5-6): 1
+- the-cat (6-7): 1
+- cat-ate (7-8): 1
+
+That gives the-cat=2, not 3. Still doesn't match.
+
+Hmm but expected says the,cat=3. Let me recount adjacent the-cat: positions (0,1) and (6,7) = 2. Where's the third?
+
+Maybe the spec counts with window pairs but only forward direction, and the,cat=3 includes... let me try window means distance ≤ window forward:
+the-cat within distance 2 forward:
+- the(0): next 2 words are cat,sat. cat found. count=1
+- the(4): next 2 words are mat,the. no cat.
+- the(6): next 2 words are cat,ate. cat found. count=1
+Total = 2. Still not 3.
+
+What about all distance ≤ window (both directions)?
+the at 0: window covers 1,2 → cat ✓
+the at 4: window covers 2,3,5,6 → no cat
+the at 6: window covers 4,5,7,8 → cat ✓
+Hmm 2 still.
+
+Maybe window means up to window+1? With window=2 meaning distance ≤ 2 sym, the,cat:
+the(0)-cat(1) dist 1 ✓
+the(4)-cat(?) nearest cats at 1,7, dist 3,3 ✗
+the(6)-cat(7) dist 1 ✓
+=2
+
+I really can't get 3. The expected output appears inconsistent. Let me try once more — maybe it's pairs within sliding window of size N:
+
+Window of size 2 = 2 consecutive words: (the cat)(cat sat)(sat on)(on the)(the mat)(mat the)(the cat)(cat ate). Pairs: the-cat=2, cat-sat=1, sat-on=1, on-the=1, the-mat=1, mat-the=1, cat-ate=1. Sym: the-cat=2, mat-the=2, on-the=1... not matching either.
+
+Window size 3 = 3 consecutive: (the cat sat)(cat sat on)(sat on the)(on the mat)(the mat the)(mat the cat)(the cat ate). Pairs in each window... the-cat appears in windows 0,5,6 = 3 ✓! 
+
+So window=2 means sliding window of size window+1=3? Or window=2 means windows containing 2+1=3 elements? Let me verify with test 2: window=1, "a b a b a". Windows of size 2: (a b)(b a)(a b)(b a). a-b pairs: 4 ✓!
+
+So window size N means sliding window of N+1 consecutive words, and we count each unique pair once per window (not pairs of duplicates within same window).
+
+Let me verify test 1 fully with windows of size 3:
+Windows: 
+0: the,cat,sat → pairs: the-cat, the-sat, cat-sat
+1: cat,sat,on → cat-sat, cat-on, sat-on
+2: sat,on,the → sat-on, sat-the, on-the
+3: on,the,mat → on-the, on-mat, the-mat
+4: the,mat,the → the-mat, the-the, mat-the
+5: mat,the,cat → mat-the, mat-cat, the-cat
+6: the,cat,ate → the-cat, the-ate, cat-ate
+
+Counts:
+the-cat: w0,w5,w6 = 3 ✓
+cat-sat: w0,w1 = 2 ✗ (expected 1)
+
+Hmm. Expected cat-sat=1. So that's not it either.
+
+Maybe pairs are only adjacent within window? Window=2 might mean distance up to 2, but only counted once total per pair occurrence across full text... no that doesn't work either.
+
+Let me try: pairs at exact distance = window size?
+window=2, distance=2 pairs:
+0-2: the-sat
+1-3: cat-on
+2-4: sat-the
+3-5: on-mat
+4-6: the-the
+5-7: mat-cat
+6-8: the-ate
+No the-cat at all.
+
+What if it's distance ≤ window, but we only count each (word1,word2,position1) once? Or count each pair where they appear together in some window=size+1, but only count each text-position pair once?
+
+Try: count pairs (i,j) with i<j and j-i ≤ window:
+window=2:
+(0,1) the-cat
+(0,2) the-sat
+(1,2) cat-sat
+(1,3) cat-on
+(2,3) sat-on
+(2,4) sat-the
+(3,4) on-the
+(3,5) on-mat
+(4,5) the-mat
+(4,6) the-the
+(5,6) mat-the
+(5,7) mat-cat
+(6,7) the-cat
+(6,8) the-ate
+(7,8) cat-ate
+
+the-cat: (0,1),(5,7),(6,7) = 3 ✓
+cat-sat: (1,2) = 1 ✓
+cat-ate: (7,8) = 1 ✓
+sat-on: (2,3) = 1 ✓
+on-the: (3,4) = 1 ✓
+mat-the: (5,6) = 1 ✓
+
+But what about the-sat, cat-on, sat-the, on-mat, the-mat, the-the, mat-cat, the-ate? These have count ≥1 but aren't in expected.
+
+Expected output has only 6 pairs. "top N most frequent pairs". Maybe top 6? Or maybe only count=1 if minimum, but mat-cat=1, the-sat=1 etc should appear too.
+
+Hmm wait, mat-cat is at (5,7), and the-cat is also for (5,7)? No, (5,7) is mat-cat. Let me recount the-cat:
+the positions: 0,4,6
+cat positions: 1,7
+Pairs (i,j) with j-i ≤ 2:
+(0,1): dist 1 ✓
+(4,7): dist 3 ✗
+(4,1): negative, skip (we need i<j or |i-j|≤2)
+(6,7): dist 1 ✓
+(6,1): skip
+
+Only 2 the-cat pairs with i<j, j-i≤2. But (5,7) is mat-cat, not the-cat.
+
+Wait I miscounted. Let me redo. Words: the(0) cat(1) sat(2) on(3) the(4) mat(5) the(6) cat(7) ate(8).
+
+Pairs with j-i ≤ 2, i<j:
+(0,1) the-cat
+(0,2) the-sat
+(1,2) cat-sat
+(1,3) cat-on
+(2,3) sat-on
+(2,4) sat-the
+(3,4) on-the
+(3,5) on-mat
+(4,5) the-mat
+(4,6) the-the
+(5,6) mat-the
+(5,7) mat-cat
+(6,7) the-cat
+(6,8) the-ate
+(7,8) cat-ate
+
+the-cat unordered: (0,1),(6,7),(5,7)→mat-cat no... (5,7) is mat at 5, cat at 7 = mat-cat.
+
+So the-cat = 2. Not 3. Expected 3.
+
+I genuinely cannot reconcile this. Spec is inconsistent.
+
+{"spec_challenge": "Test case 1 expected output is internally inconsistent. With window size 2 on 'the cat sat on the mat the cat ate', the pair (the,cat) appears at most 2 times within any reasonable window interpretation (positions 0-1 and 6-7), but the expected output claims count=3. Additionally, the expected output lists only 6 pairs while many other valid pairs (the-sat, cat-on, the-mat, mat-cat, the-ate, etc.) would also be within window distance 2 and should appear with count≥1. No top-N value is specified. Test 2 (window=1, 'a b a b a' → a,b=4) is consistent with counting adjacent ordered pairs, but no single window/counting rule satisfies both tests.", "suggested_amendment": "Clarify: (1) the exact window semantics (e.g., 'count pairs of words at distance ≤ window'), (2) explicit top-N value or threshold for which pairs to output, (3) correct the expected count for (the,cat) in test 1, and (4) include ALL pairs meeting the criteria in expected output, or specify the exact filtering rule."}

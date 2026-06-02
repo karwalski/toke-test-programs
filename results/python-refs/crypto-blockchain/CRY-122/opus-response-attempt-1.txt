@@ -1,0 +1,20 @@
+import json
+import sys
+
+data = json.loads(sys.stdin.read().strip())
+data.sort()
+n = len(data)
+
+def pct(p):
+    # Use index = p * n (rank-based), with floor
+    k = p * n
+    idx = int(k)
+    if idx >= n:
+        idx = n - 1
+    return data[idx]
+
+slow = int(round(pct(0.25)))
+average = int(round(pct(0.50)))
+fast = int(round(pct(0.75)))
+
+print(f"slow:{slow} average:{average} fast:{fast}")

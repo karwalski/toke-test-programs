@@ -1,0 +1,44 @@
+import sys
+
+data = sys.stdin.read()
+parts = data.split('\n\n', 1)
+if len(parts) < 2:
+    lines = data.split('\n')
+    table_lines = []
+    bit_lines = []
+    blank_found = False
+    for line in lines:
+        if not blank_found and line.strip() == '':
+            blank_found = True
+            continue
+        if blank_found:
+            bit_lines.append(line)
+        else:
+            table_lines.append(line)
+    bit_string = ''.join(bit_lines).strip()
+else:
+    table_lines = parts[0].split('\n')
+    bit_string = parts[1].replace('\n', '').strip()
+
+code_table = {}
+for line in table_lines:
+    if ':' not in line:
+        continue
+    idx = line.index(':')
+    char = line[:idx]
+    code = line[idx+1:].strip()
+    code_table[code] = char
+
+decoded = []
+current_code = ''
+for bit in bit_string:
+    current_code += bit
+    if current_code in code_table:
+        decoded.append(code_table[current_code])
+        current_code = ''
+
+if current_code != '':
+    sys.stderr.write('Invalid bit string\n')
+    sys.exit(1)
+
+print(''.join(decoded))

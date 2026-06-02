@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "[{\"chunk_id\":0,\"text\":\"The quick brown fox \",\"start_offset\":0,\"end_offset\":20},{\"chunk_id\":1,\"text\":\"fox jumps over the l\",\"start_offset\":15,\"end_offset\":35},{\"chunk_id\":2,\"text\":\"he lazy dog near the\",\"start_offset\":30,\"end_offset\":50},{\"chunk_id\":3,\"text\":\"r the river bank\",\"start_offset\":49,\"end_offset\":65}]",
+  "stderr": "  File \"/tmp/tmpkib3fc6d.py\", line 3\n    - chunk 1: 15-35 \"fox jumps over the l\" \u2014 wait, text[15:35]?\n                                            ^\nSyntaxError: invalid character '\u2014' (U+2014)\n",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpkib3fc6d.py\", line 3\n    - chunk 1: 15-35 \"fox jumps over the l\" \u2014 wait, text[15:35]?\n                                            ^\nSyntaxError: invalid character '\u2014' (U+2014)\n",
+      "actual": "",
+      "expected": "[{\"chunk_id\":0,\"text\":\"The quick brown fox \",\"start_offset\":0,\"end_offset\":20},{\"chunk_id\":1,\"text\":\"fox jumps over the l\",\"start_offset\":15,\"end_offset\":35},{\"chunk_id\":2,\"text\":\"he lazy dog near the\",\"start_offset\":30,\"end_offset\":50},{\"chunk_id\":3,\"text\":\"r the river bank\",\"start_offset\":49,\"end_offset\":65}]"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpkib3fc6d.py\", line 3\n    - chunk 1: 15-35 \"fox jumps over the l\" \u2014 wait, text[15:35]?\n                                            ^\nSyntaxError: invalid character '\u2014' (U+2014)\n",
+      "actual": "",
+      "expected": "[{\"chunk_id\":0,\"text\":\"Hello world\",\"start_offset\":0,\"end_offset\":11}]"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:12.348061+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

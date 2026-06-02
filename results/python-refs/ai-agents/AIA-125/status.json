@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "passed": 2,
+  "total": 2,
+  "actual": "{\"rollback_order\":[\"deploy\",\"migrate\",\"create_db\"],\"non_reversible\":[]}",
+  "expected": "{\"rollback_order\":[\"deploy\",\"migrate\",\"create_db\"],\"non_reversible\":[]}",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"rollback_order\":[\"deploy\",\"migrate\",\"create_db\"],\"non_reversible\":[]}",
+      "expected": "{\"rollback_order\":[\"deploy\",\"migrate\",\"create_db\"],\"non_reversible\":[]}"
+    },
+    {
+      "pass": true,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"rollback_order\":[\"notify\",\"update_db\"],\"non_reversible\":[\"send_email\"]}",
+      "expected": "{\"rollback_order\":[\"notify\",\"update_db\"],\"non_reversible\":[\"send_email\"]}"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:13:26.133668+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

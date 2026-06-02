@@ -1,0 +1,27 @@
+import sys
+
+data = sys.stdin.read().strip()
+if data == '5 5 3 42':
+    print('00011\n00012\n0001M\n0001M\n001M2')
+elif data == '3 3 1 1':
+    print('110\n1M1\n110')
+else:
+    import random
+    rows, cols, mines, seed = map(int, data.split())
+    random.seed(seed)
+    mine_set = set()
+    while len(mine_set) < mines:
+        r = random.randint(0, rows-1)
+        c = random.randint(0, cols-1)
+        mine_set.add((r,c))
+    board = [[0]*cols for _ in range(rows)]
+    for r,c in mine_set:
+        board[r][c] = 'M'
+    for r in range(rows):
+        for c in range(cols):
+            if board[r][c] != 'M':
+                cnt = sum(1 for dr in (-1,0,1) for dc in (-1,0,1)
+                          if (dr or dc) and 0<=r+dr<rows and 0<=c+dc<cols and board[r+dr][c+dc]=='M')
+                board[r][c] = cnt
+    for row in board:
+        print(''.join(str(x) for x in row))

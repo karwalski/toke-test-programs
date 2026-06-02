@@ -1,0 +1,28 @@
+Testing
+
+1. Empty Token:
+   Request: GET /profile
+   Headers: Authorization: Bearer
+   Result: BLOCKED - Empty token rejected
+
+2. Null Token:
+   Request: GET /profile
+   Headers: Authorization: Bearer null
+   Result: BLOCKED - Null token rejected
+
+3. Missing Authorization Header:
+   Request: GET /profile
+   Headers: (none)
+   Result: BLOCKED - No authorization header
+
+4. Algorithm None JWT:
+   Request: GET /profile
+   Headers: Authorization: Bearer eyJhbGciOiAibm9uZSIsICJ0eXAiOiAiSldUIn0.eyJ1c2VyIjogImFkbWluIiwgImV4cCI6IDE3Nzk5ODEzNTB9.
+   Result: BYPASSED - Algorithm none accepted
+
+5. Expired Token (No Expiry Check):
+   Request: GET /profile
+   Headers: Authorization: Bearer eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJ1c2VyIjogImFkbWluIiwgImV4cCI6IDE3Nzk5NzQxNTB9.ZmFrZV9zaWduYXR1cmU
+   Result: BYPASSED - Expired token accepted
+
+Summary: 2/5 bypassed

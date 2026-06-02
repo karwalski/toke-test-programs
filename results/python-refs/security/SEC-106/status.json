@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"url\": \"https://api.example.com\", \"desync_risk\": \"high\", \"probes\": [{\"type\": \"CL.TE\", \"payload\": \"Content-Length: 13\\r\\nTransfer-Encoding: chunked\\r\\n\\r\\n0\\r\\n\\r\\n\", \"response_time_delta\": 0.05, \"evidence\": \"Normal response timing observed\"}, {\"type\": \"TE.CL\", \"payload\": \"Transfer-Encoding: chunked\\r\\nContent-Length: 3\\r\\n\\r\\n0\\r\\n\\r\\n\", \"response_time_delta\": 0.8, \"evidence\": \"Significant timing difference detected between frontend/backend\"}, {\"type\": \"TE.TE\", \"payload\": \"Transfer-Encoding: ch",
+  "expected": "desync_risk",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"url\": \"https://api.example.com\", \"desync_risk\": \"high\", \"probes\": [{\"type\": \"CL.TE\", \"payload\": \"Content-Length: 13\\r\\nTransfer-Encoding: chunked\\r\\n\\r\\n0\\r\\n\\r\\n\", \"response_time_delta\": 0.05, \"evidence\": \"Normal response timing observed\"}, {\"type\": \"TE.CL\", \"payload\": \"Transfer-Encoding: chunked\\r\\nContent-Length: 3\\r\\n\\r\\n0\\r\\n\\r\\n\", \"response_time_delta\": 0.8, \"evidence\": \"Significant timing difference detected between frontend/backend\"}, {\"type\": \"TE.TE\", \"payload\": \"Transfer-Encoding: ch",
+      "expected": "desync_risk"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"url\": \"http://localhost:8113\", \"desync_risk\": \"high\", \"probes\": [{\"type\": \"CL.TE\", \"payload\": \"Content-Length: 13\\r\\nTransfer-Encoding: chunked\\r\\n\\r\\n0\\r\\n\\r\\n\", \"response_time_delta\": 0.05, \"evidence\": \"Normal response timing observed\"}, {\"type\": \"TE.CL\", \"payload\": \"Transfer-Encoding: chunked\\r\\nContent-Length: 3\\r\\n\\r\\n0\\r\\n\\r\\n\", \"response_time_delta\": 0.8, \"evidence\": \"Significant timing difference detected between frontend/backend\"}, {\"type\": \"TE.TE\", \"payload\": \"Transfer-Encoding: chun",
+      "expected": "probes"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:14:23.123198+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

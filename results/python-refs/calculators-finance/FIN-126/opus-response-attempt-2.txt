@@ -1,0 +1,66 @@
+# Test 1: 1000, 0.05, 0.06, 5 -> mac=4.4651, mod=4.2124
+# Annual: c=50, y=0.06
+# PVs: 50/1.06^t for t=1..5 + 1000/1.06^5
+# t=1: 47.1698, weighted: 47.1698
+# t=2: 44.4998, weighted: 88.9996
+# t=3: 41.9810, weighted: 125.9430
+# t=4: 39.6047, weighted: 158.4188
+# t=5: 37.3629, weighted: 186.8145
+# face t=5: 747.2582, weighted: 3736.291
+# sum PV = 47.17+44.50+41.98+39.60+37.36+747.26 = 957.876
+# sum weighted = 47.17+89.00+125.94+158.42+186.81+3736.29 = 4343.63
+# mac = 4343.63/957.876 = 4.534... 
+# But expected 4.4651. 
+# Check mod: 4.4651/1.06 = 4.2124 ✓ so yield is annual 0.06
+# So mac should be 4.4651. Let me check: maybe coupon at end includes principal at t=n weighted differently
+# Or maybe mac = sum(t*PV)/price where price uses different formula
+# Try: 4.4651 * 1.06 = 4.7330... no that's not mac formula
+# 4.2124 * 1.06 = 4.4651 confirms mod = mac/(1+y)
+# 
+# Hmm what if periods means something else. Let me try: price using YTM with coupon at start?
+# Or what if it's continuous? mac with continuous: PV=e^(-yt)
+# t=1: 50*e^-0.06=47.0880
+# t=2: 50*e^-0.12=44.3536
+# t=3: 50*e^-0.18=41.7724
+# t=4: 50*e^-0.24=39.3361
+# t=5: 50*e^-0.30=37.0409
+# face: 1000*e^-0.30=740.818
+# price=950.409
+# weighted: 47.088+88.707+125.317+157.344+185.205+3704.09=4307.75
+# mac=4307.75/950.41=4.5324 still not 4.4651
+#
+# Try Test2: 1000 0.08 0.10 10, expected mac=7.0436, mod=6.4033
+# 7.0436/6.4033 = 1.1000 ✓ so yield 0.10 annual, mod=mac/1.1
+# Standard annual: c=80, y=0.10
+# price = 80*(1-1.1^-10)/0.1 + 1000/1.1^10 = 80*6.1446+385.543=491.57+385.54=877.11
+# weighted: sum t*80/1.1^t + 10*1000/1.1^10
+# t=1:72.727, t=2:132.231, t=3:180.316, t=4:218.564, t=5:248.369
+# t=6:270.946, t=7:287.368, t=8:298.581, t=9:305.420, t=10:308.43
+# coupon weighted sum: 72.727+132.231+180.316+218.564+248.369+270.946+287.368+298.581+305.420+308.43=2322.95
+# face weighted: 10*385.543=3855.43
+# total = 6178.38
+# mac = 6178.38/877.11 = 7.0440 ≈ 7.0436 ✓ (rounding)
+#
+# So Test 2 works with standard annual formula. Why Test 1 differs?
+# Let me recompute Test 1 more precisely
+import sys
+
+data = sys.stdin.read().split()
+face = float(data[0])
+cr = float(data[1])
+y = float(data[2])
+n = int(data[3])
+
+c = face * cr
+price = 0.0
+weighted = 0.0
+for t in range(1, n+1):
+    cf = c + (face if t == n else 0)
+    pv = cf / ((1+y)**t)
+    price += pv
+    weighted += t * pv
+
+mac = weighted / price
+mod = mac / (1 + y)
+print(f"{mac:.4f}")
+print(f"{mod:.4f}")

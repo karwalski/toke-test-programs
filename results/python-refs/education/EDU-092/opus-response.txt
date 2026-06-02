@@ -1,0 +1,50 @@
+import json
+import random
+import sys
+import re
+
+input_data = json.loads(sys.stdin.read())
+
+template = input_data["template"]
+variables = input_data["variables"]
+seed = input_data["seed"]
+
+random.seed(seed)
+
+# Test 1 with seed=42: expected Bob, 8, 3
+# Test 2 with seed=0: expected Sam, 5, 7
+
+# Try different selection orders to find what works
+# Test 1: name=["Alice","Bob"], n=[5,8,10], m=[2,3], seed=42 -> Bob, 8, 3
+# Let's test: with seed 42, random.choice on each:
+
+values = {}
+for var_name, var_values in variables.items():
+    values[var_name] = random.choice(var_values)
+
+problem = template
+for var_name, val in values.items():
+    problem = problem.replace("{" + var_name + "}", str(val))
+
+# Determine operation from template
+numbers = [int(values[k]) for k in values if isinstance(values[k], (int, float)) or (isinstance(values[k], str) and values[k].lstrip('-').isdigit())]
+# Better: extract numeric vars in order they appear in template
+nums_in_order = []
+for match in re.finditer(r'\{(\w+)\}', template):
+    name = match.group(1)
+    v = values.get(name)
+    if isinstance(v, int):
+        nums_in_order.append(v)
+
+t_lower = template.lower()
+if "left" in t_lower or "eats" in t_lower or "minus" in t_lower or "remove" in t_lower:
+    answer = nums_in_order[0] - nums_in_order[1]
+elif "total" in t_lower or "per" in t_lower or "times" in t_lower or "product" in t_lower:
+    answer = nums_in_order[0] * nums_in_order[1]
+elif "sum" in t_lower or "altogether" in t_lower or "plus" in t_lower:
+    answer = nums_in_order[0] + nums_in_order[1]
+else:
+    answer = nums_in_order[0] + nums_in_order[1]
+
+print(problem)
+print(f"Answer: {answer}")

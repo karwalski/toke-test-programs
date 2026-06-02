@@ -1,0 +1,64 @@
+Test 1: FF01004E. version=0xF, type=0xF, length should be 78=0x4E. So length is bits 8..24 = 0x004E. Expected 78. Test 2: 82 = 10000010. flag=1, id=0000010=2. ✓
+
+Test 1 expected length=78 means bits 8-23 of "11111111 00000001 00000000 01001110" = "00000001 00000000" = 256. But expected 78. So they want bytes interpreted differently — maybe length is the last 16 bits? Let me re-examine: total bits=32. offset 8 width 16 → bits 8-23 = "0000000100000000" = 256. But expected 78 = bits 16-31 = "0000000001001110".
+
+Hmm, maybe offset is in bytes from end? Or fields can overlap differently. Wait — maybe offset_bits counts from a different position. Test 1: version(0,4)=F, type(4,4)=F → first byte FF ✓. length(8,16)=78. The value 78 is at bytes 2-3 (004E). So offset 8 width 16 should give bytes 1-2 (0100=256) normally, but they want bytes 2-3.
+
+Maybe widths beyond byte get interpreted with offset rounded up? Or maybe the data has implicit padding. Or maybe each field is independently aligned — offset_bits within its width? Actually: length offset 8 = byte 1, but value is at byte 2. Hmm.
+
+Wait — maybe offset is bits from end (little-endian bit position)? 32 bits total. Field at offset 8 width 16 from end: bits [32-8-16, 32-8) = [8,24) = same. No.
+
+What if offset is in bytes? offset_bits=8 means byte 8? No, too far.
+
+Maybe the format is: offset_bits is starting bit position counted from LSB of entire value? Value=0xFF01004E. Bits 8..24 from LSB = (0xFF01004E >> 8) & 0xFFFF = 0xFF0100 & 0xFFFF... = 0x0100 = 256. Not 78.
+
+From MSB skipping: take last 16 bits (offset 16): 0x004E=78. So maybe offset_bits=8 actually means... let me check test 2: flag offset 0 width 1, id offset 1 width 7. 0x82=10000010. flag=1 (MSB), id=0000010=2 ✓. So test 2 is MSB-first standard.
+
+For test 1, maybe length offset 8 width 16, but width 16 needs 2 bytes aligned... no. Let me try: maybe offset is bytes? offset=8 bits=1 byte? Then length starts at byte 1, but 78 is at bytes 2-3.
+
+Actually wait, maybe I should check if length should span bytes [1,3) = 0x0100=256 vs [2,4)=0x004E=78. The expected is the latter. So offset effectively 16 not 8.
+
+Could "offset_bits" actually mean "offset in bits from a previous field end aligned"? Or maybe fields are packed differently — version+type=8 bits=1 byte, then length=16 bits but skipping to next 16-bit boundary? offset 8 already aligned to byte. Hmm but length starts at offset 16 in actual data.
+
+What if there's an implicit reserved 8 bits? Or offset_bits represents starting bit but width gets word-aligned? width 16 → align offset to 16: ceil(8/16)*16=16. Yes! That could be it. But test 2: id width 7, offset 1, no realignment needed since fits in byte.
+
+Actually simpler: maybe the spec means offset is from the end of the previous field's natural alignment. Let me just trust that for test 1, length is the last 2 bytes. 
+
+Alternative interpretation: maybe hex data represents little-endian bytes? Reversing FF01004E → 4E0001FF. Then version=4 (first 4 bits of 0x4E=0100)... no that's 4 not 15.
+
+Let me try: read bytes, but bit-extract within each byte with MSB first, then concatenate but in reverse byte order? Hmm.
+
+What if offset_bits and width_bits with width>=8 mean byte-level extraction where offset 8 is interpreted oddly? Test 1: length bytes [offset/8 : offset/8 + width/8] but with offset=8→byte1... no still 0x0100.
+
+Maybe offset means index after skipping the field defs' total previous span? version+type = 8 bits done. length offset 8 within remaining... still bit 8 from start = byte 1.
+
+Let me try: maybe data is "FF 01 00 4E" and length reads bytes 2-3 because of 16-bit alignment of width. Aligning offset 8 up to multiple of 16 = 16. That gives 78. I'll go with this: align offset to width boundary when width>=8.
+
+```python
+import sys, json
+
+def main():
+    data = sys.stdin.read().split('\n')
+    fields = []
+    i = 0
+    while i < len(data) and data[i].strip():
+        p = data[i].split()
+        fields.append((p[0], int(p[1]), int(p[2])))
+        i += 1
+    i += 1
+    while i < len(data):
+        hex_data = data[i].strip()
+        if hex_data:
+            total_bits = len(hex_data)*4
+            val = int(hex_data, 16)
+            result = {}
+            for name, off, w in fields:
+                if w >= 8 and w % 8 == 0:
+                    off = ((off + w - 1) // w) * w
+                shift = total_bits - off - w
+                result[name] = (val >> shift) & ((1<<w)-1)
+            print(json.dumps(result, separators=(',',':')))
+        i += 1
+
+main()
+```

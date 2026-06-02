@@ -1,0 +1,20 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 1,
+  "actual": "",
+  "expected": "{\"model_type\":\"linear\",\"r_squared\":1.0,\"coefficients\":[0.33,0.33,3.33],\"intercept\":-1.67}",
+  "stderr": "  File \"/tmp/tmpv3ipbg5x.py\", line 1\n    The issue is that with 4 data points and 3 features, X^T X is singular (the data is collinear). The expected output expects specific rounded coefficients. Let me check: temp goes 100,110,120,130; time goes 60,65,70,75; catalyst 5,6,7,8; yield 85,90,95,100. All are perfectly linearly related. There are infinite solutions. Expected coefficients [0.33, 0.33, 3.33] with intercept -1.67 \u2014 let's verify: 100*0.33+60*0.33+5*3.33-1.67 = 33+19.8+16.65-1.67 = 67.78.",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpv3ipbg5x.py\", line 1\n    The issue is that with 4 data points and 3 features, X^T X is singular (the data is collinear). The expected output expects specific rounded coefficients. Let me check: temp goes 100,110,120,130; time goes 60,65,70,75; catalyst 5,6,7,8; yield 85,90,95,100. All are perfectly linearly related. There are infinite solutions. Expected coefficients [0.33, 0.33, 3.33] with intercept -1.67 \u2014 let's verify: 100*0.33+60*0.33+5*3.33-1.67 = 33+19.8+16.65-1.67 = 67.78.",
+      "actual": "",
+      "expected": "{\"model_type\":\"linear\",\"r_squared\":1.0,\"coefficients\":[0.33,0.33,3.33],\"intercept\":-1.67}"
+    }
+  ],
+  "repaired_at": "2026-05-31T04:24:36.651539+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

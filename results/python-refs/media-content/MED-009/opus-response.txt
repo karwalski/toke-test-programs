@@ -1,0 +1,80 @@
+Let me analyze test 1:
+- Text: 'The cat sat on the mat. It was a nice day.'
+- Sentences: 2, Words: 10
+- Complex words: 0
+- Fog = 0.4 * (10/2 + 0) = 0.4 * 5 = 2.0
+
+Expected is 1.6. Hmm, 1.6 = 0.4 * 4 = 0.4 * (10/2.5)... or maybe words/sentences is different.
+
+Wait: 1.6/0.4 = 4. If words=10, sentences=10/4... no.
+
+Maybe they count differently. 11 words? "The cat sat on the mat It was a nice day" = 11 words... no still 11. Let me recount: The, cat, sat, on, the, mat, It, was, a, nice, day = 11 words.
+
+If sentences=2, words=11: 11/2 = 5.5, fog=2.2 (matches actual).
+
+For 1.6: maybe words/sentences should give 4. 11 words / ? Or maybe avg sentence length counted in different way... 
+
+Actually maybe avg_words_per_sentence = total /sentences but using a different sentence count. What if it counts the period as splitting and gets 3 (trailing empty)? 11/3 = 3.67, *0.4=1.47. No.
+
+What if formula divides further? 0.4 * (words/sentences/something)...
+
+Test 2: 'The obfuscation of parliamentary procedures represents a significant challenge.'
+Words = 9, sentences = 1. Complex words: obfuscation(4), parliamentary(5), procedures(3), represents(3), significant(4) = 5 complex.
+Fog = 0.4 * (9/1 + 100*5/9) = 0.4*(9+55.56) = 0.4*64.56 = 25.8. Expected 17.0.
+
+17.0/0.4 = 42.5. 9 + 100*c/9 = 42.5 → 100c/9 = 33.5 → c = 3.015. So 3 complex words?
+
+Hmm if complex words = 3: which 3? Let me recount syllables more carefully with the algorithm:
+- obfuscation: o-b-f-u-s-c-a-t-i-o-n. vowels: o,u,a,i,o = 5 groups. Ends in 'n'. = 5. Complex.
+- parliamentary: p-a-r-l-i-a-m-e-n-t-a-r-y. vowels: a, ia (1 group), e, a, y = a,i-a,e,a,y. Wait 'ia' is consecutive vowels = 1 group. So: a, ia, e, a, y = 5. Complex.
+- procedures: p-r-o-c-e-d-u-r-e-s. vowels: o,e,u,e = 4 groups. Ends in 'e', subtract 1 = 3. Complex.
+- represents: r-e-p-r-e-s-e-n-t-s. vowels: e,e,e = 3. Complex.
+- significant: s-i-g-n-i-f-i-c-a-n-t. vowels: i,i,i,a = 4. Complex.
+
+5 complex. But we need 3 for 17.0.
+
+What if formula is fog = 0.4*(words/sentences) + 100*(complex/words)? 
+Test 2: 0.4*9 + 100*5/9 = 3.6 + 55.6 = 59.2. No.
+
+What if: 0.4 * ((words/sentences) + (complex/words)*100) but different?
+
+17.0 = 0.4 * 42.5. If words=9, sent=1: 9 + X = 42.5, X=33.5. 100*c/w = 33.5 → c/w = 0.335. c=3.
+
+What if "complex word" definition different — e.g. excludes proper nouns, words ending in -ed/-es/-ing, or compound? Standard Gunning Fog excludes proper nouns, compound words, and common suffixes. 
+
+With suffix exclusion:
+- procedures: -es suffix → procedur → 3 syllables still complex... or maybe procedure -> 3-1=2? 
+- represents: -s suffix → represent → 3 syllables complex
+- significant: 4 syllables complex
+- obfuscation: -tion counted as 1? → ob-fus-ca-tion = 4. Still complex.
+- parliamentary: -y suffix?
+
+Standard rules: don't count words ending in -es, -ed, or -ing as complex if removing those makes them <3.
+
+- procedures → procedur (3) - still 3, complex
+- represents → represent (3), complex  
+- significant: 4, complex
+- obfuscation: 4 (or 5), complex
+- parliamentary: 5, complex
+
+Hmm still 5.
+
+Test 1 again with 1.6: 1.6/0.4 = 4. If sentences=2, words/sent + 100*c/w = 4. With c=0, w/s=4, words=8. 
+
+Counting "The cat sat on the mat. It was a nice day." words... 11. To get 8, exclude... "a", "on", "the" (articles/prepositions)? 11-3=8 if remove "the","the","on","a" = 4 removed... = 7. Not 8.
+
+Let me reconsider. What if it's just 0.4*(w/s) where words excludes 1-2 syllable common words? Hmm.
+
+Actually: maybe formula uses average words per sentence but counts hard differently. Let me check: 1.6 with no complex words. 0.4*x=1.6, x=4. So average sentence length = 4. With 2 sentences that's 8 words. 
+
+"The cat sat on the mat" = 6 words. "It was a nice day" = 5 words. Total 11, avg 5.5.
+
+If we exclude monosyllabic words considered "easy": all 11 are 1-syllable. Doesn't give 8.
+
+Hmm, maybe sentences=2.75 somehow? Or word count is by syllables groups?
+
+Let me try: maybe it's actually using FIRST-100-words sample formula or something. Or maybe the expected values are just wrong/approximate from a specific implementation.
+
+Given the difficulty, I'll flag this.
+
+{"spec_challenge": "Test case expected values are inconsistent with the stated Gunning Fog formula. Test 1: 'The cat sat on the mat. It was a nice day.' has 11 words, 2 sentences, 0 complex words, giving fog=0.4*(11/2+0)=2.2, not 1.6. Test 2 has 9 words, 1 sentence, and at least 5 clearly 3+ syllable words (obfuscation, parliamentary, procedures, represents, significant), giving fog≈25.8, not 17.0. No reasonable syllable-counting or word-tokenization heuristic produces both 1.6 and 17.0 simultaneously.", "suggested_amendment": "Either update expected outputs to match the formula (Test 1: 'fog: 2.2', Test 2: 'fog: 25.8') or specify the exact tokenization/syllable algorithm and complex-word exclusions (proper nouns, -ed/-es/-ing suffixes, compound words) used to derive the current expected values."}

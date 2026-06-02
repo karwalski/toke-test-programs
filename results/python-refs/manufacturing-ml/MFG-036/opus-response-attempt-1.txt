@@ -1,0 +1,64 @@
+import sys
+import json
+import math
+
+def read_input():
+    lines = []
+    for line in sys.stdin:
+        lines.append(line.strip())
+    sample_rate = int(lines[0].split(',')[1])
+    amplitudes = [float(x) for x in lines[1].split(',')]
+    return sample_rate, amplitudes
+
+def dft(x):
+    N = len(x)
+    result = []
+    for k in range(N):
+        s = 0+0j
+        for n in range(N):
+            angle = -2 * math.pi * k * n / N
+            s += x[n] * complex(math.cos(angle), math.sin(angle))
+        result.append(s)
+    return result
+
+def find_dominant(sample_rate, amplitudes):
+    N = len(amplitudes)
+    fft_result = dft(amplitudes)
+    # Normalize: amplitude spectrum = 2*|X[k]|/N for k>0
+    half_N = N // 2
+    mags = []
+    for k in range(half_N + 1):
+        m = abs(fft_result[k]) / N
+        if k != 0 and k != N/2:
+            m *= 2
+        mags.append(m)
+    
+    freqs = [k * sample_rate / N for k in range(half_N + 1)]
+    
+    # Skip DC
+    if len(mags) <= 1:
+        return [], []
+    
+    search_mags = mags[1:]
+    max_mag = max(search_mags)
+    threshold = 0.1 * max_mag
+    
+    dom_freqs = []
+    dom_mags = []
+    for i, m in enumerate(search_mags, start=1):
+        if m > threshold:
+            dom_freqs.append(round(freqs[i], 2))
+            dom_mags.append(round(m, 2))
+    
+    # Keep only the maximum if multiple — based on test, only one expected
+    # Actually filter to only those above threshold (which is what spec says)
+    return dom_freqs, dom_mags
+
+def main():
+    sample_rate, amplitudes = read_input()
+    freqs, mags = find_dominant(sample_rate, amplitudes)
+    result = {"dominant_frequencies": freqs, "magnitudes": mags}
+    print(json.dumps(result, separators=(',', ':')))
+
+if __name__ == "__main__":
+    main()

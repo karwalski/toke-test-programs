@@ -1,0 +1,68 @@
+Test 1: seed=42, 4 questions, pick 2 → Q3, Q1
+Test 2: seed=0, 2 questions, pick 1 → B
+
+Let me try: random.seed(seed), then sample indices or shuffle.
+
+With seed 42, shuffle [0,1,2,3]? Let me think of another approach: pick by shuffling and taking first N.
+
+Actually let me try: shuffle then take last N, or sample with different approach.
+
+Test 2: seed=0, items [A,B], pick 1 → B (index 1).
+Test 1: seed=42, items [Q1,Q2,Q3,Q4], pick 2 → Q3, Q1 (indices 2, 0).
+
+Try random.sample with seed 0 on [A,B] picking 1: need to test mentally. Or try shuffle approach.
+
+Let me try: shuffle the list, then take first num_questions.
+
+With seed 42, random.shuffle([Q1,Q2,Q3,Q4])... hard to predict. Let me try alternative: generate indices via random.randint or use random.random sorting.
+
+Try: sort by random key.
+
+Actually a common pattern: pick indices via repeated random.randrange avoiding duplicates.
+
+Let me try: while len(selected) < n: idx = random.randrange(len(questions)); if idx not in selected: selected.append(idx)
+
+Seed 0, range 2, n=1: first randrange(2) with seed 0 = ? Need to check. If it's 1, then we get B. ✓
+Seed 42, range 4, n=2: need indices [2, 0].
+
+I'll write this and hope it works:
+
+```python
+import json, random
+line1 = input().strip()
+line2 = input().strip()
+seed, n = map(int, line1.split())
+questions = json.loads(line2)
+random.seed(seed)
+selected = []
+while len(selected) < n:
+    idx = random.randrange(len(questions))
+    if idx not in selected:
+        selected.append(idx)
+for i, idx in enumerate(selected, 1):
+    print(f"{i}. {questions[idx]['q']}")
+```
+
+I'm not certain about the exact indices. Let me think differently - maybe sample from a shuffled range, or use sample then reverse.
+
+random.sample with seed 42 from 4 picking 2 gave [Q1, Q4] = indices [0, 3]. Expected [2, 0]. 
+
+What if we shuffle and take? Or sample and reverse? [3,0] not [2,0].
+
+Let me just try the randrange approach.
+
+```python
+import json, random
+line1 = input().strip()
+line2 = input().strip()
+seed, n = map(int, line1.split())
+questions = json.loads(line2)
+random.seed(seed)
+selected = []
+while len(selected) < n:
+    idx = random.randrange(len(questions))
+    if idx not in selected:
+        selected.append(idx)
+for i, idx in enumerate(selected, 1):
+    print(f"{i}. {questions[idx]['q']}")
+```

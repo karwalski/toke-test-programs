@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\n  \"total_deps\": 2,\n  \"vulnerable_deps\": [\n    {\n      \"name\": \"lodash\",\n      \"version\": \"4.17.15\",\n      \"vulnerabilities\": [\n        {\n          \"id\": \"GHSA-p6mc-m468-83gw\",\n          \"severity\": \"HIGH\",\n          \"description\": \"Prototype pollution in lodash\",\n          \"fixedIn\": [\n            \"4.17.21\"\n          ]\n        }\n      ]\n    },\n    {\n      \"name\": \"express\",\n      \"version\": \"4.17.1\",\n      \"vulnerabilities\": [\n        {\n          \"id\": \"GHSA-rv95-896h-c2vc\",\n          \"severit",
+  "expected": "total_deps",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\n  \"total_deps\": 2,\n  \"vulnerable_deps\": [\n    {\n      \"name\": \"lodash\",\n      \"version\": \"4.17.15\",\n      \"vulnerabilities\": [\n        {\n          \"id\": \"GHSA-p6mc-m468-83gw\",\n          \"severity\": \"HIGH\",\n          \"description\": \"Prototype pollution in lodash\",\n          \"fixedIn\": [\n            \"4.17.21\"\n          ]\n        }\n      ]\n    },\n    {\n      \"name\": \"express\",\n      \"version\": \"4.17.1\",\n      \"vulnerabilities\": [\n        {\n          \"id\": \"GHSA-rv95-896h-c2vc\",\n          \"severit",
+      "expected": "total_deps"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\n  \"total_deps\": 3,\n  \"vulnerable_deps\": [\n    {\n      \"name\": \"django\",\n      \"version\": \"2.2.0\",\n      \"vulnerabilities\": [\n        {\n          \"id\": \"GHSA-hvmf-r292-r5hv\",\n          \"severity\": \"HIGH\",\n          \"description\": \"SQL injection in Django\",\n          \"fixedIn\": [\n            \"2.2.28\",\n            \"3.2.13\"\n          ]\n        }\n      ]\n    },\n    {\n      \"name\": \"flask\",\n      \"version\": \"1.0.0\",\n      \"vulnerabilities\": [\n        {\n          \"id\": \"GHSA-m2qf-hxjv-5gpq\",\n        ",
+      "expected": "vulnerable_deps"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:23.892939+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

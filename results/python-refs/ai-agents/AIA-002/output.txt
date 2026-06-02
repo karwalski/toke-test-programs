@@ -1,0 +1,1 @@
+[{"step_id":1,"tool":"search","arguments":{"query":"rust programming"},"depends_on":[]},{"step_id":2,"tool":"summarise","arguments":{"text":"$1.result"},"depends_on":[1]},{"step_id":3,"tool":"email","arguments":{"to":"bob@example.com","body":"$2.result"},"depends_on":[2]}]

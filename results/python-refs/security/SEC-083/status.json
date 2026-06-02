@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"url\": \"http://localhost:8083\", \"overallGrade\": \"F\", \"overallScore\": 0.0, \"categories\": {\"auth\": 0, \"transport\": 0, \"headers\": 0, \"rateLimit\": 0, \"inputValidation\": 0, \"errorHandling\": 0}, \"issues\": [\"No authentication required\", \"No API key protection detected\", \"API does not use HTTPS\", \"Missing security headers\", \"No rate limiting detected\", \"No input validation detected\", \"Could not test error handling\"], \"recommendations\": [\"Implement HTTPS encryption for all API endpoints\", \"Implement pro",
+  "expected": "overallGrade",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"url\": \"http://localhost:8083\", \"overallGrade\": \"F\", \"overallScore\": 0.0, \"categories\": {\"auth\": 0, \"transport\": 0, \"headers\": 0, \"rateLimit\": 0, \"inputValidation\": 0, \"errorHandling\": 0}, \"issues\": [\"No authentication required\", \"No API key protection detected\", \"API does not use HTTPS\", \"Missing security headers\", \"No rate limiting detected\", \"No input validation detected\", \"Could not test error handling\"], \"recommendations\": [\"Implement HTTPS encryption for all API endpoints\", \"Implement pro",
+      "expected": "overallGrade"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"url\": \"https://api.example.com\", \"overallGrade\": \"F\", \"overallScore\": 11.7, \"categories\": {\"auth\": 0, \"transport\": 70, \"headers\": 0, \"rateLimit\": 0, \"inputValidation\": 0, \"errorHandling\": 0}, \"issues\": [\"No authentication required\", \"No API key protection detected\", \"Missing HSTS header\", \"Missing security headers\", \"No rate limiting detected\", \"No input validation detected\", \"Could not test error handling\"], \"recommendations\": [\"Maintain HTTPS configuration\", \"Implement proper authentication ",
+      "expected": "overallScore"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:10:52.296734+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "",
+  "expected": "word1,word2,count\nthe,cat,3\ncat,sat,1\ncat,ate,1\nsat,on,1\non,the,1\nmat,the,1",
+  "stderr": "  File \"/tmp/tmpokrogt8f.py\", line 6\n    Let me check: pairs preserving original word order (first occurrence order), counting adjacent-only? With window=2, expected has \"the,cat,3\" \u2014 there are 3 occurrences of \"the cat\" as adjacent pairs? Let's see: positions: the(0) cat(1) sat(2) on(3) the(4) mat(5) the(6) cat(7) ate(8). Adjacent pairs: (the,cat), (cat,sat), (sat,on), (on,the), (the,mat), (mat,the), (the,cat), (cat,ate). \n                                                                        ",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpokrogt8f.py\", line 6\n    Let me check: pairs preserving original word order (first occurrence order), counting adjacent-only? With window=2, expected has \"the,cat,3\" \u2014 there are 3 occurrences of \"the cat\" as adjacent pairs? Let's see: positions: the(0) cat(1) sat(2) on(3) the(4) mat(5) the(6) cat(7) ate(8). Adjacent pairs: (the,cat), (cat,sat), (sat,on), (on,the), (the,mat), (mat,the), (the,cat), (cat,ate). \n                                                                        ",
+      "actual": "",
+      "expected": "word1,word2,count\nthe,cat,3\ncat,sat,1\ncat,ate,1\nsat,on,1\non,the,1\nmat,the,1"
+    },
+    {
+      "pass": false,
+      "rc": 1,
+      "stderr": "  File \"/tmp/tmpokrogt8f.py\", line 6\n    Let me check: pairs preserving original word order (first occurrence order), counting adjacent-only? With window=2, expected has \"the,cat,3\" \u2014 there are 3 occurrences of \"the cat\" as adjacent pairs? Let's see: positions: the(0) cat(1) sat(2) on(3) the(4) mat(5) the(6) cat(7) ate(8). Adjacent pairs: (the,cat), (cat,sat), (sat,on), (on,the), (the,mat), (mat,the), (the,cat), (cat,ate). \n                                                                        ",
+      "actual": "",
+      "expected": "word1,word2,count\na,b,4"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:07:43.225823+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

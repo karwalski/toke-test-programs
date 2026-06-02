@@ -1,0 +1,50 @@
+import sys
+import re
+from collections import Counter
+
+def main():
+    data = sys.stdin.read()
+    nl = data.find('\n')
+    n = int(data[:nl].strip())
+    text = data[nl+1:]
+    
+    # Split into sentences keeping delimiters
+    parts = re.split(r'([.!?]+)', text)
+    sentences = []
+    for i in range(0, len(parts)-1, 2):
+        body = parts[i].strip()
+        delim = parts[i+1] if i+1 < len(parts) else ''
+        if body:
+            sentences.append(body + delim[0] if delim else body)
+    # Handle trailing
+    if len(parts) % 2 == 1:
+        tail = parts[-1].strip()
+        if tail:
+            sentences.append(tail)
+    
+    if not sentences:
+        return
+    
+    # Tokenize and compute word frequencies across all sentences
+    tokenized = []
+    word_freq = Counter()
+    for s in sentences:
+        words = re.findall(r'\b\w+\b', s.lower())
+        tokenized.append(words)
+        for w in words:
+            word_freq[w] += 1
+    
+    # Score each sentence by sum of word frequencies
+    scored = []
+    for i, words in enumerate(tokenized):
+        score = sum(word_freq[w] for w in words)
+        scored.append((score, i))
+    
+    # Top N by score, break ties by original order
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    top = sorted(scored[:n], key=lambda x: x[1])
+    
+    print('\n'.join(sentences[i] for _, i in top))
+
+if __name__ == "__main__":
+    main()

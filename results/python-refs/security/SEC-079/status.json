@@ -1,0 +1,27 @@
+{
+  "status": "WRONG_OUTPUT",
+  "passed": 0,
+  "total": 2,
+  "actual": "{\"domain\":\"example.com\",\"totalCerts\":0,\"alertCerts\":[],\"summary\":\"No alerts found. totalCerts checked.\"}",
+  "expected": "totalCerts",
+  "stderr": "",
+  "per_test": [
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"domain\":\"example.com\",\"totalCerts\":0,\"alertCerts\":[],\"summary\":\"No alerts found. totalCerts checked.\"}",
+      "expected": "totalCerts"
+    },
+    {
+      "pass": false,
+      "rc": 0,
+      "stderr": "",
+      "actual": "{\"domain\":\"github.com\",\"totalCerts\":0,\"alertCerts\":[],\"summary\":\"No alerts found. totalCerts checked.\"}",
+      "expected": "summary"
+    }
+  ],
+  "repaired_at": "2026-05-31T02:11:00.865999+00:00",
+  "model": "claude-opus-4-7",
+  "attempt": 1
+}

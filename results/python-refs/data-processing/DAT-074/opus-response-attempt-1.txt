@@ -1,0 +1,77 @@
+Looking at test 1: `FF01004E`, length field is offset 8, width 16. That's bytes `01 00` ... but expected is 78 = 0x4E.
+
+Wait, `01004E` - bits 8-23 would be `01 00` = 256. But expected is 78 = 0x4E.
+
+Hmm, so length is actually bits 16-31? No, that's `00 4E` = 78. Yes!
+
+Wait, offset 8 width 16 should be bits 8-23. But the expected uses bits 16-31. Let me reconsider.
+
+Actually maybe it's little-endian byte interpretation but big-endian bit... Or perhaps offset is in bytes? No, offset 0,4 for nibbles.
+
+`FF01004E`: version=F=15 (bits 0-3), type=F=15 (bits 4-7)... wait FF means both nibbles F. So bits 0-7 = FF. version (0,4) = F=15, type (4,4) = F=15. Then length offset 8 width 16: bits 8-23 = `01 00` = 0x0100 = 256. But expected 78.
+
+Unless length reads bytes 2-3 differently. 0x004E = 78. That's bits 16-31. So offset 8 actually means... byte offset? No, version/type use bit offsets.
+
+Maybe the data is interpreted with each byte reversed? Or fields are read with offset meaning something else. Let me try: maybe offset 8 = skip 8 bits from end? 
+
+Or maybe little-endian: `FF01004E` as little-endian 32-bit = 0x4E0001FF. Bits: `01001110 00000000 00000001 11111111`. version(0,4)=0100=4. No.
+
+What if hex is parsed in 16-bit little-endian words? `FF01` -> `01FF`, `004E` -> `4E00`. Combined: `01FF4E00`. version=0, no.
+
+What if bytes are individually fine but multi-byte fields are little-endian? length spans bytes 2-3 = `00 4E`, as little-endian = 0x4E00 = 19968. No.
+
+What if length spans bytes... wait `01 00 4E` - maybe width 16 starting at bit 8 but reading differently. 0x01004E truncated to 16 bits low = 0x004E = 78! So takes low 16 bits of a 24-bit read? Or width 16 means read width but mask?
+
+Actually maybe: read from offset 8 to end (or aligned), then take last 16 bits? Or: the field width 16 should be interpreted as: starting at byte boundary, read width bits but the value is the last 16 bits of remaining data.
+
+Hmm let me try: offset_bits=8 means start at byte 1. Width 16 = 2 bytes. Data from byte 1: `01 00 4E`. Take last 2 bytes? `00 4E` = 78. Yes!
+
+So maybe offset is start, but it reads from offset to offset+width but somehow... Actually maybe offset is from the END (LSB-first big-endian style)?
+
+Total bits = 32. Field at offset 8 width 16: from bit (32-8-16)=8 to bit 24? That's `01 00` = 256. No.
+
+Or from bit 32-8 down: bits [32-8-16, 32-8] = [8,24] same thing.
+
+What if offset is from LSB? offset 8 from right, width 16: bits [32-8-16, 32-8] = bits [8,24]. Same. = `01 00` = 256.
+
+Try offset from right, but version 0 width 4 = bits [28,32] = `4E` last 4 bits = `1110` = 14. Not 15.
+
+Hmm. Let me look again. `FF01004E`. Expected length=78=0x4E. That's the last byte. Width=16 but value fits in 8 bits. 
+
+What if it's read as a 16-bit value at byte offset 1 but only `004E` is what they want... oh! What if offset 8 means skip first 8 bits, then the NEXT 16 bits in the remaining... no that's `0100`.
+
+OH WAIT. What if width 16 actually means... they messed up and it's bits [16, 32]? offset 8 + 8(alignment)? No.
+
+Or maybe in the test the field def offset for length should be 16. Let me assume the spec has offset = bit position but tests use byte-aligned little-endian within field.
+
+Actually: `01 00 4E` from offset 8, width 16. What if we read 16 bits but as: take bytes covering that range and interpret as little-endian? Range bits 8-23 covers bytes 1-2 = `01 00`, little-endian = 0x0001 = 1. No.
+
+Let me try: width 16 = 2 bytes. But the data is read from offset+width region... let me check `004E` directly - that's offset 16 width 16. Maybe offset is being added to byte position incorrectly.
+
+What if offset is in bits but they read `length` as starting from byte (offset/8 + 1)*8? Round up: 8 -> 16. Then read 16 bits: `004E` = 78. Maybe alignment? But that's weird.
+
+Test 2: `82` = `10000010`. flag offset 0 width 1 = `1`. id offset 1 width 7 = `0000010` = 2. ✓ matches direct.
+
+So test 2 works directly but test 1 doesn't. Difference is test 1 has multi-byte field. Maybe length 16 is read as big-endian but somewhere there's an off-by-one... 
+
+Wait, let me recount `FF01004E` in binary:
+- FF = 11111111 (bits 0-7)
+- 01 = 00000001 (bits 8-15)
+- 00 = 00000000 (bits 16-23)
+- 4E = 01001110 (bits 24-31)
+
+offset 8 width 16 = bits 8-23 = `00000001 00000000` = 256.
+
+For 78 = 0x4E, we need bits 24-31 only, or bits 16-31 = `00000000 01001110` = 78.
+
+So maybe length actually starts at bit 16, not 8. Maybe offset is the START of NEXT field, and length 16 means up to bit 16+16=32, with the field being width 16 ending at bit 32. That means offset is interpreted as END of previous? Or in spec offset 8 has different meaning.
+
+Hmm, OR offset is the previous total and they expect length at offset 8 because version(4) + type(4) = 8, but they want width 16 to mean something else...
+
+Let me try: maybe `length 8 16` is misread and offset is start byte (byte 1?) no.
+
+Actually, what if width-16 reads big-endian but interprets only the meaningful bits? No, that's weird.
+
+Or — flagging as ambiguous spec:
+
+{"spec_challenge": "Test 1 expects length=78 (0x4E) from hex 'FF01004E' with field 'length 8 16' (offset 8 bits, width 16 bits), but big-endian extraction of bits 8-23 gives 0x0100=256. The expected value 0x004E corresponds to bits 16-31, inconsistent with the stated offset of 8.", "suggested_amendment": "Either change the test's expected length to 256, or change the field definition to 'length 16 16', so the offset/width semantics are consistent with big-endian bit ordering."}

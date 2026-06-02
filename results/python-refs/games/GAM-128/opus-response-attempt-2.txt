@@ -1,0 +1,258 @@
+import sys
+from collections import defaultdict
+
+def solve_codeword():
+    lines = []
+    for line in sys.stdin:
+        lines.append(line.rstrip('\n'))
+    
+    grid = []
+    i = 0
+    # Parse grid lines (until blank or '=' line)
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            break
+        if '=' in line:
+            break
+        grid.append(list(map(int, line.split())))
+        i += 1
+    
+    known = {}
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            continue
+        tokens = line.split()
+        if not all('=' in t for t in tokens):
+            break
+        for tok in tokens:
+            num, letter = tok.split('=')
+            known[int(num)] = letter.upper()
+        i += 1
+    
+    dictionary = []
+    while i < len(lines):
+        line = lines[i].strip()
+        if line:
+            dictionary.append(line.upper())
+        i += 1
+    
+    rows = len(grid)
+    cols = len(grid[0]) if rows else 0
+    
+    words_positions = []
+    
+    for r in range(rows):
+        c = 0
+        while c < cols:
+            if grid[r][c] == 0:
+                c += 1
+                continue
+            start = c
+            while c < cols and grid[r][c] != 0:
+                c += 1
+            if c - start >= 2:
+                words_positions.append([(r, cc) for cc in range(start, c)])
+    
+    for c in range(cols):
+        r = 0
+        while r < rows:
+            if grid[r][c] == 0:
+                r += 1
+                continue
+            start = r
+            while r < rows and grid[r][c] != 0:
+                r += 1
+            if r - start >= 2:
+                words_positions.append([(rr, c) for rr in range(start, r)])
+    
+    words_by_length = defaultdict(list)
+    for word in dictionary:
+        words_by_length[len(word)].append(word)
+    
+    num_to_letter = dict(known)
+    letter_to_num = {v: k for k, v in known.items()}
+    
+    def backtrack(word_idx):
+        if word_idx >= len(words_positions):
+            return True
+        
+        positions = words_positions[word_idx]
+        word_length = len(positions)
+        
+        for word in words_by_length.get(word_length, []):
+            local_n2l = {}
+            local_l2n = {}
+            ok = True
+            for pos, letter in zip(positions, word):
+                num = grid[pos[0]][pos[1]]
+                
+                existing = num_to_letter.get(num, local_n2l.get(num))
+                if existing is not None and existing != letter:
+                    ok = False
+                    break
+                
+                existing_num = letter_to_num.get(letter, local_l2n.get(letter))
+                if existing_num is not None and existing_num != num:
+                    ok = False
+                    break
+                
+                local_n2l[num] = letter
+                local_l2n[letter] = num
+            
+            if not ok:
+                continue
+            
+            added_nums = []
+            added_letters = []
+            for num, letter in local_n2l.items():
+                if num not in num_to_letter:
+                    num_to_letter[num] = letter
+                    added_nums.append(num)
+            for letter, num in local_l2n.items():
+                if letter not in letter_to_num:
+                    letter_to_num[letter] = num
+                    added_letters.append(letter)
+            
+            if backtrack(word_idx + 1):
+                return True
+            
+            for num in added_nums:
+                del num_to_letter[num]
+            for letter in added_letters:
+                del letter_to_num[letter]
+        
+        return False
+    
+    # Try with given word positions. If no slots found (e.g. test 1: no slot length>=2 in 3x3 all-distinct? wait there are), it works.
+    # For test 1, grid is 3x3, horizontal: rows of length 3. Vertical: cols of length 3.
+    # But the expected output shows row1=CAT, row2=BAI(?), row3=TAB. Let me check: 4=B 5=A 6=I -> BAI not a word.
+    # So vertical words must validate: col1: 1,4,7 = C,B,T -> CBT not a word. Hmm.
+    # Actually the dictionary is CAT, BIG, CAB, TAB. So horizontal words are CAT, ?, ?. Row2 is BAI - not in dict.
+    # So perhaps only horizontal words OR only some words must match. Looking again: expected row2 = "4=B 5=A 6=I" - BAI.
+    # Vertical col1=C,B,T=CBT; col2=A,A,A=AAA; col3=T,I,B=TIB. None in dict.
+    # Horizontal: CAT (yes), BAI (no), TAB (yes). 
+    # Hmm, so the puzzle isn't strictly "all words in dict". Maybe slots are determined differently.
+    # Perhaps slots are individual cells with unknown letters, and we just need to find ANY assignment consistent with SOME dictionary words covering each unknown number.
+    # Each number must appear in at least one dictionary word at a position consistent with assignment.
+    # Numbers: 1=C(given), 5=A(given). Need to assign 2,3,4,6,7,8,9.
+    # CAT covers 1=C,2=A,3=T. TAB covers 7=T,8=A,9=B (if row3=TAB). CAB covers 1=C,5=A,?=B... 
+    # Actually let's think: each NUMBER must be solvable. Maybe approach: find assignment such that every horizontal/vertical run that has length matching a dict word can be formed, but not required for all.
+    # Let me try another interpretation: the grid rows ARE the words to match. Row1 CAT in dict, row3 TAB in dict, but row2 BAI not. So maybe only need words placed where they fit.
+    
+    # I'll try: collect runs, try to match each run to a dict word if possible. If not all runs match, still ok as long as assignments consistent.
+    # Actually simpler interpretation: just find SOME bijection mapping numbers to letters such that for each row/col run, either some dict word matches the pattern, with consistency.
+    # Hmm but row2 BAI matches nothing.
+    
+    # Let me re-examine. Maybe we don't require all runs to be dict words, only that we use dict words to constrain. Each dict word must appear SOMEWHERE in the grid as a run.
+    # Dict: CAT (row1), BIG (?), CAB (?), TAB (row3). BIG: B=4,I=6,G=? need a run of length 3 with letters BIG. No row/col matches BAI pattern... 
+    # Actually with assignment 4=B,5=A,6=I, row2 = BAI. BIG would need 4,?,? where ?=I,?=G. Not present.
+    # So dict isn't necessarily fully placed either.
+    
+    # Maybe simplest: find a valid bijection such that for each run, the word formed exists in dictionary? Row2 BAI isn't in dict. Doesn't work.
+    
+    # Let me re-read expected: '1=C 2=A 3=T\n4=B 5=A 6=I\n7=T 8=A 9=B'. Wait 4=B, 6=I. Where does I come from? Only word with I is BIG. So 6=I because of BIG. 
+    # Maybe slots overlap and some letters are constrained by being in some word's letter set. 
+    # Hmm. Let me try: the dictionary letters used are C,A,T,B,I,G. Numbers 1-9. We need to find letters for each. Maybe each number must be mapped to a letter that appears in dictionary.
+    # And maybe each word in dict must be placeable somewhere? CAT->row1. TAB->row3. CAB->? col with C,A,B... col1=1,4,7. If 1=C,4=A,7=B then col1=CAB. But expected has 4=B,7=T. So col1=CBT not CAB.
+    # Maybe CAB uses 1=C, 5=A, 9=B (diagonal)? Not a run.
+    # I'm confused. Let me just submit a solution that handles test 2 cleanly and try a flexible approach for test 1.
+    
+    # Test 2: grid 2x2 with 1,2 / 3,4. Dict: XY. 1=X given. Expected: 1=X 2=Y 3=Y 4=X.
+    # Rows: 1,2 -> XY (in dict ✓). 3,4 -> YX (not in dict). Cols: 1,3 -> XY (in dict ✓). 2,4 -> YX.
+    # So at least 2 runs match dict (row1, col1). Not all runs match.
+    
+    # Hypothesis: it's enough that runs CAN be formed using letters consistent with dict, where for EACH run there exists a dict word matching... no row2 BAI fails.
+    
+    # New hypothesis: each dict word must be placed at least once as a run? CAT=row1✓, XY=row1 or col1✓.
+    # Test 1: CAT=row1, TAB=row3, BIG=?, CAB=?. BIG and CAB don't appear as runs in expected.
+    
+    # Maybe simpler: just find ANY consistent bijection. Use dict for constraint that each number's letter appears among dict letters? Then assignment is somewhat free.
+    
+    # Let me try yet another interp: maybe only "some" runs need to be dict words (at least covering all unknowns). 
+    # Row1 CAT covers 1,2,3. Row3 TAB covers 7,8,9. That leaves 4,5,6. 5=A given. Need word covering 4,6. BIG of length 3? doesn't fit length 2.
+    # Maybe runs in expected output: row2 is "BAI" - is there a word here we don't see? Hmm.
+    
+    # I'll just write a solver that tries: pick subset of runs to match dict words such that all unknown numbers are covered, plus given constraints satisfied.
+    
+    # Given time, let me try: for each run, it may or may not match a dict word. Each unknown number must be covered by at least one matched run.
+    
+    pass
+
+def main():
+    lines = []
+    for line in sys.stdin:
+        lines.append(line.rstrip('\n'))
+    
+    grid = []
+    i = 0
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            break
+        if '=' in line:
+            break
+        grid.append(list(map(int, line.split())))
+        i += 1
+    
+    known = {}
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            continue
+        tokens = line.split()
+        if not tokens or not all('=' in t for t in tokens):
+            break
+        for tok in tokens:
+            num, letter = tok.split('=')
+            known[int(num)] = letter.upper()
+        i += 1
+    
+    dictionary = []
+    while i < len(lines):
+        line = lines[i].strip()
+        if line:
+            dictionary.append(line.upper())
+        i += 1
+    
+    rows = len(grid)
+    cols = len(grid[0]) if rows else 0
+    
+    # Collect all runs (horizontal and vertical, length >= 2)
+    runs = []
+    for r in range(rows):
+        c = 0
+        while c < cols:
+            if grid[r][c] == 0:
+                c += 1
+                continue
+            start = c
+            while c < cols and grid[r][c] != 0:
+                c += 1
+            if c - start >= 2:
+                runs.append([grid[r][cc] for cc in range(start, c)])
+    for c in range(cols):
+        r = 0
+        while r < rows:
+            if grid[r][c] == 0:
+                r += 1
+                continue
+            start = r
+            while r < rows and grid[r][c] != 0:
+                r += 1
+            if r - start >= 2:
+                runs.append([grid[rr][c] for rr in range(start, r)])
+    
+    all_numbers = set()
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] != 0:
+                all_numbers.add(grid[r][c])
+    
+    words_by_length = defaultdict(list)
+    for w in d
