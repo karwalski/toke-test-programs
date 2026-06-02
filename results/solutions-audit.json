@@ -1,11 +1,11 @@
 {
   "counters": {
-    "REGRESSED-RUN": 210,
-    "REGRESSED-BUILD": 89,
-    "GENUINE": 201,
-    "REGRESSED-COMPILE": 1549,
-    "TRIVIAL": 4,
-    "SUSPECT": 4
+    "REGRESSED-RUN": 127,
+    "TRIVIAL": 30,
+    "REGRESSED-BUILD": 75,
+    "GENUINE": 581,
+    "REGRESSED-COMPILE": 1241,
+    "SUSPECT": 3
   },
   "results": [
     {
@@ -29,20 +29,9 @@
     {
       "id": "AIA-002",
       "category": "ai-agents",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1102,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "[]",
-          "expected": "[{\"step_id\":1,\"tool\":\"search\",\"arguments\":{\"query\":\"rust programming\"},\"depends_on\":[]},{\"step_id\":2,\"tool\":\"summarise\","
-        },
-        {
-          "test": 2,
-          "actual": "[]",
-          "expected": "[{\"step_id\":1,\"tool\":\"translate\",\"arguments\":{\"text\":\"hello world\",\"lang\":\"French\"},\"depends_on\":[]},{\"step_id\":2,\"tool\""
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 760,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "AIA-003",
@@ -118,8 +107,13 @@
     {
       "id": "AIA-010",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 960
+      "verdict": "GENUINE",
+      "src_len": 1904,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-011",
@@ -160,20 +154,13 @@
     {
       "id": "AIA-017",
       "category": "ai-agents",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 3365,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "[]",
-          "expected": "[{\"id\":\"a\",\"similarity\":1.0},{\"id\":\"c\",\"similarity\":0.707}]"
-        },
-        {
-          "test": 2,
-          "actual": "[]",
-          "expected": "[{\"id\":\"x\",\"similarity\":1.0}]"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 3085,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-018",
@@ -336,13 +323,9 @@
     {
       "id": "AIA-037",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1220,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "AIA-038",
@@ -377,20 +360,13 @@
     {
       "id": "AIA-041",
       "category": "ai-agents",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1921,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "[{\"id\":\"t1\",\"priority\":1,\"category\":\"production\"},{\"id\":\"t3\",\"priority\":2,\"category\":\"customer-blocking\"},{\"id\":\"t2\",\"pr"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "[{\"id\":\"b\",\"priority\":1,\"category\":\"security\"},{\"id\":\"a\",\"priority\":5,\"category\":\"maintenance\"}]"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2318,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-042",
@@ -420,16 +396,11 @@
       "id": "AIA-044",
       "category": "ai-agents",
       "verdict": "REGRESSED-RUN",
-      "src_len": 1518,
+      "src_len": 2620,
       "failed_tests": [
         {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"level\":\"elementary\",\"metrics\":{\"avg_sentence_length\":5,\"vocabulary_complexity\":\"simple\",\"technical_terms_count\":0}}"
-        },
-        {
           "test": 2,
-          "actual": "",
+          "actual": "{\"level\":\"expert\",\"metrics\":{\"avg_sentence_length\":26,\"vocabulary_complexity\":\"technical\",\"technical_terms_count\":8}}",
           "expected": "{\"level\":\"expert\",\"metrics\":{\"avg_sentence_length\":28,\"vocabulary_complexity\":\"technical\",\"technical_terms_count\":7}}"
         }
       ]
@@ -460,13 +431,9 @@
     {
       "id": "AIA-048",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 574,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "AIA-049",
@@ -918,8 +885,13 @@
     {
       "id": "AIA-103",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 851
+      "verdict": "GENUINE",
+      "src_len": 2057,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-104",
@@ -960,8 +932,13 @@
     {
       "id": "AIA-106",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 552
+      "verdict": "GENUINE",
+      "src_len": 2038,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-107",
@@ -1008,8 +985,13 @@
     {
       "id": "AIA-114",
       "category": "ai-agents",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 1426
+      "verdict": "GENUINE",
+      "src_len": 2138,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-115",
@@ -1026,14 +1008,24 @@
     {
       "id": "AIA-117",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2911
+      "verdict": "GENUINE",
+      "src_len": 4150,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-118",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 3273
+      "verdict": "GENUINE",
+      "src_len": 3107,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-119",
@@ -1044,8 +1036,13 @@
     {
       "id": "AIA-120",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 661
+      "verdict": "GENUINE",
+      "src_len": 2000,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-121",
@@ -1056,8 +1053,13 @@
     {
       "id": "AIA-122",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1856
+      "verdict": "GENUINE",
+      "src_len": 1243,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-123",
@@ -1086,26 +1088,20 @@
     {
       "id": "AIA-125",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 105
+      "verdict": "GENUINE",
+      "src_len": 2574,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-126",
       "category": "ai-agents",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 351,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"plan\":[{\"step\":1,\"action\":\"create_directory\",\"success_criteria\":\"Project directory structure exists\",\"fallback\":\"Check"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "{\"plan\":[{\"step\":1,\"action\":\"query_data\",\"success_criteria\":\"Report data retrieved successfully\",\"fallback\":\"Use cached "
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 1393,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "AIA-127",
@@ -1152,14 +1148,24 @@
     {
       "id": "AIA-134",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 754
+      "verdict": "GENUINE",
+      "src_len": 2702,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-135",
       "category": "ai-agents",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 272
+      "verdict": "GENUINE",
+      "src_len": 2708,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "AIA-136",
@@ -1194,25 +1200,13 @@
     {
       "id": "FIN-001",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 992,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "4624070917402656768",
-          "expected": "14"
-        },
-        {
-          "test": 2,
-          "actual": "4624070917402656768",
-          "expected": "14"
-        },
-        {
-          "test": 3,
-          "actual": "4617315517961601024",
-          "expected": "5"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 629,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-002",
@@ -1285,25 +1279,13 @@
     {
       "id": "FIN-008",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 2535,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "4+6i"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "-5+10i"
-        },
-        {
-          "test": 3,
-          "actual": "2.78134e-308-1.5i",
-          "expected": "3-3i"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1671,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-009",
@@ -1417,13 +1399,8 @@
       "id": "FIN-017",
       "category": "calculators-finance",
       "verdict": "REGRESSED-RUN",
-      "src_len": 1087,
+      "src_len": 963,
       "failed_tests": [
-        {
-          "test": 1,
-          "actual": "10.4847",
-          "expected": "10.4506"
-        },
         {
           "test": 2,
           "actual": "0.0000",
@@ -1474,30 +1451,13 @@
     {
       "id": "FIN-021",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 899,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "8000.00",
-          "expected": "2000.00"
-        },
-        {
-          "test": 2,
-          "actual": "11742.00",
-          "expected": "6650.00"
-        },
-        {
-          "test": 3,
-          "actual": "55000.00",
-          "expected": "50000.00"
-        },
-        {
-          "test": 5,
-          "actual": "0.00",
-          "expected": "15000.00"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 818,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-022",
@@ -1555,15 +1515,13 @@
     {
       "id": "FIN-026",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 528,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "1,1250.00,3750.00\n2,937.50,2812.50\n3,703.12,2109.38\n4,527.34,1582.03",
-          "expected": "1,1250.00,3750.00\n2,937.50,2812.50\n3,703.13,2109.37\n4,527.34,1582.03"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 783,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-027",
@@ -1581,8 +1539,13 @@
     {
       "id": "FIN-028",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 565
+      "verdict": "GENUINE",
+      "src_len": 490,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-029",
@@ -1598,13 +1561,9 @@
     {
       "id": "FIN-030",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1003,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "FIN-031",
@@ -1695,27 +1654,35 @@
     {
       "id": "FIN-038",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 670
+      "verdict": "GENUINE",
+      "src_len": 721,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-039",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 897
+      "verdict": "GENUINE",
+      "src_len": 610,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-040",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1679,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "500.0000",
-          "expected": "2.1134"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 618,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-041",
@@ -1732,8 +1699,13 @@
     {
       "id": "FIN-043",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 253
+      "verdict": "GENUINE",
+      "src_len": 1022,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-044",
@@ -1749,26 +1721,24 @@
     {
       "id": "FIN-045",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 307
+      "verdict": "GENUINE",
+      "src_len": 545,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-046",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 877,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "4617315517961601024.0000",
-          "expected": "3.2500"
-        },
-        {
-          "test": 2,
-          "actual": "4630713726853027840.0000",
-          "expected": "46.0000"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 651,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-047",
@@ -1797,20 +1767,13 @@
     {
       "id": "FIN-051",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 826,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "-973.691,-973.691,-973.691,-973.691,-973.691,-973.691,-973.691,-973.691",
-          "expected": "-1.5000,-0.5000,-0.5000,-0.5000,0.0000,0.0000,1.0000,2.0000"
-        },
-        {
-          "test": 2,
-          "actual": "-971.245,-971.245,-971.245",
-          "expected": "-1.2247,0.0000,1.2247"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 636,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-052",
@@ -1833,8 +1796,13 @@
     {
       "id": "FIN-053",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 393
+      "verdict": "GENUINE",
+      "src_len": 924,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-054",
@@ -1845,20 +1813,13 @@
     {
       "id": "FIN-055",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 611,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "4610935418489492992.00,4613937818241073152.00,4615814318085811200.00,4617315517961601024.00,4618441417868443648.00",
-          "expected": "2.00,3.00,4.00,5.00,6.00"
-        },
-        {
-          "test": 2,
-          "actual": "4624070917402656768.00,4627730092099895296.00,4629981891913580544.00",
-          "expected": "15.00,25.00,35.00"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 574,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-056",
@@ -1922,8 +1883,13 @@
     {
       "id": "FIN-063",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 774
+      "verdict": "GENUINE",
+      "src_len": 542,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-064",
@@ -1952,20 +1918,13 @@
     {
       "id": "FIN-066",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 208,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "14.87%"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "17.46%"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 552,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-067",
@@ -1976,8 +1935,13 @@
     {
       "id": "FIN-068",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 489
+      "verdict": "GENUINE",
+      "src_len": 644,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-069",
@@ -1988,14 +1952,24 @@
     {
       "id": "FIN-070",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 543
+      "verdict": "GENUINE",
+      "src_len": 1980,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-071",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 773
+      "verdict": "GENUINE",
+      "src_len": 634,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-072",
@@ -2006,8 +1980,13 @@
     {
       "id": "FIN-073",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 911
+      "verdict": "GENUINE",
+      "src_len": 818,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-074",
@@ -2029,8 +2008,13 @@
     {
       "id": "FIN-076",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 498
+      "verdict": "GENUINE",
+      "src_len": 412,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-077",
@@ -2041,20 +2025,13 @@
     {
       "id": "FIN-078",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 519,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "5.20%\n3.81%"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "6.00%\n4.44%"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 392,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-079",
@@ -2117,8 +2094,13 @@
     {
       "id": "FIN-085",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 488
+      "verdict": "GENUINE",
+      "src_len": 345,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-086",
@@ -2136,8 +2118,13 @@
     {
       "id": "FIN-087",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 515
+      "verdict": "GENUINE",
+      "src_len": 298,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-088",
@@ -2172,14 +2159,24 @@
     {
       "id": "FIN-091",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 390
+      "verdict": "GENUINE",
+      "src_len": 1248,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-092",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 203
+      "verdict": "GENUINE",
+      "src_len": 1012,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-093",
@@ -2195,8 +2192,13 @@
     {
       "id": "FIN-094",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 412
+      "verdict": "GENUINE",
+      "src_len": 430,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-095",
@@ -2207,20 +2209,35 @@
     {
       "id": "FIN-096",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 429
+      "verdict": "GENUINE",
+      "src_len": 351,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-097",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 462
+      "verdict": "GENUINE",
+      "src_len": 386,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-098",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 146
+      "verdict": "GENUINE",
+      "src_len": 440,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-099",
@@ -2273,32 +2290,35 @@
     {
       "id": "FIN-103",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 218
+      "verdict": "GENUINE",
+      "src_len": 324,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-104",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 108
+      "verdict": "GENUINE",
+      "src_len": 474,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-105",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 352,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "6",
-          "expected": "4"
-        },
-        {
-          "test": 3,
-          "actual": "5",
-          "expected": "6"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 329,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-106",
@@ -2325,20 +2345,35 @@
     {
       "id": "FIN-108",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 243
+      "verdict": "GENUINE",
+      "src_len": 888,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-109",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 526
+      "verdict": "GENUINE",
+      "src_len": 546,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-110",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 266
+      "verdict": "GENUINE",
+      "src_len": 486,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-111",
@@ -2426,8 +2461,13 @@
     {
       "id": "FIN-120",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 169
+      "verdict": "GENUINE",
+      "src_len": 558,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "FIN-121",
@@ -2456,20 +2496,13 @@
     {
       "id": "FIN-123",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1153,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "NO_CROSS",
-          "expected": "6 DEATH_CROSS"
-        },
-        {
-          "test": 2,
-          "actual": "NO_CROSS",
-          "expected": "3 GOLDEN_CROSS"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1179,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-124",
@@ -2492,8 +2525,13 @@
     {
       "id": "FIN-125",
       "category": "calculators-finance",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 729
+      "verdict": "GENUINE",
+      "src_len": 850,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "FIN-126",
@@ -2569,20 +2607,9 @@
     {
       "id": "CRY-005",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 418,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "SGVsbG8sIFdvcmxkIQ=="
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "Y3J5cHRv"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 168,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "CRY-006",
@@ -2593,8 +2620,13 @@
     {
       "id": "CRY-007",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 453
+      "verdict": "GENUINE",
+      "src_len": 448,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-008",
@@ -2611,15 +2643,13 @@
     {
       "id": "CRY-010",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1179,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "000000",
-          "expected": "0000"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1184,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-011",
@@ -2754,8 +2784,13 @@
     {
       "id": "CRY-029",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 408
+      "verdict": "GENUINE",
+      "src_len": 1227,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-030",
@@ -2878,15 +2913,13 @@
     {
       "id": "CRY-045",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 830,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "ERROR: Block 1 previous_hash mismatch",
-          "expected": "VALID"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1446,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-046",
@@ -2903,8 +2936,13 @@
     {
       "id": "CRY-048",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 625
+      "verdict": "GENUINE",
+      "src_len": 1137,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-049",
@@ -2931,14 +2969,24 @@
     {
       "id": "CRY-051",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 306
+      "verdict": "GENUINE",
+      "src_len": 351,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-052",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 470
+      "verdict": "GENUINE",
+      "src_len": 986,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-053",
@@ -2949,8 +2997,13 @@
     {
       "id": "CRY-054",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 750
+      "verdict": "GENUINE",
+      "src_len": 1490,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-055",
@@ -2977,14 +3030,24 @@
     {
       "id": "CRY-057",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1319
+      "verdict": "GENUINE",
+      "src_len": 1377,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-058",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 777
+      "verdict": "GENUINE",
+      "src_len": 2649,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-059",
@@ -3041,8 +3104,13 @@
     {
       "id": "CRY-066",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 325
+      "verdict": "GENUINE",
+      "src_len": 327,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-067",
@@ -3099,20 +3167,13 @@
     {
       "id": "CRY-072",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 226,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "33\nSUCCESS"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "28\nOUT_OF_GAS at operation 3"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1024,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-073",
@@ -3123,20 +3184,13 @@
     {
       "id": "CRY-074",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 582,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "0\n0\n0",
-          "expected": "100\nalice\n0"
-        },
-        {
-          "test": 2,
-          "actual": "0",
-          "expected": "99"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 825,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-075",
@@ -3235,26 +3289,20 @@
     {
       "id": "CRY-085",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 353,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "VALID: inputs=10, outputs=9, fee=1"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "INVALID: outputs exceed inputs"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 1215,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "CRY-086",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1021
+      "verdict": "GENUINE",
+      "src_len": 1681,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-087",
@@ -3265,20 +3313,13 @@
     {
       "id": "CRY-088",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 175,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "0.00005000"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "0.00050000"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 210,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-089",
@@ -3334,20 +3375,13 @@
     {
       "id": "CRY-095",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 240,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "5.72"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "20.00"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 331,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-096",
@@ -3386,14 +3420,24 @@
     {
       "id": "CRY-100",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 654
+      "verdict": "GENUINE",
+      "src_len": 968,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-101",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 445
+      "verdict": "GENUINE",
+      "src_len": 1008,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-102",
@@ -3416,20 +3460,35 @@
     {
       "id": "CRY-103",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 303
+      "verdict": "GENUINE",
+      "src_len": 2066,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-104",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 351
+      "verdict": "GENUINE",
+      "src_len": 320,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-105",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 837
+      "verdict": "GENUINE",
+      "src_len": 838,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-106",
@@ -3541,8 +3600,13 @@
     {
       "id": "CRY-119",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 721
+      "verdict": "GENUINE",
+      "src_len": 1154,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-120",
@@ -3553,8 +3617,13 @@
     {
       "id": "CRY-121",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 747
+      "verdict": "GENUINE",
+      "src_len": 2008,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-122",
@@ -3571,8 +3640,13 @@
     {
       "id": "CRY-124",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 699
+      "verdict": "GENUINE",
+      "src_len": 900,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-125",
@@ -3589,8 +3663,13 @@
     {
       "id": "CRY-127",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 219
+      "verdict": "GENUINE",
+      "src_len": 948,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-128",
@@ -3601,20 +3680,35 @@
     {
       "id": "CRY-129",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 272
+      "verdict": "GENUINE",
+      "src_len": 1254,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-130",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 834
+      "verdict": "GENUINE",
+      "src_len": 1397,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-131",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 645
+      "verdict": "GENUINE",
+      "src_len": 340,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "CRY-132",
@@ -3676,13 +3770,9 @@
     {
       "id": "DAT-004",
       "category": "data-processing",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1470,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "DAT-005",
@@ -3715,8 +3805,13 @@
     {
       "id": "DAT-008",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 454
+      "verdict": "GENUINE",
+      "src_len": 2663,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-009",
@@ -3776,8 +3871,13 @@
     {
       "id": "DAT-014",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 774
+      "verdict": "GENUINE",
+      "src_len": 1761,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-015",
@@ -3788,8 +3888,13 @@
     {
       "id": "DAT-016",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 500
+      "verdict": "GENUINE",
+      "src_len": 2049,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-017",
@@ -3830,8 +3935,13 @@
     {
       "id": "DAT-023",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 614
+      "verdict": "GENUINE",
+      "src_len": 1457,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-024",
@@ -3847,8 +3957,13 @@
     {
       "id": "DAT-025",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 472
+      "verdict": "GENUINE",
+      "src_len": 738,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-026",
@@ -3917,8 +4032,13 @@
     {
       "id": "DAT-035",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1416
+      "verdict": "GENUINE",
+      "src_len": 2063,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-036",
@@ -3929,32 +4049,35 @@
     {
       "id": "DAT-037",
       "category": "data-processing",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 2966,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "name,age\nAlice,30\nCarol,35"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "x,y,c\n1,2,3"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 3731,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-038",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1235
+      "verdict": "GENUINE",
+      "src_len": 1408,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-039",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1276
+      "verdict": "GENUINE",
+      "src_len": 2208,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-040",
@@ -3971,8 +4094,13 @@
     {
       "id": "DAT-042",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 412
+      "verdict": "GENUINE",
+      "src_len": 583,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-043",
@@ -4025,8 +4153,13 @@
     {
       "id": "DAT-051",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 443
+      "verdict": "GENUINE",
+      "src_len": 668,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-052",
@@ -4079,8 +4212,13 @@
     {
       "id": "DAT-060",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 965
+      "verdict": "GENUINE",
+      "src_len": 781,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-061",
@@ -4115,14 +4253,24 @@
     {
       "id": "DAT-066",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2095
+      "verdict": "GENUINE",
+      "src_len": 1410,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-067",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 433
+      "verdict": "GENUINE",
+      "src_len": 427,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-068",
@@ -4145,8 +4293,13 @@
     {
       "id": "DAT-071",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1183
+      "verdict": "GENUINE",
+      "src_len": 809,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-072",
@@ -4169,14 +4322,24 @@
     {
       "id": "DAT-075",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 479
+      "verdict": "GENUINE",
+      "src_len": 2447,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-076",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 208
+      "verdict": "GENUINE",
+      "src_len": 1524,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-077",
@@ -4187,8 +4350,13 @@
     {
       "id": "DAT-078",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 608
+      "verdict": "GENUINE",
+      "src_len": 2498,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-079",
@@ -4222,8 +4390,13 @@
     {
       "id": "DAT-083",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 689
+      "verdict": "GENUINE",
+      "src_len": 2040,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-084",
@@ -4246,29 +4419,39 @@
     {
       "id": "DAT-087",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 527
+      "verdict": "GENUINE",
+      "src_len": 811,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-088",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 405
+      "verdict": "GENUINE",
+      "src_len": 1152,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-089",
       "category": "data-processing",
       "verdict": "REGRESSED-RUN",
-      "src_len": 2844,
+      "src_len": 3076,
       "failed_tests": [
         {
           "test": 1,
-          "actual": "TIMEOUT",
+          "actual": "kitten sitting\t3\t-\t0.7460\nhello hello\t0\t0\t1.0000",
           "expected": "kitten sitting\t3\t-\t0.7467\nhello hello\t0\t0\t1.0000"
         },
         {
           "test": 2,
-          "actual": "TIMEOUT",
+          "actual": "ABCDE ABFDE\t1\t1\t0.8933",
           "expected": "ABCDE ABFDE\t1\t1\t0.9333"
         }
       ]
@@ -4299,8 +4482,13 @@
     {
       "id": "DAT-093",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 545
+      "verdict": "GENUINE",
+      "src_len": 584,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DAT-094",
@@ -4322,8 +4510,13 @@
     {
       "id": "DAT-096",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 867
+      "verdict": "GENUINE",
+      "src_len": 1079,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-097",
@@ -4364,14 +4557,24 @@
     {
       "id": "DAT-103",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 369
+      "verdict": "GENUINE",
+      "src_len": 2134,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-104",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 269
+      "verdict": "GENUINE",
+      "src_len": 1913,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-105",
@@ -4382,8 +4585,13 @@
     {
       "id": "DAT-106",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 479
+      "verdict": "GENUINE",
+      "src_len": 2694,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-107",
@@ -4448,8 +4656,13 @@
     {
       "id": "DAT-117",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 453
+      "verdict": "GENUINE",
+      "src_len": 2056,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-118",
@@ -4538,8 +4751,13 @@
     {
       "id": "DEV-002",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 522
+      "verdict": "GENUINE",
+      "src_len": 472,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-003",
@@ -4561,14 +4779,24 @@
     {
       "id": "DEV-005",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 772
+      "verdict": "GENUINE",
+      "src_len": 1002,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-006",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 783
+      "verdict": "GENUINE",
+      "src_len": 1032,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-007",
@@ -4579,13 +4807,9 @@
     {
       "id": "DEV-008",
       "category": "devtools",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 277,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "DEV-009",
@@ -4596,8 +4820,13 @@
     {
       "id": "DEV-010",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1898
+      "verdict": "GENUINE",
+      "src_len": 1565,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-011",
@@ -4625,8 +4854,13 @@
     {
       "id": "DEV-014",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 695
+      "verdict": "GENUINE",
+      "src_len": 2186,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-015",
@@ -4637,8 +4871,13 @@
     {
       "id": "DEV-016",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 750
+      "verdict": "GENUINE",
+      "src_len": 2274,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-017",
@@ -4685,14 +4924,24 @@
     {
       "id": "DEV-024",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 438
+      "verdict": "GENUINE",
+      "src_len": 2125,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-025",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 559
+      "verdict": "GENUINE",
+      "src_len": 1643,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-026",
@@ -4714,8 +4963,13 @@
     {
       "id": "DEV-028",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 389
+      "verdict": "GENUINE",
+      "src_len": 2050,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-029",
@@ -4737,20 +4991,13 @@
     {
       "id": "DEV-031",
       "category": "devtools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 412,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "/home/user/src/main.go"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "/var/log/access.log"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 960,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-032",
@@ -4796,20 +5043,13 @@
     {
       "id": "DEV-038",
       "category": "devtools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 398,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "name: Alice\nscores:\n  - 90\n  - 85\n  - 92"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "active: true\ncount: 5"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1433,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-039",
@@ -4856,8 +5096,13 @@
     {
       "id": "DEV-044",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 754
+      "verdict": "GENUINE",
+      "src_len": 3429,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-045",
@@ -4868,8 +5113,13 @@
     {
       "id": "DEV-046",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 799
+      "verdict": "GENUINE",
+      "src_len": 1206,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-047",
@@ -4892,15 +5142,13 @@
     {
       "id": "DEV-050",
       "category": "devtools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1131,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "express: 4.17.0 -> 4.18.0\nlodash: 4.17.20 -> 4.17.20",
-          "expected": "express: 4.17.0 -> 4.18.0"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1142,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-051",
@@ -4923,13 +5171,9 @@
     {
       "id": "DEV-054",
       "category": "devtools",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 399,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "DEV-055",
@@ -4940,14 +5184,24 @@
     {
       "id": "DEV-056",
       "category": "devtools",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 258
+      "verdict": "GENUINE",
+      "src_len": 589,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-057",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 653
+      "verdict": "GENUINE",
+      "src_len": 2790,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-058",
@@ -5006,20 +5260,13 @@
     {
       "id": "DEV-067",
       "category": "devtools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1346,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "go: 1 files, 0.01 KB\ngo: 1 files, 0.01 KB\npy: 1 files, 0.01 KB",
-          "expected": "go: 2 files, 0.04 KB\npy: 1 files, 0.01 KB"
-        },
-        {
-          "test": 3,
-          "actual": "no-ext: 1 files, 0.01 KB\npy: 1 files, 0.01 KB\npy: 1 files, 0.01 KB",
-          "expected": "py: 2 files, 0.24 KB\nno-ext: 1 files, 0.10 KB"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 3336,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-068",
@@ -5030,8 +5277,13 @@
     {
       "id": "DEV-069",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 489
+      "verdict": "GENUINE",
+      "src_len": 2275,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-070",
@@ -5048,8 +5300,13 @@
     {
       "id": "DEV-072",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 788
+      "verdict": "GENUINE",
+      "src_len": 1449,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-073",
@@ -5078,14 +5335,24 @@
     {
       "id": "DEV-077",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 732
+      "verdict": "GENUINE",
+      "src_len": 703,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-078",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 653
+      "verdict": "GENUINE",
+      "src_len": 3480,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-079",
@@ -5096,14 +5363,24 @@
     {
       "id": "DEV-080",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 217
+      "verdict": "GENUINE",
+      "src_len": 1272,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-081",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 392
+      "verdict": "GENUINE",
+      "src_len": 2383,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-082",
@@ -5114,8 +5391,13 @@
     {
       "id": "DEV-083",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1220
+      "verdict": "GENUINE",
+      "src_len": 718,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-084",
@@ -5142,14 +5424,24 @@
     {
       "id": "DEV-086",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 562
+      "verdict": "GENUINE",
+      "src_len": 1707,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-087",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 675
+      "verdict": "GENUINE",
+      "src_len": 2028,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-088",
@@ -5171,8 +5463,13 @@
     {
       "id": "DEV-090",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 365
+      "verdict": "GENUINE",
+      "src_len": 2400,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-091",
@@ -5183,8 +5480,13 @@
     {
       "id": "DEV-092",
       "category": "devtools",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 495
+      "verdict": "GENUINE",
+      "src_len": 2155,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-093",
@@ -5206,8 +5508,13 @@
     {
       "id": "DEV-095",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 269
+      "verdict": "GENUINE",
+      "src_len": 2596,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-096",
@@ -5224,8 +5531,13 @@
     {
       "id": "DEV-098",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 667
+      "verdict": "GENUINE",
+      "src_len": 1245,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-099",
@@ -5271,8 +5583,13 @@
     {
       "id": "DEV-103",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 481
+      "verdict": "GENUINE",
+      "src_len": 2249,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-104",
@@ -5323,8 +5640,13 @@
     {
       "id": "DEV-110",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 641
+      "verdict": "GENUINE",
+      "src_len": 2184,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-111",
@@ -5335,8 +5657,13 @@
     {
       "id": "DEV-112",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 439
+      "verdict": "GENUINE",
+      "src_len": 3619,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-113",
@@ -5359,8 +5686,13 @@
     {
       "id": "DEV-116",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 386
+      "verdict": "GENUINE",
+      "src_len": 1701,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-117",
@@ -5377,8 +5709,13 @@
     {
       "id": "DEV-119",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 819
+      "verdict": "GENUINE",
+      "src_len": 1287,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-120",
@@ -5389,14 +5726,24 @@
     {
       "id": "DEV-121",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 266
+      "verdict": "GENUINE",
+      "src_len": 424,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "DEV-122",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 578
+      "verdict": "GENUINE",
+      "src_len": 2142,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-123",
@@ -5425,15 +5772,9 @@
     {
       "id": "DEV-127",
       "category": "devtools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1885,
-      "failed_tests": [
-        {
-          "test": 4,
-          "actual": "UNUSED: chalk\nUNUSED: dotenv",
-          "expected": "UNUSED: axios\nUNUSED: chalk\nUNUSED: dotenv"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 5730,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "DEV-128",
@@ -5479,8 +5820,13 @@
     {
       "id": "EDU-002",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 379
+      "verdict": "GENUINE",
+      "src_len": 1119,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-003",
@@ -5503,14 +5849,24 @@
     {
       "id": "EDU-006",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 578
+      "verdict": "GENUINE",
+      "src_len": 422,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-007",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 918
+      "verdict": "GENUINE",
+      "src_len": 674,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-008",
@@ -5540,8 +5896,13 @@
     {
       "id": "EDU-011",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 481
+      "verdict": "GENUINE",
+      "src_len": 1273,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-012",
@@ -5570,13 +5931,9 @@
     {
       "id": "EDU-014",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1203,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "EDU-015",
@@ -5593,14 +5950,24 @@
     {
       "id": "EDU-017",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 826
+      "verdict": "GENUINE",
+      "src_len": 934,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-018",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 506
+      "verdict": "GENUINE",
+      "src_len": 1674,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-019",
@@ -5611,8 +5978,13 @@
     {
       "id": "EDU-020",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 674
+      "verdict": "GENUINE",
+      "src_len": 1958,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-021",
@@ -5628,8 +6000,13 @@
     {
       "id": "EDU-022",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 741
+      "verdict": "GENUINE",
+      "src_len": 1983,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-023",
@@ -5670,19 +6047,20 @@
     {
       "id": "EDU-029",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1285,
+      "reason": "input-discriminator hardcoded output"
+    },
+    {
+      "id": "EDU-030",
+      "category": "education",
+      "verdict": "GENUINE",
+      "src_len": 1398,
       "structural": {
         "loop": true,
         "if": true,
         "helpers": true
       }
-    },
-    {
-      "id": "EDU-030",
-      "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 335
     },
     {
       "id": "EDU-031",
@@ -5716,8 +6094,13 @@
     {
       "id": "EDU-033",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 277
+      "verdict": "GENUINE",
+      "src_len": 1304,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-034",
@@ -5751,27 +6134,35 @@
     {
       "id": "EDU-038",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1245,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "A: ### (3)\nB:  (0)\nC:  (0)\nD:  (0)\nF:  (0)",
-          "expected": "A: ### (3)\nB: (0)\nC: (0)\nD: (0)\nF: (0)"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2418,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-039",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 676
+      "verdict": "GENUINE",
+      "src_len": 637,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-040",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 738
+      "verdict": "GENUINE",
+      "src_len": 1016,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-041",
@@ -5782,8 +6173,13 @@
     {
       "id": "EDU-042",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 265
+      "verdict": "GENUINE",
+      "src_len": 229,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-043",
@@ -5866,27 +6262,35 @@
     {
       "id": "EDU-050",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 744,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "photosynthesis: 1",
-          "expected": "photosynthesis: 2\nosmosis: 1"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1479,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-051",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 784
+      "verdict": "GENUINE",
+      "src_len": 835,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-052",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 619
+      "verdict": "GENUINE",
+      "src_len": 1755,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-053",
@@ -5909,20 +6313,35 @@
     {
       "id": "EDU-054",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 310
+      "verdict": "GENUINE",
+      "src_len": 1546,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-055",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2968
+      "verdict": "GENUINE",
+      "src_len": 2369,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-056",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 732
+      "verdict": "GENUINE",
+      "src_len": 1635,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-057",
@@ -5938,14 +6357,24 @@
     {
       "id": "EDU-058",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 666
+      "verdict": "GENUINE",
+      "src_len": 1950,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-059",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 531
+      "verdict": "GENUINE",
+      "src_len": 333,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-060",
@@ -5962,8 +6391,13 @@
     {
       "id": "EDU-062",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1335
+      "verdict": "GENUINE",
+      "src_len": 1545,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-063",
@@ -5974,15 +6408,13 @@
     {
       "id": "EDU-064",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 708,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "Reference 1: 0% similar",
-          "expected": "Reference 1: 0% similar\nCLEAN"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1158,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-065",
@@ -6039,20 +6471,13 @@
     {
       "id": "EDU-072",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 380,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "Word of the Day: ephemeral\nDefinition: lasting a short time\nExample: The ephemeral bloom of cherry blossoms."
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "Word of the Day: benevolent\nDefinition: well meaning\nExample: A benevolent leader."
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 735,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-073",
@@ -6063,86 +6488,90 @@
     {
       "id": "EDU-074",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 2040,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Q1: 2+2? (10s)\nA: 3\nAnswer: B",
-          "expected": "Q1: 2+2? (10s)\nA: 3\nB: 4\nC: 5\nD: 6\nAnswer: B"
-        },
-        {
-          "test": 2,
-          "actual": "Q1: Sky colour? (5s)\nA: Red\nAnswer: B",
-          "expected": "Q1: Sky colour? (5s)\nA: Red\nB: Blue\nAnswer: B"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1919,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-075",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 779
+      "verdict": "GENUINE",
+      "src_len": 1419,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-076",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 3032,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Feedback for :\n  clarity: 0\n  effort: 0",
-          "expected": "Feedback for B:\n  clarity: 3.0\n  effort: 4.0\n  Comments: Good work; Needs polish"
-        },
-        {
-          "test": 2,
-          "actual": "Feedback for :\n  clarity: 0\n  effort: 0",
-          "expected": "Feedback for Y:\n  quality: 5.0\n  Comments: Excellent"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 3533,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-077",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1820,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "Addition drill: Add whole numbers\nArt project: UNALIGNED"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "Lab: Describe motion"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2413,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-078",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 455
+      "verdict": "GENUINE",
+      "src_len": 516,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-079",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 708
+      "verdict": "GENUINE",
+      "src_len": 2361,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-080",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 969
+      "verdict": "GENUINE",
+      "src_len": 482,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-081",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 803
+      "verdict": "GENUINE",
+      "src_len": 1546,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-082",
@@ -6153,14 +6582,24 @@
     {
       "id": "EDU-083",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 455
+      "verdict": "GENUINE",
+      "src_len": 1504,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-084",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1367
+      "verdict": "GENUINE",
+      "src_len": 2496,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-085",
@@ -6183,8 +6622,13 @@
     {
       "id": "EDU-086",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2059
+      "verdict": "GENUINE",
+      "src_len": 2073,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-087",
@@ -6260,26 +6704,20 @@
     {
       "id": "EDU-094",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1571
+      "verdict": "GENUINE",
+      "src_len": 2093,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-095",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 334,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "Differentiated Plan: Fractions\nBelow Level:\n- Basic addition\nOn Level:\n- Mixed numbers\nAbove Level:\n- Algebra fractions"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "Differentiated Plan: Poetry\nBelow Level:\n- Identify rhyme\nOn Level:\n(none)\nAbove Level:\n- Write haiku"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 1523,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "EDU-096",
@@ -6338,13 +6776,9 @@
     {
       "id": "EDU-103",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1363,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "EDU-104",
@@ -6360,8 +6794,13 @@
     {
       "id": "EDU-105",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 344
+      "verdict": "GENUINE",
+      "src_len": 1633,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-106",
@@ -6389,15 +6828,13 @@
     {
       "id": "EDU-109",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 2462,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "ELIGIBLE FOR GRADUATION",
-          "expected": "MISSING: Science needs 1 more credit(s)"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2249,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-110",
@@ -6414,14 +6851,24 @@
     {
       "id": "EDU-112",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 275
+      "verdict": "GENUINE",
+      "src_len": 1432,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-113",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 342
+      "verdict": "GENUINE",
+      "src_len": 1759,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-114",
@@ -6432,8 +6879,13 @@
     {
       "id": "EDU-115",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1489
+      "verdict": "GENUINE",
+      "src_len": 1025,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-116",
@@ -6444,14 +6896,24 @@
     {
       "id": "EDU-117",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 274
+      "verdict": "GENUINE",
+      "src_len": 1121,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-118",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 980
+      "verdict": "GENUINE",
+      "src_len": 1252,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-119",
@@ -6486,8 +6948,13 @@
     {
       "id": "EDU-122",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1614
+      "verdict": "GENUINE",
+      "src_len": 1713,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-123",
@@ -6510,20 +6977,13 @@
     {
       "id": "EDU-126",
       "category": "education",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1584,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Fractions: 40 -> 0 (-40) REGRESSED\nDecimals: 70 -> 0 (-70) REGRESSED",
-          "expected": "Fractions: 40 -> 75 (+35) IMPROVED\nDecimals: 70 -> 65 (-5) REGRESSED"
-        },
-        {
-          "test": 2,
-          "actual": "Algebra: 50 -> 0 (-50) REGRESSED",
-          "expected": "Algebra: 50 -> 50 (0) NO CHANGE"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1909,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "EDU-127",
@@ -6534,14 +6994,24 @@
     {
       "id": "EDU-128",
       "category": "education",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 595
+      "verdict": "GENUINE",
+      "src_len": 2178,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-129",
       "category": "education",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 122
+      "verdict": "GENUINE",
+      "src_len": 1019,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "EDU-130",
@@ -6575,8 +7045,13 @@
     {
       "id": "GAM-004",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 128
+      "verdict": "GENUINE",
+      "src_len": 931,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-005",
@@ -6598,8 +7073,13 @@
     {
       "id": "GAM-007",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 513
+      "verdict": "GENUINE",
+      "src_len": 971,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-008",
@@ -6610,8 +7090,13 @@
     {
       "id": "GAM-009",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 550
+      "verdict": "GENUINE",
+      "src_len": 551,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-010",
@@ -6634,8 +7119,13 @@
     {
       "id": "GAM-013",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 205
+      "verdict": "GENUINE",
+      "src_len": 557,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-014",
@@ -6675,32 +7165,35 @@
     {
       "id": "GAM-017",
       "category": "games",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1142,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "ENLIST\nINLETS\nSILENT\nTINSEL"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "ACT\nATC\nTAC"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1424,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-018",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 648
+      "verdict": "GENUINE",
+      "src_len": 1177,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-019",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 256
+      "verdict": "GENUINE",
+      "src_len": 1940,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-020",
@@ -6733,8 +7226,13 @@
     {
       "id": "GAM-023",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 768
+      "verdict": "GENUINE",
+      "src_len": 863,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-024",
@@ -6769,8 +7267,13 @@
     {
       "id": "GAM-029",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 511
+      "verdict": "GENUINE",
+      "src_len": 810,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-030",
@@ -6781,8 +7284,13 @@
     {
       "id": "GAM-031",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 620
+      "verdict": "GENUINE",
+      "src_len": 1077,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-032",
@@ -6893,14 +7401,24 @@
     {
       "id": "GAM-048",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 406
+      "verdict": "GENUINE",
+      "src_len": 306,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-049",
       "category": "games",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 114
+      "verdict": "GENUINE",
+      "src_len": 1984,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-050",
@@ -6911,8 +7429,13 @@
     {
       "id": "GAM-051",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 515
+      "verdict": "GENUINE",
+      "src_len": 933,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-052",
@@ -6958,8 +7481,13 @@
     {
       "id": "GAM-058",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 534
+      "verdict": "GENUINE",
+      "src_len": 489,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-059",
@@ -7054,14 +7582,24 @@
     {
       "id": "GAM-072",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 688
+      "verdict": "GENUINE",
+      "src_len": 932,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-073",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 489
+      "verdict": "GENUINE",
+      "src_len": 737,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-074",
@@ -7090,8 +7628,13 @@
     {
       "id": "GAM-078",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 617
+      "verdict": "GENUINE",
+      "src_len": 1046,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-079",
@@ -7108,8 +7651,13 @@
     {
       "id": "GAM-081",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 372
+      "verdict": "GENUINE",
+      "src_len": 334,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-082",
@@ -7150,8 +7698,13 @@
     {
       "id": "GAM-088",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1189
+      "verdict": "GENUINE",
+      "src_len": 1692,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-089",
@@ -7321,8 +7874,13 @@
     {
       "id": "GAM-114",
       "category": "games",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 287
+      "verdict": "GENUINE",
+      "src_len": 776,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-115",
@@ -7333,26 +7891,24 @@
     {
       "id": "GAM-116",
       "category": "games",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 853,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Bingo! Row 1 complete after calling 68",
-          "expected": "Bingo! Row 3 complete after calling 9"
-        },
-        {
-          "test": 2,
-          "actual": "Bingo! Row 1 complete after calling 5",
-          "expected": "No bingo"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1705,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-117",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1093
+      "verdict": "GENUINE",
+      "src_len": 1056,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-118",
@@ -7381,15 +7937,13 @@
     {
       "id": "GAM-120",
       "category": "games",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1244,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "5 6: 2 coins",
-          "expected": "6 5: 2 coins"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1810,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-121",
@@ -7425,8 +7979,13 @@
     {
       "id": "GAM-125",
       "category": "games",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 676
+      "verdict": "GENUINE",
+      "src_len": 1207,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "GAM-126",
@@ -7449,20 +8008,13 @@
     {
       "id": "GAM-129",
       "category": "games",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1508,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Alice is rank 5\n1. Alice: 200\n2. Bob: 150",
-          "expected": "Alice is rank 1\n1. Alice: 200\n2. Bob: 150"
-        },
-        {
-          "test": 2,
-          "actual": "X is rank 3",
-          "expected": "X is rank 1"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1507,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "GAM-130",
@@ -7485,8 +8037,13 @@
     {
       "id": "MFG-003",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 932
+      "verdict": "GENUINE",
+      "src_len": 580,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-004",
@@ -7545,20 +8102,35 @@
     {
       "id": "MFG-013",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 213
+      "verdict": "GENUINE",
+      "src_len": 1211,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-014",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 579
+      "verdict": "GENUINE",
+      "src_len": 1177,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-015",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 144
+      "verdict": "GENUINE",
+      "src_len": 995,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-016",
@@ -7651,21 +8223,20 @@
     {
       "id": "MFG-029",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1260,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "{\"sma\":[null,null,4622100592565682176.0,4622250712553261056.0,4622382067542392832.0],\"wma\":[null,null,462219441755791872",
-          "expected": "{\"sma\":[null,null,10.5,10.77,11.0],\"wma\":[null,null,10.67,10.82,11.07]}"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 499,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "MFG-030",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 924
+      "verdict": "GENUINE",
+      "src_len": 884,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-031",
@@ -7676,14 +8247,24 @@
     {
       "id": "MFG-032",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 679
+      "verdict": "GENUINE",
+      "src_len": 1097,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-033",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 383
+      "verdict": "GENUINE",
+      "src_len": 1373,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-034",
@@ -7736,8 +8317,13 @@
     {
       "id": "MFG-042",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1237
+      "verdict": "GENUINE",
+      "src_len": 1236,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-043",
@@ -7748,8 +8334,13 @@
     {
       "id": "MFG-044",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 841
+      "verdict": "GENUINE",
+      "src_len": 1095,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-045",
@@ -7760,14 +8351,24 @@
     {
       "id": "MFG-046",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1419
+      "verdict": "GENUINE",
+      "src_len": 1651,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-047",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 730
+      "verdict": "GENUINE",
+      "src_len": 1008,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-048",
@@ -7778,8 +8379,13 @@
     {
       "id": "MFG-049",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 634
+      "verdict": "GENUINE",
+      "src_len": 868,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-050",
@@ -7825,8 +8431,13 @@
     {
       "id": "MFG-056",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1146
+      "verdict": "GENUINE",
+      "src_len": 1429,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-057",
@@ -7944,15 +8555,13 @@
     {
       "id": "MFG-075",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 150,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"prevention\":5000,\"appraisal\":3000,\"internal_failure\":8000,\"external_failure\":12000,\"total_coq\":28000,\"failure_ratio\":0"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1054,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-076",
@@ -7963,8 +8572,13 @@
     {
       "id": "MFG-077",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 103
+      "verdict": "GENUINE",
+      "src_len": 1104,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-078",
@@ -8004,15 +8618,13 @@
     {
       "id": "MFG-083",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 252,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"a\":1.0,\"b\":0.01,\"failure_threshold\":2.0,\"predicted_failure_time\":69}"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 224,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-084",
@@ -8070,15 +8682,13 @@
     {
       "id": "MFG-092",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 2356,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "{\"classes\":{\"A\":{\"precision\":0,\"recall\":0,\"f1\":0},\"A\":{\"precision\":0.67,\"recall\":1,\"f1\":0.8},\"B\":{\"precision\":0,\"recall\"",
-          "expected": "{\"classes\":{\"A\":{\"precision\":0.67,\"recall\":1.0,\"f1\":0.8},\"B\":{\"precision\":1.0,\"recall\":0.5,\"f1\":0.67},\"C\":{\"precision\":1"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2910,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-093",
@@ -8095,8 +8705,13 @@
     {
       "id": "MFG-095",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 244
+      "verdict": "GENUINE",
+      "src_len": 637,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-096",
@@ -8145,8 +8760,13 @@
     {
       "id": "MFG-101",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 658
+      "verdict": "GENUINE",
+      "src_len": 843,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MFG-102",
@@ -8239,15 +8859,13 @@
     {
       "id": "MFG-115",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 408,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"current_mean\":10.16,\"offset\":0.16,\"adjustment_needed\":true,\"adjustment_amount\":-0.16}"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 810,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-116",
@@ -8346,8 +8964,13 @@
     {
       "id": "MFG-130",
       "category": "manufacturing-ml",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 523
+      "verdict": "GENUINE",
+      "src_len": 1623,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MFG-131",
@@ -8411,8 +9034,13 @@
     {
       "id": "MED-003",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 567
+      "verdict": "GENUINE",
+      "src_len": 841,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-004",
@@ -8429,8 +9057,13 @@
     {
       "id": "MED-006",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 42
+      "verdict": "GENUINE",
+      "src_len": 354,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-007",
@@ -8488,8 +9121,13 @@
     {
       "id": "MED-013",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 455
+      "verdict": "GENUINE",
+      "src_len": 380,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-014",
@@ -8500,50 +9138,68 @@
     {
       "id": "MED-015",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 687,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "the(1) cat(1) sat(1) the(1) cat(1)",
-          "expected": "the(2) cat(2) sat(1)"
-        },
-        {
-          "test": 2,
-          "actual": "a(1) b(1) a(1) b(1) a(1)",
-          "expected": "a(3) b(2)"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1080,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-016",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 290
+      "verdict": "GENUINE",
+      "src_len": 444,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-017",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1111
+      "verdict": "GENUINE",
+      "src_len": 751,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-018",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 517
+      "verdict": "GENUINE",
+      "src_len": 1307,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-019",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 437
+      "verdict": "GENUINE",
+      "src_len": 1419,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-020",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 777
+      "verdict": "GENUINE",
+      "src_len": 1158,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-021",
@@ -8590,8 +9246,13 @@
     {
       "id": "MED-028",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 489
+      "verdict": "GENUINE",
+      "src_len": 506,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-029",
@@ -8602,8 +9263,13 @@
     {
       "id": "MED-030",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 264
+      "verdict": "GENUINE",
+      "src_len": 676,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-031",
@@ -8614,8 +9280,13 @@
     {
       "id": "MED-032",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 524
+      "verdict": "GENUINE",
+      "src_len": 1276,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-033",
@@ -8649,20 +9320,35 @@
     {
       "id": "MED-037",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 699
+      "verdict": "GENUINE",
+      "src_len": 917,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-038",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 561
+      "verdict": "GENUINE",
+      "src_len": 1443,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-039",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 748
+      "verdict": "GENUINE",
+      "src_len": 582,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-040",
@@ -8709,50 +9395,46 @@
     {
       "id": "MED-045",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 495,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "Hello world. Another sentence."
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "This is loud."
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1214,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-046",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 331
+      "verdict": "GENUINE",
+      "src_len": 482,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-047",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 639,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "banana\napple\ncherry",
-          "expected": "apple\nbanana\ncherry"
-        },
-        {
-          "test": 2,
-          "actual": "z\na\nm",
-          "expected": "a\nm\nz"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 918,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-048",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 478
+      "verdict": "GENUINE",
+      "src_len": 418,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-049",
@@ -8763,8 +9445,13 @@
     {
       "id": "MED-050",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 307
+      "verdict": "GENUINE",
+      "src_len": 908,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-051",
@@ -8792,15 +9479,13 @@
     {
       "id": "MED-054",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 931,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "eat tea tan ate nat bat",
-          "expected": "ate eat tea\nbat\nnat tan"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2121,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-055",
@@ -8852,14 +9537,24 @@
     {
       "id": "MED-062",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 534
+      "verdict": "GENUINE",
+      "src_len": 1160,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-063",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 383
+      "verdict": "GENUINE",
+      "src_len": 618,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-064",
@@ -8887,15 +9582,13 @@
     {
       "id": "MED-067",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1764,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "foo\nbar",
-          "expected": "bar\nfoo"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2032,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-068",
@@ -8912,14 +9605,24 @@
     {
       "id": "MED-070",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1063
+      "verdict": "GENUINE",
+      "src_len": 466,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-071",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 713
+      "verdict": "GENUINE",
+      "src_len": 537,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-072",
@@ -8942,8 +9645,13 @@
     {
       "id": "MED-075",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 634
+      "verdict": "GENUINE",
+      "src_len": 697,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-076",
@@ -8954,14 +9662,24 @@
     {
       "id": "MED-077",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 499
+      "verdict": "GENUINE",
+      "src_len": 822,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-078",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 576
+      "verdict": "GENUINE",
+      "src_len": 222,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-079",
@@ -8977,20 +9695,35 @@
     {
       "id": "MED-080",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 348
+      "verdict": "GENUINE",
+      "src_len": 397,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "MED-081",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 584
+      "verdict": "GENUINE",
+      "src_len": 914,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-082",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 647
+      "verdict": "GENUINE",
+      "src_len": 1013,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-083",
@@ -9044,8 +9777,13 @@
     {
       "id": "MED-090",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 328
+      "verdict": "GENUINE",
+      "src_len": 572,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-091",
@@ -9074,20 +9812,13 @@
     {
       "id": "MED-093",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 313,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "hello  world"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "a\nb"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 529,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-094",
@@ -9098,14 +9829,24 @@
     {
       "id": "MED-095",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 299
+      "verdict": "GENUINE",
+      "src_len": 530,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-096",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 333
+      "verdict": "GENUINE",
+      "src_len": 1133,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-097",
@@ -9122,20 +9863,35 @@
     {
       "id": "MED-099",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 595
+      "verdict": "GENUINE",
+      "src_len": 1457,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-100",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 389
+      "verdict": "GENUINE",
+      "src_len": 415,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-101",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 597
+      "verdict": "GENUINE",
+      "src_len": 580,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-102",
@@ -9151,33 +9907,46 @@
     {
       "id": "MED-103",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 437
+      "verdict": "GENUINE",
+      "src_len": 654,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-104",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1517
+      "verdict": "GENUINE",
+      "src_len": 972,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-105",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 306
+      "verdict": "GENUINE",
+      "src_len": 394,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-106",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 568,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "hello\ngoodbye"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 290,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-107",
@@ -9231,14 +10000,24 @@
     {
       "id": "MED-112",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 556
+      "verdict": "GENUINE",
+      "src_len": 956,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-113",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 404
+      "verdict": "GENUINE",
+      "src_len": 534,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-114",
@@ -9261,14 +10040,24 @@
     {
       "id": "MED-117",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 428
+      "verdict": "GENUINE",
+      "src_len": 747,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-118",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 688
+      "verdict": "GENUINE",
+      "src_len": 861,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MED-119",
@@ -9279,8 +10068,13 @@
     {
       "id": "MED-120",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 483
+      "verdict": "GENUINE",
+      "src_len": 1663,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-121",
@@ -9315,8 +10109,13 @@
     {
       "id": "MED-124",
       "category": "media-content",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 320
+      "verdict": "GENUINE",
+      "src_len": 1895,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MED-125",
@@ -9463,26 +10262,24 @@
     {
       "id": "MSG-011",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 297,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "Hello\nWorld"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "Foo\nBar"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1141,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-012",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 269
+      "verdict": "GENUINE",
+      "src_len": 460,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-013",
@@ -9528,14 +10325,24 @@
     {
       "id": "MSG-017",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1410
+      "verdict": "GENUINE",
+      "src_len": 2045,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-018",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 326
+      "verdict": "GENUINE",
+      "src_len": 837,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-019",
@@ -9546,14 +10353,24 @@
     {
       "id": "MSG-020",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 807
+      "verdict": "GENUINE",
+      "src_len": 1241,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-021",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1494
+      "verdict": "GENUINE",
+      "src_len": 2582,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-022",
@@ -9598,8 +10415,13 @@
     {
       "id": "MSG-025",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 284
+      "verdict": "GENUINE",
+      "src_len": 1571,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-026",
@@ -9616,14 +10438,24 @@
     {
       "id": "MSG-028",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 614
+      "verdict": "GENUINE",
+      "src_len": 1785,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-029",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 634
+      "verdict": "GENUINE",
+      "src_len": 1005,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-030",
@@ -9652,20 +10484,9 @@
     {
       "id": "MSG-034",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 495,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "12345 67890 12345 67890 12345 67890 12345 67890 12345 67890 12345 67890"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 554,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "MSG-035",
@@ -9676,32 +10497,35 @@
     {
       "id": "MSG-036",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1242
+      "verdict": "GENUINE",
+      "src_len": 3043,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-037",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 660
+      "verdict": "GENUINE",
+      "src_len": 2208,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-038",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1113,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "1"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "2\n3"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1193,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-039",
@@ -9712,8 +10536,13 @@
     {
       "id": "MSG-040",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 563
+      "verdict": "GENUINE",
+      "src_len": 2390,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-041",
@@ -9724,8 +10553,13 @@
     {
       "id": "MSG-042",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1661
+      "verdict": "GENUINE",
+      "src_len": 1326,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-043",
@@ -9759,20 +10593,13 @@
     {
       "id": "MSG-047",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1777,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "m1: 1/3 read\n  read: bob\n  unread: alice, bob, charlie\nm1: 1/3 read\n  read: charlie\n  unread: alice, bob, charlie",
-          "expected": "m1: 2/3 read\n  read: bob, charlie\n  unread: alice"
-        },
-        {
-          "test": 2,
-          "actual": "m1: 1/2 read\n  read: a\n  unread: a, b\nm1: 1/2 read\n  read: b\n  unread: a, b",
-          "expected": "m1: 2/2 read\n  read: a, b\n  unread: (none)"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2077,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-048",
@@ -9789,14 +10616,24 @@
     {
       "id": "MSG-050",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 777
+      "verdict": "GENUINE",
+      "src_len": 1497,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-051",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 474
+      "verdict": "GENUINE",
+      "src_len": 1287,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-052",
@@ -9807,26 +10644,24 @@
     {
       "id": "MSG-053",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1560,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "# Hello",
-          "expected": "HELLO\n\nThis is bold and italic text.\n\n* Item 1\n* Item 2\n\n| code block"
-        },
-        {
-          "test": 2,
-          "actual": "Check [this link](https://example.com) and `inline code`.",
-          "expected": "Check this link (https://example.com) and inline code."
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1979,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-054",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 713
+      "verdict": "GENUINE",
+      "src_len": 2865,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-055",
@@ -9921,13 +10756,9 @@
     {
       "id": "MSG-068",
       "category": "messaging",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 1255,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "MSG-069",
@@ -10063,19 +10894,20 @@
     {
       "id": "MSG-086",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 330
-    },
-    {
-      "id": "MSG-087",
-      "category": "messaging",
       "verdict": "GENUINE",
-      "src_len": 2640,
+      "src_len": 1891,
       "structural": {
         "loop": true,
         "if": true,
         "helpers": true
       }
+    },
+    {
+      "id": "MSG-087",
+      "category": "messaging",
+      "verdict": "TRIVIAL",
+      "src_len": 2640,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "MSG-088",
@@ -10127,8 +10959,13 @@
     {
       "id": "MSG-095",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 619
+      "verdict": "GENUINE",
+      "src_len": 3008,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-096",
@@ -10151,20 +10988,13 @@
     {
       "id": "MSG-099",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1248,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "general: 3 unread (1 mention)\ndev: 1 unread (1 mention)\ntotal: 4 unread (2 mentions)",
-          "expected": "general: 2 unread (1 mention)\ndev: 1 unread (1 mention)\ntotal: 3 unread (2 mentions)"
-        },
-        {
-          "test": 2,
-          "actual": "chat: 5 unread (0 mentions)\ntotal: 5 unread (0 mentions)",
-          "expected": "chat: 1 unread (0 mentions)\ntotal: 1 unread (0 mentions)"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 3236,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-100",
@@ -10181,8 +11011,13 @@
     {
       "id": "MSG-102",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 411
+      "verdict": "GENUINE",
+      "src_len": 1948,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-103",
@@ -10301,14 +11136,24 @@
     {
       "id": "MSG-118",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 394
+      "verdict": "GENUINE",
+      "src_len": 2283,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-119",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 332
+      "verdict": "GENUINE",
+      "src_len": 369,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-120",
@@ -10349,8 +11194,13 @@
     {
       "id": "MSG-124",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 343
+      "verdict": "GENUINE",
+      "src_len": 3382,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-125",
@@ -10385,14 +11235,24 @@
     {
       "id": "MSG-130",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2239
+      "verdict": "GENUINE",
+      "src_len": 2477,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-131",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 243
+      "verdict": "GENUINE",
+      "src_len": 1121,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "MSG-132",
@@ -10409,8 +11269,13 @@
     {
       "id": "MSG-134",
       "category": "messaging",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 580
+      "verdict": "GENUINE",
+      "src_len": 3226,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-135",
@@ -11719,14 +12584,24 @@
     {
       "id": "SCI-001",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 725
+      "verdict": "GENUINE",
+      "src_len": 605,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-002",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 218
+      "verdict": "GENUINE",
+      "src_len": 497,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-003",
@@ -11772,8 +12647,13 @@
     {
       "id": "SCI-007",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 388
+      "verdict": "GENUINE",
+      "src_len": 609,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-008",
@@ -11802,20 +12682,13 @@
     {
       "id": "SCI-012",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1925,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "1.000000\n 0.000000\n\n0.000000\n 1.000000\n\n\n2.000000\n 1.000000\n\n1.000000\n 3.000000\n\n\n0\n 1",
-          "expected": "1.000000 0.000000\n0.500000 1.000000\n\n2.000000 1.000000\n0.000000 2.500000\n\n0 1"
-        },
-        {
-          "test": 2,
-          "actual": "1.000000\n\n\n5.000000\n\n\n0",
-          "expected": "1.000000\n\n5.000000\n\n0"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1701,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-013",
@@ -11826,8 +12699,13 @@
     {
       "id": "SCI-014",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 291
+      "verdict": "GENUINE",
+      "src_len": 1714,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-015",
@@ -11855,8 +12733,13 @@
     {
       "id": "SCI-018",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 568
+      "verdict": "GENUINE",
+      "src_len": 1187,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-019",
@@ -11884,21 +12767,24 @@
     {
       "id": "SCI-022",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 3297,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Topological order: 4 5 2 0 3 1",
-          "expected": "Topological order: 4 5 0 2 3 1"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1841,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-023",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 603
+      "verdict": "GENUINE",
+      "src_len": 1021,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-024",
@@ -11933,41 +12819,24 @@
     {
       "id": "SCI-029",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1340,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Heap after build: \nSorted: \nComparisons: 0",
-          "expected": "Heap after build: 9 5 8 1 3 2\nSorted: 1 2 3 5 8 9\nComparisons: 15"
-        },
-        {
-          "test": 2,
-          "actual": "Heap after build: \nSorted: \nComparisons: 0",
-          "expected": "Heap after build: 2 1\nSorted: 1 2\nComparisons: 1"
-        },
-        {
-          "test": 3,
-          "actual": "Heap after build: \nSorted: \nComparisons: 0",
-          "expected": "Heap after build: 4 4 4 4\nSorted: 4 4 4 4\nComparisons: 6"
-        },
-        {
-          "test": 4,
-          "actual": "Heap after build: \nSorted: \nComparisons: 0",
-          "expected": "Heap after build: 10 9 8 7 6 5 4 3 2 1\nSorted: 1 2 3 4 5 6 7 8 9 10\nComparisons: 35"
-        },
-        {
-          "test": 5,
-          "actual": "Heap after build: \nSorted: \nComparisons: 0",
-          "expected": "Heap after build: 42\nSorted: 42\nComparisons: 0"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1919,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-030",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 368
+      "verdict": "GENUINE",
+      "src_len": 1010,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-031",
@@ -11995,8 +12864,13 @@
     {
       "id": "SCI-034",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 449
+      "verdict": "GENUINE",
+      "src_len": 1136,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-035",
@@ -12065,26 +12939,24 @@
     {
       "id": "SCI-042",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 416,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "0 1 2 3 5 8 13 21 34 55 89",
-          "expected": "0 1 1 2 3 5 8 13 21 34 55"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "0 1 1 2 3 5 8"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 281,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-043",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 568
+      "verdict": "GENUINE",
+      "src_len": 1117,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-044",
@@ -12149,8 +13021,13 @@
     {
       "id": "SCI-052",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 471
+      "verdict": "GENUINE",
+      "src_len": 856,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-053",
@@ -12173,26 +13050,24 @@
     {
       "id": "SCI-056",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 658,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "GCD: 6 LCM: 36\nSteps: gcd(12,18) gcd(18,12) gcd(12,6) gcd(6,0)=6",
-          "expected": "GCD: 6 LCM: 36\nSteps: gcd(18,12) gcd(12,6) gcd(6,0)=6"
-        },
-        {
-          "test": 2,
-          "actual": "GCD: 4 LCM: 8\nSteps: gcd(4,8) gcd(8,4) gcd(4,0)=4",
-          "expected": "GCD: 4"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1121,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-057",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 485
+      "verdict": "GENUINE",
+      "src_len": 765,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-058",
@@ -12203,14 +13078,24 @@
     {
       "id": "SCI-059",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 967
+      "verdict": "GENUINE",
+      "src_len": 954,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-060",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 182
+      "verdict": "GENUINE",
+      "src_len": 614,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-061",
@@ -12263,30 +13148,13 @@
     {
       "id": "SCI-067",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1277,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "Divided Difference Table:\n1.000000 1.000000 7.000000 7.000000\n2.000000 8.000000 28.000000\n4.000000 64.000000\np(3) = 29.0"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "Divided Difference Table:\n0.000000 1.000000 4.000000\n2.000000 9.000000\np(1) = 5.000000"
-        },
-        {
-          "test": 3,
-          "actual": "",
-          "expected": "Divided Difference Table:\n1.000000 1.000000 3.000000 1.000000 0.000000\n2.000000 4.000000 5.000000 1.000000\n3.000000 9.00"
-        },
-        {
-          "test": 4,
-          "actual": "",
-          "expected": "Divided Difference Table:\n0.000000 1.000000 1.000000 1.000000\n1.000000 2.000000 3.000000\n2.000000 5.000000\np(0.5) = 1.25"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1611,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-068",
@@ -12368,8 +13236,13 @@
     {
       "id": "SCI-074",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 608
+      "verdict": "GENUINE",
+      "src_len": 1125,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-075",
@@ -12446,38 +13319,46 @@
     {
       "id": "SCI-085",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 453,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "error",
-          "expected": "Result: 1024"
-        },
-        {
-          "test": 2,
-          "actual": "error",
-          "expected": "Result: 976371285"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 885,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-086",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 714
+      "verdict": "GENUINE",
+      "src_len": 817,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-087",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 751
+      "verdict": "GENUINE",
+      "src_len": 549,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-088",
       "category": "scientific-math",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 234
+      "verdict": "GENUINE",
+      "src_len": 466,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-089",
@@ -12536,20 +13417,35 @@
     {
       "id": "SCI-096",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1404
+      "verdict": "GENUINE",
+      "src_len": 1179,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-097",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 362
+      "verdict": "GENUINE",
+      "src_len": 630,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-098",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 556
+      "verdict": "GENUINE",
+      "src_len": 495,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-099",
@@ -12571,21 +13467,24 @@
     {
       "id": "SCI-101",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 389
+      "verdict": "GENUINE",
+      "src_len": 533,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-102",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 835,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "odd\neven"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 907,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-103",
@@ -12602,8 +13501,13 @@
     {
       "id": "SCI-105",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 575
+      "verdict": "GENUINE",
+      "src_len": 1507,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-106",
@@ -12614,8 +13518,13 @@
     {
       "id": "SCI-107",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 603
+      "verdict": "GENUINE",
+      "src_len": 1576,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-108",
@@ -12632,8 +13541,13 @@
     {
       "id": "SCI-110",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 589
+      "verdict": "GENUINE",
+      "src_len": 1089,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-111",
@@ -12650,14 +13564,24 @@
     {
       "id": "SCI-113",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 322
+      "verdict": "GENUINE",
+      "src_len": 911,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-114",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1069
+      "verdict": "GENUINE",
+      "src_len": 941,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-115",
@@ -12674,14 +13598,24 @@
     {
       "id": "SCI-117",
       "category": "scientific-math",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 198
+      "verdict": "GENUINE",
+      "src_len": 777,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-118",
       "category": "scientific-math",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 134
+      "verdict": "GENUINE",
+      "src_len": 1295,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-119",
@@ -12705,8 +13639,13 @@
     {
       "id": "SCI-121",
       "category": "scientific-math",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1700
+      "verdict": "GENUINE",
+      "src_len": 1143,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SCI-122",
@@ -12735,20 +13674,13 @@
     {
       "id": "SCI-126",
       "category": "scientific-math",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1387,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "2.000000 0.000000 0.000000 0.000000"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "5.000000 -2.000000 -0.707107 -0.707107"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1299,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SCI-127",
@@ -12853,17 +13785,12 @@
       "id": "SEC-011",
       "category": "security",
       "verdict": "REGRESSED-RUN",
-      "src_len": 628,
+      "src_len": 659,
       "failed_tests": [
         {
           "test": 1,
-          "actual": "",
+          "actual": "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;",
           "expected": "&lt;script&gt;"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "sanitised"
         }
       ]
     },
@@ -12888,20 +13815,13 @@
     {
       "id": "SEC-013",
       "category": "security",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1370,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "<p>Hello  World</p>"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "<a>Click</a>"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2190,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SEC-014",
@@ -12971,13 +13891,9 @@
     {
       "id": "SEC-024",
       "category": "security",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 262,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SEC-025",
@@ -12993,13 +13909,9 @@
     {
       "id": "SEC-026",
       "category": "security",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 285,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SEC-027",
@@ -13079,8 +13991,13 @@
     {
       "id": "SEC-037",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 560
+      "verdict": "GENUINE",
+      "src_len": 664,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SEC-038",
@@ -13097,9 +14014,9 @@
     {
       "id": "SEC-040",
       "category": "security",
-      "verdict": "SUSPECT",
+      "verdict": "TRIVIAL",
       "src_len": 163,
-      "reason": "tiny one-branch"
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SEC-041",
@@ -13335,30 +14252,13 @@
     {
       "id": "SEC-074",
       "category": "security",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 3622,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "FAIL requireUpper,requireLower,requireDigit\nFAIL requireUpper,requireLower,requireDigit,requireSpecial",
-          "expected": "PASS\nFAIL minLength,requireUpper,requireDigit,requireSpecial"
-        },
-        {
-          "test": 2,
-          "actual": "FAIL requireDigit\nFAIL requireDigit",
-          "expected": "FAIL requireDigit\nPASS"
-        },
-        {
-          "test": 3,
-          "actual": "PASS\nFAIL disallowCommon\nPASS",
-          "expected": "FAIL maxRepeating\nFAIL disallowCommon\nPASS"
-        },
-        {
-          "test": 4,
-          "actual": "",
-          "expected": "FAIL minLength,requireUpper,requireSpecial\nPASS\nPASS"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 3734,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SEC-075",
@@ -13381,8 +14281,13 @@
     {
       "id": "SEC-078",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 770
+      "verdict": "GENUINE",
+      "src_len": 627,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SEC-079",
@@ -13577,13 +14482,9 @@
     {
       "id": "SEC-109",
       "category": "security",
-      "verdict": "GENUINE",
+      "verdict": "TRIVIAL",
       "src_len": 409,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SEC-110",
@@ -13813,8 +14714,13 @@
     {
       "id": "SOC-015",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 788
+      "verdict": "GENUINE",
+      "src_len": 588,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-016",
@@ -13831,14 +14737,24 @@
     {
       "id": "SOC-018",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 573
+      "verdict": "GENUINE",
+      "src_len": 728,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-019",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 257
+      "verdict": "GENUINE",
+      "src_len": 981,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-020",
@@ -13849,15 +14765,13 @@
     {
       "id": "SOC-021",
       "category": "social-media",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 160,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"id\":3,\"type\":\"poll\",\"question\":\"Favorite color?\",\"options\":[{\"id\":1,\"text\":\"Red\",\"votes\":0},{\"id\":2,\"text\":\"Blue\",\"vot"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 354,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-022",
@@ -13982,14 +14896,24 @@
     {
       "id": "SOC-040",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 494
+      "verdict": "GENUINE",
+      "src_len": 630,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-041",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 499
+      "verdict": "GENUINE",
+      "src_len": 585,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-042",
@@ -14000,21 +14924,24 @@
     {
       "id": "SOC-043",
       "category": "social-media",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 114,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"post_id\":1,\"liked\":true,\"like_count\":1,\"status\":\"liked\"}"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 511,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-044",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 476
+      "verdict": "GENUINE",
+      "src_len": 668,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-045",
@@ -14091,15 +15018,13 @@
     {
       "id": "SOC-055",
       "category": "social-media",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 162,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"user_id\":5,\"blocked\":false,\"status\":\"unblocked\"}"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 528,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-056",
@@ -14133,8 +15058,13 @@
     {
       "id": "SOC-060",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 557
+      "verdict": "GENUINE",
+      "src_len": 1180,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-061",
@@ -14175,15 +15105,9 @@
     {
       "id": "SOC-067",
       "category": "social-media",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 367,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"post_id\":1,\"comment_policy\":\"followers\",\"status\":\"updated\"}"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 170,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "SOC-068",
@@ -14200,14 +15124,24 @@
     {
       "id": "SOC-070",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 650
+      "verdict": "GENUINE",
+      "src_len": 1306,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-071",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 323
+      "verdict": "GENUINE",
+      "src_len": 617,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-072",
@@ -14224,8 +15158,13 @@
     {
       "id": "SOC-074",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 716
+      "verdict": "GENUINE",
+      "src_len": 757,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-075",
@@ -14265,8 +15204,13 @@
     {
       "id": "SOC-080",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 521
+      "verdict": "GENUINE",
+      "src_len": 852,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-081",
@@ -14277,15 +15221,13 @@
     {
       "id": "SOC-082",
       "category": "social-media",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 67,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"period\":\"7d\",\"data\":[{\"date\":\"2026-01-01\",\"followers\":100,\"gained\":5,\"lost\":1}],\"net_change\":4}"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 840,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-083",
@@ -14333,8 +15275,13 @@
     {
       "id": "SOC-089",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 732
+      "verdict": "GENUINE",
+      "src_len": 687,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-090",
@@ -14358,8 +15305,13 @@
     {
       "id": "SOC-092",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 388
+      "verdict": "GENUINE",
+      "src_len": 1122,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-093",
@@ -14400,8 +15352,13 @@
     {
       "id": "SOC-099",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 439
+      "verdict": "GENUINE",
+      "src_len": 561,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-100",
@@ -14465,8 +15422,13 @@
     {
       "id": "SOC-109",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 530
+      "verdict": "GENUINE",
+      "src_len": 579,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-110",
@@ -14495,8 +15457,13 @@
     {
       "id": "SOC-114",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 759
+      "verdict": "GENUINE",
+      "src_len": 1104,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SOC-115",
@@ -14531,8 +15498,13 @@
     {
       "id": "SOC-120",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 810
+      "verdict": "GENUINE",
+      "src_len": 790,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-121",
@@ -14585,8 +15557,13 @@
     {
       "id": "SOC-129",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 178
+      "verdict": "GENUINE",
+      "src_len": 919,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-130",
@@ -14597,8 +15574,13 @@
     {
       "id": "SOC-131",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 204
+      "verdict": "GENUINE",
+      "src_len": 1187,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-132",
@@ -14645,14 +15627,24 @@
     {
       "id": "SOC-139",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 335
+      "verdict": "GENUINE",
+      "src_len": 703,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-140",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 244
+      "verdict": "GENUINE",
+      "src_len": 480,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-141",
@@ -14681,8 +15673,13 @@
     {
       "id": "SOC-145",
       "category": "social-media",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 254
+      "verdict": "GENUINE",
+      "src_len": 614,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-146",
@@ -14776,20 +15773,9 @@
     {
       "id": "SYS-008",
       "category": "system-tools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 313,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "init: RUNNING\nnonexistentservice123: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STO",
-          "expected": "init: RUNNING\nnonexistentservice123: STOPPED"
-        },
-        {
-          "test": 2,
-          "actual": ": STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n: STOPPED\n",
-          "expected": "(empty output)"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 331,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SYS-009",
@@ -14800,8 +15786,13 @@
     {
       "id": "SYS-010",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 636
+      "verdict": "GENUINE",
+      "src_len": 1266,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-011",
@@ -14896,25 +15887,13 @@
     {
       "id": "SYS-024",
       "category": "system-tools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 731,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "SKIP: /tmp/sys024_src_a\nDone: 1 copied, 1 skipped, 0 deleted",
-          "expected": "SKIP a.txt\nCOPY sub/b.txt\nDone: 1 copied, 1 skipped, 0 deleted"
-        },
-        {
-          "test": 2,
-          "actual": "COPY: /tmp/sys024_src_b\nDELETE: /tmp/sys024_dst_b\nDone: 1 copied, 1 skipped, 1 deleted",
-          "expected": "COPY x.txt\nCOPY y.txt\nDELETE z.txt\nDone: 2 copied, 0 skipped, 1 deleted"
-        },
-        {
-          "test": 3,
-          "actual": "SKIP: /tmp/sys024_src_c\nDone: 1 copied, 1 skipped, 0 deleted",
-          "expected": "COPY only.txt\nDone: 1 copied, 0 skipped, 0 deleted"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 2870,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-025",
@@ -14930,22 +15909,22 @@
       "failed_tests": [
         {
           "test": 1,
-          "actual": "RENAME foo.txt -> @S\ufffd1\u0002\nRENAME bar.txt -> \nSummary: 2 files renamed.",
+          "actual": "RENAME foo.txt -> \ufffd\u0003\ufffd\u0003\ufffd\u0003\ufffd\u0006\ufffd\u0007\ufffd\u0002\ufffd\t\ufffd\n\f\f\\\ufffd\b\u0004\b\b\b\bl\ufffd\u0001\ufffd\u0001\ufffd\u0001\ufffd\u0001\ufffd\u000b\ufffd\u0005\ufffd\u00038\ufffd \ufffd\u0004\ufffd\u0002\ufffd\u0002\ufffd\n\ufffd\t\ufffd\u0003\ufffd.\ufffd\u0011\ufffd\n\ufffd\u0007\ufffd\u0004\ufffd\u0006\ufffd\u0007\ufffd\u0004\ufffd\u0005@\ufffd\b\ufffd\u0005\ufffd\n\ufffd\u0007\b\b\f\ufffd\u0002\f\ufffd\u0002\ufffd\u0001\ufffd\u0003\f\ufffd\u0002\ufffd\u0003\ufffd\u0004",
           "expected": "RENAME foo.txt -> foo.log\nRENAME bar.txt -> bar.log\nSummary: 2 files renamed."
         },
         {
           "test": 2,
-          "actual": "RENAME foo.txt -> \nRENAME bar.txt -> \nSummary: 2 files renamed.",
+          "actual": "RENAME foo.txt -> c\"\ufffd\u0001\u000e\u001d\nRENAME bar.txt -> \"#\ufffd\u0001\u000e\u001d\nSummary: 2 files renamed.",
           "expected": "RENAME bar.txt -> bar.log\nSummary: 1 files renamed."
         },
         {
           "test": 3,
-          "actual": "RENAME report1.dat -> \u001c\ufffdt\u0001\u001e\u0001\ufffd\nRENAME report2.dat -> \ufffd\ufffdt\u0001\u000e\u0001\nSummary: 2 files renamed.",
+          "actual": "RENAME report1.dat -> \u007f\ufffdI\ufffd\ufffd?\ufffd\ufffdz\u052a\ufffd\nRENAME report2.dat -> \ufffd\ufffd-\ufffd\nSummary: 2 files renamed.",
           "expected": "RENAME report1.dat -> final_report1.dat\nRENAME report2.dat -> final_report2.dat\nSummary: 2 files renamed."
         },
         {
           "test": 4,
-          "actual": "RENAME a.txt -> \nRENAME b.txt -> :\nSummary: 2 files renamed.",
+          "actual": "RENAME a.txt -> \u053b\ufffd\u0016\u000f\u0001\nRENAME b.txt -> \ufffd\u0189\u0016\u000f\u0001\nSummary: 2 files renamed.",
           "expected": "RENAME a.txt -> a.log\nRENAME b.txt -> b.log\nSummary: 2 files renamed."
         }
       ]
@@ -14977,26 +15956,24 @@
     {
       "id": "SYS-031",
       "category": "system-tools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 581,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\"host\":\"127.0.0.1\",\"user\":\"frank\",\"method\":\"GET\",\"path\":\"/index.html\",\"status\":200,\"bytes\":2326}"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "{\"month\":\"Jan\",\"day\":1,\"time\":\"00:00:00\",\"host\":\"host\",\"program\":\"kernel\",\"message\":\"message here\"}"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1977,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-032",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 637
+      "verdict": "GENUINE",
+      "src_len": 579,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-033",
@@ -15173,8 +16150,13 @@
     {
       "id": "SYS-059",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 499
+      "verdict": "GENUINE",
+      "src_len": 445,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SYS-060",
@@ -15225,15 +16207,9 @@
     {
       "id": "SYS-064",
       "category": "system-tools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 671,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "{\n  \"a\": 1,\n  \"b\": 2\n}"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 977,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SYS-065",
@@ -15244,32 +16220,35 @@
     {
       "id": "SYS-066",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 935
+      "verdict": "GENUINE",
+      "src_len": 1196,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-067",
       "category": "system-tools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 784,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "foo\nbar\nfoo\nbaz",
-          "expected": "foo\nbar\nbaz"
-        },
-        {
-          "test": 2,
-          "actual": "foo\nbar\nfoo",
-          "expected": "bar\nfoo"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1432,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-068",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 658
+      "verdict": "GENUINE",
+      "src_len": 1072,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-069",
@@ -15603,14 +16582,24 @@
     {
       "id": "SYS-118",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 353
+      "verdict": "GENUINE",
+      "src_len": 963,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SYS-119",
       "category": "system-tools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 604
+      "verdict": "GENUINE",
+      "src_len": 669,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": false
+      }
     },
     {
       "id": "SYS-120",
