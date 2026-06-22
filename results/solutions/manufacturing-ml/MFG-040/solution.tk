@@ -1,1 +1,96 @@
-m=main;f=processstep(step:$str;duration:$i64):$str{let msg=s.concat(s.concat(step;" completed in ");duration) as$str+"ms";<msg};f=main():$str{let steps=@("step1";"step2";"step3"));let durations=@(100;150;200));let result=mut."";lp(let i=0;i<steps.len;i=i+1){let msg=processstep(steps.get(i);durations.get(i)));if(i>0){result=s.concat(result;"\n")};result=s.concat(result;msg)};<result};
+m=cycle;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmtf(x:$f64):$str{
+  let r=s.format(x;"%.12g");
+  if(s.contains(r;".")){<r};
+  <s.concat(r;".0");
+};
+
+f=meanof(a:@($f64)):$f64{
+  let sum=mut.0.0;
+  let i=mut.0;
+  lp(i<a.len()){sum=sum+a.get(i);i=i+1};
+  <sum/s.tofloat(s.fromint(a.len()));
+};
+
+f=stdof(a:@($f64);m:$f64):$f64{
+  let n=a.len();
+  if(n<2){<0.0};
+  let ss=mut.0.0;
+  let i=mut.0;
+  lp(i<n){let d=a.get(i)-m;ss=ss+d*d;i=i+1};
+  let nf=s.tofloat(s.fromint(n-1));
+  <math.sqrt(ss/nf);
+};
+
+f=main():$i64{
+  let header=io.readln();
+  let names=mut.@();
+
+  let line=mut.s.trim(io.readln());
+  let allvals=mut.@();
+  lp(s.len(line)>0){
+    let parts=s.split(line;",");
+    let st=s.trim(parts.get(0));
+    let ct=s.tofloat(s.trim(parts.get(1)));
+    let found=mut.0-1;
+    let j=mut.0;
+    lp(j<names.len()){if(s.equals(names.get(j);st)){found=j};j=j+1};
+    if(found<0){
+      names=names+@(st);
+      allvals=allvals+@(s.fromfloat(ct));
+    }el{
+      allvals=allvals.set(found;s.concat(allvals.get(found);s.concat(";";s.fromfloat(ct))));
+    };
+    line=s.trim(io.readln());
+  };
+
+  let nstations=names.len();
+  let order=mut.@();
+  let a=mut.0;
+  lp(a<nstations){order=order+@(a);a=a+1};
+  let p=mut.0;
+  lp(p<nstations){
+    let q=mut.p+1;
+    lp(q<nstations){
+      let oi=order.get(p);
+      let oj=order.get(q);
+      if(names.get(oj)<names.get(oi)){order=order.set(p;oj);order=order.set(q;oi)};
+      q=q+1;
+    };
+    p=p+1;
+  };
+
+  let out=mut."{\"stations\":[";
+  let bottleneck=mut."";
+  let maxmean=mut.0.0;
+  let k=mut.0;
+  lp(k<nstations){
+    let idx=order.get(k);
+    let valstr=allvals.get(idx);
+    let vparts=s.split(valstr;";");
+    let vals=mut.@();
+    let v=mut.0;
+    lp(v<vparts.len()){vals=vals+@(s.tofloat(vparts.get(v)));v=v+1};
+    let m=meanof(vals);
+    let sd=stdof(vals;m);
+    if(k>0){out=s.concat(out;",")};
+    out=s.concat(out;"{\"station\":\"");
+    out=s.concat(out;names.get(idx));
+    out=s.concat(out;"\",\"mean\":");
+    out=s.concat(out;fmtf(m));
+    out=s.concat(out;",\"std\":");
+    out=s.concat(out;fmtf(sd));
+    out=s.concat(out;"}");
+    if(m>maxmean){maxmean=m;bottleneck=names.get(idx)};
+    k=k+1;
+  };
+  out=s.concat(out;"],\"bottleneck\":\"");
+  out=s.concat(out;bottleneck);
+  out=s.concat(out;"\"}");
+  io.println(out);
+  <0;
+}

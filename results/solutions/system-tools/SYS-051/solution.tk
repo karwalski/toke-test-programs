@@ -1,24 +1,60 @@
-To achieve the task of running two commands, comparing their standard output (stdout) using `diff`, and showing the added, removed, and changed lines, you can follow these steps:
+m=cmddiff;
+i=io:std.io;
+i=s:std.str;
+i=p:std.process;
 
-1. Run the first command and capture its stdout.
-2. Run the second command and capture its stdout.
-3. Use `diff` to compare the two captured stdouts.
-4. Display the output of `diff`, which will show the added, removed, and changed lines.
+f=runcmd(cmd:$str):$str{
+  let h=p.spawn(@("sh";"-c";cmd));
+  let code=p.wait(h);
+  <p.stdout(h);
+};
 
-Here is an example of how you might write a script to perform these steps:
+f=splitlines(text:$str):@($str){
+  let out=mut.@();
+  if(s.len(text)=0){<out};
+  let t=mut.text;
+  if(s.endswith(t;"\n")){t=s.slice(t;0;s.len(t)-1)};
+  let parts=s.split(t;"\n");
+  let i=mut.0;
+  lp(i<parts.len()){out=out+@(parts.get(i));i=i+1};
+  <out;
+};
 
-```bash
-#!/bin/bash
+f=main():$i64{
+  let cmd1=s.trim(io.readln());
+  let cmd2=s.trim(io.readln());
+  let out1=runcmd(cmd1);
+  let out2=runcmd(cmd2);
+  let a=splitlines(out1);
+  let b=splitlines(out2);
+  let na=a.len();
+  let nb=b.len();
 
-# Step 1: Run the first command and capture its stdout
-cmd1="echo Hello from command 1"
-stdout1=$(eval $cmd1)
-
-# Step 2: Run the second command and capture its stdout
-cmd2="echo Hello from command 2"
-stdout2=$(eval $cmd2))
-
-# Step 3: Use diff to compare the two captured stdouts
-diff_output=$(diff <(echo "$stdout1") | (echo "$stdout2") | (echo "$stdout1") | (echo "$stdout2")))
-
-# Step 4: Display the output of diff
+  let printed=mut.0;
+  let i=mut.0;
+  let j=mut.0;
+  lp(i<na){
+    if(j<nb){
+      if(s.equals(a.get(i);b.get(j))){
+        i=i+1;
+        j=j+1;
+      }el{
+        io.println(s.concat("-";a.get(i)));
+        io.println(s.concat("+";b.get(j)));
+        printed=1;
+        i=i+1;
+        j=j+1;
+      };
+    }el{
+      io.println(s.concat("-";a.get(i)));
+      printed=1;
+      i=i+1;
+    };
+  };
+  lp(j<nb){
+    io.println(s.concat("+";b.get(j)));
+    printed=1;
+    j=j+1;
+  };
+  <0;
+}

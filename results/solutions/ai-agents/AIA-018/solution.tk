@@ -1,89 +1,24 @@
-m=selectchunks;
-i=io:std.io;
-i=s:std.str;
-i=j:std.json;
-f=main():$i64{
-    let input=io.readln();
-    let parsed=j.parse(input);
-    let chunks=parsed.get("chunks");
-    let maxtokens=s.toint(parsed.get("max_tokens"));
-    
-    let chunkids=mut.@();
-    let tokencounts=mut.@();
-    let relevancescores=mut.@();
-    
-    lp(let idx=0;idx<chunks.len;idx=idx+1){
-        let chunk=chunks.get(idx);
-        chunkids=chunkids+@(chunk.get("id"));
-        tokencounts=tokencounts+@(s.toint(chunk.get("token_count")));
-        relevancescores=relevancescores+@(s.tofloat(chunk.get("relevance_score")))
-    };
-    
-    let n=chunks.len;
-    let indices=mut.@();
-    lp(let idx=0;idx<n;idx=idx+1){
-        indices=indices+@(idx)
-    };
-    
-    lp(let idx=0;idx<n-1;idx=idx+1){
-        let jdx=mut.idx+1;
-        lp(jdx<n){
-            let idx1=indices.get(idx);
-            let idx2=indices.get(jdx);
-            let score1=relevancescores.get(idx1);
-            let score2=relevancescores.get(idx2);
-            if(score2>score1){
-                let temp=indices.get(idx);
-                let newindices=mut.@();
-                lp(let k=0;k<indices.len;k=k+1){
-                    if(k=idx){
-                        newindices=newindices+@(indices.get(jdx))
-                    }el{
-                        if(k=jdx){
-                            newindices=newindices+@(temp)
-                        }el{
-                            newindices=newindices+@(indices.get(k))
-                        }
-                    }
-                };
-                indices=newindices
-            };
-            jdx=jdx+1
-        }
-    };
-    
-    let selectedids=mut.@();
-    let totaltokens=mut.0;
-    
-    lp(let idx=0;idx<n;idx=idx+1){
-        let realidx=indices.get(idx);
-        let tokens=tokencounts.get(realidx);
-        if(totaltokens+tokens<=maxtokens){
-            selectedids=selectedids+@(chunkids.get(realidx));
-            totaltokens=totaltokens+tokens
-        }
-    };
-    
-    let utilisation=mut.0.0;
-    if(maxtokens>0){
-        utilisation=totaltokens as$f64/maxtokens as$f64
-    };
-    
-    let result=mut."{\"selected\":[";
-    lp(let idx=0;idx<selectedids.len;idx=idx+1){
-        if(idx>0){
-            result=s.concat(result;",")
-        };
-        result=s.concat(result;"\"");
-        result=s.concat(result;selectedids.get(idx));
-        result=s.concat(result;"\"")
-    };
-    result=s.concat(result;"],\"total_tokens\":");
-    result=s.concat(result;s.fromint(totaltokens));
-    result=s.concat(result;",\"utilisation\":");
-    result=s.concat(result;s.fromfloat(utilisation));
-    result=s.concat(result;"}");
-    
-    io.println(result);
-    <0
-}
+m=selectchunks;i=io:std.io;i=s:std.str;
+f=extafter(text:$str;key:$str;startat:$i64):$i64{let kpos=s.indexof(s.slice(text;startat;s.len(text));key);if(kpos<0){<-1};<startat+kpos+s.len(key)};
+f=readnum(text:$str;from:$i64):$str{let i=mut.from;let out=mut."";lp(i<s.len(text)){let c=s.slice(text;i;i+1);if(s.eq(c;",")){br};if(s.eq(c;"}")){br};if(s.eq(c;"]")){br};out=s.concat(out;c);i=i+1};<s.trim(out)};
+f=readstr(text:$str;from:$i64):$str{let i=mut.from;let out=mut."";lp(i<s.len(text)){let c=s.slice(text;i;i+1);if(s.eq(c;"\"")){br};out=s.concat(out;c);i=i+1};<out};
+f=fmtutil(x:$f64):$str{let scaled=x*1000000.0+0.5;let q=scaled as $i64;let ip=q/1000000;let fp=q-ip*1000000;
+let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("0";fs)};
+let trimmed=mut.fs;lp(s.len(trimmed)>1){let last=s.slice(trimmed;s.len(trimmed)-1;s.len(trimmed));if(s.eq(last;"0")){trimmed=s.slice(trimmed;0;s.len(trimmed)-1)}el{br}};
+<s.concat(s.concat(s.fromint(ip);".");trimmed)};
+f=main():$i64{let input=s.trim(io.readln());
+let ids=mut.@("");ids=@();let toks=mut.@(0);toks=@();let rels=mut.@(0.0);rels=@();
+let cur=mut.0;lp(1=1){let idp=extafter(input;"\"id\":\"";cur);if(idp<0){br};let id=readstr(input;idp);
+let tp=extafter(input;"\"token_count\":";idp);let tc=s.toint(readnum(input;tp));
+let rp=extafter(input;"\"relevance_score\":";idp);let rel=s.tofloat(readnum(input;rp));
+ids=ids+@(id);toks=toks+@(tc);rels=rels+@(rel);cur=tp};
+let mp=extafter(input;"\"max_tokens\":";0);let maxtok=s.toint(readnum(input;mp));
+let n=ids.len();
+let order=mut.@(0);order=@();let i=mut.0;lp(i<n){order=order+@(i);i=i+1};
+let a=mut.0;lp(a<n){let b=mut.0;lp(b<n-1){let p=order.get(b);let q=order.get(b+1);if(rels.get(q)>rels.get(p)){let no=mut.@(0);no=@();let k=mut.0;lp(k<n){if(k=b){no=no+@(q)}el{if(k=b+1){no=no+@(p)}el{no=no+@(order.get(k))}};k=k+1};order=no};b=b+1};a=a+1};
+let selected=mut.@("");selected=@();let total=mut.0;
+let z=mut.0;lp(z<n){let ri=order.get(z);if(total+toks.get(ri)<=maxtok){selected=selected+@(ids.get(ri));total=total+toks.get(ri)};z=z+1};
+let util=mut.0.0;if(maxtok>0){util=total as $f64/maxtok as $f64};
+let out=mut."{\"selected\":[";let w=mut.0;lp(w<selected.len()){if(w>0){out=s.concat(out;",")};out=s.concat(out;"\"");out=s.concat(out;selected.get(w));out=s.concat(out;"\"");w=w+1};
+out=s.concat(out;"],\"total_tokens\":");out=s.concat(out;s.fromint(total));out=s.concat(out;",\"utilisation\":");out=s.concat(out;fmtutil(util));out=s.concat(out;"}");
+io.println(out);<0}

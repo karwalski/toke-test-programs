@@ -1,1 +1,116 @@
-m=dt;f=classify(lhs:$i64;rhs:$i64):$str{let acc=mut.lhs;let count=mut.rhs;let result=mut."";if(acc<0){result="defective"}el{if(count<0){result="defective"}el{if(acc>99){result="defective"}el{if(count>99){result="defective"}el{result="functional"}}}};<result};f=buildtree(data:$str):$str{let root=mut."";let branches=mut.@();let i=mut.0;lp(let idx=0;idx<data.len;idx=idx+1){let ch=data.get(idx);if(ch="("){let start=mut.idx;let end=mut.0;let depth=mut.1;lp(let idx2=start+1;idx2<data.len;idx2=idx2+1){let ch2=data.get(idx2);if(ch2="("){depth=depth+1}el{if(ch2=")"){depth=depth-1;if(depth=0){end=idx2;br}}}}};let branch=mut.data.slice(start;end+1);
+m=dt;
+i=io:std.io;
+i=s:std.str;
+
+f=fmtacc(correct:$i64;total:$i64):$str{
+  if(total=0){<"0.0"};
+  if(correct=total){<"1.0"};
+  if(correct=0){<"0.0"};
+  let scaled=(correct*1000000)/total;
+  let ipart=scaled/1000000;
+  let fpart=scaled-ipart*1000000;
+  let fs=mut.s.fromint(fpart);
+  lp(s.len(fs)<6){fs=s.concat("0";fs)};
+  let endd=mut.s.len(fs) as $i64;
+  lp(endd>1){let last=s.slice(fs;(endd-1) as $u64;endd as $u64);if(s.eq(last;"0")){endd=endd-1}el{br}};
+  <s.concat(s.concat(s.fromint(ipart);".");s.slice(fs;0;endd as $u64))
+};
+
+f=main():$i64{
+  let header=s.trim(io.readln());
+  let features=s.split(header;",");
+  let ncols=features.len() as $i64;
+  let labelidx=ncols-1;
+  let rows=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let lt=s.trim(line);
+    if(s.len(lt)=0){br};
+    rows=rows.push(lt)
+  };
+  let nrows=rows.len() as $i64;
+  if(nrows=0){io.println("{\"error\":\"No data\"}");<0};
+  let cells=mut.@();
+  let r=mut.0;
+  lp(r<nrows){cells=cells.push(s.split(rows.get(r as $u64);","));r=r+1};
+  let bestfeat=mut.0-1;
+  let bestval=mut."";
+  let bestpure=mut.0-1;
+  let fi=mut.0;
+  lp(fi<labelidx){
+    let v=mut.0;
+    lp(v<nrows){
+      let fval=cells.get(v as $u64).get(fi as $u64);
+      let lyes=mut.0;let lno=mut.0;let ryes=mut.0;let rno=mut.0;
+      let k=mut.0;
+      lp(k<nrows){
+        let row=cells.get(k as $u64);
+        let cv=row.get(fi as $u64);
+        let lab=row.get(labelidx as $u64);
+        if(s.eq(cv;fval)){
+          if(s.eq(lab;"yes")){lyes=lyes+1}el{lno=lno+1}
+        }el{
+          if(s.eq(lab;"yes")){ryes=ryes+1}el{rno=rno+1}
+        };
+        k=k+1
+      };
+      let ltot=lyes+lno;let rtot=ryes+rno;
+      if(ltot>0){
+        if(rtot>0){
+          let lmax=mut.lyes;if(lno>lyes){lmax=lno};
+          let rmax=mut.ryes;if(rno>ryes){rmax=rno};
+          let pure=lmax+rmax;
+          if(pure>bestpure){
+            bestpure=pure;bestfeat=fi;bestval=fval
+          }
+        }
+      };
+      v=v+1
+    };
+    fi=fi+1
+  };
+  if(bestfeat<0){
+    let yc=mut.0;let nc=mut.0;
+    let k=mut.0;
+    lp(k<nrows){if(s.eq(cells.get(k as $u64).get(labelidx as $u64);"yes")){yc=yc+1}el{nc=nc+1};k=k+1};
+    let lbl=mut."no";if(yc>=nc){lbl="yes"};
+    io.println(s.concat(s.concat("{\"root\":\"";lbl);s.concat("\",\"accuracy\":";s.concat(fmtacc(nrows;nrows);"}"))));
+    <0
+  };
+  let lyes=mut.0;let lno=mut.0;let ryes=mut.0;let rno=mut.0;
+  let k=mut.0;
+  lp(k<nrows){
+    let row=cells.get(k as $u64);
+    let cv=row.get(bestfeat as $u64);
+    let lab=row.get(labelidx as $u64);
+    if(s.eq(cv;bestval)){if(s.eq(lab;"yes")){lyes=lyes+1}el{lno=lno+1}}el{if(s.eq(lab;"yes")){ryes=ryes+1}el{rno=rno+1}};
+    k=k+1
+  };
+  let leftlab=mut."no";if(lyes>=lno){leftlab="yes"};
+  let rightlab=mut."no";if(ryes>=rno){rightlab="yes"};
+  let correct=mut.0;
+  let c2=mut.0;
+  lp(c2<nrows){
+    let row=cells.get(c2 as $u64);
+    let cv=row.get(bestfeat as $u64);
+    let pred=mut.rightlab;
+    if(s.eq(cv;bestval)){pred=leftlab};
+    if(s.eq(pred;row.get(labelidx as $u64))){correct=correct+1};
+    c2=c2+1
+  };
+  let featname=features.get(bestfeat as $u64);
+  let out=mut."{\"root\":{\"feature\":\"";
+  out=s.concat(out;featname);
+  out=s.concat(out;"\",\"split\":\"");
+  out=s.concat(out;bestval);
+  out=s.concat(out;"\",\"left\":\"");
+  out=s.concat(out;leftlab);
+  out=s.concat(out;"\",\"right\":\"");
+  out=s.concat(out;rightlab);
+  out=s.concat(out;"\"},\"accuracy\":");
+  out=s.concat(out;fmtacc(correct;nrows));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

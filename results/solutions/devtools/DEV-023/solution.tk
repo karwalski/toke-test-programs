@@ -1,1 +1,86 @@
-m=buildlog;f=parsephase(line:$str):$str{let parts=line.split(" ");let phase=parts.get(3);<phase};f=extractduration(line:$str):i64{let parts=line.split(" ");let duration=parts.get(1);let num=duration.split("m").get(0);<num.to_i64()};f=buildlogparser(input:$str):$str{let lines=input.split("\n");let durations=mut.@();let phases=mut.@();lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let isphase=line.contains("phase_name:");let isduration=line.contains("HH:MM:SS.mmm");if(isphase){let phase=parsephase(line);phases=phases+@(phase);};if(isduration){let duration=extractduration(line);durations=durations+@(duration);};};let result=mut."";let n=phases.len;lp(let i=0;i<n;i=i+1){let phase=phases.get(i);let duration=durations.get(i);let line=phase+": "+duration+"ms";result=s.concat(s.concat(result;line);"\n");};<result};f=main():$void{let input="HH:MM:SS.mmm phase_name: build";let output=buildlogparser(input);<output};
+m=buildlog;
+i=io:std.io;
+i=s:std.str;
+
+f=parsets(ts:$str):$i64{
+  let dotparts=s.split(ts;".");
+  let timepart=dotparts.get(0);
+  let mspart=dotparts.get(1);
+  let hms=s.split(timepart;":");
+  let h=s.toint(hms.get(0));
+  let m=s.toint(hms.get(1));
+  let sec=s.toint(hms.get(2));
+  let ms=s.toint(mspart);
+  <h*3600000+m*60000+sec*1000+ms
+};
+
+f=main():$i64{
+  let names=mut.@();
+  let starts=mut.@();
+  let ends=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let lt=s.trim(line);
+    if(s.len(lt)=0){br};
+    let parts=s.split(lt;" ");
+    if(parts.len()>=3){
+      let ts=parts.get(0);
+      let pa=parts.get(1);
+      let action=parts.get(2);
+      let phase=s.slice(pa;0;s.len(pa)-1);
+      let ms=parsets(ts);
+      let fidx=mut.0-1;
+      let j=mut.0;
+      lp(j<names.len()){if(s.eq(names.get(j);phase)){fidx=j};j=j+1};
+      if(fidx<0){
+        names=names.push(phase);
+        starts=starts.push(0-1);
+        ends=ends.push(0-1);
+        fidx=(names.len() as $i64)-1
+      };
+      if(s.eq(action;"start")){starts=starts.set(fidx as $u64;ms)};
+      if(s.eq(action;"end")){ends=ends.set(fidx as $u64;ms)}
+    }
+  };
+  let dphase=mut.@();
+  let ddur=mut.@();
+  let total=mut.0;
+  let k=mut.0;
+  lp((k as $u64)<names.len()){
+    let st=starts.get(k as $u64);
+    let en=ends.get(k as $u64);
+    if(st>=0){
+      if(en>=0){
+        let dur=en-st;
+        dphase=dphase.push(names.get(k as $u64));
+        ddur=ddur.push(dur);
+        total=total+dur
+      }
+    };
+    k=k+1
+  };
+  let m2=(dphase.len() as $i64);
+  let a=mut.0;
+  lp(a<m2-1){
+    let b=mut.0;
+    lp(b<m2-1-a){
+      if(ddur.get(b as $u64)<ddur.get((b+1) as $u64)){
+        let tp=dphase.get(b as $u64);let td=ddur.get(b as $u64);
+        dphase=dphase.set(b as $u64;dphase.get((b+1) as $u64));
+        ddur=ddur.set(b as $u64;ddur.get((b+1) as $u64));
+        dphase=dphase.set((b+1) as $u64;tp);
+        ddur=ddur.set((b+1) as $u64;td)
+      };
+      b=b+1
+    };
+    a=a+1
+  };
+  let p=mut.0;
+  lp((p as $u64)<dphase.len()){
+    io.println(s.concat(s.concat(dphase.get(p as $u64);": ");s.concat(s.fromint(ddur.get(p as $u64));"ms")));
+    p=p+1
+  };
+  io.println(s.concat(s.concat("Total: ";s.fromint(total));"ms"));
+  <0
+}

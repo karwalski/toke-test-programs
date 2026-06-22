@@ -1,1 +1,71 @@
-m=jsonschema;f=validatejson(json:$str;schema:$str):bool{let result=mut.true;let msg=mut."";let i=mut.0;let n=json.len;lp(let idx=0;idx<n;idx=idx+1){let ch=json.get(idx);if(ch="\""){let start=idx;let end=mut.start;let found=mut.false;lp(let j=start+1;j<n;j=j+1){let c=json.get(j);if(c="\\"){let next=json.get(j+1);if(next="\""){j=j+1};};}el{if(c="\""){found=true;end=j};};};if(found){let extracted=json.substr(start;end-start+1);let key=mut."";let j=mut.start;lp(let idx=j;idx<n;idx=idx+1){let ch=json.get(idx);if(ch=":"){let k=mut."";let i=mut.idx+1;lp(let j=i;j<n;j=j+1){let c=json.get(j);if(c=","){i=j+1;k="";}el{if(c="}"){i=j+1;k="";};k=k+c
+m=jsonschema;i=io:std.io;i=s:std.str;
+f=extractobj(text:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":{"));
+  let idx=s.indexof(text;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat)-1;
+  let depth=mut.0;
+  let i=mut.start;
+  let n=s.len(text);
+  lp(i<n){
+    let c=s.slice(text;i;i+1);
+    if(s.eq(c;"{")){depth=depth+1};
+    if(s.eq(c;"}")){depth=depth-1;if(depth=0){<s.slice(text;start;i+1)}};
+    i=i+1
+  };
+  <""
+};
+f=extractarr(text:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":["));
+  let idx=s.indexof(text;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(text;start;s.len(text));
+  let bk=s.indexof(after;"]");
+  if(bk<0){<""};
+  <s.slice(after;0;bk)
+};
+f=splitstrlist(arr:$str):@($str){
+  let out=mut.@();
+  let n=s.len(arr);
+  let i=mut.0;
+  let cur=mut."";
+  let inq=mut.false;
+  lp(i<n){
+    let ch=s.slice(arr;i;i+1);
+    if(s.eq(ch;"\"")){
+      if(inq){out=out+@(cur);cur="";inq=false}el{inq=true}
+    }el{
+      if(inq){cur=s.concat(cur;ch)}
+    };
+    i=i+1
+  };
+  <out
+};
+f=haskey(obj:$str;key:$str):$bool{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  <s.indexof(obj;pat)>=0
+};
+f=main():$i64{
+  let schema=s.trim(io.readln());
+  let document=mut."";
+  let tries=mut.0;
+  lp(tries<100){
+    let line=s.trim(io.readln());
+    if(s.len(line)>0){document=line;br};
+    tries=tries+1
+  };
+  let reqarr=extractarr(schema;"required");
+  let reqfields=splitstrlist(reqarr);
+  let errfound=mut.false;
+  lp(let idx=0;idx<reqfields.len();idx=idx+1){
+    let field=reqfields.get(idx);
+    if(!haskey(document;field)){
+      io.println(s.concat("Error: required field '";s.concat(field;"' missing")));
+      errfound=true;
+      br
+    }
+  };
+  if(!errfound){io.println("Valid")};
+  <0
+}

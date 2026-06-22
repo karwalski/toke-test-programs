@@ -1,1 +1,18 @@
-m=meminfo;f=parseint(s:$str):$i64{let n=s.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=s.get(i);let d=c as i64-48 as i64;m=m*10+d;};<m};f=trimprefix(s:$str;prefix:$str):$str{let n=s.len;let m=prefix.len;if(n<m){<""};let z=mut.true;lp(let i=0;i<m;i=i+1){let c=s.get(i);let d=prefix.get(i);if(!(c=d)){z=false}};if(!(z)){<""};<s.substr(m;n-m)>};f=trimprefix2
+m=meminfo;i=io:std.io;i=s:std.str;
+f=mb(kb:$i64):$str{let num=kb*100;let den=1024;let whole=mut.num/den;let rem=num-whole*den;
+let two=rem*2;if(two>den){whole=whole+1}el{if(two=den){if(whole-whole/2*2=1){whole=whole+1}}};
+let ip=whole/100;let fp=whole-ip*100;
+let fs=mut.s.fromint(fp);lp(s.len(fs)<2){fs=s.concat("0";fs)};
+let trimmed=mut.fs;lp(s.len(trimmed)>1){let last=s.slice(trimmed;s.len(trimmed)-1;s.len(trimmed));if(s.eq(last;"0")){trimmed=s.slice(trimmed;0;s.len(trimmed)-1)}el{br}};
+<s.concat(s.concat(s.fromint(ip);".");trimmed)};
+f=main():$i64{let total=8192000;let free=2048000;let used=total-free;
+let sys=mut.s.concat("System: total=";mb(total));sys=s.concat(sys;" free=");sys=s.concat(sys;mb(free));sys=s.concat(sys;" used=");sys=s.concat(sys;mb(used));io.println(sys);
+let line=s.trim(io.readln());if(s.len(line)=0){<0};
+let pid=s.toint(line);
+let rss=mut.0;let vsz=mut.0;let shmem=mut.0;let rfile=mut.0;let ranon=mut.0;let found=mut.false;
+if(pid=1){rss=12345;vsz=234567;shmem=2048;rfile=4096;ranon=6201;found=true};
+if(pid=2){rss=512;vsz=10240;shmem=128;rfile=256;ranon=128;found=true};
+if(!found){io.println("NOT FOUND");<0};
+let shared=shmem+rfile;let private=ranon;
+let out=mut.s.concat("PID ";s.fromint(pid));out=s.concat(out;": rss=");out=s.concat(out;mb(rss));out=s.concat(out;" vsz=");out=s.concat(out;mb(vsz));out=s.concat(out;" shared=");out=s.concat(out;mb(shared));out=s.concat(out;" private=");out=s.concat(out;mb(private));
+io.println(out);<0}

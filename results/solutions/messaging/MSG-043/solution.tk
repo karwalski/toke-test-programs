@@ -1,1 +1,28 @@
-m=csvexport;f=buildcsv(messages:@($str;$str;$str;$str)):$str{let result=mut."id,sender,time,text\n";let i=mut.0;lp(let idx=0;idx<messages.len;idx=idx+1){let msg=messages.get(idx);let escaped=mut.msg.text;let j=mut.0;lp(let k=0;k<escaped.len;k=k+1){let ch=escaped.get(k);if(ch=","){escaped=s.concat(escaped.substr(0;k);escaped.substr(k+1;escaped.len-k-1)));k=k-1;}el{if(ch=""""
+m=csvexport;i=io:std.io;i=s:std.str;
+f=rawend(str:$str;pos:$i64):$i64{let n=s.len(str);let i=mut.pos;lp(i<n){let c=s.slice(str;i;i+1);if(s.equals(c;"\\")){i=i+2}el{if(s.equals(c;"\"")){<i};i=i+1}};<n};
+f=unescape(raw:$str):$str{let out=mut."";let n=s.len(raw);let i=mut.0;lp(i<n){let c=s.slice(raw;i;i+1);if(s.equals(c;"\\")){if(i+1<n){let nx=s.slice(raw;i+1;i+2);out=s.concat(out;nx);i=i+2}el{out=s.concat(out;c);i=i+1}}el{out=s.concat(out;c);i=i+1}};<out};
+f=csvfield(v:$str):$str{let need=mut.false;if(s.contains(v;",")){need=true};if(s.contains(v;"\"")){need=true};if(s.contains(v;"\n")){need=true};if(!need){<v};let out=mut."";let n=s.len(v);let i=mut.0;lp(i<n){let c=s.slice(v;i;i+1);if(s.equals(c;"\"")){out=s.concat(out;"\"\"")}el{out=s.concat(out;c)};i=i+1};<s.concat(s.concat("\"";out);"\"")};
+f=main():$i64{
+let json=io.readln();
+let n=s.len(json);
+io.println("id,sender,time,text");
+let cursor=mut.0;
+let nobj=mut.0;
+let pat=":\"";
+lp(1=1){
+let rel=s.indexof(s.slice(json;cursor;n);pat);
+if(rel<0){br};
+let row=mut."";
+let field=mut.0;
+lp(field<4){
+let rel2=s.indexof(s.slice(json;cursor;n);pat);
+let q=cursor+rel2+2;
+let e=rawend(json;q);
+let val=unescape(s.slice(json;q;e));
+if(field>0){row=s.concat(row;",")};
+row=s.concat(row;csvfield(val));
+cursor=e+1;
+field=field+1};
+io.println(row);
+nobj=nobj+1};
+<0}

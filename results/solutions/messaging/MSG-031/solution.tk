@@ -1,1 +1,17 @@
-m=setup;f=setup(alice:$str;bob:$str):$str{let alicekey=generatekey(alice);let bobkey=generatekey(bob);let aliceephemeral=generateephemeral();let bobephemeral=generateephemeral();let aliceshared=computekey(alicekey;bobephemeral);let bobshared=computekey(bobkey;aliceephemeral);let sessionkey=hashkey(aliceshared;bobshared));let nonce=generatenonce();let ciphertext=encrypt(sessionkey;nonce;alicekey;bobkey));let mac=hashkey(sessionkey;nonce));let result=buildmessage(ciphertext;mac;nonce;alicekey;bobkey));<result};f=generatekey(seed:$str):$str{let hash=hashfunction(seed);let key=extractkey(hash);<key};f=generateephemeral():$str{let ephemeral=generatekey("ephemeral");<ephemeral};f=computekey(shared:$str;ephemeral:$str):$str{let combined=hashfunction(s.concat(shared;ephemeral));let key=extractkey(combined);<key};f=hashfunction(data
+m=x3dh;i=io:std.io;i=s:std.str;i=crypto:std.crypto;i=enc:std.encoding;
+f=hexbyte(n:$i64):$str{let d="0123456789abcdef";let hi=s.slice(d;n/16;n/16+1);let lo=s.slice(d;n-n/16*16;n-n/16*16+1);<s.concat(hi;lo)};
+f=strhex(str:$str):$str{<enc.hexencode(s.bytes(str))};
+f=sha256hex(hexin:$str):$str{<s.frombytes(crypto.sha256(enc.hexdecode(hexin)))};
+f=hmacsha256hex(keyhex:$str;msghex:$str):$str{<s.frombytes(crypto.hmacsha256(enc.hexdecode(keyhex);enc.hexdecode(msghex)))};
+f=simdh(k1:$str;k2:$str):$str{let a=mut.k1;let b=mut.k2;if(s.eq(a;b)){}el{let i=mut.0;let swap=mut.false;let decided=mut.false;lp(i<s.len(a)){if(!decided){let ca=s.slice(a;i;i+1);let cb=s.slice(b;i;i+1);if(!s.eq(ca;cb)){if(!(ca<cb)){swap=true};decided=true}};i=i+1};if(swap){let t=a;a=b;b=t}};<sha256hex(s.concat(a;b))};
+f=hkdf(salthex:$str;ikmhex:$str;infohex:$str):$str{let prk=hmacsha256hex(salthex;ikmhex);let okm=mut."";let t=mut."";let i=mut.1;lp(s.len(okm)<64){let msg=s.concat(s.concat(t;infohex);hexbyte(i));t=hmacsha256hex(prk;msg);okm=s.concat(okm;t);i=i+1};<s.slice(okm;0;64)};
+f=main():$i64{let ikA=s.trim(io.readln());let ikB=s.trim(io.readln());let spkB=s.trim(io.readln());let opkB=s.trim(io.readln());
+let ekA=sha256hex(s.concat(s.concat(strhex("EK_A");ikA);ikB));
+let dh1=simdh(ikA;spkB);let dh2=simdh(ekA;ikB);let dh3=simdh(ekA;spkB);let dh4=simdh(ekA;opkB);
+let shared=s.concat(s.concat(s.concat(dh1;dh2);dh3);dh4);
+let salt="0000000000000000000000000000000000000000000000000000000000000000";
+let info=strhex("X3DH-SHA256");
+let sessionkey=hkdf(salt;shared;info);
+let ad=s.concat(ikA;ikB);
+let out=mut.s.concat("{\"shared_secret\": \"";shared);out=s.concat(out;"\", \"session_key\": \"");out=s.concat(out;sessionkey);out=s.concat(out;"\", \"associated_data\": \"");out=s.concat(out;ad);out=s.concat(out;"\"}");
+io.println(out);<0}

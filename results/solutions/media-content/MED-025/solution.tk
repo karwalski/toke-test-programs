@@ -1,1 +1,62 @@
-m=trigram;f=counttrigrams(text:$str):$str{let trigrams=mut.@();let words=text.split(" ");let n=words.len;lp(let i=0;i<n-2;i=i+1){let w1=words.get(i);let w2=words.get(i+1);let w3=words.get(i+2);let trigram=w1+" "+w2+" "+w3;trigrams=trigrams+@(trigram);};let counts=mut.@();lp(let i=0;i<trigrams.len;i=i+1){let t=trigrams.get(i);let found=mut.false;let j=mut.0;lp(let k=0;k<counts.len;k=k+1){let c=counts.get(k);if(c.trigram=t){found=true;j=k;};};if(found){let c=counts.get(j);c.count=c.count+1;counts.get(j)=c;}el{let newcount=$count{trigram:trigrams.get(i);count:1};counts=counts+@(newcount);};};let result=mut."";lp(let i=0;i<counts.len;i=i+1){let c=counts.get(i
+m=trigram;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let raw=mut."";
+  let line=mut.io.readln();
+  lp(s.len(line)>0){
+    if(s.len(raw)>0){raw=s.concat(raw;" ")};
+    raw=s.concat(raw;s.trim(line));
+    line=io.readln();
+  };
+  let text=s.trim(raw);
+  let words=s.split(text;" ");
+  let n=words.len();
+
+  let uniq=mut.@();
+  let cnts=mut.@();
+
+  if(n>=3){
+    let i=mut.0;
+    lp(i<n-2){
+      let tg=s.concat(words.get(i);s.concat(" ";s.concat(words.get(i+1);s.concat(" ";words.get(i+2)))));
+      let found=mut.0-1;
+      let j=mut.0;
+      lp(j<uniq.len()){
+        if(s.equals(uniq.get(j);tg)){found=j};
+        j=j+1;
+      };
+      if(found<0){
+        uniq=uniq+@(tg);
+        cnts=cnts+@(1);
+      }el{
+        cnts=cnts.set(found;cnts.get(found)+1);
+      };
+      i=i+1;
+    };
+  };
+
+  if(uniq.len()>0){
+    let besti=mut.0;
+    let k=mut.1;
+    lp(k<uniq.len()){
+      let bc=cnts.get(besti);
+      let cc=cnts.get(k);
+      if(cc>bc){
+        besti=k;
+      }el{
+        if(cc=bc){
+          if(uniq.get(k)<uniq.get(besti)){besti=k};
+        };
+      };
+      k=k+1;
+    };
+    let out=mut."\"";
+    out=s.concat(out;uniq.get(besti));
+    out=s.concat(out;"\": ");
+    out=s.concat(out;s.fromint(cnts.get(besti)));
+    io.println(out);
+  };
+  <0;
+}

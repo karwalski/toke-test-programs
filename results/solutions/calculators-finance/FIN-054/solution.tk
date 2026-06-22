@@ -1,1 +1,30 @@
-m=quadfit;f=solve(lhs:@($f64);rhs:@($f64)):($f64):($f64):($f64)){let n=lhs.len;let sumx=mut.0.0;let sumy=mut.0.0;let sumxy=mut.0.0;let sumx2=mut.0.0;lp(let i=0;i<n;i=i+1){let xi=lhs.get(i);let yi=rhs.get(i);sumx=sumx+xi;sumy=sumy+yi;sumxy=sumxy+xi*yi;sumx2=sumx2+xi*xi};let denom=n*sumx2-(sumx*sumx));let a=n*sumxy-(sumy*sumx);let b=n*sumx2-(sumx*sumx);let c=sumy-(a*sumx/b));<a/b;0.0;c};f=main():$i64{let lhs=@(1.0;2.0;3.0;4.0));let rhs=@(2.1;4.9;8.1;16.0));let result=solve(lhs;rhs);<0};
+m=quadfit;i=io:std.io;i=s:std.str;
+f=absf(x:$f64):$f64{if(x<0.0){<0.0-x};<x};
+f=main():$i64{
+let xp=s.split(s.trim(io.readln());",");let yp=s.split(s.trim(io.readln());",");
+let xs=mut.@(0.0);let i=mut.0;lp(i<xp.len){xs=xs+@(s.tofloat(s.trim(xp.get(i))));i=i+1};
+let ys=mut.@(0.0);let j=mut.0;lp(j<yp.len){ys=ys+@(s.tofloat(s.trim(yp.get(j))));j=j+1};
+let n=xp.len;
+let sx4=mut.0.0;let sx3=mut.0.0;let sx2=mut.0.0;let sx1=mut.0.0;let sx2y=mut.0.0;let sxy=mut.0.0;let sy=mut.0.0;
+let k=mut.0;lp(k<n){let x=xs.get(k+1);let y=ys.get(k+1);let x2=x*x;let x3=x2*x;let x4=x3*x;sx4=sx4+x4;sx3=sx3+x3;sx2=sx2+x2;sx1=sx1+x;sx2y=sx2y+x2*y;sxy=sxy+x*y;sy=sy+y;k=k+1};
+let nf=n as$f64;
+let a00=mut.sx4;let a01=mut.sx3;let a02=mut.sx2;let b0=mut.sx2y;
+let a10=mut.sx3;let a11=mut.sx2;let a12=mut.sx1;let b1=mut.sxy;
+let a20=mut.sx2;let a21=mut.sx1;let a22=mut.nf;let b2=mut.sy;
+let t=mut.0.0;
+if(absf(a10)>absf(a00)){t=a00;a00=a10;a10=t;t=a01;a01=a11;a11=t;t=a02;a02=a12;a12=t;t=b0;b0=b1;b1=t};
+if(absf(a20)>absf(a00)){t=a00;a00=a20;a20=t;t=a01;a01=a21;a21=t;t=a02;a02=a22;a22=t;t=b0;b0=b2;b2=t};
+let c1=a10/a00;a10=0.0;a11=a11-c1*a01;a12=a12-c1*a02;b1=b1-c1*b0;
+let c2=a20/a00;a20=0.0;a21=a21-c2*a01;a22=a22-c2*a02;b2=b2-c2*b0;
+if(absf(a21)>absf(a11)){t=a11;a11=a21;a21=t;t=a12;a12=a22;a22=t;t=b1;b1=b2;b2=t};
+let c3=a21/a11;a21=0.0;a22=a22-c3*a12;b2=b2-c3*b1;
+let coefc=mut.b2/a22;
+let coefb=mut.(b1-a12*coefc)/a11;
+let coefa=mut.(b0-a01*coefb-a02*coefc)/a00;
+if(absf(coefa)<0.00005){coefa=0.0};
+if(absf(coefb)<0.00005){coefb=0.0};
+if(absf(coefc)<0.00005){coefc=0.0};
+io.println(s.format(coefa;"%.4f"));
+io.println(s.format(coefb;"%.4f"));
+io.println(s.format(coefc;"%.4f"));
+<0}

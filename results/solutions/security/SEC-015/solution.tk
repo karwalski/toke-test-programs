@@ -1,1 +1,16 @@
-m=audit;f=trim(s:$str):$str{let len=s.len;let start=mut.0;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(!(c=32 as u8))el{start=i+1};};let end=mut.len;lp(let i=len-1;!(i<0);i=i-1){let c=s.get(i);if(!(c=32 as u8))el{end=i-1};};let result=mut."";lp(let i=start;i<end+1;i=i+1){result=s.concat(result;s.get(i))as$str;};<result};f=isempty(s:$str):bool{let len=s.len;if(len=0){<true};<false};f=contains(s:$str;sub:$str):bool{let len=s.len;let sublen=sub.len;if(len<sublen){<false};let found=mut.false;lp(let i=0;i<len-sublen+1;i=i+1){let match=mut.true;lp(let j=0;j<sublen;j=j+1){let sc=s.get(i+j);let subc=sub.get(j);if(!(
+m=audit;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let inner=s.trim(s.slice(input;1;s.len(input)-1));
+  if(s.len(inner)=0){io.println("No findings");<0};
+  let low=s.lower(input);
+  if(s.contains(low;"\"severity\":\"high\"")){io.println("CRITICAL");<0};
+  if(s.contains(low;"\"severity\": \"high\"")){io.println("CRITICAL");<0};
+  if(s.contains(low;"\"severity\":\"medium\"")){io.println("MEDIUM");<0};
+  if(s.contains(low;"\"severity\": \"medium\"")){io.println("MEDIUM");<0};
+  io.println("LOW");
+  <0
+}

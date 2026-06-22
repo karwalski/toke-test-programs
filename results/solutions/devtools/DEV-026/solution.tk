@@ -1,1 +1,51 @@
-m=arrcount;f=arrcount(arr:@$i64;val:$i64):$i64{let count=mut.0;lp(let i=0;i<arr.len;i=i+1){if(arr.get(i)=val){count=count+1};};<count};f=main():$i64{let arr=@(10;20;30;10;20;10));let val=10;let result=arrcount(arr;val);<0};
+m=memest;
+i=io:std.io;
+i=s:std.str;
+
+f=annotate(line:$str):$str{
+  let sep=s.indexof(line;" * ");
+  if(sep<0){<line};
+  let before=s.slice(line;0;sep as $u64);
+  let after=s.slice(line;(sep as $u64)+3;s.len(line));
+  let numpart=mut.after;
+  let bpos=s.indexof(numpart;"]");
+  if(bpos>=0){numpart=s.slice(numpart;0;bpos as $u64)};
+  numpart=s.trim(numpart);
+  let digits=mut."";
+  let i=mut.0;
+  lp((i as $u64)<s.len(numpart)){
+    let c=s.slice(numpart;i as $u64;(i as $u64)+1);
+    if(s.contains("0123456789";c)){digits=s.concat(digits;c)}el{i=s.len(numpart) as $i64};
+    i=i+1
+  };
+  if(s.len(digits)=0){<line};
+  let count=s.toint(digits);
+  let perelem=mut.1;
+  if(s.contains(before;"[")){perelem=8};
+  let bytes=count*perelem;
+  let note=mut."";
+  if(bytes>=1000000){
+    let mb=bytes/1000000;
+    note=s.concat(s.concat("  # ~";s.fromint(mb));"MB")
+  }el{
+    if(bytes>=1024){
+      let kb=bytes/1024;
+      note=s.concat(s.concat("  # ~";s.fromint(kb));"KB")
+    }
+  };
+  <s.concat(line;note)
+};
+
+f=main():$i64{
+  let lang=s.trim(io.readln());
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    if(s.eq(lang;"python")){
+      io.println(annotate(line))
+    }el{
+      io.println(line)
+    }
+  };
+  <0
+}

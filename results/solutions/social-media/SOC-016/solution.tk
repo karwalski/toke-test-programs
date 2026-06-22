@@ -1,1 +1,17 @@
-m=notes;f=addnote(title:$str;content:$str):$void{let note=mut."";note=s.concat(s.concat(title;" : ");content);<note};
+m=post;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<""};let colon=s.indexof(s.slice(json;kp;n);":");let q1=s.indexof(s.slice(json;kp+colon;n);"\"");let start=kp+colon+q1+1;let rest=s.slice(json;start;n);let q2=s.indexof(rest;"\"");<s.slice(rest;0;q2)};
+f=getarr(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<"[]"};let ob=s.indexof(s.slice(json;kp;n);"[");let start=kp+ob;let cb=s.indexof(s.slice(json;start;n);"]");<s.slice(json;start;start+cb+1)};
+f=main():$i64{
+let json=s.trim(io.readln());
+let content=getstr(json;"\"content\"");
+let tags=getarr(json;"\"tags\"");
+let vis=getstr(json;"\"visibility\"");
+let out=mut."{\"id\":1,\"content\":\"";
+out=s.concat(out;content);
+out=s.concat(out;"\",\"tags\":");
+out=s.concat(out;tags);
+out=s.concat(out;",\"visibility\":\"");
+out=s.concat(out;vis);
+out=s.concat(out;"\",\"created_at\":\"2026-01-01T00:00:00Z\",\"status\":\"created\"}");
+io.println(out);
+<0}

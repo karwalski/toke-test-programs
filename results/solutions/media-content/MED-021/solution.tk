@@ -1,1 +1,67 @@
-m=bibsort;f=sortbyauthor(b:$str):$str{let lines=b.split("\n");let n=lines.len;let sorted=mut.@();lp(let i=0;i<n;i=i+1){let line=lines.get(i);let lastcomma=line.lastIndexOf(",");let lastname=line.substring(lastcomma+1;line.len);let trimmedname=lastname.trim();sorted=sorted+@(s.concat(trimmedname;" ")+line));};let result=mut."";lp(let i=0;i<sorted.len;i=i+1){let entry=sorted.get(i);let islast=i=sorted.len-1;if(!(islast)){result=result+entry+"\n";}el{result=result+entry;};};<result};
+m=bibsort;
+i=io:std.io;
+i=s:std.str;
+
+f=charcode(c:$str):$i64{
+  let digits="0123456789";
+  let upper="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let lower="abcdefghijklmnopqrstuvwxyz";
+  let d=s.indexof(digits;c);if(d>=0){<48+d};
+  let u=s.indexof(upper;c);if(u>=0){<65+u};
+  let l=s.indexof(lower;c);if(l>=0){<97+l};
+  if(s.eq(c;" ")){<32};
+  if(s.eq(c;",")){<44};
+  if(s.eq(c;".")){<46};
+  <0
+};
+
+f=strless(a:$str;b:$str):$bool{
+  let la=s.len(a) as $i64;
+  let lb=s.len(b) as $i64;
+  let n=mut.la;
+  if(lb<la){n=lb};
+  let i=mut.0;
+  lp(i<n){
+    let ca=charcode(s.slice(a;i as $u64;(i+1) as $u64));
+    let cb=charcode(s.slice(b;i as $u64;(i+1) as $u64));
+    if(ca<cb){<true};
+    if(ca>cb){<false};
+    i=i+1
+  };
+  <la<lb
+};
+
+f=keyof(line:$str):$str{
+  let parts=s.split(line;",");
+  <parts.get(0)
+};
+
+f=main():$i64{
+  let lines=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    if(s.len(s.trim(line))>0){lines=lines.push(line)}
+  };
+  let n=lines.len() as $i64;
+  let i=mut.0;
+  lp(i<n-1){
+    let j=mut.0;
+    lp(j<n-1-i){
+      let a=lines.get(j as $u64);
+      let b=lines.get((j+1) as $u64);
+      if(strless(keyof(b);keyof(a))){
+        lines=lines.set(j as $u64;b);
+        lines=lines.set((j+1) as $u64;a)
+      };
+      j=j+1
+    };
+    i=i+1
+  };
+  let k=mut.0;
+  lp((k as $u64)<lines.len()){
+    io.println(lines.get(k as $u64));
+    k=k+1
+  };
+  <0
+}

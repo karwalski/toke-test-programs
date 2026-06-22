@@ -1,1 +1,115 @@
-m=astar;i=io:std.io;i=s:std.str;f=abs(n:$i64):$i64{if(n<0){<0-n};<n};f=manhattan(x1:$i64;y1:$i64;x2:$i64;y2:$i64):$i64{<abs(x2-x1)+abs(y2-y1)};f=inbounds(x:$i64;y:$i64;w:$i64;h:$i64):$bool{if(x>=0){if(x<w){if(y>=0){if(y<h){<(1=1)}}}};< (1=0)};f=getgrid(grid:array;x:$i64;y:$i64;w:$i64):$str{<grid.get(y*w+x)};f=findnode(open:array;x:$i64;y:$i64):$i64{let idx=mut.0;lp(idx<open.len()){let coords=s.split(open.get(idx);",");if(coords.len()>=2){let nx=s.toint(coords.get(0));let ny=s.toint(coords.get(1));if(nx=x){if(ny=y){<idx}}};idx=idx+1};<0-1};f=addopen(open:array;coord:$str):array{let result=mut.@();let idx=mut.0;lp(idx<open.len()){result=@(result;open.get(idx));idx=idx+1};result=@(result;coord);<result};f=rmopen(open:array;rmidx:$i64):array{let result=mut.@();let idx=mut.0;lp(idx<open.len()){if(idx!=rmidx){result=@(result;open.get(idx))};idx=idx+1};<result};f=findmin(open:array;fvals:array):$i64{let minf=mut.9999999;let minidx=mut.0;let idx=mut.0;lp(idx<fvals.len()){if(fvals.get(idx)<minf){minf=fvals.get(idx);minidx=idx};idx=idx+1};<minidx};f=inclosed(closed:array;x:$i64;y:$i64):$bool{let idx=mut.0;lp(idx<closed.len()){let coords=s.split(closed.get(idx);",");if(coords.len()>=2){let nx=s.toint(coords.get(0));let ny=s.toint(coords.get(1));if(nx=x){if(ny=y){<(1=1)}}};idx=idx+1};<(1=0)};f=makecoord(x:$i64;y:$i64):$str{let xs=s.fromint(x);let ys=s.fromint(y);let tmp=s.concat(xs;",");<s.concat(tmp;ys)};f=buildpath(parents:array;endx:$i64;endy:$i64):array{let path=mut.@();let coord=mut.makecoord(endx;endy);path=@(path;coord);let idx=mut.0;lp(idx<parents.len()){let parts=s.split(parents.get(idx);"->");if(parts.len()>=2){let child=parts.get(0);let parent=parts.get(1);if(child=coord){if(parent="start"){br};coord=parent;path=@(path;coord);idx=0-1}};idx=idx+1};let result=mut.@();let ridx=mut.path.len()-1;lp(ridx>=0){result=@(result;path.get(ridx));ridx=ridx-1};<result};f=makeparent(child:$str;parent:$str):$str{let tmp=s.concat(child;"->");<s.concat(tmp;parent)};f=astar(grid:array;w:$i64;h:$i64;sx:$i64;sy:$i64;ex:$i64;ey:$i64):array{let open=mut.@();let openf=mut.@();let closed=mut.@();let parents=mut.@();let start=makecoord(sx;sy);open=addopen(open;start);let sh=manhattan(sx;sy;ex;ey);openf=@(openf;sh);lp(open.len()>0){let curidx=findmin(open;openf);let cur=open.get(curidx);let curf=openf.get(curidx);open=rmopen(open;curidx);let newopenf=mut.@();let idx=mut.0;lp(idx<openf.len()){if(idx!=curidx){newopenf=@(newopenf;openf.get(idx))};idx=idx+1};openf=newopenf;closed=@(closed;cur);let coords=s.split(cur;",");let curx=s.toint(coords.get(0));let cury=s.toint(coords.get(1));if(curx=ex){if(cury=ey){<buildpath(parents;ex;ey)}};let dx=@(0-1;1;0;0);let dy=@(0;0;0-1;1);let dir=mut.0;lp(dir<4){let nx=curx+dx.get(dir);let ny=cury+dy.get(dir);if(inbounds(nx;ny;w;h)){if(getgrid(grid;nx;ny;w)!="#"){if(inclosed(closed;nx;ny)=(1=0)){let neighbor=makecoord(nx;ny);let ng=curf-manhattan(curx;cury;ex;ey)+1;let nh=manhattan(nx;ny;ex;ey);let nf=ng+nh;let openidx=findnode(open;nx;ny);if(openidx=0-1){open=addopen(open;neighbor);openf=@(openf;nf);let pentry=makeparent(neighbor;cur);parents=@(parents;pentry)}el{if(ng<openf.get(openidx)-nh){let newopenf2=mut.@();let idx2=mut.0;lp(idx2<openf.len()){if(idx2=openidx){newopenf2=@(newopenf2;nf)}el{newopenf2=@(newopenf2;openf.get(idx2))};idx2=idx2+1};openf=newopenf2;let newparents=mut.@();let pidx=mut.0;lp(pidx<parents.len()){let pparts=s.split(parents.get(pidx);"->");if(pparts.len()>=2){if(pparts.get(0)=neighbor){let newpentry=makeparent(neighbor;cur);newparents=@(newparents;newpentry)}el{newparents=@(newparents;parents.get(pidx))}}el{newparents=@(newparents;parents.get(pidx))};pidx=pidx+1};parents=newparents}}}}};dir=dir+1}};<@()};f=formatcoord(coord:$str):$str{let parts=s.split(coord;",");let result=mut."(?,?)";if(parts.len()>=2){let x=parts.get(0);let y=parts.get(1);let tmp1=s.concat("(";x);let tmp2=s.concat(tmp1;",");let tmp3=s.concat(tmp2;y);result=s.concat(tmp3;")")};< result};f=main():$i64{let line1=io.readln();let dims=s.split(line1;" ");let w=s.toint(dims.get(0));let h=s.toint(dims.get(1));let grid=mut.@();let row=mut.0;lp(row<h){let line=io.readln();let col=mut.0;lp(col<w){grid=@(grid;s.slice(line;col;col+1));col=col+1};row=row+1};let startline=io.readln();let startpos=s.split(startline;" ");let sx=s.toint(startpos.get(0));let sy=s.toint(startpos.get(1));let endline=io.readln();let endpos=s.split(endline;" ");let ex=s.toint(endpos.get(0));let ey=s.toint(endpos.get(1));let path=astar(grid;w;h;sx;sy;ex;ey);if(path.len()>0){let output=mut."Path: ";let idx=mut.0;lp(idx<path.len()){if(idx>0){output=s.concat(output;" ")};let fcoord=formatcoord(path.get(idx));output=s.concat(output;fcoord);idx=idx+1};let coststr=s.fromint(path.len()-1);let tmp=s.concat(" Cost: ";coststr);output=s.concat(output;tmp);io.println(output)}el{io.println("No path found")};<0}
+m=astar;
+i=io:std.io;
+i=s:std.str;
+
+f=absi(n:$i64):$i64{if(n<0){<0-n};<n};
+
+f=main():$i64{
+  let dims=s.split(s.trim(io.readln());" ");
+  let rows=s.toint(dims.get(0));
+  let cols=s.toint(dims.get(1));
+  let grid=mut.@();
+  let r=mut.0;
+  lp(r<rows){grid=grid.push(io.readln());r=r+1};
+  let sp=s.split(s.trim(io.readln());" ");
+  let sr=s.toint(sp.get(0));
+  let scol=s.toint(sp.get(1));
+  let ep=s.split(s.trim(io.readln());" ");
+  let er=s.toint(ep.get(0));
+  let ec=s.toint(ep.get(1));
+  let total=rows*cols;
+  let inf=99999999;
+  let g=mut.@();
+  let camer=mut.@();
+  let camec=mut.@();
+  let q=mut.0;
+  lp(q<total){g=g.push(inf);camer=camer.push(0-1);camec=camec.push(0-1);q=q+1};
+  let startid=sr*cols+scol;
+  g=g.set(startid as $u64;0);
+  let openr=mut.@();
+  let openc=mut.@();
+  let openf=mut.@();
+  openr=openr.push(sr);openc=openc.push(scol);
+  openf=openf.push(absi(sr-er)+absi(scol-ec));
+  let found=mut.0;
+  lp(openr.len()>0){
+    let n=openr.len() as $i64;
+    let besti=mut.0;
+    let bestf=mut.openf.get(0);
+    let bestr=mut.openr.get(0);
+    let bestc=mut.openc.get(0);
+    let i=mut.1;
+    lp(i<n){
+      let cf=openf.get(i as $u64);
+      let cr=openr.get(i as $u64);
+      let cc=openc.get(i as $u64);
+      let better=mut.0;
+      if(cf<bestf){better=1}el{
+        if(cf=bestf){
+          if(cr<bestr){better=1}el{
+            if(cr=bestr){if(cc<bestc){better=1}}
+          }
+        }
+      };
+      if(better=1){besti=i;bestf=cf;bestr=cr;bestc=cc};
+      i=i+1
+    };
+    let curr=openr.get(besti as $u64);
+    let curc=openc.get(besti as $u64);
+    let newr=mut.@();let newc=mut.@();let newf=mut.@();
+    let k=mut.0;
+    lp(k<n){
+      if(k!=besti){newr=newr.push(openr.get(k as $u64));newc=newc.push(openc.get(k as $u64));newf=newf.push(openf.get(k as $u64))};
+      k=k+1
+    };
+    openr=newr;openc=newc;openf=newf;
+    if(curr=er){if(curc=ec){found=1}};
+    if(found=1){br};
+    let dr=@(0;0;1;0-1);
+    let dc=@(1;0-1;0;0);
+    let d=mut.0;
+    lp(d<4){
+      let nr=curr+dr.get(d as $u64);
+      let nc=curc+dc.get(d as $u64);
+      let ok=mut.0;
+      if(nr>=0){if(nr<rows){if(nc>=0){if(nc<cols){ok=1}}}};
+      if(ok=1){
+        let cell=s.slice(grid.get(nr as $u64);nc as $u64;(nc+1) as $u64);
+        if(s.eq(cell;"#")=false){
+          let curid=curr*cols+curc;
+          let nid=nr*cols+nc;
+          let tg=g.get(curid as $u64)+1;
+          if(tg<g.get(nid as $u64)){
+            camer=camer.set(nid as $u64;curr);
+            camec=camec.set(nid as $u64;curc);
+            g=g.set(nid as $u64;tg);
+            let nf=tg+absi(nr-er)+absi(nc-ec);
+            openr=openr.push(nr);openc=openc.push(nc);openf=openf.push(nf)
+          }
+        }
+      };
+      d=d+1
+    }
+  };
+  if(found=0){io.println("NO PATH");<0};
+  let pr=mut.@();let pc=mut.@();
+  let cr2=mut.er;let cc2=mut.ec;
+  lp(1=1){
+    pr=pr.push(cr2);pc=pc.push(cc2);
+    if(cr2=sr){if(cc2=scol){br}};
+    let id=cr2*cols+cc2;
+    let ppr=camer.get(id as $u64);
+    let ppc=camec.get(id as $u64);
+    if(ppr<0){br};
+    cr2=ppr;cc2=ppc
+  };
+  let out=mut."Path:";
+  let m=mut.(pr.len() as $i64)-1;
+  lp(m>=0){
+    out=s.concat(out;s.concat(" (";s.concat(s.fromint(pr.get(m as $u64));s.concat(",";s.concat(s.fromint(pc.get(m as $u64));")")))));
+    m=m-1
+  };
+  out=s.concat(out;s.concat(" Cost: ";s.fromint(g.get((er*cols+ec) as $u64))));
+  io.println(out);
+  <0
+}

@@ -1,1 +1,36 @@
-m=yamltojson;f=main():$i64{let y=std.io:readline();let j=mut.std.json:newobj();let keys=yamlkeys(y);let n=keys.len;lp(let i=0;i<n;i=i+1){let key=keys.get(i);let val=yamlval(y;key);std.json:set(j;key;val);};let out=std.json:tojson(j);std.io:print(out);<0};f=yamlkeys(y:$str):@$str{let lines=yamllines(y);let n=lines.len;let keys=mut.@();lp(let i=0;i<n;i=i+1){let line=lines.get(i);let iskey=mut.false;let idx=mut.0;lp(let j=0;j<line.len;j=j+1){let c=line.get(j);if(c=":"){iskey=true;idx=j};};if(iskey){let key=trimkey(line;idx);keys=keys+@(key)};};<keys};f=yamllines(y:$str):@$str{let lines=mut.@();let current=mut."";lp(let i=0;i<y.len;i=i+1){let c=y.get(i);if(c="\n"){lines=lines+@(current);current="";}el{current=current+c;};};if(!(current="")){lines=lines+@(current);};<lines};f=yamlval(y:$str;key:$str):$str{let lines=yamllines(y);let n=lines.len;lp(let i=0;i<n;i=i+1){let line=lines.get(i);let trimmed=trimkey(line;key.len);if(trimmed=key){let val=trimval(line;key.len);<val};};<""};f=trimkey(line:$str;len:i64):$str{let trimmed=mut."";let i
+m=yamltojson;i=io:std.io;i=s:std.str;
+f=isint(v:$str):$bool{let n=s.len(v);if(n=0){<false};let st=mut.0;if(s.equals(s.slice(v;0;1);"-")){if(n=1){<false};st=1};let i=mut.st;lp(i<n){let c=s.slice(v;i;i+1);if(s.indexof("0123456789";c)<0){<false};i=i+1};<true};
+f=isfloat(v:$str):$bool{if(!s.contains(v;".")){<false};let n=s.len(v);let st=mut.0;let dots=mut.0;if(s.equals(s.slice(v;0;1);"-")){st=1};let i=mut.st;if(i>=n){<false};lp(i<n){let c=s.slice(v;i;i+1);if(s.equals(c;".")){dots=dots+1}el{if(s.indexof("0123456789";c)<0){<false}};i=i+1};if(dots=1){<true};<false};
+f=jsonval(v:$str):$str{if(isint(v)){<v};if(isfloat(v)){<v};<s.concat(s.concat("\"";v);"\"")};
+f=charcode(c:$str):$i64{let tab=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz";let idx=s.indexof(tab;c);if(idx<0){<999};<idx+32};
+f=strgt(a:$str;b:$str):$bool{let na=s.len(a);let nb=s.len(b);let n=mut.na;if(nb<na){n=nb};let i=mut.0;lp(i<n){let ia=charcode(s.slice(a;i;i+1));let ib=charcode(s.slice(b;i;i+1));if(ia>ib){<true};if(ia<ib){<false};i=i+1};if(na>nb){<true};<false};
+f=main():$i64{
+let keys=mut.@("");let vals=mut.@("");let nkeys=mut.0;
+let curlist=mut."";let inlist=mut.false;
+lp(1=1){
+let line=io.readln();
+if(s.len(line)=0){br};
+let trimmed=s.trim(line);
+if(s.len(trimmed)>0){
+if(s.startswith(line;"  - ")){
+let item=s.trim(s.slice(line;4;s.len(line)));
+if(inlist){if(s.len(curlist)>0){curlist=s.concat(curlist;",\n")};curlist=s.concat(curlist;s.concat("    ";jsonval(item)))}
+}el{
+if(s.startswith(line;"  ")){nkeys=nkeys}el{
+let ci=s.indexof(trimmed;":");
+if(ci>=0){
+if(inlist){vals=vals+@(s.concat(s.concat("[\n";curlist);"\n  ]"));inlist=false;curlist=""};
+let k=s.trim(s.slice(trimmed;0;ci));
+let v=s.trim(s.slice(trimmed;ci+1;s.len(trimmed)));
+keys=keys+@(k);
+nkeys=nkeys+1;
+if(s.len(v)>0){vals=vals+@(jsonval(v))}el{inlist=true}
+}}}}};
+if(inlist){vals=vals+@(s.concat(s.concat("[\n";curlist);"\n  ]"));inlist=false};
+let order=mut.@(0);let i=mut.1;lp(i<=nkeys){order=order+@(i);i=i+1};
+let a=mut.0;lp(a<nkeys){let b=mut.1;lp(b<nkeys){let p=order.get(b);let q=order.get(b+1);if(strgt(keys.get(p);keys.get(q))){order=swapidx(order;b)};b=b+1};a=a+1};
+io.println("{");
+let j=mut.0;lp(j<nkeys){let pos=order.get(j+1);let outl=mut.s.concat(s.concat(s.concat("  \"";keys.get(pos));"\": ");vals.get(pos));if(j<nkeys-1){outl=s.concat(outl;",")};io.println(outl);j=j+1};
+io.println("}");
+<0};
+f=swapidx(arr:@$i64;b:$i64):@$i64{let out=mut.@(0);let i=mut.1;lp(i<arr.len){let v=mut.arr.get(i);if(i=b){v=arr.get(b+1)};if(i=b+1){v=arr.get(b)};out=out+@(v);i=i+1};<out};

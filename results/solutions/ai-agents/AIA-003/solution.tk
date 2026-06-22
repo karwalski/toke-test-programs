@@ -1,1 +1,137 @@
-m=validate;i=io:std.io;i=s:std.str;i=j:std.json;f=main():$i64{let line=io.readln();let input=j.parse(line);let schema=j.getobject(input;"schema");let args=j.getobject(input;"arguments");let errors=mut.@();let reqfields=j.getarray(schema;"required");let props=j.getobject(schema;"properties");lp(let idx=0;idx<j.arraylen(reqfields);idx=idx+1){let field=j.getstring(j.arrayget(reqfields;idx);"");if(!j.hasfield(args;field)){let msg=s.concat("missing required field: ";field);errors=s.concat(errors;@(msg))}};let argkeys=j.getkeys(args);lp(let idx=0;idx<argkeys.len;idx=idx+1){let key=argkeys.get(idx);let fieldschema=j.getobject(props;key);if(j.hasfield(fieldschema;"enum")){let enumvals=j.getarray(fieldschema;"enum");let argval=j.getstring(args;key);let found=mut.false;lp(let eidx=0;eidx<j.arraylen(enumvals);eidx=eidx+1){let enumval=j.getstring(j.arrayget(enumvals;eidx);"");if(argval=enumval){found=true}};if(!found){let errmsg=mut.s.concat(key;" must be one of: ");let vals=mut.@();lp(let vidx=0;vidx<j.arraylen(enumvals);vidx=vidx+1){vals=s.concat(vals;@(j.getstring(j.arrayget(enumvals;vidx);"")))};errmsg=s.concat(errmsg;s.join(vals;", "));errors=s.concat(errors;@(errmsg))}}};let result=j.newobject();j.setbool(result;"valid";errors.len=0);j.setarray(result;"errors";j.fromarray(errors));io.println(j.stringify(result));<0}
+m=validate;i=io:std.io;i=s:std.str;
+f=extractobj(text:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":{"));
+  let idx=s.indexof(text;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat)-1;
+  let depth=mut.0;
+  let i=mut.start;
+  let n=s.len(text);
+  lp(i<n){
+    let c=s.slice(text;i;i+1);
+    if(s.eq(c;"{")){depth=depth+1};
+    if(s.eq(c;"}")){depth=depth-1;if(depth=0){<s.slice(text;start;i+1)}};
+    i=i+1
+  };
+  <""
+};
+f=extractarr(text:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":["));
+  let idx=s.indexof(text;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(text;start;s.len(text));
+  let bk=s.indexof(after;"]");
+  if(bk<0){<""};
+  <s.slice(after;0;bk)
+};
+f=splitstrlist(arr:$str):@($str){
+  let out=mut.@();
+  let n=s.len(arr);
+  let i=mut.0;
+  let cur=mut."";
+  let inq=mut.false;
+  lp(i<n){
+    let ch=s.slice(arr;i;i+1);
+    if(s.eq(ch;"\"")){
+      if(inq){out=out+@(cur);cur="";inq=false}el{inq=true}
+    }el{
+      if(inq){cur=s.concat(cur;ch)}
+    };
+    i=i+1
+  };
+  <out
+};
+f=haskey(obj:$str;key:$str):$bool{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  <s.indexof(obj;pat)>=0
+};
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=topkeys(obj:$str):@($str){
+  let out=mut.@();
+  let n=s.len(obj);
+  let i=mut.0;
+  let depth=mut.0;
+  let inq=mut.false;
+  let cur=mut."";
+  let expectkey=mut.true;
+  lp(i<n){
+    let ch=s.slice(obj;i;i+1);
+    if(inq){
+      if(s.eq(ch;"\"")){
+        inq=false;
+        if(depth=1&&expectkey){out=out+@(cur)};
+        cur=""
+      }el{
+        cur=s.concat(cur;ch)
+      }
+    }el{
+      if(s.eq(ch;"\"")){inq=true;cur=""};
+      if(s.eq(ch;"{")){depth=depth+1;expectkey=true};
+      if(s.eq(ch;"}")){depth=depth-1};
+      if(s.eq(ch;"[")){depth=depth+1};
+      if(s.eq(ch;"]")){depth=depth-1};
+      if(s.eq(ch;":")){if(depth=1){expectkey=false}};
+      if(s.eq(ch;",")){if(depth=1){expectkey=true}}
+    };
+    i=i+1
+  };
+  <out
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let schema=extractobj(line;"schema");
+  let args=extractobj(line;"arguments");
+  let errors=mut.@();
+  let reqarr=extractarr(schema;"required");
+  let reqfields=splitstrlist(reqarr);
+  lp(let idx=0;idx<reqfields.len();idx=idx+1){
+    let field=reqfields.get(idx);
+    if(!haskey(args;field)){
+      errors=errors+@(s.concat("missing required field: ";field))
+    }
+  };
+  let props=extractobj(schema;"properties");
+  let pkeys=topkeys(props);
+  lp(let pi=0;pi<pkeys.len();pi=pi+1){
+    let pname=pkeys.get(pi);
+    let pschema=extractobj(props;pname);
+    let enumarr=extractarr(pschema;"enum");
+    if(s.len(enumarr)>0){
+      if(haskey(args;pname)){
+        let argval=getstrval(args;pname);
+        let enumvals=splitstrlist(enumarr);
+        let found=mut.false;
+        lp(let ei=0;ei<enumvals.len();ei=ei+1){
+          if(s.eq(enumvals.get(ei);argval)){found=true}
+        };
+        if(!found){
+          let joined=mut."";
+          lp(let vi=0;vi<enumvals.len();vi=vi+1){
+            if(vi>0){joined=s.concat(joined;", ")};
+            joined=s.concat(joined;enumvals.get(vi))
+          };
+          errors=errors+@(s.concat(pname;s.concat(" must be one of: ";joined)))
+        }
+      }
+    }
+  };
+  let validstr=mut."true";
+  if(errors.len()>0){validstr="false"};
+  let errjoined=mut."";
+  lp(let k=0;k<errors.len();k=k+1){
+    if(k>0){errjoined=s.concat(errjoined;",")};
+    errjoined=s.concat(errjoined;s.concat("\"";s.concat(errors.get(k);"\"")))
+  };
+  io.println(s.concat("{\"valid\":";s.concat(validstr;s.concat(",\"errors\":[";s.concat(errjoined;"]}")))));
+  <0
+}

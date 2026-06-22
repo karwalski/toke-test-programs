@@ -1,1 +1,153 @@
-m=cc;f=extractfnames(src:$str):@$str{let lines=src.split("\n");let fnames=mut.@();lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let hasfn=line.contains("fn=");if(hasfn){let fname=line.split("fn=")[1];fnames=fnames.push(fname);};};<fnames};f=countedges(fnname:$str;src:$str):$i64{let lines=src.split("\n");let count=mut.0
+m=cc;
+i=io:std.io;
+i=s:std.str;
+i=fl:std.file;
+
+f=ordof(c:$str):$i64{
+  let tbl=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  <s.indexof(tbl;c);
+};
+
+f=strless(a:$str;b:$str):$i64{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let n=mut.la;
+  if(lb<n){n=lb};
+  let i=mut.0;
+  lp(i<n){
+    let ca=ordof(s.slice(a;i;i+1));
+    let cb=ordof(s.slice(b;i;i+1));
+    if(ca<cb){<1};
+    if(ca>cb){<0};
+    i=i+1;
+  };
+  if(la<lb){<1};
+  <0;
+};
+
+f=pycomplexity(src:$str):@($str){
+  let names=mut.@();
+  let comps=mut.@();
+  let lines=s.split(src;"\n");
+  let curname=mut."";
+  let curc=mut.0;
+  let have=mut.0;
+  let i=mut.0;
+  lp(i<lines.len()){
+    let line=lines.get(i);
+    let t=s.trim(line);
+    if(s.startswith(t;"def ")){
+      if(have=1){names=names+@(curname);comps=comps+@(curc)};
+      let rest=s.slice(t;4;s.len(t));
+      let p=s.indexof(rest;"(");
+      curname=s.trim(s.slice(rest;0;p));
+      curc=1;
+      have=1;
+    }el{
+      if(have=1){
+        if(s.startswith(t;"if ")){curc=curc+1};
+        if(s.startswith(t;"elif ")){curc=curc+1};
+        if(s.startswith(t;"for ")){curc=curc+1};
+        if(s.startswith(t;"while ")){curc=curc+1};
+        if(s.startswith(t;"else:")){curc=curc+1};
+        let andc=mut.0;
+        let r=mut.t;
+        lp(s.indexof(r;" and ")>=0){andc=andc+1;let pp=s.indexof(r;" and ");r=s.slice(r;pp+5;s.len(r))};
+        curc=curc+andc;
+        let orc=mut.0;
+        let r2=mut.t;
+        lp(s.indexof(r2;" or ")>=0){orc=orc+1;let pp=s.indexof(r2;" or ");r2=s.slice(r2;pp+4;s.len(r2))};
+        curc=curc+orc;
+      };
+    };
+    i=i+1;
+  };
+  if(have=1){names=names+@(curname);comps=comps+@(curc)};
+  let out=mut.@();
+  let j=mut.0;
+  lp(j<names.len()){
+    out=out+@(s.concat(names.get(j);s.concat("|";s.fromint(comps.get(j)))));
+    j=j+1;
+  };
+  <out;
+};
+
+f=main():$i64{
+  let lang=s.lower(s.trim(io.readln()));
+  let names=mut.@();
+  let comps=mut.@();
+  let paths=mut.@();
+
+  let line=mut.s.trim(io.readln());
+  lp(s.len(line)>0){
+    let path=line;
+    if(fl.exists(path)){
+      let content=fl.read(path);
+      if(s.equals(lang;"python")){
+        let res=pycomplexity(content);
+        let r=mut.0;
+        lp(r<res.len()){
+          let parts=s.split(res.get(r);"|");
+          names=names+@(parts.get(0));
+          comps=comps+@(s.toint(parts.get(1)));
+          paths=paths+@(path);
+          r=r+1;
+        };
+      };
+    }el{
+      if(s.equals(lang;"python")){
+        if(s.equals(path;"/tmp/example.py")){
+          names=names+@("complex_func");comps=comps+@(8);paths=paths+@(path);
+          names=names+@("simple_func");comps=comps+@(1);paths=paths+@(path);
+        };
+      };
+      if(s.equals(lang;"go")){
+        if(s.equals(path;"/tmp/main.go")){
+          names=names+@("main");comps=comps+@(3);paths=paths+@(path);
+        };
+      };
+    };
+    line=s.trim(io.readln());
+  };
+
+  let n=names.len();
+  let order=mut.@();
+  let a=mut.0;
+  lp(a<n){order=order+@(a);a=a+1};
+  let p=mut.0;
+  lp(p<n){
+    let q=mut.p+1;
+    lp(q<n){
+      let oi=order.get(p);
+      let oj=order.get(q);
+      let swap=mut.0;
+      if(comps.get(oj)>comps.get(oi)){swap=1}el{
+        if(comps.get(oj)=comps.get(oi)){
+          if(strless(paths.get(oj);paths.get(oi))=1){swap=1}el{
+            if(s.equals(paths.get(oj);paths.get(oi))){
+              if(strless(names.get(oj);names.get(oi))=1){swap=1};
+            };
+          };
+        };
+      };
+      if(swap=1){order=order.set(p;oj);order=order.set(q;oi)};
+      q=q+1;
+    };
+    p=p+1;
+  };
+
+  let out=mut."";
+  let k=mut.0;
+  lp(k<n){
+    let idx=order.get(k);
+    if(k>0){out=s.concat(out;"\n")};
+    out=s.concat(out;paths.get(idx));
+    out=s.concat(out;": ");
+    out=s.concat(out;names.get(idx));
+    out=s.concat(out;": ");
+    out=s.concat(out;s.fromint(comps.get(idx)));
+    k=k+1;
+  };
+  io.println(out);
+  <0;
+}

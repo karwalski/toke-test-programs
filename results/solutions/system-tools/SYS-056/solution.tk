@@ -1,1 +1,1 @@
-m=stopwatch;f=stopwatch():$i64{let laps=mut.0;let running=mut.true;lp(let idx=0;idx<1000000;idx=idx+1){if(running){laps=laps+1;running=false;};};<laps};
+m=timer;i=io:std.io;i=s:std.str;f=main():$i64{let mode=s.trim(io.readln());if(s.equals(mode;"countdown")){let secs=s.toint(s.trim(io.readln()));let i=mut.secs;lp(i>0){io.println(s.concat(s.fromint(i);"s remaining"));i=i-1};io.println("DONE")}el{if(s.equals(mode;"stopwatch")){io.println("(lap times on ENTER)")}};<0}

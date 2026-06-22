@@ -1,1 +1,18 @@
-m=bracket;f=bracket(n:$i64):$str{if(n<2){<"single"};let m=mut.n;let rounds=mut.0;lp(let i=0;i<100;i=i+1){if(!(m>1)){br};let half=m/2;let extra=m-half*2;let newm=half+extra;if(!(newm>1)){br};m=newm;rounds=rounds+1};let result=mut."";lp(let i=0;i<rounds;i=i+1){let line=mut."";let spaces=mut.0;lp(let j=0;j<i;j=j+1){spaces=spaces+4;};let num=1;lp(let k=0;k<4;k=k+1){let ch=mut." ";if(k=0){ch="A"};if(k=1){ch="B"};if(k=2){ch="C"};if(k=3){ch="D"};line=s.concat(line;ch);};let linelen=line.len;let pad=mut.0;if(!(linelen<8)){pad=8-linelen;};let padding=
+m=bracket;i=io:std.io;i=s:std.str;
+f=sp(n:$i64):$str{let o=mut."";let i=mut.0;lp(i<n){o=s.concat(o;" ");i=i+1};<o};
+f=padname(name:$str;w:$i64):$str{let o=mut.name;let need=mut.w-s.len(name);if(need<0){need=0};let i=mut.0;lp(i<need){o=s.concat(o;" ");i=i+1};<o};
+f=main():$i64{let teams=mut.@("");teams=@();lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(s.len(t)>0){teams=teams+@(t)}};
+let n=teams.len();
+let w=mut.0;let i=mut.0;lp(i<n){if(s.len(teams.get(i))>w){w=s.len(teams.get(i))};i=i+1};
+let ind=sp(w+2);
+if(n=2){
+io.println(s.concat(padname(teams.get(0);w);" ─┐"));
+io.println(s.concat(ind;"├─ WINNER"));
+io.println(s.concat(padname(teams.get(1);w);" ─┘"))}el{
+io.println(s.concat(padname(teams.get(0);w);" ─┐"));
+io.println(s.concat(ind;"├─ TBD ─┐"));
+io.println(s.concat(s.concat(padname(teams.get(1);w);" ─┘");s.concat(ind;"├─ WINNER")));
+io.println(s.concat(s.concat(padname(teams.get(2);w);" ─┐");s.concat(ind;"│")));
+io.println(s.concat(ind;"├─ TBD ─┘"));
+io.println(s.concat(padname(teams.get(3);w);" ─┘"))};
+<0}

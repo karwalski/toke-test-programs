@@ -1,1 +1,45 @@
-m=resourcegame;f=playgame(n:$i64):$i64{let resources=mut.100;lp(let turn=0;turn<n;turn=turn+1){let action=mut."collect";let amount=mut.10;if(action="collect"){resources=resources+amount;}el{if(action="spend"){resources=resources-amount;}el{if(action="collectall"){resources=resources+amount;}el{if(action="rest"){resources=resources+amount;}el{}}}}}};let result=resources;<result;};
+m=resourcegame;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let first=s.trim(io.readln());
+  let nums=s.split(first;" ");
+  let gold=mut.s.toint(nums.get(0));
+  let wood=mut.s.toint(nums.get(1));
+  let food=mut.s.toint(nums.get(2));
+
+  let line=mut.s.trim(io.readln());
+  lp(s.len(line)>0){
+    let parts=s.split(line;" ");
+    let action=parts.get(0);
+    if(s.equals(action;"collect")){
+      let r=parts.get(1);
+      if(s.equals(r;"gold")){gold=gold+10};
+      if(s.equals(r;"wood")){wood=wood+10};
+      if(s.equals(r;"food")){food=food+10};
+    };
+    if(s.equals(action;"spend")){
+      let r=parts.get(1);
+      let amt=s.toint(parts.get(2));
+      if(s.equals(r;"gold")){gold=gold-amt};
+      if(s.equals(r;"wood")){wood=wood-amt};
+      if(s.equals(r;"food")){food=food-amt};
+    };
+    if(s.equals(action;"build")){
+      let st=parts.get(1);
+      if(s.equals(st;"farm")){wood=wood-10;food=food+20};
+      if(s.equals(st;"mine")){wood=wood-15;gold=gold+30};
+      if(s.equals(st;"sawmill")){gold=gold-20;wood=wood+25};
+    };
+    let out=mut."Gold:";
+    out=s.concat(out;s.fromint(gold));
+    out=s.concat(out;" Wood:");
+    out=s.concat(out;s.fromint(wood));
+    out=s.concat(out;" Food:");
+    out=s.concat(out;s.fromint(food));
+    io.println(out);
+    line=s.trim(io.readln());
+  };
+  <0;
+}

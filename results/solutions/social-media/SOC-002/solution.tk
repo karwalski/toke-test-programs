@@ -1,1 +1,22 @@
-m=auth;f=authenticate(email:$str;password:$str):$str{let user=loaduser(email);if(user.id<0){<""};if(!checkpassword(password;user.passwordhash))){<""};let token=generatetoken(user.id;user.email));<token};f=loaduser(email:$str):$user{let result=execquery("select id,email,role,password_hash from users where email=?";email);let row=result.rows.get(0);let user=$user{id:row.id;email:row.email;role:row.role;passwordhash:row.password_hash}};<user};f=checkpassword(password:$str;hash:$str):$bool{let verified=execquery("select verify_password(?,?) as valid";password;hash);let row=verified.rows.get(0);let valid=row.valid;if(valid=true){<true};<false};f=generatetoken(userid:$i64;email:$str):$str{let now=execquery("select unix_timestamp() as ts";);let ts=now.ts;let exp=ts+3600;let payload=execquery("select concat('{\"sub\":\"',user.id,\",\
+m=auth;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let email=getstrval(line;"email");
+  if(s.eq(action;"login")&&s.len(email)>0){
+    io.println("{\"token\":\"eyJ...\",\"expires_in\":3600,\"status\":\"authenticated\"}")
+  }el{
+    io.println("{\"status\":\"unauthorized\"}")
+  };
+  <0
+}

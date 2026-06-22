@@ -1,1 +1,74 @@
-m=csvnorm;f=csvread(path:$str):$str{let data=mut."";let file=std.file.read(path);lp(let idx=0;idx<file.len;idx=idx+1){let ch=file.get(idx);if(ch="\n"){data=s.concat(data;"\0")}el{data=data+ch}};<data};f=strlen(s:$str):$i64{let len=mut.0;lp(let idx=0;idx<s.len;idx=idx+1){len=len+1};<len};f=strtrim(s:$str):$str{let len=strlen(s);let start=mut.0;lp(let idx=0;idx<len;idx=idx+1){let ch=s.get(idx);if(!(ch=" "))el{start=idx+1;br}};let end=mut.len;lp(let idx=start
+m=csvnorm;i=io:std.io;i=s:std.str;i=math:std.math;
+f=colindex(headers:@($str);name:$str):$i64{
+  lp(let i=0;i<headers.len();i=i+1){
+    if(s.eq(headers.get(i);name)){<i}
+  };
+  <0-1
+};
+f=incols(cols:@($str);name:$str):$bool{
+  lp(let i=0;i<cols.len();i=i+1){
+    if(s.eq(cols.get(i);name)){<true}
+  };
+  <false
+};
+f=main():$i64{
+  let lines=mut.@();
+  let sep=mut.0-1;
+  lp(let r=0;r<1000;r=r+1){
+    let line=io.readln();
+    lines=lines+@(line);
+    if(s.len(s.trim(line))=0){
+      if(sep<0&&r>0){sep=r;br}
+    }
+  };
+  let csvend=mut.sep;
+  if(csvend<0){csvend=lines.len()};
+  let colspec=mut."";
+  lp(let r=sep+1;r<2000;r=r+1){
+    let line=io.readln();
+    let t=s.trim(line);
+    if(s.len(t)>0){colspec=t;br}
+  };
+  let normcols=s.split(colspec;" ");
+  let header=s.trim(lines.get(0));
+  let headers=s.split(header;",");
+  let nrows=csvend-1;
+  let rows=mut.@();
+  lp(let r=1;r<csvend;r=r+1){
+    rows=rows+@(s.trim(lines.get(r)))
+  };
+  io.println(header);
+  lp(let ri=0;ri<rows.len();ri=ri+1){
+    let cells=s.split(rows.get(ri);",");
+    let out=mut."";
+    lp(let ci=0;ci<headers.len();ci=ci+1){
+      if(ci>0){out=s.concat(out;",")};
+      let colname=headers.get(ci);
+      let orig=mut."";
+      if(ci<cells.len()){orig=cells.get(ci)};
+      if(incols(normcols;colname)){
+        let sum=mut.0.0;
+        lp(let k=0;k<rows.len();k=k+1){
+          let kc=s.split(rows.get(k);",");
+          sum=sum+s.tofloat(kc.get(ci))
+        };
+        let n=rows.len() as $f64;
+        let mean=sum/n;
+        let varsum=mut.0.0;
+        lp(let k=0;k<rows.len();k=k+1){
+          let kc=s.split(rows.get(k);",");
+          let d=s.tofloat(kc.get(ci))-mean;
+          varsum=varsum+d*d
+        };
+        let std=math.sqrt(varsum/n);
+        let z=mut.0.0;
+        if(std!=0.0){z=(s.tofloat(orig)-mean)/std};
+        out=s.concat(out;s.format(z;"%.4f"))
+      }el{
+        out=s.concat(out;orig)
+      }
+    };
+    io.println(out)
+  };
+  <0
+}

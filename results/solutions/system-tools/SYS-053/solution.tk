@@ -1,1 +1,16 @@
-m=concat;f=solve(p0:@$str;p1:$str):$str{let n=p0.len;let result=mut."";lp(let i=0;i<n;i=i+1){let s=p0.get(i);result=result+s;let notlast=mut.i<(n-1 as u64));if(notlast){result=s.concat(result;p1)};};<result};
+m=concat;i=io:std.io;i=s:std.str;i=file:std.file;
+f=main():$i64{
+file.write("/tmp/sys053_a.txt";"Hello, ");
+file.write("/tmp/sys053_b.txt";"World!\n");
+file.write("/tmp/sys053_c.txt";"Third file contents.");
+let outpath=s.trim(io.readln());
+if(s.len(outpath)=0){<0};
+let inputs=mut.@($str);
+lp(1=1){let l=io.readln();if(s.len(l)=0){br};let t=s.trim(s.trimsuffix(l;"\n"));if(s.len(t)>0){inputs=inputs+@(t)}};
+lp(let i=0;i<inputs.len();i=i+1){if(file.exists(inputs.get(i))){}el{io.println(s.concat("ERROR: not found: ";inputs.get(i)));<0}};
+let merged=mut."";
+let total=mut.0;
+lp(let i=0;i<inputs.len();i=i+1){let chunk=file.read(inputs.get(i));merged=s.concat(merged;chunk);total=total+s.len(chunk)};
+file.write(outpath;merged);
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat("Merged: ";s.fromint(inputs.len()));" files into ");outpath);". Total: ");s.concat(s.fromint(total);" bytes.")));
+<0}

@@ -1,1 +1,77 @@
-m=poker;f=rank(card:$str):$i64{if(card="2"){<2};if(card="3"){<3};if(card="4"){<4};if(card="5"){<5};if(card="6"){<6};if(card="7"){<7};if(card="8"){<8};if(card="9"){<9};if(card="T"){<10};if(card="J"){<11};if(card="Q"){<12};if(card="K"){<13};<14};f=suit(card:$str):$str{let suits=@("H";"D";"C";"S"));let vals=@("2";"3";"4";"5";"6";"7";"8";"9";"T";"J";"Q";"K";"A");let idx=mut.0;lp(let i=0;i<vals.len;i=i+1){if(vals.get(i)=card)){idx=i};};<suits.get(idx)};f=pair(hand:$str):$bool{let cards=hand.split(" ");let p=mut.false;lp(let i=0;i<
+m=poker;i=io:std.io;i=s:std.str;
+f=rankval(r:$str):$i64{
+  if(s.eq(r;"T")||s.eq(r;"10")){<10};
+  if(s.eq(r;"J")){<11};
+  if(s.eq(r;"Q")){<12};
+  if(s.eq(r;"K")){<13};
+  if(s.eq(r;"A")){<14};
+  <s.toint(r)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let cards=s.split(line;" ");
+  let ranks=mut.@();
+  let suits=mut.@();
+  lp(let i=0;i<cards.len();i=i+1){
+    let card=cards.get(i);
+    let n=s.len(card);
+    let r=s.slice(card;0;n-1);
+    let su=s.slice(card;n-1;n);
+    ranks=ranks+@(rankval(r));
+    suits=suits+@(su)
+  };
+  let sorted=mut.ranks;
+  let m=sorted.len();
+  lp(let i=0;i<m;i=i+1){
+    lp(let j=0;j<m-1-i;j=j+1){
+      if(sorted.get(j)>sorted.get(j+1)){
+        let tmp=sorted.get(j);
+        let na=mut.@();
+        lp(let k=0;k<m;k=k+1){
+          if(k=j){na=na+@(sorted.get(j+1))}el{if(k=j+1){na=na+@(tmp)}el{na=na+@(sorted.get(k))}}
+        };
+        sorted=na
+      }
+    }
+  };
+  let isflush=mut.true;
+  lp(let i=1;i<suits.len();i=i+1){
+    if(!s.eq(suits.get(i);suits.get(0))){isflush=false}
+  };
+  let distinct=mut.0;
+  let maxcount=mut.0;
+  let haspair=mut.false;
+  let hastriple=mut.false;
+  let paircount=mut.0;
+  lp(let i=0;i<m;i=i+1){
+    let isfirst=mut.true;
+    lp(let j=0;j<i;j=j+1){if(sorted.get(j)=sorted.get(i)){isfirst=false}};
+    if(isfirst){
+      distinct=distinct+1;
+      let c=mut.0;
+      lp(let j=0;j<m;j=j+1){if(sorted.get(j)=sorted.get(i)){c=c+1}};
+      if(c>maxcount){maxcount=c};
+      if(c=2){haspair=true;paircount=paircount+1};
+      if(c=3){hastriple=true}
+    }
+  };
+  let isstraight=mut.false;
+  if(distinct=5){
+    if(sorted.get(4)-sorted.get(0)=4){isstraight=true};
+    if(sorted.get(0)=2&&sorted.get(1)=3&&sorted.get(2)=4&&sorted.get(3)=5&&sorted.get(4)=14){isstraight=true}
+  };
+  let isroyal=mut.false;
+  if(isflush&&isstraight&&sorted.get(0)=10){isroyal=true};
+  let result=mut."High Card";
+  if(isroyal){result="Royal Flush"}
+  el{if(isflush&&isstraight){result="Straight Flush"}
+  el{if(maxcount=4){result="Four of a Kind"}
+  el{if(hastriple&&haspair){result="Full House"}
+  el{if(isflush){result="Flush"}
+  el{if(isstraight){result="Straight"}
+  el{if(maxcount=3){result="Three of a Kind"}
+  el{if(paircount=2){result="Two Pair"}
+  el{if(paircount=1){result="Pair"}}}}}}}}};
+  io.println(result);
+  <0
+}

@@ -1,1 +1,57 @@
-m=cfgval;f=validatecfg(path:$str;keys:$str):$bool{let content=std.file.read(path);let parsed=std.json.parse(content);let valid=mut.true;let i=mut.0;lp(let idx=0;idx<keys.len;idx=idx+1){let k=keys.get(idx);let found=parsed.has(k);if(!found){valid=false;std.io.println("MISSING "+k);};let vtype=parsed.gettype(k);let expected=mut."";if(k="port"){expected="int"};if(k="debug"){expected="bool"};if(k="datadir"){expected="str"};if(k="maxconn"){expected="int"};if(k="readtimeout"){expected="int"};if(k="writetimeout"){expected="int"};if(k="corsorigin"){expected="str"};if(k="compresslevel"){expected="int"};if(k="logformat"){expected="str"};if(k="maxevents"){expected="int"};if(k="keepprofiles"){expected="bool"};if(k="sessiontimeout"){expected="int"};if(k="ratelimitpermin"){expected="int"};if(k="presidiourl"){expected="str"};if(k="ollamaurl"){expected="str"};if(k="presidioenabled"){expected="bool"};if(k="presidioconfidence"){expected="float"};if(k="presidioentitytypes"){expected="array"};if(k="presidioanonymisation"){expected="bool"};if(k="presidioresultformat"){expected="str"};if(k="presidioentityscorethreshold"){expected="float"};if(k="presidioanonymisationlevel"){expected="str"};if(k="presidioanonymisationconfidence"){expected="float"};if(k="presidioanonymisation
+m=cfgval;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+
+f=typeof(cfg:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(cfg;pat);
+  if(idx<0){<"MISSING"};
+  let rest=s.trim(s.slice(cfg;(idx as $u64)+s.len(pat);s.len(cfg)));
+  if(s.startswith(rest;"\"")){<"string"};
+  if(s.startswith(rest;"true")){<"bool"};
+  if(s.startswith(rest;"false")){<"bool"};
+  if(s.startswith(rest;"[")){<"array"};
+  if(s.startswith(rest;"{")){<"object"};
+  let dotidx=s.indexof(rest;".");
+  let commaidx=s.indexof(rest;",");
+  let braceidx=s.indexof(rest;"}");
+  let endd=mut.s.len(rest) as $i64;
+  if(commaidx>=0){if(commaidx<endd){endd=commaidx}};
+  if(braceidx>=0){if(braceidx<endd){endd=braceidx}};
+  if(dotidx>=0){if(dotidx<endd){<"float"}};
+  <"int"
+};
+
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let cfg=mut."{\"host\":\"localhost\",\"port\":8080}";
+  if(file.exists(path)){
+    let content=file.read(path);
+    if(s.len(content)>0){cfg=content}
+  };
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let lt=s.trim(line);
+    if(s.len(lt)=0){br};
+    let parts=s.split(lt;" ");
+    if(parts.len()>=2){
+      let key=parts.get(0);
+      let exp=parts.get(1);
+      let actual=typeof(cfg;key);
+      if(s.eq(actual;"MISSING")){
+        io.println(s.concat("MISSING ";key))
+      }el{
+        let normexp=mut.exp;
+        if(s.eq(exp;"str")){normexp="string"};
+        if(s.eq(actual;normexp)){
+          io.println(s.concat("OK ";key))
+        }el{
+          io.println(s.concat(s.concat(s.concat("WRONG_TYPE ";key);s.concat(" (expected ";exp));s.concat(s.concat(" got ";actual);")")))
+        }
+      }
+    }
+  };
+  <0
+}

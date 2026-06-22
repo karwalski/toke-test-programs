@@ -1,1 +1,27 @@
-m=pointinpolygon;f=pointinpolygon(p:$point;q:$point):$str{let px=p.x;let py=p.y;let qx=q.x;let qy=q.y;let dx=px-qx;let dy=py-qy;let dot=dx*qy-dy*qx;if(dot<0){<"inside"};if(dot=0){<"boundary"};<"outside"};
+m=pip;i=io:std.io;i=s:std.str;
+f=absf(x:$f64):$f64{if(x<0.0){<0.0-x};<x};
+f=minf(a:$f64;b:$f64):$f64{if(a<b){<a};<b};
+f=maxf(a:$f64;b:$f64):$f64{if(a>b){<a};<b};
+f=onseg(px:$f64;py:$f64;x1:$f64;y1:$f64;x2:$f64;y2:$f64):$bool{if(px<minf(x1;x2)){<false};if(px>maxf(x1;x2)){<false};if(py<minf(y1;y2)){<false};if(py>maxf(y1;y2)){<false};let cp=(py-y1)*(x2-x1)-(px-x1)*(y2-y1);if(absf(cp)<0.0000000001){<true};<false};
+f=main():$i64{
+let n=s.toint(s.trim(io.readln()));
+let px=mut.@(0.0);let py=mut.@(0.0);
+let i=mut.0;lp(i<n){let parts=s.split(s.trim(io.readln());" ");px=px+@(s.tofloat(parts.get(0)));py=py+@(s.tofloat(parts.get(1)));i=i+1};
+let q=s.toint(s.trim(io.readln()));
+let qq=mut.0;
+lp(qq<q){
+let parts=s.split(s.trim(io.readln());" ");
+let x=s.tofloat(parts.get(0));let y=s.tofloat(parts.get(1));
+let onb=mut.false;
+let k=mut.1;lp(k<=n){let nx=mut.k+1;if(k=n){nx=1};if(onseg(x;y;px.get(k);py.get(k);px.get(nx);py.get(nx))){onb=true};k=k+1};
+if(onb){io.println("BOUNDARY")}el{
+let inside=mut.false;let j=mut.n;let a=mut.1;
+lp(a<=n){
+let xi=px.get(a);let yi=py.get(a);let xj=px.get(j);let yj=py.get(j);
+let c1=mut.false;let c2=mut.false;if(yi>y){c1=true};if(yj>y){c2=true};
+if(c1!=c2){let xint=(xj-xi)*(y-yi)/(yj-yi)+xi;if(x<xint){inside=!inside}};
+j=a;a=a+1};
+if(inside){io.println("INSIDE")}el{io.println("OUTSIDE")}
+};
+qq=qq+1};
+<0}

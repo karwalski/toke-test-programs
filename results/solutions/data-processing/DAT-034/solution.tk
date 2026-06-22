@@ -1,1 +1,27 @@
-m=hashjoin;f=buildhash(rows:@(@(i64;str);i64;str)));col:i64):$str{let result=mut."";lp(let i=0;i<rows.len;i=i+1){let row=rows.get(i);let key=row.get(col as u64);if(result.len=0){result=key+"="+row.get((col+1)as u64))}el{result=s.concat(result;"\n")+key+"="+row.get((col+1)as u64))}};<result};f=hashjoin(proberows:@(@(i64;str);i64;str)));buildrows:@(@(i64;str);i64;str)));probehash=buildhash(proberows);buildhash=buildhash(buildrows);let result=mut.@();lp(let i=0;i<proberows.len;i=i+1){let probekey=proberows.get(i).get(0 as u64);let found=mut.false;let resultrow=mut.@();lp(let j=0;j<buildrows.len;j=j+1){let buildkey=buildrows.get(j).get(0 as u64
+m=hashjoin;i=io:std.io;i=s:std.str;
+f=colidx(headers:@($str);name:$str):$i64{let i=mut.0;lp(i<headers.len()){if(s.eq(s.trim(headers.get(i));name)){<i};i=i+1};<-1};
+f=main():$i64{
+let ds1=mut.@("");ds1=@();let ds2=mut.@("");ds2=@();let joinLine=mut."";
+let phase=mut.1;
+lp(1=1){let raw=io.readln();let line=s.trimsuffix(raw;"\n");
+if(s.startswith(line;"join ")){joinLine=line;br};
+if(s.len(s.trim(line))=0){if(phase=1){phase=2}}el{if(phase=1){ds1=ds1+@(line)}el{ds2=ds2+@(line)}}}
+let jp=s.trimprefix(joinLine;"join ");let cols=s.split(jp;"=");let leftCol=s.trim(cols.get(0));let rightCol=s.trim(cols.get(1));
+let bh=s.split(ds1.get(0);",");let ph=s.split(ds2.get(0);",");
+let li=colidx(bh;leftCol);let ri=colidx(ph;rightCol);
+let buildSize=ds1.len()-1;let probeSize=ds2.len()-1;
+io.println(s.concat("Build table: ";s.concat(s.fromint(buildSize);" rows")));
+io.println(s.concat("Probe table: ";s.concat(s.fromint(probeSize);" rows")));
+let matchLines=mut.@("");matchLines=@();let matchCount=mut.0;
+let pIdx=mut.1;lp(pIdx<ds2.len()){let prow=s.split(ds2.get(pIdx);",");let pkey=s.trim(prow.get(ri));
+let bIdx=mut.1;lp(bIdx<ds1.len()){let brow=s.split(ds1.get(bIdx);",");let bkey=s.trim(brow.get(li));
+if(s.eq(bkey;pkey)){matchCount=matchCount+1;
+let combined=mut."";let c=mut.0;lp(c<brow.len()){if(c>0){combined=s.concat(combined;",")};combined=s.concat(combined;brow.get(c));c=c+1};
+let pc=mut.0;lp(pc<prow.len()){if(pc!=ri){combined=s.concat(combined;",");combined=s.concat(combined;prow.get(pc))};pc=pc+1};
+matchLines=matchLines+@(combined)};bIdx=bIdx+1};pIdx=pIdx+1};
+io.println(s.concat("Matches: ";s.fromint(matchCount)));
+let outHeader=mut."";let h=mut.0;lp(h<bh.len()){if(h>0){outHeader=s.concat(outHeader;",")};outHeader=s.concat(outHeader;bh.get(h));h=h+1};
+let ph2=mut.0;lp(ph2<ph.len()){if(ph2!=ri){outHeader=s.concat(outHeader;",");outHeader=s.concat(outHeader;ph.get(ph2))};ph2=ph2+1};
+io.println(outHeader);
+let m=mut.0;lp(m<matchLines.len()){io.println(matchLines.get(m));m=m+1};
+<0}

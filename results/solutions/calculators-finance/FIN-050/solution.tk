@@ -1,1 +1,34 @@
-m=weightedavg;f=weightedavg(vals:@$f64;other:@$f64):$f64{let sum=mut.0.0;let total=mut.0.0;lp(let i=0;i<vals.len;i=i+1){let v=vals.get(i);let o=other.get(i);sum=sum+v*o;total=total+v};let result=sum/total;<result};f=main():$i64{let a=@(1.0;2.0;3.0));let b=@(3.0;2.0;1.0));let r=weightedavg(a;b);<0};
+m=weightedavg;
+i=io:std.io;
+i=s:std.str;
+
+f=parsef(line:$str):@($f64){
+  let parts=s.split(line;",");
+  let out=mut.@();
+  let i=mut.0;
+  lp(i<parts.len()){
+    let p=s.trim(parts.get(i));
+    if(s.len(p)>0){out=out+@(s.tofloat(p))};
+    i=i+1;
+  };
+  <out;
+};
+
+f=wavg(vals:@($f64);wts:@($f64)):$f64{
+  let wsum=mut.0.0;
+  let total=mut.0.0;
+  let i=mut.0;
+  lp(i<vals.len()){
+    wsum=wsum+vals.get(i)*wts.get(i);
+    total=total+wts.get(i);
+    i=i+1;
+  };
+  <wsum/total;
+};
+
+f=main():$i64{
+  let vals=parsef(io.readln());
+  let wts=parsef(io.readln());
+  io.println(s.format(wavg(vals;wts);"%.4f"));
+  <0;
+}

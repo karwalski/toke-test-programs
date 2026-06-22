@@ -1,5 +1,1 @@
-m=colmove;
-i=io:std.io;
-i=s:std.str;
-f=colmove(board:$str;col:$i64):$i64{let n=board.len;let m=col;let r=mut.0;lp(let idx=0;idx<n;idx=idx+1){let c=board.get(idx);if(c=43){let rtmp=idx/7;let ctmp=idx-rtmp*7;if(ctmp=m){if(rtmp<r){r=rtmp}}}};<r};
-f=main():$i64{let board=mut."";lp(let row=0;row<6;row=row+1){board=s.concat(board;io.readln())};let col=s.toint(io.readln());let result=colmove(board;col);if(result=0){io.println("Invalid")}{io.println(s.concat("Valid row ";s.fromint(5-result)))};<0}
+m=colmove;i=io:std.io;i=s:std.str;f=main():$i64{let rows=mut.@($str);lp(let r=0;r<6;r=r+1){let l=io.readln();let t=mut.l;if(s.endswith(t;"\n")){t=s.slice(t;0;s.len(t)-1)};rows=rows+@(s.trim(t))};let col=s.toint(s.trim(io.readln()));if(col<0){io.println("Invalid");<0};if(col>6){io.println("Invalid");<0};let validrow=mut.0-1;lp(let r=5;r>=0;r=r-1){let row=rows.get(r);if(col<s.len(row)){let ch=s.slice(row;col;col+1);if(s.eq(ch;".")){if(validrow<0){validrow=r}}}};if(validrow<0){io.println("Invalid")}el{io.println(s.concat("Valid row ";s.fromint(validrow)))};<0}

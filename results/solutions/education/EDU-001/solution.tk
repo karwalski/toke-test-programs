@@ -1,1 +1,98 @@
-m=quiz;i=io:std.io;i=s:std.str;f=findstr(text:$str;pattern:$str;start:$i64):$i64{let idx=mut.start;lp(idx<=s.len(text)-s.len(pattern)){let ismatch=mut.1;let pidx=mut.0;lp(pidx<s.len(pattern)){if(s.slice(text;idx+pidx;idx+pidx+1)!=s.slice(pattern;pidx;pidx+1)){ismatch=0;pidx=s.len(pattern)}el{pidx=pidx+1}};if(ismatch=1){<idx};idx=idx+1};<-1};f=parsejson(json:$str;user:$str):$i64{let qstart=findstr(json;"\"q\":\"";0);if(qstart=-1){<0};let qvalend=mut.findstr(json;"\",\"options\"";qstart+5);if(qvalend=-1){qvalend=findstr(json;"\"}";qstart+5)};if(qvalend=-1){<0};let question=s.slice(json;qstart+5;qvalend);io.println(s.concat("Q1: ";question));let optstart=findstr(json;"\"options\":[";0);if(optstart=-1){<0};let optend=findstr(json;"]";optstart);if(optend=-1){<0};let optstr=s.slice(json;optstart+11;optend);let opts=s.split(optstr;",");let idx=mut.0;lp(idx<opts.len()){let opt=mut.s.trim(opts.get(idx));if(s.slice(opt;0;1)="\""){opt=s.slice(opt;1;s.len(opt)-1)};io.println(opt);idx=idx+1};let ansstart=findstr(json;"\"answer\":\"";0);if(ansstart=-1){<0};let ansend=findstr(json;"\"";ansstart+10);let ansendreal=mut.ansstart+11;lp(ansendreal<s.len(json)){if(s.slice(json;ansendreal;ansendreal+1)="\""){<parsejson2(json;ansstart;ansendreal;user)};ansendreal=ansendreal+1};<0};f=parsejson2(json:$str;ansstart:$i64;ansend:$i64;user:$str):$i64{let correct=s.slice(json;ansstart+10;ansend);if(user=correct){io.println("Correct!");io.println("Score: 1/1 (100%)")}el{io.println(s.concat("Incorrect. Answer: ";correct));io.println("Score: 0/1 (0%)")};<1};f=main():$i64{let json=io.readln();let user=s.trim(io.readln());<parsejson(json;user)}
+m=quiz;i=io:std.io;i=s:std.str;
+f=extractarr(text:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":["));
+  let idx=s.indexof(text;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat)-1;
+  let depth=mut.0;
+  let i=mut.start;
+  let n=s.len(text);
+  let inq=mut.false;
+  lp(i<n){
+    let c=s.slice(text;i;i+1);
+    if(inq){
+      if(s.eq(c;"\"")){inq=false}
+    }el{
+      if(s.eq(c;"\"")){inq=true};
+      if(s.eq(c;"[")){depth=depth+1};
+      if(s.eq(c;"]")){depth=depth-1;if(depth=0){<s.slice(text;start+1;i)}}
+    };
+    i=i+1
+  };
+  <""
+};
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=splitstrlist(arr:$str):@($str){
+  let out=mut.@();
+  let n=s.len(arr);
+  let i=mut.0;
+  let cur=mut."";
+  let inq=mut.false;
+  lp(i<n){
+    let ch=s.slice(arr;i;i+1);
+    if(s.eq(ch;"\"")){
+      if(inq){out=out+@(cur);cur="";inq=false}el{inq=true}
+    }el{
+      if(inq){cur=s.concat(cur;ch)}
+    };
+    i=i+1
+  };
+  <out
+};
+f=splitobjects(arr:$str):@($str){
+  let out=mut.@();
+  let n=s.len(arr);
+  let i=mut.0;
+  let depth=mut.0;
+  let start=mut.0;
+  let inq=mut.false;
+  lp(i<n){
+    let c=s.slice(arr;i;i+1);
+    if(inq){
+      if(s.eq(c;"\"")){inq=false}
+    }el{
+      if(s.eq(c;"\"")){inq=true};
+      if(s.eq(c;"{")){if(depth=0){start=i};depth=depth+1};
+      if(s.eq(c;"}")){depth=depth-1;if(depth=0){out=out+@(s.slice(arr;start;i+1))}}
+    };
+    i=i+1
+  };
+  <out
+};
+f=main():$i64{
+  let json=io.readln();
+  let qarr=extractarr(json;"questions");
+  let questions=splitobjects(qarr);
+  let total=questions.len();
+  let correct=mut.0;
+  lp(let qi=0;qi<total;qi=qi+1){
+    let qobj=questions.get(qi);
+    let qtext=getstrval(qobj;"q");
+    io.println(s.concat("Q";s.concat(s.fromint(qi+1);s.concat(": ";qtext))));
+    let optarr=extractarr(qobj;"options");
+    let opts=splitstrlist(optarr);
+    lp(let oi=0;oi<opts.len();oi=oi+1){
+      io.println(opts.get(oi))
+    };
+    let answer=getstrval(qobj;"answer");
+    let user=s.trim(io.readln());
+    if(s.eq(user;answer)){
+      io.println("Correct!");
+      correct=correct+1
+    }el{
+      io.println(s.concat("Incorrect. Answer: ";answer))
+    }
+  };
+  let pct=correct*100/total;
+  io.println(s.concat("Score: ";s.concat(s.fromint(correct);s.concat("/";s.concat(s.fromint(total);s.concat(" (";s.concat(s.fromint(pct);"%)")))))));
+  <0
+}

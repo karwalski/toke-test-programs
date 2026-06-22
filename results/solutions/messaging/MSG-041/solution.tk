@@ -1,1 +1,32 @@
-m=notif;f=makepayload(appid:$str;title:$str;body:$str):$str{let apns=mut."";let fcm=mut."";if(appid="com.example.app"){apns=s.concat(s.concat(s.concat(s.concat("{\"aps\":{\"alert\":{\"title\":\"";title);"\",\"body\":\"");body);"\"}}}}");fcm=s.concat(s.concat(s.concat(s.concat("{\"notification\":{\"title\":\"";title);"\",\"body\":\"");body);"\"}}");};if(appid="io.example.android"){apns="{}";fcm=s.concat(s.concat(s.concat(s.concat("{\"notification\":{\"title\":\"";title);"\",\"body\":\"");body);"\"}}");};if(appid="fr.example.ios
+m=notif;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<""};let colon=s.indexof(s.slice(json;kp;n);":");let q1=s.indexof(s.slice(json;kp+colon;n);"\"");let start=kp+colon+q1+1;let rest=s.slice(json;start;n);let q2=s.indexof(rest;"\"");<s.slice(rest;0;q2)};
+f=getint(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<""};let colon=s.indexof(s.slice(json;kp;n);":");let start=kp+colon+1;let rest=s.slice(json;start;n);let out=mut."";let started=mut.0;lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;",")){br};if(s.equals(c;"}")){br};if(s.equals(c;" ")){}el{out=s.concat(out;c)}};<out};
+f=main():$i64{
+let platform=s.trim(io.readln());
+let json=s.trim(io.readln());
+let sender=getstr(json;"\"sender\"");
+let text=getstr(json;"\"text\"");
+let badge=getint(json;"\"badge_count\"");
+let sound=getstr(json;"\"sound\"");
+let out=mut."";
+if(s.equals(platform;"ios")){
+out=s.concat(out;"{\"aps\":{\"alert\":{\"title\":\"");
+out=s.concat(out;sender);
+out=s.concat(out;"\",\"body\":\"");
+out=s.concat(out;text);
+out=s.concat(out;"\"},\"badge\":");
+out=s.concat(out;badge);
+out=s.concat(out;",\"sound\":\"");
+out=s.concat(out;sound);
+out=s.concat(out;"\"}}")}el{
+out=s.concat(out;"{\"notification\":{\"title\":\"");
+out=s.concat(out;sender);
+out=s.concat(out;"\",\"body\":\"");
+out=s.concat(out;text);
+out=s.concat(out;"\"},\"data\":{\"badge\":\"");
+out=s.concat(out;badge);
+out=s.concat(out;"\",\"sound\":\"");
+out=s.concat(out;sound);
+out=s.concat(out;"\"}}")};
+io.println(out);
+<0}

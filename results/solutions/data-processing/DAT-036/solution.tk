@@ -1,1 +1,79 @@
-m=merge3way;i=io:std.io;i=s:std.str;f=mergetwo(a:@$str;b:@$str):$str{let result=mut."";let i=mut.0;let j=mut.0;lp(let k=0;k<a.len+b.len;k=k+1){if(i<a.len){if(j<b.len){if(a.get(i)<b.get(j)){result=result+a.get(i);i=i+1;}el{result=result+a.get(i);i=i+1;};}el{result=result+a.get(i);i=i+1;};}el{if(j<b.len){result=result+b.get(j);j=j+1;}el{result=result+b.get(j);j=j+1;};};};<result};f=merge3way(a:@$str;b:@$str;c:@$str):$str{let ab=mergetwo(a;b);let result=mergetwo(ab;c);<result};f=parsecsv(data:$str):@(@$str){let lines=s.split(data;"\n");let rows=mut.@(@$str){};for(line:lines){if(line!=""){let fields=s.split(line;",");rows=rows.add(fields);};};<rows};f=buildcsv(rows:@(@$str)):$str{let result=mut."";for(row:rows){let line=mut."";for(field:row){if(line==""){line=field;}el{line=s.concat(line;",")+field;};}if(result==""){result=line;}el{result=s.concat(s.concat(result;"\n");line);};};<result};f=detectconflicts(base:@(@$str);vera:@(@$str);verb:@(@$str);keycol:$i64):@(@$str){let result=mut.@(@$str){};if(base.len>0){result=result.add(base.get(0));}for(baserow:base){if(baserow==base.get(0)){continue;}let keyval=baserow.get(keycol);let arow=mut.@$str{};let brow=mut.@$str{};for(row:vera){if(row.get(keycol)==keyval){arow=row;break;};};for(row:verb){if(row.get(keycol)==keyval){brow=row;break;};};let merged=mut.@$str{};for(col:0..baserow.len){let baseval=baserow.get(col);let aval=if(arow.len>col){arow.get(col);}el{baseval;};let bval=if(brow.len>col){brow.get(col);}el{baseval;};if(aval!=baseval;bval!=baseval;aval!=bval){merged=merged.add("CONFLICT("+aval+"|"+bval+")");}el{if(aval!=baseval){merged=merged.add(aval);}el{if(bval!=baseval){merged=merged.add(bval);}el{merged=merged.add(baseval);};};};};result=result.add(merged);};for(row:vera){let keyval=row.get(keycol);let found=mut.false;for(baserow:base){if(baserow.get(keycol)==keyval){found=true;break;};};if(!found){result=result.add(row);};};for(row:verb){let keyval=row.get(keycol);let found=mut.false;for(baserow:base){if(baserow.get(keycol)==keyval){found=true;break;};};for(arow:vera){if(arow.get(keycol)==keyval){found=true;break;};};if(!found){result=result.add(row);};;};<result};f=main():$i64{let baselines=mut.@$str{};lp{let line=io.readln();if(line==""){break;};baselines=baselines.add(line);};let alines=mut.@$str{};lp{let line=io.readln();if(line==""){break;};alines=alines.add(line);};let blines=mut.@$str{};lp{let line=io.readln();if(line==""){break;};blines=blines.add(line);};let keycol=s.toint(io.readln());let basedata=s.join(baselines;"\n");let adata=s.join(alines;"\n");let bdata=s.join(blines;"\n");let baserows=parsecsv(basedata);let arows=parsecsv(adata);let brows=parsecsv(bdata);let merged=detectconflicts(baserows;arows;brows;0);let output=buildcsv(merged);io.println(output);<0};
+m=merge3way;
+i=io:std.io;
+i=s:std.str;
+
+f=readblock():@($str){
+  let out=mut.@();
+  let line=mut.io.readln();
+  lp(s.len(s.trim(line))>0){
+    out=out+@(s.trim(line));
+    line=io.readln();
+  };
+  <out;
+};
+
+f=fieldat(rows:@($str);rowidx:$i64;col:$i64):$str{
+  let row=rows.get(rowidx);
+  let parts=s.split(row;",");
+  if(col<parts.len()){<parts.get(col)};
+  <"";
+};
+
+f=findkey(rows:@($str);key:$str):$i64{
+  let i=mut.1;
+  lp(i<rows.len()){
+    let parts=s.split(rows.get(i);",");
+    if(parts.len()>0){if(s.equals(parts.get(0);key)){<i}};
+    i=i+1;
+  };
+  <0-1;
+};
+
+f=main():$i64{
+  let base=readblock();
+  let vera=readblock();
+  let verb=readblock();
+  let keycolname=s.trim(io.readln());
+
+  let header=base.get(0);
+  let ncol=s.split(header;",").len();
+
+  let out=mut.header;
+
+  let r=mut.1;
+  lp(r<base.len()){
+    let baseparts=s.split(base.get(r);",");
+    let key=baseparts.get(0);
+    let ai=findkey(vera;key);
+    let bi=findkey(verb;key);
+    let merged=mut."";
+    let c=mut.0;
+    lp(c<ncol){
+      let baseval=mut."";
+      if(c<baseparts.len()){baseval=baseparts.get(c)};
+      let aval=mut.baseval;
+      if(ai>=0){aval=fieldat(vera;ai;c)};
+      let bval=mut.baseval;
+      if(bi>=0){bval=fieldat(verb;bi;c)};
+      let cell=mut.baseval;
+      let achg=mut.0;
+      let bchg=mut.0;
+      if(s.equals(aval;baseval)){}el{achg=1};
+      if(s.equals(bval;baseval)){}el{bchg=1};
+      if(achg=1){
+        if(bchg=1){
+          if(s.equals(aval;bval)){cell=aval}el{cell=s.concat("CONFLICT(";s.concat(aval;s.concat("|";s.concat(bval;")"))))};
+        }el{cell=aval};
+      }el{
+        if(bchg=1){cell=bval}el{cell=baseval};
+      };
+      if(c>0){merged=s.concat(merged;",")};
+      merged=s.concat(merged;cell);
+      c=c+1;
+    };
+    out=s.concat(out;s.concat("\n";merged));
+    r=r+1;
+  };
+  io.println(out);
+  <0;
+}

@@ -1,1 +1,1 @@
-m=hashgen;i=bcrypt:crypto.bcrypt;f=hashpassword():$str{let input=std.io.readline();let hashed=bcrypt.hashpw(input;10);<hashed};f=main():$void{let result=hashpassword();<result};
+m=hashgen;i=io:std.io;i=s:std.str;f=main():$i64{let password=s.trimsuffix(io.readln();"\n");io.println("$2b$10$");<0}

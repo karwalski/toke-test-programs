@@ -1,1 +1,6 @@
-m=indent;f=solve(p0:$str):$str{let n=p0.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=p0.get(i);if(c=9){m=m+1}el{if(c=32){m=m+1}el{br}}}};let result=mut."";lp(let i=0;i<n;i=i+1){let c=p0.get(i);if(c=9){result=s.concat(result;" ");m=m-1}el{if(c=32){if(m>0){result=s.concat(result;" ");m=m-1}el{result=result+c}}el{result=result+c}}}};<result};
+m=indent;i=io:std.io;i=s:std.str;
+f=expand(line:$str;w:$i64):$str{let out=mut."";let col=mut.0;let i=mut.0;let n=s.len(line);lp(i<n){let c=s.slice(line;i;i+1);if(s.equals(c;"\t")){let nsp=w-(col%w);let k=mut.0;lp(k<nsp){out=s.concat(out;" ");k=k+1};col=col+nsp}el{out=s.concat(out;c);col=col+1};i=i+1};<out};
+f=main():$i64{
+let first=s.trim(io.readln());let w=s.toint(first);
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};io.println(expand(line;w))};
+<0}

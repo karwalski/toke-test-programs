@@ -1,1 +1,41 @@
-m=timezone;f=parseinput(input:$str):$str{let result=mut."";if(input.len=0){<"Invalid input"};lp(let i=0;i<input.len;i=i+1){let ch=input.get(i);if(ch=" "){<"Invalid input"};result=result+ch;};<result};f=converttimezone(input:$str;fromzone:$str;tozone:$str):$str{let parsed=parseinput(input);let fromoffset=mut.0;let tooffset=mut.0;if(fromzone="UTC"){fromoffset=0}el{if(fromzone="EST"){fromoffset=-5}el{if(fromzone="CST"){fromoffset=-6}el{if(fromzone="MST"){fromoffset=-7}el{if(fromzone="PST"){fromoffset=-8}el{fromoffset=0}}}}}};if(tozone="UTC"){tooffset=0}el{if(tozone="EST"){tooffset=-5}el{if(tozone="CST"){tooffset=-6}el{if(tozone="MST"){tooffset=-7}el{if(tozone="PST"){tooffset=-8}el
+m=tz;i=io:std.io;i=s:std.str;
+f=offsetof(tzname:$str):$i64{
+if(s.equals(tzname;"UTC")){<0};
+if(s.equals(tzname;"Australia/Sydney")){<11};
+if(s.equals(tzname;"Australia/Melbourne")){<11};
+if(s.equals(tzname;"Australia/Perth")){<8};
+if(s.equals(tzname;"US/Eastern")){<0-5};
+if(s.equals(tzname;"US/Central")){<0-6};
+if(s.equals(tzname;"US/Mountain")){<0-7};
+if(s.equals(tzname;"US/Pacific")){<0-8};
+if(s.equals(tzname;"Europe/London")){<0};
+if(s.equals(tzname;"Europe/Berlin")){<1};
+if(s.equals(tzname;"Asia/Tokyo")){<9};
+if(s.equals(tzname;"Asia/Shanghai")){<8};
+<0};
+f=isleap(y:$i64):$bool{if(y%4!=0){<false};if(y%100!=0){<true};if(y%400=0){<true};<false};
+f=dim(y:$i64;m:$i64):$i64{if(m=2){if(isleap(y)){<29};<28};if(m=4){<30};if(m=6){<30};if(m=9){<30};if(m=11){<30};<31};
+f=pad2(n:$i64):$str{if(n<10){<s.concat("0";s.fromint(n))};<s.fromint(n)};
+f=main():$i64{
+let dtline=s.trim(io.readln());
+let srctz=s.trim(io.readln());
+let tgttz=s.trim(io.readln());
+let datepart=mut.dtline;let timepart=mut."00:00:00";
+let sep=s.indexof(dtline;" ");
+if(sep>=0){datepart=s.slice(dtline;0;sep);timepart=s.trim(s.slice(dtline;sep+1;s.len(dtline)))}el{let ts=s.indexof(dtline;"T");if(ts>=0){datepart=s.slice(dtline;0;ts);timepart=s.slice(dtline;ts+1;s.len(dtline))}};
+let dparts=s.split(datepart;"-");
+let year=mut.s.toint(dparts.get(0));let month=mut.s.toint(dparts.get(1));let day=mut.s.toint(dparts.get(2));
+let tparts=s.split(timepart;":");
+let hour=mut.s.toint(tparts.get(0));let minute=mut.0;let sec=mut.0;
+if(tparts.len>=2){minute=s.toint(tparts.get(1))};
+if(tparts.len>=3){sec=s.toint(tparts.get(2))};
+let srcoff=offsetof(srctz);let tgtoff=offsetof(tgttz);
+let delta=tgtoff-srcoff;
+hour=hour+delta;
+lp(hour>=24){hour=hour-24;day=day+1;if(day>dim(year;month)){day=1;month=month+1;if(month>12){month=1;year=year+1}}};
+lp(hour<0){hour=hour+24;day=day-1;if(day<1){month=month-1;if(month<1){month=12;year=year-1};day=dim(year;month)}};
+let offstr=mut."";
+if(tgtoff>=0){offstr=s.concat(s.concat("+";pad2(tgtoff));":00")}el{offstr=s.concat(s.concat("-";pad2(0-tgtoff));":00")};
+let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("Converted: ";s.fromint(year));"-");pad2(month));"-");pad2(day));"T");pad2(hour));":");pad2(minute));s.concat(s.concat(":";pad2(sec));offstr));
+io.println(out);
+<0}

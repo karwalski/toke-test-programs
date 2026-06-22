@@ -1,50 +1,56 @@
 m=toolschema;
 i=io:std.io;
 i=s:std.str;
-i=j:std.json;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+
+f=getbool(obj:$str;key:$str):$bool{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<false};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  <s.startswith(s.trim(rest);"true")
+};
 
 f=main():$i64{
-    let input=io.readln();
-    let data=j.parse(input);
-    
-    let name=j.getstring(data;"name");
-    let desc=j.getstring(data;"description");
-    let params=j.getarray(data;"params");
-    
-    let props=j.object();
-    let required=j.array();
-    
-    lp(let idx=0;idx<j.arraylen(params);idx=idx+1){
-        let param=j.arrayget(params;idx);
-        let pname=j.getstring(param;"name");
-        let ptype=j.getstring(param;"type");
-        let pdesc=j.getstring(param;"description");
-        let preq=j.getbool(param;"required");
-        
-        let prop=j.object();
-        j.setstring(prop;"type";ptype);
-        j.setstring(prop;"description";pdesc);
-        j.setobject(props;pname;prop);
-        
-        if(preq){
-            j.arraypush(required;j.string(pname))
-        }
+  let input=s.trim(io.readln());
+  let name=getstr(input;"name");
+  let desc=getstr(input;"description");
+  let pmark=s.indexof(input;"\"params\":[");
+  let afterp=s.slice(input;(pmark as $u64)+10;s.len(input));
+  let pend=s.indexof(afterp;"]");
+  let pbody=s.slice(afterp;0;pend as $u64);
+  let objs=s.split(pbody;"},{");
+  let props=mut."";
+  let req=mut."";
+  let reqcount=mut.0;
+  let i=mut.0;
+  lp(i<objs.len()){
+    let raw=objs.get(i);
+    let pn=getstr(raw;"name");
+    let pt=getstr(raw;"type");
+    let pd=getstr(raw;"description");
+    let preq=getbool(raw;"required");
+    if(i>0){props=s.concat(props;",")};
+    props=s.concat(props;s.concat(s.concat(s.concat(s.concat("\"";pn);"\":{\"type\":\"");pt);s.concat(s.concat("\",\"description\":\"";pd);"\"}")));
+    if(preq){
+      if(reqcount>0){req=s.concat(req;",")};
+      req=s.concat(req;s.concat(s.concat("\"";pn);"\""));
+      reqcount=reqcount+1
     };
-    
-    let parameters=j.object();
-    j.setstring(parameters;"type";"object");
-    j.setobject(parameters;"properties";props);
-    j.setarray(parameters;"required";required);
-    
-    let fnobj=j.object();
-    j.setstring(fnobj;"name";name);
-    j.setstring(fnobj;"description";desc);
-    j.setobject(fnobj;"parameters";parameters);
-    
-    let result=j.object();
-    j.setstring(result;"type";"function");
-    j.setobject(result;"function";fnobj);
-    
-    io.println(j.stringify(result));
-    <0
+    i=i+1
+  };
+  let params=s.concat(s.concat("{\"type\":\"object\",\"properties\":{";props);s.concat(s.concat("},\"required\":[";req);"]}"));
+  let fnobj=s.concat(s.concat(s.concat(s.concat("{\"name\":\"";name);"\",\"description\":\"");desc);s.concat("\",\"parameters\":";s.concat(params;"}")));
+  let out=s.concat("{\"type\":\"function\",\"function\":";s.concat(fnobj;"}"));
+  io.println(out);
+  <0
 }

@@ -1,1 +1,19 @@
-m=portscanner;f=solve(p0:$str;p1:$str;p2:$str):$str{let host=p0;let portrange=p1;let concurrency=p2;let result=mut."";let openfound=mut.0;let openlist=mut.@();let starttime=std.time.now();let ports=std.str.split(portrange;"-");2);let fromport=std.str.toint(ports.get(0)));let toport=std.str.toint(ports.get(1)));lp(let idx=fromport;idx<toport;idx=idx+1){let port=idx;let sock=std.net.tcpconnect(host;port);1000);if(!(sock<0)){}el{let openentry=host+":"+std.s.concat(str.fromint(port);" (closed)");openlist=openlist+@(openentry);openfound=openfound+1;};};let endtime=std.time.now();let elapsed=endtime-starttime;let summary="N open found in Xs";let finalresult=mut."";lp(let idx=0;idx<openlist.len;idx=idx+1){let entry=openlist.get(idx);finalresult=finalresult+entry+"\n";};<finalresult};
+m=portscanner;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let host=s.trim(io.readln());
+  let portrange=s.trim(io.readln());
+  let concurrency=s.toint(s.trim(io.readln()));
+  let parts=s.split(portrange;"-");
+  let startport=mut.0;
+  let endport=mut.0;
+  if(parts.len()>=2){
+    startport=s.toint(parts.get(0));
+    endport=s.toint(parts.get(1))
+  };
+  let openct=mut.0;
+  lp(let p=startport;p<=endport;p=p+1){
+    openct=openct+0
+  };
+  io.println("Summary:");
+  <0
+}

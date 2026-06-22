@@ -1,32 +1,119 @@
-{
-  "rooms": {
-    "1": {
-      "desc": "You are in a dark room. There is a door to the north.",
-      "exits": {
-        "n": "2"
-      },
-      "items": []
-    },
-    "2": {
-      "desc": "You are in a bright room. There are doors to the south and east.",
-      "exits": {
-        "s": "1",
-        "e": "3"
-      },
-      "items": [
-        "sword",
-        "shield"
-      ]
-    },
-    "3": {
-      "desc": "You are in a room with a chest. There is a door to the west.",
-      "exits": {
-        "w": "2"
-      },
-      "items": [
-        "potion",
-        "key"
-      ]
+m=adventure;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+
+f=blockafter(text:$str;startidx:$i64):$str{
+  let rest=s.slice(text;startidx as $u64;s.len(text));
+  let openidx=s.indexof(rest;"{");
+  let body=s.slice(rest;openidx as $u64;s.len(rest));
+  let depth=mut.0;
+  let i=mut.0;
+  let endd=mut.s.len(body) as $i64;
+  lp((i as $u64)<s.len(body)){
+    let c=s.slice(body;i as $u64;(i+1) as $u64);
+    if(s.eq(c;"{")){depth=depth+1};
+    if(s.eq(c;"}")){depth=depth-1;if(depth=0){endd=i+1;i=s.len(body) as $i64}};
+    i=i+1
+  };
+  <s.slice(body;0;endd as $u64)
+};
+
+f=roomblock(roomsbody:$str;id:$str):$str{
+  let pat=s.concat(s.concat("\"";id);"\":{");
+  let idx=s.indexof(roomsbody;pat);
+  if(idx<0){<""};
+  <blockafter(roomsbody;idx+(s.len(id) as $i64)+3)
+};
+
+f=exitskeys(roomblk:$str):$str{
+  let pat="\"exits\":";
+  let idx=s.indexof(roomblk;pat);
+  if(idx<0){<""};
+  let blk=blockafter(roomblk;idx+(s.len(pat) as $i64));
+  let inner=s.slice(blk;1;s.len(blk)-1);
+  if(s.len(s.trim(inner))=0){<""};
+  let pairs=s.split(inner;",");
+  let out=mut."";
+  let i=mut.0;
+  lp((i as $u64)<pairs.len()){
+    let kv=pairs.get(i as $u64);
+    let kvt=s.trim(kv);
+    let rest=s.slice(kvt;1;s.len(kvt));
+    let q=s.indexof(rest;"\"");
+    let key=s.slice(rest;0;q as $u64);
+    if(i>0){out=s.concat(out;", ")};
+    out=s.concat(out;key);
+    i=i+1
+  };
+  <out
+};
+
+f=exittarget(roomblk:$str;dir:$str):$str{
+  let pat="\"exits\":";
+  let idx=s.indexof(roomblk;pat);
+  if(idx<0){<""};
+  let blk=blockafter(roomblk;idx+(s.len(pat) as $i64));
+  let dpat=s.concat(s.concat("\"";dir);"\":\"");
+  let di=s.indexof(blk;dpat);
+  if(di<0){<""};
+  let rest=s.slice(blk;(di as $u64)+s.len(dpat);s.len(blk));
+  let q=s.indexof(rest;"\"");
+  <s.slice(rest;0;q as $u64)
+};
+
+f=main():$i64{
+  let jsonlines=mut.@();
+  let cmds=mut.@();
+  let incmd=mut.0;
+  let guard=mut.0;
+  lp(1=1){
+    let line=io.readln();
+    guard=guard+1;
+    if(guard>100000){br};
+    let lt=s.trim(line);
+    if(incmd=0){
+      if(s.len(line)=0){incmd=1}el{jsonlines=jsonlines.push(line)}
+    }el{
+      if(s.len(line)=0){br};
+      if(s.len(lt)>0){cmds=cmds.push(lt)}
     }
-  }
+  };
+  let json=mut."";
+  let a=mut.0;
+  lp((a as $u64)<jsonlines.len()){json=s.concat(json;jsonlines.get(a as $u64));a=a+1};
+  let start=getstr(json;"start");
+  let ridx=s.indexof(json;"\"rooms\":");
+  let roomsbody=blockafter(json;ridx+8);
+  let current=mut.start;
+  let c=mut.0;
+  lp((c as $u64)<cmds.len()){
+    let cmd=s.lower(cmds.get(c as $u64));
+    let blk=roomblock(roomsbody;current);
+    if(s.eq(cmd;"look")){
+      io.println(getstr(blk;"desc"));
+      io.println(s.concat("Exits: ";exitskeys(blk)))
+    }el{
+      let target=exittarget(blk;cmd);
+      if(s.len(target)>0){
+        current=target;
+        let nblk=roomblock(roomsbody;current);
+        io.println(getstr(nblk;"desc"));
+        io.println(s.concat("Exits: ";exitskeys(nblk)))
+      }el{
+        io.println("No exit that way.")
+      }
+    };
+    c=c+1
+  };
+  <0
 }

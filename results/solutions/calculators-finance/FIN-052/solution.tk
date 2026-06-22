@@ -1,5 +1,18 @@
-m=five;
-i=io:std.io;
-i=s:std.str;
-f=five(num1:@$i64;num2:$i64):@$i64{let sorted=mut.num1;lp(let i=0;i<sorted.len;i=i+1){lp(let j=i+1;j<sorted.len;j=j+1){if(sorted.get(i)>sorted.get(j)){let tmp=sorted.get(i);sorted.get(i)=sorted.get(j);sorted.get(j)=tmp;};};};let len=sorted.len;let min=sorted.get(0);let max=sorted.get(len-1);let median=sorted.get(len/2);let q1idx=len/4;let q3idx=len*3/4;let q1=sorted.get(q1idx);let q3=sorted.get(q3idx);let result=mut.@();result=result+@(min);result=result+@(q1);result=result+@(median);result=result+@(q3);result=result+@(max);<result};
-f=main():$i64{let line=io.readln();let parts=s.split(line;",");let numbers=mut.@();lp(let i=0;i<parts.len;i=i+1){numbers=numbers+@(s.toint(parts.get(i)));};let result=five(numbers;0);let output=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.fromint(result.get(0));" ");s.fromint(result.get(1)));" ");s.fromint(result.get(2)));" ");s.fromint(result.get(3)));" ");s.fromint(result.get(4)));io.println(output);<0};
+m=five;i=io:std.io;i=s:std.str;
+f=medslice(arr:@($str);lo:$i64;hi:$i64):$f64{let cnt=hi-lo;let mid=cnt/2;if(cnt%2=0){let a=s.tofloat(arr.get(lo+mid-1));let b=s.tofloat(arr.get(lo+mid));<(a+b)/2.0}el{<s.tofloat(arr.get(lo+mid))}};
+f=fmtnum(x:$f64):$str{<s.fromfloat(x)};
+f=main():$i64{
+let line=s.trim(io.readln());
+let parts=s.split(line;",");
+let nums=mut.@($str);
+lp(let i=0;i<parts.len();i=i+1){let t=s.trim(parts.get(i));if(s.len(t)>0){nums=nums+@(t)}};
+let n=nums.len();
+lp(let a=0;a<n;a=a+1){lp(let b=0;b<n-1-a;b=b+1){let x=s.tofloat(nums.get(b));let y=s.tofloat(nums.get(b+1));if(x>y){let t=nums.get(b);nums=nums.set(b;nums.get(b+1));nums=nums.set(b+1;t)}}};
+let minv=s.tofloat(nums.get(0));
+let maxv=s.tofloat(nums.get(n-1));
+let median=medslice(nums;0;n);
+let q1=medslice(nums;0;n/2);
+let upperlo=mut.0;if(n%2=0){upperlo=n/2}el{upperlo=n/2+1};
+let q3=medslice(nums;upperlo;n);
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(fmtnum(minv);" ");fmtnum(q1));" ");fmtnum(median));" ");fmtnum(q3));" ");fmtnum(maxv)));
+<0}

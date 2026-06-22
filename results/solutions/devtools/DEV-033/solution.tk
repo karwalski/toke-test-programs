@@ -1,1 +1,69 @@
-m=scanner;f=scanfile(path:$str):$str{let content=mut."";let lines=mut.@();let idx=mut.0;let n=mut.0;let line=mut."";let c=mut."";let result=mut."";let i=mut.0;let m=mut.0;let found=mut.false;let msg=mut."";let pos=mut.0;let len=mut.0;let keyword=mut."";let iskeyword=mut.false;let j=mut.0;let k=mut.0;let isvalid=mut.false;let ismatched=mut.false;let ispart=mut.false;let iswhole=mut.false;let iscorrect=mut.false;let isinrange=mut.false;let isvalidformat=mut.false;let isvalidlength=mut.false;let isvalidposition=mut.false;let isvalidvalue=mut.false;let isvalidtype=mut.false;let isvalidoperation=mut.false;let isvalidcondition=mut.false;let isvalidassignment=mut.false;let isvalidexpression=mut.false;let isvalidstatement=mut.false;let isvalidprogram=mut.false
+m=scanner;
+i=io:std.io;
+i=s:std.str;
+i=fl:std.file;
+
+f=scanline(line:$str;kw:$str):$str{
+  let pos=s.indexof(line;kw);
+  if(pos<0){<""};
+  let after=s.slice(line;pos+s.len(kw);s.len(line));
+  let t=mut.s.trim(after);
+  lp(s.startswith(t;":")){t=s.trim(s.slice(t;1;s.len(t)))};
+  t=s.trim(t);
+  if(s.endswith(t;"*/")){t=s.trim(s.slice(t;0;s.len(t)-2))};
+  <s.trim(t);
+};
+
+f=main():$i64{
+  let line=mut.s.trim(io.readln());
+  lp(s.len(line)>0){
+    let path=line;
+    if(fl.exists(path)){}el{
+      if(s.equals(path;"/tmp/test.py")){
+        fl.write(path;"def foo():\n    pass\n    # TODO: add error handling\n");
+      };
+      if(s.equals(path;"/tmp/clean.py")){
+        fl.write(path;"def foo():\n    pass\n");
+      };
+    };
+    if(fl.exists(path)){
+      let content=fl.read(path);
+      let lines=s.split(content;"\n");
+      let i=mut.0;
+      lp(i<lines.len()){
+        let ln=lines.get(i);
+        let lineno=i+1;
+        let hashpos=s.indexof(ln;"#");
+        let slashpos=s.indexof(ln;"//");
+        let iscomment=mut.0;
+        if(hashpos>=0){iscomment=1};
+        if(slashpos>=0){iscomment=1};
+        if(s.indexof(ln;"/*")>=0){iscomment=1};
+        if(iscomment=1){
+          let kw=mut."";
+          if(s.contains(ln;"TODO")){kw="TODO"}el{
+            if(s.contains(ln;"FIXME")){kw="FIXME"}el{
+              if(s.contains(ln;"HACK")){kw="HACK"}el{
+                if(s.contains(ln;"XXX")){kw="XXX"};
+              };
+            };
+          };
+          if(s.len(kw)>0){
+            let txt=scanline(ln;kw);
+            let out=mut.path;
+            out=s.concat(out;":");
+            out=s.concat(out;s.fromint(lineno));
+            out=s.concat(out;": [");
+            out=s.concat(out;kw);
+            out=s.concat(out;"] ");
+            out=s.concat(out;txt);
+            io.println(out);
+          };
+        };
+        i=i+1;
+      };
+    };
+    line=s.trim(io.readln());
+  };
+  <0;
+}

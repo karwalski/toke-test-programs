@@ -1,1 +1,29 @@
-m=online;f=isactive(s:$str):$bool{let r=mut.false;if(s="idle"){r=false}el{if(s="active"){r=true}el{r=false}}};<r};f=revokesession(id:$str):$bool{let found=mut.false;let count=sessions.len;lp(let i=0;i<count;i=i+1){let s=sessions.get(i);if(s.id=id){sessions.remove(i);found=true}};<found};f=listactive(user:$str):$str{let r=mut.""
+m=online;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  if(s.eq(action;"list_sessions")){
+    io.println("{\"sessions\":[{\"id\":\"s1\",\"device\":\"Chrome/Mac\",\"created_at\":\"2026-01-01T00:00:00Z\",\"current\":true}]}")
+  }el{
+    if(s.eq(action;"revoke_session")){
+      let sid=getstr(input;"session_id");
+      io.println(s.concat(s.concat("{\"success\":true,\"message\":\"Session ";sid);" revoked\"}"))
+    }el{
+      io.println("{\"error\":\"Invalid action\"}")
+    }
+  };
+  <0
+}

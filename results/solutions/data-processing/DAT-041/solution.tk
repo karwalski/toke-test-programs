@@ -1,1 +1,14 @@
-m=rle;f=rle(s:$str):$str{let n=s.len;if(n=0){<""};let result=mut."";let i=mut.0;lp(let idx=0;idx<n;idx=idx+1){let current=s.get(idx);if(i=0){result=result+current;i=i+1;}el{if(current=result.get(result.len-1))){let tmp=result.len;result=result+current;}el{result=result+current;};};};<result};f=report(original:$str;encoded:$str):$str{let origlen=original.len;let enclen=encoded.len;let ratio=mut.0.0;if(origlen>0){ratio=enclen as f64/origlen as f64};let ratiostr=ratio as$str;let result=s.concat("original len: ";origlen) as$str+s.concat(", encoded len: ";enclen) as$str+", ratio: "+ratiostr;<result};f=main():$str{let original="aaabbbccccddddeee";let encoded=rle(original);let reportstr=report(original;encoded);<reportstr};
+m=rle;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let data=s.trim(io.readln());
+let n=s.len(data);
+if(n=0){io.println("");io.println("Ratio: 0.00");<0};
+let encoded=mut."";
+let cur=mut.s.slice(data;0;1);
+let count=mut.1;
+lp(let i=1;i<n;i=i+1){let c=s.slice(data;i;i+1);if(s.equals(c;cur)){count=count+1}el{encoded=s.concat(encoded;s.concat(s.fromint(count);cur));cur=c;count=1}};
+encoded=s.concat(encoded;s.concat(s.fromint(count);cur));
+io.println(encoded);
+let ratio=s.tofloat(s.fromint(s.len(encoded)))/s.tofloat(s.fromint(n));
+io.println(s.concat("Ratio: ";s.format(ratio;"%.2f")));
+<0}

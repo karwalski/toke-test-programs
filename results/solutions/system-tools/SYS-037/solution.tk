@@ -1,1 +1,34 @@
-m=regexsearch;f=run(pattern:$str;paths:@$str):$void{let results=searchall(pattern;paths);let count=results.len;lp(let i=0;i<count;i=i+1){let r=results.get(i);let line=r.line;let linenum=r.linenum;let msg="match in ";let part1=msg;let part2=part1+r.filename;let part3=part2+s.concat(":";linenum) as$str;let part4=part3+" -> ";let part5=part4+line;let final=part5;let out=final;let print=out;};};f=searchall(pattern:$str;paths:@$str):@$searchresult{let results=mut.@();lp(let i=0;i<paths.len;i=i+1){let path=paths.get(i);let r=searchinpath(pattern;path);results=results+@(r);};<results};f=searchinpath(pattern:$str;path:$str):@$searchresult{let results=mut.@();let content=loadfilecontent(path);let lines=content.split("\n");let linecount=lines.len;lp(let i=0;i<linecount;i=i+1){let
+m=grep;i=io:std.io;i=s:std.str;
+f=ch(str:$str;i:$i64):$str{<s.slice(str;i;i+1)};
+f=matchstar(c:$str;pat:$str;pi:$i64;text:$str;ti:$i64):$bool{let n=s.len(text);let t=mut.ti;
+lp(1=1){if(matchhere(pat;pi;text;t)){<true};if(t>=n){<false};let tc=ch(text;t);if(!s.eq(c;".")){if(!s.eq(c;tc)){<false}};t=t+1}};
+f=matchhere(pat:$str;pi:$i64;text:$str;ti:$i64):$bool{let pn=s.len(pat);
+if(pi>=pn){<true};
+let pc=ch(pat;pi);
+if(pi+1<pn){let nxt=ch(pat;pi+1);if(s.eq(nxt;"*")){<matchstar(pc;pat;pi+2;text;ti)}};
+if(ti>=s.len(text)){<false};
+let tc=ch(text;ti);
+if(s.eq(pc;".")){<matchhere(pat;pi+1;text;ti+1)};
+if(s.eq(pc;tc)){<matchhere(pat;pi+1;text;ti+1)};
+<false};
+f=search(pat:$str;text:$str):$bool{let n=s.len(text);let i=mut.0;
+lp(1=1){if(matchhere(pat;0;text;i)){<true};if(i>=n){<false};i=i+1}};
+f=main():$i64{let pattern=s.trimsuffix(io.readln();"\n");
+let sep1=s.trimsuffix(io.readln();"\n");
+let fnamesLine=s.trimsuffix(io.readln();"\n");
+let fnames=s.split(fnamesLine;"|");
+let contentLines=mut.@("");contentLines=@();
+lp(1=1){let raw=io.readln();if(s.len(raw)=0){br};let line=s.trimsuffix(raw;"\n");if(s.eq(s.trim(line);"---")){br};contentLines=contentLines+@(line)};
+let files=mut.@("");files=@();let cur=mut."";let firstLine=mut.true;let started=mut.false;
+let fileLineCounts=mut.@(0);fileLineCounts=@();
+let i=mut.0;
+let fileBlocks=mut.@("");fileBlocks=@();let blockCount=mut.@(0);blockCount=@();
+let curBlock=mut."";let curCount=mut.0;let any=mut.false;
+lp(i<contentLines.len()){let ln=contentLines.get(i);
+if(s.eq(ln;"--FILE--")){fileBlocks=fileBlocks+@(curBlock);blockCount=blockCount+@(curCount);curBlock="";curCount=0;any=true}el{if(curCount>0){curBlock=s.concat(curBlock;"\n")};curBlock=s.concat(curBlock;ln);curCount=curCount+1};i=i+1};
+fileBlocks=fileBlocks+@(curBlock);blockCount=blockCount+@(curCount);
+let nf=fnames.len();let f=mut.0;
+lp(f<nf){if(f<fileBlocks.len()){let fname=fnames.get(f);let block=fileBlocks.get(f);let cnt=blockCount.get(f);
+let lines=mut.@("");lines=@();if(cnt>0){lines=s.split(block;"\n")};
+let li=mut.0;lp(li<cnt){let line=lines.get(li);if(search(pattern;line)){let out=s.concat(s.concat(s.concat(fname;":");s.fromint(li+1));s.concat(":";line));io.println(out)};li=li+1}};f=f+1};
+<0}

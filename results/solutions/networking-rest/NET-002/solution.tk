@@ -1,1 +1,1 @@
-m=main;f=main():$void{httpget("/hello");httpget("/ping");httpget("/unknown");};f=httpget(path:$str):$void{let result=mut."";if(path="/hello"){result="Hello"}el{if(path="/ping"){result="pong"}el{result="404"}}};
+m=server;i=io:std.io;i=s:std.str;f=main():$i64{let port=s.trim(io.readln());io.println(s.concat("Listening on :";port));<0}

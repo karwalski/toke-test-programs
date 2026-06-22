@@ -1,1 +1,38 @@
-m=privacy;f=checkpermission(user:$str;permission:$str):$bool{let perms=mut.@();if(permission="read"){perms=@("read");}el{if(permission="write"){perms=@("write");}el{if(permission="execute"){perms=@("execute");}el{perms=@();};};};let found=mut.false;lp(let i=0;i<perms.len;i=i+1){if(perms.get(i)=user)){found=true;};};<found};f=updatepermission(user:$str;permission:$str;current:$str):$str{let result=mut."";if(permission="read"){result=s.concat(user;" can read");}el{if(permission="write"){result=s.concat(user;" can write");}el{if(permission="execute"){result=s.concat(user;" can execute");}el{result="unknown permission";};};};if(current.len>0){result=s.concat(s.concat(s.concat(result;" (current: ");current);")");};<result};f=main():$i64{let perm=checkpermission("alice";"read");if(perm){<0;}el{<1;};};
+m=privacy;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let raw=mut."";
+  let line=mut.io.readln();
+  lp(s.len(line)>0){raw=s.concat(raw;line);line=io.readln()};
+  let input=raw;
+
+  let key="\"settings\":";
+  let ks=s.indexof(input;key);
+  let settings=mut."{}";
+  if(ks>=0){
+    let vs=ks+s.len(key);
+    let rest=s.slice(input;vs;s.len(input));
+    let depth=mut.0;
+    let i=mut.0;
+    let started=mut.0;
+    let endpos=mut.0;
+    let done=mut.0;
+    lp(i<s.len(rest)){
+      if(done=0){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"{")){depth=depth+1;started=1};
+        if(s.equals(c;"}")){depth=depth-1;if(depth=0){if(started=1){endpos=i+1;done=1}}};
+      };
+      i=i+1;
+    };
+    settings=s.slice(rest;0;endpos);
+  };
+
+  let out=mut."{\"settings\":";
+  out=s.concat(out;settings);
+  out=s.concat(out;",\"status\":\"updated\"}");
+  io.println(out);
+  <0;
+}

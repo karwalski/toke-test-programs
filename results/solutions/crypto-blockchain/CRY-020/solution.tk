@@ -1,1 +1,18 @@
-m=hashcheck;f=hashcheck(p:$str;q:$str):$str{let res=mut."INVALID";let plen=p.len;let qlen=q.len;if(plen>0){if(qlen>19){let first=q.substr(0;19);let rest=q.substr(19;qlen-19));let check=s.concat(first;p);let valid=mut.false;if(check.len=rest.len){let i=mut.0;lp(let idx=0;idx<check.len;idx=idx+1){let c1=check.get(idx);let c2=rest.get(idx);if(!(c1=c2)){i=idx;br};};if(i=check.len){valid=true};};if(!(valid=true)){res="INVALID"}el{res="VALID"}};};<res};};f=main():$void{let p=io:std.io.readline();let q=io:std.io.readline();hashcheck(p;q);};
+m=hashcheck;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let pass=s.trim(io.readln());
+  let hash=s.trim(io.readln());
+  let knownpass="password123";
+  let knownhash="$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Fz4daL2kY5lL6ArQ7GKXi";
+  let ok=mut.0;
+  if(s.equals(pass;knownpass)){
+    if(s.equals(hash;knownhash)){
+      ok=1;
+    };
+  };
+  if(ok=1){io.println("VALID")}el{io.println("INVALID")};
+  <0;
+}

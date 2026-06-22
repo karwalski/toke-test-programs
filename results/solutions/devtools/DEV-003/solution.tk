@@ -1,1 +1,55 @@
-m=semver;i=io:std.io;i=s:std.str;f=parseversion(v:$str):$i64{let parts=v.split(".");let major=parts.get(0);let minor=parts.get(1);let patch=parts.get(2);<major};f=compare(a:$str;b:$str):$i64{let ap=parseversion(a);let bp=parseversion(b);if(ap<bp){<1};if(ap>bp){<-1};<0};f=sortversions(versions:@$str):@$str{let n=versions.len;let sorted=mut.versions;lp(let i=0;i<n;i=i+1){lp(let j=0;j+1<n;j=j+1){let a=sorted.get(j);let b=sorted.get(j+1);if(compare(a;b)>0){let tmp=sorted.get(j);sorted.get(j)=sorted.get(j+1);sorted.get(j+1)=tmp;};};};<sorted};f=main():$i64{let cmd=io.readln();if(cmd=="sort"){let versions=@$str{};lp(true){let line=io.readln();if(line!=""){versions.push(line);}else{break;};};let sorted=sortversions(versions);lp(let i=0;i<sorted.len;i=i+1){io.println(sorted.get(i));};};if(cmd=="compare"){let a=io.readln();let b=io.readln();let result=compare(a;b);io.println(s.fromint(result));};if(cmd=="validate"){lp(true){let line=io.readln();if(line!=""){let parts=line.split(".");if(parts.len==3){io.println("VALID");}else{io.println("INVALID");};;}else{break;};};;};<0};
+m=semver;i=io:std.io;i=s:std.str;
+f=cmp(a:$str;b:$str):$i64{
+  let pa=s.split(a;".");
+  let pb=s.split(b;".");
+  lp(let i=0;i<3;i=i+1){
+    let na=mut.0;
+    let nb=mut.0;
+    if(i<pa.len()){na=s.toint(pa.get(i))};
+    if(i<pb.len()){nb=s.toint(pb.get(i))};
+    if(na<nb){<0-1};
+    if(na>nb){<1}
+  };
+  <0
+};
+f=main():$i64{
+  let command=s.trim(io.readln());
+  let versions=mut.@();
+  lp(1=1){
+    let line=s.trim(io.readln());
+    if(s.len(line)=0){br};
+    versions=versions+@(line)
+  };
+  if(s.eq(command;"compare")){
+    if(versions.len()>=2){
+      io.println(s.fromint(cmp(versions.get(0);versions.get(1))))
+    };
+    <0
+  };
+  if(s.eq(command;"sort")){
+    let arr=mut.versions;
+    let n=arr.len();
+    lp(let i=0;i<n;i=i+1){
+      lp(let j=0;j<n-1-i;j=j+1){
+        if(cmp(arr.get(j);arr.get(j+1))>0){
+          let tmp=arr.get(j);
+          let na=mut.@();
+          lp(let k=0;k<n;k=k+1){
+            if(k=j){na=na+@(arr.get(j+1))}el{if(k=j+1){na=na+@(tmp)}el{na=na+@(arr.get(k))}}
+          };
+          arr=na
+        }
+      }
+    };
+    lp(let i=0;i<arr.len();i=i+1){io.println(arr.get(i))};
+    <0
+  };
+  if(s.eq(command;"validate")){
+    lp(let i=0;i<versions.len();i=i+1){
+      let parts=s.split(versions.get(i);".");
+      if(parts.len()=3){io.println("VALID")}el{io.println("INVALID")}
+    };
+    <0
+  };
+  <0
+}

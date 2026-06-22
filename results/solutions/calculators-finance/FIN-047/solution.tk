@@ -1,1 +1,49 @@
-m=pearson;f=pearson(x:$str;y:$str):$str{let xvals=x.split(",");let yvals=y.split(",");let n=xvals.len;let sumx=mut.0;let sumy=mut.0;let sumxy=mut.0;let sumx2=mut.0;let sumy2=mut.0;lp(let i=0;i<n;i=i+1){let xi=xvals.get(i).parsef64();let yi=yvals.get(i).parsef64();sumx=sumx+xi;sumy=sumy+yi;sumxy=sumxy+xi*yi;sumx2=sumx2+xi*xi;sumy2=sumy2+yi*yi};let meanx=sumx/n as f64;let meany=sumy/n as f64;let num=mut.0;let den
+m=pearson;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=parsef(line:$str):@($f64){
+  let parts=s.split(line;",");
+  let out=mut.@();
+  let i=mut.0;
+  lp(i<parts.len()){
+    let p=s.trim(parts.get(i));
+    if(s.len(p)>0){out=out+@(s.tofloat(p))};
+    i=i+1;
+  };
+  <out;
+};
+
+f=corr(x:@($f64);y:@($f64)):$f64{
+  let n=x.len();
+  let sumx=mut.0.0;
+  let sumy=mut.0.0;
+  let i=mut.0;
+  lp(i<n){sumx=sumx+x.get(i);sumy=sumy+y.get(i);i=i+1};
+  let nf=s.tofloat(s.fromint(n));
+  let meanx=sumx/nf;
+  let meany=sumy/nf;
+  let num=mut.0.0;
+  let ssx=mut.0.0;
+  let ssy=mut.0.0;
+  let k=mut.0;
+  lp(k<n){
+    let dx=x.get(k)-meanx;
+    let dy=y.get(k)-meany;
+    num=num+dx*dy;
+    ssx=ssx+dx*dx;
+    ssy=ssy+dy*dy;
+    k=k+1;
+  };
+  let den=math.sqrt(ssx*ssy);
+  if(den=0.0){<0.0};
+  <num/den;
+};
+
+f=main():$i64{
+  let x=parsef(io.readln());
+  let y=parsef(io.readln());
+  io.println(s.format(corr(x;y);"%.4f"));
+  <0;
+}

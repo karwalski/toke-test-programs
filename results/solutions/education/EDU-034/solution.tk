@@ -1,1 +1,19 @@
-m=outline;f=extractpoints(text:$str):$str{let lines=text.split("\n");let result=mut."";let depth=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let spaces=line.len-line.trim().len;let currentdepth=spaces/2;if(currentdepth>depth){result=s.concat(s.concat(result;line.trim());"\n");depth=currentdepth;}el{if(currentdepth<depth){let tmp=mut."";lp(let j=0;j<currentdepth;j=j+1){tmp=s.concat(tmp;"  ");};result=s.concat(s.concat(tmp;line.trim());"\n");depth=currentdepth;}el{result=s.concat(s.concat(result;line.trim());"\n");};};};<result};f=main():$void{let input="Introduction to Programming\n  Variables and Types\n  Operators and Expressions\n  Control Structures\n    Conditional Statements\n    Loops\n      For Loops\n      While Loops\n  Functions\n  Data Structures\n  File I/O\n  Networking\n  Error Handling\n  Best Practices";let output=extractpoints(input);<output};
+m=outline;i=io:std.io;i=s:std.str;
+f=roman(n:$i64):$str{let arr=@("I";"II";"III";"IV";"V";"VI";"VII";"VIII";"IX";"X");if(n>=1){if(n<=10){<arr.get(n-1)}};<s.fromint(n)};
+f=letter(n:$i64):$str{let abc="ABCDEFGHIJKLMNOPQRSTUVWXYZ";if(n>=1){if(n<=26){<s.slice(abc;n-1;n)}};<s.fromint(n)};
+f=main():$i64{
+let c0=mut.0;let c1=mut.0;let c2=mut.0;
+lp(1=1){
+let line=io.readln();
+if(s.len(line)=0){br};
+let trimmed=s.trim(line);
+if(s.len(trimmed)>0){
+let indent=mut.0;let i=mut.0;let n=s.len(line);let go=mut.true;
+lp(i<n){if(go){let ch=s.slice(line;i;i+1);if(s.equals(ch;" ")){indent=indent+1}el{go=false}};i=i+1};
+let level=indent/2;
+let marker=mut."";
+if(level=0){c0=c0+1;c1=0;c2=0;marker=s.concat(roman(c0);".")}el{if(level=1){c1=c1+1;c2=0;marker=s.concat(letter(c1);".")}el{c2=c2+1;marker=s.concat(s.fromint(c2);".")}};
+let pad=mut."";let k=mut.0;lp(k<level){pad=s.concat(pad;"  ");k=k+1};
+io.println(s.concat(s.concat(s.concat(pad;marker);" ");trimmed))
+}};
+<0}

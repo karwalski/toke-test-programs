@@ -1,1 +1,114 @@
-m=costcalc;i=io:std.io;i=j:std.json;i=s:std.str;f=main():$i64{let input=j.parse(io.readln());let plan=input.get("plan");let pricing=input.get("pricing");let total=mut.0.0;let counts=j.parse("{}");let bdown=j.parse("{}");lp(let idx=0;idx<plan.len;idx=idx+1){let call=plan.get(idx);let tool=call.get("tool");let price=pricing.get(tool);total=total+price;let oldcount=counts.get(tool);if(oldcount=j.null()){counts.set(tool;1)}el{counts.set(tool;oldcount+1)}};let tools=pricing.keys;lp(let idx=0;idx<tools.len;idx=idx+1){let tool=tools.get(idx);let count=counts.get(tool);if(count!=j.null()){let price=pricing.get(tool);let cost=count*price;let info=j.parse("{}");info.set("count";count);info.set("cost";cost);bdown.set(tool;info)}};let result=j.parse("{}");result.set("total_cost";total);result.set("breakdown";bdown);io.println(j.stringify(result));<0}
+m=costcalc;
+i=io:std.io;
+i=s:std.str;
+
+f=toscaled(numstr:$str):$i64{
+  let t=s.trim(numstr);
+  let dot=s.indexof(t;".");
+  if(dot<0){
+    let whole=s.toint(t);
+    <whole*1000000
+  };
+  let ip=s.slice(t;0;dot as $u64);
+  let fp=s.slice(t;(dot as $u64)+1;s.len(t));
+  let ipart=mut.0;
+  if(s.len(ip)>0){ipart=s.toint(ip)};
+  let frac=mut.fp;
+  lp(s.len(frac)<6){frac=s.concat(frac;"0")};
+  if(s.len(frac)>6){frac=s.slice(frac;0;6)};
+  let fpart=s.toint(frac);
+  <ipart*1000000+fpart
+};
+
+f=fmtscaled(v:$i64):$str{
+  let ipart=v/1000000;
+  let fpart=v-ipart*1000000;
+  if(fpart=0){
+    <s.fromint(ipart)
+  };
+  let fs=mut.s.fromint(fpart);
+  lp(s.len(fs)<6){fs=s.concat("0";fs)};
+  let endd=mut.s.len(fs) as $i64;
+  lp(endd>1){
+    let last=s.slice(fs;(endd-1) as $u64;endd as $u64);
+    if(s.eq(last;"0")){endd=endd-1}el{br}
+  };
+  let trimmed=s.slice(fs;0;endd as $u64);
+  <s.concat(s.concat(s.fromint(ipart);".");trimmed)
+};
+
+f=extract(seg:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(seg;pat);
+  if(idx<0){<""};
+  let after=s.slice(seg;(idx as $u64)+s.len(pat);s.len(seg));
+  let a=s.trim(after);
+  if(s.startswith(a;"\"")){
+    let rest=s.slice(a;1;s.len(a));
+    let q=s.indexof(rest;"\"");
+    <s.slice(rest;0;q as $u64)
+  };
+  let stop=mut.s.len(a) as $i64;
+  let i=mut.0;
+  lp((i as $u64)<s.len(a)){
+    let c=s.slice(a;i as $u64;(i as $u64)+1);
+    if(s.eq(c;",")){stop=i;i=s.len(a) as $i64}el{if(s.eq(c;"}")){stop=i;i=s.len(a) as $i64}el{i=i+1}}
+  };
+  <s.trim(s.slice(a;0;stop as $u64))
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let planmark=s.indexof(input;"\"plan\":[");
+  let afterplan=s.slice(input;(planmark as $u64)+8;s.len(input));
+  let planend=s.indexof(afterplan;"]");
+  let planbody=s.slice(afterplan;0;planend as $u64);
+  let toolsegs=s.split(planbody;"\"tool\":");
+  let names=mut.@();
+  let counts=mut.@();
+  let order=mut.@();
+  let i=mut.1;
+  lp(i<toolsegs.len()){
+    let seg=toolsegs.get(i);
+    let t=s.trim(seg);
+    let rest=s.slice(t;1;s.len(t));
+    let q=s.indexof(rest;"\"");
+    let tool=s.slice(rest;0;q as $u64);
+    let fidx=mut.0-1;
+    let j=mut.0;
+    lp(j<names.len()){if(s.eq(names.get(j);tool)){fidx=j};j=j+1};
+    if(fidx<0){
+      names=names.push(tool);
+      counts=counts.push(1);
+      order=order.push(tool)
+    }el{
+      counts=counts.set(fidx;counts.get(fidx)+1)
+    };
+    i=i+1
+  };
+  let pmark=s.indexof(input;"\"pricing\":{");
+  let afterp=s.slice(input;(pmark as $u64)+11;s.len(input));
+  let total=mut.0;
+  let bparts=mut.@();
+  let k=mut.0;
+  lp(k<order.len()){
+    let tool=order.get(k);
+    let cnt=counts.get(k);
+    let price=toscaled(extract(afterp;tool));
+    let cost=cnt*price;
+    total=total+cost;
+    let entry=s.concat(s.concat(s.concat(s.concat("\"";tool);"\":{\"count\":");s.fromint(cnt));s.concat(",\"cost\":";s.concat(fmtscaled(cost);"}")));
+    bparts=bparts.push(entry);
+    k=k+1
+  };
+  let bdown=mut."";
+  let m=mut.0;
+  lp(m<bparts.len()){
+    if(m>0){bdown=s.concat(bdown;",")};
+    bdown=s.concat(bdown;bparts.get(m));
+    m=m+1
+  };
+  let out=s.concat(s.concat("{\"total_cost\":";fmtscaled(total));s.concat(",\"breakdown\":{";s.concat(bdown;"}}")));
+  io.println(out);
+  <0
+}

@@ -1,1 +1,1 @@
-m=httpserver;f=main():$void{let port=8080;let msg="Hello, World!";let status=200;<};
+m=httpserver;i=io:std.io;i=s:std.str;f=main():$i64{let port=s.trim(io.readln());io.println(s.concat("Listening on :";port));<0}

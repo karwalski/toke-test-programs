@@ -1,12 +1,1 @@
-m=sqli;
-i=io:std.io;
-i=s:std.str;
-f=solve(p0:$str):$str{let val=p0;let other=mut."";let found=mut.false;lp(let i=0;i<val.len;i=i+1){let ch=val.get(i);if(ch=" "){found=true;br};if(!(found)){other=other+ch};};if(!(found)){<other};let rest=mut."";lp(let i=found;i<val.len;i=i+1){let ch=val.get(i);rest=rest+ch;};let result=mut."";result=s.concat(result;"Attack type: ");if(other.len>0){result=s.concat(result;"SQL Injection");if(other.len>0){result=s.concat(result;" via parameterised query");};}el{result=s.concat(result;"Unknown");};result=s.concat(result;"\n");result=s.concat(result;"Victim query: ");result=s.concat(s.concat(result;rest);"\n");result=s.concat(result;"Recommendation: Use parameterised queries to prevent SQL injection.\n");<result};
-f=main():$i64{
-let line=io.readln();
-if(line.len>0){
-let result=solve(line);
-io.println(result);
-};
-<0
-}
+m=sqli;i=io:std.io;i=s:std.str;f=detect(line:$str):$str{let up=s.upper(line);let hasq=s.contains(line;"'");if(s.contains(up;"UNION")){if(s.contains(up;"SELECT")){<"union_based"}};if(s.contains(up;"WAITFOR")){<"time_based"};if(s.contains(up;"SLEEP(")){<"time_based"};if(s.contains(up;"BENCHMARK(")){<"time_based"};if(s.contains(up;"DROP TABLE")){<"error_based"};if(s.contains(up;"INSERT INTO")){<"error_based"};if(s.contains(up;"DELETE FROM")){<"error_based"};if(hasq){if(s.contains(up;"OR")){<"boolean_based"};if(s.contains(up;"AND")){<"boolean_based"}};<"[]"};f=main():$i64{let line=s.trim(io.readln());if(s.len(line)=0){io.println("[]")}el{io.println(detect(line))};<0}

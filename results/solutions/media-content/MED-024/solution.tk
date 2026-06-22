@@ -1,1 +1,15 @@
-m=wordbigram;f=extractbigrams(text:$str):@$str{let words=text.split(" ");let n=words.len;let bigrams=mut.@();lp(let i=0;i<n-1;i=i+1){let w1=words.get(i);let w2=words.get(i+1);let bg=w1+"_"+w2;bigrams=bigrams.push(bg)};<bigrams>};f=countbigramfreq(bigrams:@$str):$str{let freq=mut."";lp(let i=0;i<bigrams.len;i=i+1){let bg=bigrams.get(i);let found=mut.false;let j=mut.0;lp(let k=0;k<freq.len;k=k+1){let ch=freq.get(k);if(ch=bg){found=true;j=k};};if(found){j=j+1;freq=freq+bg}el{freq=freq+bg}};<freq>};f=wordbigram(text:$str):$str{let bigrams=extractbigrams(text);let freq=countbigramfreq(bigrams);<freq>};
+m=bigram;i=io:std.io;i=s:std.str;
+f=main():$i64{let text=s.trim(io.readln());let words=s.split(text;" ");
+let clean=mut.@("");clean=@();let w=mut.0;lp(w<words.len()){let t=s.trim(words.get(w));if(s.len(t)>0){clean=clean+@(t)};w=w+1};
+let nw=clean.len();
+let keys=mut.@("");keys=@();let counts=mut.@(0);counts=@();
+let i=mut.0;lp(i<nw-1){let bg=s.concat(s.concat(clean.get(i);" ");clean.get(i+1));
+let found=mut.-1;let j=mut.0;lp(j<keys.len()){if(s.eq(keys.get(j);bg)){found=j};j=j+1};
+if(found<0){keys=keys+@(bg);counts=counts+@(1)}el{
+let nc=mut.@(0);nc=@();let k=mut.0;lp(k<counts.len()){if(k=found){nc=nc+@(counts.get(k)+1)}el{nc=nc+@(counts.get(k))};k=k+1};counts=nc};
+i=i+1};
+let nk=keys.len();
+let order=mut.@(0);order=@();let o=mut.0;lp(o<nk){order=order+@(o);o=o+1};
+let a=mut.0;lp(a<nk){let b=mut.0;lp(b<nk-1){let p=order.get(b);let q=order.get(b+1);if(counts.get(p)<counts.get(q)){let no=mut.@(0);no=@();let k=mut.0;lp(k<nk){if(k=b){no=no+@(q)}el{if(k=b+1){no=no+@(p)}el{no=no+@(order.get(k))}};k=k+1};order=no};b=b+1};a=a+1};
+let z=mut.0;lp(z<nk){let idx=order.get(z);let line=s.concat(s.concat("\"";keys.get(idx));s.concat("\": ";s.fromint(counts.get(idx))));io.println(line);z=z+1};
+<0}

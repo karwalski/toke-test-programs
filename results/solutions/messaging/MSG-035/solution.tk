@@ -1,1 +1,118 @@
-m=priorityqueue;f=enqueue(queue:$str;message:$str;priority:$i64):$str{let entry=mut."";entry=s.concat(entry;message);entry=s.concat(entry;"|");entry=s.concat(entry;priority) as$str;queue=s.concat(queue;entry);queue=s.concat(queue;"\n");<queue};f=dequeue(queue:$str):$str{let lines=queue.split("\n");let n=lines.len;let minpri=mut.999999;let minidx=mut.0;lp(let idx=0;idx<n;idx=idx+1){let line=lines.get(idx);let parts=line.split("|");let hasparts=parts.len>2;let pri=mut.0;if(hasparts){pri=parts.get(2).to.i64};if(pri<minpri){minpri=pri;minidx=idx}};if(minidx>0){let newqueue=mut."";lp(let idx=0;idx<minidx;idx=idx+1){let line=lines.get(idx);newqueue=newqueue+line+"\n";};lp(let idx=minidx+1;idx<n;idx=idx+1){let line=
+m=priorityqueue;
+i=io:std.io;
+i=s:std.str;
+
+f=jstr(seg:$str;field:$str):$str{
+  let key=s.concat("\"";s.concat(field;"\":\""));
+  let start=s.indexof(seg;key);
+  if(start<0){<""};
+  let vs=start+s.len(key);
+  let rest=s.slice(seg;vs;s.len(seg));
+  let end=s.indexof(rest;"\"");
+  if(end<0){<""};
+  <s.slice(rest;0;end);
+};
+
+f=jint(seg:$str;field:$str):$i64{
+  let key=s.concat("\"";s.concat(field;"\":"));
+  let start=s.indexof(seg;key);
+  if(start<0){<0};
+  let vs=start+s.len(key);
+  let rest=s.slice(seg;vs;s.len(seg));
+  let i=mut.0;
+  let numstr=mut."";
+  let stop=mut.0;
+  lp(i<s.len(rest)){
+    if(stop=0){
+      let c=s.slice(rest;i;i+1);
+      let isdigit=mut.0;
+      if(s.contains("0123456789";c)){isdigit=1};
+      if(s.equals(c;"-")){isdigit=1};
+      if(isdigit=1){numstr=s.concat(numstr;c)}el{stop=1};
+    };
+    i=i+1;
+  };
+  if(s.len(numstr)=0){<0};
+  <s.toint(numstr);
+};
+
+f=ordof(c:$str):$i64{
+  let tbl=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  let idx=s.indexof(tbl;c);
+  <idx;
+};
+
+f=strless(a:$str;b:$str):$i64{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let n=mut.la;
+  if(lb<n){n=lb};
+  let i=mut.0;
+  lp(i<n){
+    let ca=ordof(s.slice(a;i;i+1));
+    let cb=ordof(s.slice(b;i;i+1));
+    if(ca<cb){<1};
+    if(ca>cb){<0};
+    i=i+1;
+  };
+  if(la<lb){<1};
+  <0;
+};
+
+f=main():$i64{
+  let raw=mut."";
+  let line=mut.io.readln();
+  lp(s.len(line)>0){raw=s.concat(raw;line);line=io.readln()};
+  let input=raw;
+
+  let msgs=mut.@();
+  let pris=mut.@();
+  let active=mut.@();
+
+  let segs=s.split(input;"{");
+  let si=mut.0;
+  lp(si<segs.len()){
+    let seg=segs.get(si);
+    let op=jstr(seg;"op");
+    if(s.equals(op;"enqueue")){
+      let m=jstr(seg;"msg");
+      let p=jint(seg;"priority");
+      msgs=msgs+@(m);
+      pris=pris+@(p);
+      active=active+@(1);
+    };
+    if(s.equals(op;"dequeue")){
+      let besti=mut.0-1;
+      let k=mut.0;
+      lp(k<msgs.len()){
+        if(active.get(k)=1){
+          if(besti<0){
+            besti=k;
+          }el{
+            if(pris.get(k)>pris.get(besti)){
+              besti=k;
+            }el{
+              if(pris.get(k)=pris.get(besti)){
+                if(strless(msgs.get(k);msgs.get(besti))=1){besti=k};
+              };
+            };
+          };
+        };
+        k=k+1;
+      };
+      if(besti<0){
+        io.println("dequeue: EMPTY");
+      }el{
+        active=active.set(besti;0);
+        let out=mut."dequeue: ";
+        out=s.concat(out;msgs.get(besti));
+        out=s.concat(out;" (priority ");
+        out=s.concat(out;s.fromint(pris.get(besti)));
+        out=s.concat(out;")");
+        io.println(out);
+      };
+    };
+    si=si+1;
+  };
+  <0;
+}

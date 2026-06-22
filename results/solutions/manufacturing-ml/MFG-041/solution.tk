@@ -1,1 +1,21 @@
-m=tt;f=calc(tot:$i64;cnt:$i64):$f64{let r=mut.0.0;if(cnt>0){r=tot as$f64/cnt as$f64};<r};f=compare(tgt:$f64;act:$f64):$str{let r=mut."";if(tgt>act){r="slow"}el{if(tgt<act){r="fast"}el{r="ok"}};<r};f=main():$i64{let t=calc(1000;10));let r=compare(t;900.0);<0};
+m=takt;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let avail=mut.0.0;
+let demand=mut.0.0;
+let names=mut.@($str);
+let cycles=mut.@($str);
+lp(1=1){let l=io.readln();if(s.len(l)=0){br};let line=s.trimsuffix(l;"\n");if(s.len(line)=0){br};let parts=s.split(line;",");if(parts.len()>=2){let key=parts.get(0);let val=parts.get(1);if(s.equals(key;"available_time")){avail=s.tofloat(val)}el{if(s.equals(key;"demand")){demand=s.tofloat(val)}el{if(s.equals(key;"station")){}el{names=names+@(key);cycles=cycles+@(val)}}}}};
+let takt=avail/demand;
+let out=mut."{\"takt_time\":";
+out=s.concat(out;s.fromfloat(takt));
+out=s.concat(out;",\"stations\":[");
+lp(let i=0;i<names.len();i=i+1){
+if(i>0){out=s.concat(out;",")};
+out=s.concat(out;"{\"station\":\"");
+out=s.concat(out;names.get(i));
+out=s.concat(out;"\",\"meets_takt\":");
+let cyc=s.tofloat(cycles.get(i));if(cyc<=takt){out=s.concat(out;"true")}el{out=s.concat(out;"false")};
+out=s.concat(out;"}")};
+out=s.concat(out;"]}");
+io.println(out);
+<0}

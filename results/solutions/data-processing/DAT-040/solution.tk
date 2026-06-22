@@ -1,1 +1,134 @@
-m=report;f=buildreport(data:$str;title:$str):$str{let out=mut."";let lines=data.split("\n");let n=lines.len;lp(let i=0;i<n;i=i+1){let line=lines.get(i);let prefix=title;prefix=prefix+": ";prefix=prefix+"Line ";let idx=i+1;let idxstr=idx as$str;prefix=prefix+idxstr;prefix=prefix+": ";out=out+prefix;out=out+line;out=s.concat(out;"\n");};<out};f=main():$void{let data="apple 100\nbanana 20\ncherry 5\n";let title="Fruit Inventory";let report=buildreport(data;title);<;};
+m=report;
+i=io:std.io;
+i=s:std.str;
+
+f=rawval(obj:$str;key:$str):$str{
+  let k=s.concat("\"";s.concat(key;"\":"));
+  let pos=s.indexof(obj;k);
+  if(pos<0){<""};
+  let vs=pos+s.len(k);
+  let rest=s.slice(obj;vs;s.len(obj));
+  if(s.startswith(rest;"\"")){
+    let inner=s.slice(rest;1;s.len(rest));
+    let e=s.indexof(inner;"\"");
+    <s.slice(inner;0;e);
+  };
+  let i=mut.0;
+  let out=mut."";
+  let stop=mut.0;
+  lp(i<s.len(rest)){
+    if(stop=0){
+      let c=s.slice(rest;i;i+1);
+      if(s.equals(c;",")){stop=1}el{if(s.equals(c;"}")){stop=1}el{if(s.equals(c;"]")){stop=1}el{out=s.concat(out;c)}}};
+    };
+    i=i+1;
+  };
+  <s.trim(out);
+};
+
+f=israwstr(obj:$str;key:$str):$i64{
+  let k=s.concat("\"";s.concat(key;"\":"));
+  let pos=s.indexof(obj;k);
+  if(pos<0){<0};
+  let vs=pos+s.len(k);
+  let rest=s.slice(obj;vs;s.len(obj));
+  if(s.startswith(rest;"\"")){<1};
+  <0;
+};
+
+f=fmtg(num:$str):$str{
+  if(s.contains(num;".")){
+    let dotpos=s.indexof(num;".");
+    let intpart=s.slice(num;0;dotpos);
+    let frac=s.slice(num;dotpos+1;s.len(num));
+    let end=mut.s.len(frac);
+    lp(end>0){
+      if(s.equals(s.slice(frac;end-1;end);"0")){end=end-1}el{br};
+    };
+    if(end=0){<intpart};
+    <s.concat(intpart;s.concat(".";s.slice(frac;0;end)));
+  };
+  <num;
+};
+
+f=subst(line:$str;json:$str):$str{
+  let result=mut.line;
+  lp(s.indexof(result;"{{")>=0){
+    let start=s.indexof(result;"{{");
+    let after=s.slice(result;start+2;s.len(result));
+    let endrel=s.indexof(after;"}}");
+    if(endrel<0){br};
+    let field=s.slice(after;0;endrel);
+    let val=rawval(json;field);
+    let pre=s.slice(result;0;start);
+    let post=s.slice(result;start+2+endrel+2;s.len(result));
+    result=s.concat(pre;s.concat(val;post));
+  };
+  <result;
+};
+
+f=main():$i64{
+  let raw=mut."";
+  let first=mut.1;
+  let line=mut.io.readln();
+  lp(s.len(line)>0){
+    if(first=1){raw=line;first=0}el{raw=s.concat(raw;s.concat("\n";line))};
+    line=io.readln();
+  };
+  let json=mut.s.trim(io.readln());
+  let more=mut.io.readln();
+  lp(s.len(more)>0){json=s.concat(json;s.trim(more));more=io.readln()};
+
+  let tlines=s.split(raw;"\n");
+  let out=mut."";
+  let firstout=mut.1;
+  let li=mut.0;
+  lp(li<tlines.len()){
+    let tl=tlines.get(li);
+    if(s.startswith(tl;"{{TABLE:")){
+      let colspec=s.slice(tl;8;s.len(tl)-2);
+      let colparts=s.split(colspec;",");
+      let cols=mut.@();
+      let ci=mut.0;
+      lp(ci<colparts.len()){cols=cols+@(s.trim(colparts.get(ci)));ci=ci+1};
+
+      let hdr=mut."";
+      let h=mut.0;
+      lp(h<cols.len()){if(h>0){hdr=s.concat(hdr;"  ")};hdr=s.concat(hdr;cols.get(h));h=h+1};
+      if(firstout=1){out=hdr;firstout=0}el{out=s.concat(out;s.concat("\n";hdr))};
+
+      let rk="\"rows\":";
+      let rp=s.indexof(json;rk);
+      if(rp>=0){
+        let afterr=s.slice(json;rp+s.len(rk);s.len(json));
+        let lb=s.indexof(afterr;"[");
+        let rowsbody=s.slice(afterr;lb+1;s.len(afterr));
+        let segs=s.split(rowsbody;"{");
+        let si=mut.0;
+        lp(si<segs.len()){
+          let seg=segs.get(si);
+          if(s.contains(seg;":")){
+            let rowline=mut."";
+            let cc=mut.0;
+            lp(cc<cols.len()){
+              let col=cols.get(cc);
+              let v=mut.rawval(seg;col);
+              if(israwstr(seg;col)=0){v=fmtg(v)};
+              if(cc>0){rowline=s.concat(rowline;"  ")};
+              rowline=s.concat(rowline;v);
+              cc=cc+1;
+            };
+            out=s.concat(out;s.concat("\n";rowline));
+          };
+          si=si+1;
+        };
+      };
+    }el{
+      let subbed=subst(tl;json);
+      if(firstout=1){out=subbed;firstout=0}el{out=s.concat(out;s.concat("\n";subbed))};
+    };
+    li=li+1;
+  };
+  io.println(out);
+  <0;
+}
