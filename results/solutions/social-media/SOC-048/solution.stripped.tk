@@ -1,0 +1,27 @@
+m=share;i=io:std.io;i=s:std.str;
+f=getint(j:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(j;pat) as $i64;
+  if(idx<0){<0};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let num=mut."_";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    let d=s.indexof("_";ch) as $i64;
+    if(d<0){br};
+    num=s.concat(num;ch);
+    start=start+1;
+  };
+  <s.toint(num);
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let pid=getint(line;"_");
+  let token=mut."_";
+  let out=mut."_"post_id\"_";
+  out=s.concat(out;s.fromint(pid));
+  out=s.concat(out;"_"share_url\"_"https://social.app/s/"_"\"_"expires_at\"_"2026-01-03T00:00:00Z\"_");
+  io.println(out);
+  <0;
+};

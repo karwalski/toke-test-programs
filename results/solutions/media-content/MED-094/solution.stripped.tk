@@ -1,0 +1,50 @@
+m=phoneformat;
+i=io:std.io;
+i=s:std.str;
+
+f=isdigit(c:$str):$bool{
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    if(s.equals(c;"_")){<true};
+    <false
+};
+
+f=formatphone(phone:$str):$str{
+    let orig=s.trim(phone);
+    let digits=mut."_";
+    let i=mut.0;
+    lp(i<s.len(orig)){
+        let c=s.slice(orig;i;i+1);
+        if(isdigit(c)){digits=s.concat(digits;c)};
+        i=i+1
+    };
+    let n=s.len(digits);
+    if(n=11){
+        if(s.equals(s.slice(digits;0;1);"_")){
+            let area=s.slice(digits;1;4);
+            let exch=s.slice(digits;4;7);
+            let num=s.slice(digits;7;11);
+            <s.concat(s.concat(s.concat(s.concat(s.concat("_";area);"_");exch);"_");num)
+        }
+    };
+    if(n=10){
+        let area=s.slice(digits;0;3);
+        let exch=s.slice(digits;3;6);
+        let num=s.slice(digits;6;10);
+        <s.concat(s.concat(s.concat(s.concat(s.concat("_";area);"_");exch);"_");num)
+    };
+    <orig
+};
+
+f=main():$i64{
+    let phone=io.readln();
+    io.println(formatphone(phone));
+    <0
+};

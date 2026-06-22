@@ -1,1 +1,110 @@
-m=chatpermissions;f=canreadroom(role:$str;group:$str):$bool{if(role="admin"){<true};if(role="mod"){<true};if(role="user"){<false};<false};f=canwrite
+m=chatpermissions;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("\"";key);"\":\"");
+    let p=s.indexof(json;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let endp=s.indexof(rest;"\"");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=roleblock(roles:$str;role:$str):$str{
+    let pat=s.concat(s.concat("\"";role);"\":{");
+    let p=s.indexof(roles;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(roles;start;s.len(roles));
+    let endp=s.indexof(rest;"}");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=getinherits(roles:$str;role:$str):$str{
+    let block=roleblock(roles;role);
+    let p=s.indexof(block;"\"inherits\":");
+    if(p<0){<""};
+    let rest=s.slice(block;p+11;s.len(block));
+    if(s.startswith(rest;"null")){<""};
+    if(s.startswith(rest;"\"")){
+        let r2=s.slice(rest;1;s.len(rest));
+        let e=s.indexof(r2;"\"");
+        if(e<0){<r2};
+        <s.slice(r2;0;e)
+    };
+    <""
+};
+
+f=getperms(roles:$str;role:$str):$str{
+    let block=roleblock(roles;role);
+    let p=s.indexof(block;"\"perms\":[");
+    if(p<0){<""};
+    let rest=s.slice(block;p+9;s.len(block));
+    let e=s.indexof(rest;"]");
+    if(e<0){<rest};
+    <s.slice(rest;0;e)
+};
+
+f=permhas(perms:$str;action:$str):$bool{
+    <s.contains(perms;s.concat(s.concat("\"";action);"\""))
+};
+
+f=main():$i64{
+    let roles=io.readln();
+    let userroles=io.readln();
+    let checks=io.readln();
+
+    let cursor=mut.checks;
+    lp(true){
+        let up=s.indexof(cursor;"\"user\":\"");
+        if(up<0){br};
+        let r1=s.slice(cursor;up+8;s.len(cursor));
+        let ue=s.indexof(r1;"\"");
+        let user=s.slice(r1;0;ue);
+        let r2=s.slice(r1;ue;s.len(r1));
+        let ap=s.indexof(r2;"\"action\":\"");
+        let r3=s.slice(r2;ap+10;s.len(r2));
+        let ae=s.indexof(r3;"\"");
+        let action=s.slice(r3;0;ae);
+
+        let role=getstr(userroles;user);
+        let line=mut.user;
+        line=s.concat(line;" ");
+        line=s.concat(line;action);
+        if(s.len(role)=0){
+            line=s.concat(line;": DENIED (user not found)")
+        }el{
+            let allowed=mut.false;
+            let src=mut."";
+            let cur=mut.role;
+            lp(s.len(cur)>0){
+                let perms=getperms(roles;cur);
+                if(permhas(perms;action)){allowed=true;src=action;cur=""}el{
+                if(permhas(perms;"all")){allowed=true;src="all";cur=""}el{
+                    cur=getinherits(roles;cur)
+                }}
+            };
+            if(allowed){
+                line=s.concat(line;": ALLOWED (role: ");
+                line=s.concat(line;role);
+                line=s.concat(line;", perm: ");
+                line=s.concat(line;src);
+                line=s.concat(line;")")
+            }el{
+                line=s.concat(line;": DENIED (role: ");
+                line=s.concat(line;role);
+                line=s.concat(line;", no matching perm)")
+            }
+        };
+        io.println(line);
+
+        let nextp=s.indexof(r3;"}");
+        if(nextp<0){br};
+        cursor=s.slice(r3;nextp+1;s.len(r3))
+    };
+    <0
+};

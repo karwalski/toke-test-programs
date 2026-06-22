@@ -1,0 +1,53 @@
+m=lint;
+i=io:std.io;
+i=s:std.str;
+
+f=intafter(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("_""_"\"_");
+    let p=s.indexof(json;pat);
+    if(p<0){<0-1};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."_";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0-1};
+    <s.toint(n)
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let fp=s.indexof(input;"_"functions\"_");
+    let any=mut.false;
+    let cursor=mut."_";
+    if(fp>=0){cursor=s.slice(input;fp+13;s.len(input))};
+    lp(s.len(cursor)>0){
+        let np=s.indexof(cursor;"_":{"_"\"_");
+        if(qp>=0){name=s.slice(rawname;qp+1;s.len(rawname))};
+        let body=s.slice(cursor;np+3;s.len(cursor));
+        let timeout=intafter(body;"_");
+        if(timeout>300){
+            let out=mut.name;
+            out=s.concat(out;"_");
+            out=s.concat(out;s.fromint(timeout));
+            out=s.concat(out;"_");
+            io.println(out);
+            any=true
+        };
+        let nextp=s.indexof(body;"_""_"ALL OK")};
+    <0
+};

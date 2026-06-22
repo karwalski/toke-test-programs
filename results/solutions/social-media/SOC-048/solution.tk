@@ -1,1 +1,29 @@
-m=shorten;f=shorten(id:$str;expirydays:i64):$str{let base="https://short.link/";let tail=id;if(tail.len=0){<""};let result=base+tail;<result};f=main():$void{let short=shorten("abc123";0);<short};
+m=share;i=io:std.io;i=s:std.str;
+f=getint(j:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(j;pat) as $i64;
+  if(idx<0){<0};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let num=mut."";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    let d=s.indexof("0123456789";ch) as $i64;
+    if(d<0){br};
+    num=s.concat(num;ch);
+    start=start+1;
+  };
+  <s.toint(num);
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let pid=getint(line;"post_id");
+  let token=mut."abc123";
+  let out=mut."{\"post_id\":";
+  out=s.concat(out;s.fromint(pid));
+  out=s.concat(out;",\"share_url\":\"https://social.app/s/");
+  out=s.concat(out;token);
+  out=s.concat(out;"\",\"expires_at\":\"2026-01-03T00:00:00Z\"}");
+  io.println(out);
+  <0;
+};

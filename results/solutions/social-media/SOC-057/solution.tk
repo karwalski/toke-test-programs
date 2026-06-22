@@ -1,1 +1,39 @@
-m=bookmarks;f=makebookmark(id:$str;title:$str;url:$str;tags:$str):$str{<title;id;url;tags>};f=makebookmarktags
+m=bookmarks;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("\"";key);"\":\"");
+    let p=s.indexof(json;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let endp=s.indexof(rest;"\"");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=main():$i64{
+    let input=mut."";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let action=getstr(input;"action");
+    let token=getstr(input;"token");
+    if(s.len(token)=0){
+        io.println("{\"error\":\"Invalid token\"}");
+        <0
+    };
+    if(s.equals(action;"create_bookmark_folder")){
+        let name=getstr(input;"folder_name");
+        let out=mut."{\"folder_id\":\"bf_1\",\"name\":\"";
+        out=s.concat(out;name);
+        out=s.concat(out;"\",\"post_count\":0,\"status\":\"created\"}");
+        io.println(out);
+        <0
+    };
+    if(s.equals(action;"list_bookmark_folders")){
+        io.println("{\"folders\":[],\"status\":\"success\"}");
+        <0
+    };
+    io.println("{\"error\":\"Unknown action\"}");
+    <0
+};

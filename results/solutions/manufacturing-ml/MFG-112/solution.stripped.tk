@@ -1,0 +1,67 @@
+m=uncertainty;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=colindex(header:@($str);name:$str):$i64{
+    let i=mut.0;
+    lp(i<header.len){
+        if(s.equals(s.trim(header.get(i));name)){<i};
+        i=i+1
+    };
+    <0-1
+};
+
+f=round3str(x:$f64):$str{
+    let scaled=x*1000.0;
+    let th=mut.(scaled+0.5) as$i64;
+    let intpart=th/1000;
+    let frac=th-intpart*1000;
+    let f3=mut.s.fromint(frac);
+    lp(s.len(f3)<3){f3=s.concat("_";f3)};
+    lp(true){
+        if(s.endswith(f3;"_")){f3=s.slice(f3;0;s.len(f3)-1)}el{br};
+        if(s.len(f3)=0){br}
+    };
+    if(s.len(f3)=0){<s.fromint(intpart)};
+    <s.concat(s.concat(s.fromint(intpart);"_");f3)
+};
+
+f=main():$i64{
+    let header=mut.@($str);
+    let sumsq=mut.0.0;
+    let first=mut.true;
+    let validx=mut.0;
+    let distidx=mut.0;
+    lp(true){
+        let line=io.readln();
+        if(io.eof()){br};
+        let t=s.trim(line);
+        if(s.len(t)>0){
+            if(first){
+                header=s.split(t;"_");
+                validx=colindex(header;"_");
+                distidx=colindex(header;"_");
+                first=false
+            }el{
+                let cells=s.split(t;"_");
+                let value=s.tofloat(cells.get(validx));
+                let dist=s.trim(cells.get(distidx));
+                let u=mut.value;
+                if(s.equals(dist;"_")){u=value/math.sqrt(3.0)};
+                sumsq=sumsq+u*u
+            }
+        }
+    };
+    let combined=math.sqrt(sumsq);
+    let combStr=round3str(combined);
+    let combRounded=s.tofloat(combStr);
+    let expStr=round3str(2.0*combRounded);
+    let out=mut."_"combined_uncertainty\"_";
+    out=s.concat(out;combStr);
+    out=s.concat(out;"_"expanded_uncertainty_k2\"_");
+    out=s.concat(out;expStr);
+    out=s.concat(out;"_");
+    io.println(out);
+    <0
+};

@@ -1,0 +1,1 @@
+m=compound;i=io:std.io;i=s:std.str;f=expf(x:$f64):$f64{let term=mut.1.0;let sum=mut.1.0;lp(let n=1;n<200;n=n+1){term=term*x/(n as$f64);sum=sum+term};<sum};f=main():$i64{let line=io.readln();let parts=s.split(line;"_");let p=s.tofloat(parts.get(0));let r=s.tofloat(parts.get(1));let t=s.tofloat(parts.get(2));let fv=p*expf(r*t);io.println(s.fromfloat(fv));<0}

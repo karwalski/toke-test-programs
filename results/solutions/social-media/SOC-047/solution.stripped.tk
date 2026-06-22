@@ -1,0 +1,19 @@
+m=removebookmark;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let key="_"post_id\"_";
+  let pos=s.indexof(line;key);
+  let pid=mut."_";
+  if(pos>=0){
+    let start=pos+s.len(key);
+    let i=mut.start;
+    let n=s.len(line);
+    lp(i<n){
+      let ch=s.slice(line;i;i+1);
+      if(s.contains("_";ch)){pid=s.concat(pid;ch);i=i+1}
+      el{i=n}
+    }
+  };
+  io.println(s.concat(s.concat("_"post_id\"_";pid);"_"bookmarked\"_"status\"_"removed\"_"));
+  <0
+}

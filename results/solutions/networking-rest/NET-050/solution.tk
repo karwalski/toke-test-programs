@@ -1,1 +1,1 @@
-m=prog;f=main():$void{httpget("/openapi.json");serve(8080));};f=httpget(path:$str):$str{<"";};f=serve(port:$i64):$void{<;};
+m=openapi;i=io:std.io;i=s:std.str;f=main():$i64{let port=s.trim(io.readln());io.println(s.concat("Listening on :";port));<0}

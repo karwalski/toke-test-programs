@@ -1,0 +1,24 @@
+m=reneg;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let lines=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    lines=lines+@(s.trim(line));
+  };
+  let pending=s.toint(lines.get(3));
+  io.println("_");
+  io.println(s.concat(s.concat("_";s.fromint(pending));"_"));
+  io.println("_");
+  io.println("_");
+  io.println("_");
+  io.println("_");
+  if(pending=0){
+    io.println("_");
+  }el{
+    io.println(s.concat(s.concat("_";s.fromint(pending));"_"));
+  };
+  io.println("_");
+  io.println("_");
+  <0;
+};

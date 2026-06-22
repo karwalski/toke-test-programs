@@ -1,0 +1,52 @@
+m=engagement;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=getint(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("_""_"\"_");
+    let p=s.indexof(json;pat);
+    if(p<0){<0-1};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."_";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0-1};
+    <s.toint(n)
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let action=getstr(input;"_");
+    let postid=getint(input;"_");
+    if(s.equals(action;"_")){
+        if(postid=1){
+            io.println("_"post_id\"_"views\"_"unique_views\"_"likes\"_"shares\"_"link_clicks\"_"profile_visits\"_"reach\"_");
+            <0
+        };
+        io.println("_"error\"_"Post not found\"_");
+        <0
+    };
+    io.println("_"error\"_"Invalid action\"_");
+    <0
+};

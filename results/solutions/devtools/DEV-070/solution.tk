@@ -1,1 +1,70 @@
-m=buildmatrix;f=solve(p0:$str;p1:$str;p2:$str):$str{let osarr=@(p0;p1;p2);let archarr=@("x86_64";"arm64";"i386");let result=mut."";lp(let i=0;i<osarr.len;i=i+1){let os=osarr.get(i);lp(let j=0;j<archarr.len;j=j+1){let arch=archarr.get(j);let line=os+"_"+arch;result=result+line;if(!(i=(osarr.len-1)))){result=s.concat(result;"\n")};};};<result};
+m=buildmatrix;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json);
+  let keys=mut.@();
+  let counts=mut.@();
+  let flatvals=mut.@();
+  let starts=mut.@();
+  let p=mut.0;
+  lp(p<jn){
+    let ch=s.slice(json;p;p+1);
+    if(s.eq(ch;"\"")){
+      let after=s.slice(json;p+1;jn);
+      let endq=s.indexof(after;"\"");
+      let key=s.slice(after;0;endq);
+      let afterkey=p+1+endq+1;
+      let rest=s.slice(json;afterkey;jn);
+      let colon=s.indexof(rest;":");
+      let nextch=s.slice(rest;colon+1;colon+2);
+      if(s.eq(nextch;"[")){
+        let arrAbs=afterkey+colon+2;
+        let arrRest=s.slice(json;arrAbs;jn);
+        let close=s.indexof(arrRest;"]");
+        let seg=s.slice(arrRest;0;close);
+        keys=keys+@(key);
+        starts=starts+@(flatvals.len());
+        let sl=s.len(seg);
+        let cnt=mut.0;
+        let q=mut.0;
+        lp(q<sl){
+          let qch=s.slice(seg;q;q+1);
+          if(s.eq(qch;"\"")){
+            let af=s.slice(seg;q+1;sl);
+            let eq2=s.indexof(af;"\"");
+            flatvals=flatvals+@(s.slice(af;0;eq2));
+            cnt=cnt+1;
+            q=q+1+eq2+1
+          }el{q=q+1}
+        };
+        counts=counts+@(cnt);
+        p=arrAbs+close+1
+      }el{p=afterkey}
+    }el{p=p+1}
+  };
+  let nk=keys.len();
+  let totalcombos=mut.1;
+  lp(let k=0;k<nk;k=k+1){totalcombos=totalcombos*counts.get(k)};
+  let idx=mut.@();
+  lp(let k=0;k<nk;k=k+1){idx=idx+@(0)};
+  lp(let c=0;c<totalcombos;c=c+1){
+    let line=mut."";
+    lp(let k=0;k<nk;k=k+1){
+      let val=flatvals.get(starts.get(k)+idx.get(k));
+      if(k=0){line=s.concat(s.concat(s.concat("- ";keys.get(k));": ");val)}
+      el{line=s.concat(s.concat(s.concat(s.concat(line;"\n  ");keys.get(k));": ");val)}
+    };
+    io.println(line);
+    let carry=mut.1;
+    let k2=mut.nk-1;
+    lp(k2>=0){
+      if(carry=1){
+        let nv=idx.get(k2)+1;
+        if(nv>=counts.get(k2)){idx=idx.set(k2;0)}
+        el{idx=idx.set(k2;nv);carry=0}
+      };
+      k2=k2-1
+    }
+  };
+  <0
+}

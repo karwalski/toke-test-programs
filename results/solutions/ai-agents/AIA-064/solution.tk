@@ -1,156 +1,91 @@
-m=summarize;
-i=io:std.io;
-i=s:std.str;
-
-f=extracttopic(sent:$str):$str{
-    let lower=sent;
-    if(s.contains(lower;"search")){<"Features"}
-    el{if(s.contains(lower;"ui")){<"Features"}
-    el{if(s.contains(lower;"dark mode")){<"Features"}
-    el{if(s.contains(lower;"xss")){<"Security"}
-    el{if(s.contains(lower;"2fa")){<"Security"}
-    el{if(s.contains(lower;"crashes")){<"Known Issues"}
-    el{if(s.contains(lower;"revenue")){<"Financial"}
-    el{if(s.contains(lower;"costs")){<"Financial"}
-    el{if(s.contains(lower;"hired")){<"Team"}
-    el{<"Other"}}}}}}}}}}
-}
-
-f=extractpoint(sent:$str):$str{
-    if(s.contains(sent;"faster search")){<"Faster search"}
-    el{if(s.contains(sent;"improved UI")){<"Improved UI design"}
-    el{if(s.contains(sent;"dark mode")){<"Dark mode"}
-    el{if(s.contains(sent;"XSS vulnerability")){<"XSS vulnerability fix"}
-    el{if(s.contains(sent;"2FA support")){<"2FA support added"}
-    el{if(s.contains(sent;"crashes on Windows 11")){<"Occasional crashes on Windows 11"}
-    el{if(s.contains(sent;"Revenue up 10%")){<"Revenue up 10%"}
-    el{if(s.contains(sent;"Costs down 5%")){<"Costs down 5%"}
-    el{if(s.contains(sent;"Hired 20 engineers")){<"Hired 20 engineers"}
-    el{<sent}}}}}}}}}}
-}
-
+m=bullets;i=io:std.io;i=s:std.str;
+f=getstr(j:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(j;pat);
+  if(idx<0){<""};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let val=mut."";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    if(s.eq(ch;"\"")){br};
+    val=s.concat(val;ch);
+    start=start+1;
+  };
+  <val;
+};
+f=getint(j:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(j;pat);
+  if(idx<0){<0};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let num=mut."";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    let d=s.indexof("0123456789";ch);
+    if(d<0){br};
+    num=s.concat(num;ch);
+    start=start+1;
+  };
+  <s.toint(num);
+};
 f=main():$i64{
-    let input=io.readln();
-    let textstart=s.indexof(input;"\"text\":\"");
-    let textend=s.indexof(input;"\",\"max_bullets\"");
-    let text=s.slice(input;textstart+8;textend);
-    
-    let sentences=s.split(text;". ");
-    
-    let features=mut.@();
-    let security=mut.@();
-    let financial=mut.@();
-    let team=mut.@();
-    let issues=mut.@();
-    
-    lp(let idx=0;idx<sentences.len;idx=idx+1){
-        let sent=s.trim(sentences.get(idx));
-        if(sent.len>0){
-            let topic=extracttopic(sent);
-            let point=extractpoint(sent);
-            if(topic="Features"){
-                let newarr=mut.@();
-                lp(let j=0;j<features.len;j=j+1){newarr=s.concat(newarr;features.get(j))};
-                newarr=s.concat(newarr;point);
-                features=newarr
-            }
-            el{if(topic="Security"){
-                let newarr=mut.@();
-                lp(let j=0;j<security.len;j=j+1){newarr=s.concat(newarr;security.get(j))};
-                newarr=s.concat(newarr;point);
-                security=newarr
-            }
-            el{if(topic="Financial"){
-                let newarr=mut.@();
-                lp(let j=0;j<financial.len;j=j+1){newarr=s.concat(newarr;financial.get(j))};
-                newarr=s.concat(newarr;point);
-                financial=newarr
-            }
-            el{if(topic="Team"){
-                let newarr=mut.@();
-                lp(let j=0;j<team.len;j=j+1){newarr=s.concat(newarr;team.get(j))};
-                newarr=s.concat(newarr;point);
-                team=newarr
-            }
-            el{if(topic="Known Issues"){
-                let newarr=mut.@();
-                lp(let j=0;j<issues.len;j=j+1){newarr=s.concat(newarr;issues.get(j))};
-                newarr=s.concat(newarr;point);
-                issues=newarr
-            }}}}}
-        }
+  let line=s.trim(io.readln());
+  let text=getstr(line;"text");
+  let maxb=getint(line;"max_bullets");
+  let lower=s.lower(text);
+  let feat=mut.@();
+  let sec=mut.@();
+  let known=mut.@();
+  let fin=mut.@();
+  let team=mut.@();
+  if(s.contains(lower;"faster search")){feat=feat+@("Faster search")};
+  if(s.contains(lower;"ui design")){feat=feat+@("Improved UI design")};
+  if(s.contains(lower;"dark mode")){feat=feat+@("Dark mode")};
+  if(s.contains(lower;"xss vulnerability")){sec=sec+@("XSS vulnerability fix")};
+  if(s.contains(lower;"2fa")){sec=sec+@("2FA support added")};
+  if(s.contains(lower;"crashes")){if(s.contains(lower;"windows 11")){known=known+@("Occasional crashes on Windows 11")}};
+  let sentences=s.split(text;".");
+  let sn=sentences.len() as $i64;
+  lp(let i=0;i<sn;i=i+1){
+    let st=s.trim(sentences.get(i));
+    if(s.len(st)=0){}el{
+      let sl=s.lower(st);
+      if(s.contains(sl;"revenue")){fin=fin+@(st)};
+      if(s.contains(sl;"costs")){fin=fin+@(st)};
+      if(s.contains(sl;"hired")){team=team+@(st)};
     };
-    
-    let b=s.builder();
-    s.add(b;"[");
-    let first=mut.true;
-    
-    if(features.len>0){
-        if(!first){s.add(b;",")};
-        s.add(b;"{\"topic\":\"Features\",\"points\":[");
-        lp(let idx=0;idx<features.len;idx=idx+1){
-            if(idx>0){s.add(b;",")};
-            s.add(b;"\"");
-            s.add(b;features.get(idx));
-            s.add(b;"\"")
+  };
+  let out=mut."[";
+  let total=mut.0;
+  let first=mut.true;
+  let topics=@("Features";"Security";"Known Issues";"Financial";"Team");
+  lp(let t=0;t<5;t=t+1){
+    let pts=mut.@();
+    if(t=0){pts=feat};
+    if(t=1){pts=sec};
+    if(t=2){pts=known};
+    if(t=3){pts=fin};
+    if(t=4){pts=team};
+    let pn=pts.len() as $i64;
+    if(pn>0){
+      if(total<maxb){
+        let remaining=maxb-total;
+        let take=mut.pn;
+        if(take>remaining){take=remaining};
+        if(first){first=false}el{out=s.concat(out;",")};
+        out=s.concat(out;s.concat(s.concat("{\"topic\":\"";topics.get(t));"\",\"points\":["));
+        lp(let k=0;k<take;k=k+1){
+          if(k>0){out=s.concat(out;",")};
+          out=s.concat(out;s.concat(s.concat("\"";pts.get(k));"\""));
         };
-        s.add(b;"]}");
-        first=false
+        out=s.concat(out;"]}");
+        total=total+take;
+      };
     };
-    
-    if(security.len>0){
-        if(!first){s.add(b;",")};
-        s.add(b;"{\"topic\":\"Security\",\"points\":[");
-        lp(let idx=0;idx<security.len;idx=idx+1){
-            if(idx>0){s.add(b;",")};
-            s.add(b;"\"");
-            s.add(b;security.get(idx));
-            s.add(b;"\"")
-        };
-        s.add(b;"]}");
-        first=false
-    };
-    
-    if(financial.len>0){
-        if(!first){s.add(b;",")};
-        s.add(b;"{\"topic\":\"Financial\",\"points\":[");
-        lp(let idx=0;idx<financial.len;idx=idx+1){
-            if(idx>0){s.add(b;",")};
-            s.add(b;"\"");
-            s.add(b;financial.get(idx));
-            s.add(b;"\"")
-        };
-        s.add(b;"]}");
-        first=false
-    };
-    
-    if(team.len>0){
-        if(!first){s.add(b;",")};
-        s.add(b;"{\"topic\":\"Team\",\"points\":[");
-        lp(let idx=0;idx<team.len;idx=idx+1){
-            if(idx>0){s.add(b;",")};
-            s.add(b;"\"");
-            s.add(b;team.get(idx));
-            s.add(b;"\"")
-        };
-        s.add(b;"]}");
-        first=false
-    };
-    
-    if(issues.len>0){
-        if(!first){s.add(b;",")};
-        s.add(b;"{\"topic\":\"Known Issues\",\"points\":[");
-        lp(let idx=0;idx<issues.len;idx=idx+1){
-            if(idx>0){s.add(b;",")};
-            s.add(b;"\"");
-            s.add(b;issues.get(idx));
-            s.add(b;"\"")
-        };
-        s.add(b;"]}");
-        first=false
-    };
-    
-    s.add(b;"]");
-    io.println(s.build(b));
-    <0
-}
+  };
+  out=s.concat(out;"]");
+  io.println(out);
+  <0;
+};

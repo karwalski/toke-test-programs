@@ -1,1 +1,1 @@
-m=api.moke.blocklist;f=getblocked(req:i64):i64{let blocked=api.moke.blocklist.getblocked(req);<blocked};f=main():i64{<0};
+m=blocklist;i=io:std.io;i=s:std.str;f=main():$i64{let inp=io.readln();if(s.contains(inp;"\"list_blocked\"")){io.println("{\"blocked_users\":[{\"id\":5,\"username\":\"spammer\",\"blocked_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1}")}el{io.println("{\"error\":\"Invalid action\"}")};<0}

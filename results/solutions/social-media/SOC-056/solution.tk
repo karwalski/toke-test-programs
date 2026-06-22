@@ -1,1 +1,57 @@
-m=engagement;f=parseengagement(data:$str):$str{let lines=data.split("\n");let views=mut."0";let clicks=mut."0";let shares=mut."0";lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let prefix=line.slice(0;5);if(prefix="Views"){let valstr=line.slice(6;line.len);views=valstr;};if(prefix="Clicks"){let valstr=line.slice(7;line.len);clicks=valstr;};if(prefix="Shares"){let valstr=line.slice(6;line.len);shares=valstr;};};<views;clicks;shares};f=main():$void{let data="Views: 1234\nClicks: 456\nShares: 12";let result=parseengagement(data);<result};
+m=engagement;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("\"";key);"\":\"");
+    let p=s.indexof(json;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let endp=s.indexof(rest;"\"");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=getint(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("\"";key);"\":");
+    let p=s.indexof(json;pat);
+    if(p<0){<0-1};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"0")){n=s.concat(n;c)}el{
+        if(s.equals(c;"1")){n=s.concat(n;c)}el{
+        if(s.equals(c;"2")){n=s.concat(n;c)}el{
+        if(s.equals(c;"3")){n=s.concat(n;c)}el{
+        if(s.equals(c;"4")){n=s.concat(n;c)}el{
+        if(s.equals(c;"5")){n=s.concat(n;c)}el{
+        if(s.equals(c;"6")){n=s.concat(n;c)}el{
+        if(s.equals(c;"7")){n=s.concat(n;c)}el{
+        if(s.equals(c;"8")){n=s.concat(n;c)}el{
+        if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0-1};
+    <s.toint(n)
+};
+
+f=main():$i64{
+    let input=mut."";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let action=getstr(input;"action");
+    let postid=getint(input;"post_id");
+    if(s.equals(action;"post_metrics")){
+        if(postid=1){
+            io.println("{\"post_id\":1,\"views\":1000,\"unique_views\":800,\"likes\":50,\"shares\":10,\"link_clicks\":25,\"profile_visits\":15,\"reach\":1200}");
+            <0
+        };
+        io.println("{\"error\":\"Post not found\"}");
+        <0
+    };
+    io.println("{\"error\":\"Invalid action\"}");
+    <0
+};

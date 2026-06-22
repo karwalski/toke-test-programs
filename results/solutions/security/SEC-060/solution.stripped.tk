@@ -1,0 +1,37 @@
+m=regex;i=io:std.io;i=s:std.str;
+f=isq(ch:$str):$bool{if(s.eq(ch;"_")){<true};if(s.eq(ch;"_")){<true};if(s.eq(ch;"_")){<true};<false};
+f=check(p:$str):$bool{
+  let n=s.len(p) as $i64;
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(p;i;i+1);
+    if(s.eq(ch;"_")){
+      let depth=mut.1;
+      let j=mut.i+1;
+      let hasq=mut.false;
+      lp(depth>0){
+        if(j>=n){br};
+        let cj=s.slice(p;j;j+1);
+        if(s.eq(cj;"_")){depth=depth+1};
+        if(s.eq(cj;"_")){depth=depth-1};
+        if(depth>0){if(isq(cj)){hasq=true}};
+        j=j+1;
+      };
+      if(j<n){
+        let after=s.slice(p;j;j+1);
+        if(isq(after)){if(hasq){<true}};
+      };
+    };
+  };
+  <false;
+};
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let p=s.trim(line);
+    if(s.len(p)=0){}el{
+      if(check(p)){io.println("_")}el{io.println("_")};
+    };
+  };
+  <0;
+};

@@ -1,1 +1,56 @@
-m=abtest;f=runtest(aconv:$i64;atotal:$i64;bconv:$i64;btotal:$i64):$str{let arate=aconv as$f64/atotal as$f64;let brate=bconv as$f64/btotal as$f64;let diff=arate-brate;let z=diff/0.01;let p=1.0-0.5*exp(-z*z/2.0);let result=mut."";if(p<0.05){result="significant";}el{result="not significant";};<result};
+m=abtest;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let sucA=mut.0;
+  let atot=mut.0;
+  let bsucc=mut.0;
+  let btot=mut.0;
+  let first=mut.true;
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let t=s.trim(line);
+    if(s.len(t)>0){
+      if(first){first=false}
+      el{
+        let parts=s.split(t;",");
+        let variant=parts.get(0);
+        let outcome=s.toint(parts.get(1));
+        if(s.eq(variant;"A")){atot=atot+1;if(outcome=1){sucA=sucA+1}};
+        if(s.eq(variant;"B")){btot=btot+1;if(outcome=1){bsucc=bsucc+1}}
+      }
+    }
+  };
+  let af=s.tofloat(s.fromint(sucA));
+  let at=s.tofloat(s.fromint(atot));
+  let bf=s.tofloat(s.fromint(bsucc));
+  let bt=s.tofloat(s.fromint(btot));
+  let arate=mut.0.0;
+  if(atot>0){arate=af/at*100.0};
+  let rtB=mut.0.0;
+  if(btot>0){rtB=bf/bt*100.0};
+  let faila=at-af;
+  let failb=bt-bf;
+  let totsucc=af+bf;
+  let totfail=faila+failb;
+  let grand=at+bt;
+  let ea=at*totsucc/grand;
+  let eaf=at*totfail/grand;
+  let eb=bt*totsucc/grand;
+  let ebf=bt*totfail/grand;
+  let chisq=mut.0.0;
+  chisq=chisq+(af-ea)*(af-ea)/ea;
+  chisq=chisq+(faila-eaf)*(faila-eaf)/eaf;
+  chisq=chisq+(bf-eb)*(bf-eb)/eb;
+  chisq=chisq+(failb-ebf)*(failb-ebf)/ebf;
+  let pval=mut.0.0;
+  if(chisq=0.0){pval=1.0}
+  el{if(chisq>=3.841){pval=0.0}
+  el{pval=1.0-(chisq/3.841)*0.95;if(pval<0.0){pval=0.0}}};
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat("A: ";s.fromint(sucA));"/");s.fromint(atot));" = ");s.concat(s.format(arate;"%.2f");"%")));
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat("B: ";s.fromint(bsucc));"/");s.fromint(btot));" = ");s.concat(s.format(rtB;"%.2f");"%")));
+  io.println(s.concat("Chi-squared: ";s.format(chisq;"%.2f")));
+  io.println(s.concat("p-value: ";s.format(pval;"%.2f")));
+  if(pval<0.05){io.println("Significant (p < 0.05)")}
+  el{io.println("Not significant (p >= 0.05)")};
+  <0
+}

@@ -1,0 +1,77 @@
+m=lessonhook;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=getint(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("_""_"\"_");
+    let p=s.indexof(json;pat);
+    if(p<0){<0-1};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."_";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0-1};
+    <s.toint(n)
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let subject=getstr(input;"_");
+    let topic=getstr(input;"_");
+    let grade=getint(input;"_");
+    let hooktype=getstr(input;"_");
+
+    let header=mut."_";
+    header=s.concat(header;topic);
+    header=s.concat(header;"_");
+    header=s.concat(header;subject);
+    header=s.concat(header;"_");
+    header=s.concat(header;s.fromint(grade));
+    header=s.concat(header;"_");
+    io.println(header);
+
+    let content=mut."_";
+    let label=mut."_";
+    if(s.equals(hooktype;"_")){
+        label="_";
+        if(s.equals(subject;"_")){if(s.equals(topic;"_")){content="_"}}
+        el{content=s.concat(s.concat("_";topic);"_")};
+        if(s.len(content)=0){content=s.concat(s.concat("_";topic);"_")}
+    }el{
+    if(s.equals(hooktype;"_")){
+        label="_";
+        content=s.concat(s.concat("_";topic);"_")
+    }el{
+    if(s.equals(hooktype;"_")){
+        label="_";
+        content=s.concat(s.concat("_";topic);"_")
+    }el{
+        label="_";
+        content=s.concat(s.concat("_";topic);"_")
+    }}};
+    io.println(s.concat(label;content));
+
+    io.println(s.concat(s.concat("_";topic);"_"));
+    <0
+};

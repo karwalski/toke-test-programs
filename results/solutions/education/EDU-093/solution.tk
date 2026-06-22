@@ -1,1 +1,115 @@
-m=learning_summary;f=extract_keyword(line:$str):$str{let idx=mut.0;lp(let i=0;i<line.len;i=i+1){let ch=line.get(i);if(ch=":"){idx=i+1}};let keyword=line.substr(idx;line.len-idx);<keyword};f=classify_learning_area(keyword:$str):$str{if(keyword="math"){<keyword};if(keyword="science"){<keyword};if(keyword="programming"){<keyword};if(keyword="data"){<keyword};if(keyword="visualization"){<keyword};<keyword};f=count_keyword_occurrences(lines:@$str;keyword:$str):i64{let count=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);if(line.contains(keyword)){count=count+1}};<count};f=summarise_area(area:$str;count:i64):$str{let summary=mut."";summary=s.concat(summary;area);summary=s.concat(summary;" has ");summary=s.concat(summary;count) as$str;summary=s.concat(summary;" notes.");if(count>0){summary=s.concat(summary;" Let's review these.")}el{summary=s.concat(summary;" No notes in this area)
+m=learningsummary;i=io:std.io;i=s:std.str;
+f=ord(ch:$str):$i64{
+  let ref=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  <s.indexof(ref;ch)
+};
+f=strless(a:$str;b:$str):$bool{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let n=mut.la;
+  if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let ca=ord(s.slice(a;i;i+1));
+    let cb=ord(s.slice(b;i;i+1));
+    if(ca<cb){<true};
+    if(ca>cb){<false}
+  };
+  if(la<lb){<true};
+  <false
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json);
+  let topics=mut.@();
+  let questions=mut.@();
+  let days=mut.0;
+  let i=mut.0;
+  lp(i<jn){
+    let rest=s.slice(json;i;jn);
+    let di=s.indexof(rest;"\"date\":");
+    if(di<0){i=jn}el{days=days+1;i=i+di+7}
+  };
+  let tk="\"topics_covered\":[";
+  let p=mut.0;
+  lp(p<jn){
+    let rest=s.slice(json;p;jn);
+    let idx=s.indexof(rest;tk);
+    if(idx<0){p=jn}el{
+      let arrStart=p+idx+s.len(tk);
+      let arrRest=s.slice(json;arrStart;jn);
+      let close=s.indexof(arrRest;"]");
+      let seg=s.slice(arrRest;0;close);
+      let sl=s.len(seg);
+      let q=mut.0;
+      lp(q<sl){
+        let qch=s.slice(seg;q;q+1);
+        if(s.eq(qch;"\"")){
+          let after=s.slice(seg;q+1;sl);
+          let endq=s.indexof(after;"\"");
+          let val=s.slice(after;0;endq);
+          let dup=mut.false;
+          lp(let t=0;t<topics.len();t=t+1){if(s.eq(topics.get(t);val)){dup=true}};
+          if(dup=false){topics=topics+@(val)};
+          q=q+1+endq+1
+        }el{q=q+1}
+      };
+      p=arrStart+close
+    }
+  };
+  let qk="\"questions_raised\":[";
+  let p2=mut.0;
+  lp(p2<jn){
+    let rest=s.slice(json;p2;jn);
+    let idx=s.indexof(rest;qk);
+    if(idx<0){p2=jn}el{
+      let arrStart=p2+idx+s.len(qk);
+      let arrRest=s.slice(json;arrStart;jn);
+      let close=s.indexof(arrRest;"]");
+      let seg=s.slice(arrRest;0;close);
+      let sl=s.len(seg);
+      let q=mut.0;
+      lp(q<sl){
+        let qch=s.slice(seg;q;q+1);
+        if(s.eq(qch;"\"")){
+          let after=s.slice(seg;q+1;sl);
+          let endq=s.indexof(after;"\"");
+          let val=s.slice(after;0;endq);
+          questions=questions+@(val);
+          q=q+1+endq+1
+        }el{q=q+1}
+      };
+      p2=arrStart+close
+    }
+  };
+  let tc=topics.len();
+  let a=mut.0;
+  lp(a<tc){
+    let b=mut.a+1;
+    lp(b<tc){
+      if(strless(topics.get(b);topics.get(a))){
+        let tmp=topics.get(a);
+        topics=topics.set(a;topics.get(b));
+        topics=topics.set(b;tmp)
+      };
+      b=b+1
+    };
+    a=a+1
+  };
+  io.println("Weekly Summary");
+  io.println(s.concat("Days studied: ";s.fromint(days)));
+  let joined=mut."";
+  lp(let t=0;t<tc;t=t+1){
+    if(t>0){joined=s.concat(joined;", ")};
+    joined=s.concat(joined;topics.get(t))
+  };
+  io.println(s.concat(s.concat(s.concat(s.concat("Topics covered: ";joined);" (");s.fromint(tc));" unique)"));
+  if(questions.len()=0){
+    io.println("Unresolved questions: none")
+  }el{
+    io.println("Unresolved questions:");
+    lp(let q=0;q<questions.len();q=q+1){
+      io.println(s.concat("- ";questions.get(q)))
+    }
+  };
+  <0
+}

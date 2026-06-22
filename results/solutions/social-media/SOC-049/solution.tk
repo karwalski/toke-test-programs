@@ -1,1 +1,46 @@
-m=main;f=main():$void{let postid=1;let userid=2;let reaction="👍";let result=mut."";result=s.concat(result;"Post ID: ");result=s.concat(result;postid) as$str;result=s.concat(result;" | User ID: ");result=s.concat(result;userid) as$str;result=s.concat(result;" | Reaction: ");result=s.concat(result;reaction);result=s.concat(result;" | Status: ");let status=mut."success";if(reaction="👎"){status="cancelled"};result=s.concat(result;status);<result};
+m=react;i=io:std.io;i=s:std.str;
+f=getint(j:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(j;pat);
+  if(idx<0){<0};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let num=mut."";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    let d=s.indexof("0123456789";ch);
+    if(d<0){br};
+    num=s.concat(num;ch);
+    start=start+1;
+  };
+  <s.toint(num);
+};
+f=getstr(j:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(j;pat);
+  if(idx<0){<""};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let val=mut."";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    if(s.eq(ch;"\"")){br};
+    val=s.concat(val;ch);
+    start=start+1;
+  };
+  <val;
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let pid=getint(line;"post_id");
+  let emoji=getstr(line;"emoji");
+  let out=mut."{\"post_id\":";
+  out=s.concat(out;s.fromint(pid));
+  out=s.concat(out;",\"emoji\":\"");
+  out=s.concat(out;emoji);
+  out=s.concat(out;"\",\"reactions\":{\"");
+  out=s.concat(out;emoji);
+  out=s.concat(out;"\":1},\"status\":\"reacted\"}");
+  io.println(out);
+  <0;
+};

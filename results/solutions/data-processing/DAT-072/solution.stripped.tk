@@ -1,0 +1,1 @@
+m=csvtotsv;i=io:std.io;i=s:std.str;f=conv(line:$str):$str{let n=s.len(line);let out=mut."_";let inq=mut.false;lp(let idx=0;idx<n;idx=idx+1){let c=s.slice(line;idx;idx+1);if(s.eq(c;"_""_","_"\t")}el{out=s.concat(out;c)}}};<out};f=main():$i64{lp(1=1){let line=io.readln();if(io.eof()&&s.len(line)=0){br};io.println(conv(line));if(io.eof()){br}};<0}

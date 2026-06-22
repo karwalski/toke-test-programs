@@ -1,0 +1,119 @@
+m=polyreg;i=io:std.io;i=s:std.str;
+f=absf(v:$f64):$f64{if(v<0.0){<0.0-v};<v};
+f=fmtnum(v:$f64):$str{
+  let x=mut.v;
+  if(absf(x)<0.0000001){x=0.0};
+  let raw=s.format(x;"_");
+  let dot=s.indexof(raw;"_");
+  let intpart=s.slice(raw;0;dot);
+  let frac=s.slice(raw;dot+1;s.len(raw));
+  let last=mut.s.len(frac);
+  lp(last>1){
+    let ch=s.slice(frac;last-1;last);
+    if(s.eq(ch;"_")){last=last-1}el{last=s.len(frac)+999}
+  };
+  if(last>900){last=last-1000};
+  let trimmed=s.slice(frac;0;last);
+  <s.concat(s.concat(intpart;"_");trimmed)
+};
+f=main():$i64{
+  let degree=s.toint(s.trim(io.readln()));
+  let xs=mut.@($f64);
+  let ys=mut.@($f64);
+  let header=mut.true;
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let t=s.trim(line);
+    if(s.len(t)>0){
+      if(header){header=false}
+      el{
+        let p=s.split(t;"_");
+        xs=xs+@(s.tofloat(p.get(0)));
+        ys=ys+@(s.tofloat(p.get(1)))
+      }
+    }
+  };
+  let n=xs.len();
+  let m=degree+1;
+  let a=mut.@($f64);
+  lp(let r=0;r<m;r=r+1){
+    lp(let c=0;c<n;c=c+1){
+      let power=degree-r;
+      let val=mut.1.0;
+      lp(let e=0;e<power;e=e+1){val=val*xs.get(c)};
+      a=a+@(val)
+    }
+  };
+  let ata=mut.@($f64);
+  lp(let r=0;r<m;r=r+1){
+    lp(let c=0;c<m;c=c+1){
+      let sum=mut.0.0;
+      lp(let k=0;k<n;k=k+1){sum=sum+a.get(r*n+k)*a.get(c*n+k)};
+      ata=ata+@(sum)
+    }
+  };
+  let aty=mut.@($f64);
+  lp(let r=0;r<m;r=r+1){
+    let sum=mut.0.0;
+    lp(let k=0;k<n;k=k+1){sum=sum+a.get(r*n+k)*ys.get(k)};
+    aty=aty+@(sum)
+  };
+  let aug=mut.@($f64);
+  lp(let r=0;r<m;r=r+1){
+    lp(let c=0;c<m;c=c+1){aug=aug+@(ata.get(r*m+c))};
+    aug=aug+@(aty.get(r))
+  };
+  let w=m+1;
+  lp(let i=0;i<m;i=i+1){
+    let maxrow=mut.i;
+    lp(let k=i+1;k<m;k=k+1){
+      if(absf(aug.get(k*w+i))>absf(aug.get(maxrow*w+i))){maxrow=k}
+    };
+    lp(let c=0;c<w;c=c+1){
+      let tmp=aug.get(i*w+c);
+      aug=aug.set(i*w+c;aug.get(maxrow*w+c));
+      aug=aug.set(maxrow*w+c;tmp)
+    };
+    let pivot=aug.get(i*w+i);
+    if(absf(pivot)>=0.0000000001){
+      lp(let c=i;c<w;c=c+1){aug=aug.set(i*w+c;aug.get(i*w+c)/pivot)};
+      lp(let k=0;k<m;k=k+1){
+        if(k!=i){
+          let factor=aug.get(k*w+i);
+          lp(let c=i;c<w;c=c+1){aug=aug.set(k*w+c;aug.get(k*w+c)-factor*aug.get(i*w+c))}
+        }
+      }
+    }
+  };
+  let coeffs=mut.@($f64);
+  lp(let i=0;i<m;i=i+1){coeffs=coeffs+@(aug.get(i*w+m))};
+  let ymean=mut.0.0;
+  lp(let k=0;k<n;k=k+1){ymean=ymean+ys.get(k)};
+  ymean=ymean/s.tofloat(s.fromint(n));
+  let ssres=mut.0.0;
+  let sstot=mut.0.0;
+  lp(let k=0;k<n;k=k+1){
+    let pred=mut.0.0;
+    lp(let j=0;j<m;j=j+1){
+      let power=degree-j;
+      let val=mut.1.0;
+      lp(let e=0;e<power;e=e+1){val=val*xs.get(k)};
+      pred=pred+coeffs.get(j)*val
+    };
+    ssres=ssres+(ys.get(k)-pred)*(ys.get(k)-pred);
+    sstot=sstot+(ys.get(k)-ymean)*(ys.get(k)-ymean)
+  };
+  let r2=mut.1.0;
+  if(absf(sstot)>0.0){r2=1.0-ssres/sstot};
+  let out=mut."_"coefficients\"_";
+  lp(let j=0;j<m;j=j+1){
+    if(j>0){out=s.concat(out;"_")};
+    out=s.concat(out;fmtnum(coeffs.get(j)))
+  };
+  out=s.concat(out;"_"r_squared\"_");
+  out=s.concat(out;fmtnum(r2));
+  out=s.concat(out;"_");
+  io.println(out);
+  <0
+}

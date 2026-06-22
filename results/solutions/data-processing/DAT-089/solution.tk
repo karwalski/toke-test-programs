@@ -1,1 +1,136 @@
-m=stringdist;i=io:std.io;i=s:std.str;f=imin(a:$i64;b:$i64):$i64{if(a<b){<a};<b};f=lev(a:$str;b:$str):$i64{let al=s.len(a) as i64;let bl=s.len(b) as i64;let prev=mut.@(0);let p1=mut.1;lp(p1<=bl){prev=prev+@(p1);p1=p1+1};let curr=mut.@();lp(let i=1;i<=al;i=i+1){curr=@(i);let achar=s.slice(a;(i-1) as u64;i as u64);lp(let j=1;j<=bl;j=j+1){let bchar=s.slice(b;(j-1) as u64;j as u64);let cost=mut.1;if(s.equals(achar;bchar)){cost=0};let del=prev.get(j as u64)+1;let ins=curr.get((j-1) as u64)+1;let sub=prev.get((j-1) as u64)+cost;let m=imin(imin(del;ins);sub);curr=curr+@(m)};prev=curr};<prev.get(bl as u64)};f=ham(a:$str;b:$str):$i64{let al=s.len(a);let bl=s.len(b);if(al!=bl){<0-1};let cnt=mut.0;lp(let i=0;i<al as i64;i=i+1){let ac=s.slice(a;i as u64;(i+1) as u64);let bc=s.slice(b;i as u64;(i+1) as u64);if(!s.equals(ac;bc)){cnt=cnt+1}};<cnt};f=jaro(a:$str;b:$str):$f64{let al=s.len(a) as i64;let bl=s.len(b) as i64;if(al=0){<0.0};if(bl=0){<0.0};let mxl=mut.al;if(bl>mxl){mxl=bl};let md=mut.mxl/2-1;if(md<0){md=0};let am=mut.@(false);let p1=mut.1;lp(p1<al){am=am+@(false);p1=p1+1};let bm=mut.@(false);let p2=mut.1;lp(p2<bl){bm=bm+@(false);p2=p2+1};let matches=mut.0;lp(let i=0;i<al;i=i+1){let lo=mut.i-md;if(lo<0){lo=0};let hi=mut.i+md+1;if(hi>bl){hi=bl};let done=mut.false;lp(let j=lo;j<hi;j=j+1){if(!done){if(!bm.get(j as u64)){let ac=s.slice(a;i as u64;(i+1) as u64);let bc=s.slice(b;j as u64;(j+1) as u64);if(s.equals(ac;bc)){am=am.set(i as u64;true);bm=bm.set(j as u64;true);done=true;matches=matches+1}}}}};if(matches=0){<0.0};let astr=mut."";lp(let i=0;i<al;i=i+1){if(am.get(i as u64)){astr=s.concat(astr;s.slice(a;i as u64;(i+1) as u64))}};let bstr=mut."";lp(let j=0;j<bl;j=j+1){if(bm.get(j as u64)){bstr=s.concat(bstr;s.slice(b;j as u64;(j+1) as u64))}};let tlen=s.len(astr) as i64;let tc=mut.0;lp(let i=0;i<tlen;i=i+1){let ac=s.slice(astr;i as u64;(i+1) as u64);let bc=s.slice(bstr;i as u64;(i+1) as u64);if(!s.equals(ac;bc)){tc=tc+1}};let mf=s.tofloat(s.fromint(matches));let af=s.tofloat(s.fromint(al));let bf=s.tofloat(s.fromint(bl));let tf=s.tofloat(s.fromint(tc))/2.0;<(mf/af+mf/bf+(mf-tf)/mf)/3.0};f=cpref(a:$str;b:$str):$i64{let al=s.len(a) as i64;let bl=s.len(b) as i64;let lim=mut.al;if(bl<lim){lim=bl};if(lim>4){lim=4};let cnt=mut.0;let done=mut.false;lp(let i=0;i<lim;i=i+1){if(!done){let ac=s.slice(a;i as u64;(i+1) as u64);let bc=s.slice(b;i as u64;(i+1) as u64);if(s.equals(ac;bc)){cnt=cnt+1}el{done=true}}};<cnt};f=jw(a:$str;b:$str):$f64{let jv=jaro(a;b);let pl=cpref(a;b);let plf=s.tofloat(s.fromint(pl));<jv+plf*0.1*(1.0-jv)};f=processline(line:$str):$void{let parts=s.split(line;" ");if(parts.len()<2){<};let a=parts.get(0);let b=parts.get(1);let lv=lev(a;b);let hm=ham(a;b);let hms=mut."-";if(hm>=0){hms=s.fromint(hm)};let jwv=jw(a;b);let jws=s.format(jwv;"%.4f");let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(line;"\t");s.fromint(lv));"\t");hms);"\t");jws);io.println(out)};f=main():$i64{lp(let cnt=0;cnt<100;cnt=cnt+1){let line=io.readln();if(s.equals(line;"")){<0};let t=s.trim(line);if(s.equals(t;"")){<0};processline(t)};<0}
+m=stringdist;i=io:std.io;i=s:std.str;
+f=imin(a:$i64;b:$i64):$i64{if(a<b){<a};<b};
+f=chr(x:$str;i:$i64):$str{<s.slice(x;i;i+1)};
+f=lev(a:$str;b:$str):$i64{
+  let al=s.len(a) as $i64;
+  let bl=s.len(b) as $i64;
+  let prev=mut.@(0);
+  lp(let p=1;p<=bl;p=p+1){prev=prev+@(p)};
+  lp(let i=1;i<=al;i=i+1){
+    let curr=mut.@(i);
+    let ac=chr(a;i-1);
+    lp(let j=1;j<=bl;j=j+1){
+      let bc=chr(b;j-1);
+      let cost=mut.1;
+      if(s.eq(ac;bc)){cost=0};
+      let del=prev.get(j)+1;
+      let ins=curr.get(j-1)+1;
+      let sub=prev.get(j-1)+cost;
+      let mn=imin(imin(del;ins);sub);
+      curr=curr+@(mn);
+    };
+    prev=curr;
+  };
+  <prev.get(bl);
+};
+f=ham(a:$str;b:$str):$i64{
+  let al=s.len(a) as $i64;
+  let bl=s.len(b) as $i64;
+  if(al!=bl){<0-1};
+  let cnt=mut.0;
+  lp(let i=0;i<al;i=i+1){
+    if(s.eq(chr(a;i);chr(b;i))){}el{cnt=cnt+1};
+  };
+  <cnt;
+};
+f=jaro(a:$str;b:$str):$f64{
+  let al=s.len(a) as $i64;
+  let bl=s.len(b) as $i64;
+  if(s.eq(a;b)){<1.0};
+  if(al=0){<0.0};
+  if(bl=0){<0.0};
+  let mxl=mut.al;
+  if(bl>mxl){mxl=bl};
+  let md=mut.mxl/2-1;
+  if(md<0){md=0};
+  let am=mut.@();
+  lp(let i=0;i<al;i=i+1){am=am+@(0)};
+  let bm=mut.@();
+  lp(let i=0;i<bl;i=i+1){bm=bm+@(0)};
+  let matches=mut.0;
+  lp(let i=0;i<al;i=i+1){
+    let lo=mut.i-md;
+    if(lo<0){lo=0};
+    let hi=mut.i+md+1;
+    if(hi>bl){hi=bl};
+    let done=mut.false;
+    lp(let j=lo;j<hi;j=j+1){
+      if(done){}el{
+        if(bm.get(j)=0){
+          if(s.eq(chr(a;i);chr(b;j))){
+            am=am.set(i;1);
+            bm=bm.set(j;1);
+            done=true;
+            matches=matches+1;
+          };
+        };
+      };
+    };
+  };
+  if(matches=0){<0.0};
+  let k=mut.0;
+  let tc=mut.0;
+  lp(let i=0;i<al;i=i+1){
+    if(am.get(i)=1){
+      lp(bm.get(k)=0){k=k+1};
+      if(s.eq(chr(a;i);chr(b;k))){}el{tc=tc+1};
+      k=k+1;
+    };
+  };
+  let mf=matches as $f64;
+  let af=al as $f64;
+  let bf=bl as $f64;
+  let tf=(tc as $f64)/2.0;
+  <(mf/af+mf/bf+(mf-tf)/mf)/3.0;
+};
+f=cpref(a:$str;b:$str):$i64{
+  let al=s.len(a) as $i64;
+  let bl=s.len(b) as $i64;
+  let lim=mut.al;
+  if(bl<lim){lim=bl};
+  if(lim>4){lim=4};
+  let cnt=mut.0;
+  let done=mut.false;
+  lp(let i=0;i<lim;i=i+1){
+    if(done){}el{
+      if(s.eq(chr(a;i);chr(b;i))){cnt=cnt+1}el{done=true};
+    };
+  };
+  <cnt;
+};
+f=jw(a:$str;b:$str):$f64{
+  let jv=jaro(a;b);
+  if(jv<0.7){<jv};
+  let pl=cpref(a;b);
+  let plf=pl as $f64;
+  <jv+plf*0.1*(1.0-jv);
+};
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){}el{
+      let parts=s.split(t;" ");
+      if((parts.len() as $i64)<2){}el{
+        let a=parts.get(0);
+        let b=parts.get(1);
+        let lv=lev(a;b);
+        let hm=ham(a;b);
+        let hms=mut."-";
+        if(hm>=0){hms=s.fromint(hm)};
+        let jwv=jw(a;b);
+        let jws=s.format(jwv;"%.4f");
+        let out=mut.t;
+        out=s.concat(out;"\t");
+        out=s.concat(out;s.fromint(lv));
+        out=s.concat(out;"\t");
+        out=s.concat(out;hms);
+        out=s.concat(out;"\t");
+        out=s.concat(out;jws);
+        io.println(out);
+      };
+    };
+  };
+  <0;
+};

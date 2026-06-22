@@ -1,1 +1,35 @@
-m=validate;f=checkprefix(prefix:$str;addr:$str):$bool{let len=prefix.len;let sub=addr.substr(0;len);<sub=prefix};f=validateaddr(addr:$str):$str{let prefixes=@("0x";"1";"bc1";"tb1");let found=mut."";lp(let i=0;i<prefixes.len;i=i+1){let prefix=prefixes.get(i);let isvalid=checkprefix(prefix;addr);if(isvalid){found=prefix;br};};if(found=""){<"invalid";}el{<found;};};
+m=validate;
+i=io:std.io;
+i=s:std.str;
+
+f=allin(t:$str;alphabet:$str):$bool{
+    let i=mut.0;
+    lp(i<s.len(t)){
+        let c=s.slice(t;i;i+1);
+        if(!s.contains(alphabet;c)){<false};
+        i=i+1
+    };
+    <true
+};
+
+f=main():$i64{
+    let addr=s.trim(io.readln());
+    let n=s.len(addr);
+    let hex="0123456789abcdefABCDEF";
+    let b58="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+    let iseth=mut.false;
+    if(s.startswith(addr;"0x")){if(n=42){if(allin(s.slice(addr;2;n);hex)){iseth=true}}};
+    if(iseth){io.println("Ethereum");io.println("VALID");<0};
+
+    let isbtc=mut.false;
+    if(s.startswith(addr;"1")){isbtc=true}el{if(s.startswith(addr;"3")){isbtc=true}};
+    if(isbtc){if(n<25){isbtc=false}};
+    if(isbtc){if(n>34){isbtc=false}};
+    if(isbtc){if(!allin(addr;b58)){isbtc=false}};
+    if(isbtc){io.println("Bitcoin");io.println("VALID");<0};
+
+    io.println("Unknown");
+    io.println("INVALID: unrecognized format");
+    <0
+};

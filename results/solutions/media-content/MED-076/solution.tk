@@ -1,1 +1,20 @@
-m=rot13;f=rot13(lhs:$str):$str{let n=lhs.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=lhs.get(i);let newc=mut.c;if(c>64){if(c<91){let tmp=c-65;let rotated=tmp+13;let modval=rotated-rotated/26*26;newc=modval+65;}el{if(c>96){if(c<123){let tmp=c-97
+m=rot13;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let up="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let upr="NOPQRSTUVWXYZABCDEFGHIJKLM";
+  let lo="abcdefghijklmnopqrstuvwxyz";
+  let lor="nopqrstuvwxyzabcdefghijklm";
+  let line=io.readln();
+  let n=s.len(line);
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(line;i;i+1);
+    let ui=s.indexof(up;ch);
+    let li=s.indexof(lo;ch);
+    if(ui>=0){out=s.concat(out;s.slice(upr;ui;ui+1))}
+    el{if(li>=0){out=s.concat(out;s.slice(lor;li;li+1))}
+    el{out=s.concat(out;ch)}}
+  };
+  io.println(out);
+  <0
+}

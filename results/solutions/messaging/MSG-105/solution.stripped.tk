@@ -1,0 +1,112 @@
+m=history;i=io:std.io;i=s:std.str;
+f=charat(str:$str;i:$i64):$str{<s.slice(str;i;i+1)};
+f=flm(a:$str;b:$str;alo:$i64;ahi:$i64;blo:$i64;bhi:$i64):@$i64{
+let besti=mut.alo;let bestj=mut.blo;let bestsize=mut.0;
+let blen=s.len(b) as $i64;
+let j2len=mut.@($i64);lp(let k=0;k<blen+1;k=k+1){j2len=j2len+@(0)};
+lp(let i=alo;i<ahi;i=i+1){
+let newj2len=mut.@($i64);lp(let k=0;k<blen+1;k=k+1){newj2len=newj2len+@(0)};
+lp(let j=blo;j<bhi;j=j+1){
+if(s.eq(charat(a;i);charat(b;j))){
+let prev=mut.0;if(j>0){prev=j2len.get(j-1)};
+let k=prev+1;newj2len=newj2len.set(j;k);
+if(k>bestsize){besti=i-k+1;bestj=j-k+1;bestsize=k}
+}};
+j2len=newj2len};
+<@(besti;bestj;bestsize)};
+f=removelast4(q:@$i64):@$i64{let out=mut.@($i64);lp(let i=0;i<(q.len as $i64)-4;i=i+1){out=out+@(q.get(i))};<out};
+f=sortblocks(blocks:@$i64):@$i64{
+let nb=(blocks.len as $i64)/3;let bi=mut.@($i64);let bj=mut.@($i64);let bk=mut.@($i64);
+lp(let i=0;i<nb;i=i+1){bi=bi+@(blocks.get(i*3));bj=bj+@(blocks.get(i*3+1));bk=bk+@(blocks.get(i*3+2))};
+lp(let p=0;p<nb;p=p+1){lp(let q=0;q<nb-1;q=q+1){
+if(bi.get(q)>bi.get(q+1)){
+let ti=bi.get(q);bi=bi.set(q;bi.get(q+1));bi=bi.set(q+1;ti);
+let tj=bj.get(q);bj=bj.set(q;bj.get(q+1));bj=bj.set(q+1;tj);
+let tk=bk.get(q);bk=bk.set(q;bk.get(q+1));bk=bk.set(q+1;tk)}}};
+let out=mut.@($i64);lp(let i=0;i<nb;i=i+1){out=out+@(bi.get(i));out=out+@(bj.get(i));out=out+@(bk.get(i))};<out};
+f=matchblocks(a:$str;b:$str):@$i64{
+let queue=mut.@($i64);let alen=s.len(a) as $i64;let blen=s.len(b) as $i64;
+queue=queue+@(0);queue=queue+@(alen);queue=queue+@(0);queue=queue+@(blen);
+let blocks=mut.@($i64);
+lp(queue.len>0){
+let n=queue.len as $i64;
+let bhi=queue.get(n-1);let blo=queue.get(n-2);let ahi=queue.get(n-3);let alo=queue.get(n-4);
+queue=removelast4(queue);
+let m=flm(a;b;alo;ahi;blo;bhi);
+let i=m.get(0);let j=m.get(1);let k=m.get(2);
+if(k>0){
+blocks=blocks+@(i);blocks=blocks+@(j);blocks=blocks+@(k);
+if(alo<i){if(blo<j){queue=queue+@(alo);queue=queue+@(i);queue=queue+@(blo);queue=queue+@(j)}};
+if(i+k<ahi){if(j+k<bhi){queue=queue+@(i+k);queue=queue+@(ahi);queue=queue+@(j+k);queue=queue+@(bhi)}}
+}};
+<sortblocks(blocks)};
+f=chardiff(old:$str;new:$str):$str{
+if(s.eq(old;new)){<"_"};
+let blocks=mut.matchblocks(old;new);
+blocks=blocks+@(s.len(old) as $i64);blocks=blocks+@(s.len(new) as $i64);blocks=blocks+@(0);
+let changes=mut.@($str);let hasnoninsert=mut.false;
+let ai=mut.0;let bj=mut.0;
+let nb=(blocks.len as $i64)/3;
+lp(let bi=0;bi<nb;bi=bi+1){
+let i=blocks.get(bi*3);let j=blocks.get(bi*3+1);let size=blocks.get(bi*3+2);
+let adel=i-ai;let bins=j-bj;
+if(adel>0){if(bins>0){
+let oldpart=s.slice(old;ai;i);let newpart=s.slice(new;bj;j);
+changes=changes+@(s.concat(s.concat(s.concat(s.concat("_";oldpart);"_");newpart);"_"));hasnoninsert=true
+}el{
+let delpart=s.slice(old;ai;i);
+changes=changes+@(s.concat(s.concat("_";delpart);"_"));hasnoninsert=true
+}}el{if(bins>0){
+let addpart=s.slice(new;bj;j);
+changes=changes+@(s.concat(s.concat("_";addpart);"_"))
+}};
+ai=i+size;bj=j+size};
+if(changes.len=0){<"_"};
+let joined=mut."_";lp(let c=0;c<(changes.len as $i64);c=c+1){if(c>0){joined=s.concat(joined;"_")};joined=s.concat(joined;changes.get(c))};
+if(hasnoninsert){<s.concat(s.concat("_";joined);"_")};
+<s.concat(s.concat("_";joined);"_")};
+f=getstr(obj:$str;key:$str):$str{
+let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+<s.slice(rest;0;endq)};
+f=getint(obj:$str;key:$str):$i64{
+let pat=s.concat(s.concat("_""_"\"_");
+let idx=s.indexof(obj;pat);
+if(idx<0){<0};
+let start=idx+(s.len(pat) as $i64);
+let rest=s.slice(obj;start;s.len(obj) as $i64);
+let num=mut."_";lp(let i=0;i<(s.len(rest) as $i64);i=i+1){let c=charat(rest;i);if(s.contains("_";c)){num=s.concat(num;c)}el{br}};
+<s.toint(num)};
+f=main():$i64{
+let input=mut."_";lp(1=1){let line=io.readln();if(io.eof()){input=s.concat(input;line);br};input=s.concat(input;line)};
+let trimmed=s.trim(input);
+let inner=s.slice(trimmed;1;(s.len(trimmed) as $i64)-1);
+let objs=s.split(inner;"_");
+let n=objs.len as $i64;
+let ids=mut.@($str);let vers=mut.@($i64);let texts=mut.@($str);let edits=mut.@($str);
+lp(let i=0;i<n;i=i+1){
+let raw=objs.get(i);
+let obj=s.concat(s.concat("_";raw);"_");
+ids=ids+@(getstr(obj;"_"));
+vers=vers+@(getint(obj;"_"));
+texts=texts+@(getstr(obj;"_"));
+edits=edits+@(getstr(obj;"_"))};
+let uniq=mut.@($str);
+lp(let i=0;i<n;i=i+1){let id=ids.get(i);let found=mut.false;lp(let j=0;j<(uniq.len as $i64);j=j+1){if(s.eq(uniq.get(j);id)){found=true}};if(found=false){uniq=uniq+@(id)}};
+lp(let p=0;p<(uniq.len as $i64);p=p+1){lp(let q=0;q<(uniq.len as $i64)-1;q=q+1){if(strgt(uniq.get(q);uniq.get(q+1))){let t=uniq.get(q);uniq=uniq.set(q;uniq.get(q+1));uniq=uniq.set(q+1;t)}}};
+let out=mut."_";let first=mut.true;
+lp(let u=0;u<(uniq.len as $i64);u=u+1){
+let id=uniq.get(u);
+if(first){out=s.concat(out;s.concat(id;"_"));first=false}el{out=s.concat(out;s.concat("_";s.concat(id;"_")))};
+let vv=mut.@($i64);let vt=mut.@($str);let ve=mut.@($str);
+lp(let i=0;i<n;i=i+1){if(s.eq(ids.get(i);id)){vv=vv+@(vers.get(i));vt=vt+@(texts.get(i));ve=ve+@(edits.get(i))}};
+let m=vv.len as $i64;
+lp(let p=0;p<m;p=p+1){lp(let q=0;q<m-1;q=q+1){if(vv.get(q)>vv.get(q+1)){let a=vv.get(q);vv=vv.set(q;vv.get(q+1));vv=vv.set(q+1;a);let b=vt.get(q);vt=vt.set(q;vt.get(q+1));vt=vt.set(q+1;b);let c=ve.get(q);ve=ve.set(q;ve.get(q+1));ve=ve.set(q+1;c)}}};
+let prev=mut."_";
+lp(let i=0;i<m;i=i+1){
+let text=vt.get(i);
+let line=s.concat(s.concat(s.concat(s.concat(s.concat("_";s.fromint(vv.get(i)));"_");ve.get(i));"_");text);
+if(i=0){out=s.concat(out;line)}el{let d=chardiff(prev;text);out=s.concat(out;s.concat(line;d))};
+prev=text}};
+io.println(out);<0};
+f=strgt(a:$str;b:$str):$bool{let la=s.len(a) as $i64;let lb=s.len(b) as $i64;let mn=mut.la;if(lb<la){mn=lb};lp(let i=0;i<mn;i=i+1){let ca=charat(a;i);let cb=charat(b;i);if(s.eq(ca;cb)=false){<gtchar(ca;cb)}};<la>lb};
+f=gtchar(a:$str;b:$str):$bool{<s.indexof("_";a)>s.indexof("_";b)}

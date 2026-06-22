@@ -1,0 +1,77 @@
+m=changepoint;i=io:std.io;i=s:std.str;
+f=fmt1(v:$f64):$str{
+  let raw=s.format(v;"_");
+  let dot=s.indexof(raw;"_");
+  let intpart=s.slice(raw;0;dot);
+  let frac=s.slice(raw;dot+1;s.len(raw));
+  let last=mut.1;
+  lp(let k=1;k<s.len(frac);k=k+1){
+    let ch=s.slice(frac;k;k+1);
+    if(s.eq(ch;"_")=false){last=k+1}
+  };
+  <s.concat(s.concat(intpart;"_");s.slice(frac;0;last))
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let parts=s.split(line;"_");
+  let n=parts.len();
+  let vals=mut.@($f64);
+  lp(let i=0;i<n;i=i+1){vals=vals+@(s.tofloat(s.trim(parts.get(i))))};
+  let penalty=10.0;
+  let big=1000000000000.0;
+  let fcost=mut.@($f64);
+  let cp=mut.@();
+  fcost=fcost+@(0.0);
+  cp=cp+@(0-1);
+  lp(let t=1;t<=n;t=t+1){fcost=fcost+@(big);cp=cp+@(0-1)};
+  lp(let t=1;t<=n;t=t+1){
+    let mincost=mut.big;
+    let besttau=mut.0-1;
+    lp(let tau=0;tau<t;tau=tau+1){
+      let seglen=t-tau;
+      let sum=mut.0.0;
+      lp(let k=tau;k<t;k=k+1){sum=sum+vals.get(k)};
+      let mean=sum/s.tofloat(s.fromint(seglen));
+      let cost=mut.0.0;
+      lp(let k=tau;k<t;k=k+1){let d=vals.get(k)-mean;cost=cost+d*d};
+      let total=fcost.get(tau)+cost+penalty;
+      if(total<mincost){mincost=total;besttau=tau}
+    };
+    fcost=fcost.set(t;mincost);
+    cp=cp.set(t;besttau)
+  };
+  let changes=mut.@();
+  let t=mut.n;
+  lp(cp.get(t)!=(0-1)){
+    if(cp.get(t)>0){changes=@(cp.get(t))+changes};
+    t=cp.get(t)
+  };
+  let nc=changes.len();
+  let bounds=mut.@();
+  bounds=bounds+@(0);
+  lp(let i=0;i<nc;i=i+1){bounds=bounds+@(changes.get(i))};
+  bounds=bounds+@(n);
+  let means=mut.@($f64);
+  lp(let i=0;i<bounds.len()-1;i=i+1){
+    let a=bounds.get(i);
+    let b=bounds.get(i+1);
+    if(b>a){
+      let sum=mut.0.0;
+      lp(let k=a;k<b;k=k+1){sum=sum+vals.get(k)};
+      means=means+@(sum/s.tofloat(s.fromint(b-a)))
+    }
+  };
+  let out=mut."_"change_points\"_";
+  lp(let i=0;i<nc;i=i+1){
+    if(i>0){out=s.concat(out;"_")};
+    out=s.concat(out;s.fromint(changes.get(i)))
+  };
+  out=s.concat(out;"_"segment_means\"_");
+  lp(let i=0;i<means.len();i=i+1){
+    if(i>0){out=s.concat(out;"_")};
+    out=s.concat(out;fmt1(means.get(i)))
+  };
+  out=s.concat(out;"_");
+  io.println(out);
+  <0
+}

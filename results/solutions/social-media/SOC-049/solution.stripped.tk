@@ -1,0 +1,34 @@
+m=react;i=io:std.io;i=s:std.str;
+f=getint(j:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(j;pat);
+  if(idx<0){<0};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let num=mut."_";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    let d=s.indexof("_";ch);
+    if(d<0){br};
+    num=s.concat(num;ch);
+    start=start+1;
+  };
+  <s.toint(num);
+};
+f=getstr(j:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_""_"\"_")){br};
+    val=s.concat(val;ch);
+    start=start+1;
+  };
+  <val;
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let pid=getint(line;"_");
+  let emoji=getstr(line;"_");
+  let out=mut."_"post_id\"_";
+  out=s.concat(out;s.fromint(pid));
+  out=s.concat(out;"_"emoji\"_""_"\"_"reactions\"_""_"\"_"status\"_"reacted\"_");
+  io.println(out);
+  <0;
+};

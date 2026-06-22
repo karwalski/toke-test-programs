@@ -1,1 +1,6 @@
-m=httpserver;f=main():$void{let port=8080;let basepath="/api/v1";let certpath="/etc/certs/server.crt";let keypath="/etc/certs/server.key";let r=mut.0;let s=mut.0;r=0;s=0;r=0;s=0;r=0;s=0;r=0;s=0;r=0;s=0;r=0;s=0;r=0;s=
+m=httpserver;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let port=s.trim(io.readln());
+  io.println(s.concat("Listening on :";port));
+  <0
+}

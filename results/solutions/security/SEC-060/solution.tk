@@ -1,1 +1,37 @@
-m=regex;f=main():$i64{let count=mut.0;let lines=mut.@();let idx=mut.0;lp(let i=0;i<1000;i=i+1){let c=mut.std.stdin.readchar();if(c=10){lines=lines+@(idx);idx=0;}el{idx=idx+1;};};if(!(idx=0))){lines=lines+@(idx);};let n=lines.len;lp(let i=0;i<n;i=i+1){let line=lines.get(i);let num1=mut.std.str.toint(line);let num2=mut.std.str.toint(line);let result=mut.num1+num2;std.str.printint(result);std.str.printchar(10);};<0};
+m=regex;i=io:std.io;i=s:std.str;
+f=isq(ch:$str):$bool{if(s.eq(ch;"+")){<true};if(s.eq(ch;"*")){<true};if(s.eq(ch;"{")){<true};<false};
+f=check(p:$str):$bool{
+  let n=s.len(p) as $i64;
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(p;i;i+1);
+    if(s.eq(ch;"(")){
+      let depth=mut.1;
+      let j=mut.i+1;
+      let hasq=mut.false;
+      lp(depth>0){
+        if(j>=n){br};
+        let cj=s.slice(p;j;j+1);
+        if(s.eq(cj;"(")){depth=depth+1};
+        if(s.eq(cj;")")){depth=depth-1};
+        if(depth>0){if(isq(cj)){hasq=true}};
+        j=j+1;
+      };
+      if(j<n){
+        let after=s.slice(p;j;j+1);
+        if(isq(after)){if(hasq){<true}};
+      };
+    };
+  };
+  <false;
+};
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let p=s.trim(line);
+    if(s.len(p)=0){}el{
+      if(check(p)){io.println("VULNERABLE")}el{io.println("SAFE")};
+    };
+  };
+  <0;
+};

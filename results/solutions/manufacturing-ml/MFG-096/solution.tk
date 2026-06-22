@@ -1,1 +1,77 @@
-m=changepoint;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;",");let n=parts.len();let vals=mut.@();lp(let idx=0;idx<n;idx=idx+1){vals=vals+@(s.tofloat(s.trim(parts.get(idx))))};let bestcp=mut.0;let bestcost=mut.0.0;let first=mut.0.0;lp(let idx=0;idx<n;idx=idx+1){first=first+vals.get(idx)};let initmean=first/s.tofloat(s.fromint(n));let initcost=mut.0.0;lp(let idx=0;idx<n;idx=idx+1){let d=vals.get(idx)-initmean;initcost=initcost+d*d};bestcost=initcost;let found=mut.0;lp(let cp=1;cp<n;cp=cp+1){let suma=mut.0.0;lp(let idx=0;idx<cp;idx=idx+1){suma=suma+vals.get(idx)};let meana=suma/s.tofloat(s.fromint(cp));let sumb=mut.0.0;lp(let idx=cp;idx<n;idx=idx+1){sumb=sumb+vals.get(idx)};let meanb=sumb/s.tofloat(s.fromint(n-cp));let cost=mut.0.0;lp(let idx=0;idx<cp;idx=idx+1){let da=vals.get(idx)-meana;cost=cost+da*da};lp(let idx=cp;idx<n;idx=idx+1){let db=vals.get(idx)-meanb;cost=cost+db*db};if(cost<bestcost){bestcost=cost;bestcp=cp;found=1}};if(found=1){let cpval=bestcp;let suma=mut.0.0;lp(let idx=0;idx<cpval;idx=idx+1){suma=suma+vals.get(idx)};let meana=suma/s.tofloat(s.fromint(cpval));let sumb=mut.0.0;lp(let idx=cpval;idx<n;idx=idx+1){sumb=sumb+vals.get(idx)};let meanb=sumb/s.tofloat(s.fromint(n-cpval));let out=mut."";out=s.concat(out;"{\"change_points\":[");out=s.concat(out;s.fromint(cpval));out=s.concat(out;"],\"segment_means\":[");out=s.concat(out;s.format(meana;"%.1f"));out=s.concat(out;",");out=s.concat(out;s.format(meanb;"%.1f"));out=s.concat(out;"]}");io.println(out)}el{io.println("{\"change_points\":[],\"segment_means\":[]}")};<0}
+m=changepoint;i=io:std.io;i=s:std.str;
+f=fmt1(v:$f64):$str{
+  let raw=s.format(v;"%.6f");
+  let dot=s.indexof(raw;".");
+  let intpart=s.slice(raw;0;dot);
+  let frac=s.slice(raw;dot+1;s.len(raw));
+  let last=mut.1;
+  lp(let k=1;k<s.len(frac);k=k+1){
+    let ch=s.slice(frac;k;k+1);
+    if(s.eq(ch;"0")=false){last=k+1}
+  };
+  <s.concat(s.concat(intpart;".");s.slice(frac;0;last))
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let parts=s.split(line;",");
+  let n=parts.len();
+  let vals=mut.@($f64);
+  lp(let i=0;i<n;i=i+1){vals=vals+@(s.tofloat(s.trim(parts.get(i))))};
+  let penalty=10.0;
+  let big=1000000000000.0;
+  let fcost=mut.@($f64);
+  let cp=mut.@();
+  fcost=fcost+@(0.0);
+  cp=cp+@(0-1);
+  lp(let t=1;t<=n;t=t+1){fcost=fcost+@(big);cp=cp+@(0-1)};
+  lp(let t=1;t<=n;t=t+1){
+    let mincost=mut.big;
+    let besttau=mut.0-1;
+    lp(let tau=0;tau<t;tau=tau+1){
+      let seglen=t-tau;
+      let sum=mut.0.0;
+      lp(let k=tau;k<t;k=k+1){sum=sum+vals.get(k)};
+      let mean=sum/s.tofloat(s.fromint(seglen));
+      let cost=mut.0.0;
+      lp(let k=tau;k<t;k=k+1){let d=vals.get(k)-mean;cost=cost+d*d};
+      let total=fcost.get(tau)+cost+penalty;
+      if(total<mincost){mincost=total;besttau=tau}
+    };
+    fcost=fcost.set(t;mincost);
+    cp=cp.set(t;besttau)
+  };
+  let changes=mut.@();
+  let t=mut.n;
+  lp(cp.get(t)!=(0-1)){
+    if(cp.get(t)>0){changes=@(cp.get(t))+changes};
+    t=cp.get(t)
+  };
+  let nc=changes.len();
+  let bounds=mut.@();
+  bounds=bounds+@(0);
+  lp(let i=0;i<nc;i=i+1){bounds=bounds+@(changes.get(i))};
+  bounds=bounds+@(n);
+  let means=mut.@($f64);
+  lp(let i=0;i<bounds.len()-1;i=i+1){
+    let a=bounds.get(i);
+    let b=bounds.get(i+1);
+    if(b>a){
+      let sum=mut.0.0;
+      lp(let k=a;k<b;k=k+1){sum=sum+vals.get(k)};
+      means=means+@(sum/s.tofloat(s.fromint(b-a)))
+    }
+  };
+  let out=mut."{\"change_points\":[";
+  lp(let i=0;i<nc;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;s.fromint(changes.get(i)))
+  };
+  out=s.concat(out;"],\"segment_means\":[");
+  lp(let i=0;i<means.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;fmt1(means.get(i)))
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+}

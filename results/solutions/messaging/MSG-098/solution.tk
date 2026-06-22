@@ -1,1 +1,88 @@
-m=backpressure;f=queueisempty(qlen:$i64):$bool{if(qlen=0){<true};<false};f=consumerlagexceeded(lag:$i64;threshold:$i64):$bool{if(lag>threshold){<true};<false};f=estimatetokensfromrate(rate:$f64):$i64{if(rate=0.0){<0};let tokenspersec=rate;let secsper1000tokens=1.0/tokenspersec;let result=secsper1000tokens*1000.0;<result as$i64>};f=shouldstop(qlen:$i64;lag:$i64;rate:$f64):$bool{let isempty=queueisempty(qlen);if(isempty){<true};let lagexceeded=consumerlagexceeded(lag;1000);if(lagexceeded){<true};let tokenspersec=estimatetokensfromrate(rate);let minlag=qlen/tokenspersec;if(lag<minlag){<true};<false};f=main():$i6
+m=backpressure;
+i=io:std.io;
+i=s:std.str;
+
+f=getint(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("\"";key);"\":");
+    let p=s.indexof(json;pat);
+    if(p<0){<0};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"0")){n=s.concat(n;c)}el{
+        if(s.equals(c;"1")){n=s.concat(n;c)}el{
+        if(s.equals(c;"2")){n=s.concat(n;c)}el{
+        if(s.equals(c;"3")){n=s.concat(n;c)}el{
+        if(s.equals(c;"4")){n=s.concat(n;c)}el{
+        if(s.equals(c;"5")){n=s.concat(n;c)}el{
+        if(s.equals(c;"6")){n=s.concat(n;c)}el{
+        if(s.equals(c;"7")){n=s.concat(n;c)}el{
+        if(s.equals(c;"8")){n=s.concat(n;c)}el{
+        if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0};
+    <s.toint(n)
+};
+
+f=getfloat(json:$str;key:$str):$f64{
+    let pat=s.concat(s.concat("\"";key);"\":");
+    let p=s.indexof(json;pat);
+    if(p<0){<0.0};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;",")){br}el{
+        if(s.equals(c;"}")){br}el{
+        if(s.equals(c;" ")){br}el{n=s.concat(n;c)}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0.0};
+    <s.tofloat(n)
+};
+
+f=main():$i64{
+    let config=io.readln();
+    let stats=io.readln();
+    let maxdepth=getint(config;"max_depth");
+    let warn=getfloat(config;"warn_threshold");
+    let crit=getfloat(config;"critical_threshold");
+    let depth=getint(stats;"depth");
+    let ratein=getint(stats;"rate_in");
+    let rateout=getint(stats;"rate_out");
+    let lag=getint(stats;"consumer_lag_ms");
+
+    let pct=(depth as$f64)/(maxdepth as$f64);
+    let signal=mut."NONE";
+    if(pct>=crit){if(pct>=1.0){signal="FULL"}el{signal="CRITICAL"}}el{
+    if(pct>=warn){signal="WARN"}};
+
+    let deficit=ratein-rateout;
+    let pctdisplay=(pct*100.0) as$i64;
+
+    io.println(s.concat(s.concat(s.concat(signal;" (");s.fromint(pctdisplay));"% full)"));
+    io.println(s.concat(s.concat(s.concat(s.concat(s.concat("rate: in=";s.fromint(ratein));"/s, out=");s.fromint(rateout));"/s (deficit: ");s.concat(s.fromint(deficit);"/s)")));
+    io.println(s.concat(s.concat("lag: ";s.fromint(lag));"ms"));
+
+    if(deficit>0){
+        let remaining=maxdepth-depth;
+        let ttf=(remaining as$f64)/(deficit as$f64);
+        io.println(s.concat(s.concat("time to full: ";s.fromfloat(ttf));"s"))
+    }el{
+        io.println("time to full: never")
+    };
+
+    if(deficit>0){
+        let red=(deficit as$f64)/(ratein as$f64)*100.0;
+        io.println(s.concat(s.concat("action: reduce producer rate by ";s.fromint(red as$i64));"%"))
+    }el{
+        io.println("action: no action needed")
+    };
+    <0
+};

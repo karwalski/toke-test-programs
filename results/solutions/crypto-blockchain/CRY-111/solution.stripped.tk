@@ -1,0 +1,46 @@
+m=entropy;i=io:std.io;i=s:std.str;
+f=ln(x:$f64):$f64{
+  let y=(x-1.0)/(x+1.0);
+  let y2=y*y;
+  let term=mut.y;
+  let sum=mut.0.0;
+  lp(let k=0;k<200;k=k+1){
+    let denom=2.0*s.tofloat(s.fromint(k))+1.0;
+    sum=sum+term/denom;
+    term=term*y2
+  };
+  <2.0*sum
+};
+f=log2(x:$f64):$f64{
+  let ln2=0.6931471805599453;
+  <ln(x)/ln2
+};
+f=main():$i64{
+  let text=s.trim(io.readln());
+  let n=s.len(text);
+  let seen=mut.@();
+  let cnt=mut.@();
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(text;i;i+1);
+    let found=mut.0-1;
+    lp(let j=0;j<seen.len();j=j+1){
+      if(s.eq(seen.get(j);ch)){found=j}
+    };
+    if(found<0){
+      seen=seen+@(ch);
+      cnt=cnt+@(1)
+    }el{
+      cnt=cnt.set(found;cnt.get(found)+1)
+    }
+  };
+  let total=s.tofloat(s.fromint(n));
+  let ent=mut.0.0;
+  if(n>0){
+    lp(let j=0;j<cnt.len();j=j+1){
+      let p=s.tofloat(s.fromint(cnt.get(j)))/total;
+      if(p>0.0){ent=ent-p*log2(p)}
+    }
+  };
+  io.println(s.format(ent;"_"));
+  <0
+}

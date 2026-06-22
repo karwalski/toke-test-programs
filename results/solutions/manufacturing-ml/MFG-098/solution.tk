@@ -1,1 +1,98 @@
-m=main;i=math:std.math;f=mean(vals:@$f64):$f64{let n=vals.len;let sum=mut.0.0;lp(let i=0;i<n;i=i+1){sum=sum+vals.get(i)};let m=mut.0.0;if(!(n=0)){m=sum/n as$f64};<m};f=variance(vals:@$f64):$f64{let n=vals.len;if(n<2){<0.0};let mu=mean(vals);let sum=mut.0.0;lp(let i=0;i<n;i=i+1){let dx=vals.get(i)-mu;sum=sum+dx*dx};let var=mut.0.0;if(!(n=0)){var=sum/(n-1)as$f64};<var};f=main():$i64{let scores=@(72.0;85.0;91.0;78.0;83.0;94.0;81.0));let n=scores.len;let mu=mean(scores);let var=variance(scores);<0
+m=doe;i=io:std.io;i=s:std.str;
+f=pow2(n:$i64):$i64{let r=mut.1;lp(let i=0;i<n;i=i+1){r=r*2};<r};
+f=fmtnum(v:$f64):$str{
+  let iv=v as $i64;
+  if((iv as $f64)=v){<s.fromint(iv)};
+  <s.format(v;"%g");
+};
+f=main():$i64{
+  let lines=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    lines=lines+@(s.trim(line));
+  };
+  let ln=lines.len() as $i64;
+  let respidx=mut.0-1;
+  lp(let i=0;i<ln;i=i+1){
+    if(s.eq(lines.get(i);"response")){respidx=i;br};
+  };
+  let names=mut.@();
+  lp(let i=1;i<respidx;i=i+1){
+    let parts=s.split(lines.get(i);",");
+    names=names+@(parts.get(0));
+  };
+  let resp=mut.@($f64);
+  lp(let i=respidx+1;i<ln;i=i+1){
+    let t=lines.get(i);
+    if(s.len(t)=0){}el{
+      let parts=s.split(t;",");
+      let pn=parts.len() as $i64;
+      lp(let k=0;k<pn;k=k+1){resp=resp+@(s.tofloat(parts.get(k)))};
+    };
+  };
+  let n=names.len() as $i64;
+  let nruns=pow2(n);
+  let maineff=mut.@($f64);
+  lp(let f=0;f<n;f=f+1){
+    let hsum=mut.0.0;
+    let hcnt=mut.0;
+    let lsum=mut.0.0;
+    let lcnt=mut.0;
+    lp(let r=0;r<nruns;r=r+1){
+      let bit=(r/pow2(f))%2;
+      if(bit=1){hsum=hsum+resp.get(r);hcnt=hcnt+1}el{lsum=lsum+resp.get(r);lcnt=lcnt+1};
+    };
+    let eff=hsum/(hcnt as $f64)-lsum/(lcnt as $f64);
+    maineff=maineff+@(eff);
+  };
+  let out=mut."{\"main_effects\":{";
+  lp(let f=0;f<n;f=f+1){
+    if(f>0){out=s.concat(out;",")};
+    out=s.concat(out;s.concat(s.concat("\"";names.get(f));"\":"));
+    out=s.concat(out;fmtnum(maineff.get(f)));
+  };
+  out=s.concat(out;"}");
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=a+1;b<n;b=b+1){
+      let hsum=mut.0.0;
+      let hcnt=mut.0;
+      let lsum=mut.0.0;
+      let lcnt=mut.0;
+      lp(let r=0;r<nruns;r=r+1){
+        let ba=(r/pow2(a))%2;
+        let bb=(r/pow2(b))%2;
+        let ca=mut.0-1;
+        if(ba=1){ca=1};
+        let cb=mut.0-1;
+        if(bb=1){cb=1};
+        let prod=ca*cb;
+        if(prod=1){hsum=hsum+resp.get(r);hcnt=hcnt+1}el{lsum=lsum+resp.get(r);lcnt=lcnt+1};
+      };
+      let eff=hsum/(hcnt as $f64)-lsum/(lcnt as $f64);
+      out=s.concat(out;s.concat(s.concat(",\"interaction_";s.concat(names.get(a);names.get(b)));"\":"));
+      out=s.concat(out;fmtnum(eff));
+    };
+  };
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  lp(let p=0;p<n;p=p+1){
+    lp(let q=0;q<n-1-p;q=q+1){
+      let i1=order.get(q);
+      let i2=order.get(q+1);
+      let v1=mut.maineff.get(i1);
+      if(v1<0.0){v1=0.0-v1};
+      let v2=mut.maineff.get(i2);
+      if(v2<0.0){v2=0.0-v2};
+      if(v1<v2){order=order.set(q;i2);order=order.set(q+1;i1)};
+    };
+  };
+  out=s.concat(out;",\"significant_factors\":[");
+  lp(let i=0;i<n;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;s.concat(s.concat("\"";names.get(order.get(i)));"\""));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0;
+};

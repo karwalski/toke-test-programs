@@ -1,1 +1,68 @@
-m=worddiff;f=splitwords(text:$str):@$str{let words=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<text.len;idx=idx+1){let ch=text.get(idx);if(ch=" "){if(!(current="")){words=words+@(current);current="";};}el{current=current+ch;};};if(!(current="")){words=words+@(current);};<words};f=worddiff(a:$str;b:$str):$str{let wa=splitwords(a);let wb=splitwords(b);let result=mut."";let i=mut.0;let j=mut.0;lp(let idx=0;idx<wa.len;idx=idx+1){let waidx=wa.get(idx);let found=mut.false;let jval=mut.0;lp(let jidx=0;jidx<wb.len;jidx=jidx+1){let wbidx=wb.get(jidx);if(waidx=wbidx){found=true;jval=jidx;j=jidx;};};if(found){result=result+waidx+" ";j=j+1;}
+m=worddiff;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let all=mut."";
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    if(s.len(all)=0){all=line}el{all=s.concat(all;s.concat("\n";line))};
+  };
+  let parts=s.split(all;"---");
+  let txta=s.trim(parts.get(0));
+  let txtb=s.trim(parts.get(1));
+  let w1=s.split(txta;" ");
+  let w2=s.split(txtb;" ");
+  let n=w1.len() as $i64;
+  let m=w2.len() as $i64;
+  let dp=mut.@();
+  lp(let i=0;i<=n;i=i+1){
+    let row=mut.@();
+    lp(let j=0;j<=m;j=j+1){row=row+@(0)};
+    dp=dp+@(row);
+  };
+  lp(let i=n-1;i>=0;i=i-1){
+    lp(let j=m-1;j>=0;j=j-1){
+      let row=dp.get(i);
+      let rdown=dp.get(i+1);
+      if(s.eq(w1.get(i);w2.get(j))){
+        row=row.set(j;rdown.get(j+1)+1);
+      }el{
+        let a=rdown.get(j);
+        let b=row.get(j+1);
+        if(a>=b){row=row.set(j;a)}el{row=row.set(j;b)};
+      };
+      dp=dp.set(i;row);
+    };
+  };
+  let i=mut.0;
+  let j=mut.0;
+  let out=mut."";
+  let parts2=mut.@();
+  lp(1=1){
+    if(i>=n){br};
+    if(j>=m){br};
+    if(s.eq(w1.get(i);w2.get(j))){
+      parts2=parts2+@(w1.get(i));
+      i=i+1;
+      j=j+1;
+    }el{
+      let rdown=dp.get(i+1);
+      let row=dp.get(i);
+      if(rdown.get(j)>=row.get(j+1)){
+        parts2=parts2+@(s.concat(s.concat("[-";w1.get(i));"-]"));
+        i=i+1;
+      }el{
+        parts2=parts2+@(s.concat(s.concat("{+";w2.get(j));"+}"));
+        j=j+1;
+      };
+    };
+  };
+  lp(i<n){parts2=parts2+@(s.concat(s.concat("[-";w1.get(i));"-]"));i=i+1};
+  lp(j<m){parts2=parts2+@(s.concat(s.concat("{+";w2.get(j));"+}"));j=j+1};
+  let pn=parts2.len() as $i64;
+  lp(let k=0;k<pn;k=k+1){
+    if(k>0){out=s.concat(out;" ")};
+    out=s.concat(out;parts2.get(k));
+  };
+  io.println(out);
+  <0;
+};

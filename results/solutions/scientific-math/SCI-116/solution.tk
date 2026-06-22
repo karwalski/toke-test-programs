@@ -1,1 +1,59 @@
-m=scheduler;f=schedule(jobs:@($i64;$i64;$i64))):@$i64{let n=jobs.len;let m=mut.@($i64);let weights=mut.@($i64);let deadlines=mut.@($i64);lp(let i=0;i<n;i=i+1){let j=jobs.get(i);let w=j.get(0);let d=j.get(1);let s=j.get(2);weights=weights+@(w);deadlines=deadlines+@(d);m=m+@(s);};let njobs=m.len;let sorted=mut.@($i64);lp(let i=0;i<njobs;i=i+1){sorted=sorted+@(i);};lp(let i=0;i<njobs;i=i+1){lp(let j=i+1;j<njobs;j=j+1){let s1=sorted.get(i);let s2=sorted.get(j);let w1=weights.get(s1);let w2=weights.get(s2);let d1=deadlines.get(s1);let d2=deadlines.get(s2);let swap=mut.false;if(w1<w2
+m=jobsched;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let n=s.toint(s.trim(io.readln()));
+  let names=mut.@();
+  let deadlines=mut.@();
+  let weights=mut.@();
+  lp(let i=0;i<n;i=i+1){
+    let parts=s.split(s.trim(io.readln());" ");
+    names=names+@(parts.get(0));
+    deadlines=deadlines+@(s.toint(parts.get(1)));
+    weights=weights+@(s.toint(parts.get(2)))
+  };
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  let a=mut.0;
+  lp(a<n){
+    let b=mut.a+1;
+    lp(b<n){
+      if(weights.get(order.get(b))>weights.get(order.get(a))){
+        let tmp=order.get(a);
+        order=order.set(a;order.get(b));
+        order=order.set(b;tmp)
+      };
+      b=b+1
+    };
+    a=a+1
+  };
+  let maxd=mut.0;
+  lp(let i=0;i<n;i=i+1){if(deadlines.get(i)>maxd){maxd=deadlines.get(i)}};
+  let slots=mut.@();
+  lp(let i=0;i<=maxd;i=i+1){slots=slots+@(0-1)};
+  let total=mut.0;
+  lp(let k=0;k<n;k=k+1){
+    let j=order.get(k);
+    let placed=mut.false;
+    let slot=mut.deadlines.get(j);
+    lp(slot>0){
+      if(placed=false){
+        if(slots.get(slot)<0){
+          slots=slots.set(slot;j);
+          total=total+weights.get(j);
+          placed=true
+        }
+      };
+      slot=slot-1
+    }
+  };
+  let sched=mut."";
+  let first=mut.true;
+  lp(let sl=1;sl<=maxd;sl=sl+1){
+    if(slots.get(sl)>=0){
+      if(first){sched=names.get(slots.get(sl));first=false}
+      el{sched=s.concat(s.concat(sched;" ");names.get(slots.get(sl)))}
+    }
+  };
+  io.println(s.concat("Schedule: ";sched));
+  io.println(s.concat("Total weight: ";s.fromint(total)));
+  <0
+}

@@ -1,1 +1,36 @@
-m=rank;f=rank(cipher:$str):$i64{let score=mut.0;if(cipher.contains("PSK"))){score=score-50};if(cipher.contains("SRP"))){score=score-50};if(cipher.contains("DHE"))){score=score+50};if(cipher.contains("ECDHE"))){score=score+100};if(cipher.contains("AES"))){score=score+50};if(cipher.contains("SHA256"))){score=score+50};if(cipher.contains("RSA"))){score=score+50};if(score<0){score=0};<score};f=isdeprecated(cipher:$str):$bool{let result=mut.false;if(cipher.contains("DES"))){result=true};if(cipher.contains("RC4"))){result=true};if(cipher.contains("MD5"))){result=true};<result};f=suggestmodern(cipher:$str):$str{let result=mut."";if(cipher.contains("DES"))){result="AES_256"};if(cipher.contains("RC4"))){result="AES_256"};
+m=cipherrank;i=io:std.io;i=s:std.str;
+f=strength(name:$str):$str{
+  let c=s.upper(name);
+  let insecure=mut.false;
+  if(s.contains(c;"RC4")){insecure=true};
+  if(s.contains(c;"DES")){insecure=true};
+  if(s.contains(c;"NULL")){insecure=true};
+  if(s.contains(c;"EXPORT")){insecure=true};
+  if(s.contains(c;"MD5")){insecure=true};
+  if(s.contains(c;"SHA1")){insecure=true};
+  if(s.contains(c;"ADH")){insecure=true};
+  if(s.contains(c;"AECDH")){insecure=true};
+  if(insecure){<"insecure"};
+  let weak=mut.false;
+  if(s.contains(c;"RSA_WITH_")){weak=true};
+  if(s.contains(c;"3DES")){weak=true};
+  if(s.contains(c;"CBC")){weak=true};
+  if(weak){<"weak"};
+  let strong=mut.false;
+  if(s.contains(c;"ECDHE")){strong=true};
+  if(s.contains(c;"DHE")){strong=true};
+  if(s.contains(c;"AES_256_GCM")){strong=true};
+  if(s.contains(c;"AES_128_GCM")){strong=true};
+  if(s.contains(c;"CHACHA20_POLY1305")){strong=true};
+  if(strong){<"strong"};
+  <"acceptable"
+};
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let name=s.trim(line);
+    if(s.len(name)>0){io.println(strength(name))}
+  };
+  <0
+}

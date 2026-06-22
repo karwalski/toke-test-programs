@@ -1,0 +1,33 @@
+m=loancompare;i=io:std.io;i=s:std.str;i=math:std.math;
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){}el{
+      let parts=s.split(t;"_");
+      let name=parts.get(0);
+      let principal=s.tofloat(parts.get(1));
+      let rate=s.tofloat(parts.get(2));
+      let years=s.toint(parts.get(3));
+      let mr=rate/12.0;
+      let np=(years*12) as $f64;
+      let monthly=mut.0.0;
+      if(mr=0.0){monthly=principal/np}el{
+        let factor=math.pow(1.0+mr;np);
+        monthly=principal*(mr*factor)/(factor-1.0);
+      };
+      let totalpaid=monthly*np;
+      let interest=totalpaid-principal;
+      let out=mut.name;
+      out=s.concat(out;"_");
+      out=s.concat(out;s.format(monthly;"_"));
+      out=s.concat(out;"_");
+      out=s.concat(out;s.format(interest;"_"));
+      out=s.concat(out;"_");
+      out=s.concat(out;s.format(totalpaid;"_"));
+      io.println(out);
+    };
+  };
+  <0;
+};

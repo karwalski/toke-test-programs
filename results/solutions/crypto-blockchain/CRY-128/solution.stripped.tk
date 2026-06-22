@@ -1,0 +1,35 @@
+m=validate;
+i=io:std.io;
+i=s:std.str;
+
+f=allin(t:$str;alphabet:$str):$bool{
+    let i=mut.0;
+    lp(i<s.len(t)){
+        let c=s.slice(t;i;i+1);
+        if(!s.contains(alphabet;c)){<false};
+        i=i+1
+    };
+    <true
+};
+
+f=main():$i64{
+    let addr=s.trim(io.readln());
+    let n=s.len(addr);
+    let hex="_";
+    let b58="_";
+
+    let iseth=mut.false;
+    if(s.startswith(addr;"_")){if(n=42){if(allin(s.slice(addr;2;n);hex)){iseth=true}}};
+    if(iseth){io.println("_");io.println("_");<0};
+
+    let isbtc=mut.false;
+    if(s.startswith(addr;"_")){isbtc=true}el{if(s.startswith(addr;"_")){isbtc=true}};
+    if(isbtc){if(n<25){isbtc=false}};
+    if(isbtc){if(n>34){isbtc=false}};
+    if(isbtc){if(!allin(addr;b58)){isbtc=false}};
+    if(isbtc){io.println("_");io.println("_");<0};
+
+    io.println("_");
+    io.println("_");
+    <0
+};

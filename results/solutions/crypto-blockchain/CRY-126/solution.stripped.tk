@@ -1,0 +1,34 @@
+m=metadata;
+i=io:std.io;
+i=s:std.str;
+
+f=has(json:$str;key:$str):$bool{
+    let pat=s.concat(s.concat("_""_"\"_");
+    <s.indexof(json;pat)>=0
+};
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    if(!has(input;"_")){io.println("_");<0};
+    if(!has(input;"_")){io.println("_");<0};
+    if(!has(input;"_")){io.println("_");<0};
+    io.println("_");
+    let name=getstr(input;"_");
+    let desc=mut.getstr(input;"_");
+    let image=getstr(input;"_");
+    if(s.len(desc)>50){desc=s.slice(desc;0;50)};
+    let out=mut.name;
+    out=s.concat(out;"_");
+    out=s.concat(out;desc);
+    out=s.concat(out;"_");
+    out=s.concat(out;image);
+    io.println(out);
+    <0
+};

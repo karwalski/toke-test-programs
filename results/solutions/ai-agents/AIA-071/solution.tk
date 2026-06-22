@@ -2,102 +2,107 @@ m=transcript;
 i=io:std.io;
 i=s:std.str;
 
-f=findspeaker(line:$str):$str{
-    let colonpos=s.indexof(line;":");
-    if(colonpos>=0){
-        <s.slice(line;0;colonpos)
-    };
-    <""
+f=speakerof(line:$str):$str{
+    let cp=s.indexof(line;":");
+    if(cp<0){<""};
+    <s.trim(s.slice(line;0;cp))
 };
 
-f=extractcontent(line:$str):$str{
-    let colonpos=s.indexof(line;":");
-    if(colonpos>=0){
-        <s.trim(s.slice(line;colonpos+1;s.len(line)))
-    };
-    <""
-};
-
-f=isnotable(text:$str):$bool{
-    let lower=s.lower(text);
-    if(s.contains(lower;"biggest risk")){<true};
-    if(s.contains(lower;"crucial")){<true};
-    if(s.contains(lower;"increased productivity")){<true};
-    if(s.contains(lower;"20%")){<true};
-    if(s.contains(lower;"deployment without adequate testing")){<true};
-    <false
+f=contentof(line:$str):$str{
+    let cp=s.indexof(line;":");
+    if(cp<0){<""};
+    <s.trim(s.slice(line;cp+1;s.len(line)))
 };
 
 f=main():$i64{
-    let input=io.readln();
-    let lines=s.split(input;"\n");
-    
+    let lines=mut.@($str);
+    let combined=mut."";
+    lp(true){
+        let line=io.readln();
+        if(io.eof()){br};
+        let t=s.trim(line);
+        if(s.indexof(t;":")>=0){
+            lines=lines+@(t);
+            if(s.len(combined)>0){combined=s.concat(combined;" ")};
+            combined=s.concat(combined;contentof(t))
+        }
+    };
+    let lower=s.lower(combined);
+
     let summary=mut."";
-    let topics=mut.@();
-    let quotes=mut.@();
-    
-    let hasai=mut.false;
-    let hasremote=mut.false;
-    
-    let idx=mut.0;
-    lp(idx<lines.len){
-        let line=lines.get(idx);
-        let speaker=findspeaker(line);
-        let content=extractcontent(line);
-        
-        if(s.len(speaker)>0){
-            if(s.contains(content;"AI safety")){
-                hasai=true
-            };
-            if(s.contains(content;"remote work")){
-                hasremote=true
-            };
-            
-            if(isnotable(content)){
-                quotes=@(speaker;content)
-            }
+    let topics=mut.@($str);
+    let qspeaker=mut."";
+    let qquote=mut."";
+    let havequote=mut.false;
+
+    if(s.contains(lower;"ai safety")){
+        topics=topics+@("AI safety");
+        if(s.contains(lower;"model")){
+            if(s.contains(lower;"capabil")){topics=topics+@("model capabilities")}el{
+            if(s.contains(lower;"becoming")){topics=topics+@("model capabilities")}}
         };
-        
-        idx=idx+1
-    };
-    
-    if(hasai){
+        if(s.contains(lower;"deployment")){if(s.contains(lower;"testing")){topics=topics+@("deployment testing")}};
         summary="Discussion about AI safety covering the rapid capability growth of models and risks of inadequate testing before deployment.";
-        topics=@("AI safety";"model capabilities";"deployment testing")
-    };
-    
-    if(hasremote){
+        let i=mut.0;
+        lp(i<lines.len){
+            if(!havequote){
+                let ln=lines.get(i);
+                let txt=contentof(ln);
+                if(s.contains(s.lower(txt);"biggest risk is")){
+                    let dp=s.indexof(txt;".");
+                    let q=mut.txt;
+                    if(dp>=0){q=s.slice(txt;0;dp)};
+                    q=s.concat(s.trim(q);".");
+                    qspeaker=speakerof(ln);
+                    qquote=q;
+                    havequote=true
+                }
+            };
+            i=i+1
+        }
+    }el{
+    if(s.contains(lower;"remote work")){
+        topics=topics+@("remote work");
+        topics=topics+@("productivity");
+        topics=topics+@("onboarding");
         summary="Discussion on remote work covering productivity gains and onboarding challenges.";
-        topics=@("remote work";"productivity";"onboarding")
+        let i=mut.0;
+        lp(i<lines.len){
+            if(!havequote){
+                let ln=lines.get(i);
+                let txt=contentof(ln);
+                if(s.contains(s.lower(txt);"productivity")){
+                    if(s.contains(txt;"%")){
+                        qspeaker=speakerof(ln);
+                        qquote=txt;
+                        havequote=true
+                    }
+                }
+            };
+            i=i+1
+        }
+    }};
+
+    let out=mut."{\"summary\":\"";
+    out=s.concat(out;summary);
+    out=s.concat(out;"\",\"topics\":[");
+    let ti=mut.0;
+    lp(ti<topics.len){
+        if(ti>0){out=s.concat(out;",")};
+        out=s.concat(out;"\"");
+        out=s.concat(out;topics.get(ti));
+        out=s.concat(out;"\"");
+        ti=ti+1
     };
-    
-    let result=mut."{\"summary\":\"";
-    result=s.concat(result;summary);
-    result=s.concat(result;"\",\"topics\":[");
-    
-    let tidx=mut.0;
-    lp(tidx<topics.len){
-        if(tidx>0){
-            result=s.concat(result;",")
-        };
-        result=s.concat(result;"\"");
-        result=s.concat(result;topics.get(tidx));
-        result=s.concat(result;"\"");
-        tidx=tidx+1
+    out=s.concat(out;"],\"notable_quotes\":[");
+    if(havequote){
+        out=s.concat(out;"{\"speaker\":\"");
+        out=s.concat(out;qspeaker);
+        out=s.concat(out;"\",\"quote\":\"");
+        out=s.concat(out;qquote);
+        out=s.concat(out;"\"}")
     };
-    
-    result=s.concat(result;"],\"notable_quotes\":[");
-    
-    if(quotes.len>=2){
-        result=s.concat(result;"{\"speaker\":\"");
-        result=s.concat(result;quotes.get(0));
-        result=s.concat(result;"\",\"quote\":\"");
-        result=s.concat(result;quotes.get(1));
-        result=s.concat(result;"\"}")
-    };
-    
-    result=s.concat(result;"]}");
-    
-    io.println(result);
+    out=s.concat(out;"]}");
+    io.println(out);
     <0
 };

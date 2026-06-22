@@ -1,0 +1,32 @@
+m=bookmarks;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let action=getstr(input;"_");
+    let token=getstr(input;"_");
+    if(s.len(token)=0){
+        io.println("_"error\"_"Invalid token\"_");
+        <0
+    };
+    if(s.equals(action;"_")){
+        let name=getstr(input;"_");
+        let out=mut."_"folder_id\"_"bf_1\"_"name\"_""_"\"_"post_count\"_"status\"_"created\"_");
+        io.println(out);
+        <0
+    };
+    if(s.equals(action;"_")){
+        io.println("_"folders\"_"status\"_"success\"_");
+        <0
+    };
+    io.println("_"error\"_"Unknown action\"_");
+    <0
+};

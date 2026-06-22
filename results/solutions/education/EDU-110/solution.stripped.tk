@@ -1,0 +1,54 @@
+m=rewrite;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=collapsespaces(t:$str):$str{
+    let r=mut.t;
+    lp(s.contains(r;"_")){r=s.replace(r;"_";"_")};
+    <s.trim(r)
+};
+
+f=improve(question:$str;issue:$str):$str{
+    if(s.equals(issue;"_")){
+        let improved=mut.question;
+        if(s.contains(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(s.contains(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(s.contains(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(s.contains(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(s.contains(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(s.contains(improved;"_")){improved=s.replace(improved;"_";"_")}}}}}};
+        improved=collapsespaces(improved);
+        if(s.endswith(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(s.endswith(improved;"_")){improved=s.replace(improved;"_";"_")}el{
+        if(!s.contains(improved;"_")){
+            if(s.endswith(improved;"_")){improved=s.concat(s.slice(improved;0;s.len(improved)-1);"_")}
+            el{improved=s.concat(improved;"_")}
+        }}};
+        <improved
+    };
+    <question
+};
+
+f=reason(issue:$str):$str{
+    if(s.equals(issue;"_")){<"_"};
+    <"_"
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let id=getstr(input;"_");
+    let question=getstr(input;"_");
+    let issue=getstr(input;"_");
+    let improved=improve(question;issue);
+    io.println(s.concat(s.concat(id;"_");question));
+    io.println(s.concat(s.concat(id;"_");improved));
+    io.println(s.concat("_";reason(issue)));
+    <0
+};

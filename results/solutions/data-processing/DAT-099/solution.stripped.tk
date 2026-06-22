@@ -1,0 +1,163 @@
+m=csvparse;
+i=io:std.io;
+i=s:std.str;
+
+f=param(first:@($str);key:$str):$str{
+    let i=mut.1;
+    lp(i<first.len){
+        let tok=first.get(i);
+        let eq=s.indexof(tok;"_");
+        if(eq>=0){
+            if(s.equals(s.slice(tok;0;eq);key)){<s.slice(tok;eq+1;s.len(tok))}
+        };
+        i=i+1
+    };
+    <"_"
+};
+
+f=colidx(header:@($str);name:$str):$i64{
+    let i=mut.0;
+    lp(i<header.len){if(s.equals(header.get(i);name)){<i};i=i+1};
+    <0-1
+};
+
+f=contains(arr:@($str);v:$str):$bool{
+    let i=mut.0;
+    lp(i<arr.len){if(s.equals(arr.get(i);v)){<true};i=i+1};
+    <false
+};
+
+f=rank(c:$str):$i64{
+    let up="_";
+    let lo="_";
+    let di="_";
+    let k=mut.0;
+    lp(k<10){if(s.equals(c;s.slice(di;k;k+1))){<48+k};k=k+1};
+    let k2=mut.0;
+    lp(k2<26){if(s.equals(c;s.slice(up;k2;k2+1))){<65+k2};k2=k2+1};
+    let k3=mut.0;
+    lp(k3<26){if(s.equals(c;s.slice(lo;k3;k3+1))){<97+k3};k3=k3+1};
+    <0
+};
+
+f=strlt(x:$str;y:$str):$bool{
+    let lx=s.len(x);
+    let ly=s.len(y);
+    let n=mut.lx;
+    if(ly<lx){n=ly};
+    let i=mut.0;
+    lp(i<n){
+        let cx=rank(s.slice(x;i;i+1));
+        let cy=rank(s.slice(y;i;i+1));
+        if(cx<cy){<true};
+        if(cy<cx){<false};
+        i=i+1
+    };
+    <lx<ly
+};
+
+f=sortstr(arr:@($str)):@($str){
+    let a=mut.arr;
+    let n=a.len;
+    let i=mut.0;
+    lp(i<n){
+        let j=mut.0;
+        j=i+1;
+        lp(j<n){
+            if(strlt(a.get(j);a.get(i))){
+                let tmp=a.get(i);
+                a=a.set(i;a.get(j));
+                a=a.set(j;tmp)
+            };
+            j=j+1
+        };
+        i=i+1
+    };
+    <a
+};
+
+f=main():$i64{
+    let lines=mut.@($str);
+    lp(true){
+        let line=io.readln();
+        if(io.eof()){br};
+        lines=lines+@(s.trim(line))
+    };
+    let first=s.split(lines.get(0);"_");
+    let mode=first.get(0);
+    let header=s.split(lines.get(1);"_");
+
+    if(s.equals(mode;"_")){
+        let idcol=param(first;"_");
+        let varcol=param(first;"_");
+        let valcol=param(first;"_");
+        let ididx=colidx(header;idcol);
+        io.println(s.concat(s.concat(s.concat(s.concat(idcol;"_");varcol);"_");valcol));
+        let r=mut.2;
+        lp(r<lines.len){
+            let cells=s.split(lines.get(r);"_");
+            let idval=cells.get(ididx);
+            let c=mut.0;
+            lp(c<header.len){
+                if(c!=ididx){
+                    let out=mut.idval;
+                    out=s.concat(out;"_");
+                    out=s.concat(out;header.get(c));
+                    out=s.concat(out;"_");
+                    out=s.concat(out;cells.get(c));
+                    io.println(out)
+                };
+                c=c+1
+            };
+            r=r+1
+        }
+    }el{
+    if(s.equals(mode;"_")){
+        let idcol=param(first;"_");
+        let colcol=param(first;"_");
+        let valcol=param(first;"_");
+        let ididx=colidx(header;idcol);
+        let colidx2=colidx(header;colcol);
+        let valdx=colidx(header;valcol);
+        let pivvals=mut.@($str);
+        let idvals=mut.@($str);
+        let keys=mut.@($str);
+        let vals=mut.@($str);
+        let r=mut.2;
+        lp(r<lines.len){
+            let cells=s.split(lines.get(r);"_");
+            let idv=cells.get(ididx);
+            let cv=cells.get(colidx2);
+            let vv=cells.get(valdx);
+            if(!contains(pivvals;cv)){pivvals=pivvals+@(cv)};
+            if(!contains(idvals;idv)){idvals=idvals+@(idv)};
+            keys=keys+@(s.concat(s.concat(idv;"_");cv));
+            vals=vals+@(vv);
+            r=r+1
+        };
+        let spiv=sortstr(pivvals);
+        let sids=sortstr(idvals);
+        let head=mut.idcol;
+        let p=mut.0;
+        lp(p<spiv.len){head=s.concat(s.concat(head;"_");spiv.get(p));p=p+1};
+        io.println(head);
+        let ii=mut.0;
+        lp(ii<sids.len){
+            let idv=sids.get(ii);
+            let row=mut.idv;
+            let pp=mut.0;
+            lp(pp<spiv.len){
+                let wantkey=s.concat(s.concat(idv;"_");spiv.get(pp));
+                let found=mut."_";
+                let kk=mut.0;
+                lp(kk<keys.len){if(s.equals(keys.get(kk);wantkey)){found=vals.get(kk)};kk=kk+1};
+                row=s.concat(row;"_");
+                row=s.concat(row;found);
+                pp=pp+1
+            };
+            io.println(row);
+            ii=ii+1
+        }
+    }};
+    <0
+};

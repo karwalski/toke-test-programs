@@ -1,1 +1,94 @@
-m=ghost;f=evaluate(board:$str;dict:$str):$str{let result=mut."";let len=board.len;let last=board.get(len-1));let dictlen=dict.len;let dictstart=mut.0;let word=mut."";lp(let idx=0;idx<dictlen;idx=idx+1){let ch=dict.get(idx);if(ch="\n"){if(word.len>1){result=s.concat(s.concat(result;word);"\n")};word="";dictstart=idx+1;}el{word=word+ch;};};if(word.len>1){result=s.concat(s.concat(result;word);"\n")};let words=result.split("\n");let valid=mut.@();lp(let idx=0;idx<words.len;idx=idx+1){let w=words.get(idx);let wlen=w.len;if(wlen>1){let first=w.get(0);let last=w.get(wlen-1));let ok=mut.false;if(first="a"){if(last="y"){ok=true;};};if(!(ok=true)){if(first="e"){if(last="x"){ok=true;};};};if(!(ok=true)){if(first="i"){if(last="i"){ok
+m=ghost;i=io:std.io;i=s:std.str;
+f=hasidx(arr:@($str);v:$str):$bool{
+  let n=arr.len() as $i64;
+  lp(let i=0;i<n;i=i+1){if(s.eq(arr.get(i);v)){<true}};
+  <false;
+};
+f=winning(dict:@($str);ns:$str):$bool{
+  let n=dict.len() as $i64;
+  let nslen=s.len(ns) as $i64;
+  if(hasidx(dict;ns)){
+    let hasext=mut.false;
+    lp(let i=0;i<n;i=i+1){
+      let w=dict.get(i);
+      if(s.startswith(w;ns)){if((s.len(w) as $i64)>nslen){hasext=true}};
+    };
+    if(hasext){}el{<true};
+  };
+  let opp=mut.@();
+  lp(let i=0;i<n;i=i+1){
+    let w=dict.get(i);
+    if(s.startswith(w;ns)){if((s.len(w) as $i64)>nslen){
+      let ch=s.slice(w;nslen;nslen+1);
+      if(hasidx(opp;ch)){}el{opp=opp+@(ch)};
+    }};
+  };
+  if((opp.len() as $i64)=0){<false};
+  let om=opp.len() as $i64;
+  lp(let k=0;k<om;k=k+1){
+    let ol=opp.get(k);
+    let os=s.concat(ns;ol);
+    let oslen=s.len(os) as $i64;
+    let oploses=mut.false;
+    if(hasidx(dict;os)){
+      let hasext=mut.false;
+      lp(let i=0;i<n;i=i+1){
+        let w=dict.get(i);
+        if(s.startswith(w;os)){if((s.len(w) as $i64)>oslen){hasext=true}};
+      };
+      if(hasext){}el{oploses=true};
+    };
+    if(oploses){}el{<false};
+  };
+  <true;
+};
+f=main():$i64{
+  let lines=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){}el{lines=lines+@(t)};
+  };
+  let current=lines.get(0);
+  let dict=mut.@();
+  let ln=lines.len() as $i64;
+  lp(let i=1;i<ln;i=i+1){dict=dict+@(lines.get(i))};
+  let clen=s.len(current) as $i64;
+  let poss=mut.@();
+  let dn=dict.len() as $i64;
+  lp(let i=0;i<dn;i=i+1){
+    let w=dict.get(i);
+    if(s.startswith(w;current)){if((s.len(w) as $i64)>clen){
+      let ch=s.slice(w;clen;clen+1);
+      if(hasidx(poss;ch)){}el{poss=poss+@(ch)};
+    }};
+  };
+  let pn=poss.len() as $i64;
+  let sorted=mut.@();
+  lp(let pass=0;pass<pn;pass=pass+1){
+    let best=mut."";
+    let found=mut.false;
+    lp(let i=0;i<pn;i=i+1){
+      let c=poss.get(i);
+      if(hasidx(sorted;c)){}el{
+        if(found){if(s.indexof("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";c)<s.indexof("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";best)){best=c}}el{best=c;found=true};
+      };
+    };
+    sorted=sorted+@(best);
+  };
+  let win=mut."";
+  let lose=mut."";
+  lp(let i=0;i<pn;i=i+1){
+    let c=sorted.get(i);
+    let ns=s.concat(current;c);
+    if(winning(dict;ns)){
+      if(s.len(win)=0){win=c}el{win=s.concat(s.concat(win;" ");c)};
+    }el{
+      if(s.len(lose)=0){lose=c}el{lose=s.concat(s.concat(lose;" ");c)};
+    };
+  };
+  io.println(s.concat("Winning moves: ";win));
+  io.println(s.concat("Losing moves: ";lose));
+  <0;
+};

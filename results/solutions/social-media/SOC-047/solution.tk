@@ -1,1 +1,19 @@
-m=main;f=removepost(bookmarks:@$str;postid:$str):@$str{let result=mut.@();lp(let i=0;i<bookmarks.len;i=i+1){let b=bookmarks.get(i);if(b=postid){<bookmarks};result=result+@(b)};<result};f=main():$void{let bookmarks=@("post1";"post2";"post3"));let postid="post2";let updated=removepost(bookmarks;postid));};
+m=removebookmark;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let key="\"post_id\":";
+  let pos=s.indexof(line;key);
+  let pid=mut."";
+  if(pos>=0){
+    let start=pos+s.len(key);
+    let i=mut.start;
+    let n=s.len(line);
+    lp(i<n){
+      let ch=s.slice(line;i;i+1);
+      if(s.contains("0123456789-";ch)){pid=s.concat(pid;ch);i=i+1}
+      el{i=n}
+    }
+  };
+  io.println(s.concat(s.concat("{\"post_id\":";pid);",\"bookmarked\":false,\"status\":\"removed\"}"));
+  <0
+}

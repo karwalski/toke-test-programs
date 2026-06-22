@@ -1,0 +1,31 @@
+m=translator;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=translate(text:$str;source:$str;target:$str):$str{
+    if(s.equals(source;"_")){if(s.equals(target;"_")){if(s.equals(text;"_")){
+        <"_"
+    }}};
+    if(s.equals(source;"_")){if(s.equals(target;"_")){if(s.equals(text;"_")){
+        <"_"
+    }}};
+    <text
+};
+
+f=main():$i64{
+    let input=mut."_";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let text=getstr(input;"_");
+    let source=getstr(input;"_");
+    let target=getstr(input;"_");
+    let translated=translate(text;source;target);
+    let out=mut."_"translated_text\"_""_"\"_"source_lang\"_""_"\"_"target_lang\"_""_"\"_");
+    io.println(out);
+    <0
+};

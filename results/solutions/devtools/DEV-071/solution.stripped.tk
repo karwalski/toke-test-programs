@@ -1,0 +1,79 @@
+m=errrate;i=io:std.io;i=s:std.str;
+f=findidx(names:@($str);target:$str):$i64{
+  let n=names.len() as $i64;
+  lp(let i=0;i<n;i=i+1){if(s.eq(names.get(i);target)){<i}};
+  <0-1;
+};
+f=strless(a:$str;b:$str):$bool{
+  let al=s.len(a) as $i64;
+  let bl=s.len(b) as $i64;
+  let n=mut.al;
+  if(bl<n){n=bl};
+  lp(let i=0;i<n;i=i+1){
+    let ca=s.indexof("_";s.slice(a;i;i+1));
+    let cb=s.indexof("_";s.slice(b;i;i+1));
+    if(ca<cb){<true};
+    if(ca>cb){<false};
+  };
+  <al<bl;
+};
+f=main():$i64{
+  let names=mut.@();
+  let counts=mut.@();
+  let total=mut.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){}el{
+      let parts=s.split(t;"_");
+      if((parts.len() as $i64)>=2){
+        let lvl=parts.get(1);
+        let idx=findidx(names;lvl);
+        if(idx<0){
+          names=names+@(lvl);
+          counts=counts+@(1);
+        }el{
+          counts=counts.set(idx;counts.get(idx)+1);
+        };
+        total=total+1;
+      };
+    };
+  };
+  let order=@("_";"_";"_");
+  lp(let i=0;i<3;i=i+1){
+    let lvl=order.get(i);
+    let idx=findidx(names;lvl);
+    if(idx>=0){io.println(s.concat(s.concat(lvl;"_");s.fromint(counts.get(idx))))};
+  };
+  let nn=names.len() as $i64;
+  let printed=mut.@();
+  lp(let pass=0;pass<nn;pass=pass+1){
+    let best=mut.0-1;
+    let bestname=mut."_";
+    lp(let i=0;i<nn;i=i+1){
+      let nm=names.get(i);
+      if(s.eq(nm;"_")){}el{if(s.eq(nm;"_")){}el{if(s.eq(nm;"_")){}el{
+        if(findidx(printed;nm)<0){
+          if(best<0){best=i;bestname=nm}el{
+            if(strless(nm;bestname)){best=i;bestname=nm};
+          };
+        };
+      }}};
+    };
+    if(best<0){br};
+    io.println(s.concat(s.concat(bestname;"_");s.fromint(counts.get(best))));
+    printed=printed+@(bestname);
+  };
+  io.println(s.concat("_";s.fromint(total)));
+  if(total=0){
+    io.println("_");
+  }el{
+    let eidx=findidx(names;"_");
+    let ecount=mut.0;
+    if(eidx>=0){ecount=counts.get(eidx)};
+    let rate=(ecount as $f64)/(total as $f64)*100.0;
+    io.println(s.concat(s.concat("_";s.format(rate;"_"));"_"));
+  };
+  <0;
+};

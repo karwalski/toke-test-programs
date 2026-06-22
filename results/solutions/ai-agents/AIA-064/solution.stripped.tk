@@ -1,0 +1,83 @@
+m=bullets;i=io:std.io;i=s:std.str;
+f=getstr(j:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_""_"\"_")){br};
+    val=s.concat(val;ch);
+    start=start+1;
+  };
+  <val;
+};
+f=getint(j:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(j;pat);
+  if(idx<0){<0};
+  let start=mut.idx+(s.len(pat) as $i64);
+  let n=s.len(j) as $i64;
+  let num=mut."_";
+  lp(start<n){
+    let ch=s.slice(j;start;start+1);
+    let d=s.indexof("_";ch);
+    if(d<0){br};
+    num=s.concat(num;ch);
+    start=start+1;
+  };
+  <s.toint(num);
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let text=getstr(line;"_");
+  let maxb=getint(line;"_");
+  let lower=s.lower(text);
+  let feat=mut.@();
+  let sec=mut.@();
+  let known=mut.@();
+  let fin=mut.@();
+  let team=mut.@();
+  if(s.contains(lower;"_")){feat=feat+@("_")};
+  if(s.contains(lower;"_")){feat=feat+@("_")};
+  if(s.contains(lower;"_")){feat=feat+@("_")};
+  if(s.contains(lower;"_")){sec=sec+@("_")};
+  if(s.contains(lower;"_")){sec=sec+@("_")};
+  if(s.contains(lower;"_")){if(s.contains(lower;"_")){known=known+@("_")}};
+  let sentences=s.split(text;"_");
+  let sn=sentences.len() as $i64;
+  lp(let i=0;i<sn;i=i+1){
+    let st=s.trim(sentences.get(i));
+    if(s.len(st)=0){}el{
+      let sl=s.lower(st);
+      if(s.contains(sl;"_")){fin=fin+@(st)};
+      if(s.contains(sl;"_")){fin=fin+@(st)};
+      if(s.contains(sl;"_")){team=team+@(st)};
+    };
+  };
+  let out=mut."_";
+  let total=mut.0;
+  let first=mut.true;
+  let topics=@("_";"_";"_";"_";"_");
+  lp(let t=0;t<5;t=t+1){
+    let pts=mut.@();
+    if(t=0){pts=feat};
+    if(t=1){pts=sec};
+    if(t=2){pts=known};
+    if(t=3){pts=fin};
+    if(t=4){pts=team};
+    let pn=pts.len() as $i64;
+    if(pn>0){
+      if(total<maxb){
+        let remaining=maxb-total;
+        let take=mut.pn;
+        if(take>remaining){take=remaining};
+        if(first){first=false}el{out=s.concat(out;"_")};
+        out=s.concat(out;s.concat(s.concat("_"topic\"_""_"\"_"points\"_"));
+        lp(let k=0;k<take;k=k+1){
+          if(k>0){out=s.concat(out;"_")};
+          out=s.concat(out;s.concat(s.concat("_""_"\"_"));
+        };
+        out=s.concat(out;"_");
+        total=total+take;
+      };
+    };
+  };
+  out=s.concat(out;"_");
+  io.println(out);
+  <0;
+};

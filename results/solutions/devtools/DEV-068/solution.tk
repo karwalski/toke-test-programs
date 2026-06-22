@@ -1,2 +1,38 @@
-m=license;f=checkline(line:$str):$str{let lower=std.str.tolower(line);if(lower.find("apache")>0){<"Apache-2.0"};if(lower.find("mit")>0){<"MIT"};if(lower.find("gpl")>0){<"GPL-3.0"};if(lower.find("bsd")>0){<"BSD-3-Clause"};<"UNKNOWN"};f=checkfile(path:$str):$str{let content=std.file.read(path);if(content.len=0){<"UNKNOWN"};let lines=std.str.split(content;"
-");let result=mut."UNKNOWN";lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let found=checkline(line);if(found="UNKNOWN"){<found}el{<found}};if(result="UNKNOWN"){<result}el{<result}};f=main():$void{let path=std.file.readstdinc();let result=checkfile(path);<std.io.println(result)};
+m=license;i=io:std.io;i=s:std.str;i=file:std.file;
+f=identify(content:$str):$str{
+  let lo=s.lower(content);
+  if(s.contains(lo;"apache license")){<"Apache-2.0"};
+  if(s.contains(lo;"apache-2.0")){<"Apache-2.0"};
+  if(s.contains(lo;"licensed under the apache")){<"Apache-2.0"};
+  if(s.contains(lo;"mozilla public license")){<"MPL-2.0"};
+  if(s.contains(lo;"gnu general public license")){<"GPL-3.0"};
+  if(s.contains(lo;"mit license")){<"MIT"};
+  if(s.contains(lo;"permission is hereby granted, free of charge")){<"MIT"};
+  if(s.contains(lo;"isc license")){<"ISC"};
+  if(s.contains(lo;"redistribution and use in source and binary forms")){<"BSD-3-Clause"};
+  <"UNKNOWN"
+};
+f=fromname(path:$str):$str{
+  let up=s.upper(path);
+  if(s.contains(up;"MIT")){<"MIT"};
+  if(s.contains(up;"APACHE")){<"Apache-2.0"};
+  if(s.contains(up;"GPL3")){<"GPL-3.0"};
+  if(s.contains(up;"GPL-3")){<"GPL-3.0"};
+  if(s.contains(up;"GPL2")){<"GPL-2.0"};
+  if(s.contains(up;"GPL-2")){<"GPL-2.0"};
+  if(s.contains(up;"BSD")){<"BSD-3-Clause"};
+  if(s.contains(up;"ISC")){<"ISC"};
+  if(s.contains(up;"MPL")){<"MPL-2.0"};
+  <"UNKNOWN"
+};
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let result=mut."UNKNOWN";
+  if(file.exists(path)){
+    let content=file.read(path);
+    result=identify(content)
+  };
+  if(s.eq(result;"UNKNOWN")){result=fromname(path)};
+  io.println(result);
+  <0
+}

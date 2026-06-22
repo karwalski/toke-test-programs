@@ -1,1 +1,1 @@
-m=binomial;f=binomial(n:$i64;r:$i64):$i64{if(r<0){<0};if(r>n){<0};let result=mut.1;lp(let i=0;i<r;i=i+1){result=result*(n-i);result=result/(i+1)};<result};f=permutation
+m=binomial;i=io:std.io;i=s:std.str;f=fact(n:$i64):$i64{let r=mut.1;lp(let i=2;i<=n;i=i+1){r=r*i};<r};f=main():$i64{let line=io.readln();let p=s.split(s.trim(line);" ");let n=s.toint(p.get(0));let r=s.toint(p.get(1));let ncr=fact(n)/(fact(r)*fact(n-r));let npr=fact(n)/fact(n-r);io.println(s.fromint(ncr));io.println(s.fromint(npr));<0}

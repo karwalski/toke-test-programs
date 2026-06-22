@@ -1,21 +1,82 @@
 m=lessonhook;
 i=io:std.io;
 i=s:std.str;
-f=hook(subject:$str):$str{if(subject="math"){<"solve this puzzle:"};if(subject="science"){<"what is the effect of..."};if(subject="history"){<"what were the consequences of..."};if(subject="literature"){<"what is the theme of this book?"}};
-f=main():$i64{
-let input=io.readln();
-let parts=s.split(input;",");
-let subject=s.trim(s.split(s.split(parts[0];"\"")[1];"\"")[0]);
-let topic=s.trim(s.split(s.split(parts[1];"\"")[1];"\"")[0]);
-let gradelevel=s.toint(s.trim(s.split(s.split(parts[2];"\"")[1];"\"")[0]));
-let hooktype=s.trim(s.split(s.split(parts[3];"\"")[1];"\"")[0]);
-let hooktext=hook(subject);
-io.println(s.concat(s.concat("Lesson Hook: ";topic);s.concat(s.concat(s.concat(s.concat(" (";subject);", Grade ");s.fromint(gradelevel));")")));
-if(hooktype="question"){
-io.println("Opening Question: If there were no gravity, what would happen to everything on Earth?")
-} else {
-io.println("Opening Hook: " + hooktext)
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("\"";key);"\":\"");
+    let p=s.indexof(json;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let endp=s.indexof(rest;"\"");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
 };
-io.println(s.concat(s.concat("Purpose: Activate prior knowledge and curiosity about ";topic);"."));
-<0
-}
+
+f=getint(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("\"";key);"\":");
+    let p=s.indexof(json;pat);
+    if(p<0){<0-1};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"0")){n=s.concat(n;c)}el{
+        if(s.equals(c;"1")){n=s.concat(n;c)}el{
+        if(s.equals(c;"2")){n=s.concat(n;c)}el{
+        if(s.equals(c;"3")){n=s.concat(n;c)}el{
+        if(s.equals(c;"4")){n=s.concat(n;c)}el{
+        if(s.equals(c;"5")){n=s.concat(n;c)}el{
+        if(s.equals(c;"6")){n=s.concat(n;c)}el{
+        if(s.equals(c;"7")){n=s.concat(n;c)}el{
+        if(s.equals(c;"8")){n=s.concat(n;c)}el{
+        if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0-1};
+    <s.toint(n)
+};
+
+f=main():$i64{
+    let input=mut."";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let subject=getstr(input;"subject");
+    let topic=getstr(input;"topic");
+    let grade=getint(input;"grade_level");
+    let hooktype=getstr(input;"hook_type");
+
+    let header=mut."Lesson Hook: ";
+    header=s.concat(header;topic);
+    header=s.concat(header;" (");
+    header=s.concat(header;subject);
+    header=s.concat(header;", Grade ");
+    header=s.concat(header;s.fromint(grade));
+    header=s.concat(header;")");
+    io.println(header);
+
+    let content=mut."";
+    let label=mut."";
+    if(s.equals(hooktype;"question")){
+        label="Opening Question: ";
+        if(s.equals(subject;"Science")){if(s.equals(topic;"Gravity")){content="If there were no gravity, what would happen to everything on Earth?"}}
+        el{content=s.concat(s.concat("What do you think you know about ";topic);"?")};
+        if(s.len(content)=0){content=s.concat(s.concat("What do you think you know about ";topic);"?")}
+    }el{
+    if(s.equals(hooktype;"story")){
+        label="Opening Story: ";
+        content=s.concat(s.concat("Imagine a world where ";topic);" works differently than it does today...")
+    }el{
+    if(s.equals(hooktype;"fact")){
+        label="Opening Fact: ";
+        content=s.concat(s.concat("Did you know that ";topic);" affects our daily lives in surprising ways?")
+    }el{
+        label="Opening Hook: ";
+        content=s.concat(s.concat("Let's explore the fascinating world of ";topic);"!")
+    }}};
+    io.println(s.concat(label;content));
+
+    io.println(s.concat(s.concat("Purpose: Activate prior knowledge and curiosity about ";topic);"."));
+    <0
+};

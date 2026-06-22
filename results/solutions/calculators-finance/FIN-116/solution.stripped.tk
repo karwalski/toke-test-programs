@@ -1,0 +1,49 @@
+m=newton;i=io:std.io;i=s:std.str;
+f=evalpoly(coeffs:@($f64);x:$f64):$f64{
+  let result=mut.0.0;
+  lp(let i=0;i<coeffs.len();i=i+1){
+    result=result*x+coeffs.get(i)
+  };
+  <result
+};
+f=evalderiv(coeffs:@($f64);x:$f64):$f64{
+  let n=coeffs.len();
+  if(n<=1){<0.0};
+  let dc=mut.@($f64);
+  lp(let i=0;i<n-1;i=i+1){
+    let m=s.tofloat(s.fromint(n-1-i));
+    dc=dc+@(coeffs.get(i)*m)
+  };
+  <evalpoly(dc;x)
+};
+f=absf(v:$f64):$f64{if(v<0.0){<0.0-v};<v};
+f=main():$i64{
+  let p=s.split(s.trim(io.readln());"_");
+  let x0=s.tofloat(p.get(0));
+  let tol=s.tofloat(p.get(1));
+  let maxit=s.toint(p.get(2));
+  let cstr=s.split(s.trim(io.readln());"_");
+  let coeffs=mut.@($f64);
+  lp(let i=0;i<cstr.len();i=i+1){coeffs=coeffs+@(s.tofloat(cstr.get(i)))};
+  let x=mut.x0;
+  let iters=mut.maxit;
+  let done=mut.false;
+  lp(let it=0;it<maxit;it=it+1){
+    if(done=false){
+      let fx=evalpoly(coeffs;x);
+      if(absf(fx)<tol){iters=it+1;done=true}
+      el{
+        let fpx=evalderiv(coeffs;x);
+        if(absf(fpx)<0.000000000000001){done=true}
+        el{
+          let xnew=x-fx/fpx;
+          if(absf(xnew-x)<tol){x=xnew;iters=it+1;done=true}
+          el{x=xnew}
+        }
+      }
+    }
+  };
+  io.println(s.format(x;"_"));
+  io.println(s.concat(s.fromint(iters);"_"));
+  <0
+}

@@ -2,57 +2,41 @@ m=translator;
 i=io:std.io;
 i=s:std.str;
 
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("\"";key);"\":\"");
+    let p=s.indexof(json;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let endp=s.indexof(rest;"\"");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
 f=translate(text:$str;source:$str;target:$str):$str{
-  if(source="en"){
-    if(target="es"){
-      if(text="Hello, how are you today?"){
+    if(s.equals(source;"en")){if(s.equals(target;"es")){if(s.equals(text;"Hello, how are you today?")){
         <"Hola, ¿cómo estás hoy?"
-      };
-      <"Hola mundo"
-    };
-    <text
-  };
-  if(source="fr"){
-    if(target="en"){
-      if(text="Bonjour le monde"){
+    }}};
+    if(s.equals(source;"fr")){if(s.equals(target;"en")){if(s.equals(text;"Bonjour le monde")){
         <"Hello world"
-      };
-      <"Hello"
-    };
+    }}};
     <text
-  };
-  <text
 };
 
 f=main():$i64{
-  let input=io.readln();
-  
-  let parts=s.split(input;"\"");
-  let text="";
-  let source="";
-  let target="";
-  
-  lp(let idx=0;idx<parts.len;idx=idx+1){
-    let part=parts.get(idx);
-    if(s.contains(part;"text")){
-      if(idx+2<parts.len){
-        text=parts.get(idx+2)
-      }
-    };
-    if(s.contains(part;"source_lang")){
-      if(idx+2<parts.len){
-        source=parts.get(idx+2)
-      }
-    };
-    if(s.contains(part;"target_lang")){
-      if(idx+2<parts.len){
-        target=parts.get(idx+2)
-      }
-    }
-  };
-  
-  let translated=translate(text;source;target);
-  
-  io.println("{\"translated_text\":\"\(translated)\",\"source_lang\":\"\(source)\",\"target_lang\":\"\(target)\"}");
-  <0
-}
+    let input=mut."";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let text=getstr(input;"text");
+    let source=getstr(input;"source_lang");
+    let target=getstr(input;"target_lang");
+    let translated=translate(text;source;target);
+    let out=mut."{\"translated_text\":\"";
+    out=s.concat(out;translated);
+    out=s.concat(out;"\",\"source_lang\":\"");
+    out=s.concat(out;source);
+    out=s.concat(out;"\",\"target_lang\":\"");
+    out=s.concat(out;target);
+    out=s.concat(out;"\"}");
+    io.println(out);
+    <0
+};

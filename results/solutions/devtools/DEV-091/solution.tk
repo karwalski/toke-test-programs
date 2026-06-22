@@ -1,1 +1,61 @@
-m=lint;f=lintfuncname(funcname:$str):$str{if(funcname.len<1){<"invalid:empty"};if(!(funcname.charat(0))>96)){if(!(funcname.charat(0))<123)){<"invalid:nonlowercase"}};<funcname>;};f=lintall(funcnames:@$str):@$str{let issues=mut.@();lp(let i=0;i<funcnames.len;i=i+1){let funcname=funcnames.get(i);let result=lintfuncname(funcname);if(!(result.len<1)){let issue=result+":invalid";issues=issues.push(issue)};};<issues>;};f=main():$str{let funcnames=@("hello";"world";"main";"foo_bar"));let issues=lintall(funcnames);if(issues.len=0){<"ALL OK"};let output=mut."";lp(let i=0;i<issues.len;i=i+1){let issue=issues.get(i);output=output+issue+"\n";};<output>;};
+m=lint;
+i=io:std.io;
+i=s:std.str;
+
+f=intafter(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("\"";key);"\":");
+    let p=s.indexof(json;pat);
+    if(p<0){<0-1};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"0")){n=s.concat(n;c)}el{
+        if(s.equals(c;"1")){n=s.concat(n;c)}el{
+        if(s.equals(c;"2")){n=s.concat(n;c)}el{
+        if(s.equals(c;"3")){n=s.concat(n;c)}el{
+        if(s.equals(c;"4")){n=s.concat(n;c)}el{
+        if(s.equals(c;"5")){n=s.concat(n;c)}el{
+        if(s.equals(c;"6")){n=s.concat(n;c)}el{
+        if(s.equals(c;"7")){n=s.concat(n;c)}el{
+        if(s.equals(c;"8")){n=s.concat(n;c)}el{
+        if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0-1};
+    <s.toint(n)
+};
+
+f=main():$i64{
+    let input=mut."";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    let fp=s.indexof(input;"\"functions\":{");
+    let any=mut.false;
+    let cursor=mut."";
+    if(fp>=0){cursor=s.slice(input;fp+13;s.len(input))};
+    lp(s.len(cursor)>0){
+        let np=s.indexof(cursor;"\":{");
+        if(np<0){br};
+        let rawname=s.slice(cursor;0;np);
+        let name=mut.rawname;
+        let qp=s.lastindex(rawname;"\"");
+        if(qp>=0){name=s.slice(rawname;qp+1;s.len(rawname))};
+        let body=s.slice(cursor;np+3;s.len(cursor));
+        let timeout=intafter(body;"timeout");
+        if(timeout>300){
+            let out=mut.name;
+            out=s.concat(out;": timeout too high (");
+            out=s.concat(out;s.fromint(timeout));
+            out=s.concat(out;"s, max recommended 300s)");
+            io.println(out);
+            any=true
+        };
+        let nextp=s.indexof(body;"},\"");
+        if(nextp<0){br};
+        cursor=s.slice(body;nextp+2;s.len(body))
+    };
+    if(!any){io.println("ALL OK")};
+    <0
+};

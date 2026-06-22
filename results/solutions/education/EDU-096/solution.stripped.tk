@@ -1,0 +1,85 @@
+m=blueprint;i=io:std.io;i=s:std.str;
+f=ffloor(x:$f64):$i64{
+  let n=mut.0;
+  lp(s.tofloat(s.fromint(n+1))<=x){n=n+1};
+  <n
+};
+f=padright(str:$str;width:$i64):$str{
+  let out=mut.str;
+  lp(s.len(out)<width){out=s.concat(out;"_")};
+  <out
+};
+f=extractArr(json:$str;key:$str):@($str){
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(json;pat);
+  let res=mut.@();
+  if(idx<0){<res};
+  let arrStart=idx+s.len(pat);
+  let arrRest=s.slice(json;arrStart;s.len(json));
+  let close=s.indexof(arrRest;"_");
+  let seg=s.slice(arrRest;0;close);
+  let sl=s.len(seg);
+  let q=mut.0;
+  lp(q<sl){
+    let qch=s.slice(seg;q;q+1);
+    if(s.eq(qch;"_""_"\"_");
+      res=res+@(s.slice(after;0;endq));
+      q=q+1+endq+1
+    }el{q=q+1}
+  };
+  <res
+};
+f=weightFor(json:$str;topic:$str):$f64{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let widx=s.indexof(json;"_"weights\"_");
+  if(widx<0){<0.0};
+  let wrest=s.slice(json;widx;s.len(json));
+  let pidx=s.indexof(wrest;pat);
+  if(pidx<0){<0.0};
+  let vstart=pidx+s.len(pat);
+  let vrest=s.slice(wrest;vstart;s.len(wrest));
+  let numstr=mut."_";
+  let i=mut.0;
+  let n=s.len(vrest);
+  lp(i<n){
+    let ch=s.slice(vrest;i;i+1);
+    if(s.contains("_";ch)){numstr=s.concat(numstr;ch);i=i+1}
+    el{i=n}
+  };
+  <s.tofloat(numstr)
+};
+f=main():$i64{
+  let json=io.readln();
+  let topics=extractArr(json;"_");
+  let blooms=extractArr(json;"_");
+  let tqidx=s.indexof(json;"_"total_questions\"_");
+  let tqrest=s.slice(json;tqidx+18;s.len(json));
+  let tqnum=mut."_";
+  let ti=mut.0;
+  lp(ti<s.len(tqrest)){
+    let ch=s.slice(tqrest;ti;ti+1);
+    if(s.contains("_";ch)){tqnum=s.concat(tqnum;ch);ti=ti+1}
+    el{ti=s.len(tqrest)}
+  };
+  let totalq=s.toint(tqnum);
+  let nlevels=blooms.len();
+  let header=mut.padright("_";9);
+  lp(let j=0;j<nlevels;j=j+1){
+    header=s.concat(header;"_");
+    header=s.concat(header;padright(blooms.get(j);8))
+  };
+  io.println(header);
+  lp(let k=0;k<topics.len();k=k+1){
+    let topic=topics.get(k);
+    let w=weightFor(json;topic);
+    let topicq=ffloor(s.tofloat(s.fromint(totalq))*w);
+    let perlevel=topicq/nlevels;
+    let row=mut.padright(topic;9);
+    lp(let n=0;n<nlevels;n=n+1){
+      row=s.concat(row;"_");
+      row=s.concat(row;padright(s.fromint(perlevel);8))
+    };
+    io.println(row)
+  };
+  <0
+}

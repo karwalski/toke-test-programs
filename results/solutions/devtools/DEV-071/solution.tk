@@ -1,1 +1,79 @@
-m=errrate;f=counterrors(logpath:$str):$i64{let count=mut.0;let lines=br.logread(logpath);lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);if(br.strcontains(line;"error"))){count=count+1;};};<count};f=computeerrrate(logpath:$str):$str{let total=br.logcount(logpath);if(total=0){<"0.00"};let errors=counterrors(logpath);let rate=errors as$f64/total as$f64;let result=rate*100.0;<br.strformat("{}.{}";result as$i64;((result as$f64)-(result as$i64)as$f64)*100.0 as$i64))};
+m=errrate;i=io:std.io;i=s:std.str;
+f=findidx(names:@($str);target:$str):$i64{
+  let n=names.len() as $i64;
+  lp(let i=0;i<n;i=i+1){if(s.eq(names.get(i);target)){<i}};
+  <0-1;
+};
+f=strless(a:$str;b:$str):$bool{
+  let al=s.len(a) as $i64;
+  let bl=s.len(b) as $i64;
+  let n=mut.al;
+  if(bl<n){n=bl};
+  lp(let i=0;i<n;i=i+1){
+    let ca=s.indexof("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";s.slice(a;i;i+1));
+    let cb=s.indexof("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";s.slice(b;i;i+1));
+    if(ca<cb){<true};
+    if(ca>cb){<false};
+  };
+  <al<bl;
+};
+f=main():$i64{
+  let names=mut.@();
+  let counts=mut.@();
+  let total=mut.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){}el{
+      let parts=s.split(t;" ");
+      if((parts.len() as $i64)>=2){
+        let lvl=parts.get(1);
+        let idx=findidx(names;lvl);
+        if(idx<0){
+          names=names+@(lvl);
+          counts=counts+@(1);
+        }el{
+          counts=counts.set(idx;counts.get(idx)+1);
+        };
+        total=total+1;
+      };
+    };
+  };
+  let order=@("INFO";"WARN";"ERROR");
+  lp(let i=0;i<3;i=i+1){
+    let lvl=order.get(i);
+    let idx=findidx(names;lvl);
+    if(idx>=0){io.println(s.concat(s.concat(lvl;": ");s.fromint(counts.get(idx))))};
+  };
+  let nn=names.len() as $i64;
+  let printed=mut.@();
+  lp(let pass=0;pass<nn;pass=pass+1){
+    let best=mut.0-1;
+    let bestname=mut."";
+    lp(let i=0;i<nn;i=i+1){
+      let nm=names.get(i);
+      if(s.eq(nm;"INFO")){}el{if(s.eq(nm;"WARN")){}el{if(s.eq(nm;"ERROR")){}el{
+        if(findidx(printed;nm)<0){
+          if(best<0){best=i;bestname=nm}el{
+            if(strless(nm;bestname)){best=i;bestname=nm};
+          };
+        };
+      }}};
+    };
+    if(best<0){br};
+    io.println(s.concat(s.concat(bestname;": ");s.fromint(counts.get(best))));
+    printed=printed+@(bestname);
+  };
+  io.println(s.concat("Total: ";s.fromint(total)));
+  if(total=0){
+    io.println("Error rate: 0.0%");
+  }el{
+    let eidx=findidx(names;"ERROR");
+    let ecount=mut.0;
+    if(eidx>=0){ecount=counts.get(eidx)};
+    let rate=(ecount as $f64)/(total as $f64)*100.0;
+    io.println(s.concat(s.concat("Error rate: ";s.format(rate;"%.1f"));"%"));
+  };
+  <0;
+};

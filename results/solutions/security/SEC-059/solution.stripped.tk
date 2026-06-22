@@ -1,0 +1,36 @@
+m=cipherrank;i=io:std.io;i=s:std.str;
+f=strength(name:$str):$str{
+  let c=s.upper(name);
+  let insecure=mut.false;
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(s.contains(c;"_")){insecure=true};
+  if(insecure){<"_"};
+  let weak=mut.false;
+  if(s.contains(c;"_")){weak=true};
+  if(s.contains(c;"_")){weak=true};
+  if(s.contains(c;"_")){weak=true};
+  if(weak){<"_"};
+  let strong=mut.false;
+  if(s.contains(c;"_")){strong=true};
+  if(s.contains(c;"_")){strong=true};
+  if(s.contains(c;"_")){strong=true};
+  if(s.contains(c;"_")){strong=true};
+  if(s.contains(c;"_")){strong=true};
+  if(strong){<"_"};
+  <"_"
+};
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let name=s.trim(line);
+    if(s.len(name)>0){io.println(strength(name))}
+  };
+  <0
+}

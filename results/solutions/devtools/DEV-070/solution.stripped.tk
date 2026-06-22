@@ -1,0 +1,66 @@
+m=buildmatrix;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json);
+  let keys=mut.@();
+  let counts=mut.@();
+  let flatvals=mut.@();
+  let starts=mut.@();
+  let p=mut.0;
+  lp(p<jn){
+    let ch=s.slice(json;p;p+1);
+    if(s.eq(ch;"_""_"\"_");
+      let key=s.slice(after;0;endq);
+      let afterkey=p+1+endq+1;
+      let rest=s.slice(json;afterkey;jn);
+      let colon=s.indexof(rest;"_");
+      let nextch=s.slice(rest;colon+1;colon+2);
+      if(s.eq(nextch;"_")){
+        let arrAbs=afterkey+colon+2;
+        let arrRest=s.slice(json;arrAbs;jn);
+        let close=s.indexof(arrRest;"_");
+        let seg=s.slice(arrRest;0;close);
+        keys=keys+@(key);
+        starts=starts+@(flatvals.len());
+        let sl=s.len(seg);
+        let cnt=mut.0;
+        let q=mut.0;
+        lp(q<sl){
+          let qch=s.slice(seg;q;q+1);
+          if(s.eq(qch;"_""_"\"_");
+            flatvals=flatvals+@(s.slice(af;0;eq2));
+            cnt=cnt+1;
+            q=q+1+eq2+1
+          }el{q=q+1}
+        };
+        counts=counts+@(cnt);
+        p=arrAbs+close+1
+      }el{p=afterkey}
+    }el{p=p+1}
+  };
+  let nk=keys.len();
+  let totalcombos=mut.1;
+  lp(let k=0;k<nk;k=k+1){totalcombos=totalcombos*counts.get(k)};
+  let idx=mut.@();
+  lp(let k=0;k<nk;k=k+1){idx=idx+@(0)};
+  lp(let c=0;c<totalcombos;c=c+1){
+    let line=mut."_";
+    lp(let k=0;k<nk;k=k+1){
+      let val=flatvals.get(starts.get(k)+idx.get(k));
+      if(k=0){line=s.concat(s.concat(s.concat("_";keys.get(k));"_");val)}
+      el{line=s.concat(s.concat(s.concat(s.concat(line;"_");keys.get(k));"_");val)}
+    };
+    io.println(line);
+    let carry=mut.1;
+    let k2=mut.nk-1;
+    lp(k2>=0){
+      if(carry=1){
+        let nv=idx.get(k2)+1;
+        if(nv>=counts.get(k2)){idx=idx.set(k2;0)}
+        el{idx=idx.set(k2;nv);carry=0}
+      };
+      k2=k2-1
+    }
+  };
+  <0
+}

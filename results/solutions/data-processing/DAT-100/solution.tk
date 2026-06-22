@@ -1,1 +1,74 @@
-m=fmt;f=fmtbytes(n:$i64):$str{if(n<0){<"0B"};if(n<1024){<n as$str+"B"};let m=mut.n/1024;if(m<1024){<m as$str+"KB"};let g=mut.m/1024;if(g>0){<g as$str+"MB"};<n as$str+"B"};
+m=fmt;
+i=io:std.io;
+i=s:std.str;
+
+f=ipow10(p:$i64):$i64{
+    let r=mut.1;
+    let i=mut.0;
+    lp(i<p){r=r*10;i=i+1};
+    <r
+};
+
+f=fmtprec(x:$f64;prec:$i64):$str{
+    let scale=ipow10(prec);
+    let th=mut.(x*(scale as$f64)+0.5) as$i64;
+    let intpart=th/scale;
+    let frac=th-intpart*scale;
+    if(prec=0){<s.fromint(intpart)};
+    let f=mut.s.fromint(frac);
+    lp(s.len(f)<prec){f=s.concat("0";f)};
+    <s.concat(s.concat(s.fromint(intpart);".");f)
+};
+
+f=si(n:$i64;prec:$i64):$str{
+    let x=n as$f64;
+    let ax=mut.x;
+    if(ax<0.0){ax=0.0-ax};
+    if(ax>=1000000000000.0){<s.concat(fmtprec(x/1000000000000.0;prec);"T")}el{
+    if(ax>=1000000000.0){<s.concat(fmtprec(x/1000000000.0;prec);"B")}el{
+    if(ax>=1000000.0){<s.concat(fmtprec(x/1000000.0;prec);"M")}el{
+    if(ax>=1000.0){<s.concat(fmtprec(x/1000.0;prec);"K")}el{
+        <fmtprec(x;prec)
+    }}}}
+};
+
+f=commas(n:$i64):$str{
+    let digits=mut.(s.fromint(n));
+    let neg=mut.false;
+    if(s.startswith(digits;"-")){neg=true;digits=s.slice(digits;1;s.len(digits))};
+    let out=mut."";
+    let len=s.len(digits);
+    let i=mut.0;
+    lp(i<len){
+        let pos=len-1-i;
+        if(i>0){if(i%3=0){out=s.concat(",";out)}};
+        out=s.concat(s.slice(digits;pos;pos+1);out);
+        i=i+1
+    };
+    if(neg){<s.concat("-";out)};
+    <out
+};
+
+f=main():$i64{
+    let lines=mut.@($str);
+    lp(true){
+        let line=io.readln();
+        if(io.eof()){br};
+        lines=lines+@(s.trim(line))
+    };
+    let mode=lines.get(0);
+    let prec=s.toint(lines.get(1));
+    let i=mut.2;
+    lp(i<lines.len){
+        let numstr=lines.get(i);
+        if(s.len(numstr)>0){
+            let num=s.toint(numstr);
+            if(s.equals(mode;"si")){io.println(si(num;prec))}el{
+            if(s.equals(mode;"comma")){io.println(commas(num))}el{
+                io.println(s.fromint(num))
+            }}
+        };
+        i=i+1
+    };
+    <0
+};

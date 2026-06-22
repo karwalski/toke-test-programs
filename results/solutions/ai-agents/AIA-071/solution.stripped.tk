@@ -1,0 +1,100 @@
+m=transcript;
+i=io:std.io;
+i=s:std.str;
+
+f=speakerof(line:$str):$str{
+    let cp=s.indexof(line;"_");
+    if(cp<0){<"_"};
+    <s.trim(s.slice(line;0;cp))
+};
+
+f=contentof(line:$str):$str{
+    let cp=s.indexof(line;"_");
+    if(cp<0){<"_"};
+    <s.trim(s.slice(line;cp+1;s.len(line)))
+};
+
+f=main():$i64{
+    let lines=mut.@($str);
+    let combined=mut."_";
+    lp(true){
+        let line=io.readln();
+        if(io.eof()){br};
+        let t=s.trim(line);
+        if(s.indexof(t;"_")>=0){
+            lines=lines+@(t);
+            if(s.len(combined)>0){combined=s.concat(combined;"_")};
+            combined=s.concat(combined;contentof(t))
+        }
+    };
+    let lower=s.lower(combined);
+
+    let summary=mut."_";
+    let topics=mut.@($str);
+    let qspeaker=mut."_";
+    let qquote=mut."_";
+    let havequote=mut.false;
+
+    if(s.contains(lower;"_")){
+        topics=topics+@("_");
+        if(s.contains(lower;"_")){
+            if(s.contains(lower;"_")){topics=topics+@("_")}el{
+            if(s.contains(lower;"_")){topics=topics+@("_")}}
+        };
+        if(s.contains(lower;"_")){if(s.contains(lower;"_")){topics=topics+@("_")}};
+        summary="_";
+        let i=mut.0;
+        lp(i<lines.len){
+            if(!havequote){
+                let ln=lines.get(i);
+                let txt=contentof(ln);
+                if(s.contains(s.lower(txt);"_")){
+                    let dp=s.indexof(txt;"_");
+                    let q=mut.txt;
+                    if(dp>=0){q=s.slice(txt;0;dp)};
+                    q=s.concat(s.trim(q);"_");
+                    qspeaker=speakerof(ln);
+                    qquote=q;
+                    havequote=true
+                }
+            };
+            i=i+1
+        }
+    }el{
+    if(s.contains(lower;"_")){
+        topics=topics+@("_");
+        topics=topics+@("_");
+        topics=topics+@("_");
+        summary="_";
+        let i=mut.0;
+        lp(i<lines.len){
+            if(!havequote){
+                let ln=lines.get(i);
+                let txt=contentof(ln);
+                if(s.contains(s.lower(txt);"_")){
+                    if(s.contains(txt;"_")){
+                        qspeaker=speakerof(ln);
+                        qquote=txt;
+                        havequote=true
+                    }
+                }
+            };
+            i=i+1
+        }
+    }};
+
+    let out=mut."_"summary\"_""_"\"_"topics\"_");
+    let ti=mut.0;
+    lp(ti<topics.len){
+        if(ti>0){out=s.concat(out;"_")};
+        out=s.concat(out;"_""_"\"_");
+        ti=ti+1
+    };
+    out=s.concat(out;"_"notable_quotes\"_");
+    if(havequote){
+        out=s.concat(out;"_"speaker\"_""_"\"_"quote\"_""_"\"_")
+    };
+    out=s.concat(out;"_");
+    io.println(out);
+    <0
+};

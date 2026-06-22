@@ -1,0 +1,59 @@
+m=wordfind;i=io:std.io;i=s:std.str;
+f=matches(pat:$str;word:$str):$bool{
+  if(s.len(pat)!=s.len(word)){<false};
+  let n=s.len(pat);
+  lp(let i=0;i<n;i=i+1){
+    let pc=s.slice(pat;i;i+1);
+    if(s.eq(pc;"_")=false){
+      let wc=s.slice(word;i;i+1);
+      if(s.eq(pc;wc)=false){<false}
+    }
+  };
+  <true
+};
+f=ord(ch:$str):$i64{
+  let ref="_"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  <s.indexof(ref;ch)
+};
+f=strless(a:$str;b:$str):$bool{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let n=mut.la;
+  if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let ca=ord(s.slice(a;i;i+1));
+    let cb=ord(s.slice(b;i;i+1));
+    if(ca<cb){<true};
+    if(ca>cb){<false}
+  };
+  if(la<lb){<true};
+  <false
+};
+f=main():$i64{
+  let pat=s.trim(io.readln());
+  let res=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let word=s.trim(line);
+    if(s.len(word)>0){
+      if(matches(pat;word)){res=res+@(word)}
+    }
+  };
+  let cnt=res.len();
+  let i=mut.0;
+  lp(i<cnt){
+    let j=mut.i+1;
+    lp(j<cnt){
+      if(strless(res.get(j);res.get(i))){
+        let tmp=res.get(i);
+        res=res.set(i;res.get(j));
+        res=res.set(j;tmp)
+      };
+      j=j+1
+    };
+    i=i+1
+  };
+  lp(let k=0;k<cnt;k=k+1){io.println(res.get(k))};
+  <0
+}

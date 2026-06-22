@@ -1,1 +1,24 @@
-m=encnegotiate;f=generatekeypair():$str{let privkey="privkey";let pubkey="pubkey";<s.concat(s.concat(privkey;":");pubkey)};f=encryptwithkey(key:$str;data:$str):$str{let encdata=s.concat(key;data);<encdata};f=decryptwithkey(key:$str;encdata:$str):$str{let prefix=key;let check=encdata;let result=mut."";if(check.startswith(prefix)){let datalen=check.len-prefix.len;let data=check.substr(prefix.len;datalen);result=data;};<result};f=generateephemeralkey():$str{let ephemeral="ephemeral";<ephemeral};f=deriveencryptionkey(sharedsecret:$str;ephemeralkey:$str):$str{let derivedkey=mut."";let slen=sharedsecret.len;let elen=ephemeralkey.len;let maxlen=slen;if(elen>maxlen){maxlen=elen};lp(let idx=0;idx<maxlen;idx=idx+1){let schar=sharedsecret.get(idx);let echar=ephemeralkey.get(idx);let xorval=schar as
+m=reneg;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let lines=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    lines=lines+@(s.trim(line));
+  };
+  let pending=s.toint(lines.get(3));
+  io.println("RENEGOTIATION:");
+  io.println(s.concat(s.concat("1. Suspend message delivery (";s.fromint(pending));" pending)"));
+  io.println("2. Generate new ephemeral key");
+  io.println("3. Send renegotiation request");
+  io.println("4. Await acknowledgement");
+  io.println("5. Derive new session key");
+  if(pending=0){
+    io.println("6. No pending messages to re-encrypt");
+  }el{
+    io.println(s.concat(s.concat("6. Re-encrypt ";s.fromint(pending));" pending messages"));
+  };
+  io.println("7. Resume delivery");
+  io.println("new_session: {key_hex, established_at}");
+  <0;
+};

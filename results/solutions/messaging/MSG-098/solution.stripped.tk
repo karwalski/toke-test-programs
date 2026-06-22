@@ -1,0 +1,88 @@
+m=backpressure;
+i=io:std.io;
+i=s:std.str;
+
+f=getint(json:$str;key:$str):$i64{
+    let pat=s.concat(s.concat("_""_"\"_");
+    let p=s.indexof(json;pat);
+    if(p<0){<0};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."_";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{
+        if(s.equals(c;"_")){n=s.concat(n;c)}el{br}}}}}}}}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0};
+    <s.toint(n)
+};
+
+f=getfloat(json:$str;key:$str):$f64{
+    let pat=s.concat(s.concat("_""_"\"_");
+    let p=s.indexof(json;pat);
+    if(p<0){<0.0};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let n=mut."_";
+    let i=mut.0;
+    lp(i<s.len(rest)){
+        let c=s.slice(rest;i;i+1);
+        if(s.equals(c;"_")){br}el{
+        if(s.equals(c;"_")){br}el{
+        if(s.equals(c;"_")){br}el{n=s.concat(n;c)}}};
+        i=i+1
+    };
+    if(s.len(n)=0){<0.0};
+    <s.tofloat(n)
+};
+
+f=main():$i64{
+    let config=io.readln();
+    let stats=io.readln();
+    let maxdepth=getint(config;"_");
+    let warn=getfloat(config;"_");
+    let crit=getfloat(config;"_");
+    let depth=getint(stats;"_");
+    let ratein=getint(stats;"_");
+    let rateout=getint(stats;"_");
+    let lag=getint(stats;"_");
+
+    let pct=(depth as$f64)/(maxdepth as$f64);
+    let signal=mut."_";
+    if(pct>=crit){if(pct>=1.0){signal="_"}el{signal="_"}}el{
+    if(pct>=warn){signal="_"}};
+
+    let deficit=ratein-rateout;
+    let pctdisplay=(pct*100.0) as$i64;
+
+    io.println(s.concat(s.concat(s.concat(signal;"_");s.fromint(pctdisplay));"_"));
+    io.println(s.concat(s.concat(s.concat(s.concat(s.concat("_";s.fromint(ratein));"_");s.fromint(rateout));"_");s.concat(s.fromint(deficit);"_")));
+    io.println(s.concat(s.concat("_";s.fromint(lag));"_"));
+
+    if(deficit>0){
+        let remaining=maxdepth-depth;
+        let ttf=(remaining as$f64)/(deficit as$f64);
+        io.println(s.concat(s.concat("_";s.fromfloat(ttf));"_"))
+    }el{
+        io.println("_")
+    };
+
+    if(deficit>0){
+        let red=(deficit as$f64)/(ratein as$f64)*100.0;
+        io.println(s.concat(s.concat("_";s.fromint(red as$i64));"_"))
+    }el{
+        io.println("_")
+    };
+    <0
+};

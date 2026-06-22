@@ -1,0 +1,31 @@
+m=summary;i=io:std.io;i=s:std.str;
+f=getstr(j:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_""_"\"_")){br};
+    val=s.concat(val;ch);
+    start=start+1;
+  };
+  <val;
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let current=getstr(line;"_");
+  let content=getstr(line;"_");
+  let updated=mut."_";
+  let changes=mut."_";
+  if(s.contains(content;"_")){
+    updated="_";
+    changes="_"updated delivery from Q2 to Q3\"_"updated team size from 3 to 2\"_";
+  }el{
+    if(s.contains(content;"_")){
+      updated=s.concat(s.concat(current;"_");content);
+      changes="_"added EMEA performance data\"_";
+    }el{
+      updated=current;
+    };
+  };
+  let out=mut."_"updated_summary\"_""_"\"_"changes_made\"_");
+  out=s.concat(out;changes);
+  out=s.concat(out;"_");
+  io.println(out);
+  <0;
+};

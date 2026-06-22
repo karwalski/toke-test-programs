@@ -1,1 +1,39 @@
-m=metadata;f=validatefield(fieldname:$str;value:$str):$bool{let isvalid=mut.true;if(value.len=0){isvalid=false};<isvalid};f=validatejson(jsonstr:$str):$bool{let isvalid=mut.true;let fields=@("name";"description";"image";"attributes"));lp(let idx=0;idx<fields.len;idx=idx+1){let fieldname=fields.get(idx);let value=jsonstr;let found=mut.false;let startidx=mut.0;let endidx=mut.0;let keylen=fieldname.len;let i=mut.0;lp(let j=0;j<value.len;j=j+1){let ch=value.get(j);if(ch=":"){if(j-i=keylen){found=true;startidx=i;endidx=j};i=j+1}};if(found){let extracted=value.sub(startidx;endidx);let isvalid=validatefield(fieldname;extracted);if(!(isvalid=true)){isvalid=false}};if(!(isvalid=true)){isvalid=false}}
+m=metadata;
+i=io:std.io;
+i=s:std.str;
+
+f=has(json:$str;key:$str):$bool{
+    let pat=s.concat(s.concat("\"";key);"\":");
+    <s.indexof(json;pat)>=0
+};
+
+f=getstr(json:$str;key:$str):$str{
+    let pat=s.concat(s.concat("\"";key);"\":\"");
+    let p=s.indexof(json;pat);
+    if(p<0){<""};
+    let start=p+s.len(pat);
+    let rest=s.slice(json;start;s.len(json));
+    let endp=s.indexof(rest;"\"");
+    if(endp<0){<rest};
+    <s.slice(rest;0;endp)
+};
+
+f=main():$i64{
+    let input=mut."";
+    lp(true){let line=io.readln();if(io.eof()){br};input=s.concat(input;line)};
+    if(!has(input;"name")){io.println("INVALID: missing name");<0};
+    if(!has(input;"description")){io.println("INVALID: missing description");<0};
+    if(!has(input;"image")){io.println("INVALID: missing image");<0};
+    io.println("VALID");
+    let name=getstr(input;"name");
+    let desc=mut.getstr(input;"description");
+    let image=getstr(input;"image");
+    if(s.len(desc)>50){desc=s.slice(desc;0;50)};
+    let out=mut.name;
+    out=s.concat(out;" | ");
+    out=s.concat(out;desc);
+    out=s.concat(out;" | ");
+    out=s.concat(out;image);
+    io.println(out);
+    <0
+};
