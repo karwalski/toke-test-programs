@@ -1,1 +1,9 @@
-m=filter;f=filtermessages(messages:@$str;blocklist:@$str):@$str{let result=mut.@();lp(let i=0;i<blocklist.len;i=i+1){let blocked=blocklist.get(i);lp(let j=0;j<messages.len;j=j+1){let msg=messages.get(j);let isblocked=mut.false;if(msg.len>blocked.len){if(msg.startswith(blocked)){isblocked=true;};}el{if(msg=blocked){isblocked=true;};};if(!(isblocked)){result=result+@(msg);};};<result};
+m=blockfilter;
+i=io:std.io;
+i=s:std.str;
+f=strval(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\"");let ki=s.indexof(obj;pat);if(ki<0){<""};let rest=s.slice(obj;ki+s.len(pat);s.len(obj));let qi=s.indexof(rest;"\"");let after=s.slice(rest;qi+1;s.len(rest));let qe=s.indexof(after;"\"");<s.slice(after;0;qe)};
+f=inlist(arr:@($str);v:$str):$bool{let i=mut.0;let ok=mut.false;lp(i<arr.len()){if(s.equals(arr.get(i);v)){ok=true};i=i+1};<ok};
+f=main():$i64{let blockline=io.readln();let msgline=io.readln();
+let blocked=mut.@();let bi=mut.0;lp(bi<s.len(blockline)){let c=s.slice(blockline;bi;bi+1);if(s.equals(c;"\"")){let after=s.slice(blockline;bi+1;s.len(blockline));let qe=s.indexof(after;"\"");blocked=blocked+@(s.slice(after;0;qe));bi=bi+qe+2}el{bi=bi+1}};
+let parts=s.split(msgline;"}");let blockedCount=mut.0;let blockedUsers=mut.@();let p=mut.0;lp(p<parts.len()){let chunk=parts.get(p);if(s.contains(chunk;"\"sender\"")){let sender=strval(chunk;"sender");let text=strval(chunk;"text");if(inlist(blocked;sender)){blockedCount=blockedCount+1;if(inlist(blockedUsers;sender)=false){blockedUsers=blockedUsers+@(sender)}}el{io.println(s.concat(s.concat(sender;": ");text))}};p=p+1};
+io.println("---");if(blockedCount>0){io.println(s.concat(s.concat(s.concat(s.fromint(blockedCount);" messages blocked from ");s.fromint(blockedUsers.len()));" users"))}el{io.println("0 messages blocked")};<0}

@@ -1,41 +1,9 @@
-m=sumshw;
+m=hwpoints;
 i=io:std.io;
 i=s:std.str;
-i=json:std.json;
-f=sumshw(scores:@$i64):$i64{let total=mut.0;lp(let i=0;i<scores.len;i=i+1){let val=scores.get(i);if(val<0){let other=0-val;total=total+other;}el{total=total+val;};};<total};
-f=main():$i64{
-let input=io.readln();
-let parsed=json.parse(input);
-let students=mut.map();
-lp(let i=0;i<parsed.len;i=i+1){
-let record=parsed.get(i);
-let student=record.get("student");
-let earned=record.get("points_earned") as$i64;
-let possible=record.get("points_possible") as$i64;
-if(students.has(student)){
-let existing=students.get(student);
-let newearned=existing.get(0)+earned;
-let newpossible=existing.get(1)+possible;
-students.set(student;[newearned;newpossible]);
-}el{
-students.set(student;[earned;possible]);
-};
-};
-let results=mut.[];
-for(student;totals in students){
-let earned=totals.get(0);
-let possible=totals.get(1);
-let percentage=(earned*100)/possible;
-results.push([student;earned;possible;percentage]);
-};
-results.sort(fn(a;b){b.get(3)-a.get(3);});
-lp(let i=0;i<results.len;i=i+1){
-let result=results.get(i);
-let student=result.get(0);
-let earned=result.get(1);
-let possible=result.get(2);
-let percentage=result.get(3);
-io.println(student+s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(": ";s.fromint(earned));"/");s.fromint(possible));" (");s.fromint(percentage));"%)"));
-};
-<0
-}
+f=strval(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\"");let ki=s.indexof(obj;pat);if(ki<0){<""};let rest=s.slice(obj;ki;s.len(obj));let qi=s.indexof(s.slice(rest;s.len(pat);s.len(rest));"\"");let after=s.slice(rest;s.len(pat)+qi+1;s.len(rest));let qe=s.indexof(after;"\"");<s.slice(after;0;qe)};
+f=intval(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("\"";key);"\"");let ki=s.indexof(obj;pat);if(ki<0){<0};let rest=s.slice(obj;ki+s.len(pat);s.len(obj));let ci=s.indexof(rest;":");let body=s.slice(rest;ci+1;s.len(rest));let i=mut.0;let out=mut."";let done=mut.0;lp(i<s.len(body)){if(done=0){let c=s.slice(body;i;i+1);if(s.contains("0123456789";c)){out=s.concat(out;c)}el{if(s.len(out)>0){done=1}}};i=i+1};<s.toint(out)};
+f=main():$i64{let line=io.readln();let names=mut.@();let earned=mut.@();let possible=mut.@();let parts=s.split(line;"}");let p=mut.0;lp(p<parts.len()){let chunk=parts.get(p);if(s.contains(chunk;"\"student\"")){let st=strval(chunk;"student");let e=intval(chunk;"points_earned");let po=intval(chunk;"points_possible");let found=mut.0-1;let k=mut.0;lp(k<names.len()){if(s.equals(names.get(k);st)){found=k};k=k+1};if(found<0){names=names+@(st);earned=earned+@(e);possible=possible+@(po)}el{earned=earned.set(found;earned.get(found)+e);possible=possible.set(found;possible.get(found)+po)}};p=p+1};
+let n=mut.names.len();let pct=mut.@();let q=mut.0;lp(q<n){let po=possible.get(q);let pc=mut.0;if(po>0){pc=(earned.get(q)*100+po/2)/po};pct=pct+@(pc);q=q+1};
+let i=mut.0;lp(i<n){let j=mut.i+1;lp(j<n){if(pct.get(j)>pct.get(i)){let tn=names.get(i);names=names.set(i;names.get(j));names=names.set(j;tn);let te=earned.get(i);earned=earned.set(i;earned.get(j));earned=earned.set(j;te);let tp=possible.get(i);possible=possible.set(i;possible.get(j));possible=possible.set(j;tp);let tc=pct.get(i);pct=pct.set(i;pct.get(j));pct=pct.set(j;tc)};j=j+1};i=i+1};
+let r=mut.0;lp(r<n){io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(names.get(r);": ");s.fromint(earned.get(r)));"/");s.fromint(possible.get(r)));" (");s.concat(s.fromint(pct.get(r));"%)")));r=r+1};<0}

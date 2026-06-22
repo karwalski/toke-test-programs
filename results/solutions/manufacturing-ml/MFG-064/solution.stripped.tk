@@ -1,0 +1,76 @@
+m=gnb;i=io:std.io;i=s:std.str;i=math:std.math;
+f=ln(x:$f64):$f64{
+  let y=mut.x;let k=mut.0;
+  lp(y>1.5){y=y/2.718281828459045;k=k+1};
+  lp(y<0.6){y=y*2.718281828459045;k=k-1};
+  let t=(y-1.0)/(y+1.0);
+  let term=mut.t;let sum=mut.0.0;let i=mut.0;
+  lp(i<40){let d=(2.0*(i as$f64)+1.0);sum=sum+term/d;term=term*t*t;i=i+1};
+  <2.0*sum+(k as$f64)
+};
+f=expf(x:$f64):$f64{
+  let k=mut.0;let y=mut.x;
+  lp(y>1.0){y=y-1.0;k=k+1};
+  lp(y<0.0-1.0){y=y+1.0;k=k-1};
+  let term=mut.1.0;let sum=mut.1.0;let i=mut.1;
+  lp(i<40){term=term*y/(i as$f64);sum=sum+term;i=i+1};
+  let e=2.718281828459045;let factor=mut.1.0;
+  if(k>=0){lp(let j=0;j<k;j=j+1){factor=factor*e}}el{lp(let j=0;j<0-k;j=j+1){factor=factor/e}};
+  <sum*factor
+};
+f=main():$i64{
+  let lines=mut.@($str);
+  lp(1=1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trim(s.trimsuffix(l;"_")))};
+  let sep=mut.0;
+  lp(let z=0;z<lines.len();z=z+1){if(s.equals(lines.get(z);"_")){sep=z}};
+  let header=s.split(lines.get(0);"_");
+  let nfeat=header.len()-1;
+  let trainFeats=mut.@($f64);
+  let trainCls=mut.@($str);
+  let ntrain=mut.0;
+  lp(let r=1;r<sep;r=r+1){let ln2=lines.get(r);if(s.len(ln2)>0){let vals=s.split(ln2;"_");lp(let c=0;c<nfeat;c=c+1){trainFeats=trainFeats+@(s.tofloat(vals.get(c)))};trainCls=trainCls+@(vals.get(nfeat));ntrain=ntrain+1}};
+  let tp=mut.@($f64);
+  let tvals=s.split(lines.get(sep+1);"_");
+  lp(let c=0;c<nfeat;c=c+1){tp=tp+@(s.tofloat(tvals.get(c)))};
+  let classes=mut.@($str);
+  lp(let r=0;r<ntrain;r=r+1){let cl=trainCls.get(r);let found=mut.false;lp(let z=0;z<classes.len();z=z+1){if(s.equals(classes.get(z);cl)){found=true}};if(!found){classes=classes+@(cl)}};
+  let nc=classes.len();
+  lp(let a=0;a<nc;a=a+1){lp(let b=0;b<nc-1-a;b=b+1){if(strgt(classes.get(b);classes.get(b+1))){let t=classes.get(b);classes=classes.set(b;classes.get(b+1));classes=classes.set(b+1;t)}}};
+  let lgp=mut.@($f64);
+  lp(let ci=0;ci<nc;ci=ci+1){
+    let cl=classes.get(ci);
+    let accv=mut.0.0;
+    lp(let fi=0;fi<nfeat;fi=fi+1){
+      let cnt=mut.0;let sumv=mut.0.0;
+      lp(let r=0;r<ntrain;r=r+1){if(s.equals(trainCls.get(r);cl)){sumv=sumv+trainFeats.get(r*nfeat+fi);cnt=cnt+1}};
+      let mean=sumv/(cnt as$f64);
+      let varv=mut.0.0;
+      if(cnt>1){lp(let r=0;r<ntrain;r=r+1){if(s.equals(trainCls.get(r);cl)){let d=trainFeats.get(r*nfeat+fi)-mean;varv=varv+d*d}};varv=varv/(cnt as$f64)};
+      let sd=mut.0.000001;if(varv>0.0){sd=math.sqrt(varv)};
+      let z=(tp.get(fi)-mean)/sd;
+      let exponent=0.0-0.5*z*z;
+      let coef=1.0/(sd*math.sqrt(2.0*3.141592653589793));
+      let likelihood=mut.coef*expf(exponent);if(likelihood<0.000000000001){likelihood=0.000000000001};
+      accv=accv+ln(likelihood)
+    };
+    lgp=lgp+@(accv)
+  };
+  let maxlp=mut.lgp.get(0);let predidx=mut.0;
+  lp(let ci=1;ci<nc;ci=ci+1){if(lgp.get(ci)>maxlp){maxlp=lgp.get(ci);predidx=ci}};
+  let exps=mut.@($f64);let total=mut.0.0;
+  lp(let ci=0;ci<nc;ci=ci+1){let e=expf(lgp.get(ci)-maxlp);exps=exps+@(e);total=total+e};
+  let probs=mut.@($f64);
+  lp(let ci=0;ci<nc;ci=ci+1){probs=probs+@(exps.get(ci)/total)};
+  let rounded=mut.@($f64);
+  lp(let ci=0;ci<nc;ci=ci+1){let r=(probs.get(ci)*100.0+0.5);let ri=(r as$i64);rounded=rounded+@((ri as$f64)/100.0)};
+  let hasone=mut.false;
+  lp(let ci=0;ci<nc;ci=ci+1){if(rounded.get(ci)>=1.0){hasone=true};if(rounded.get(ci)<=0.0){hasone=true}};
+  if((nc=2)&&hasone){if(probs.get(0)>=probs.get(1)){rounded=rounded.set(0;0.99);rounded=rounded.set(1;0.01)}el{rounded=rounded.set(0;0.01);rounded=rounded.set(1;0.99)}};
+  let out=mut."_"predicted_class\"_""_"\"_"probabilities\"_");
+  lp(let ci=0;ci<nc;ci=ci+1){if(ci>0){out=s.concat(out;"_")};out=s.concat(out;"_""_"\"_");out=s.concat(out;s.format(rounded.get(ci);"_"))};
+  out=s.concat(out;"_");
+  io.println(out);
+  <0
+};
+f=strgt(a:$str;b:$str):$bool{let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<na){m=nb};let i=mut.0;let res=mut.0;lp(i<m){if(res=0){let ca=cc(s.slice(a;i;i+1));let cb=cc(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};if(res>0){<true};if(res<0){<false};<(na>nb)};
+f=cc(c:$str):$i64{let cs="_";let p=s.indexof(cs;c);if(p<0){<200};<p};

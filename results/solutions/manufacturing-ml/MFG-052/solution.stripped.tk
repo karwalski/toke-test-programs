@@ -1,0 +1,11 @@
+m=drift;i=io:std.io;i=s:std.str;
+f=main():$i64{let ts=mut.@($f64);let rs=mut.@($f64);let first=mut.(1=1);
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)=0){br};if(first){first=1=0}el{let parts=s.split(l;"_");if(parts.len()>=2){ts=ts+@(s.tofloat(parts.get(0)));rs=rs+@(s.tofloat(parts.get(1)))}}};
+if(ts.len()<2){io.println("_"drift_detected\"_"drift_rate\"_"direction\"_"none\"_");<0};
+let sum=mut.0.0;let cnt=mut.0;
+lp(let i=1;i<ts.len();i=i+1){let td=ts.get(i)-ts.get(i-1);let rd=rs.get(i)-rs.get(i-1);if(td>0.0){sum=sum+rd/td;cnt=cnt+1}};
+if(cnt=0){io.println("_"drift_detected\"_"drift_rate\"_"direction\"_"none\"_");<0};
+let avg=sum/s.tofloat(s.fromint(cnt));
+let dir=mut."_";let det=mut."_";
+if(avg>0.0000000001){dir="_";det="_"}el{if(avg<(0.0-0.0000000001)){dir="_";det="_"}};
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat("_"drift_detected\"_";det);"_"drift_rate\"_");s.fromfloat(avg));"_"direction\"_""_"\"_")));<0}

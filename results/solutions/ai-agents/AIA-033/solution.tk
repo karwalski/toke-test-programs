@@ -1,1 +1,27 @@
-m=spamfilter;i=io:std.io;i=s:std.str;i=j:std.json;f=main():$i64{let input=io.readln();let parsed=j.parse(input);let subject=j.get(parsed;"subject");let body=j.get(parsed;"body");let spam=mut.false;let factors=mut.@();let combined=s.concat(subject;" ");combined=s.concat(combined;body);let lower=s.tolower(combined);if(s.contains(lower;"urgent")){let oldfactors=factors;factors=@("urgency language");lp(let idx=0;idx<oldfactors.len;idx=idx+1){let newfactors=@(factors.get(0);oldfactors.get(idx));factors=newfactors};spam=true};if(s.contains(lower;"$")){if(s.contains(lower;"000")){let oldfactors=factors;if(factors.len=0){factors=@("monetary claim")}el{if(factors.len=1){factors=@(factors.get(0);"monetary claim")}el{if(factors.len=2){factors=@(factors.get(0);factors.get(1);"monetary claim")}el{factors=@(factors.get(0);factors.get(1);factors.get(2);"monetary claim")}}};spam=true}};if(s.contains(lower;"click here")){let oldfactors=factors;if(factors.len=0){factors=@("call to action")}el{if(factors.len=1){factors=@(factors.get(0);"call to action")}el{if(factors.len=2){factors=@(factors.get(0);factors.get(1);"call to action")}el{if(factors.len=3){factors=@(factors.get(0);factors.get(1);factors.get(2);"call to action")}el{factors=@(factors.get(0);factors.get(1);factors.get(2);factors.get(3);"call to action")}}}};spam=true};let bangcount=mut.0;lp(let idx=0;idx<subject.len;idx=idx+1){if(s.slice(subject;idx;idx+1)="!"){bangcount=bangcount+1}};if(bangcount>=3){let oldfactors=factors;if(factors.len=0){factors=@("excessive punctuation")}el{if(factors.len=1){factors=@(factors.get(0);"excessive punctuation")}el{if(factors.len=2){factors=@(factors.get(0);factors.get(1);"excessive punctuation")}el{if(factors.len=3){factors=@(factors.get(0);factors.get(1);factors.get(2);"excessive punctuation")}el{factors=@(factors.get(0);factors.get(1);factors.get(2);factors.get(3);"excessive punctuation")}}}};spam=true};let conf=mut.0.98;if(spam){conf=0.95};let result=mut."{\"is_spam\":";if(spam){result=s.concat(result;"true")}el{result=s.concat(result;"false")};result=s.concat(result;",\"confidence\":");result=s.concat(result;s.fromfloat(conf));result=s.concat(result;",\"factors\":[");lp(let idx=0;idx<factors.len;idx=idx+1){if(idx>0){result=s.concat(result;",")};result=s.concat(result;"\"");result=s.concat(result;factors.get(idx));result=s.concat(result;"\"")};result=s.concat(result;"]}");io.println(result);<0}
+m=spamfilter;i=io:std.io;i=s:std.str;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=strval(input:$str;key:$str):$str{let k=findfrom(input;key;0);if(k<0){<""};let vstart=k+s.len(key);let vend=findfrom(input;"\"";vstart);<s.slice(input;vstart;vend)};
+f=isdigit(c:$str):$bool{<s.eq(c;"0")||s.eq(c;"1")||s.eq(c;"2")||s.eq(c;"3")||s.eq(c;"4")||s.eq(c;"5")||s.eq(c;"6")||s.eq(c;"7")||s.eq(c;"8")||s.eq(c;"9")};
+f=hasdollarnum(t:$str):$bool{let n=s.len(t);let i=mut.0;lp(i<n-1){if(s.eq(s.slice(t;i;i+1);"$")){if(isdigit(s.slice(t;i+1;i+2))){<true}};i=i+1};<false};
+f=wonmoney(t:$str):$bool{let w=findfrom(t;"won";0);if(w<0){<false};let m=findfrom(t;"money";w);<m>=0};
+f=hasbangbang(t:$str):$bool{let n=s.len(t);let i=mut.0;lp(i<n-1){if(s.eq(s.slice(t;i;i+1);"!")){if(s.eq(s.slice(t;i+1;i+2);"!")){<true}};i=i+1};<false};
+f=main():$i64{
+let input=mut."";lp(1=1){if(io.eof()){br};input=s.concat(input;io.readln())};
+let subject=strval(input;"\"subject\":\"");
+let body=strval(input;"\"body\":\"");
+let text=s.lower(s.concat(s.concat(subject;" ");body));
+let factors=mut.@("");factors=@();
+if(s.contains(text;"urgent")||s.contains(text;"hurry")||s.contains(text;"limited time")||s.contains(text;"act now")||s.contains(text;"expires")){factors=factors+@("urgency language")};
+if(hasdollarnum(text)||wonmoney(text)||s.contains(text;"prize")||s.contains(text;"million")){factors=factors+@("monetary claim")};
+if(s.contains(text;"click here")||s.contains(text;"call now")||s.contains(text;"claim your")||s.contains(text;"download now")||s.contains(text;"subscribe now")){factors=factors+@("call to action")};
+if(hasbangbang(s.concat(subject;body))){factors=factors+@("excessive punctuation")};
+let isspam=mut.false;let conf=mut."0.98";
+if(factors.len()>0){isspam=true;conf="0.95"};
+let out=mut."{\"is_spam\":";
+if(isspam){out=s.concat(out;"true")}el{out=s.concat(out;"false")};
+out=s.concat(out;s.concat(",\"confidence\":";conf));
+out=s.concat(out;",\"factors\":[");
+lp(let i=0;i<factors.len();i=i+1){if(i>0){out=s.concat(out;",")};out=s.concat(out;s.concat(s.concat("\"";factors.get(i));"\""))};
+out=s.concat(out;"]}");
+io.println(out);
+<0}

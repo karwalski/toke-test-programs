@@ -1,0 +1,6 @@
+m=bloom;i=io:std.io;i=s:std.str;
+f=field(obj:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=intfield(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("_""_"\"_");let start=s.indexof(obj;pat);if(start<0){<0};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."_";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}};if(s.len(num)=0){<0};<s.toint(num)};
+f=lname(lvl:$i64):$str{if(lvl=1){<"_"};if(lvl=2){<"_"};if(lvl=3){<"_"};if(lvl=4){<"_"};if(lvl=5){<"_"};<"_"};
+f=main():$i64{let input=io.readln();let segs=s.split(input;"_");let acts=mut.@();let lvls=mut.@();
+lp(let i=0;i<segs.len();i=i+1){let seg=segs.get(i);if(s.contains(seg;"_"activity\"_""_"activity"_"level"_": ");acts.get(i)))}}};<0}

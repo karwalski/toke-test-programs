@@ -1,0 +1,14 @@
+m=gauss;i=io:std.io;i=s:std.str;i=math:std.math;
+f=setAt(arr:@$f64;idx:$i64;val:$f64):@$f64{let out=mut.@($f64);lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(val)}el{out=out+@(arr.get(i))}};<out};
+f=main():$i64{let nrows=mut.0;let cols=mut.0;let flat=mut.@($f64);lp(1=1){if(io.eof()){br};let line=s.trim(io.readln());if(s.len(line)=0){br};let parts=s.split(line;"_");let c=mut.0;lp(let i=0;i<parts.len();i=i+1){let p=s.trim(parts.get(i));if(s.len(p)>0){flat=flat+@(s.tofloat(p));c=c+1}};cols=c;nrows=nrows+1};
+let n=nrows;let w=cols;
+lp(let i=0;i<n;i=i+1){
+  let maxRow=mut.i;
+  lp(let k=i+1;k<n;k=k+1){let a=math.abs(flat.get(k*w+i));let b=math.abs(flat.get(maxRow*w+i));if(a>b){maxRow=k}};
+  if(!(maxRow=i)){lp(let j=0;j<w;j=j+1){let tmp=flat.get(i*w+j);flat=setAt(flat;i*w+j;flat.get(maxRow*w+j));flat=setAt(flat;maxRow*w+j;tmp)}};
+  let piv=flat.get(i*w+i);
+  if(!(piv=0.0)){lp(let k=i+1;k<n;k=k+1){let factor=flat.get(k*w+i)/piv;lp(let j=i;j<w;j=j+1){let nv=flat.get(k*w+j)-factor*flat.get(i*w+j);flat=setAt(flat;k*w+j;nv)}}}
+};
+let sol=mut.@($f64);lp(let i=0;i<n;i=i+1){sol=sol+@(0.0)};
+lp(let ii=0;ii<n;ii=ii+1){let i=n-1-ii;let val=mut.flat.get(i*w+n);lp(let j=i+1;j<n;j=j+1){val=val-flat.get(i*w+j)*sol.get(j)};val=val/flat.get(i*w+i);sol=setAt(sol;i;val)};
+lp(let i=0;i<n;i=i+1){io.println(s.concat("_";s.concat(s.fromint(i+1);s.concat("_";s.format(sol.get(i);"_")))))};<0}

@@ -1,0 +1,9 @@
+m=blockfilter;
+i=io:std.io;
+i=s:std.str;
+f=strval(obj:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_");let ki=s.indexof(obj;pat);if(ki<0){<"_"};let rest=s.slice(obj;ki+s.len(pat);s.len(obj));let qi=s.indexof(rest;"_""_"\"_");<s.slice(after;0;qe)};
+f=inlist(arr:@($str);v:$str):$bool{let i=mut.0;let ok=mut.false;lp(i<arr.len()){if(s.equals(arr.get(i);v)){ok=true};i=i+1};<ok};
+f=main():$i64{let blockline=io.readln();let msgline=io.readln();
+let blocked=mut.@();let bi=mut.0;lp(bi<s.len(blockline)){let c=s.slice(blockline;bi;bi+1);if(s.equals(c;"_""_"\"_");blocked=blocked+@(s.slice(after;0;qe));bi=bi+qe+2}el{bi=bi+1}};
+let parts=s.split(msgline;"_");let blockedCount=mut.0;let blockedUsers=mut.@();let p=mut.0;lp(p<parts.len()){let chunk=parts.get(p);if(s.contains(chunk;"_"sender\"_")){let sender=strval(chunk;"_");let text=strval(chunk;"_");if(inlist(blocked;sender)){blockedCount=blockedCount+1;if(inlist(blockedUsers;sender)=false){blockedUsers=blockedUsers+@(sender)}}el{io.println(s.concat(s.concat(sender;"_");text))}};p=p+1};
+io.println("_");if(blockedCount>0){io.println(s.concat(s.concat(s.concat(s.fromint(blockedCount);"_");s.fromint(blockedUsers.len()));"_"))}el{io.println("_")};<0}

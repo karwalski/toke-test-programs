@@ -1,1 +1,1 @@
-m=compoundinterest;f=compoundinterest(stake:$f64;annualrate:$f64;compoundingperiod:$i64;duration:$i64):$f64{let r=annualrate/100.0;let n=duration*12;let p=stake;let result=mut.p;lp(let i=1;i<n+1;i=i+1){let interest=result*r/12.0;result=result+interest;};<result};
+m=main;i=io:std.io;i=s:std.str;i=math:std.math;f=main():$i64{let p=s.tofloat(s.trim(io.readln()));let r=s.tofloat(s.trim(io.readln()));let n=s.tofloat(s.trim(io.readln()));let t=s.tofloat(s.trim(io.readln()));let exp=n*t;let amt=p*math.pow(1.0+r/n;exp);io.println(s.format(amt;"%.2f"));<0}

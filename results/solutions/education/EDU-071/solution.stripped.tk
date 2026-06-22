@@ -1,0 +1,6 @@
+m=topo;i=io:std.io;i=s:std.str;
+f=findFrom(h:$str;needle:$str;start:$i64):$i64{let sub=s.slice(h;start;s.len(h));let r=s.indexof(sub;needle);if(r<0){<0-1};<start+r};
+f=contains(arr:@$str;v:$str):$bool{lp(let i=0;i<arr.len();i=i+1){if(s.eq(arr.get(i);v)){<true}};<false};
+f=main():$i64{let raw=s.trim(io.readln());let concepts=mut.@("_");concepts=@();let prereqs=mut.@("_");prereqs=@();let pos=mut.0;lp(1=1){let ck=findFrom(raw;"_"concept\"_";pos);if(ck<0){br};let cco=findFrom(raw;"_";ck);let q1=findFrom(raw;"_""_"\"_";q1+1);let cname=s.slice(raw;q1+1;q2);let mk=findFrom(raw;"_"must_know_first\"_";q2);let mco=findFrom(raw;"_";mk);let p1=findFrom(raw;"_""_"\"_";p1+1);let pname=s.slice(raw;p1+1;p2);concepts=concepts+@(cname);prereqs=prereqs+@(pname);pos=p2+1};
+let total=concepts.len();let done=mut.@("_");done=@();let order=mut.@("_");order=@();lp(order.len()<total){let progressed=mut.false;lp(let i=0;i<total;i=i+1){let c=concepts.get(i);if(!(contains(done;c))){let pr=prereqs.get(i);let ready=mut.false;if(s.len(pr)=0){ready=true}el{if(contains(done;pr)){ready=true}};if(ready){done=done+@(c);order=order+@(c);progressed=true}}};if(!progressed){br}};
+lp(let i=0;i<order.len();i=i+1){io.println(s.concat(s.fromint(i+1);s.concat("_";order.get(i))))};<0}

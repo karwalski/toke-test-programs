@@ -1,0 +1,21 @@
+m=bloom;i=io:std.io;i=s:std.str;
+f=cc(ch:$str):$i64{let cs="_";let p=s.indexof(cs;ch);if(p<0){<127};<p+33};
+f=hashfn(item:$str;seed:$i64;size:$i64):$i64{
+  let mul=mut.1000003+seed*92821;
+  let h=mut.2166136+seed*7919;
+  let n=s.len(item);
+  lp(let i=0;i<n;i=i+1){let c=cc(s.slice(item;i;i+1));h=(h*mul+c+seed*131)%1000000007;if(h<0){h=h+1000000007}};
+  let r=mut.h%size;if(r<0){r=r+size};
+  <r
+};
+f=main():$i64{
+  let size=s.toint(s.trim(io.readln()));
+  let nh=s.toint(s.trim(io.readln()));
+  let adds=s.split(s.trim(io.readln());"_");
+  let checks=s.split(s.trim(io.readln());"_");
+  let bits=mut.@($i64);
+  lp(let i=0;i<size;i=i+1){bits=bits+@(0)};
+  lp(let a=0;a<adds.len();a=a+1){let item=adds.get(a);lp(let k=0;k<nh;k=k+1){let pos=hashfn(item;k;size);bits=bits.set(pos;1)}};
+  lp(let c=0;c<checks.len();c=c+1){let item=checks.get(c);let allset=mut.true;lp(let k=0;k<nh;k=k+1){let pos=hashfn(item;k;size);if(bits.get(pos)=0){allset=false}};if(allset){io.println("_")}el{io.println("_")}};
+  <0
+}

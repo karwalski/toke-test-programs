@@ -1,0 +1,18 @@
+m=tail;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let n=s.toint(s.trim(io.readln()));
+  let follow=s.trim(io.readln());
+  if(!fl.exists(path)){io.println(s.concat("_";path));<0};
+  let body=fl.read(path);
+  let raw=s.split(body;"_");
+  let lines=mut.@($str);
+  lp(let i=0;i<raw.len();i=i+1){if(!(i=raw.len()-1)){lines=lines+@(raw.get(i))}el{if(s.len(raw.get(i))>0){lines=lines+@(raw.get(i))}}};
+  let total=lines.len();
+  let start=mut.0;
+  if(n<total){start=total-n};
+  let out=mut."_";
+  lp(let i=start;i<total;i=i+1){if(i>start){out=s.concat(out;"_")};out=s.concat(out;lines.get(i))};
+  if(s.len(out)>0){io.println(out)};
+  <0
+}

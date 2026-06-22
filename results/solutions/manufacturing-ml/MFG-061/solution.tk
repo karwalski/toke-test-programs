@@ -1,1 +1,71 @@
-m=confusion;f=buildconfusion(p:$str;q:$str):$str{let res=mut."";let hit=mut.0;let total=mut.0;lp(let i=0;i<p.len;i=i+1){let pi=p.get(i);let qi=q.get(i);if(pi=qi){hit=hit+1};total=total+1;};res=s.concat(s.concat(res;"TP: ");hit) as$str+"\n";res=s.concat(res;"FP: ")+(total-hit)as$str+"\n";res=s.concat(res;"FN: ")+(total-hit)as$str+"\n";res=s.concat(res;"TN: ")+(total-2*hit)as$str+"\n";<res};f=main():$str{let p=$str.fromarray(@("y";"n";"y";"n";"y")));let q=$str.fromarray(@("y";"n";"y";"m";"y")));let r=buildconfusion(p;q);<r};
+m=confusion;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{
+  let scaled=x*100.0+0.5;
+  let h=mut.math.floor(scaled) as $i64;
+  if(h<0){h=0};
+  let whole=h/100;
+  let frac=h%100;
+  let out=mut.s.fromint(whole);
+  out=s.concat(out;".");
+  if(frac%10=0){
+    out=s.concat(out;s.fromint(frac/10))
+  }el{
+    if(frac<10){out=s.concat(out;"0")};
+    out=s.concat(out;s.fromint(frac))
+  };
+  <out
+};
+f=main():$i64{
+  let tp=mut.0;
+  let fp=mut.0;
+  let tn=mut.0;
+  let fneg=mut.0;
+  let first=mut.(1=1);
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    let row=s.trim(line);
+    if(s.len(row)>0){
+      if(first){first=(1=0)}el{
+        let cells=s.split(row;",");
+        if(cells.len()>=2){
+          let actual=s.trim(cells.get(0));
+          let pred=s.trim(cells.get(1));
+          if(s.eq(actual;"defect")){
+            if(s.eq(pred;"defect")){tp=tp+1}el{fneg=fneg+1}
+          }el{
+            if(s.eq(pred;"defect")){fp=fp+1}el{tn=tn+1}
+          }
+        }
+      }
+    }
+  };
+  let total=tp+fp+tn+fneg;
+  let accuracy=mut.0.0;
+  if(total>0){accuracy=((tp+tn) as $f64)/(total as $f64)};
+  let precision=mut.0.0;
+  if((tp+fp)>0){precision=(tp as $f64)/((tp+fp) as $f64)};
+  let recall=mut.0.0;
+  if((tp+fneg)>0){recall=(tp as $f64)/((tp+fneg) as $f64)};
+  let f1=mut.0.0;
+  if((precision+recall)>0.0){f1=2.0*(precision*recall)/(precision+recall)};
+  let out=mut."{\"tp\":";
+  out=s.concat(out;s.fromint(tp));
+  out=s.concat(out;",\"fp\":");
+  out=s.concat(out;s.fromint(fp));
+  out=s.concat(out;",\"tn\":");
+  out=s.concat(out;s.fromint(tn));
+  out=s.concat(out;",\"fn\":");
+  out=s.concat(out;s.fromint(fneg));
+  out=s.concat(out;",\"accuracy\":");
+  out=s.concat(out;fmt2(accuracy));
+  out=s.concat(out;",\"precision\":");
+  out=s.concat(out;fmt2(precision));
+  out=s.concat(out;",\"recall\":");
+  out=s.concat(out;fmt2(recall));
+  out=s.concat(out;",\"f1\":");
+  out=s.concat(out;fmt2(f1));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

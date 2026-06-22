@@ -1,1 +1,59 @@
-m=atmentions;f=solve(p0:$str;p1:$str):$str{let users=std.json.parse(p0);let msg=p1;let result=mut."";let i=mut.0;let len=msg.len;lp(let pos=0;pos<len;pos=pos+1){let ch=msg.charat(pos);if(ch="@"){let j=mut.pos+1;lp(let k=j;k<len;k=k+1){let c=msg.charat(k);if(c=" "){j=k+1;};};let found=mut.false;let username=mut."";lp(let idx=0;idx<users.len;idx=idx+1){let u=users.get(idx);let nameu=u.username;let lennameu=nameu.len;let lenj=j.len;if(!(lennameu>lenj))){let match=mut.true;lp(let m=0;m<lennameu;m=m+1){let c1=nameu.charat(m);let c2=j.charat(m);if(!(c1=c2))){match=false;};};if(match){username=nameu;found=true;j=k+1;};};};if(found){let disp=u.display;let start=j-1;let before=msg.substr(0;start);let after=msg.substr(j;len);let newmsg=before+disp+after;result=newmsg;};if(!(found)){result=msg;};};f=main():$void{let p0=@({"username":"alice";"display":"Alice Smith"};{"username":"bob";"display":"Bob Johnson"}));let p1="hello @alice and @bob";let r=solve(p0;p1);<r};
+m=atmentions;i=io:std.io;i=s:std.str;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=isword(c:$str):$bool{<s.contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";c)};
+f=main():$i64{
+let dir=s.trim(io.readln());
+let msg=io.readln();
+let unames=mut.@("");unames=@();
+let displays=mut.@("");displays=@();
+let pos=mut.0;
+lp(1=1){
+let uk=findfrom(dir;"\"username\":\"";pos);
+if(uk<0){br};
+let us=uk+12;let ue=findfrom(dir;"\"";us);
+let uname=s.slice(dir;us;ue);
+let dk=findfrom(dir;"\"display\":\"";ue);
+let ds=dk+11;let de=findfrom(dir;"\"";ds);
+let disp=s.slice(dir;ds;de);
+unames=unames+@(uname);displays=displays+@(disp);
+pos=de+1;
+};
+let mstarts=mut.@(0);mstarts=@();
+let mends=mut.@(0);mends=@();
+let mnames=mut.@("");mnames=@();
+let mresolved=mut.@(false);mresolved=@();
+let mdisp=mut.@("");mdisp=@();
+let n=s.len(msg);
+let i=mut.0;
+lp(i<n){
+if(s.eq(s.slice(msg;i;i+1);"@")){
+let we=mut.i+1;lp(we<n){if(isword(s.slice(msg;we;we+1))){we=we+1}el{br}};
+if(we>i+1){
+let uname=s.slice(msg;i+1;we);
+let resolved=mut.false;let mval=mut."";
+lp(let k=0;k<unames.len();k=k+1){if(s.eq(unames.get(k);uname)){resolved=true;mval=displays.get(k)}};
+mstarts=mstarts+@(i);mends=mends+@(we);mnames=mnames+@(uname);mresolved=mresolved+@(resolved);mdisp=mdisp+@(mval);
+i=we;
+}el{i=i+1};
+}el{i=i+1};
+};
+let nm=mstarts.len();
+let mentstr=mut."";let mc=mut.0;
+let unrstr=mut."";let uc=mut.0;
+lp(let k=0;k<nm;k=k+1){
+let part=s.concat(s.concat(mnames.get(k);" (pos ");s.concat(s.fromint(mstarts.get(k));")"));
+if(mresolved.get(k)){if(mc>0){mentstr=s.concat(mentstr;", ")};mentstr=s.concat(mentstr;part);mc=mc+1}el{if(uc>0){unrstr=s.concat(unrstr;", ")};unrstr=s.concat(unrstr;part);uc=uc+1}};
+let formatted=mut.msg;
+let k=mut.nm-1;
+lp(k>=0){
+if(mresolved.get(k)){
+let before=s.slice(formatted;0;mstarts.get(k));
+let after=s.slice(formatted;mends.get(k);s.len(formatted));
+formatted=s.concat(s.concat(before;mdisp.get(k));after);
+};
+k=k-1;
+};
+if(mc>0){io.println(s.concat("mentions: ";mentstr))};
+if(uc>0){io.println(s.concat("unresolved: ";unrstr))};
+io.println(s.concat("formatted: ";formatted));
+<0}

@@ -1,1 +1,70 @@
-m=solve;i=s:std.str;f=solve(p0:$str;p1:$str):$str{let schema=p0;let hex=p1;let jsonout=mut."";let keys=mut.@();let vals=mut.@();let i=mut.0;let n=schema.len;lp(let idx=0;idx<n;idx=idx+1){let ch=schema.get(idx);if(ch=":"){let start=i;let end=idx;let key=schema.slice(start;end);keys=keys+@(key);i=idx+1;};};let nkeys=keys.len;lp(let idx=0;idx<nkeys;idx=idx+1){let key=keys.get(idx);let start=i;let end=hex.len;let val=hex.slice(start;end);vals=vals+@(val);i=hex.len;};let nvals=vals.len;lp(let idx=0;idx<nvals;idx=idx+1){let key=keys.get(idx);let val=vals.get(idx);let pair=s.concat(s.concat(key;":");val);let sep=mut."";if(idx=0){sep="";}el{sep="\n"};jsonout=s.concat(s.concat(jsonout;sep);pair);};<jsonout};
+m=deser;i=io:std.io;i=s:std.str;
+f=hexval(c:$str):$i64{let d="0123456789";let p=s.indexof(d;c);if(!(p<0)){<p};let lo="abcdef";let q=s.indexof(lo;c);if(!(q<0)){<q+10};let up="ABCDEF";let r=s.indexof(up;c);if(!(r<0)){<r+10};<0};
+f=main():$i64{
+  let lines=mut.@($str);
+  lp(1=1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trim(s.trimsuffix(l;"\n")))};
+  let schema=lines.get(0);
+  let hexraw=s.replace(lines.get(1);" ";"");
+  let nbytes=s.len(hexraw)/2;
+  let bytes=mut.@($i64);
+  lp(let i=0;i<nbytes;i=i+1){let hi=hexval(s.slice(hexraw;i*2;i*2+1));let lo=hexval(s.slice(hexraw;i*2+1;i*2+2));bytes=bytes+@(hi*16+lo)};
+  let ftags=mut.@($i64);
+  let fnames=mut.@($str);
+  let ftypes=mut.@($str);
+  let sn=s.len(schema);
+  let si=mut.0;
+  lp(si<sn){
+    let tp=s.indexof(s.slice(schema;si;sn);"\"tag\":");
+    if(tp<0){si=sn}el{
+      let tstart=si+tp+6;
+      let rest=s.slice(schema;tstart;sn);
+      let comma=s.indexof(rest;",");
+      let tag=s.toint(s.trim(s.slice(rest;0;comma)));
+      let np=s.indexof(s.slice(schema;tstart;sn);"\"name\":\"");
+      let nstart=tstart+np+8;
+      let nrest=s.slice(schema;nstart;sn);
+      let nq=s.indexof(nrest;"\"");
+      let name=s.slice(nrest;0;nq);
+      let typp=s.indexof(s.slice(schema;nstart;sn);"\"type\":\"");
+      let tystart=nstart+typp+8;
+      let tyrest=s.slice(schema;tystart;sn);
+      let tyq=s.indexof(tyrest;"\"");
+      let typ=s.slice(tyrest;0;tyq);
+      ftags=ftags+@(tag);fnames=fnames+@(name);ftypes=ftypes+@(typ);
+      si=tystart+tyq+1
+    }
+  };
+  let pos=mut.0;
+  let outnames=mut.@($str);
+  let outvals=mut.@($str);
+  lp(pos<bytes.len()){
+    let tw=mut.0;let shift=mut.0;let cont=mut.true;
+    lp(cont){if(pos<bytes.len()){let bt=bytes.get(pos);pos=pos+1;tw=tw+(bt%128)*pw(shift);if(bt<128){cont=false}el{shift=shift+7}}el{cont=false}};
+    let tag=tw/8;
+    let wire=tw%8;
+    let fidx=mut.0-1;
+    lp(let f=0;f<ftags.len();f=f+1){if(ftags.get(f)=tag){fidx=f}};
+    if(fidx<0){
+      if(wire=0){let cc=mut.true;lp(cc){if(pos<bytes.len()){let bt=bytes.get(pos);pos=pos+1;if(bt<128){cc=false}}el{cc=false}}}el{if(wire=2){let ln2=readv(bytes;pos);pos=pos+vlen(bytes;pos)+ln2}}
+    }el{
+      let typ=ftypes.get(fidx);
+      if(s.equals(typ;"string")){
+        let lenv=readv(bytes;pos);pos=pos+vlen(bytes;pos);
+        let str=mut."";lp(let k=0;k<lenv;k=k+1){str=s.concat(str;chr(bytes.get(pos+k)))};pos=pos+lenv;
+        outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(s.concat(s.concat("\"";str);"\""))
+      }el{
+        let v=readv(bytes;pos);pos=pos+vlen(bytes;pos);
+        if(s.equals(typ;"bool")){let b=mut."false";if(!(v=0)){b="true"};outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(b)}el{outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(s.fromint(v))}
+      }
+    }
+  };
+  let out=mut."{";
+  lp(let i=0;i<outnames.len();i=i+1){if(i>0){out=s.concat(out;",")};out=s.concat(out;"\"");out=s.concat(out;outnames.get(i));out=s.concat(out;"\":");out=s.concat(out;outvals.get(i))};
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};
+f=pw(shift:$i64):$i64{let r=mut.1;let i=mut.0;lp(i<shift){r=r*2;i=i+1};<r};
+f=readv(bytes:@($i64);start:$i64):$i64{let v=mut.0;let shift=mut.0;let p=mut.start;let cont=mut.true;lp(cont){if(p<bytes.len()){let bt=bytes.get(p);p=p+1;v=v+(bt%128)*pw(shift);if(bt<128){cont=false}el{shift=shift+7}}el{cont=false}};<v};
+f=vlen(bytes:@($i64);start:$i64):$i64{let p=mut.start;let cont=mut.true;let n=mut.0;lp(cont){if(p<bytes.len()){let bt=bytes.get(p);p=p+1;n=n+1;if(bt<128){cont=false}}el{cont=false}};<n};
+f=chr(code:$i64):$str{let asc=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";if(code<32){<"?"};if(code>126){<"?"};<s.slice(asc;code-32;code-31)};

@@ -1,1 +1,33 @@
-m=dupcode;i=io:std.io;i=s:std.str;f=main():$i64{let n=s.toint(io.readln());let total=mut.0;total=n;let fnames=mut.@();let flines=mut.@();let fnums=mut.@();let curname=mut."";let fileline=mut.0;let idx=mut.0;lp(idx<total){let line=io.readln();idx=idx+1;if(s.contains(line;"---FILE: ")){let rest=s.slice(line;9;s.len(line));let nm=s.slice(rest;0;s.len(rest)-6);curname=nm;fileline=0}el{fileline=fileline+1;let tr=s.trim(line);if(s.len(tr)>0){fnames=fnames.push(curname);flines=flines.push(tr);fnums=fnums.push(fileline)}}};let total2=flines.len();let bestlen=mut.0;let bestai=mut.0;let bestbi=mut.0;let ai=mut.0;lp(ai<total2){let bi=mut.0;bi=ai+1;lp(bi<total2){if(fnames.get(ai)!=fnames.get(bi)){let k=mut.0;let cont=mut.1;lp(cont=1){if(ai+k<total2){if(bi+k<total2){if(fnames.get(ai+k)=fnames.get(ai)){if(fnames.get(bi+k)=fnames.get(bi)){if(flines.get(ai+k)=flines.get(bi+k)){k=k+1}el{cont=0}}el{cont=0}}el{cont=0}}el{cont=0}}el{cont=0}};if(k>bestlen){bestlen=k;bestai=ai;bestbi=bi}};bi=bi+1};ai=ai+1};if(bestlen>=2){io.println(s.concat(s.concat("Duplicate block (";s.fromint(bestlen));" lines):"));io.println(s.concat(s.concat("  ";fnames.get(bestai));s.concat(":";s.fromint(fnums.get(bestai)))));io.println(s.concat(s.concat("  ";fnames.get(bestbi));s.concat(":";s.fromint(fnums.get(bestbi)))))}el{io.println("No duplicates found")};<0}
+m=dupcode;i=io:std.io;i=s:std.str;
+f=startswith(line:$str;pre:$str):$bool{if(s.len(line)<s.len(pre)){<false};<s.eq(s.slice(line;0;s.len(pre));pre)};
+f=main():$i64{
+let minlines=s.toint(s.trim(io.readln()));
+let fnames=mut.@("");fnames=@();
+let contents=mut.@("");contents=@();
+let orignums=mut.@(0);orignums=@();
+let curname=mut."";
+let fileline=mut.0;
+lp(1=1){if(io.eof()){br};let line=io.readln();
+if(startswith(line;"---FILE:")){let rest=s.slice(line;8;s.len(line));let nm=s.trim(s.slice(rest;0;s.len(rest)-3));curname=nm;fileline=0}
+el{fileline=fileline+1;let tr=s.trim(line);if(s.len(tr)>0){if(startswith(tr;"#")=false){fnames=fnames+@(curname);contents=contents+@(tr);orignums=orignums+@(fileline)}}}};
+let n=contents.len();
+let bestlen=mut.0;let bestai=mut.0-1;let bestbi=mut.0-1;
+lp(let ai=0;ai<n;ai=ai+1){
+lp(let bi=ai+1;bi<n;bi=bi+1){
+if(s.eq(fnames.get(ai);fnames.get(bi))=false){
+let k=mut.0;let cont=mut.true;
+lp(cont){
+let aii=ai+k;let bii=bi+k;
+if(aii>=n||bii>=n){cont=false}el{
+if(s.eq(fnames.get(aii);fnames.get(ai))=false){cont=false}el{
+if(s.eq(fnames.get(bii);fnames.get(bi))=false){cont=false}el{
+if(s.eq(contents.get(aii);contents.get(bii))){k=k+1}el{cont=false}}}}};
+if(k>bestlen){bestlen=k;bestai=ai;bestbi=bi};
+}};
+};
+if(bestlen>=minlines){
+io.println(s.concat(s.concat("Duplicate block (";s.fromint(bestlen));" lines):"));
+io.println(s.concat(s.concat("  ";fnames.get(bestai));s.concat(":";s.fromint(orignums.get(bestai)))));
+io.println(s.concat(s.concat("  ";fnames.get(bestbi));s.concat(":";s.fromint(orignums.get(bestbi)))));
+}el{io.println("No duplicates found")};
+<0}

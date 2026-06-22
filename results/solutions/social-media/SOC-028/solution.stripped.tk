@@ -1,0 +1,42 @@
+m=setvis;i=io:std.io;i=s:std.str;
+f=extractstr(line:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+  if(endp.len()<1){<"_"};
+  <endp.get(0)
+};
+f=extractnum(line:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let parts=s.split(line;pat);
+  if(parts.len()<2){<"_"};
+  let rest=parts.get(1);
+  let out=mut."_";
+  let n=s.len(rest) as $i64;
+  let digits="_";
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(rest;i as $u64;(i+1) as $u64);
+    if(s.indexof(digits;c)>=0){out=s.concat(out;c)}el{br}
+  };
+  <out
+};
+f=main():$i64{
+  let line=io.readln();
+  let action=extractstr(line;"_");
+  let token=extractstr(line;"_");
+  let visibility=extractstr(line;"_");
+  let postid=extractnum(line;"_");
+  if(s.eq(action;"_")=(1=0)){
+    io.println("_"error\"_"Invalid action\"_");<0
+  };
+  let validvis=s.eq(visibility;"_")||s.eq(visibility;"_")||s.eq(visibility;"_");
+  if(validvis=(1=0)){
+    io.println("_"error\"_"Invalid visibility\"_");<0
+  };
+  if(s.len(token)=0||s.len(postid)=0||s.len(visibility)=0){
+    io.println("_"error\"_"Missing required fields\"_");<0
+  };
+  let out=mut."_"post_id\"_";
+  out=s.concat(out;postid);
+  out=s.concat(out;"_"visibility\"_""_"\"_"status\"_"updated\"_");
+  io.println(out);
+  <0
+}

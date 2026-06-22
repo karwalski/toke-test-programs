@@ -1,0 +1,26 @@
+m=quiz;i=io:std.io;i=s:std.str;
+f=extractanswers(input:$str):@($str){
+  let result=mut.@();
+  let parts=s.split(input;"_"answer\"_""_"\"_");
+    if(endp.len()>=1){
+      result=result+@(endp.get(0))
+    };
+    idx=idx+1
+  };
+  <result
+};
+f=extractstudents(input:$str):@($str){
+  let result=mut.@();
+  let parts=s.split(input;"_"student_answers\"_");
+  if(parts.len()<2){<result};
+  let rest=parts.get(1);
+  let endp=s.split(rest;"_");
+  let arr=endp.get(0);
+  let items=s.split(arr;"_");
+  let idx=mut.0;
+  lp(idx<items.len()){
+    let item=s.trim(items.get(idx));
+    let inner=s.split(item;"_""_""_"Q"_": Correct"_"Q"_": Incorrect. Answer: "_"Score: "_"/"_" ("_"%)");
+  io.println(line);
+  <0
+}

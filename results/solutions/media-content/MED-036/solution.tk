@@ -1,1 +1,26 @@
-m=extractcode;f=extractcode(md:$str):@$str{let result=mut.@();let len=md.len;let i=mut.0;let incode=mut.false;let currentcode=mut."";lp(let idx=0;idx<len;idx=idx+1){let ch=md.get(idx);if(!(incode)){if(ch="["){let nextidx=idx+1;if(nextidx<len){let ch2=md.get(nextidx);if(ch2="("){let endidx=mut.idx+2;lp(let j=idx+2;j<len;j=j+1){let ch3=md.get(j);if(ch3=")"){endidx=j;br};};let block=md.slice(idx+2;endidx);result=result+@(block);idx=endidx;};};};}el{if(ch="]"){incode=false;};if(incode){currentcode=currentcode+ch;};};};};<result};
+m=extractcode;i=io:std.io;i=s:std.str;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=main():$i64{
+let text=mut."";let first=mut.true;lp(1=1){if(io.eof()){br};let l=io.readln();if(first){text=l;first=false}el{text=s.concat(s.concat(text;"\n");l)}};
+let out=mut."";let nblocks=mut.0;
+let pos=mut.0;
+lp(1=1){
+let open=findfrom(text;"```";pos);
+if(open<0){br};
+let langstart=open+3;
+let nl=findfrom(text;"\n";langstart);
+if(nl<0){br};
+let lang=s.slice(text;langstart;nl);
+let cstart=nl+1;
+let close=findfrom(text;"```";cstart);
+if(close<0){br};
+let code=mut.s.slice(text;cstart;close);
+let cl=s.len(code);
+if(cl>0){if(s.eq(s.slice(code;cl-1;cl);"\n")){code=s.slice(code;0;cl-1)}};
+let block=s.concat(s.concat(s.concat("lang: ";lang);"\n");code);
+if(nblocks=0){out=block}el{out=s.concat(s.concat(out;"\n---\n");block)};
+nblocks=nblocks+1;
+pos=close+3;
+};
+io.println(out);
+<0}

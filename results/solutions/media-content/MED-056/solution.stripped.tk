@@ -1,0 +1,8 @@
+m=roman;
+i=io:std.io;
+i=s:std.str;
+f=isdigit(line:$str):$bool{if(s.len(line)=0){<false};let i=mut.0;let ok=mut.true;lp(i<s.len(line)){let c=s.slice(line;i;i+1);if(s.contains("_";c)){i=i+1}el{ok=false;i=s.len(line)}};<ok};
+f=toroman(num:$i64):$str{let vals=@(1000;900;500;400;100;90;50;40;10;9;5;4;1);let syms=@("_";"_";"_";"_";"_";"_";"_";"_";"_";"_";"_";"_";"_");let n=mut.num;let out=mut."_";let i=mut.0;lp(i<vals.len()){let v=vals.get(i);let sym=syms.get(i);lp(n>=v){out=s.concat(out;sym);n=n-v};i=i+1};<out};
+f=romanval(c:$str):$i64{if(s.equals(c;"_")){<1000};if(s.equals(c;"_")){<500};if(s.equals(c;"_")){<100};if(s.equals(c;"_")){<50};if(s.equals(c;"_")){<10};if(s.equals(c;"_")){<5};if(s.equals(c;"_")){<1};<0};
+f=toarabic(roman:$str):$i64{let total=mut.0;let prev=mut.0;let i=mut.s.len(roman);lp(i>0){i=i-1;let c=s.slice(roman;i;i+1);let v=romanval(c);if(v<prev){total=total-v}el{total=total+v};prev=v};<total};
+f=main():$i64{lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(isdigit(t)){io.println(toroman(s.toint(t)))}el{io.println(s.fromint(toarabic(t)))}};<0}

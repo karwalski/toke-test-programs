@@ -1,40 +1,17 @@
-m=picrossvalidator;
-i=io:std.io;
-i=str:std.str;
-i=col:std.collections;
-
-f=validate(grid:$str;rowclues:$str;colclues:$str):$str{
-    let rows=str.split(grid;"
-");
-    let rowcluearr=str.split(rowclues;"
-");
-    let colcluearr=str.split(colclues;"
-");
-    let n=rows.len;
-    let m=rows.get(0).len;
-    let rowclues=col.newarr(n);
-    let colclues=col.newarr(m);
-    let i=0;
-    lp(let idx=0;idx<rowcluearr.len;idx=idx+1){
-        let clue=rowcluearr.get(idx);
-        let len=str.len(clue);
-        let j=0;
-        lp(let k=0;k<len;k=k+1){
-            let ch=str.charat(clue;k);
-            let isnum=str.isdigit(ch);
-            if(isnum){
-                let digit=str.toint(ch);
-                if(digit<1){
-                    let msg=str.concat("Invalid: row ";str.concat(str.fromint(idx+1));" col 1")));
-                    <msg;
-                };
-            };
-        };
-    };
-    let j=0;
-    lp(let k=0;k<colcluearr.len;k=k+1){
-        let clue=colcluearr.get(k);
-        let len=str.len(clue);
-        let i=0;
-        lp(let m=0;m<len;m=m+1){
-            let ch=str.charat(clue;m
+m=picross;i=io:std.io;i=s:std.str;
+f=onerun(seq:$str;clue:$i64):$bool{let n=s.len(seq);let runs=mut.0;let cur=mut.0;let runlen=mut.0;lp(let i=0;i<n;i=i+1){if(s.eq(s.slice(seq;i;i+1);"X")){cur=cur+1}el{if(cur>0){runs=runs+1;runlen=cur;cur=0}}};if(cur>0){runs=runs+1;runlen=cur};if(clue=0){<runs=0};<(runs=1)&&(runlen=clue)};
+f=main():$i64{
+let grid=mut.@("");grid=@();
+let rowc=mut.@(0);rowc=@();
+let colc=mut.@(0);colc=@();
+let phase=mut.0;
+lp(1=1){if(io.eof()){br};let raw=io.readln();let line=s.trim(raw);
+if(s.len(line)=0){phase=phase+1}el{
+if(phase=0){grid=grid+@(line)}el{if(phase=1){rowc=rowc+@(s.toint(line))}el{colc=colc+@(s.toint(line))}}}};
+let nrows=grid.len();
+let ncols=s.len(grid.get(0));
+let done=mut.false;
+lp(let i=0;i<nrows;i=i+1){if(done=false){if(onerun(grid.get(i);rowc.get(i))=false){io.println(s.concat("Invalid: row ";s.fromint(i+1)));done=true}}};
+lp(let j=0;j<ncols;j=j+1){if(done=false){let col=mut."";lp(let i=0;i<nrows;i=i+1){col=s.concat(col;s.slice(grid.get(i);j;j+1))};if(onerun(col;colc.get(j))=false){io.println(s.concat("Invalid: col ";s.fromint(j+1)));done=true}}};
+if(done=false){io.println("Valid")};
+<0}

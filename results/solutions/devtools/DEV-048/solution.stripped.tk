@@ -1,0 +1,41 @@
+m=release;i=io:std.io;i=s:std.str;
+f=extractstr(line:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+  if(endp.len()<1){<"_"};
+  <endp.get(0)
+};
+f=main():$i64{
+  let input=mut."_";
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    input=s.concat(input;line)
+  };
+  let version=extractstr(input;"_");
+  let date=extractstr(input;"_");
+  let header=mut."_";
+  header=s.concat(header;version);
+  header=s.concat(header;"_");
+  header=s.concat(header;date);
+  header=s.concat(header;"_");
+  io.println(header);
+  let blocks=s.split(input;"_"category\"_""_"\"_");
+    let category=catend.get(0);
+    io.println("_");
+    io.println(s.concat("_";category));
+    let itemsparts=s.split(block;"_"items\"_");
+    if(itemsparts.len()>=2){
+      let irest=itemsparts.get(1);
+      let iend=s.split(irest;"_");
+      let arr=iend.get(0);
+      let items=s.split(arr;"_");
+      lp(let k=0;k<items.len();k=k+1){
+        let item=s.trim(items.get(k));
+        let inner=s.split(item;"_""_"- ";inner.get(1)))
+        }
+      }
+    };
+    bidx=bidx+1
+  };
+  <0
+}

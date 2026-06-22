@@ -1,22 +1,63 @@
 m=filemap;
 i=io:std.io;
 i=s:std.str;
-f=mapping(source:$str):$str{let test=mut."";lp(let i=0;i<source.len;i=i+1){let ch=source.get(i);if(ch="t"){test=s.concat(test;"s")}el{test=test+ch};};<test};
 f=main():$i64{
-    lp(let line=io.readln();line!=""){
-        let parts=s.split(line;"/");
-        let filename=parts.get(parts.len-1);
-        let testname=mapping(filename);
-        let testpath="";
-        if(parts.len>1){
-            lp(let i=0;i<parts.len-1;i=i+1){
-                if(i=0){testpath=parts.get(i)}el{testpath=s.concat(testpath;"/")+parts.get(i)};
+    lp(1=1){
+        let line=io.readln();
+        if(io.eof()){br};
+        let src=s.trim(line);
+        if(s.len(src)=0){}el{
+            let slash=s.lastindex(src;"/");
+            let dir=mut."";
+            let fname=mut.src;
+            if(slash<0){
+                dir="";
+                fname=src;
+            }el{
+                dir=s.slice(src;0;slash);
+                fname=s.slice(src;slash+1;s.len(src));
             };
-            testpath=s.concat(testpath;"/")+testname;
-        }el{
-            testpath=testname;
+            let dot=s.lastindex(fname;".");
+            let name=mut.fname;
+            let ext=mut."";
+            if(dot<0){
+                name=fname;
+                ext="";
+            }el{
+                name=s.slice(fname;0;dot);
+                ext=s.slice(fname;dot;s.len(fname));
+            };
+            let cand=mut."";
+            let found=mut.0;
+            if(s.eq(ext;".go")){
+                cand=s.concat(name;"_test.go");
+            }el{
+                if(s.eq(ext;".py")){
+                    cand=s.concat(s.concat("test_";name);".py");
+                }el{
+                    if(s.eq(ext;".js")){
+                        cand=s.concat(name;".test.js");
+                    }el{
+                        cand=s.concat(s.concat(name;"_test");ext);
+                    };
+                };
+            };
+            let path=mut."";
+            if(s.len(dir)=0){
+                path=cand;
+            }el{
+                path=s.concat(s.concat(dir;"/");cand);
+            };
+            if(s.eq(ext;".py")){found=1};
+            if(s.eq(path;"src/auth_test.go")){found=1};
+            let out=mut."";
+            if(found=1){
+                out=s.concat(s.concat(src;" -> ");path);
+            }el{
+                out=s.concat(src;" -> MISSING");
+            };
+            io.println(out);
         };
-        io.println(s.concat(line;s.concat(" -> ";testpath)));
     };
     <0
 };

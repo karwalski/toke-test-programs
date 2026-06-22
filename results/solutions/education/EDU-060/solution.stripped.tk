@@ -1,0 +1,67 @@
+m=tag;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let dict=s.trim(io.readln());
+  let tags=mut.@($str);
+  let kwflat=mut.@($str);
+  let kwowner=mut.@($i64);
+  let n=s.len(dict);
+  let i=mut.0;
+  lp(i<n){
+    let qa=s.indexof(s.slice(dict;i;n);"_""_"\"_");
+      let key=s.slice(rest;0;qb);
+      let afterkey=ks+qb+1;
+      let r2=s.slice(dict;afterkey;n);
+      let colon=s.indexof(r2;"_");
+      let br1=s.indexof(r2;"_");
+      let br2=s.indexof(r2;"_");
+      if(br1<0){i=n}el{
+        if(s.equals(key;"_")){i=afterkey}el{
+          let tagidx=tags.len();
+          tags=tags+@(key);
+          let arrbody=s.slice(r2;br1+1;br2);
+          let m=s.len(arrbody);
+          let j=mut.0;
+          lp(j<m){
+            let qx=s.indexof(s.slice(arrbody;j;m);"_""_"\"_");
+              let kw=s.slice(rv;0;qy);
+              kwflat=kwflat+@(kw);
+              kwowner=kwowner+@(tagidx);
+              j=vs+qy+1
+            }
+          };
+          i=afterkey+br2+1
+        }
+      }
+    }
+  };
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){br};
+    let lower=s.lower(t);
+    let matched=mut.@($str);
+    lp(let ti=0;ti<tags.len();ti=ti+1){
+      let found=mut.false;
+      lp(let ki=0;ki<kwflat.len();ki=ki+1){
+        if(kwowner.get(ki)=ti){
+          if(!found){
+            if(s.contains(lower;s.lower(kwflat.get(ki)))){found=true}
+          }
+        }
+      };
+      if(found){matched=matched+@(tags.get(ti))}
+    };
+    if(matched.len()>0){
+      let tagstr=mut."_";
+      lp(let mi=0;mi<matched.len();mi=mi+1){
+        if(mi>0){tagstr=s.concat(tagstr;"_")};
+        tagstr=s.concat(tagstr;matched.get(mi))
+      };
+      io.println(s.concat(s.concat(s.concat(t;"_");tagstr);"_"))
+    }el{
+      io.println(t)
+    }
+  };
+  <0
+}

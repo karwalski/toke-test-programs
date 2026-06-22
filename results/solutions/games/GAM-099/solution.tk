@@ -1,1 +1,13 @@
-m=caesar;f=caesarencrypt(first:$str;second:$i64):$str{let s=first;let shift=second;let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);let code=c as i64;let acode=65 as i64;let zcode=90 as i64;let shifted=code-shift;let wrapped=mut.shifted;if(!(shifted<acode))wrapped=shifted-acode;if(!(wrapped<acode))wrapped=wrapped-acode;let finalcode=wrapped as u8;result=s.concat(result;finalcode) as$str;};<result};
+m=crypt;i=io:std.io;i=s:std.str;
+f=wordVal(word:$str;lts:$str;mp:@$i64):$i64{let num=mut.0;lp(let i=0;i<s.len(word);i=i+1){let ch=s.slice(word;i;i+1);let li=s.indexof(lts;ch);num=num*10+mp.get(li)};<num};
+f=isFirst(fst:$str;ch:$str):$bool{<s.indexof(fst;ch)>=0};
+f=setA(arr:@$i64;idx:$i64;v:$i64):@$i64{let out=mut.@($i64);lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=check(words:@$str;lts:$str;mp:@$i64):$bool{let sum=mut.0;let nw=words.len();lp(let i=0;i<nw-1;i=i+1){sum=sum+wordVal(words.get(i);lts;mp)};let res=wordVal(words.get(nw-1);lts;mp);<sum=res};
+f=solve(li:$i64;lts:$str;fst:$str;mp:@$i64;usd:@$i64;words:@$str):@$i64{let nl=s.len(lts);if(li=nl){if(check(words;lts;mp)){<mp};let e=mut.@($i64);<e};let ch=s.slice(lts;li;li+1);let first=isFirst(fst;ch);let dstart=mut.0;if(first){dstart=1};lp(let d=dstart;d<10;d=d+1){if(usd.get(d)=0){let na=setA(mp;li;d);let nu=setA(usd;d;1);let r=solve(li+1;lts;fst;na;nu;words);if(r.len()>0){<r}}};let e2=mut.@($i64);<e2};
+f=main():$i64{let line=s.trim(io.readln());let eq=s.replace(line;"=";"+");let rawparts=s.split(eq;"+");let words=mut.@("x");words=@();lp(let i=0;i<rawparts.len();i=i+1){let w=s.trim(rawparts.get(i));if(s.len(w)>0){words=words+@(w)}};
+let lts=mut."";let fst=mut."";lp(let i=0;i<words.len();i=i+1){let w=words.get(i);let f0=s.slice(w;0;1);if(s.indexof(fst;f0)<0){fst=s.concat(fst;f0)};lp(let j=0;j<s.len(w);j=j+1){let ch=s.slice(w;j;j+1);if(s.indexof(lts;ch)<0){lts=s.concat(lts;ch)}}};
+let alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";let sorted=mut."";lp(let a=0;a<26;a=a+1){let c=s.slice(alpha;a;a+1);if(s.indexof(lts;c)>=0){sorted=s.concat(sorted;c)}};
+let mp=mut.@($i64);lp(let i=0;i<s.len(lts);i=i+1){mp=mp+@(0-1)};let usd=mut.@($i64);lp(let i=0;i<10;i=i+1){usd=usd+@(0)};
+let sol=solve(0;sorted;fst;mp;usd;words);
+if(sol.len()>0){let line1=mut."";lp(let i=0;i<s.len(sorted);i=i+1){if(i>0){line1=s.concat(line1;" ")};line1=s.concat(line1;s.concat(s.slice(sorted;i;i+1);s.concat("=";s.fromint(sol.get(i)))))};io.println(line1);
+let nw=words.len();let line2=mut."";lp(let i=0;i<nw-1;i=i+1){if(i>0){line2=s.concat(line2;" + ")};line2=s.concat(line2;s.fromint(wordVal(words.get(i);sorted;sol)))};line2=s.concat(line2;s.concat(" = ";s.fromint(wordVal(words.get(nw-1);sorted;sol))));io.println(line2)}el{io.println("No solution")};<0}

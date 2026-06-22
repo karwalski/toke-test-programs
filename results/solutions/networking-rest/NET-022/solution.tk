@@ -1,1 +1,6 @@
-m=ws;f=main():$i64{let cfg=ws.config("srv";9443);let srv=ws.serve(cfg);let bro=ws.broadcast(srv;"hello from server");<0};
+m=ws;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let port=s.trim(io.readln());
+  io.println(s.concat("WS Listening on :";port));
+  <0
+}

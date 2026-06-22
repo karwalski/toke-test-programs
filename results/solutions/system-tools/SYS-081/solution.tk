@@ -1,1 +1,18 @@
-m=filetail;f=tail(file:$str;n:$i64;follow:$i64):$str{let result=mut."";let lines=mut.@();let line=mut."";lp(let i=0;i<file.len;i=i+1){let c=file.get(i);if(c=10){lines=lines+@(line);line="";}el{line=line+c;};};if(!(line.len=0))){lines=lines+@(line);};let lastidx=mut.0;if(!(lines.len=0))){lastidx=lines.len-1;};lp(let i=0;i<n;i=i+1){let idx=lastidx-i;let l=lines.get(idx);result=result+l;};if(!(follow=0))){let t=mut.0;lp(let i=0;i<follow;i=i+1){t=t+1;};};<result};f=main():$void{let file="example.txt";let n=3;let follow=5;let result=tail(file;n;follow);};
+m=tail;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let n=s.toint(s.trim(io.readln()));
+  let follow=s.trim(io.readln());
+  if(!fl.exists(path)){io.println(s.concat("ERROR: file not found: ";path));<0};
+  let body=fl.read(path);
+  let raw=s.split(body;"\n");
+  let lines=mut.@($str);
+  lp(let i=0;i<raw.len();i=i+1){if(!(i=raw.len()-1)){lines=lines+@(raw.get(i))}el{if(s.len(raw.get(i))>0){lines=lines+@(raw.get(i))}}};
+  let total=lines.len();
+  let start=mut.0;
+  if(n<total){start=total-n};
+  let out=mut."";
+  lp(let i=start;i<total;i=i+1){if(i>start){out=s.concat(out;"\n")};out=s.concat(out;lines.get(i))};
+  if(s.len(out)>0){io.println(out)};
+  <0
+}

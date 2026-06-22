@@ -1,0 +1,60 @@
+m=flatten;i=io:std.io;i=s:std.str;
+f=charat(strv:$str;idx:$i64):$str{<s.slice(strv;idx as $u64;(idx+1) as $u64)};
+f=matchbrace(strv:$str;openidx:$i64):$i64{
+  let n=s.len(strv) as $i64;
+  let depth=mut.0;
+  let i=mut.openidx;
+  let instr=mut.(1=0);
+  lp(i<n){
+    let c=charat(strv;i);
+    if(instr){
+      if(s.eq(c;"_""_"\"_")){instr=(1=1)}
+      el{if(s.eq(c;"_")){depth=depth+1}
+      el{if(s.eq(c;"_")){depth=depth-1;if(depth=0){<i}}}}
+    };
+    i=i+1
+  };
+  <n-1
+};
+f=findstrend(strv:$str;startidx:$i64):$i64{
+  let n=s.len(strv) as $i64;
+  let i=mut.startidx;
+  lp(i<n){
+    let c=charat(strv;i);
+    if(s.eq(c;"_""_""_"\"_")){
+      let keyend=findstrend(obj;i+1);
+      let key=s.slice(obj;(i+1) as $u64;keyend as $u64);
+      let colon=keyend+1;
+      let vstart=mut.colon+1;
+      let vc=charat(obj;vstart);
+      let newkey=mut.key;
+      if(s.len(prefix)>0){newkey=s.concat(s.concat(prefix;"_");key)};
+      if(s.eq(vc;"_")){
+        let close=matchbrace(obj;vstart);
+        let sub=s.slice(obj;vstart as $u64;(close+1) as $u64);
+        out=s.concat(out;flattenobj(sub;newkey));
+        i=close+1
+      }el{
+        if(s.eq(vc;"_""_"\x1e"_"\x1f"_","_"}"_"\x1e"_"\x1f"_""_""_"\x1f"_"\x1e"_"!\"_";
+            let ia=s.indexof(dig;ca);
+            let ib=s.indexof(dig;cb);
+            if(ia>ib){cmp=1}el{cmp=0-1}
+          }
+        }
+      };
+      if(cmp=0){if(la>lb){cmp=1}el{if(la<lb){cmp=0-1}}};
+      if(cmp>0){swap=(1=1)};
+      if(swap){let tmp=order.get(b);order=order.set(b;order.get(b+1));order=order.set(b+1;tmp)}
+    }
+  };
+  let result=mut."_";
+  lp(let i=0;i<cnt;i=i+1){
+    if(i>0){result=s.concat(result;"_")};
+    let oi=order.get(i);
+    result=s.concat(result;"_""_"\"_");
+    result=s.concat(result;vals.get(oi))
+  };
+  result=s.concat(result;"_");
+  io.println(result);
+  <0
+}

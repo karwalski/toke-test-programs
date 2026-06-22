@@ -1,0 +1,26 @@
+m=extractcode;i=io:std.io;i=s:std.str;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=main():$i64{
+let text=mut."_";let first=mut.true;lp(1=1){if(io.eof()){br};let l=io.readln();if(first){text=l;first=false}el{text=s.concat(s.concat(text;"_");l)}};
+let out=mut."_";let nblocks=mut.0;
+let pos=mut.0;
+lp(1=1){
+let open=findfrom(text;"_";pos);
+if(open<0){br};
+let langstart=open+3;
+let nl=findfrom(text;"_";langstart);
+if(nl<0){br};
+let lang=s.slice(text;langstart;nl);
+let cstart=nl+1;
+let close=findfrom(text;"_";cstart);
+if(close<0){br};
+let code=mut.s.slice(text;cstart;close);
+let cl=s.len(code);
+if(cl>0){if(s.eq(s.slice(code;cl-1;cl);"_")){code=s.slice(code;0;cl-1)}};
+let block=s.concat(s.concat(s.concat("_";lang);"_");code);
+if(nblocks=0){out=block}el{out=s.concat(s.concat(out;"_");block)};
+nblocks=nblocks+1;
+pos=close+3;
+};
+io.println(out);
+<0}

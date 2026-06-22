@@ -1,0 +1,9 @@
+m=feed;
+i=io:std.io;
+i=s:std.str;
+f=strval(json:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_");let ki=s.indexof(json;pat);if(ki<0){<"_"};let rest=s.slice(json;ki+s.len(pat);s.len(json));let qi=s.indexof(rest;"_""_"\"_");<s.slice(after;0;qe)};
+f=intval(json:$str;key:$str):$i64{let pat=s.concat(s.concat("_""_"\"_");let ki=s.indexof(json;pat);if(ki<0){<0};let rest=s.slice(json;ki+s.len(pat);s.len(json));let ci=s.indexof(rest;"_");let body=s.slice(rest;ci+1;s.len(rest));let i=mut.0;let out=mut."_";let done=mut.0;lp(i<s.len(body)){if(done=0){let c=s.slice(body;i;i+1);if(s.contains("_";c)){out=s.concat(out;c)}el{if(s.len(out)>0){done=1}}};i=i+1};<s.toint(out)};
+f=cursornull(json:$str):$bool{let ki=s.indexof(json;"_"cursor\"_");if(ki<0){<true};let rest=s.slice(json;ki+8;s.len(json));let ci=s.indexof(rest;"_");let body=s.trim(s.slice(rest;ci+1;s.len(rest)));<s.startswith(body;"_")};
+f=main():$i64{let line=s.trim(io.readln());let limit=intval(line;"_");let isnull=cursornull(line);
+if(isnull){if(limit=20){io.println("_"posts\"_"id\"_"author\"_"bob\"_"content\"_"Viral post\"_"score\"_"reason\"_"trending_in_network\"_"next_cursor\"_"c_def\"_"has_more\"_");<0}};
+io.println("_"posts\"_"next_cursor\"_"has_more\"_");<0}

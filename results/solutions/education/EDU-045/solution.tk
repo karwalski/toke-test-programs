@@ -1,1 +1,37 @@
-m=feedback;f=classify(num1:$i64;num2:$i64):$str{if(num1>8){<"excellent"};if(num1>5){<"good"};if(num1>3){<"average"};if(num1>1){<"poor"};<"unclassified"};f=countfor(arr:@$str;target:$str):$i64{let num1=mut.0;lp(let idx=0;idx<arr.len;idx=idx+1){if(arr.get(idx)=target){num1=num1+1};};<num1};f=main():$i64{let ratings=@$str{"excellent";"good";"average";"poor";"unclassified"};let counts=@$i64{0;0;0;0;0};let idx=mut.0;lp(let i=0;i<ratings.len;i=i+1){let r=ratings.get(i);let c=counts.get(idx);let n=countfor(ratings;r);let m=mut.0;if(n>0){m=n};counts.get(idx)=m;idx=idx+1};let total=mut
+m=feedback;i=io:std.io;i=s:std.str;
+f=fmtg(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=mut.v*1000000.0+0.5;let si=scaled as $i64;let ip=si/1000000;let fp=si%1000000;let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("0";fs)};let end=mut.6;lp(end>1){let last=s.slice(fs;end-1;end);if(s.eq(last;"0")){end=end-1}el{br}};fs=s.slice(fs;0;end);let r=mut.s.concat(s.concat(s.fromint(ip);".");fs);if(neg){r=s.concat("-";r)};<r};
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=main():$i64{
+let input=mut."";lp(1=1){if(io.eof()){br};input=s.concat(input;io.readln())};
+let names=mut.@("");names=@();
+let sums=mut.@(0.0);sums=@();
+let counts=mut.@(0);counts=@();
+let pos=mut.0;
+lp(1=1){
+let ck=findfrom(input;"\"category\":\"";pos);
+if(ck<0){br};
+let vstart=ck+12;
+let vend=findfrom(input;"\"";vstart);
+let cat=s.slice(input;vstart;vend);
+let sk=findfrom(input;"\"score\":";vend);
+let nstart=sk+8;
+let ne=mut.nstart;lp(ne<s.len(input)){let ch=s.slice(input;ne;ne+1);if(s.eq(ch;",")||s.eq(ch;"}")){br};ne=ne+1};
+let score=s.tofloat(s.trim(s.slice(input;nstart;ne)));
+let found=mut.0-1;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);cat)){found=i}};
+if(found>=0){sums=sums.set(found;sums.get(found)+score);counts=counts.set(found;counts.get(found)+1)}el{names=names+@(cat);sums=sums+@(score);counts=counts+@(1)};
+pos=ne;
+};
+let n=names.len();
+let totalsum=mut.0.0;let totalcount=mut.0;
+lp(let i=0;i<n;i=i+1){totalsum=totalsum+sums.get(i);totalcount=totalcount+counts.get(i)};
+let used=mut.@(false);used=@();lp(let i=0;i<n;i=i+1){used=used+@(false)};
+lp(let k=0;k<n;k=k+1){
+let best=mut.0-1;
+lp(let i=0;i<n;i=i+1){if(used.get(i)=false){let avi=sums.get(i)/(counts.get(i) as $f64);if(best<0){best=i}el{let avb=sums.get(best)/(counts.get(best) as $f64);if(avi>avb){best=i}}}};
+used=used.set(best;true);
+let avg=sums.get(best)/(counts.get(best) as $f64);
+io.println(s.concat(s.concat(names.get(best);": ");fmtg(avg)));
+};
+let overall=totalsum/(totalcount as $f64);
+io.println(s.concat("Overall: ";fmtg(overall)));
+<0}

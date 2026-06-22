@@ -1,1 +1,76 @@
-m=wsframe;f=maskbit(n:$i64):$i64{let m=mut.1;lp(let i=0;i<n;i=i+1){m=m*2};<m};f=maskxor(mask:$i64;payload:$i64):$i64{<payload-mask};f=maskbits
+m=wsframe;i=io:std.io;i=s:std.str;
+f=ascii():$str{< " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"};
+f=charat(strv:$str;i:$i64):$str{<s.slice(strv;i as $u64;(i+1) as $u64)};
+f=ord(c:$str):$i64{let idx=s.indexof(ascii();c);if(idx<0){<0};<idx+32};
+f=hex2(b:$i64):$str{
+  let digits="0123456789ABCDEF";
+  let hi=b/16;
+  let lo=b%16;
+  <s.concat(charat(digits;hi);charat(digits;lo))
+};
+f=opcodefor(ftype:$str):$i64{
+  if(s.eq(ftype;"text")){<1};
+  if(s.eq(ftype;"binary")){<2};
+  if(s.eq(ftype;"close")){<8};
+  if(s.eq(ftype;"ping")){<9};
+  if(s.eq(ftype;"pong")){<10};
+  <0
+};
+f=opcodename(op:$i64):$str{
+  if(op=1){<"text"};
+  if(op=2){<"binary"};
+  if(op=8){<"close"};
+  if(op=9){<"ping"};
+  if(op=10){<"pong"};
+  <"unknown"
+};
+f=main():$i64{
+  let lines=mut.@($str);
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    lines=lines+@(s.trim(line))
+  };
+  let direction=lines.get(0);
+  let ftype=lines.get(1);
+  let payload=mut."";
+  if(lines.len()>=3){payload=lines.get(2)};
+  let plen=s.len(payload) as $i64;
+  let opcode=opcodefor(ftype);
+  let firstbyte=128+opcode;
+  let maskbit=mut.0;
+  if(s.eq(direction;"client")){maskbit=1};
+  let secondbyte=maskbit*128+plen;
+  let opname=opcodename(opcode);
+  if(s.eq(direction;"client")){
+    let l1=mut.hex2(firstbyte);
+    l1=s.concat(l1;" ");
+    l1=s.concat(l1;hex2(secondbyte));
+    l1=s.concat(l1;" [mask4] [masked_payload]");
+    io.println(l1);
+    let l2=mut."FIN=1, opcode=0x";
+    l2=s.concat(l2;s.fromint(opcode));
+    l2=s.concat(l2;" (");
+    l2=s.concat(l2;opname);
+    l2=s.concat(l2;"), MASK=1, len=");
+    l2=s.concat(l2;s.fromint(plen));
+    io.println(l2)
+  }el{
+    let l1=mut.hex2(firstbyte);
+    l1=s.concat(l1;" ");
+    l1=s.concat(l1;hex2(secondbyte));
+    lp(let i=0;i<plen;i=i+1){
+      l1=s.concat(l1;" ");
+      l1=s.concat(l1;hex2(ord(charat(payload;i))))
+    };
+    io.println(l1);
+    let l2=mut."FIN=1, opcode=0x";
+    l2=s.concat(l2;s.fromint(opcode));
+    l2=s.concat(l2;" (");
+    l2=s.concat(l2;opname);
+    l2=s.concat(l2;"), MASK=0, len=");
+    l2=s.concat(l2;s.fromint(plen));
+    io.println(l2)
+  };
+  <0
+}

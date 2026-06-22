@@ -1,0 +1,8 @@
+m=promptgen;
+i=io:std.io;
+i=s:std.str;
+f=findval(json:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_");let ki=s.indexof(json;pat);if(ki<0){<"_"};let ci=s.indexof(s.slice(json;ki;s.len(json));"_");let start=ki+ci+1;<s.slice(json;start;s.len(json))};
+f=strval(json:$str;key:$str):$str{let rest=findval(json;key);let qi=s.indexof(rest;"_""_""_"\"_");<s.slice(after;0;end)};
+f=intval(json:$str;key:$str):$i64{let rest=findval(json;key);let trimmed=s.trim(rest);let i=mut.0;let out=mut."_";let done=mut.0;lp(i<s.len(trimmed)){if(done=0){let c=s.slice(trimmed;i;i+1);if(s.contains("_";c)){out=s.concat(out;c)}el{done=1}};i=i+1};<s.toint(out)};
+f=cap(w:$str):$str{if(s.len(w)=0){<w};let first=s.upper(s.slice(w;0;1));<s.concat(first;s.slice(w;1;s.len(w)))};
+f=main():$i64{let line=io.readln();let topic=strval(line;"_");let genre=strval(line;"_");let wc=intval(line;"_");io.println("_");io.println(s.concat("_";topic));io.println(s.concat("_";cap(genre)));io.println(s.concat(s.concat("_";s.fromint(wc));"_"));io.println("_");let ci=s.indexof(line;"_"constraints\"_");let bi=s.indexof(s.slice(line;ci;s.len(line));"_");let arrstart=ci+bi+1;let rest=s.slice(line;arrstart;s.len(line));let endb=s.indexof(rest;"_");let body=s.slice(rest;0;endb);let i=mut.0;lp(i<s.len(body)){let q=s.indexof(s.slice(body;i;s.len(body));"_""_"\"_");let item=s.slice(after;0;qe);io.println(s.concat("_";item));i=astart+qe+1}};<0}

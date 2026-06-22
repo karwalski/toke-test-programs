@@ -1,0 +1,35 @@
+m=eigenpower;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmtfix6(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=mut.v*1000000.0+0.5;let si=scaled as $i64;let ip=si/1000000;let fp=si%1000000;let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("_";fs)};let r=mut.s.concat(s.concat(s.fromint(ip);"_");fs);if(neg){r=s.concat("_";r)};<r};
+f=main():$i64{
+let n=s.toint(s.trim(io.readln()));
+let mat=mut.@(0.0);mat=@();
+lp(let r=0;r<n;r=r+1){let row=s.split(s.trim(io.readln());"_");let cc=mut.0;lp(let c=0;c<row.len();c=c+1){let t=s.trim(row.get(c));if(s.len(t)>0){mat=mat+@(s.tofloat(t))}}};
+let maxiter=s.toint(s.trim(io.readln()));
+let tol=s.tofloat(s.trim(io.readln()));
+let v=mut.@(0.0);v=@();
+let nrm=math.sqrt(n as $f64);
+lp(let i=0;i<n;i=i+1){v=v+@(1.0/nrm)};
+let preveig=mut.0.0;let eig=mut.0.0;
+lp(let it=1;it<=maxiter;it=it+1){
+let w=mut.@(0.0);w=@();
+lp(let i=0;i<n;i=i+1){let acc=mut.0.0;lp(let j=0;j<n;j=j+1){acc=acc+mat.get(i*n+j)*v.get(j)};w=w+@(acc)};
+let wn=mut.0.0;lp(let i=0;i<n;i=i+1){wn=wn+w.get(i)*w.get(i)};wn=math.sqrt(wn);
+if(wn=0.0){br};
+let vnew=mut.@(0.0);vnew=@();lp(let i=0;i<n;i=i+1){vnew=vnew+@(w.get(i)/wn)};
+let e=mut.0.0;lp(let i=0;i<n;i=i+1){let acc=mut.0.0;lp(let j=0;j<n;j=j+1){acc=acc+mat.get(i*n+j)*vnew.get(j)};e=e+vnew.get(i)*acc};
+eig=e;
+io.println(s.concat(s.concat("_";s.fromint(it));s.concat("_";fmtfix6(eig))));
+v=vnew;
+let diff=mut.eig-preveig;if(diff<0.0){diff=0.0-diff};
+if(diff<tol){br};
+preveig=eig;
+};
+# sign convention: first nonzero component positive
+let flip=mut.false;let determined=mut.false;
+lp(let i=0;i<n;i=i+1){if(determined=false){let a=mut.v.get(i);if(a<0.0){a=0.0-a};if(a>0.000000000001){if(v.get(i)<0.0){flip=true};determined=true}}};
+if(flip){lp(let i=0;i<n;i=i+1){v=v.set(i;0.0-v.get(i))}};
+io.println(s.concat("_";fmtfix6(eig)));
+let ev=mut."_";
+lp(let i=0;i<n;i=i+1){if(i>0){ev=s.concat(ev;"_")};ev=s.concat(ev;fmtfix6(v.get(i)))};
+io.println(ev);
+<0}

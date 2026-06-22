@@ -1,1 +1,65 @@
-m=charfreq;f=buildfreqmap(text:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<text.len;idx=idx+1){let ch=text.get(idx);let found=mut.false;let j=mut.0;lp(let k=0;k<result.len;k=k+1){let c=result.get(k);if(c=ch){found=true};};if(!(found)){result=result+ch};};<result};f=countcharfreq(text:$str):$str{let freqmap=buildfreqmap(text);let result=mut."";let i=mut.0;lp(let idx=0;idx<freqmap.len;idx=idx+1){let ch=freqmap
+m=charfreq;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+    let text=mut."";
+    lp(1=1){
+        let line=io.readln();
+        if(io.eof()){br};
+        if(s.len(text)>0){text=s.concat(text;"\n")};
+        text=s.concat(text;line);
+    };
+    text=s.trim(text);
+    let chars=mut.@();
+    let counts=mut.@();
+    let codes=mut.@();
+    lp(let idx=0;idx<s.len(text);idx=idx+1){
+        let ch=s.slice(text;idx;idx+1);
+        let found=mut.0-1;
+        lp(let k=0;k<chars.len;k=k+1){
+            let c=chars.get(k);
+            if(s.eq(c;ch)){found=k};
+        };
+        if(found<0){
+            chars=chars+@(ch);
+            counts=counts+@(1);
+            let bts=s.bytes(ch);
+            codes=codes+@(bts.get(0));
+        }el{
+            let old=counts.get(found);
+            counts=counts.set(found;old+1);
+        };
+    };
+    let n=chars.len;
+    let order=mut.@();
+    lp(let a=0;a<n;a=a+1){order=order+@(a)};
+    lp(let a=0;a<n;a=a+1){
+        lp(let b=0;b<n-1-a;b=b+1){
+            let ia=order.get(b);
+            let ib=order.get(b+1);
+            let ca=counts.get(ia);
+            let cb=counts.get(ib);
+            let swap=mut.0;
+            if(ca<cb){swap=1};
+            if(ca=cb){
+                let ka=codes.get(ia);
+                let kb=codes.get(ib);
+                if(ka>kb){swap=1};
+            };
+            if(swap=1){
+                order=order.set(b;ib);
+                order=order.set(b+1;ia);
+            };
+        };
+    };
+    let out=mut."";
+    lp(let a=0;a<n;a=a+1){
+        let oi=order.get(a);
+        let ch=chars.get(oi);
+        let ct=counts.get(oi);
+        if(a>0){out=s.concat(out;"\n")};
+        out=s.concat(out;s.concat(ch;s.concat(": ";s.fromint(ct))));
+    };
+    io.println(out);
+    <0
+};

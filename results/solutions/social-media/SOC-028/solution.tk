@@ -1,1 +1,48 @@
-m=main;f=main():$i64{let visibility=mut."public";if(visibility="public"){<1};if(visibility="followers-only"){<2};if(visibility="private"){<3};<0};
+m=setvis;i=io:std.io;i=s:std.str;
+f=extractstr(line:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let parts=s.split(line;pat);
+  if(parts.len()<2){<""};
+  let rest=parts.get(1);
+  let endp=s.split(rest;"\"");
+  if(endp.len()<1){<""};
+  <endp.get(0)
+};
+f=extractnum(line:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let parts=s.split(line;pat);
+  if(parts.len()<2){<""};
+  let rest=parts.get(1);
+  let out=mut."";
+  let n=s.len(rest) as $i64;
+  let digits="0123456789";
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(rest;i as $u64;(i+1) as $u64);
+    if(s.indexof(digits;c)>=0){out=s.concat(out;c)}el{br}
+  };
+  <out
+};
+f=main():$i64{
+  let line=io.readln();
+  let action=extractstr(line;"action");
+  let token=extractstr(line;"token");
+  let visibility=extractstr(line;"visibility");
+  let postid=extractnum(line;"post_id");
+  if(s.eq(action;"set_visibility")=(1=0)){
+    io.println("{\"error\":\"Invalid action\"}");<0
+  };
+  let validvis=s.eq(visibility;"public")||s.eq(visibility;"followers")||s.eq(visibility;"private");
+  if(validvis=(1=0)){
+    io.println("{\"error\":\"Invalid visibility\"}");<0
+  };
+  if(s.len(token)=0||s.len(postid)=0||s.len(visibility)=0){
+    io.println("{\"error\":\"Missing required fields\"}");<0
+  };
+  let out=mut."{\"post_id\":";
+  out=s.concat(out;postid);
+  out=s.concat(out;",\"visibility\":\"");
+  out=s.concat(out;visibility);
+  out=s.concat(out;"\",\"status\":\"updated\"}");
+  io.println(out);
+  <0
+}

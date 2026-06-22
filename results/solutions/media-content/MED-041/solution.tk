@@ -1,1 +1,18 @@
-m=ellipsis;i=io:std.io;i=s:std.str;f=ellipsis(s:$str;maxlen:$i64):$str{let len=s.len;let useellipsis=mut.false;if(len>maxlen){useellipsis=true};let result=mut."";if(useellipsis){let trunclen=maxlen-3;let truncated=s.substr(0;trunclen);result=s.concat(truncated;"...");}el{result=s;};<result};f=main():$i64{let maxlen=s.toint(io.readln());let line=io.readln();io.println(ellipsis(line;maxlen));<0};
+m=ellipsis;i=io:std.io;i=s:std.str;
+f=ellipsis(text:$str;maxlen:$i64):$str{
+  let len=s.len(text) as $i64;
+  if(len<=maxlen){<text};
+  let trunclen=mut.maxlen-3;
+  if(trunclen<0){trunclen=0};
+  let truncated=s.slice(text;0;trunclen as $u64);
+  <s.concat(truncated;"...")
+};
+f=main():$i64{
+  let maxlen=s.toint(io.readln());
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    io.println(ellipsis(line;maxlen))
+  };
+  <0
+}

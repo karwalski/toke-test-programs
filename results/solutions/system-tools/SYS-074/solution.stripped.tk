@@ -1,0 +1,33 @@
+m=queue;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=loadq(path:$str):$str{if(fl.exists(path)){<fl.read(path)};<"_"};
+f=maxid(content:$str):$i64{let m=mut.0;let pos=mut.0;lp(1=1){let k=findfrom(content;"_"id\"_";pos);if(k<0){br};let ns=k+5;let ne=mut.ns;lp(ne<s.len(content)){let ch=s.slice(content;ne;ne+1);if(s.eq(ch;"_")||s.eq(ch;"_")){br};ne=ne+1};let id=s.toint(s.trim(s.slice(content;ns;ne)));if(id>m){m=id};pos=ne};<m};
+f=main():$i64{
+let path=s.trim(io.readln());
+let cmdline=s.trim(io.readln());
+let sp=s.indexof(cmdline;"_");
+let cmd=mut.cmdline;let arg=mut."_";
+if(sp>=0){cmd=s.slice(cmdline;0;sp);arg=s.slice(cmdline;sp+1;s.len(cmdline))};
+let content=loadq(path);
+if(s.eq(cmd;"_")){
+let nid=maxid(content)+1;
+let job=mut."_"id\"_";
+job=s.concat(job;s.fromint(nid));
+job=s.concat(job;"_"command\"_""_"\"_"status\"_"queued\"_"created_at\"_"2026-01-01T00:00:00\"_");
+let trimmed=s.trim(content);
+let newc=mut."_";
+if(s.eq(trimmed;"_")||s.len(trimmed)=0){newc=s.concat(s.concat("_";job);"_")}el{let inner=s.slice(trimmed;1;s.len(trimmed)-1);newc=s.concat(s.concat(s.concat("_";inner);"_");s.concat(job;"_"))};
+let ok=fl.write(path;newc);
+io.println(s.concat(s.concat("_";s.fromint(nid));"_"));
+}el{if(s.eq(cmd;"_")){
+let trimmed=s.trim(content);
+if(s.eq(trimmed;"_")||s.len(trimmed)=0){io.println("_")}el{
+let pos=mut.0;
+lp(1=1){let k=findfrom(content;"_"id\"_";pos);if(k<0){br};
+let ns=k+5;let ne=mut.ns;lp(ne<s.len(content)){let ch=s.slice(content;ne;ne+1);if(s.eq(ch;"_")||s.eq(ch;"_")){br};ne=ne+1};let id=s.trim(s.slice(content;ns;ne));
+let stk=findfrom(content;"_"status\"_""_"\"_";ss);let status=s.slice(content;ss;se);
+let ck=findfrom(content;"_"command\"_""_"\"_";cs);let command=s.slice(content;cs;ce);
+io.println(s.concat(s.concat(s.concat(s.concat(id;"_");status);"_");command));
+pos=ne};
+}}};
+<0}

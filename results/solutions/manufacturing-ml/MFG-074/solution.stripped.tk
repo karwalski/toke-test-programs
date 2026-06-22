@@ -1,0 +1,15 @@
+m=shift;i=io:std.io;i=s:std.str;i=math:std.math;
+f=ipow(b:$i64;e:$i64):$i64{let r=mut.1;lp(let i=0;i<e;i=i+1){r=r*b};<r};
+f=pyround(x:$f64;d:$i64):$str{let scale=ipow(10;d);let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=v*(scale as $f64)+0.5;let si=scaled as $i64;let ip=si/scale;let fp=si-ip*scale;let frac=mut.s.fromint(fp);lp(s.len(frac)<d){frac=s.concat("_";frac)};lp(s.len(frac)>1){let last=s.slice(frac;s.len(frac)-1;s.len(frac));if(s.eq(last;"_")){frac=s.slice(frac;0;s.len(frac)-1)}el{br}};let out=mut.s.concat(s.fromint(ip);s.concat("_";frac));if(neg){out=s.concat("_";out)};<out};
+f=contains(arr:@$str;v:$str):$bool{lp(let i=0;i<arr.len();i=i+1){if(s.eq(arr.get(i);v)){<true}};<false};
+f=strlt(a:$str;b:$str):$bool{let la=s.len(a);let lb=s.len(b);let mn=mut.la;if(lb<mn){mn=lb};lp(let k=0;k<mn;k=k+1){let ca=s.slice(a;k;k+1);let cb=s.slice(b;k;k+1);if(!(s.eq(ca;cb))){let ia=s.indexof("_";ca);let ib=s.indexof("_";cb);if(ia<ib){<true};<false}};if(la<lb){<true};<false};
+f=meanFor(names:@$str;vals:@$f64;target:$str):$f64{let sum=mut.0.0;let cnt=mut.0;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);target)){sum=sum+vals.get(i);cnt=cnt+1}};<sum/(cnt as $f64)};
+f=stdFor(names:@$str;vals:@$f64;target:$str;mean:$f64):$f64{let ss=mut.0.0;let cnt=mut.0;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);target)){let d=vals.get(i)-mean;ss=ss+d*d;cnt=cnt+1}};if(cnt<2){<0.0};<math.sqrt(ss/((cnt-1) as $f64))};
+f=countFor(names:@$str;target:$str):$i64{let cnt=mut.0;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);target)){cnt=cnt+1}};<cnt};
+f=main():$i64{let header=s.trim(io.readln());let names=mut.@("_");names=@();let vals=mut.@($f64);let distinct=mut.@("_");distinct=@();lp(1=1){if(io.eof()){br};let line=s.trim(io.readln());if(s.len(line)=0){br};let comma=s.indexof(line;"_");let sh=s.slice(line;0;comma);let mv=s.tofloat(s.slice(line;comma+1;s.len(line)));names=names+@(sh);vals=vals+@(mv);if(!(contains(distinct;sh))){distinct=distinct+@(sh)}};
+let sorted=mut.@("_");sorted=@();lp(sorted.len()<distinct.len()){let best=mut."_";let have=mut.false;lp(let i=0;i<distinct.len();i=i+1){let d=distinct.get(i);if(!(contains(sorted;d))){if(!have){best=d;have=true}el{if(strlt(d;best)){best=d}}}};sorted=sorted+@(best)};
+let bestShift=mut."_";let bestMean=mut.0.0;let haveBest=mut.false;
+lp(let i=0;i<distinct.len();i=i+1){let sh=distinct.get(i);let m=meanFor(names;vals;sh);if(!haveBest){bestShift=sh;bestMean=m;haveBest=true}el{if(m<bestMean){bestShift=sh;bestMean=m}}};
+let shiftsJson=mut."_";let firstS=mut.true;
+lp(let i=0;i<sorted.len();i=i+1){let sh=sorted.get(i);let m=meanFor(names;vals;sh);let sd=stdFor(names;vals;sh;m);let n=countFor(names;sh);let obj=s.concat("_"shift\"_""_"\"_"mean\"_";s.concat(pyround(m;2);s.concat("_"std\"_";s.concat(pyround(sd;2);s.concat("_"n\"_";s.concat(s.fromint(n);"_"))))))));if(firstS){shiftsJson=obj;firstS=false}el{shiftsJson=s.concat(shiftsJson;s.concat("_";obj))}};
+io.println(s.concat("_"shifts\"_";s.concat(shiftsJson;s.concat("_"best_shift\"_""_"\"_")))));<0}

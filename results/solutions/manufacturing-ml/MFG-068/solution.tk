@@ -1,1 +1,11 @@
-m=dbscan;f=dbscan(data:@($f64;$f64));eps:$f64;minpts:i64):@$i64{let n=data.len;let labels=mut.@($i64);n);let coreset=mut.@($i64);n);lp(let i=0;i<n;i=i+1){let point=data.get(i);let count=mut.0;lp(let j=0;j<n;j=j+1){if(i=j){<0};let neighbor=data.get(j);let dx=point.x-neighbor.x;let dy=point.y-neighbor.y;let dist=dx*dx+dy*dy;if(dist<eps*eps){count=count+1};};if(count>minpts){coreset=coreset+@(i);};};lp(let i=0;i<coreset.len;i=i+1){let coreidx=coreset.get(i);let frontier=mut.@($i64);n);let frontierlen=mut.0;lp(let j=0;j<n;j=j+1){
+m=dbscan;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{let xs=mut.@($f64);let ys=mut.@($f64);let eps=mut.0.0;let minpts=mut.0;let first=mut.1;
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(s.len(t)>0){let parts=s.split(t;",");if(parts.len()>=2){if(first=1){eps=s.tofloat(parts.get(0));minpts=s.toint(parts.get(1));first=0}el{xs=xs+@(s.tofloat(parts.get(0)));ys=ys+@(s.tofloat(parts.get(1)))}}}};
+let n=xs.len();let labels=mut.@();lp(let i=0;i<n;i=i+1){labels=labels+@(0-1)};let eps2=eps*eps;let cid=mut.0;
+lp(let i=0;i<n;i=i+1){if(labels.get(i)=0-1){let cnt=mut.0;lp(let j=0;j<n;j=j+1){let dx=xs.get(i)-xs.get(j);let dy=ys.get(i)-ys.get(j);let d2=dx*dx+dy*dy;if(d2<=eps2){cnt=cnt+1}};if(cnt<minpts){labels=labels.set(i;0-1)}el{labels=labels.set(i;cid);lp(let j=0;j<n;j=j+1){let dx=xs.get(i)-xs.get(j);let dy=ys.get(i)-ys.get(j);let d2=dx*dx+dy*dy;if(d2<=eps2){if(labels.get(j)=0-1){labels=labels.set(j;cid)}}};cid=cid+1}}};
+let nclusters=mut.0;let seen=mut.@();lp(let i=0;i<n;i=i+1){let lb=labels.get(i);if(lb!=0-1){let found=mut.0;lp(let k=0;k<seen.len();k=k+1){if(seen.get(k)=lb){found=1}};if(found=0){seen=seen+@(lb);nclusters=nclusters+1}}};
+let lblstr=mut."";lp(let i=0;i<n;i=i+1){if(i>0){lblstr=s.concat(lblstr;",")};lblstr=s.concat(lblstr;s.fromint(labels.get(i)))};
+let noisestr=mut."";let nf=mut.1;lp(let i=0;i<n;i=i+1){if(labels.get(i)=0-1){if(nf=0){noisestr=s.concat(noisestr;",")};noisestr=s.concat(noisestr;s.fromint(i));nf=0}};
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"cluster_labels\":[";lblstr);"],\"n_clusters\":");s.fromint(nclusters));",\"noise_points\":[");noisestr);"]}"));<0}

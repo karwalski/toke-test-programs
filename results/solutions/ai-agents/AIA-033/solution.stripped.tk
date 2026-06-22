@@ -1,0 +1,6 @@
+m=spamfilter;i=io:std.io;i=s:std.str;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=strval(input:$str;key:$str):$str{let k=findfrom(input;key;0);if(k<0){<"_"};let vstart=k+s.len(key);let vend=findfrom(input;"_""_"0"_"1"_"2"_"3"_"4"_"5"_"6"_"7"_"8"_"9"_"$"_"won"_"money"_"!"_"!"_""_"\"_":\"_");
+let body=strval(input;"_"body\"_""_" "_""_"urgent"_"hurry"_"limited time"_"act now"_"expires"_"urgency language"_"prize"_"million"_"monetary claim"_"click here"_"call now"_"claim your"_"download now"_"subscribe now"_"call to action"_"excessive punctuation"_"0.98"_"0.95"_"{\"_":"_"true"_"false"_",\"_":"_",\"_":["_","_"\"_";factors.get(i));"_""_"]}");
+io.println(out);
+<0}

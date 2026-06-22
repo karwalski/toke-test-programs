@@ -1,0 +1,32 @@
+m=cameltosnake;
+i=io:std.io;
+i=s:std.str;
+f=cameltosnake(line:$str):$str{
+  let upper="_";
+  let lower="_";
+  let n=s.len(line) as $i64;
+  let out=mut."_";
+  let prevlower=mut.(1=0);
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(line;i as $u64;(i+1) as $u64);
+    let uidx=s.indexof(upper;c);
+    let lidx=s.indexof(lower;c);
+    if(uidx>=0){
+      if(prevlower){out=s.concat(out;"_")};
+      out=s.concat(out;s.slice(lower;uidx as $u64;(uidx+1) as $u64));
+      prevlower=(1=0)
+    }el{
+      out=s.concat(out;c);
+      prevlower=(lidx>=0)
+    }
+  };
+  <out
+};
+f=main():$i64{
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    io.println(cameltosnake(line))
+  };
+  <0
+}

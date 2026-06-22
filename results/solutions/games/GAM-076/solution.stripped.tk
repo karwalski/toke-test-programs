@@ -1,0 +1,168 @@
+m=markov;i=io:std.io;i=s:std.str;
+f=band(a:$i64;b:$i64):$i64{
+  let r=mut.0;
+  let bit=mut.1;
+  let x=mut.a;
+  let y=mut.b;
+  lp(let k=0;k<32;k=k+1){
+    if((x%2)=1){if((y%2)=1){r=r+bit}};
+    x=x/2;y=y/2;bit=bit*2
+  };
+  <r
+};
+f=bxor(a:$i64;b:$i64):$i64{
+  let r=mut.0;
+  let bit=mut.1;
+  let x=mut.a;
+  let y=mut.b;
+  lp(let k=0;k<32;k=k+1){
+    let xb=x%2;
+    let yb=y%2;
+    if(xb!=yb){r=r+bit};
+    x=x/2;y=y/2;bit=bit*2
+  };
+  <r
+};
+f=pow2(n:$i64):$i64{let r=mut.1;lp(let k=0;k<n;k=k+1){r=r*2};<r};
+f=mask32(x:$i64):$i64{<x%4294967296};
+f=shr(x:$i64;n:$i64):$i64{<x/pow2(n)};
+f=shl(x:$i64;n:$i64):$i64{<mask32(x*pow2(n))};
+f=initgenrand(st:@($i64);seed:$i64):@($i64){
+  let m=mut.st;
+  m=m.set(0;mask32(seed));
+  lp(let i=1;i<624;i=i+1){
+    let prev=m.get(i-1);
+    let v=mask32(1812433253*(bxor(prev;shr(prev;30)))+i);
+    m=m.set(i;v)
+  };
+  <m
+};
+f=initbyarray(seed:$i64):@($i64){
+  let m=mut.@($i64);
+  lp(let z=0;z<624;z=z+1){m=m+@(0)};
+  m=initgenrand(m;19650218);
+  let i=mut.1;
+  let j=mut.0;
+  let key=@(seed);
+  let klen=key.len() as $i64;
+  let kk=mut.624;
+  if(klen>624){kk=klen};
+  lp(kk>0){
+    let prev=m.get(i-1);
+    let mixed=mask32(bxor(m.get(i);mask32(bxor(prev;shr(prev;30))*1664525))+key.get(j)+j);
+    m=m.set(i;mixed);
+    i=i+1;j=j+1;
+    if(i>=624){m=m.set(0;m.get(623));i=1};
+    if(j>=klen){j=0};
+    kk=kk-1
+  };
+  let c=mut.623;
+  lp(c>0){
+    let prev=m.get(i-1);
+    let mixed=mask32(bxor(m.get(i);mask32(bxor(prev;shr(prev;30))*1566083941))-i);
+    m=m.set(i;mixed);
+    i=i+1;
+    if(i>=624){m=m.set(0;m.get(623));i=1};
+    c=c-1
+  };
+  m=m.set(0;2147483648);
+  <m
+};
+f=genrand(st:@($i64);idxin:$i64):@($i64){
+  let m=mut.st;
+  if(idxin>=624){
+    lp(let i=0;i<624;i=i+1){
+      let y=band(m.get(i);2147483648)+band(m.get((i+1)%624);2147483647);
+      let next=mut.bxor(m.get((i+397)%624);shr(y;1));
+      if((y%2)=1){next=bxor(next;2567483615)};
+      m=m.set(i;next)
+    }
+  };
+  <m
+};
+f=temper(y0:$i64):$i64{
+  let y=mut.y0;
+  y=bxor(y;shr(y;11));
+  y=bxor(y;band(shl(y;7);2636928640));
+  y=bxor(y;band(shl(y;15);4022730752));
+  y=bxor(y;shr(y;18));
+  <mask32(y)
+};
+f=bitlen(n:$i64):$i64{
+  let c=mut.0;
+  let x=mut.n;
+  lp(x>0){c=c+1;x=x/2};
+  <c
+};
+f=main():$i64{
+  let lines=mut.@($str);
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    lines=lines+@(line)
+  };
+  let blankidx=mut.0-1;
+  lp(let i=0;i<lines.len();i=i+1){
+    if(blankidx<0){if(s.len(s.trim(lines.get(i)))=0){blankidx=i}}
+  };
+  let trainwords=mut.@($str);
+  lp(let i=0;i<blankidx;i=i+1){
+    let parts=s.split(lines.get(i);"_");
+    lp(let j=0;j<parts.len();j=j+1){
+      let w=s.trim(parts.get(j));
+      if(s.len(w)>0){trainwords=trainwords+@(w)}
+    }
+  };
+  let params=s.split(s.trim(lines.get(blankidx+1));"_");
+  let count=s.toint(params.get(0));
+  let seed=s.toint(params.get(1));
+  let keys=mut.@($str);
+  lp(let i=0;i<trainwords.len()-1;i=i+1){
+    let w=trainwords.get(i);
+    let found=mut.(1=0);
+    lp(let k=0;k<keys.len();k=k+1){if(s.eq(keys.get(k);w)){found=(1=1)}};
+    if(found=(1=0)){keys=keys+@(w)}
+  };
+  let mtstate=mut.initbyarray(seed);
+  let mtidx=mut.624;
+  let curidx=mut.0;
+  if(keys.len()>0){
+    let k=bitlen(keys.len() as $i64);
+    let r=mut.0;
+    let cond=mut.(1=1);
+    lp(cond){
+      if(mtidx>=624){mtstate=genrand(mtstate;mtidx);mtidx=0};
+      let raw=temper(mtstate.get(mtidx));
+      mtidx=mtidx+1;
+      r=shr(raw;32-k);
+      if(r<(keys.len() as $i64)){cond=(1=0)}
+    };
+    curidx=r
+  };
+  let curword=mut.keys.get(curidx);
+  let result=mut."_";
+  let first=mut.(1=1);
+  let produced=mut.0;
+  lp(produced<count){
+    let nextwords=mut.@($str);
+    lp(let i=0;i<trainwords.len()-1;i=i+1){
+      if(s.eq(trainwords.get(i);curword)){nextwords=nextwords+@(trainwords.get(i+1))}
+    };
+    if(nextwords.len()=0){br};
+    if(first){result=curword;first=(1=0)}el{result=s.concat(result;s.concat("_";curword))};
+    produced=produced+1;
+    let k=bitlen(nextwords.len() as $i64);
+    let r=mut.0;
+    let cond=mut.(1=1);
+    lp(cond){
+      if(mtidx>=624){mtstate=genrand(mtstate;mtidx);mtidx=0};
+      let raw=temper(mtstate.get(mtidx));
+      mtidx=mtidx+1;
+      r=shr(raw;32-k);
+      if(r<(nextwords.len() as $i64)){cond=(1=0)}
+    };
+    curword=nextwords.get(r)
+  };
+  io.println(result);
+  <0
+}

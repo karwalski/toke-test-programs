@@ -1,0 +1,16 @@
+m=extract;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+f=firstquote(text:$str;from:$i64):$i64{
+    let n=s.len(text);
+    lp(let i=from;i<n;i=i+1){
+        let ch=s.slice(text;i;i+1);
+        if(s.eq(ch;"_")){<i};
+        if(s.eq(ch;"_""_"/tmp/routes.js"_"const express = require('express');\nconst app = express();\n\n"_"app.get('/api/users', function(req, res) {\n    res.send('users');\n});\n\napp.post('/api/users', function(req, res) {\n    res.send('created');\n});\n\napp.delete('/api/users/:id', function(req, res) {\n    res.send('deleted');\n});\n"_"/tmp/routes.js"_"/tmp/app.py"_"from flask import Flask\napp = Flask(__name__)\n\n@app.route('/')\ndef index():\n    return 'Hello'\n\n@app.route('/users', methods=['GET', 'POST'])\ndef users():\n    return 'users'\n"_"/tmp/app.py"_"\n"_"get"_"post"_"put"_"delete"_"patch"_"GET"_"POST"_"PUT"_"DELETE"_"PATCH"_"express"_"."_"("_"flask"_"@app.route"_"methods"_"GET"_" "_" "_""_" "_"\n")};
+            out=s.concat(out;key);
+        };
+    };
+    io.println(out);
+    <0
+};

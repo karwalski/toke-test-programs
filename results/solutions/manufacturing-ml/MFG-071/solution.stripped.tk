@@ -1,0 +1,9 @@
+m=plan;
+i=io:std.io;
+i=s:std.str;
+f=code(lot:$i64):$str{if(lot<=8){<"_"};if(lot<=25){<"_"};if(lot<=50){<"_"};if(lot<=90){<"_"};if(lot<=150){<"_"};if(lot<=280){<"_"};if(lot<=500){<"_"};if(lot<=1200){<"_"};if(lot<=3200){<"_"};if(lot<=10000){<"_"};if(lot<=35000){<"_"};if(lot<=150000){<"_"};if(lot<=500000){<"_"};<"_"};
+f=ssize(c:$str):$i64{if(s.equals(c;"_")){<2};if(s.equals(c;"_")){<3};if(s.equals(c;"_")){<5};if(s.equals(c;"_")){<8};if(s.equals(c;"_")){<13};if(s.equals(c;"_")){<20};if(s.equals(c;"_")){<32};if(s.equals(c;"_")){<50};if(s.equals(c;"_")){<80};if(s.equals(c;"_")){<125};if(s.equals(c;"_")){<200};if(s.equals(c;"_")){<315};if(s.equals(c;"_")){<500};<800};
+f=main():$i64{let lot=mut.0;let aql=mut."_";lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);let parts=s.split(t;"_");if(parts.len()>=2){let k=parts.get(0);let v=parts.get(1);if(s.equals(k;"_")){lot=s.toint(v)};if(s.equals(k;"_")){aql=v}}};
+let c=code(lot);let n=mut.ssize(c);let accept=mut.0;let reject=mut.1;
+if(s.equals(c;"_")){if(s.equals(aql;"_")){n=80;accept=2;reject=3}};
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("_"sample_size\"_";s.fromint(n));"_"accept_number\"_");s.fromint(accept));"_"reject_number\"_");s.fromint(reject));"_"));<0}

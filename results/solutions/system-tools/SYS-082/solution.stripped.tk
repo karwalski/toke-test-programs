@@ -1,0 +1,94 @@
+m=merge;i=io:std.io;i=s:std.str;
+f=isdigit(c:$str):$bool{<(s.indexof("_";c)>=0)};
+f=matchlen(pat:$str;line:$str):$i64{
+  let pi=mut.0;
+  let li=mut.0;
+  let pn=s.len(pat);
+  let ln=s.len(line);
+  let ok=mut.true;
+  lp(pi<pn){
+    if(!ok){pi=pn}el{
+      let pc=s.slice(pat;pi;pi+1);
+      if(s.equals(pc;"_")){
+        let nc=s.slice(pat;pi+1;pi+2);
+        let count=mut.1;
+        let advance=mut.2;
+        if(pi+2<pn){if(s.equals(s.slice(pat;pi+2;pi+3);"_")){
+          let close=s.indexof(s.slice(pat;pi+2;pn);"_");
+          let numstr=s.slice(pat;pi+3;pi+2+close);
+          count=s.toint(numstr);
+          advance=2+close+1
+        }};
+        if(s.equals(nc;"_")){
+          let matched=mut.0;
+          lp(matched<count){if(li<ln){if(isdigit(s.slice(line;li;li+1))){li=li+1;matched=matched+1}el{ok=false;matched=count}}el{ok=false;matched=count}};
+          pi=pi+advance
+        }el{ok=false;pi=pn}
+      }el{
+        if(li<ln){if(s.equals(s.slice(line;li;li+1);pc)){li=li+1;pi=pi+1}el{ok=false}}el{ok=false}
+      }
+    }
+  };
+  if(ok){<li}el{<0-1}
+};
+f=main():$i64{
+  let raw=io.readln();
+  let pat=s.trim(raw);
+  let all=mut.@($str);
+  lp(1=1){let l=io.readln();if(io.eof()){br};all=all+@(s.trimsuffix(l;"_"))};
+  let tslist=mut.@($str);
+  let blocks=mut.@($str);
+  let order=mut.@($i64);
+  let ord=mut.0;
+  let curHas=mut.false;
+  lp(let i=0;i<all.len();i=i+1){
+    let ln=all.get(i);
+    if(s.equals(ln;"_")){curHas=false}el{
+      let ml=matchlen(pat;ln);
+      if(!(ml<0)){
+        let ts=s.slice(ln;0;ml);
+        tslist=tslist+@(ts);
+        blocks=blocks+@(ln);
+        order=order+@(ord);
+        ord=ord+1;
+        curHas=true
+      }el{
+        if(curHas){
+          let last=blocks.len()-1;
+          let merged=s.concat(s.concat(blocks.get(last);"_");ln);
+          blocks=blocks.set(last;merged)
+        }
+      }
+    }
+  };
+  let uts=mut.@($str);
+  let ublk=mut.@($str);
+  let uord=mut.@($i64);
+  lp(let i=0;i<blocks.len();i=i+1){
+    let dup=mut.false;
+    lp(let j=0;j<ublk.len();j=j+1){if(s.equals(uts.get(j);tslist.get(i))){if(s.equals(ublk.get(j);blocks.get(i))){dup=true}}};
+    if(!dup){uts=uts+@(tslist.get(i));ublk=ublk+@(blocks.get(i));uord=uord+@(order.get(i))}
+  };
+  let cnt=ublk.len();
+  let idx=mut.@($i64);
+  lp(let i=0;i<cnt;i=i+1){idx=idx+@(i)};
+  lp(let a=0;a<cnt;a=a+1){lp(let b=0;b<cnt-1-a;b=b+1){
+    let x=idx.get(b);let y=idx.get(b+1);
+    let swap=mut.false;
+    let cmp=mut.0;
+    if(s.equals(uts.get(x);uts.get(y))){cmp=0}el{if(strlt(uts.get(x);uts.get(y))){cmp=0-1}el{cmp=1}};
+    if(cmp>0){swap=true}el{if(cmp=0){if(uord.get(x)>uord.get(y)){swap=true}}};
+    if(swap){idx=idx.set(b;y);idx=idx.set(b+1;x)}
+  }};
+  let out=mut."_";
+  lp(let i=0;i<cnt;i=i+1){if(i>0){out=s.concat(out;"_")};out=s.concat(out;ublk.get(idx.get(i)))};
+  io.println(out);
+  <0
+};
+f=strlt(a:$str;b:$str):$bool{
+  let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<na){m=nb};
+  let i=mut.0;let res=mut.0;
+  lp(i<m){if(res=0){let ca=charcode(s.slice(a;i;i+1));let cb=charcode(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};
+  if(res<0){<true};if(res>0){<false};<(na<nb)
+};
+f=charcode(c:$str):$i64{let codes="_";let i=s.indexof("_";c);<i};

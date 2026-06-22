@@ -1,0 +1,61 @@
+m=classify;i=io:std.io;i=s:std.str;
+f=checkinvoice(text:$str):$bool{
+  let upper=s.upper(text);
+  let count=mut.0;
+  if(s.contains(upper;"_")){count=count+1};
+  if(s.contains(upper;"_")){count=count+1};
+  if(s.contains(upper;"_")){count=count+1};
+  if(s.contains(upper;"_")){count=count+1};
+  if(s.contains(text;"_")){count=count+1};
+  <(count>=3)
+};
+f=checkletter(text:$str):$bool{
+  let upper=s.upper(text);
+  let count=mut.0;
+  if(s.contains(upper;"_")){count=count+1};
+  if(s.contains(upper;"_")){count=count+1};
+  if(s.contains(text;"_")){count=count+1};
+  if(s.contains(text;"_")){count=count+1};
+  <(count>=2)
+};
+f=classify(text:$str):$str{
+  let isinvoice=checkinvoice(text);
+  let isletter=checkletter(text);
+  let doctype=mut."_";
+  let conf=mut.0.0;
+  let ind=mut.@();
+  let upper=s.upper(text);
+  if(isinvoice){
+    doctype="_";conf=0.98;
+    if(s.contains(upper;"_")){ind=@("_")};
+    if(s.contains(upper;"_")){ind=@("_";"_")};
+    if(s.contains(text;"_")){ind=@("_";"_";"_")};
+    if(s.contains(upper;"_")){ind=@("_";"_";"_";"_")};
+    if(s.contains(upper;"_")){ind=@("_";"_";"_";"_";"_")}
+  }el{
+    if(isletter){
+      doctype="_";conf=0.9;
+      ind=@("_";"_";"_")
+    }
+  };
+  let result=mut."_"document_type\"_""_"\"_"confidence\"_");
+  result=s.concat(result;s.fromfloat(conf));
+  result=s.concat(result;"_"indicators\"_");
+  lp(let idx=0;idx<ind.len();idx=idx+1){
+    if(idx>0){result=s.concat(result;"_")};
+    result=s.concat(result;"_""_"\"_")
+  };
+  result=s.concat(result;"_");
+  <result
+};
+f=main():$i64{
+  let input=mut."_";
+  let first=mut.(1=1);
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    if(first){input=line;first=(1=0)}el{input=s.concat(input;s.concat("_";line))}
+  };
+  io.println(classify(input));
+  <0
+}

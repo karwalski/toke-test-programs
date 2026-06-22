@@ -1,1 +1,63 @@
-m=gridpath;f=solve(p0:$str;p1:$str):$str{let head=mut.0;let body=mut.0;let food=mut.@();let gridrows=p0.split("\n");let grid=mut.@();lp(let i=0;i<gridrows.len;i=i+1){let row=gridrows.get(i);let cells=row.split(" ");lp(let j=0;j<cells.len;j=j+1){let cell=cells.get(j);if(cell="H"){head=cell};if(cell="B"){body=cell};if(cell="F"){food=food+@(cell)};};};let result=mut."";let visited=mut.@();lp(let i=0;i<food.len;i=i+1){let f=food.get(i);let path=mut."";let current=mut.head;let steps=mut.0;lp(let j=0;j<100;j=j+1){if(current=f){path=s.concat(path;"F");steps=steps+1;current=current;};if(current=f){br};if(current=f){br};if(current=f){br};if(current=f){br};if(current=f){br};if(current
+m=gridpath;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let n=s.toint(s.trim(io.readln()));
+let foodR=mut.@();let foodC=mut.@();
+let bodyR=mut.@();let bodyC=mut.@();
+let hr=mut.0;let hc=mut.0;
+lp(let r=0;r<n;r=r+1){let row=s.trim(io.readln());lp(let c=0;c<n;c=c+1){let cell=s.slice(row;c;c+1);if(cell="H"){hr=r;hc=c};if(cell="B"){bodyR=bodyR+@(r);bodyC=bodyC+@(c)};if(cell="F"){foodR=foodR+@(r);foodC=foodC+@(c)}}};
+let cmd=s.trim(io.readln());
+let nfood=foodR.len();
+let nbody=bodyR.len();
+let ordR=mut.@();let ordC=mut.@();
+let usedB=mut.@();lp(let i=0;i<nbody;i=i+1){usedB=usedB+@(0)};
+let curR=mut.hr;let curC=mut.hc;
+lp(let step=0;step<nbody;step=step+1){
+let dr=mut.@();dr=dr+@(0-1);dr=dr+@(1);dr=dr+@(0);dr=dr+@(0);
+let dc=mut.@();dc=dc+@(0);dc=dc+@(0);dc=dc+@(0-1);dc=dc+@(1);
+let found=mut.0-1;
+lp(let d=0;d<4;d=d+1){if(found<0){let nr=curR+dr.get(d);let nc=curC+dc.get(d);lp(let b=0;b<nbody;b=b+1){if(found<0){if(usedB.get(b)=0){if(bodyR.get(b)=nr){if(bodyC.get(b)=nc){found=b}}}}}}};
+if(found>=0){usedB=usedB.set(found;1);ordR=ordR+@(bodyR.get(found));ordC=ordC+@(bodyC.get(found));curR=bodyR.get(found);curC=bodyC.get(found)}
+};
+let targetMask=mut.0;lp(let i=0;i<nfood;i=i+1){targetMask=targetMask+pow2(i)};
+let initMask=mut.0;lp(let i=0;i<nfood;i=i+1){if(foodR.get(i)=hr){if(foodC.get(i)=hc){initMask=initMask+pow2(i)}}};
+let initHead=hr*n+hc;
+let initBody=encbody2(ordR;ordC;nbody;n);
+let qHead=mut.@();qHead=qHead+@(initHead);
+let qBody=mut.@();qBody=qBody+@(initBody);
+let qMask=mut.@();qMask=qMask+@(initMask);
+let qPath=mut.@();qPath=qPath+@("");
+let vis=mut.@();vis=vis+@(visKey(initHead;initBody;initMask));
+let qi=mut.0;
+let answer=mut."No solution";
+lp(qi<qHead.len()){
+let chead=qHead.get(qi);let cbodyS=qBody.get(qi);let cmask=qMask.get(qi);let cpath=qPath.get(qi);
+qi=qi+1;
+if(cmask=targetMask){answer=cpath;br}el{
+let chr=chead/n;let chc=chead-chr*n;
+let dr=mut.@();dr=dr+@(0-1);dr=dr+@(1);dr=dr+@(0);dr=dr+@(0);
+let dc=mut.@();dc=dc+@(0);dc=dc+@(0);dc=dc+@(0-1);dc=dc+@(1);
+let dch=mut.@();dch=dch+@("U");dch=dch+@("D");dch=dch+@("L");dch=dch+@("R");
+lp(let d=0;d<4;d=d+1){
+let nhr=chr+dr.get(d);let nhc=chc+dc.get(d);
+if(nhr>=0){if(nhr<n){if(nhc>=0){if(nhc<n){
+let collide=inbody(cbodyS;nhr*n+nhc);
+if(!collide){
+let nbodyS=movebody(cbodyS;chead);
+let nmask=mut.cmask;
+lp(let fi=0;fi<nfood;fi=fi+1){if(foodR.get(fi)=nhr){if(foodC.get(fi)=nhc){nmask=orbit(nmask;fi)}}};
+let nhead=nhr*n+nhc;
+let key=visKey(nhead;nbodyS;nmask);
+if(!seen(vis;key)){vis=vis+@(key);qHead=qHead+@(nhead);qBody=qBody+@(nbodyS);qMask=qMask+@(nmask);qPath=qPath+@(s.concat(cpath;dch.get(d)))}
+}
+}}}}
+}
+}
+};
+io.println(answer);<0};
+f=pow2(e:$i64):$i64{let v=mut.1;lp(let i=0;i<e;i=i+1){v=v*2};<v};
+f=orbit(m:$i64;b:$i64):$i64{let bit=pow2(b);let q=m/bit;let has=q-q/2*2;if(has=1){<m};<m+bit};
+f=encbody2(ordR:@($i64);ordC:@($i64);len:$i64;n:$i64):$str{let outb=mut."";lp(let i=0;i<len;i=i+1){outb=s.concat(outb;s.concat(s.fromint(ordR.get(i)*n+ordC.get(i));","))};<outb};
+f=inbody(b:$str;cell:$i64):$bool{let tok=s.concat(s.fromint(cell);",");let padded=s.concat(",";b);let target=s.concat(",";tok);<s.contains(padded;target)};
+f=movebody(b:$str;headcell:$i64):$str{let parts=s.split(b;",");let cnt=mut.0;lp(let i=0;i<parts.len();i=i+1){if(s.len(parts.get(i))>0){cnt=cnt+1}};if(cnt=0){<""};let outb=mut.s.concat(s.fromint(headcell);",");lp(let i=0;i<cnt-1;i=i+1){outb=s.concat(outb;s.concat(parts.get(i);","))};<outb};
+f=visKey(head:$i64;body:$str;mask:$i64):$str{<s.concat(s.fromint(head);s.concat("|";s.concat(body;s.concat("|";s.fromint(mask)))))};
+f=seen(vis:@($str);key:$str):$bool{lp(let i=0;i<vis.len();i=i+1){if(vis.get(i)=key){<true}};<false};

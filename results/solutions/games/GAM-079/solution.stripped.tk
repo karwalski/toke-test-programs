@@ -1,0 +1,17 @@
+m=ld;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let bid=s.split(s.trim(io.readln());"_");
+  let bc=s.toint(bid.get(0));
+  let bf=s.toint(bid.get(1));
+  let actual=mut.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){br};
+    let dice=s.split(t;"_");
+    lp(let i=0;i<dice.len();i=i+1){let d=s.toint(dice.get(i));if(d=bf){actual=actual+1}}
+  };
+  if(actual>=bc){io.println(s.concat("_";s.fromint(actual)))}el{io.println(s.concat("_";s.fromint(actual)))};
+  <0
+}

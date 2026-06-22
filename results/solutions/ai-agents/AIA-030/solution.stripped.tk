@@ -1,0 +1,18 @@
+m=ragconfig;i=io:std.io;i=s:std.str;
+f=intfield(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("_""_"\"_");let start=s.indexof(obj;pat);if(start<0){<0};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."_";let neg=mut."_";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"_")&&s.len(num)=0){neg="_"}el{if(s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}}};if(s.len(num)=0){<0};<s.toint(s.concat(neg;num))};
+f=strfield(obj:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=main():$i64{let input=io.readln();
+let cs=intfield(input;"_");let ov=intfield(input;"_");let ed=intfield(input;"_");let tk=intfield(input;"_");let mc=intfield(input;"_");let model=strfield(input;"_");
+let errors=mut.@();let warnings=mut.@();
+if(ov>=cs){errors=errors+@(s.concat(s.concat(s.concat(s.concat("_";s.fromint(ov));"_");s.fromint(cs));"_"))};
+if(cs<=0){errors=errors+@("_")};
+if(ov<0){errors=errors+@("_")};
+if(ed<=0){errors=errors+@("_")};
+if(tk<=0){errors=errors+@("_")};
+if(mc<=0){errors=errors+@("_")};
+if(s.len(s.trim(model))=0){errors=errors+@("_")};
+let valid=mut."_";if(errors.len()>0){valid="_"};
+if(errors.len()=0){if(tk*cs>mc){warnings=warnings+@(s.concat(s.concat(s.concat("_";s.fromint(tk));"_");s.concat(s.fromint(cs);"_")))}};
+let es=mut."_";lp(let i=0;i<errors.len();i=i+1){if(i>0){es=s.concat(es;"_")};es=s.concat(s.concat(s.concat(es;"_""_"\"_")};
+let ws=mut."_";lp(let i=0;i<warnings.len();i=i+1){if(i>0){ws=s.concat(ws;"_")};ws=s.concat(s.concat(s.concat(ws;"_""_"\"_")};
+let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("_"valid\"_";valid);"_"errors\"_");es);"_"warnings\"_");ws);"_");io.println(out);<0}

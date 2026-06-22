@@ -1,0 +1,84 @@
+m=detectlang;
+i=io:std.io;
+i=s:std.str;
+
+f=extractcode(input:$str):$str{
+  let start=s.indexof(input;"_"code\"_""_""_"\"_");
+    if(pos<0){br};
+    let realpos=searchfrom+pos;
+    if(realpos>codestart){
+      let prev=s.slice(input;realpos-1;realpos);
+      if(prev!="_"){
+        endpos=realpos;
+        br
+      }
+    };
+    searchfrom=realpos+1
+  };
+  let code=s.slice(input;codestart;endpos);
+  let result=mut.s.replace(code;"_";"_");
+  result=s.replace(result;"_""_"\"_");
+  result=s.replace(result;"_";"_");
+  <result
+};
+
+f=rustscore(code:$str):$i64{
+  let score=mut.0;
+  if(s.contains(code;"_")){score=score+1};
+  if(s.contains(code;"_")){score=score+1};
+  if(s.contains(code;"_")){score=score+1};
+  <score
+};
+f=pyscore(code:$str):$i64{
+  let score=mut.0;
+  if(s.contains(code;"_")){score=score+1};
+  if(s.contains(code;"_")){score=score+1};
+  if(s.contains(code;"_""_"\n    "_"#include"_"printf"_"{"_"func "_"fmt."_"{"_""_"fn "_"\"_""_"println!"_",\"_""_"{"_",\"_""_""_"def "_"\"_""_":"_",\"_""_"f\"_")){out=s.concat(out;"_"f-string\"_")};
+  if(s.contains(code;"_")){out=s.concat(out;"_"indentation\"_")};
+  <out
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let code=extractcode(input);
+
+  let rs=rustscore(code);
+  let ps=pyscore(code);
+  let cs=cscore(code);
+  let gs=goscore(code);
+
+  let bestscore=mut.0;
+  let bestlang=mut."_";
+  let besttotal=mut.0;
+  let bestind=mut."_";
+
+  if(s.contains(input;"_"rust\"_")){
+    if(rs>bestscore){bestscore=rs;bestlang="_";besttotal=3;bestind=rustind(code)}
+  };
+  if(s.contains(input;"_"python\"_")){
+    if(ps>bestscore){bestscore=ps;bestlang="_";besttotal=4;bestind=pyind(code)}
+  };
+  if(s.contains(input;"_"c\"_")){
+    if(cs>bestscore){bestscore=cs;bestlang="_";besttotal=3;bestind="_"}
+  };
+  if(s.contains(input;"_"go\"_")){
+    if(gs>bestscore){bestscore=gs;bestlang="_";besttotal=3;bestind="_"}
+  };
+
+  let confidence=mut.0.5;
+  if(besttotal>0){
+    if(bestscore=besttotal){
+      if(bestlang="_"){confidence=0.98}el{confidence=0.95}
+    }
+  };
+
+  let confstr=s.fromfloat(confidence);
+  let output=mut.s.concat("_"language\"_""_"\"_"confidence\"_");
+  output=s.concat(output;confstr);
+  output=s.concat(output;"_"indicators\"_");
+  output=s.concat(output;bestind);
+  output=s.concat(output;"_");
+
+  io.println(output);
+  <0
+}

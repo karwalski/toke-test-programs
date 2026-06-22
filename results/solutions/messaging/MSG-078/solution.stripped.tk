@@ -1,0 +1,9 @@
+m=msgsize;i=io:std.io;i=s:std.str;
+f=getInt(raw:$str;key:$str):$i64{let k=s.indexof(raw;key);let co=s.indexof(s.slice(raw;k;s.len(raw));"_");let start=k+co+1;let n=s.len(raw);let e=mut.start;lp(e<n){let ch=s.slice(raw;e;e+1);if(s.eq(ch;"_")||s.eq(ch;"_")){br};e=e+1};<s.toint(s.trim(s.slice(raw;start;e)))};
+f=main():$i64{let cfg=s.trim(io.readln());let msg=s.trim(io.readln());let hb=getInt(cfg;"_"header_bytes\"_");let eb=getInt(cfg;"_"encryption_block\"_");let fo=getInt(cfg;"_"frame_overhead\"_");let payload=s.len(msg);let pad=mut.0;if(eb>0){let rem=payload-(payload/eb*eb);if(!(rem=0)){pad=eb-rem}};let total=payload+pad+hb+fo;let overhead=((total-payload) as $f64)/(total as $f64)*100.0;
+io.println(s.concat("_";s.concat(s.fromint(payload);"_")));
+io.println(s.concat("_";s.concat(s.fromint(pad);s.concat("_";s.concat(s.fromint(eb);"_")))));
+io.println(s.concat("_";s.concat(s.fromint(hb);"_")));
+io.println(s.concat("_";s.concat(s.fromint(fo);"_")));
+io.println(s.concat("_";s.concat(s.fromint(total);"_")));
+io.println(s.concat("_";s.concat(s.format(overhead;"_");"_")));<0}

@@ -1,0 +1,38 @@
+m=rankfeatures;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmtg(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=mut.v*1000000.0+0.5;let si=scaled as $i64;let ip=si/1000000;let fp=si%1000000;let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("_";fs)};let end=mut.6;lp(end>1){let last=s.slice(fs;end-1;end);if(s.eq(last;"_")){end=end-1}el{br}};fs=s.slice(fs;0;end);let r=mut.s.concat(s.concat(s.fromint(ip);"_");fs);if(neg){r=s.concat("_";r)};<r};
+f=main():$i64{
+let lines=mut.@("_");lines=@();
+lp(1=1){if(io.eof()){br};let l=s.trim(io.readln());if(s.len(l)>0){lines=lines+@(l)}};
+let headers=s.split(lines.get(0);"_");
+let nfeat=headers.len()-1;
+let nrows=lines.len()-1;
+# build target array
+let target=mut.@(0.0);target=@();
+lp(let r=1;r<lines.len();r=r+1){let cols=s.split(lines.get(r);"_");target=target+@(s.tofloat(cols.get(cols.len()-1)))};
+let meant=mut.0.0;lp(let r=0;r<nrows;r=r+1){meant=meant+target.get(r)};meant=meant/(nrows as $f64);
+let names=mut.@("_");names=@();
+let corrs=mut.@(0.0);corrs=@();
+lp(let f=0;f<nfeat;f=f+1){
+let xs=mut.@(0.0);xs=@();
+lp(let r=1;r<lines.len();r=r+1){let cols=s.split(lines.get(r);"_");xs=xs+@(s.tofloat(cols.get(f)))};
+let meanx=mut.0.0;lp(let r=0;r<nrows;r=r+1){meanx=meanx+xs.get(r)};meanx=meanx/(nrows as $f64);
+let num=mut.0.0;let ssx=mut.0.0;let ssy=mut.0.0;
+lp(let r=0;r<nrows;r=r+1){let dx=xs.get(r)-meanx;let dy=target.get(r)-meant;num=num+dx*dy;ssx=ssx+dx*dx;ssy=ssy+dy*dy};
+let den=math.sqrt(ssx*ssy);
+let c=mut.0.0;if(den!=0.0){c=num/den};
+names=names+@(headers.get(f));corrs=corrs+@(c);
+};
+# stable sort desc by corr
+let used=mut.@(false);used=@();lp(let f=0;f<nfeat;f=f+1){used=used+@(false)};
+let out=mut."_"rankings\"_";
+lp(let k=0;k<nfeat;k=k+1){
+let best=mut.0-1;
+lp(let f=0;f<nfeat;f=f+1){if(used.get(f)=false){if(best<0){best=f}el{if(corrs.get(f)>corrs.get(best)){best=f}}}};
+used=used.set(best;true);
+if(k>0){out=s.concat(out;"_")};
+out=s.concat(out;s.concat(s.concat("_"feature\"_""_"\"_"correlation\"_"));
+out=s.concat(out;s.concat(fmtg(corrs.get(best));"_"));
+};
+out=s.concat(out;"_");
+io.println(out);
+<0}

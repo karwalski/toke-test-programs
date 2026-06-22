@@ -1,0 +1,21 @@
+m=claim;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let parts=s.split(line;"_");
+  let damage=s.tofloat(parts.get(0));
+  let deductible=s.tofloat(parts.get(1));
+  let limit=s.tofloat(parts.get(2));
+  let copaypct=s.tofloat(parts.get(3));
+  let afterded=mut.damage-deductible;
+  if(afterded<0.0){afterded=0.0};
+  let covered=mut.afterded;
+  if(covered>limit){covered=limit};
+  let copay=covered*copaypct;
+  let insurer=covered-copay;
+  let claimant=deductible+copay;
+  io.println(s.format(claimant;"_"));
+  io.println(s.format(insurer;"_"));
+  <0
+}

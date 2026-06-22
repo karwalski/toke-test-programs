@@ -1,1 +1,31 @@
-m=gradesc;i=io:std.io;i=s:std.str;i=math:std.math;f=poly(x:$f64;a:$f64;b:$f64;c:$f64):$f64{<a*x*x+b*x+c};f=polyder(x:$f64;a:$f64;b:$f64):$f64{<2.0*a*x+b};f=absf(x:$f64):$f64{if(x<0.0){<0.0-x};<x};f=main():$i64{let line1=io.readln();let parts1=s.split(line1;" ");let a=s.tofloat(parts1.get(0));let b=s.tofloat(parts1.get(1));let c=s.tofloat(parts1.get(2));let x=mut.s.tofloat(io.readln());let lr=s.tofloat(io.readln());let tol=s.tofloat(io.readln());let maxiter=s.toint(io.readln());let iter=mut.0;lp(iter<maxiter){let grad=polyder(x;a;b);let newx=x-lr*grad;let fx=poly(newx;a;b;c);io.println(s.concat("Iteration ";s.concat(s.fromint(iter+1);s.concat(": x=";s.concat(s.format(newx;"%.6f");s.concat(" f(x)=";s.format(fx;"%.6f")))))));let diff=absf(newx-x);x=newx;if(diff<tol){br};iter=iter+1};let fx=poly(x;a;b;c);io.println(s.concat("Minimum: x=";s.concat(s.format(x;"%.6f");s.concat(" f(x)=";s.format(fx;"%.6f")))));<0}
+m=gradesc;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmtfix6(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=mut.v*1000000.0+0.5;let si=scaled as $i64;let ip=si/1000000;let fp=si%1000000;let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("0";fs)};let r=mut.s.concat(s.concat(s.fromint(ip);".");fs);if(neg){r=s.concat("-";r)};<r};
+f=main():$i64{
+let coefs=mut.@(0.0);coefs=@();
+let cline=s.split(s.trim(io.readln());" ");
+lp(let i=0;i<cline.len();i=i+1){let t=s.trim(cline.get(i));if(s.len(t)>0){coefs=coefs+@(s.tofloat(t))}};
+let nc=coefs.len();
+let x=mut.s.tofloat(s.trim(io.readln()));
+let lr=s.tofloat(s.trim(io.readln()));
+let tol=s.tofloat(s.trim(io.readln()));
+let maxiter=s.toint(s.trim(io.readln()));
+let diverged=mut.false;
+let it=mut.1;
+lp(it<=maxiter){
+# grad and fx
+let g=mut.0.0;let fx=mut.0.0;
+lp(let i=0;i<nc;i=i+1){let xp=mut.1.0;lp(let k=0;k<i;k=k+1){xp=xp*x};fx=fx+coefs.get(i)*xp};
+lp(let i=1;i<nc;i=i+1){let xp=mut.1.0;lp(let k=0;k<i-1;k=k+1){xp=xp*x};g=g+(i as $f64)*coefs.get(i)*xp};
+io.println(s.concat(s.concat(s.concat("Iter ";s.fromint(it));s.concat(": x=";fmtfix6(x)));s.concat(s.concat(" f(x)=";fmtfix6(fx));s.concat(" grad=";fmtfix6(g)))));
+let ag=mut.g;if(ag<0.0){ag=0.0-ag};
+if(ag<tol){br};
+let xnew=x-lr*g;
+let axn=mut.xnew;if(axn<0.0){axn=0.0-axn};
+if(axn<1000000000000.0){x=xnew}el{diverged=true;br};
+it=it+1;
+};
+if(diverged){io.println("DIVERGED")}el{
+let fx=mut.0.0;lp(let i=0;i<nc;i=i+1){let xp=mut.1.0;lp(let k=0;k<i;k=k+1){xp=xp*x};fx=fx+coefs.get(i)*xp};
+io.println(s.concat(s.concat("Minimum: x=";fmtfix6(x));s.concat(" f(x)=";fmtfix6(fx))));
+};
+<0}

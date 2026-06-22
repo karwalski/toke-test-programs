@@ -41,13 +41,24 @@ f=checkreqs(prereqs:@($str);completed:@($str)):$bool{
 };
 f=main():$i64{
   let line=io.readln();
-  let parts=s.split(line;":");
-  if(parts.len()<2){
-    <0
-  };
-  let topicspart=parts.get(1);
-  let topicstrs=s.split(topicspart;"{");
+  let topicstrs=s.split(line;"{");
   let completed=mut.@();
+  let cidx=mut.1;
+  lp(cidx<topicstrs.len()){
+    let topic=topicstrs.get(cidx);
+    let idstart=s.split(topic;"\"id\":\"");
+    if(idstart.len()>=2){
+      let idpart=idstart.get(1);
+      let idend=s.split(idpart;"\"");
+      if(idend.len()>=1){
+        let topicid=idend.get(0);
+        if(s.contains(topic;"\"completed\":true")){
+          completed=completed+@(topicid)
+        }
+      }
+    };
+    cidx=cidx+1
+  };
   let available=mut.@();
   let idx=mut.1;
   lp(idx<topicstrs.len()){
@@ -74,9 +85,7 @@ f=main():$i64{
                 prereqs=parsepreqs(prereqstr)
               }
             };
-            if(s.contains(topic;"\"completed\":true")){
-              completed=completed+@(topicid)
-            }el{
+            if(s.contains(topic;"\"completed\":true")=(1=0)){
               if(checkreqs(prereqs;completed)){
                 available=available+@(title)
               }

@@ -1,1 +1,57 @@
-m=healthcheck;f=checkfile(file:$str):$str{let exists=mut."false";let size=mut.0;let handle=mut."";let result=mut."false";let msg=mut."";let code=mut.0;let ok=mut.false;let found=mut.false;let count=mut.0;let i=mut.0;let j=mut.0;let innerok=mut.false;let outerok=mut.false;let innercount=mut.0;let outercount=mut.0;let innerfound=mut.false;let outerfound=mut.false;let innerok2=mut.false;let outerok2=mut.false;let innercount2=mut.0;let outercount2=mut.0;let innerfound2=mut.false;let outerfound2=mut.false;let innerok3=mut.false;let outerok3=mut.false;let innercount3=mut.0;let outercount3=mut.0;let innerfound3=mut.false;let outerfound3=mut.false;let innerok4=mut.false;let outerok4=mut.false;let innercount4=mut.
+m=healthcheck;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;i=process:std.process;
+f=hasenv(name:$str):$bool{
+  <mt env.get(name){
+    $str:v (1=1);
+    EnvErr:e (1=0)
+  }
+};
+f=procrunning(name:$str):$bool{
+  let out=mt process.spawn(@("/usr/bin/pgrep";"-f";name)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  };
+  <(s.len(s.trim(out))>0)
+};
+f=main():$i64{
+  let passed=mut.0;
+  let total=mut.0;
+  lp(io.eof()=(1=0)){
+    let raw=io.readln();
+    if(io.eof()){if(s.len(raw)=0){br}};
+    let line=s.trim(raw);
+    if(s.len(line)>0){
+      let sp=s.indexof(line;" ");
+      if(sp>0){
+        let ctype=s.slice(line;0 as $u64;sp as $u64);
+        let cname=s.slice(line;(sp+1) as $u64;s.len(line));
+        total=total+1;
+        let success=mut.(1=0);
+        if(s.eq(ctype;"file")){success=file.exists(cname)}
+        el{if(s.eq(ctype;"proc")){success=procrunning(cname)}
+        el{if(s.eq(ctype;"env")){success=hasenv(cname)}
+        el{if(s.eq(ctype;"port")){success=(1=0)}}}};
+        let label=s.concat(s.concat(ctype;" ");cname);
+        if(success){
+          io.println(s.concat("PASS ";label));
+          passed=passed+1
+        }el{
+          io.println(s.concat("FAIL ";label))
+        }
+      }
+    }
+  };
+  let stat=mut."HEALTHY";
+  if(passed!=total){stat="UNHEALTHY"};
+  let outline=mut."";
+  outline=s.concat(outline;stat);
+  outline=s.concat(outline;" (");
+  outline=s.concat(outline;s.fromint(passed));
+  outline=s.concat(outline;"/");
+  outline=s.concat(outline;s.fromint(total));
+  outline=s.concat(outline;" checks passed)");
+  io.println(outline);
+  <0
+}

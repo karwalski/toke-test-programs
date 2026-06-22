@@ -1,1 +1,62 @@
-m=main;f=solve(p0:$str):bool{let len=p0.len;let found=mut.false;lp(let i=0;i<len;i=i+1){let ch=p0.get(i);if(ch=" "){let j=i+1;lp(let k=j;k<len;k=k+1){let c=p0.get(k);if(!(c=" ")){if(!(c="\n")){if(!(c="\r")){found=true}}}}}}};<found};f=main():$void{let input=mut."";let c=mut.std.io.stdin.read();lp(let i=0;!(c=0);i=i+1){input=input+std.io.stdin.read();c=std.io.stdin.read();};let output=solve(input);if(output){std.io.stdout.write("sensitive data detected");}el{std.io.stdout.write("no sensitive data detected");};};
+m=scan;i=io:std.io;i=s:std.str;
+f=isdigit(c:$str):$bool{<s.indexof("0123456789";c)>=0};
+f=charat(strv:$str;i:$i64):$str{<s.slice(strv;i as $u64;(i+1) as $u64)};
+f=hascc(body:$str):$bool{
+  let n=s.len(body) as $i64;
+  let i=mut.0;
+  let found=mut.(1=0);
+  lp(i<n){
+    if(found=(1=0)){
+      if(isdigit(charat(body;i))){
+        let run=mut.0;
+        let j=mut.i;
+        lp(j<n){if(isdigit(charat(body;j))){run=run+1;j=j+1}el{br}};
+        if(run>=13){if(run<=16){found=(1=1)}};
+        i=j
+      }el{i=i+1}
+    }el{i=i+1}
+  };
+  <found
+};
+f=hasssn(body:$str):$bool{
+  let n=s.len(body) as $i64;
+  let i=mut.0;
+  let found=mut.(1=0);
+  lp(i<=n-11){
+    if(found=(1=0)){
+      let ok=mut.(1=1);
+      lp(let k=0;k<3;k=k+1){if(isdigit(charat(body;i+k))=(1=0)){ok=(1=0)}};
+      if(s.eq(charat(body;i+3);"-")=(1=0)){ok=(1=0)};
+      lp(let k=4;k<6;k=k+1){if(isdigit(charat(body;i+k))=(1=0)){ok=(1=0)}};
+      if(s.eq(charat(body;i+6);"-")=(1=0)){ok=(1=0)};
+      lp(let k=7;k<11;k=k+1){if(isdigit(charat(body;i+k))=(1=0)){ok=(1=0)}};
+      if(ok){found=(1=1)}
+    };
+    i=i+1
+  };
+  <found
+};
+f=hasemail(body:$str):$bool{
+  let at=s.indexof(body;"@");
+  if(at<0){<(1=0)};
+  let rest=s.slice(body;(at+1) as $u64;s.len(body));
+  <s.contains(rest;".")
+};
+f=main():$i64{
+  let lines=mut.@($str);
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    lines=lines+@(line)
+  };
+  if(lines.len()<1){<0};
+  let body=mut."";
+  lp(let i=1;i<lines.len();i=i+1){
+    if(i>1){body=s.concat(body;"\n")};
+    body=s.concat(body;lines.get(i))
+  };
+  if(hascc(body)){io.println("credit_card");<0};
+  if(hasssn(body)){io.println("ssn");<0};
+  if(hasemail(body)){io.println("email");<0};
+  <0
+}

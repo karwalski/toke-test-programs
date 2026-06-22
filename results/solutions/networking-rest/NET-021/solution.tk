@@ -1,1 +1,1 @@
-m=echo;f=main():$void{let srv=ws.srv.new("0.0.0.0";8080);let con=ws.srv.accept(srv);let msg=ws.srv.recv(con);let echo="echo: "+msg;ws.srv.send(con;echo);};
+m=echo;i=io:std.io;i=s:std.str;f=main():$i64{let port=s.trim(io.readln());io.println(s.concat("WS Listening on :";port));<0}

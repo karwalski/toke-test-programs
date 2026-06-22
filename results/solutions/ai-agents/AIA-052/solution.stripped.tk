@@ -1,0 +1,12 @@
+m=actions;i=io:std.io;i=s:std.str;
+f=jstr(v:$str):$str{<s.concat("_""_"\"_"))};
+f=main():$i64{let items=mut."_";let first=mut.true;
+lp(1=1){if(io.eof()){br};let raw=io.readln();let line=s.trim(raw);if(s.len(line)=0){br};
+ if(s.startswith(line;"_")){let body=s.trim(s.slice(line;1;s.len(line)));
+  let sp=s.indexof(body;"_");if(sp>0){let assignee=s.slice(body;0;sp);let rest=s.slice(body;sp+1;s.len(body));
+   let assignee2=mut.assignee;let task=mut."_";let deadline=mut."_";let hasDeadline=mut.false;let matched=mut.false;
+   if(s.startswith(rest;"_")){matched=true;let r2=s.slice(rest;5;s.len(rest));let bi=s.indexof(r2;"_");if(bi>=0){task=s.slice(r2;0;bi);deadline=s.slice(r2;bi+4;s.len(r2));hasDeadline=true}el{task=r2}}
+   el{if(s.startswith(rest;"_")){matched=true;let r2=s.slice(rest;9;s.len(rest));let bi=s.indexof(r2;"_");if(bi>=0){task=s.slice(r2;0;bi);deadline=s.concat("_";s.slice(r2;bi+8;s.len(r2)));hasDeadline=true}el{task=r2}}
+   el{if(s.startswith(rest;"_")){matched=true;task=s.slice(rest;3;s.len(rest))}}};
+   if(matched){let dl=mut."_";if(hasDeadline){dl=jstr(s.trim(deadline))};let obj=s.concat("_"assignee\"_";s.concat(jstr(assignee2);s.concat("_"task\"_";s.concat(jstr(s.trim(task));s.concat("_"deadline\"_";s.concat(dl;"_"))))));if(first){items=obj;first=false}el{items=s.concat(items;s.concat("_";obj))}}}}};
+io.println(s.concat("_";s.concat(items;"_")));<0}

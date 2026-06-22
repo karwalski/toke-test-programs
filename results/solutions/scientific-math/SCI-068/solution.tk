@@ -1,1 +1,35 @@
-m=spline;i=io:std.io;i=s:std.str;i=math:std.math;f=gauss(a:@(@($f64));b:@($f64);n:$i64):@($f64){let x=mut.@($f64);let idx=mut.0;lp(idx<n){x=x.push(0.0);idx=idx+1};idx=0;lp(idx<n){let maxrow=mut.idx;let jdx=mut.idx+1;lp(jdx<n){if(math.abs(a.get(jdx).get(idx))>math.abs(a.get(maxrow).get(idx))){maxrow=jdx};jdx=jdx+1};if(maxrow!=idx){let kdx=mut.0;lp(kdx<n){let temp=a.get(idx).get(kdx);a.get(idx).set(kdx;a.get(maxrow).get(kdx));a.get(maxrow).set(kdx;temp);kdx=kdx+1};let temp=b.get(idx);b.set(idx;b.get(maxrow));b.set(maxrow;temp)};let kdx=mut.idx+1;lp(kdx<n){let factor=a.get(kdx).get(idx)/a.get(idx).get(idx);let ldx=mut.idx;lp(ldx<n){a.get(kdx).set(ldx;a.get(kdx).get(ldx)-factor*a.get(idx).get(ldx));ldx=ldx+1};b.set(kdx;b.get(kdx)-factor*b.get(idx));kdx=kdx+1};idx=idx+1};idx=n-1;lp(idx>=0){let sum=mut.0.0;let jdx=mut.idx+1;lp(jdx<n){sum=sum+a.get(idx).get(jdx)*x.get(jdx);jdx=jdx+1};x.set(idx;(b.get(idx)-sum)/a.get(idx).get(idx));idx=idx-1};<x};f=splineeval(xvals:@($f64);yvals:@($f64);coeffs:@($f64);query:$f64):$f64{let n=xvals.len();let idx=mut.0;lp(idx<n-1){if(query>=xvals.get(idx)){if(query<=xvals.get(idx+1)){let h=xvals.get(idx+1)-xvals.get(idx);let t=(query-xvals.get(idx))/h;let a=yvals.get(idx);let b=(yvals.get(idx+1)-yvals.get(idx))/h-h*(2.0*coeffs.get(idx)+coeffs.get(idx+1))/6.0;let c=coeffs.get(idx)/2.0;let d=(coeffs.get(idx+1)-coeffs.get(idx))/(6.0*h);<a+b*t+c*t*t+d*t*t*t}};idx=idx+1};<0.0};f=main():$i64{let n=s.toint(io.readln());let xvals=mut.@($f64);let yvals=mut.@($f64);let idx=mut.0;lp(idx<n){let line=io.readln();let parts=s.split(line;" ");if(parts.len()>=2){let x=s.tofloat(parts.get(0));let y=s.tofloat(parts.get(1));let newx=xvals.push(x);xvals=newx;let newy=yvals.push(y);yvals=newy};idx=idx+1};let query=s.tofloat(io.readln());let nm1=n-1;let matrix=mut.@(@($f64));let rhs=mut.@($f64);idx=0;lp(idx<nm1){let row=mut.@($f64);let jdx=mut.0;lp(jdx<nm1){let newrow=row.push(0.0);row=newrow;jdx=jdx+1};let newmat=matrix.push(row);matrix=newmat;let newrhs=rhs.push(0.0);rhs=newrhs;idx=idx+1};idx=1;lp(idx<n-2){let h0=xvals.get(idx)-xvals.get(idx-1);let h1=xvals.get(idx+1)-xvals.get(idx);matrix.get(idx-1).set(idx-1;2.0*(h0+h1));if(idx>1){matrix.get(idx-1).set(idx-2;h0)};if(idx<n-2){matrix.get(idx-1).set(idx;h1)};let dy0=(yvals.get(idx)-yvals.get(idx-1))/h0;let dy1=(yvals.get(idx+1)-yvals.get(idx))/h1;rhs.set(idx-1;6.0*(dy1-dy0));idx=idx+1};let coeffs=gauss(matrix;rhs;nm1);let result=splineeval(xvals;yvals;coeffs;query);let formatted=s.format(result;"%.6f");io.println(s.concat(s.concat(s.concat("S(";s.fromfloat(query));") = ");formatted));<0}
+m=spline;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fset(arr:@($f64);idx:$i64;v:$f64):@($f64){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=main():$i64{let toks=mut.@();
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let parts=s.split(s.trim(line);" ");lp(let p=0;p<parts.len();p=p+1){let t=s.trim(parts.get(p));if(s.len(t)>0){toks=toks+@(t)}}};
+let idx=mut.0;let n=s.toint(toks.get(idx));idx=idx+1;
+let xs=mut.@($f64);let ys=mut.@($f64);
+lp(let k=0;k<n;k=k+1){xs=xs+@(s.tofloat(toks.get(idx)));idx=idx+1;ys=ys+@(s.tofloat(toks.get(idx)));idx=idx+1};
+let queries=mut.@($f64);
+lp(idx<toks.len()){queries=queries+@(s.tofloat(toks.get(idx)));idx=idx+1};
+let h=mut.@($f64);lp(let i=0;i<n-1;i=i+1){h=h+@(xs.get(i+1)-xs.get(i))};
+let mm=mut.@($f64);lp(let i=0;i<n;i=i+1){mm=mm+@(0.0)};
+if(n>=3){let sz=n-2;
+let aa=mut.@($f64);let bb=mut.@($f64);let cc=mut.@($f64);let dd=mut.@($f64);
+lp(let z=0;z<sz;z=z+1){aa=aa+@(0.0);bb=bb+@(0.0);cc=cc+@(0.0);dd=dd+@(0.0)};
+lp(let i=1;i<n-1;i=i+1){let k=i-1;
+let av=mut.0.0;if(i-1>0){av=h.get(i-1)};aa=fset(aa;k;av);
+bb=fset(bb;k;2.0*(h.get(i-1)+h.get(i)));
+let cv=mut.0.0;if(i<n-2){cv=h.get(i)};cc=fset(cc;k;cv);
+let dv=6.0*((ys.get(i+1)-ys.get(i))/h.get(i)-(ys.get(i)-ys.get(i-1))/h.get(i-1));dd=fset(dd;k;dv)};
+let cp=mut.@($f64);let dp=mut.@($f64);lp(let z=0;z<sz;z=z+1){cp=cp+@(0.0);dp=dp+@(0.0)};
+cp=fset(cp;0;cc.get(0)/bb.get(0));dp=fset(dp;0;dd.get(0)/bb.get(0));
+lp(let i=1;i<sz;i=i+1){let denom=bb.get(i)-aa.get(i)*cp.get(i-1);let cpv=mut.0.0;if(i<sz-1){cpv=cc.get(i)/denom};cp=fset(cp;i;cpv);dp=fset(dp;i;(dd.get(i)-aa.get(i)*dp.get(i-1))/denom)};
+let xsol=mut.@($f64);lp(let z=0;z<sz;z=z+1){xsol=xsol+@(0.0)};
+xsol=fset(xsol;sz-1;dp.get(sz-1));
+lp(let i=sz-2;i>=0;i=i-1){xsol=fset(xsol;i;dp.get(i)-cp.get(i)*xsol.get(i+1))};
+lp(let i=1;i<n-1;i=i+1){mm=fset(mm;i;xsol.get(i-1))}};
+let outparts=mut.@();
+lp(let qi=0;qi<queries.len();qi=qi+1){let q=queries.get(qi);
+let i=mut.0;
+if(q<=xs.get(0)){i=0}el{if(q>=xs.get(n-1)){i=n-2}el{let lo=mut.0;let hi=mut.(n-1);lp(lo+1<hi){let mid=(lo+hi)/2;if(xs.get(mid)<=q){lo=mid}el{hi=mid}};i=lo}};
+let hi=h.get(i);let aA=(xs.get(i+1)-q)/hi;let bB=(q-xs.get(i))/hi;
+let y=aA*ys.get(i)+bB*ys.get(i+1)+((math.pow(aA;3.0)-aA)*mm.get(i)+(math.pow(bB;3.0)-bB)*mm.get(i+1))*(hi*hi)/6.0;
+outparts=outparts+@(s.concat(s.concat(s.concat("S(";s.format(q;"%g"));") = ");s.format(y;"%.6f")))};
+let out=mut."";lp(let z=0;z<outparts.len();z=z+1){if(z>0){out=s.concat(out;"\n")};out=s.concat(out;outparts.get(z))};
+io.println(out);<0}

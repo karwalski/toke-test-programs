@@ -1,0 +1,56 @@
+m=atmentions;i=io:std.io;i=s:std.str;
+f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
+f=isword(c:$str):$bool{<s.contains("_";c)};
+f=main():$i64{
+let dir=s.trim(io.readln());
+let msg=io.readln();
+let unames=mut.@("_");unames=@();
+let displays=mut.@("_");displays=@();
+let pos=mut.0;
+lp(1=1){
+let uk=findfrom(dir;"_"username\"_""_"\"_";us);
+let uname=s.slice(dir;us;ue);
+let dk=findfrom(dir;"_"display\"_""_"\"_";ds);
+let disp=s.slice(dir;ds;de);
+unames=unames+@(uname);displays=displays+@(disp);
+pos=de+1;
+};
+let mstarts=mut.@(0);mstarts=@();
+let mends=mut.@(0);mends=@();
+let mnames=mut.@("_");mnames=@();
+let mresolved=mut.@(false);mresolved=@();
+let mdisp=mut.@("_");mdisp=@();
+let n=s.len(msg);
+let i=mut.0;
+lp(i<n){
+if(s.eq(s.slice(msg;i;i+1);"_")){
+let we=mut.i+1;lp(we<n){if(isword(s.slice(msg;we;we+1))){we=we+1}el{br}};
+if(we>i+1){
+let uname=s.slice(msg;i+1;we);
+let resolved=mut.false;let mval=mut."_";
+lp(let k=0;k<unames.len();k=k+1){if(s.eq(unames.get(k);uname)){resolved=true;mval=displays.get(k)}};
+mstarts=mstarts+@(i);mends=mends+@(we);mnames=mnames+@(uname);mresolved=mresolved+@(resolved);mdisp=mdisp+@(mval);
+i=we;
+}el{i=i+1};
+}el{i=i+1};
+};
+let nm=mstarts.len();
+let mentstr=mut."_";let mc=mut.0;
+let unrstr=mut."_";let uc=mut.0;
+lp(let k=0;k<nm;k=k+1){
+let part=s.concat(s.concat(mnames.get(k);"_");s.concat(s.fromint(mstarts.get(k));"_"));
+if(mresolved.get(k)){if(mc>0){mentstr=s.concat(mentstr;"_")};mentstr=s.concat(mentstr;part);mc=mc+1}el{if(uc>0){unrstr=s.concat(unrstr;"_")};unrstr=s.concat(unrstr;part);uc=uc+1}};
+let formatted=mut.msg;
+let k=mut.nm-1;
+lp(k>=0){
+if(mresolved.get(k)){
+let before=s.slice(formatted;0;mstarts.get(k));
+let after=s.slice(formatted;mends.get(k);s.len(formatted));
+formatted=s.concat(s.concat(before;mdisp.get(k));after);
+};
+k=k-1;
+};
+if(mc>0){io.println(s.concat("_";mentstr))};
+if(uc>0){io.println(s.concat("_";unrstr))};
+io.println(s.concat("_";formatted));
+<0}

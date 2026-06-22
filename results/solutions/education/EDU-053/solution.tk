@@ -1,1 +1,66 @@
-m=quiz;i=io:std.io;i=s:std.str;f=main():$i64{let input=io.readln();let correct=mut.0;let total=mut.0;let inq=mut.0;let inanswers=mut.0;let idx=mut.0;let lines=s.split(input;"\"");let answers=mut.@();let studentans=mut.@();lp(idx<lines.len()){let line=lines.get(idx);if(s.contains(line;"answer")){inq=1}el{if(inq=1){if(s.contains(line;":")==0){if(s.contains(line;",")==0){if(s.contains(line;"}")==0){if(s.contains(line;"]")==0){answers=answers.push(line);inq=0}}}}}};if(s.contains(line;"student_answers")){inanswers=1}el{if(inanswers=1){if(s.contains(line;":")==0){if(s.contains(line;",")==0){if(s.contains(line;"]")){inanswers=0}el{if(s.contains(line;"}")==0){studentans=studentans.push(line)}}}}}};idx=idx+1};total=answers.len();let qidx=mut.0;lp(qidx<total){let expected=answers.get(qidx);let student=mut."";if(qidx<studentans.len()){student=studentans.get(qidx)};if(expected=student){io.println(s.concat("Q";s.concat(s.fromint(qidx+1);": Correct")));correct=correct+1}el{io.println(s.concat("Q";s.concat(s.fromint(qidx+1);s.concat(": Incorrect. Answer: ";expected))))};qidx=qidx+1};let percent=mut.0;if(total>0){percent=(correct*100)/total};io.println(s.concat("Score: ";s.concat(s.fromint(correct);s.concat("/";s.concat(s.fromint(total);s.concat(" (";s.concat(s.fromint(percent);"%)")))))));<0}
+m=quiz;i=io:std.io;i=s:std.str;
+f=extractanswers(input:$str):@($str){
+  let result=mut.@();
+  let parts=s.split(input;"\"answer\":\"");
+  let idx=mut.1;
+  lp(idx<parts.len()){
+    let rest=parts.get(idx);
+    let endp=s.split(rest;"\"");
+    if(endp.len()>=1){
+      result=result+@(endp.get(0))
+    };
+    idx=idx+1
+  };
+  <result
+};
+f=extractstudents(input:$str):@($str){
+  let result=mut.@();
+  let parts=s.split(input;"\"student_answers\":[");
+  if(parts.len()<2){<result};
+  let rest=parts.get(1);
+  let endp=s.split(rest;"]");
+  let arr=endp.get(0);
+  let items=s.split(arr;",");
+  let idx=mut.0;
+  lp(idx<items.len()){
+    let item=s.trim(items.get(idx));
+    let inner=s.split(item;"\"");
+    if(inner.len()>=2){
+      result=result+@(inner.get(1))
+    };
+    idx=idx+1
+  };
+  <result
+};
+f=main():$i64{
+  let input=io.readln();
+  let answers=extractanswers(input);
+  let students=extractstudents(input);
+  let total=answers.len();
+  let correct=mut.0;
+  let qidx=mut.0;
+  lp(qidx<total){
+    let expected=answers.get(qidx);
+    let student=mut."";
+    if(qidx<students.len()){student=students.get(qidx)};
+    let qn=s.fromint((qidx+1) as $i64);
+    if(s.eq(s.lower(s.trim(expected));s.lower(s.trim(student)))){
+      io.println(s.concat("Q";s.concat(qn;": Correct")));
+      correct=correct+1
+    }el{
+      io.println(s.concat("Q";s.concat(qn;s.concat(": Incorrect. Answer: ";expected))))
+    };
+    qidx=qidx+1
+  };
+  let percent=mut.0;
+  if(total>0){percent=(correct*100)/(total as $i64)};
+  let line=mut."Score: ";
+  line=s.concat(line;s.fromint(correct as $i64));
+  line=s.concat(line;"/");
+  line=s.concat(line;s.fromint(total as $i64));
+  line=s.concat(line;" (");
+  line=s.concat(line;s.fromint(percent));
+  line=s.concat(line;"%)");
+  io.println(line);
+  <0
+}

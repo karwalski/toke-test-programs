@@ -1,0 +1,14 @@
+m=extract;i=io:std.io;i=s:std.str;
+f=isd(c:$str):$bool{<s.contains("_";c)};
+f=isw(c:$str):$bool{<s.contains("_";c)};
+f=ordof(c:$str):$i64{let tbl="_"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"_"\\"_"w"_"d"_"s"_" "_"-"_"\\"_"["_"]"_"\\"_"."_"\\"_"d"_"w"_"s"_" "_"["_"$"_"\\"_"b"_""_"+"_"*"_"+"_"?"_"{"_"}"_","_""_"\\"_"("_")"_"("_")"_""_"\n"_"("_"";if(hasgroup){g1=group1pat(pat)};
+let plen=s.len(cpat);let tlen=s.len(rest);let g1len=s.len(g1);
+let ti=mut.0;
+lp(ti<=tlen){
+let e=rxm(cpat;0;plen;rest;ti;tlen);
+if(e>=0){
+if(hasgroup){let ge=rxm(g1;0;g1len;rest;ti;tlen);io.println(s.slice(rest;ti;ge))}el{io.println(s.slice(rest;ti;e))};
+if(e>ti){ti=e}el{ti=ti+1};
+}el{ti=ti+1};
+};
+<0}

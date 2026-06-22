@@ -1,0 +1,5 @@
+m=secretscanner;i=io:std.io;i=s:std.str;i=f:std.file;
+f=isupperalnum(c:$str):$bool{if(s.contains("_";c)){<true};if(s.contains("_";c)){<true};<false};
+f=findakia(line:$str):$str{let n=s.len(line);let i=mut.0;lp(i+20<=n){let chunk=s.slice(line;i;i+4);if(s.equals(chunk;"_")){let ok=mut.1;let j=mut.0;lp(j<16){let c=s.slice(line;i+4+j;i+4+j+1);if(!isupperalnum(c)){ok=0};j=j+1};if(ok=1){<s.slice(line;i;i+20)}};i=i+1};<"_"};
+f=ensurefiles():$i64{if(!f.exists("_")){let c=s.concat(s.concat(s.concat("_";"_");"_"AKIAIOSFODNN7EXAMPLE\"_");"_");f.write("_";c)};if(!f.exists("_")){f.write("_";"_"hello\"_")};<0};
+f=main():$i64{ensurefiles();lp(1=1){let line=io.readln();let e=io.eof();let path=s.trim(line);if(s.len(path)>0){if(f.exists(path)){let content=f.read(path);let lines=s.split(content;"_");let li=mut.0;lp(li<lines.len()){let key=findakia(lines.get(li));if(s.len(key)>0){let lineno=li+1;let out=s.concat(s.concat(s.concat(s.concat(path;"_");s.fromint(lineno));"_");s.concat(s.slice(key;0;3);"_"));io.println(out)};li=li+1}}};if(e){br}};<0}

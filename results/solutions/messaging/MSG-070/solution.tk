@@ -1,1 +1,10 @@
-m=rot13;f=rot13(s:$str):$str{let n=s.len;let m=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);let z=mut.c;if(c>64){if(c<91){let x=c-65;let y=x+13;let b=y-y/26*26;let a=b+65;z=a;}el{if(c>96){if(c<123){let x=c-97;let y=x+13;let b=y-y/26*26;let a=b+97;z=a;}}}};m=z;};<m};
+m=rotkey;
+i=io:std.io;
+i=s:std.str;
+i=enc:std.encoding;
+f=tohex(n:$i64):$str{let d="0123456789abcdef";let hi=n/16;let lo=n-hi*16;<s.concat(s.slice(d;hi;hi+1);s.slice(d;lo;lo+1))};
+f=xorb(a:$i64;b:$i64):$i64{let r=mut.0;let bit=mut.1;let x=mut.a;let y=mut.b;lp(let i=0;i<8;i=i+1){let xb=x-(x/2)*2;let yb=y-(y/2)*2;if(xb!=yb){r=r+bit};bit=bit*2;x=x/2;y=y/2};<r};
+f=findkey(ring:$str;version:$i64):$str{let pat=s.concat(s.concat("\"version\":";s.fromint(version));",");let ki=s.indexof(ring;pat);if(ki<0){<""};let rest=s.slice(ring;ki;s.len(ring));let kp=s.indexof(rest;"\"key\":\"");let after=s.slice(rest;kp+7;s.len(rest));let qe=s.indexof(after;"\"");<s.slice(after;0;qe)};
+f=main():$i64{let ringline=io.readln();let active=s.toint(s.trim(io.readln()));let op=s.trim(io.readln());let payload=io.readln();let payload2=s.trim(payload);
+let keyhex=findkey(ringline;active);let key=enc.hexdecode(keyhex);let klen=key.len();
+if(s.equals(op;"encrypt")){let pt=s.bytes(payload2);let out=mut.enc.hexdecode("");let i=mut.0;lp(i<pt.len()){let kb=key.get(i-(i/klen)*klen) as$i64;let pb=pt.get(i) as$i64;let x=xorb(pb;kb);out=out+enc.hexdecode(tohex(x));i=i+1};io.println(s.concat(s.concat(s.concat("v";s.fromint(active));":");enc.b64encode(out)))}el{let ci=s.indexof(payload2;":");let prefix=s.slice(payload2;0;ci);let b64=s.slice(payload2;ci+1;s.len(payload2));let version=s.toint(s.slice(prefix;1;s.len(prefix)));let vkeyhex=findkey(ringline;version);let vkey=enc.hexdecode(vkeyhex);let vklen=vkey.len();let ct=enc.b64decode(b64);let out=mut.enc.hexdecode("");let i=mut.0;lp(i<ct.len()){let kb=vkey.get(i-(i/vklen)*vklen) as$i64;let cb=ct.get(i) as$i64;let x=xorb(cb;kb);out=out+enc.hexdecode(tohex(x));i=i+1};let pt=s.frombytes(out);io.println(s.concat(s.concat(s.concat(pt;" (decrypted with key v");s.fromint(version));")"))};<0}

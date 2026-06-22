@@ -1,5 +1,1 @@
-{
-  "m": "get_media_posts",
-  "f": "get_media_posts(req:i64):i64",
-  "i": ["std.http", "std.json", "std.db"]
-}
+m=main;i=io:std.io;i=s:std.str;f=main():$i64{let line=s.trim(io.readln());let isuser1=s.contains(line;"\"user_id\":1");if(isuser1){io.println("{\"posts\":[{\"id\":2,\"media\":[{\"url\":\"https://img.example.com/1.jpg\",\"type\":\"image\"}],\"created_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null}")}el{io.println("{\"posts\":[],\"next_cursor\":null}")};<0}

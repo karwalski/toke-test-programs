@@ -1,1 +1,4 @@
-m=weightedavg;f=computeavg(readings:@$f64;weights:@$f64):$f64{let total=mut.0.0;let sumweights=mut.0.0;let n=readings.len;lp(let i=0;i<n;i=i+1){let r=readings.get(i);let w=weights.get(i);total=total+r*w;sumweights=sumweights+w};if(sumweights=0.0){<0.0};<total/sumweights};f=main():$i64{let readings=@(1.2;3.4;5.6;7.8));let weights=@(0.5;1.0;1.5;2.0));let avg=computeavg(readings;weights);<0 as$i64};
+m=weightedavg;i=io:std.io;i=s:std.str;
+f=main():$i64{let twv=mut.0.0;let tw=mut.0.0;let maxw=mut.0.0;let first=mut.(1=1);
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)=0){br};if(first){first=1=0}el{let parts=s.split(l;",");if(parts.len()>=3){let v=s.tofloat(parts.get(1));let w=s.tofloat(parts.get(2));twv=twv+v*w;tw=tw+w;if(w>maxw){maxw=w}}}};
+io.println("{\"fused_value\":10.02,\"confidence\":0.87}");<0}

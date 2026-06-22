@@ -1,1 +1,11 @@
-m=jsonvalidator;f=validatefield(val:$str;rules:@$str):bool{let result=mut.true;lp(let i=0;i<rules.len;i=i+1){let rule=rules.get(i);if(rule="required"){if(val.len=0){result=false}}el{if(rule="min"){let minval=rule.split("=").get(1);if(!(val.len>minval)){result=false}}el{if(rule="max"){let maxval=rule.split("=").get(1);if(!(val.len<maxval)){result=false}}el{if(rule="pattern"){let pattern=rule.split("=").get(1);if(!(val.matches(pattern))){result=false}}}}};<result};f=validatejson(obj:$str;schema:@$str):bool{let result=mut.true;lp(let i=0;i<schema.len;i=i+1){let rule=schema.get(i);let field=rule.split("=").get(0);let expectedtype=rule.split("=").get(1);let valstr=obj.get(field);let valtype=valstr.split("=").get(0);if(!(valtype=expectedtype)){result=false}};<result};
+m=jsonvalidator;i=io:std.io;i=s:std.str;
+f=rawval(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":");let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"-")||s.eq(ch;".")||s.eq(ch;"0")||s.eq(ch;"1")||s.eq(ch;"2")||s.eq(ch;"3")||s.eq(ch;"4")||s.eq(ch;"5")||s.eq(ch;"6")||s.eq(ch;"7")||s.eq(ch;"8")||s.eq(ch;"9")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}};<num};
+f=haskey(obj:$str;key:$str):$bool{let pat=s.concat(s.concat("\"";key);"\":");<s.contains(obj;pat)};
+f=intstr(f:$f64):$str{let n=mut.0;if(f<0.0){n=0-1*intpart(0.0-f)}el{n=intpart(f)};<s.fromint(n)};
+f=intpart(f:$f64):$i64{let n=mut.0;lp(s.tofloat(s.fromint(n+1))<=f){n=n+1};<n};
+f=main():$i64{let fields=mut.@();let mins=mut.@($f64);let maxs=mut.@($f64);
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)=0){br};let parts=s.split(l;" ");if(parts.len()>=3){fields=fields+@(parts.get(0));mins=mins+@(s.tofloat(parts.get(1)));maxs=maxs+@(s.tofloat(parts.get(2)))}};
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)=0){}el{
+let viol=mut.@();
+lp(let i=0;i<fields.len();i=i+1){let fld=fields.get(i);if(haskey(l;fld)){let raw=rawval(l;fld);let v=s.tofloat(raw);if(v<mins.get(i)||v>maxs.get(i)){let msg=s.concat(s.concat(s.concat(s.concat(s.concat(fld;"=");raw);" (expected ");intstr(mins.get(i)));s.concat("-";intstr(maxs.get(i))));viol=viol+@(s.concat(msg;")"))}}};
+if(viol.len()>0){let out=mut."INVALID: ";lp(let w=0;w<viol.len();w=w+1){if(w>0){out=s.concat(out;", ")};out=s.concat(out;viol.get(w))};io.println(out)}el{io.println(l)}}};<0}

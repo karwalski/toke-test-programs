@@ -1,1 +1,47 @@
-m=tsp;f=dist(a:$i64;b:$i64;c:$i64;d:$i64):$i64{let dx=a-c;let dy=b-d;let sq=dx*dx+dy*dy;let res=mut.0;let rem=mut.sq;lp(let i=0;i<10;i=i+1){let tmp=res*10;if(tmp+10>sq){br};res=tmp+10;rem=sq-res*res};<res};f=solve(p0:@($i64;$i64))):$i64{let n=p0.len;let m=mut.0;lp(let i=0;i<n;i=i+1){lp(let j=0;j<n;j=j+1){if(i=j){<0};};};let best=mut.922337203685477580;let bestperm=mut.@();lp(let i=0;i<n;i=i+1){let perm=mut.@();lp(let j=0;j<n;j=j+1){if(j=i){<0};perm=perm+@(p0.get
+m=tsp;i=io:std.io;i=s:std.str;i=math:std.math;
+f=dist(xs:@($f64);ys:@($f64);a:$i64;b:$i64):$f64{let dx=xs.get(a)-xs.get(b);let dy=ys.get(a)-ys.get(b);<math.sqrt(dx*dx+dy*dy)};
+f=routedist(xs:@($f64);ys:@($f64);route:@($i64)):$f64{let total=mut.0.0;let m=route.len();lp(let i=0;i<m;i=i+1){let frm=route.get(i);let to=route.get((i+1)%m);total=total+dist(xs;ys;frm;to)};<total};
+f=permgen(remaining:@($i64);prefix:@($i64);outroutes:@($str);n:$i64):@($str){
+  if(remaining.len()=0){
+    let rs=mut."0";
+    lp(let i=0;i<prefix.len();i=i+1){rs=s.concat(rs;" ");rs=s.concat(rs;s.fromint(prefix.get(i)))};
+    let acc=mut.outroutes;
+    acc=acc+@(rs);
+    <acc
+  };
+  let res=mut.outroutes;
+  lp(let i=0;i<remaining.len();i=i+1){
+    let pick=remaining.get(i);
+    let newrem=mut.@($i64);
+    lp(let j=0;j<remaining.len();j=j+1){if(!(j=i)){newrem=newrem+@(remaining.get(j))}};
+    let newpre=prefix+@(pick);
+    res=permgen(newrem;newpre;res;n)
+  };
+  <res
+};
+f=main():$i64{
+  let n=s.toint(s.trim(io.readln()));
+  let xs=mut.@($f64);
+  let ys=mut.@($f64);
+  lp(let i=0;i<n;i=i+1){let parts=s.split(s.trim(io.readln());" ");xs=xs+@(s.tofloat(parts.get(0)));ys=ys+@(s.tofloat(parts.get(1)))};
+  let remaining=mut.@($i64);
+  lp(let i=1;i<n;i=i+1){remaining=remaining+@(i)};
+  let empty=mut.@($i64);
+  let outr=mut.@($str);
+  let routes=permgen(remaining;empty;outr;n);
+  let best=mut.0.0;
+  let bestidx=mut.0;
+  let first=mut.true;
+  lp(let r=0;r<routes.len();r=r+1){
+    let rstr=routes.get(r);
+    let toks=s.split(rstr;" ");
+    let route=mut.@($i64);
+    lp(let t=0;t<toks.len();t=t+1){route=route+@(s.toint(toks.get(t)))};
+    let d=routedist(xs;ys;route);
+    if(first){best=d;bestidx=r;first=false}el{if(d<best){best=d;bestidx=r}}
+  };
+  let bestr=routes.get(bestidx);
+  io.println(s.concat("Optimal route: ";s.concat(bestr;" 0")));
+  io.println(s.concat("Total distance: ";s.format(best;"%.4f")));
+  <0
+}

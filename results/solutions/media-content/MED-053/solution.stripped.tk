@@ -1,0 +1,6 @@
+m=palindrome;
+i=io:std.io;
+i=s:std.str;
+f=norm(line:$str):$str{let low=s.lower(line);let out=mut."_";let i=mut.0;lp(i<s.len(low)){let c=s.slice(low;i;i+1);if(s.contains("_";c)){out=s.concat(out;c)};i=i+1};<out};
+f=ispal(str:$str):$bool{let n=s.len(str);let i=mut.0;let ok=mut.true;lp(i<n/2){let a=s.slice(str;i;i+1);let b=s.slice(str;n-1-i;n-i);if(s.equals(a;b)){i=i+1}el{ok=false;i=n}};<ok};
+f=main():$i64{lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);let nrm=norm(t);let res=mut."_";if(ispal(nrm)){res="_"};io.println(s.concat(s.concat(t;"_");res))};<0}

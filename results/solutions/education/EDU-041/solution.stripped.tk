@@ -1,0 +1,5 @@
+m=prereq;i=io:std.io;i=s:std.str;
+f=field(obj:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=arrayfield(obj:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_");let start=s.indexof(obj;pat);if(start<0){<"_"};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let ce=s.indexof(rest;"_");if(ce<0){<"_"};<s.slice(rest;0;ce)};
+f=tokens(arr:$str):@($str){let out=mut.@();if(s.len(arr)=0){<out};let parts=s.split(arr;"_");lp(let i=0;i<parts.len();i=i+1){let p=s.trim(parts.get(i));let q=s.replace(p;"_""_""_"\"_":["_"student_completed"_"{"_"\"_":\"_")){let cid=field(seg;"_");let prereqs=tokens(arrayfield(seg;"_"));let missing=mut.@();lp(let k=0;k<prereqs.len();k=k+1){let pr=prereqs.get(k);if(!contains(completed;pr)){missing=missing+@(pr)}};
+if(missing.len()=0){io.println(s.concat(cid;"_"))}el{let ms=mut."_";lp(let m=0;m<missing.len();m=m+1){if(m>0){ms=s.concat(ms;"_")};ms=s.concat(ms;missing.get(m))};io.println(s.concat(s.concat(s.concat(cid;"_");ms);"_"))}}};<0}

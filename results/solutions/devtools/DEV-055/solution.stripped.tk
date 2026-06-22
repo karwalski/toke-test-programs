@@ -1,0 +1,6 @@
+m=convcommit;
+i=io:std.io;
+i=s:std.str;
+f=istype(t:$str):$bool{let types=@("_";"_";"_";"_";"_";"_";"_";"_";"_";"_";"_");let i=mut.0;let ok=mut.false;lp(i<types.len()){if(s.equals(types.get(i);t)){ok=true};i=i+1};<ok};
+f=valid(msg:$str):$bool{let ci=s.indexof(msg;"_");if(ci<0){<false};let prefix=s.slice(msg;0;ci);let after=s.slice(msg;ci;s.len(msg));if(s.len(after)<2){<false};let sp=s.slice(after;1;2);if(s.equals(sp;"_")=false){<false};let desc=s.slice(after;2;s.len(after));if(s.len(desc)=0){<false};let typ=mut.prefix;let pi=s.indexof(prefix;"_");if(pi>=0){let last=s.slice(prefix;s.len(prefix)-1;s.len(prefix));if(s.equals(last;"_")=false){<false};typ=s.slice(prefix;0;pi)};<istype(typ)};
+f=main():$i64{lp(1=1){let line=io.readln();if(s.len(line)=0){br};let msg=s.trim(line);if(valid(msg)){io.println(s.concat("_";msg))}el{io.println(s.concat(s.concat("_";msg);"_"))}};<0}

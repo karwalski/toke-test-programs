@@ -1,1 +1,152 @@
-m=extract;f=extractendpoints(file:$str):@$str{let lines=file.split("\n");let endpoints=mut.@();lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let hasget=line.contains("get(");let haspost=line.contains("post(");let hassrc=line.contains("src=");if(hasget){let start=line.find("get(");let end=line.find(")");let ep=line.slice(start+4;end);endpoints=endpoints+@(ep);};if(haspost){let start=line.find("pos
+m=extract;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+f=firstquote(text:$str;from:$i64):$i64{
+    let n=s.len(text);
+    lp(let i=from;i<n;i=i+1){
+        let ch=s.slice(text;i;i+1);
+        if(s.eq(ch;"'")){<i};
+        if(s.eq(ch;"\"")){<i};
+    };
+    <0-1
+};
+f=nextquote(text:$str;from:$i64;q:$str):$i64{
+    let n=s.len(text);
+    lp(let i=from;i<n;i=i+1){
+        let ch=s.slice(text;i;i+1);
+        if(s.eq(ch;q)){<i};
+    };
+    <0-1
+};
+f=ensurefixtures():$i64{
+    if(file.exists("/tmp/routes.js")){}el{
+        let js=s.concat("const express = require('express');\nconst app = express();\n\n";"app.get('/api/users', function(req, res) {\n    res.send('users');\n});\n\napp.post('/api/users', function(req, res) {\n    res.send('created');\n});\n\napp.delete('/api/users/:id', function(req, res) {\n    res.send('deleted');\n});\n");
+        file.write("/tmp/routes.js";js);
+    };
+    if(file.exists("/tmp/app.py")){}el{
+        let py="from flask import Flask\napp = Flask(__name__)\n\n@app.route('/')\ndef index():\n    return 'Hello'\n\n@app.route('/users', methods=['GET', 'POST'])\ndef users():\n    return 'users'\n";
+        file.write("/tmp/app.py";py);
+    };
+    <0
+};
+f=main():$i64{
+    ensurefixtures();
+    let framework=s.trim(io.readln());
+    let pathline=s.trim(io.readln());
+    let content=file.read(pathline);
+    let lines=s.split(content;"\n");
+    let methods=mut.@();
+    let paths=mut.@();
+    let mkeys=mut.@();
+    mkeys=mkeys+@("get");
+    mkeys=mkeys+@("post");
+    mkeys=mkeys+@("put");
+    mkeys=mkeys+@("delete");
+    mkeys=mkeys+@("patch");
+    let mups=mut.@();
+    mups=mups+@("GET");
+    mups=mups+@("POST");
+    mups=mups+@("PUT");
+    mups=mups+@("DELETE");
+    mups=mups+@("PATCH");
+    lp(let li=0;li<lines.len;li=li+1){
+        let line=lines.get(li);
+        if(s.eq(framework;"express")){
+            lp(let mi=0;mi<mkeys.len;mi=mi+1){
+                let tok=s.concat(".";s.concat(mkeys.get(mi);"("));
+                let pos=s.indexof(line;tok);
+                if(pos<0){}el{
+                    let q1=firstquote(line;pos);
+                    if(q1<0){}el{
+                        let q=s.slice(line;q1;q1+1);
+                        let q2=nextquote(line;q1+1;q);
+                        if(q2<0){}el{
+                            let p=s.slice(line;q1+1;q2);
+                            methods=methods+@(mups.get(mi));
+                            paths=paths+@(p);
+                        };
+                    };
+                };
+            };
+        };
+        if(s.eq(framework;"flask")){
+            let rpos=s.indexof(line;"@app.route");
+            if(rpos<0){}el{
+                let q1=firstquote(line;rpos);
+                if(q1<0){}el{
+                    let q=s.slice(line;q1;q1+1);
+                    let q2=nextquote(line;q1+1;q);
+                    if(q2<0){}el{
+                        let p=s.slice(line;q1+1;q2);
+                        let mpos=s.indexof(line;"methods");
+                        if(mpos<0){
+                            methods=methods+@("GET");
+                            paths=paths+@(p);
+                        }el{
+                            let cur=mut.q2+1;
+                            lp(1=1){
+                                let mq1=firstquote(line;cur);
+                                if(mq1<0){br};
+                                let mq=s.slice(line;mq1;mq1+1);
+                                let mq2=nextquote(line;mq1+1;mq);
+                                if(mq2<0){br};
+                                let mm=s.slice(line;mq1+1;mq2);
+                                methods=methods+@(s.upper(mm));
+                                paths=paths+@(p);
+                                cur=mq2+1;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    let cnt=methods.len;
+    let order=mut.@();
+    lp(let a=0;a<cnt;a=a+1){order=order+@(a)};
+    lp(let a=0;a<cnt;a=a+1){
+        lp(let b=0;b<cnt-1-a;b=b+1){
+            let ia=order.get(b);
+            let ib=order.get(b+1);
+            let ma=methods.get(ia);
+            let mb=methods.get(ib);
+            let pa=paths.get(ia);
+            let pb=paths.get(ib);
+            let ka=s.concat(s.concat(ma;" ");pa);
+            let kb=s.concat(s.concat(mb;" ");pb);
+            let swap=mut.0;
+            lp(let ci=0;ci<s.len(ka);ci=ci+1){
+                if(ci>=s.len(kb)){swap=0;ci=s.len(ka)}el{
+                    let bka=s.bytes(s.slice(ka;ci;ci+1)).get(0);
+                    let bkb=s.bytes(s.slice(kb;ci;ci+1)).get(0);
+                    if(bka>bkb){swap=1;ci=s.len(ka)}el{
+                        if(bka<bkb){swap=0;ci=s.len(ka)};
+                    };
+                };
+            };
+            if(swap=1){
+                order=order.set(b;ib);
+                order=order.set(b+1;ia);
+            };
+        };
+    };
+    let seen=mut.@();
+    let out=mut."";
+    let first=mut.1;
+    lp(let a=0;a<cnt;a=a+1){
+        let oi=order.get(a);
+        let key=s.concat(s.concat(methods.get(oi);" ");paths.get(oi));
+        let dup=mut.0;
+        lp(let k=0;k<seen.len;k=k+1){
+            if(s.eq(seen.get(k);key)){dup=1};
+        };
+        if(dup=0){
+            seen=seen+@(key);
+            if(first=1){first=0}el{out=s.concat(out;"\n")};
+            out=s.concat(out;key);
+        };
+    };
+    io.println(out);
+    <0
+};

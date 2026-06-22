@@ -1,0 +1,91 @@
+m=huff;i=io:std.io;i=s:std.str;
+f=ccode(ch:$str):$i64{let cs="_";let p=s.indexof(cs;ch);if(p<0){<200};<p};
+f=lessnode(fa:$i64;cha:$str;fb:$i64;chb:$str):$bool{
+  if(!(fa=fb)){<(fa<fb)};
+  let aleaf=mut.true;if(s.equals(cha;"_")){aleaf=false};
+  let bleaf=mut.true;if(s.equals(chb;"_")){bleaf=false};
+  if((!aleaf)&&bleaf){<false};
+  if(aleaf&&(!bleaf)){<true};
+  if(aleaf&&bleaf){<(ccode(cha)<ccode(chb))};
+  <false
+};
+f=main():$i64{
+  let lines=mut.@($str);
+  lp(1=1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trimsuffix(l;"_"))};
+  let mode=lines.get(0);
+  let chars=mut.@($str);
+  let freqs=mut.@($i64);
+  let idx=mut.1;
+  lp(idx<lines.len()){let ln=lines.get(idx);if(s.equals(ln;"_")){idx=lines.len()+1000}el{let parts=s.split(ln;"_");chars=chars+@(parts.get(0));freqs=freqs+@(s.toint(parts.get(1)));idx=idx+1}};
+  let sepidx=mut.0-1;
+  lp(let z=0;z<lines.len();z=z+1){if(s.equals(lines.get(z);"_")){sepidx=z}};
+  let nsym=chars.len();
+  let nodeChar=mut.@($str);
+  let nodeFreq=mut.@($i64);
+  let nodeLeft=mut.@($i64);
+  let nodeRight=mut.@($i64);
+  lp(let i=0;i<nsym;i=i+1){nodeChar=nodeChar+@(chars.get(i));nodeFreq=nodeFreq+@(freqs.get(i));nodeLeft=nodeLeft+@(0-1);nodeRight=nodeRight+@(0-1)};
+  let heap=mut.@($i64);
+  lp(let i=0;i<nsym;i=i+1){heap=heap+@(i)};
+  let root=mut.0;
+  if(nsym=1){root=0}el{
+    lp(heap.len()>1){
+      let bi1=mut.0;
+      lp(let h=1;h<heap.len();h=h+1){let n=heap.get(h);let cur=heap.get(bi1);if(lessnode(nodeFreq.get(n);nodeChar.get(n);nodeFreq.get(cur);nodeChar.get(cur))){bi1=h}};
+      let first=heap.get(bi1);
+      let nh=mut.@($i64);lp(let h=0;h<heap.len();h=h+1){if(!(h=bi1)){nh=nh+@(heap.get(h))}};heap=nh;
+      let bi2=mut.0;
+      lp(let h=1;h<heap.len();h=h+1){let n=heap.get(h);let cur=heap.get(bi2);if(lessnode(nodeFreq.get(n);nodeChar.get(n);nodeFreq.get(cur);nodeChar.get(cur))){bi2=h}};
+      let second=heap.get(bi2);
+      let nh2=mut.@($i64);lp(let h=0;h<heap.len();h=h+1){if(!(h=bi2)){nh2=nh2+@(heap.get(h))}};heap=nh2;
+      let newid=nodeChar.len();
+      nodeChar=nodeChar+@("_");nodeFreq=nodeFreq+@(nodeFreq.get(first)+nodeFreq.get(second));nodeLeft=nodeLeft+@(first);nodeRight=nodeRight+@(second);
+      heap=heap+@(newid);
+      root=newid
+    };
+    root=heap.get(0)
+  };
+  let codeChars=mut.@($str);
+  let codeStrs=mut.@($str);
+  let stackNode=mut.@($i64);
+  let stackCode=mut.@($str);
+  stackNode=stackNode+@(root);stackCode=stackCode+@("_");
+  lp(stackNode.len()>0){
+    let top=stackNode.len()-1;
+    let nd=stackNode.get(top);
+    let cd=stackCode.get(top);
+    let stkn=mut.@($i64);lp(let h=0;h<top;h=h+1){stkn=stkn+@(stackNode.get(h))};stackNode=stkn;
+    let stkc=mut.@($str);lp(let h=0;h<top;h=h+1){stkc=stkc+@(stackCode.get(h))};stackCode=stkc;
+    if(!s.equals(nodeChar.get(nd);"_")){
+      let fcode=mut.cd;if(s.equals(cd;"_")){fcode="_"};
+      codeChars=codeChars+@(nodeChar.get(nd));codeStrs=codeStrs+@(fcode)
+    }el{
+      let l=nodeLeft.get(nd);let r=nodeRight.get(nd);
+      if(!(r<0)){stackNode=stackNode+@(r);stackCode=stackCode+@(s.concat(cd;"_"))};
+      if(!(l<0)){stackNode=stackNode+@(l);stackCode=stackCode+@(s.concat(cd;"_"))}
+    }
+  };
+  if(s.equals(mode;"_")){
+    let m=codeChars.len();
+    let ord=mut.@($i64);lp(let i=0;i<m;i=i+1){ord=ord+@(i)};
+    lp(let a=0;a<m;a=a+1){lp(let b=0;b<m-1-a;b=b+1){
+      let x=ord.get(b);let y=ord.get(b+1);
+      let cx=codeStrs.get(x);let cy=codeStrs.get(y);
+      let sw=mut.false;
+      if(s.len(cx)>s.len(cy)){sw=true}el{if(s.len(cx)=s.len(cy)){if(codegt(cx;cy)){sw=true}el{if(s.equals(cx;cy)){if(ccode(codeChars.get(x))>ccode(codeChars.get(y))){sw=true}}}}};
+      if(sw){ord=ord.set(b;y);ord=ord.set(b+1;x)}
+    }};
+    lp(let i=0;i<m;i=i+1){let k=ord.get(i);io.println(s.concat(s.concat(codeChars.get(k);"_");codeStrs.get(k)))}
+  }el{
+    let msg=lines.get(sepidx+1);
+    if(s.equals(mode;"_")){
+      let out=mut."_";
+      lp(let i=0;i<s.len(msg);i=i+1){let ch=s.slice(msg;i;i+1);lp(let j=0;j<codeChars.len();j=j+1){if(s.equals(codeChars.get(j);ch)){out=s.concat(out;codeStrs.get(j))}}};
+      io.println(out)
+    }el{
+      io.println("_")
+    }
+  };
+  <0
+};
+f=codegt(a:$str;b:$str):$bool{let n=s.len(a);let i=mut.0;let res=mut.0;lp(i<n){if(res=0){let ca=s.slice(a;i;i+1);let cb=s.slice(b;i;i+1);if(s.equals(ca;"_")&&s.equals(cb;"_")){res=1}el{if(s.equals(ca;"_")&&s.equals(cb;"_")){res=0-1}};i=i+1}el{i=n}};<(res>0)};

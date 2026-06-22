@@ -1,0 +1,12 @@
+m=presence;i=io:std.io;i=s:std.str;
+f=field(obj:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=tmin(iso:$str):$i64{let year=s.toint(s.slice(iso;0;4));let mon=s.toint(s.slice(iso;5;7));let day=s.toint(s.slice(iso;8;10));let hr=s.toint(s.slice(iso;11;13));let mn=s.toint(s.slice(iso;14;16));<((year*365+mon*31+day)*24+hr)*60+mn};
+f=hhmm(iso:$str):$str{<s.slice(iso;11;16)};
+f=idxof(arr:@($str);v:$str):$i64{lp(let i=0;i<arr.len();i=i+1){if(s.eq(arr.get(i);v)){<i}};<0-1};
+f=lt(a:$str;b:$str):$bool{let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<m){m=nb};lp(let i=0;i<m;i=i+1){let ca=s.slice(a;i;i+1);let cb=s.slice(b;i;i+1);if(!s.eq(ca;cb)){let ba=s.bytes(ca);let bb=s.bytes(cb);if(ba.get(0)<bb.get(0)){<1=1}el{<1=0}}};<(na<nb);};
+f=main():$i64{let reportstr=s.trim(io.readln());let eventsline=io.readln();let reportmin=tmin(reportstr);
+let segs=s.split(eventsline;"_");
+let eusers=mut.@();let estatus=mut.@();let etimes=mut.@($i64);let eiso=mut.@();
+lp(let i=0;i<segs.len();i=i+1){let seg=segs.get(i);if(s.contains(seg;"_"user\"_""_"user"_"status"_"time"_""_""_"online"_"offline"_"away"_"online"_"offline"_"away"_""_"online: "_"m"_", "_"offline: "_"m"_", "_"away: "_"m"_": "_" (since "_", "_")")))};<0;};
+f=setint(arr:@($i64);idx:$i64;v:$i64):@($i64){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=setstr(arr:@($str);idx:$i64;v:$str):@($str){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};

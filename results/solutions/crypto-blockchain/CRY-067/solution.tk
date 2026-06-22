@@ -1,1 +1,54 @@
-m=blockheader;f=solve(p0:$i64;p1:$str;p2:$str;p3:$i64;p4:$str;p5:$i64):$str{let version=p0;let prevhash=p1;let merkle=p2;let timestamp=p3;let bits=p4;let nonce=p5;let result=mut."";let versionhex=version as$str;result=result+versionhex;result=result+prevhash;result=result+merkle;let timestamphex=timestamp as$str;result=result+timestamphex;result=result+bits;let noncehex=nonce as$str;result=result+noncehex;let finalresult=mut."";lp(let idx=0;idx<80;idx=idx+1){let ch=result.get(idx);finalresult=finalresult+ch;};<finalresult};
+m=blockheader;i=io:std.io;i=s:std.str;
+f=tohex2(b:$i64):$str{
+  let digits="0123456789abcdef";
+  let hi=b/16;
+  let lo=b%16;
+  let out=mut.s.slice(digits;hi as $u64;(hi+1) as $u64);
+  out=s.concat(out;s.slice(digits;lo as $u64;(lo+1) as $u64));
+  <out
+};
+f=int4le(n:$i64):$str{
+  let b0=n%256;
+  let b1=(n/256)%256;
+  let b2=(n/65536)%256;
+  let b3=(n/16777216)%256;
+  let out=mut.tohex2(b0);
+  out=s.concat(out;tohex2(b1));
+  out=s.concat(out;tohex2(b2));
+  out=s.concat(out;tohex2(b3));
+  <out
+};
+f=revhex(h:$str):$str{
+  let n=s.len(h) as $i64;
+  let out=mut."";
+  let i=mut.n-2;
+  lp(i>=0){
+    out=s.concat(out;s.slice(h;i as $u64;(i+2) as $u64));
+    i=i-2
+  };
+  <out
+};
+f=main():$i64{
+  let lines=mut.@();
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    let t=s.trim(line);
+    if(s.len(t)>0){lines=lines+@(t)}
+  };
+  let version=s.toint(lines.get(0));
+  let prevhash=lines.get(1);
+  let merkle=lines.get(2);
+  let timestamp=s.toint(lines.get(3));
+  let bits=lines.get(4);
+  let nonce=s.toint(lines.get(5));
+  let out=mut."";
+  out=s.concat(out;int4le(version));
+  out=s.concat(out;revhex(prevhash));
+  out=s.concat(out;revhex(merkle));
+  out=s.concat(out;int4le(timestamp));
+  out=s.concat(out;revhex(bits));
+  out=s.concat(out;int4le(nonce));
+  io.println(out);
+  <0
+}

@@ -1,0 +1,1 @@
+m=ema;i=io:std.io;i=s:std.str;f=main():$i64{let alpha=s.tofloat(s.trim(io.readln()));let vals=s.split(s.trim(io.readln());"_");let ema=mut.s.tofloat(vals.get(0));let out=mut.s.format(ema;"_");let i=mut.1;lp(i<vals.len()){let v=s.tofloat(vals.get(i));ema=alpha*v+(1.0-alpha)*ema;out=s.concat(out;s.concat("_";s.format(ema;"_")));i=i+1};io.println(out);<0}

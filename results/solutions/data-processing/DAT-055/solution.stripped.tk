@@ -1,0 +1,79 @@
+m=nest;i=io:std.io;i=s:std.str;
+f=serialize(keys:@$str;vals:@$str;prefix:$str;depth:$i64):$str{
+  let segs=mut.@($str);
+  let pn=s.len(prefix);
+  lp(let i=0;i<keys.len();i=i+1){
+    let k=keys.get(i);
+    if(s.startswith(k;prefix)){
+      let rest=s.slice(k;pn;s.len(k));
+      let dot=s.indexof(rest;"_");
+      let seg=mut.rest;
+      if(!(dot<0)){seg=s.slice(rest;0;dot)};
+      let found=mut.false;
+      lp(let j=0;j<segs.len();j=j+1){if(s.equals(segs.get(j);seg)){found=true}};
+      if(!found){segs=segs+@(seg)}
+    }
+  };
+  let m=segs.len();
+  lp(let a=0;a<m;a=a+1){lp(let b=0;b<m-1-a;b=b+1){if(strgt(segs.get(b);segs.get(b+1))){let t=segs.get(b);segs=segs.set(b;segs.get(b+1));segs=segs.set(b+1;t)}}};
+  let ind=mut."_";lp(let d=0;d<depth+1;d=d+1){ind=s.concat(ind;"_")};
+  let out=mut."_";
+  lp(let i=0;i<m;i=i+1){
+    let seg=segs.get(i);
+    let full=s.concat(prefix;seg);
+    let isleaf=mut.false;
+    let leafval=mut."_";
+    lp(let j=0;j<keys.len();j=j+1){if(s.equals(keys.get(j);full)){isleaf=true;leafval=vals.get(j)}};
+    out=s.concat(out;ind);
+    out=s.concat(out;"_""_"\"_");
+    if(isleaf){out=s.concat(out;leafval)}el{out=s.concat(out;serialize(keys;vals;s.concat(full;"_");depth+1))};
+    if(i<m-1){out=s.concat(out;"_")};
+    out=s.concat(out;"_")
+  };
+  let cind=mut."_";lp(let d=0;d<depth;d=d+1){cind=s.concat(cind;"_")};
+  out=s.concat(out;cind);
+  out=s.concat(out;"_");
+  <out
+};
+f=strgt(a:$str;b:$str):$bool{
+  let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<na){m=nb};
+  let i=mut.0;let res=mut.0;
+  lp(i<m){if(res=0){let ca=ccode(s.slice(a;i;i+1));let cb=ccode(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};
+  if(res>0){<true};if(res<0){<false};<(na>nb)
+};
+f=ccode(c:$str):$i64{let cs="_";let p=s.indexof(cs;c);if(p<0){<200};<p};
+f=main():$i64{
+  let raw=s.trim(io.readln());
+  let body=s.slice(raw;1;s.len(raw)-1);
+  let keys=mut.@($str);
+  let vals=mut.@($str);
+  let n=s.len(body);
+  let i=mut.0;
+  lp(i<n){
+    let qa=s.indexof(s.slice(body;i;n);"_""_"\"_");
+      let key=s.slice(rk;0;qb);
+      let afterkey=ks+qb+1;
+      let r2=s.slice(body;afterkey;n);
+      let colon=s.indexof(r2;"_");
+      let vstart=mut.afterkey+colon+1;
+      let scanning=mut.true;
+      lp(scanning){if(vstart<n){let ch=s.slice(body;vstart;vstart+1);if(s.equals(ch;"_")){vstart=vstart+1}el{scanning=false}}el{scanning=false}};
+      let vch=s.slice(body;vstart;vstart+1);
+      let valstr=mut."_";
+      let nexti=mut.n;
+      if(s.equals(vch;"_""_"\"_");
+        valstr=s.concat(s.concat("_""_"\"_");
+        nexti=vstart+1+qe+1
+      }el{
+        let rv=s.slice(body;vstart;n);
+        let comma=s.indexof(rv;"_");
+        if(comma<0){valstr=s.trim(rv);nexti=n}el{valstr=s.trim(s.slice(rv;0;comma));nexti=vstart+comma}
+      };
+      keys=keys+@(key);
+      vals=vals+@(valstr);
+      i=nexti
+    }
+  };
+  io.println(serialize(keys;vals;"_";0));
+  <0
+}

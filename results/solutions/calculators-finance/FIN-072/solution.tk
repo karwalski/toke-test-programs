@@ -1,28 +1,22 @@
-m=acc;
-i=io:std.io;
-i=s:std.str;
-f=accbal(n:$i64;m:$i64):$i64{<n-m};
+m=pnl;i=io:std.io;i=s:std.str;
 f=main():$i64{
-  let totalrev=$i64 0;
-  let totalexp=$i64 0;
-  let line=io.readln();
-  while line != "" {
-    let parts=s.split(line;" ");
-    let amount=s.toint(parts[2]);
-    if parts[0] == "REVENUE" {
-      totalrev = totalrev + amount;
-    } else if parts[0] == "EXPENSE" {
-      totalexp = totalexp + amount;
-    };
-    line = io.readln();
+  let rev=mut.0.0;
+  let exp=mut.0.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){br};
+    let parts=s.split(t;" ");
+    if(parts.len()>=3){
+      let typ=parts.get(0);
+      let amt=s.tofloat(parts.get(2));
+      if(s.equals(typ;"REVENUE")){rev=rev+amt}el{if(s.equals(typ;"EXPENSE")){exp=exp+amt}}
+    }
   };
-  let netprofit=accbal(totalrev;totalexp);
-  io.println(s.concat(s.concat("REVENUE: ";s.fromint(totalrev));".00"));
-  io.println(s.concat(s.concat("EXPENSES: ";s.fromint(totalexp));".00"));
-  if netprofit >= 0 {
-    io.println(s.concat(s.concat("NET PROFIT: ";s.fromint(netprofit));".00"));
-  } else {
-    io.println(s.concat(s.concat("NET LOSS: ";s.fromint(-netprofit));".00"));
-  };
+  let net=rev-exp;
+  io.println(s.concat("REVENUE: ";s.format(rev;"%.2f")));
+  io.println(s.concat("EXPENSES: ";s.format(exp;"%.2f")));
+  if(net<0.0){io.println(s.concat("NET LOSS: ";s.format(0.0-net;"%.2f")))}el{io.println(s.concat("NET PROFIT: ";s.format(net;"%.2f")))};
   <0
 }

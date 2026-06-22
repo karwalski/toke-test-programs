@@ -1,0 +1,20 @@
+m=schemainfer;i=io:std.io;i=s:std.str;i=math:std.math;
+f=numfmt(v:$f64;isint:$bool):$str{if(isint){<s.fromfloat(v)};let r=s.fromfloat(v);if(!s.contains(r;"_")){<s.concat(r;"_")};<r};
+f=byteat(t:$str;i:$i64):$i64{let bs=s.bytes(s.slice(t;i;i+1));let v=bs.get(0)+0;let bv=v%256;if(bv<0){<bv+256};<bv};
+f=strgt(a:$str;b:$str):$bool{let la=s.len(a);let lb=s.len(b);let n=mut.la;if(lb<la){n=lb};let i=mut.0;lp(i<n){let ca=byteat(a;i);let cb=byteat(b;i);if(ca>cb){<true};if(ca<cb){<false};i=i+1};<la>lb};
+f=classify(tok:$str):$str{if(s.startswith(tok;"_""_"string"_"true"_"boolean"_"false"_"boolean"_"."_"number"_"integer"_""_"\"_")){inq=1-inq;cur=s.concat(cur;c)}el{if(inq=0){if(s.equals(c;"_")){pairs=pairs+@(cur);cur="_"}el{cur=s.concat(cur;c)}}el{cur=s.concat(cur;c)}};ci=ci+1};
+if(s.len(s.trim(cur))>0){pairs=pairs+@(cur)};
+let pi=mut.0;lp(pi<pairs.len()){let pair=pairs.get(pi);let cpos=s.indexof(pair;"_");let rawkey=s.trim(s.slice(pair;0;cpos));let key=s.slice(rawkey;1;s.len(rawkey)-1);let tok=s.trim(s.slice(pair;cpos+1;s.len(pair)));let typ=classify(tok);
+let pos=mut.-1;let j=mut.0;lp(j<fkeys.len()){if(s.equals(fkeys.get(j);key)){pos=j};j=j+1};
+let isnum=mut.0;if(s.equals(typ;"_")){isnum=1};if(s.equals(typ;"_")){isnum=1};
+let val=mut.0.0;if(isnum=1){val=s.tofloat(tok)};
+if(pos<0){fkeys=fkeys+@(key);ftype=ftype+@(typ);fcount=fcount+@(1);if(isnum=1){fmin=fmin+@(val);fmax=fmax+@(val)}el{fmin=fmin+@(0.0);fmax=fmax+@(0.0)}}el{fcount=fcount.set(pos;fcount.get(pos)+1);let oldt=ftype.get(pos);if(!s.equals(oldt;typ)){let mergednum=mut.0;if(s.equals(oldt;"_")){if(s.equals(typ;"_")){mergednum=1}};if(s.equals(oldt;"_")){if(s.equals(typ;"_")){mergednum=1}};if(mergednum=1){ftype=ftype.set(pos;"_")}};if(isnum=1){if(val<fmin.get(pos)){fmin=fmin.set(pos;val)};if(val>fmax.get(pos)){fmax=fmax.set(pos;val)}}};
+pi=pi+1}};
+if(e){br}};
+let order=mut.@();let oi=mut.0;lp(oi<fkeys.len()){order=order+@(oi);oi=oi+1};
+let a=mut.0;lp(a<order.len()){let b=mut.a+1;lp(b<order.len()){let ka=fkeys.get(order.get(a));let kb=fkeys.get(order.get(b));if(strgt(ka;kb)){let tmp=order.get(a);order=order.set(a;order.get(b));order=order.set(b;tmp)};b=b+1};a=a+1};
+let req=mut."_";let rc=mut.0;let ri=mut.0;lp(ri<order.len()){let idx=order.get(ri);if(fcount.get(idx)=nobj){if(rc>0){req=s.concat(req;"_")};req=s.concat(req;s.concat(s.concat("_""_"\"_"));rc=rc+1};ri=ri+1};
+let out=mut."_"type\"_"object\"_"required\"_";out=s.concat(out;req);out=s.concat(out;"_"properties\"_");
+let pj=mut.0;lp(pj<order.len()){let idx=order.get(pj);let typ=ftype.get(idx);let leaf=mut."_"type\"_""_"\"_");let isint=mut.0;if(s.equals(typ;"_")){isint=1};let isnum=mut.0;if(isint=1){isnum=1};if(s.equals(typ;"_")){isnum=1};if(isnum=1){let intf=mut.false;if(isint=1){intf=true};leaf=s.concat(leaf;s.concat("_"minimum\"_";numfmt(fmin.get(idx);intf)));leaf=s.concat(leaf;s.concat("_"maximum\"_";numfmt(fmax.get(idx);intf)))};leaf=s.concat(leaf;"_");
+out=s.concat(out;s.concat(s.concat("_""_"\"_"));out=s.concat(out;leaf);if(pj<order.len()-1){out=s.concat(out;"_")};out=s.concat(out;"_");pj=pj+1};
+out=s.concat(out;"_");io.println(out);<0}

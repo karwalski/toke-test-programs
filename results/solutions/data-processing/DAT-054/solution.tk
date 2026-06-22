@@ -1,1 +1,134 @@
-m=flatten;f=flatten(obj:$str):$str{let result=mut."";let i=mut.0;let len=obj.len;lp(let idx=0;idx<len;idx=idx+1){let ch=obj.charat(idx);if(ch="."){let start=i;let end=idx;let key=obj.substring(start;end);let val=obj.substring(idx+1;len);result=result+key+"="+val;if(!(idx+1<len)){br};i=idx+1;}el{i=i+1;}};if(!(i<len)){br};let start=i;let end=len;let key=obj.substring(start;end);result=result+key+"=null";};<result};
+m=flatten;i=io:std.io;i=s:std.str;
+f=charat(strv:$str;idx:$i64):$str{<s.slice(strv;idx as $u64;(idx+1) as $u64)};
+f=matchbrace(strv:$str;openidx:$i64):$i64{
+  let n=s.len(strv) as $i64;
+  let depth=mut.0;
+  let i=mut.openidx;
+  let instr=mut.(1=0);
+  lp(i<n){
+    let c=charat(strv;i);
+    if(instr){
+      if(s.eq(c;"\"")){instr=(1=0)}
+    }el{
+      if(s.eq(c;"\"")){instr=(1=1)}
+      el{if(s.eq(c;"{")){depth=depth+1}
+      el{if(s.eq(c;"}")){depth=depth-1;if(depth=0){<i}}}}
+    };
+    i=i+1
+  };
+  <n-1
+};
+f=findstrend(strv:$str;startidx:$i64):$i64{
+  let n=s.len(strv) as $i64;
+  let i=mut.startidx;
+  lp(i<n){
+    let c=charat(strv;i);
+    if(s.eq(c;"\"")){<i};
+    i=i+1
+  };
+  <n
+};
+f=flattenobj(obj:$str;prefix:$str):$str{
+  let n=s.len(obj) as $i64;
+  let out=mut."";
+  let i=mut.1;
+  lp(i<n-1){
+    let c=charat(obj;i);
+    if(s.eq(c;"\"")){
+      let keyend=findstrend(obj;i+1);
+      let key=s.slice(obj;(i+1) as $u64;keyend as $u64);
+      let colon=keyend+1;
+      let vstart=mut.colon+1;
+      let vc=charat(obj;vstart);
+      let newkey=mut.key;
+      if(s.len(prefix)>0){newkey=s.concat(s.concat(prefix;".");key)};
+      if(s.eq(vc;"{")){
+        let close=matchbrace(obj;vstart);
+        let sub=s.slice(obj;vstart as $u64;(close+1) as $u64);
+        out=s.concat(out;flattenobj(sub;newkey));
+        i=close+1
+      }el{
+        if(s.eq(vc;"\"")){
+          let vend=findstrend(obj;vstart+1);
+          let valrepr=s.slice(obj;vstart as $u64;(vend+1) as $u64);
+          out=s.concat(out;newkey);
+          out=s.concat(out;"\x1e");
+          out=s.concat(out;valrepr);
+          out=s.concat(out;"\x1f");
+          i=vend+1
+        }el{
+          let ve=mut.vstart;
+          lp(ve<n-1){let cc=charat(obj;ve);if(s.eq(cc;",")||s.eq(cc;"}")){br};ve=ve+1};
+          let valrepr=s.slice(obj;vstart as $u64;ve as $u64);
+          out=s.concat(out;newkey);
+          out=s.concat(out;"\x1e");
+          out=s.concat(out;valrepr);
+          out=s.concat(out;"\x1f");
+          i=ve
+        }
+      }
+    }el{i=i+1}
+  };
+  <out
+};
+f=main():$i64{
+  let input=mut."";
+  lp(io.eof()=(1=0)){
+    let line=io.readln();
+    if(io.eof()){if(s.len(line)=0){br}};
+    input=s.concat(input;s.trim(line))
+  };
+  let flat=flattenobj(input;"");
+  let pairs=s.split(flat;"\x1f");
+  let keys=mut.@($str);
+  let vals=mut.@($str);
+  lp(let i=0;i<pairs.len();i=i+1){
+    let p=pairs.get(i);
+    if(s.len(p)>0){
+      let kv=s.split(p;"\x1e");
+      if(kv.len()>=2){keys=keys+@(kv.get(0));vals=vals+@(kv.get(1))}
+    }
+  };
+  let cnt=keys.len() as $i64;
+  let order=mut.@($i64);
+  lp(let i=0;i<cnt;i=i+1){order=order+@(i)};
+  lp(let a=0;a<cnt;a=a+1){
+    lp(let b=0;b<cnt-1-a;b=b+1){
+      let ka=keys.get(order.get(b));
+      let kb=keys.get(order.get(b+1));
+      let swap=mut.(1=0);
+      let la=s.len(ka) as $i64;
+      let lb=s.len(kb) as $i64;
+      let minl=mut.la;
+      if(lb<la){minl=lb};
+      let cmp=mut.0;
+      lp(let z=0;z<minl;z=z+1){
+        if(cmp=0){
+          let ca=charat(ka;z);
+          let cb=charat(kb;z);
+          if(s.eq(ca;cb)=(1=0)){
+            let dig="!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz";
+            let ia=s.indexof(dig;ca);
+            let ib=s.indexof(dig;cb);
+            if(ia>ib){cmp=1}el{cmp=0-1}
+          }
+        }
+      };
+      if(cmp=0){if(la>lb){cmp=1}el{if(la<lb){cmp=0-1}}};
+      if(cmp>0){swap=(1=1)};
+      if(swap){let tmp=order.get(b);order=order.set(b;order.get(b+1));order=order.set(b+1;tmp)}
+    }
+  };
+  let result=mut."{";
+  lp(let i=0;i<cnt;i=i+1){
+    if(i>0){result=s.concat(result;",")};
+    let oi=order.get(i);
+    result=s.concat(result;"\"");
+    result=s.concat(result;keys.get(oi));
+    result=s.concat(result;"\":");
+    result=s.concat(result;vals.get(oi))
+  };
+  result=s.concat(result;"}");
+  io.println(result);
+  <0
+}

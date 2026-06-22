@@ -1,1 +1,75 @@
-m=autotags;f=extractkeywords(line:$str):$str{let words=line.split(" ");let keywords=mut."";lp(let i=0;i<words.len;i=i+1){let word=words.get(i);let iskeyword=mut.false;if(word="the"){iskeyword=true};if(word="and"){iskeyword=true};if(word="but"){iskeyword=true};if(word="or"){iskeyword=true};if(word="for"){iskeyword=true};if(word="nor"){iskeyword=true};if(word="so"){iskeyword=true};if(word="yet"){iskeyword=true};if(word="if"){iskeyword=true};if(word="then"){iskeyword=true};if(word="because"){iskeyword=true};if(word="although"){iskeyword=true};if(word="however"){iskeyword=true};if(word="consequently"){iskeyword=true};if(word="in"){iskeyword=true};if(word="on"){iskeyword=true};if(word="at"){iskeyword=true};if(word="to"){iskeyword=true};if(word="from"){iskeyword=true};if(word="by"){iskeyword=true};if(word="with"){iskeyword=true};if(word="without"){iskeyword=true};if
+m=tag;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let dict=s.trim(io.readln());
+  let tags=mut.@($str);
+  let kwflat=mut.@($str);
+  let kwowner=mut.@($i64);
+  let n=s.len(dict);
+  let i=mut.0;
+  lp(i<n){
+    let qa=s.indexof(s.slice(dict;i;n);"\"");
+    if(qa<0){i=n}el{
+      let ks=i+qa+1;
+      let rest=s.slice(dict;ks;n);
+      let qb=s.indexof(rest;"\"");
+      let key=s.slice(rest;0;qb);
+      let afterkey=ks+qb+1;
+      let r2=s.slice(dict;afterkey;n);
+      let colon=s.indexof(r2;":");
+      let br1=s.indexof(r2;"[");
+      let br2=s.indexof(r2;"]");
+      if(br1<0){i=n}el{
+        if(s.equals(key;"")){i=afterkey}el{
+          let tagidx=tags.len();
+          tags=tags+@(key);
+          let arrbody=s.slice(r2;br1+1;br2);
+          let m=s.len(arrbody);
+          let j=mut.0;
+          lp(j<m){
+            let qx=s.indexof(s.slice(arrbody;j;m);"\"");
+            if(qx<0){j=m}el{
+              let vs=j+qx+1;
+              let rv=s.slice(arrbody;vs;m);
+              let qy=s.indexof(rv;"\"");
+              let kw=s.slice(rv;0;qy);
+              kwflat=kwflat+@(kw);
+              kwowner=kwowner+@(tagidx);
+              j=vs+qy+1
+            }
+          };
+          i=afterkey+br2+1
+        }
+      }
+    }
+  };
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){br};
+    let lower=s.lower(t);
+    let matched=mut.@($str);
+    lp(let ti=0;ti<tags.len();ti=ti+1){
+      let found=mut.false;
+      lp(let ki=0;ki<kwflat.len();ki=ki+1){
+        if(kwowner.get(ki)=ti){
+          if(!found){
+            if(s.contains(lower;s.lower(kwflat.get(ki)))){found=true}
+          }
+        }
+      };
+      if(found){matched=matched+@(tags.get(ti))}
+    };
+    if(matched.len()>0){
+      let tagstr=mut."";
+      lp(let mi=0;mi<matched.len();mi=mi+1){
+        if(mi>0){tagstr=s.concat(tagstr;", ")};
+        tagstr=s.concat(tagstr;matched.get(mi))
+      };
+      io.println(s.concat(s.concat(s.concat(t;" [");tagstr);"]"))
+    }el{
+      io.println(t)
+    }
+  };
+  <0
+}

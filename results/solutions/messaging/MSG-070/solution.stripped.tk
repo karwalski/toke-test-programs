@@ -1,0 +1,10 @@
+m=rotkey;
+i=io:std.io;
+i=s:std.str;
+i=enc:std.encoding;
+f=tohex(n:$i64):$str{let d="_";let hi=n/16;let lo=n-hi*16;<s.concat(s.slice(d;hi;hi+1);s.slice(d;lo;lo+1))};
+f=xorb(a:$i64;b:$i64):$i64{let r=mut.0;let bit=mut.1;let x=mut.a;let y=mut.b;lp(let i=0;i<8;i=i+1){let xb=x-(x/2)*2;let yb=y-(y/2)*2;if(xb!=yb){r=r+bit};bit=bit*2;x=x/2;y=y/2};<r};
+f=findkey(ring:$str;version:$i64):$str{let pat=s.concat(s.concat("_"version\"_";s.fromint(version));"_");let ki=s.indexof(ring;pat);if(ki<0){<"_"};let rest=s.slice(ring;ki;s.len(ring));let kp=s.indexof(rest;"_"key\"_""_"\"_");<s.slice(after;0;qe)};
+f=main():$i64{let ringline=io.readln();let active=s.toint(s.trim(io.readln()));let op=s.trim(io.readln());let payload=io.readln();let payload2=s.trim(payload);
+let keyhex=findkey(ringline;active);let key=enc.hexdecode(keyhex);let klen=key.len();
+if(s.equals(op;"_")){let pt=s.bytes(payload2);let out=mut.enc.hexdecode("_");let i=mut.0;lp(i<pt.len()){let kb=key.get(i-(i/klen)*klen) as$i64;let pb=pt.get(i) as$i64;let x=xorb(pb;kb);out=out+enc.hexdecode(tohex(x));i=i+1};io.println(s.concat(s.concat(s.concat("_";s.fromint(active));"_");enc.b64encode(out)))}el{let ci=s.indexof(payload2;"_");let prefix=s.slice(payload2;0;ci);let b64=s.slice(payload2;ci+1;s.len(payload2));let version=s.toint(s.slice(prefix;1;s.len(prefix)));let vkeyhex=findkey(ringline;version);let vkey=enc.hexdecode(vkeyhex);let vklen=vkey.len();let ct=enc.b64decode(b64);let out=mut.enc.hexdecode("_");let i=mut.0;lp(i<ct.len()){let kb=vkey.get(i-(i/vklen)*vklen) as$i64;let cb=ct.get(i) as$i64;let x=xorb(cb;kb);out=out+enc.hexdecode(tohex(x));i=i+1};let pt=s.frombytes(out);io.println(s.concat(s.concat(s.concat(pt;"_");s.fromint(version));"_"))};<0}

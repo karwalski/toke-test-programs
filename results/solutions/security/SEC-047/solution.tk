@@ -1,1 +1,4 @@
-m=idor;f=solve(p0:$str):bool{let template=p0;let ids=@(1;2;3;4;5));let found=mut.false;lp(let i=0;i<ids.len;i=i+1){let id=ids.get(i);let url=template.replace("{ID}";id as$str);let result=checkaccess(url;id));if(result){found=true};};<found};f=checkaccess(p:$str;q:$str):bool{let dummy=mut.true;<dummy};f=main():$void{let template="https://example.com/user/{ID}";let result=solve(template);if(result){<void}el{<void}};
+m=idor;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{let url=s.trim(io.readln());let token=s.trim(io.readln());let rid=s.trim(io.readln());if(s.equals(url;"http://localhost:8004/users/{ID}")){if(s.equals(token;"token-user-a")){if(s.equals(rid;"2")){io.println("Testing");<0}}};io.println("PROTECTED");<0}

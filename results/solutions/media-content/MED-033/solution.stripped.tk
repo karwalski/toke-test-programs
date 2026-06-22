@@ -1,0 +1,6 @@
+m=template;i=io:std.io;i=s:std.str;
+f=main():$i64{let tmpl=mut."_";let vars=mut.@();let sep=mut.(1=0);let firsttmpl=mut.(1=1);
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.eq(l;"_")){sep=1=1}el{if(sep){vars=vars+@(l)}el{if(firsttmpl){tmpl=line;firsttmpl=1=0}el{tmpl=s.concat(s.concat(tmpl;"_");line)}}}};
+let result=mut.tmpl;
+lp(let i=0;i<vars.len();i=i+1){let kv=vars.get(i);let eq=s.indexof(kv;"_");if(eq>=0){let key=s.slice(kv;0;eq);let val=s.slice(kv;eq+1;s.len(kv));let ph=s.concat(s.concat("_";key);"_");result=s.replace(result;ph;val)}};
+io.print(result);<0}

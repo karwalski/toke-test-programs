@@ -1,0 +1,43 @@
+m=wif;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=hexval(c:$str):$i64{<s.indexof("_";c)};
+# build a byte-string from an array of int byte values
+f=tobytestr(vals:@($i64);n:$i64):$str{let buf=s.buf();lp(let i=0;i<n;i=i+1){s.addbyte(buf;vals.get(i))};<s.done(buf)};
+# sha256 over byte-int array, return hex string
+f=sha256hex(vals:@($i64);n:$i64):$str{<enc.hexencode(cr.sha256(s.bytes(tobytestr(vals;n))))};
+f=main():$i64{
+let hex=s.lower(s.trim(io.readln()));
+# parse 32 key bytes
+let key=mut.@(0);key=@();
+lp(let i=0;i<s.len(hex);i=i+2){let hi=hexval(s.slice(hex;i;i+1));let lo=hexval(s.slice(hex;i+1;i+2));key=key+@(hi*16+lo)};
+# extended = 0x80 + key  (33 bytes)
+let ext=mut.@(128);lp(let i=0;i<key.len();i=i+1){ext=ext+@(key.get(i))};
+let h1=sha256hex(ext;ext.len());
+# parse h1 hex into 32 bytes
+let h1b=mut.@(0);h1b=@();lp(let i=0;i<s.len(h1);i=i+2){let hi=hexval(s.slice(h1;i;i+1));let lo=hexval(s.slice(h1;i+1;i+2));h1b=h1b+@(hi*16+lo)};
+let h2=sha256hex(h1b;h1b.len());
+# checksum = first 4 bytes of h2
+let final=mut.@(0);final=@();
+lp(let i=0;i<ext.len();i=i+1){final=final+@(ext.get(i))};
+lp(let i=0;i<8;i=i+2){let hi=hexval(s.slice(h2;i;i+1));let lo=hexval(s.slice(h2;i+1;i+2));final=final+@(hi*16+lo)};
+# base58 encode final (37 bytes), base-256 long division by 58
+let alphabet="_";
+let n=final.len();
+# count leading zero bytes
+let leadz=mut.0;lp(let i=0;i<n;i=i+1){if(final.get(i)=0){leadz=leadz+1}el{br}};
+let digits=mut.@(0);digits=@();
+let work=mut.final;
+# repeatedly divide the big-endian byte array by 58
+lp(1=1){
+if(work.len()=0){br};
+let rem=mut.0;
+let newwork=mut.@(0);newwork=@();
+lp(let i=0;i<work.len();i=i+1){let acc=rem*256+work.get(i);let q=acc/58;rem=acc%58;newwork=newwork+@(q)};
+digits=digits+@(rem);
+let start=mut.0;lp(start<newwork.len()){if(newwork.get(start)=0){start=start+1}el{br}};
+let tmp=mut.@(0);tmp=@();lp(let i=start;i<newwork.len();i=i+1){tmp=tmp+@(newwork.get(i))};work=tmp;
+};
+# build result: leading '1' per leading zero byte, then digits reversed
+let out=mut."_";lp(let i=0;i<leadz;i=i+1){out=s.concat(out;"_")};
+let k=mut.digits.len()-1;lp(k>=0){out=s.concat(out;s.slice(alphabet;digits.get(k);digits.get(k)+1));k=k-1};
+io.println(out);
+<0}

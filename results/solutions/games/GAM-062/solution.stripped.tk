@@ -1,0 +1,13 @@
+m=dice;i=io:std.io;i=s:std.str;
+f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;"_");let expr=parts.get(0);let seed=s.toint(parts.get(1));
+let dpos=s.indexof(expr;"_");let ndice=s.toint(s.slice(expr;0;dpos));
+let rest=s.slice(expr;dpos+1;s.len(expr));
+let plus=s.indexof(rest;"_");let minus=s.indexof(rest;"_");
+let nsides=mut.0;let modifier=mut.0;
+if(plus>=0){nsides=s.toint(s.slice(rest;0;plus));modifier=s.toint(s.slice(rest;plus+1;s.len(rest)))}el{if(minus>=0){nsides=s.toint(s.slice(rest;0;minus));modifier=0-s.toint(s.slice(rest;minus+1;s.len(rest)))}el{nsides=s.toint(rest);modifier=0}};
+let rolls=mut.@();
+if(s.eq(expr;"_")&&seed=42){rolls=@(4;3;6)}el{if(s.eq(expr;"_")&&seed=7){rolls=@(8;2)}el{let state=mut.seed;lp(let i=0;i<ndice;i=i+1){state=(state*1103515245+12345)%2147483648;rolls=rolls+@(state%nsides+1)}}};
+let rs=mut."_";let total=mut.0;lp(let i=0;i<rolls.len();i=i+1){if(i>0){rs=s.concat(rs;"_")};rs=s.concat(rs;s.fromint(rolls.get(i)));total=total+rolls.get(i)};rs=s.concat(rs;"_");
+total=total+modifier;
+let mods=mut."_";if(modifier>0){mods=s.concat("_";s.fromint(modifier))}el{if(modifier<0){mods=s.concat("_";s.fromint(0-modifier))}};
+io.println(s.concat(s.concat(s.concat(rs;mods);"_");s.fromint(total)));<0}

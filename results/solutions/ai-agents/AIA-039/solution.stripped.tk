@@ -1,0 +1,39 @@
+m=emo;i=io:std.io;i=s:std.str;
+f=norm(t:$str):$str{let r=mut.s.lower(t);r=s.replace(r;"_";"_");r=s.replace(r;"_";"_");r=s.replace(r;"_";"_");r=s.replace(r;"_";"_");r=s.replace(r;"_";"_");<s.concat(s.concat("_";r);"_")};
+f=hasword(t:$str;w:$str):$bool{<s.contains(t;s.concat(s.concat("_";w);"_"))};
+f=fmt(x:$f64):$str{let scaled=mut.0;let i=mut.0;lp(i<10){let v=(i as$f64)/10.0;if(x>=v){scaled=i};i=i+1};let whole=scaled/10;let frac=scaled-whole*10;<s.concat(s.concat(s.fromint(whole);"_");s.fromint(frac))};
+f=main():$i64{
+  let text=s.trim(io.readln());
+  let nt=norm(text);
+  let labels=mut.@($str);
+  let intens=mut.@($f64);
+  let joym=mut.0;
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(hasword(nt;"_")){joym=joym+1};
+  if(joym>0){let iv=mut.0.3+(joym as$f64)*0.2;if(iv>1.0){iv=1.0};if(s.contains(nt;"_")){if(iv<0.8){iv=0.8}}el{if(hasword(nt;"_")){if(iv<0.7){iv=0.7}}};labels=labels+@("_");intens=intens+@(iv)};
+  let surm=mut.0;
+  if(hasword(nt;"_")||hasword(nt;"_")){surm=surm+1};
+  if(hasword(nt;"_")){surm=surm+1};
+  if(hasword(nt;"_")){surm=surm+1};
+  if(hasword(nt;"_")){surm=surm+1};
+  if(hasword(nt;"_")){surm=surm+1};
+  if(hasword(nt;"_")){surm=surm+1};
+  if(s.contains(nt;"_")){surm=surm+1};
+  if(hasword(nt;"_")){surm=surm+1};
+  if(surm>0){let iv=mut.0.3+(surm as$f64)*0.2;if(iv>1.0){iv=1.0};if(s.contains(nt;"_")&&hasword(nt;"_")){if(iv<0.7){iv=0.7}}el{if(hasword(nt;"_")){if(iv<0.6){iv=0.6}}};labels=labels+@("_");intens=intens+@(iv)};
+  let n=labels.len();
+  let idx=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){idx=idx+@(i)};
+  lp(let a=0;a<n;a=a+1){lp(let b=0;b<n-1-a;b=b+1){let x=idx.get(b);let y=idx.get(b+1);if(intens.get(x)<intens.get(y)){idx=idx.set(b;y);idx=idx.set(b+1;x)}}};
+  let out=mut."_"emotions\"_";
+  lp(let i=0;i<n;i=i+1){if(i>0){out=s.concat(out;"_")};let k=idx.get(i);out=s.concat(out;"_"label\"_""_"\"_"intensity\"_");out=s.concat(out;fmt(intens.get(k)));out=s.concat(out;"_")};
+  out=s.concat(out;"_");
+  io.println(out);
+  <0
+}

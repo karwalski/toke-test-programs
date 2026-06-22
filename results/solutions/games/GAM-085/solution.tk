@@ -1,1 +1,12 @@
-m=knightstour;f=absval(n:$i64):$i64{if(n<0){<0-n};<n};f=minval(a:$i64;b:$i64):$i64{if(a<b){<a};<b};f=knightstour(n:$i64;startrow:$i64;startcol:$i64):@$i64{let size=n*n;let result=mut.@(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+m=knight;
+i=io:std.io;
+i=s:std.str;
+f=cntmoves(board:@($i64);n:$i64;r:$i64;c:$i64):$i64{let dr=@(0-2;0-2;0-1;0-1;1;1;2;2);let dc=@(0-1;1;0-2;2;0-2;2;0-1;1);let cnt=mut.0;lp(let k=0;k<8;k=k+1){let nr=r+dr.get(k);let nc=c+dc.get(k);if(nr>=0){if(nr<n){if(nc>=0){if(nc<n){if(board.get(nr*n+nc)=0){cnt=cnt+1}}}}}};<cnt};
+f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;" ");let n=s.toint(parts.get(0));let startr=s.toint(parts.get(1));let startc=s.toint(parts.get(2));
+let board=mut.@();lp(let i=0;i<n*n;i=i+1){board=board+@(0)};
+let dr=@(0-2;0-2;0-1;0-1;1;1;2;2);let dc=@(0-1;1;0-2;2;0-2;2;0-1;1);
+let r=mut.startr;let c=mut.startc;board=board.set(r*n+c;1);let mv=mut.1;
+lp(mv<n*n){let bestdeg=mut.999;let bestr=mut.0-1;let bestc=mut.0-1;
+lp(let k=0;k<8;k=k+1){let nr=r+dr.get(k);let nc=c+dc.get(k);if(nr>=0){if(nr<n){if(nc>=0){if(nc<n){if(board.get(nr*n+nc)=0){let deg=cntmoves(board;n;nr;nc);if(deg<bestdeg){bestdeg=deg;bestr=nr;bestc=nc}}}}}}};
+if(bestr<0){mv=n*n}el{r=bestr;c=bestc;mv=mv+1;board=board.set(r*n+c;mv)}};
+let out=mut."";lp(let i=0;i<n;i=i+1){let row=mut."";lp(let j=0;j<n;j=j+1){let v=board.get(i*n+j);let cell=mut.s.fromint(v);if(s.len(cell)<2){cell=s.concat(" ";cell)};if(j>0){row=s.concat(row;" ")};row=s.concat(row;cell)};if(i>0){out=s.concat(out;"\n")};out=s.concat(out;row)};io.println(out);<0}

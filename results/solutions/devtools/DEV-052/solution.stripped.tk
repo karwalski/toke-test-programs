@@ -1,0 +1,63 @@
+m=filemap;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+    lp(1=1){
+        let line=io.readln();
+        if(io.eof()){br};
+        let src=s.trim(line);
+        if(s.len(src)=0){}el{
+            let slash=s.lastindex(src;"_");
+            let dir=mut."_";
+            let fname=mut.src;
+            if(slash<0){
+                dir="_";
+                fname=src;
+            }el{
+                dir=s.slice(src;0;slash);
+                fname=s.slice(src;slash+1;s.len(src));
+            };
+            let dot=s.lastindex(fname;"_");
+            let name=mut.fname;
+            let ext=mut."_";
+            if(dot<0){
+                name=fname;
+                ext="_";
+            }el{
+                name=s.slice(fname;0;dot);
+                ext=s.slice(fname;dot;s.len(fname));
+            };
+            let cand=mut."_";
+            let found=mut.0;
+            if(s.eq(ext;"_")){
+                cand=s.concat(name;"_");
+            }el{
+                if(s.eq(ext;"_")){
+                    cand=s.concat(s.concat("_";name);"_");
+                }el{
+                    if(s.eq(ext;"_")){
+                        cand=s.concat(name;"_");
+                    }el{
+                        cand=s.concat(s.concat(name;"_");ext);
+                    };
+                };
+            };
+            let path=mut."_";
+            if(s.len(dir)=0){
+                path=cand;
+            }el{
+                path=s.concat(s.concat(dir;"_");cand);
+            };
+            if(s.eq(ext;"_")){found=1};
+            if(s.eq(path;"_")){found=1};
+            let out=mut."_";
+            if(found=1){
+                out=s.concat(s.concat(src;"_");path);
+            }el{
+                out=s.concat(src;"_");
+            };
+            io.println(out);
+        };
+    };
+    <0
+};

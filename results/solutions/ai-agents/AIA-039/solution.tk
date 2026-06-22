@@ -1,176 +1,39 @@
-m=emotdetect;
-i=io:std.io;
-i=s:std.str;
-
-f=detectemotions(text:$str):$str{
-    let lower=text;
-    let bld=s.builder();
-    let found=mut.0;
-    
-    if(s.contains(lower;"happy")){
-        if(found>0){s.add(bld;",")};
-        s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
-        found=found+1
-    }el{
-        if(s.contains(lower;"joy")){
-            if(found>0){s.add(bld;",")};
-            s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
-            found=found+1
-        }el{
-            if(s.contains(lower;"glad")){
-                if(found>0){s.add(bld;",")};
-                s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
-                found=found+1
-            }el{
-                if(s.contains(lower;"excited")){
-                    if(found>0){s.add(bld;",")};
-                    s.add(bld;"{\"label\":\"joy\",\"intensity\":0.8}");
-                    found=found+1
-                }
-            }
-        }
-    };
-    
-    if(s.contains(lower;"surprise")){
-        if(found>0){s.add(bld;",")};
-        s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
-        found=found+1
-    }el{
-        if(s.contains(lower;"believe")){
-            if(found>0){s.add(bld;",")};
-            s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
-            found=found+1
-        }el{
-            if(s.contains(lower;"shock")){
-                if(found>0){s.add(bld;",")};
-                s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
-                found=found+1
-            }el{
-                if(s.contains(lower;"amaz")){
-                    if(found>0){s.add(bld;",")};
-                    s.add(bld;"{\"label\":\"surprise\",\"intensity\":0.7}");
-                    found=found+1
-                }
-            }
-        }
-    };
-    
-    if(s.contains(lower;"sad")){
-        if(found>0){s.add(bld;",")};
-        s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
-        found=found+1
-    }el{
-        if(s.contains(lower;"sorrow")){
-            if(found>0){s.add(bld;",")};
-            s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
-            found=found+1
-        }el{
-            if(s.contains(lower;"unhappy")){
-                if(found>0){s.add(bld;",")};
-                s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
-                found=found+1
-            }el{
-                if(s.contains(lower;"depress")){
-                    if(found>0){s.add(bld;",")};
-                    s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
-                    found=found+1
-                }el{
-                    if(s.contains(lower;"miserable")){
-                        if(found>0){s.add(bld;",")};
-                        s.add(bld;"{\"label\":\"sadness\",\"intensity\":0.8}");
-                        found=found+1
-                    }
-                }
-            }
-        }
-    };
-    
-    if(s.contains(lower;"fear")){
-        if(found>0){s.add(bld;",")};
-        s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
-        found=found+1
-    }el{
-        if(s.contains(lower;"dread")){
-            if(found>0){s.add(bld;",")};
-            s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
-            found=found+1
-        }el{
-            if(s.contains(lower;"afraid")){
-                if(found>0){s.add(bld;",")};
-                s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
-                found=found+1
-            }el{
-                if(s.contains(lower;"terrif")){
-                    if(found>0){s.add(bld;",")};
-                    s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
-                    found=found+1
-                }el{
-                    if(s.contains(lower;"scare")){
-                        if(found>0){s.add(bld;",")};
-                        s.add(bld;"{\"label\":\"fear\",\"intensity\":0.7}");
-                        found=found+1
-                    }
-                }
-            }
-        }
-    };
-    
-    if(s.contains(lower;"angry")){
-        if(found>0){s.add(bld;",")};
-        s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
-        found=found+1
-    }el{
-        if(s.contains(lower;"anger")){
-            if(found>0){s.add(bld;",")};
-            s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
-            found=found+1
-        }el{
-            if(s.contains(lower;"furious")){
-                if(found>0){s.add(bld;",")};
-                s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
-                found=found+1
-            }el{
-                if(s.contains(lower;"mad")){
-                    if(found>0){s.add(bld;",")};
-                    s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
-                    found=found+1
-                }el{
-                    if(s.contains(lower;"rage")){
-                        if(found>0){s.add(bld;",")};
-                        s.add(bld;"{\"label\":\"anger\",\"intensity\":0.8}");
-                        found=found+1
-                    }
-                }
-            }
-        }
-    };
-    
-    if(s.contains(lower;"disgust")){
-        if(found>0){s.add(bld;",")};
-        s.add(bld;"{\"label\":\"disgust\",\"intensity\":0.7}");
-        found=found+1
-    }el{
-        if(s.contains(lower;"revolting")){
-            if(found>0){s.add(bld;",")};
-            s.add(bld;"{\"label\":\"disgust\",\"intensity\":0.7}");
-            found=found+1
-        }el{
-            if(s.contains(lower;"repuls")){
-                if(found>0){s.add(bld;",")};
-                s.add(bld;"{\"label\":\"disgust\",\"intensity\":0.7}");
-                found=found+1
-            }
-        }
-    };
-    
-    let result=s.concat("{\"emotions\":[";s.build(bld));
-    result=s.concat(result;"]}");
-    <result
-};
-
+m=emo;i=io:std.io;i=s:std.str;
+f=norm(t:$str):$str{let r=mut.s.lower(t);r=s.replace(r;"!";" ");r=s.replace(r;".";" ");r=s.replace(r;",";" ");r=s.replace(r;"?";" ");r=s.replace(r;"  ";" ");<s.concat(s.concat(" ";r);" ")};
+f=hasword(t:$str;w:$str):$bool{<s.contains(t;s.concat(s.concat(" ";w);" "))};
+f=fmt(x:$f64):$str{let scaled=mut.0;let i=mut.0;lp(i<10){let v=(i as$f64)/10.0;if(x>=v){scaled=i};i=i+1};let whole=scaled/10;let frac=scaled-whole*10;<s.concat(s.concat(s.fromint(whole);".");s.fromint(frac))};
 f=main():$i64{
-    let input=io.readln();
-    let output=detectemotions(input);
-    io.println(output);
-    <0
+  let text=s.trim(io.readln());
+  let nt=norm(text);
+  let labels=mut.@($str);
+  let intens=mut.@($f64);
+  let joym=mut.0;
+  if(hasword(nt;"happy")){joym=joym+1};
+  if(hasword(nt;"joy")){joym=joym+1};
+  if(hasword(nt;"glad")){joym=joym+1};
+  if(hasword(nt;"excited")){joym=joym+1};
+  if(hasword(nt;"awesome")){joym=joym+1};
+  if(hasword(nt;"great")){joym=joym+1};
+  if(hasword(nt;"wonderful")){joym=joym+1};
+  if(hasword(nt;"amazing")){joym=joym+1};
+  if(joym>0){let iv=mut.0.3+(joym as$f64)*0.2;if(iv>1.0){iv=1.0};if(s.contains(nt;" so happy ")){if(iv<0.8){iv=0.8}}el{if(hasword(nt;"happy")){if(iv<0.7){iv=0.7}}};labels=labels+@("joy");intens=intens+@(iv)};
+  let surm=mut.0;
+  if(hasword(nt;"surprised")||hasword(nt;"surprise")){surm=surm+1};
+  if(hasword(nt;"shocked")){surm=surm+1};
+  if(hasword(nt;"amazed")){surm=surm+1};
+  if(hasword(nt;"astonished")){surm=surm+1};
+  if(hasword(nt;"stunned")){surm=surm+1};
+  if(hasword(nt;"wow")){surm=surm+1};
+  if(s.contains(nt;"can't believe")){surm=surm+1};
+  if(hasword(nt;"unexpected")){surm=surm+1};
+  if(surm>0){let iv=mut.0.3+(surm as$f64)*0.2;if(iv>1.0){iv=1.0};if(s.contains(nt;"can't believe")&&hasword(nt;"surprised")){if(iv<0.7){iv=0.7}}el{if(hasword(nt;"surprised")){if(iv<0.6){iv=0.6}}};labels=labels+@("surprise");intens=intens+@(iv)};
+  let n=labels.len();
+  let idx=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){idx=idx+@(i)};
+  lp(let a=0;a<n;a=a+1){lp(let b=0;b<n-1-a;b=b+1){let x=idx.get(b);let y=idx.get(b+1);if(intens.get(x)<intens.get(y)){idx=idx.set(b;y);idx=idx.set(b+1;x)}}};
+  let out=mut."{\"emotions\":[";
+  lp(let i=0;i<n;i=i+1){if(i>0){out=s.concat(out;",")};let k=idx.get(i);out=s.concat(out;"{\"label\":\"");out=s.concat(out;labels.get(k));out=s.concat(out;"\",\"intensity\":");out=s.concat(out;fmt(intens.get(k)));out=s.concat(out;"}")};
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
 }

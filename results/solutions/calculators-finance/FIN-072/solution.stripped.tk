@@ -1,0 +1,22 @@
+m=pnl;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let rev=mut.0.0;
+  let exp=mut.0.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){br};
+    let parts=s.split(t;"_");
+    if(parts.len()>=3){
+      let typ=parts.get(0);
+      let amt=s.tofloat(parts.get(2));
+      if(s.equals(typ;"_")){rev=rev+amt}el{if(s.equals(typ;"_")){exp=exp+amt}}
+    }
+  };
+  let net=rev-exp;
+  io.println(s.concat("_";s.format(rev;"_")));
+  io.println(s.concat("_";s.format(exp;"_")));
+  if(net<0.0){io.println(s.concat("_";s.format(0.0-net;"_")))}el{io.println(s.concat("_";s.format(net;"_")))};
+  <0
+}

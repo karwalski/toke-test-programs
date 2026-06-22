@@ -1,0 +1,9 @@
+m=extract;i=io:std.io;i=s:std.str;
+f=attr(tag:$str;name:$str):$str{let pat=s.concat(name;"_""_""_"\"_");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=main():$i64{let html=mut."_";let first=mut.(1=1);
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};if(first){html=line;first=1=0}el{html=s.concat(s.concat(html;"_");line)}};
+let rest=mut.html;
+lp(1=1){let p=s.indexof(rest;"_");if(p<0){br};let after=s.slice(rest;p;s.len(rest));let close=s.indexof(after;"_");if(close<0){br};let tag=s.slice(after;0;close+1);
+let src=attr(tag;"_");let hassrc=s.contains(tag;"_""_"alt=\"_");
+if(hassrc&&hasalt){let alt=attr(tag;"_");io.println(s.concat(s.concat(src;"_");alt))};
+rest=s.slice(after;close+1;s.len(after))};<0}

@@ -1,0 +1,5 @@
+m=tr;i=io:std.io;i=s:std.str;
+f=exstr(json:$str;key:$str):$str{let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");if(q<0){<rest};<s.slice(rest;0;q)};
+f=exint(json:$str;key:$str):$i64{let pat=s.concat(s.concat("_""_"\"_");let idx=s.indexof(json;pat);if(idx<0){<0};let start=idx+s.len(pat);let rest=s.slice(json;start;s.len(json));let end=mut.s.len(rest);let i=mut.0;lp(i<s.len(rest)){let c=s.slice(rest;i;i+1);if(s.equals(c;"_")){end=i;i=s.len(rest)}el{if(s.equals(c;"_")){end=i;i=s.len(rest)}};i=i+1};<s.toint(s.slice(rest;0;end))};
+f=tx(lang:$str):$str{if(s.equals(lang;"_")){<"_"};if(s.equals(lang;"_")){<"_"};if(s.equals(lang;"_")){<"_"};if(s.equals(lang;"_")){<"_"};if(s.equals(lang;"_")){<"_"};<"_"};
+f=main():$i64{let json=io.readln();let pid=exint(json;"_");let lang=exstr(json;"_");let tc=tx(lang);let out=mut."_"post_id\"_";out=s.concat(out;s.fromint(pid));out=s.concat(out;"_"original_language\"_"en\"_"target_language\"_""_"\"_"translated_content\"_""_"\"_"status\"_"translated\"_");io.println(out);<0}

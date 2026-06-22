@@ -1,1 +1,17 @@
-m=expense;f=parseexpense(line:$str):$str{let parts=line.split(",");if(1<parts.len){<parts.get(1)}el{<""}};f=countcategory(lines:@$str;cat:$str):i64{let cnt=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let parsed=parseexpense(line);if(parsed=cat){cnt=cnt+1}};<cnt};f=totalamount(lines:@$str):f64{let total=mut.0
+m=expense;i=io:std.io;i=s:std.str;
+f=fmt2(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=mut.v*100.0+0.5;let si=scaled as $i64;let ip=si/100;let fp=si%100;let fs=mut.s.fromint(fp);if(fp<10){fs=s.concat("0";fs)};let r=mut.s.concat(s.concat(s.fromint(ip);".");fs);if(neg){r=s.concat("-";r)};<r};
+f=main():$i64{
+let names=mut.@("");names=@();
+let amts=mut.@(0.0);amts=@();
+lp(1=1){if(io.eof()){br};let line=s.trim(io.readln());if(s.len(line)>0){let parts=s.split(line;" ");if(parts.len()>=2){let cat=s.trim(parts.get(0));let amt=s.tofloat(s.trim(parts.get(1)));let found=mut.0-1;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);cat)){found=i}};if(found>=0){amts=amts.set(found;amts.get(found)+amt)}el{names=names+@(cat);amts=amts+@(amt)}}}};
+let n=names.len();
+let total=mut.0.0;lp(let i=0;i<n;i=i+1){total=total+amts.get(i)};
+let used=mut.@(false);used=@();lp(let i=0;i<n;i=i+1){used=used+@(false)};
+lp(let k=0;k<n;k=k+1){
+let best=mut.0-1;
+lp(let i=0;i<n;i=i+1){if(used.get(i)=false){if(best<0){best=i}el{if(amts.get(i)>=amts.get(best)){best=i}}}};
+used=used.set(best;true);
+let pct=amts.get(best)/total*100.0;
+io.println(s.concat(s.concat(s.concat(s.concat(names.get(best);" ");fmt2(amts.get(best)));" ");s.concat(fmt2(pct);"%")));
+};
+<0}
