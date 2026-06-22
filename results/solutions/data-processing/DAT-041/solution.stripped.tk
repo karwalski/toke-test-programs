@@ -1,0 +1,14 @@
+m=rle;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let data=s.trim(io.readln());
+let n=s.len(data);
+if(n=0){io.println("_");io.println("_");<0};
+let encoded=mut."_";
+let cur=mut.s.slice(data;0;1);
+let count=mut.1;
+lp(let i=1;i<n;i=i+1){let c=s.slice(data;i;i+1);if(s.equals(c;cur)){count=count+1}el{encoded=s.concat(encoded;s.concat(s.fromint(count);cur));cur=c;count=1}};
+encoded=s.concat(encoded;s.concat(s.fromint(count);cur));
+io.println(encoded);
+let ratio=s.tofloat(s.fromint(s.len(encoded)))/s.tofloat(s.fromint(n));
+io.println(s.concat("_";s.format(ratio;"_")));
+<0}

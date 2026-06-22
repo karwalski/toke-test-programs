@@ -1,0 +1,76 @@
+m=costcalc;
+i=io:std.io;
+i=s:std.str;
+
+f=toscaled(numstr:$str):$i64{
+  let t=s.trim(numstr);
+  let dot=s.indexof(t;"_");
+  if(dot<0){
+    let whole=s.toint(t);
+    <whole*1000000
+  };
+  let ip=s.slice(t;0;dot as $u64);
+  let fp=s.slice(t;(dot as $u64)+1;s.len(t));
+  let ipart=mut.0;
+  if(s.len(ip)>0){ipart=s.toint(ip)};
+  let frac=mut.fp;
+  lp(s.len(frac)<6){frac=s.concat(frac;"_")};
+  if(s.len(frac)>6){frac=s.slice(frac;0;6)};
+  let fpart=s.toint(frac);
+  <ipart*1000000+fpart
+};
+
+f=fmtscaled(v:$i64):$str{
+  let ipart=v/1000000;
+  let fpart=v-ipart*1000000;
+  if(fpart=0){
+    <s.fromint(ipart)
+  };
+  let fs=mut.s.fromint(fpart);
+  lp(s.len(fs)<6){fs=s.concat("_";fs)};
+  let endd=mut.s.len(fs) as $i64;
+  lp(endd>1){
+    let last=s.slice(fs;(endd-1) as $u64;endd as $u64);
+    if(s.eq(last;"_")){endd=endd-1}el{br}
+  };
+  let trimmed=s.slice(fs;0;endd as $u64);
+  <s.concat(s.concat(s.fromint(ipart);"_");trimmed)
+};
+
+f=extract(seg:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(seg;pat);
+  if(idx<0){<"_"};
+  let after=s.slice(seg;(idx as $u64)+s.len(pat);s.len(seg));
+  let a=s.trim(after);
+  if(s.startswith(a;"_""_"\"_");
+    <s.slice(rest;0;q as $u64)
+  };
+  let stop=mut.s.len(a) as $i64;
+  let i=mut.0;
+  lp((i as $u64)<s.len(a)){
+    let c=s.slice(a;i as $u64;(i as $u64)+1);
+    if(s.eq(c;"_")){stop=i;i=s.len(a) as $i64}el{if(s.eq(c;"_")){stop=i;i=s.len(a) as $i64}el{i=i+1}}
+  };
+  <s.trim(s.slice(a;0;stop as $u64))
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let planmark=s.indexof(input;"_"plan\"_");
+  let afterplan=s.slice(input;(planmark as $u64)+8;s.len(input));
+  let planend=s.indexof(afterplan;"_");
+  let planbody=s.slice(afterplan;0;planend as $u64);
+  let toolsegs=s.split(planbody;"_"tool\"_");
+  let names=mut.@();
+  let counts=mut.@();
+  let order=mut.@();
+  let i=mut.1;
+  lp(i<toolsegs.len()){
+    let seg=toolsegs.get(i);
+    let t=s.trim(seg);
+    let rest=s.slice(t;1;s.len(t));
+    let q=s.indexof(rest;"_""_"\"_":{"_"\"_";tool);"_":{\"_":"_",\"_":"_"}"_""_","_"{\"_":"_",\"_":{"_"}}")));
+  io.println(out);
+  <0
+}

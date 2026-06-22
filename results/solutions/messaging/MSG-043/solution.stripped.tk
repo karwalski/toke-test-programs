@@ -1,0 +1,19 @@
+m=csvexport;i=io:std.io;i=s:std.str;
+f=rawend(str:$str;pos:$i64):$i64{let n=s.len(str);let i=mut.pos;lp(i<n){let c=s.slice(str;i;i+1);if(s.equals(c;"_")){i=i+2}el{if(s.equals(c;"_""_""_"\\"_","_"\"_")){need=true};if(s.contains(v;"_")){need=true};if(!need){<v};let out=mut."_";let n=s.len(v);let i=mut.0;lp(i<n){let c=s.slice(v;i;i+1);if(s.equals(c;"_""_"\"_""_"\"_";out);"_""_"id,sender,time,text"_":\"_";
+lp(1=1){
+let rel=s.indexof(s.slice(json;cursor;n);pat);
+if(rel<0){br};
+let row=mut."_";
+let field=mut.0;
+lp(field<4){
+let rel2=s.indexof(s.slice(json;cursor;n);pat);
+let q=cursor+rel2+2;
+let e=rawend(json;q);
+let val=unescape(s.slice(json;q;e));
+if(field>0){row=s.concat(row;"_")};
+row=s.concat(row;csvfield(val));
+cursor=e+1;
+field=field+1};
+io.println(row);
+nobj=nobj+1};
+<0}

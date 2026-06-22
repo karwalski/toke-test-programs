@@ -1,0 +1,132 @@
+m=timetable;
+i=io:std.io;
+i=s:std.str;
+
+f=jstr(seg:$str;field:$str):$str{
+  let key=s.concat("_""_"\"_""_""_"\"_");
+  if(end<0){<"_"};
+  <s.slice(rest;0;end);
+};
+
+f=ljust(str:$str;w:$i64):$str{
+  let out=mut.str;
+  let n=mut.s.len(str);
+  lp(n<w){out=s.concat(out;"_");n=n+1};
+  <out;
+};
+
+f=main():$i64{
+  let raw=mut."_";
+  let line=mut.io.readln();
+  lp(s.len(line)>0){raw=s.concat(raw;line);line=io.readln()};
+  let input=raw;
+
+  let segs=s.split(input;"_");
+  let cday=mut.@();
+  let cslot=mut.@();
+  let cname=mut.@();
+  let si=mut.0;
+  lp(si<segs.len()){
+    let seg=segs.get(si);
+    if(s.contains(seg;"_"course\"_")){
+      let course=jstr(seg;"_");
+      let day=jstr(seg;"_");
+      let st=jstr(seg;"_");
+      let et=jstr(seg;"_");
+      let slot=s.concat(st;s.concat("_";et));
+      cname=cname+@(course);
+      cday=cday+@(day);
+      cslot=cslot+@(slot);
+    };
+    si=si+1;
+  };
+
+  let nc=cname.len();
+
+  let slots=mut.@();
+  let i=mut.0;
+  lp(i<nc){
+    let sl=cslot.get(i);
+    let seen=mut.0;
+    let j=mut.0;
+    lp(j<slots.len()){if(s.equals(slots.get(j);sl)){seen=1};j=j+1};
+    if(seen=0){slots=slots+@(sl)};
+    i=i+1;
+  };
+  let ns=slots.len();
+  let so=mut.0;
+  lp(so<ns){
+    let sq=mut.so+1;
+    lp(sq<ns){
+      let startA=s.slice(slots.get(so);0;s.indexof(slots.get(so);"_"));
+      let startB=s.slice(slots.get(sq);0;s.indexof(slots.get(sq);"_"));
+      if(startB<startA){let t=slots.get(so);slots=slots.set(so;slots.get(sq));slots=slots.set(sq;t)};
+      sq=sq+1;
+    };
+    so=so+1;
+  };
+
+  let week=@("_";"_";"_";"_";"_";"_";"_");
+  let days=mut.@();
+  let w=mut.0;
+  lp(w<week.len()){
+    let d=week.get(w);
+    let used=mut.0;
+    let c=mut.0;
+    lp(c<nc){if(s.equals(cday.get(c);d)){used=1};c=c+1};
+    if(used=1){days=days+@(d)};
+    w=w+1;
+  };
+  let nd=days.len();
+
+  let timewidth=mut.4;
+  let tw=mut.0;
+  lp(tw<ns){if(s.len(slots.get(tw))>timewidth){timewidth=s.len(slots.get(tw))};tw=tw+1};
+
+  let daywidths=mut.@();
+  let d2=mut.0;
+  lp(d2<nd){
+    let day=days.get(d2);
+    let mx=mut.s.len(day);
+    let slx=mut.0;
+    lp(slx<ns){
+      let slot=slots.get(slx);
+      let content=mut."_";
+      let c=mut.0;
+      lp(c<nc){
+        if(s.equals(cslot.get(c);slot)){if(s.equals(cday.get(c);day)){content=cname.get(c)}};
+        c=c+1;
+      };
+      if(s.len(content)>mx){mx=s.len(content)};
+      slx=slx+1;
+    };
+    daywidths=daywidths+@(mx);
+    d2=d2+1;
+  };
+
+  let header=mut.ljust("_";timewidth);
+  let h=mut.0;
+  lp(h<nd){header=s.concat(header;s.concat("_";ljust(days.get(h);daywidths.get(h))));h=h+1};
+  io.println(header);
+
+  let r=mut.0;
+  lp(r<ns){
+    let slot=slots.get(r);
+    let row=mut.ljust(slot;timewidth);
+    let rd=mut.0;
+    lp(rd<nd){
+      let day=days.get(rd);
+      let content=mut."_";
+      let c=mut.0;
+      lp(c<nc){
+        if(s.equals(cslot.get(c);slot)){if(s.equals(cday.get(c);day)){content=cname.get(c)}};
+        c=c+1;
+      };
+      row=s.concat(row;s.concat("_";ljust(content;daywidths.get(rd))));
+      rd=rd+1;
+    };
+    io.println(row);
+    r=r+1;
+  };
+  <0;
+}

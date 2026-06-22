@@ -1,0 +1,69 @@
+m=scanner;
+i=io:std.io;
+i=s:std.str;
+i=fl:std.file;
+
+f=scanline(line:$str;kw:$str):$str{
+  let pos=s.indexof(line;kw);
+  if(pos<0){<"_"};
+  let after=s.slice(line;pos+s.len(kw);s.len(line));
+  let t=mut.s.trim(after);
+  lp(s.startswith(t;"_")){t=s.trim(s.slice(t;1;s.len(t)))};
+  t=s.trim(t);
+  if(s.endswith(t;"_")){t=s.trim(s.slice(t;0;s.len(t)-2))};
+  <s.trim(t);
+};
+
+f=main():$i64{
+  let line=mut.s.trim(io.readln());
+  lp(s.len(line)>0){
+    let path=line;
+    if(fl.exists(path)){}el{
+      if(s.equals(path;"_")){
+        fl.write(path;"_");
+      };
+      if(s.equals(path;"_")){
+        fl.write(path;"_");
+      };
+    };
+    if(fl.exists(path)){
+      let content=fl.read(path);
+      let lines=s.split(content;"_");
+      let i=mut.0;
+      lp(i<lines.len()){
+        let ln=lines.get(i);
+        let lineno=i+1;
+        let hashpos=s.indexof(ln;"_");
+        let slashpos=s.indexof(ln;"_");
+        let iscomment=mut.0;
+        if(hashpos>=0){iscomment=1};
+        if(slashpos>=0){iscomment=1};
+        if(s.indexof(ln;"_")>=0){iscomment=1};
+        if(iscomment=1){
+          let kw=mut."_";
+          if(s.contains(ln;"_")){kw="_"}el{
+            if(s.contains(ln;"_")){kw="_"}el{
+              if(s.contains(ln;"_")){kw="_"}el{
+                if(s.contains(ln;"_")){kw="_"};
+              };
+            };
+          };
+          if(s.len(kw)>0){
+            let txt=scanline(ln;kw);
+            let out=mut.path;
+            out=s.concat(out;"_");
+            out=s.concat(out;s.fromint(lineno));
+            out=s.concat(out;"_");
+            out=s.concat(out;kw);
+            out=s.concat(out;"_");
+            out=s.concat(out;txt);
+            io.println(out);
+          };
+        };
+        i=i+1;
+      };
+    };
+    line=s.trim(io.readln());
+  };
+  <0;
+}

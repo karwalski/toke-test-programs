@@ -1,0 +1,45 @@
+m=resourcegame;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let first=s.trim(io.readln());
+  let nums=s.split(first;"_");
+  let gold=mut.s.toint(nums.get(0));
+  let wood=mut.s.toint(nums.get(1));
+  let food=mut.s.toint(nums.get(2));
+
+  let line=mut.s.trim(io.readln());
+  lp(s.len(line)>0){
+    let parts=s.split(line;"_");
+    let action=parts.get(0);
+    if(s.equals(action;"_")){
+      let r=parts.get(1);
+      if(s.equals(r;"_")){gold=gold+10};
+      if(s.equals(r;"_")){wood=wood+10};
+      if(s.equals(r;"_")){food=food+10};
+    };
+    if(s.equals(action;"_")){
+      let r=parts.get(1);
+      let amt=s.toint(parts.get(2));
+      if(s.equals(r;"_")){gold=gold-amt};
+      if(s.equals(r;"_")){wood=wood-amt};
+      if(s.equals(r;"_")){food=food-amt};
+    };
+    if(s.equals(action;"_")){
+      let st=parts.get(1);
+      if(s.equals(st;"_")){wood=wood-10;food=food+20};
+      if(s.equals(st;"_")){wood=wood-15;gold=gold+30};
+      if(s.equals(st;"_")){gold=gold-20;wood=wood+25};
+    };
+    let out=mut."_";
+    out=s.concat(out;s.fromint(gold));
+    out=s.concat(out;"_");
+    out=s.concat(out;s.fromint(wood));
+    out=s.concat(out;"_");
+    out=s.concat(out;s.fromint(food));
+    io.println(out);
+    line=s.trim(io.readln());
+  };
+  <0;
+}

@@ -1,0 +1,55 @@
+m=semver;i=io:std.io;i=s:std.str;
+f=cmp(a:$str;b:$str):$i64{
+  let pa=s.split(a;"_");
+  let pb=s.split(b;"_");
+  lp(let i=0;i<3;i=i+1){
+    let na=mut.0;
+    let nb=mut.0;
+    if(i<pa.len()){na=s.toint(pa.get(i))};
+    if(i<pb.len()){nb=s.toint(pb.get(i))};
+    if(na<nb){<0-1};
+    if(na>nb){<1}
+  };
+  <0
+};
+f=main():$i64{
+  let command=s.trim(io.readln());
+  let versions=mut.@();
+  lp(1=1){
+    let line=s.trim(io.readln());
+    if(s.len(line)=0){br};
+    versions=versions+@(line)
+  };
+  if(s.eq(command;"_")){
+    if(versions.len()>=2){
+      io.println(s.fromint(cmp(versions.get(0);versions.get(1))))
+    };
+    <0
+  };
+  if(s.eq(command;"_")){
+    let arr=mut.versions;
+    let n=arr.len();
+    lp(let i=0;i<n;i=i+1){
+      lp(let j=0;j<n-1-i;j=j+1){
+        if(cmp(arr.get(j);arr.get(j+1))>0){
+          let tmp=arr.get(j);
+          let na=mut.@();
+          lp(let k=0;k<n;k=k+1){
+            if(k=j){na=na+@(arr.get(j+1))}el{if(k=j+1){na=na+@(tmp)}el{na=na+@(arr.get(k))}}
+          };
+          arr=na
+        }
+      }
+    };
+    lp(let i=0;i<arr.len();i=i+1){io.println(arr.get(i))};
+    <0
+  };
+  if(s.eq(command;"_")){
+    lp(let i=0;i<versions.len();i=i+1){
+      let parts=s.split(versions.get(i);"_");
+      if(parts.len()=3){io.println("_")}el{io.println("_")}
+    };
+    <0
+  };
+  <0
+}

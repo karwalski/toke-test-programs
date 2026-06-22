@@ -1,0 +1,31 @@
+m=textwrap;i=io:std.io;i=s:std.str;
+f=wrapline(text:$str;width:$i64):$str{
+let t=s.trim(text);
+if(s.len(t)=0){<"_"};
+let words=s.split(t;"_");
+let out=mut."_";
+let cur=mut."_";
+let started=mut.0;
+lp(let i=0;i<words.len();i=i+1){
+let w=words.get(i);
+if(s.len(w)=0){}el{
+if(started=0){cur=w;started=1}el{
+if(s.len(cur)+1+s.len(w)<=width){cur=s.concat(s.concat(cur;"_");w)}el{out=s.concat(s.concat(out;cur);"_");cur=w}}}};
+out=s.concat(out;cur);
+<out};
+f=main():$i64{
+let widthline=s.trimsuffix(io.readln();"_");
+let width=s.toint(s.trim(widthline));
+let paras=mut.@($str);
+let curpar=mut."_";
+let haspar=mut.0;
+lp(1=1){let l=io.readln();if(s.len(l)=0){br};let line=s.trimsuffix(l;"_");let trimmed=s.trim(line);if(s.len(trimmed)=0){if(haspar=1){paras=paras+@(curpar);curpar="_";haspar=0};paras=paras+@("_")}el{if(haspar=0){curpar=trimmed;haspar=1}el{curpar=s.concat(s.concat(curpar;"_");trimmed)}}};
+if(haspar=1){paras=paras+@(curpar)};
+let parts=mut.@($str);
+lp(let i=0;i<paras.len();i=i+1){let p=paras.get(i);if(s.len(p)=0){parts=parts+@("_")}el{let w=wrapline(p;width);if(s.len(w)>0){parts=parts+@(w)}}};
+let result=mut."_";
+lp(let i=0;i<parts.len();i=i+1){if(i>0){result=s.concat(result;"_")};result=s.concat(result;parts.get(i))};
+let trimmedresult=mut.result;
+lp(s.endswith(trimmedresult;"_")){trimmedresult=s.trimsuffix(trimmedresult;"_")};
+if(s.len(s.trim(trimmedresult))>0){io.println(trimmedresult)};
+<0}

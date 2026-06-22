@@ -1,0 +1,52 @@
+m=toolschema;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+
+f=getbool(obj:$str;key:$str):$bool{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<false};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  <s.startswith(s.trim(rest);"_")
+};
+
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let name=getstr(input;"_");
+  let desc=getstr(input;"_");
+  let pmark=s.indexof(input;"_"params\"_");
+  let afterp=s.slice(input;(pmark as $u64)+10;s.len(input));
+  let pend=s.indexof(afterp;"_");
+  let pbody=s.slice(afterp;0;pend as $u64);
+  let objs=s.split(pbody;"_");
+  let props=mut."_";
+  let req=mut."_";
+  let reqcount=mut.0;
+  let i=mut.0;
+  lp(i<objs.len()){
+    let raw=objs.get(i);
+    let pn=getstr(raw;"_");
+    let pt=getstr(raw;"_");
+    let pd=getstr(raw;"_");
+    let preq=getbool(raw;"_");
+    if(i>0){props=s.concat(props;"_")};
+    props=s.concat(props;s.concat(s.concat(s.concat(s.concat("_""_"\"_"type\"_""_"\"_"description\"_""_"\"_")));
+    if(preq){
+      if(reqcount>0){req=s.concat(req;"_")};
+      req=s.concat(req;s.concat(s.concat("_""_"\"_"));
+      reqcount=reqcount+1
+    };
+    i=i+1
+  };
+  let params=s.concat(s.concat("_"type\"_"object\"_"properties\"_";props);s.concat(s.concat("_"required\"_";req);"_"));
+  let fnobj=s.concat(s.concat(s.concat(s.concat("_"name\"_""_"\"_"description\"_""_"\"_"parameters\"_";s.concat(params;"_")));
+  let out=s.concat("_"type\"_"function\"_"function\"_";s.concat(fnobj;"_"));
+  io.println(out);
+  <0
+}

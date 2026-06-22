@@ -1,0 +1,33 @@
+m=minesweeper;i=io:std.io;i=s:std.str;
+f=isdigit(c:$str):$bool{if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};if(s.equals(c;"_")){<true};<false};
+f=bitof(cfg:$i64;u:$i64):$i64{let cc=mut.cfg;lp(let z=0;z<u;z=z+1){cc=cc/2};<cc%2};
+f=findidx(ur:@($i64);uc:@($i64);k:$i64;r:$i64;c:$i64):$i64{lp(let u=0;u<k;u=u+1){if(ur.get(u)=r){if(uc.get(u)=c){<u}}};<0-1};
+f=ismine(rows:@($str);ur:@($i64);uc:@($i64);k:$i64;cfg:$i64;r:$i64;c:$i64):$i64{let ch=s.slice(rows.get(r);c;c+1);if(s.equals(ch;"_")){<1};if(s.equals(ch;"_")){let qi=findidx(ur;uc;k;r;c);if(bitof(cfg;qi)=1){<1}};<0};
+f=countn(rows:@($str);ur:@($i64);uc:@($i64);k:$i64;cfg:$i64;nr:$i64;nc:$i64;r:$i64;c:$i64):$i64{let cnt=mut.0;lp(let dr=0-1;dr<=1;dr=dr+1){lp(let dc=0-1;dc<=1;dc=dc+1){let nrr=r+dr;let ncc=c+dc;let skip=mut.0;if(dr=0){if(dc=0){skip=1}};if(skip=0){if(nrr>=0){if(nrr<nr){if(ncc>=0){if(ncc<nc){if(ismine(rows;ur;uc;k;cfg;nrr;ncc)=1){cnt=cnt+1}}}}}}}};<cnt};
+f=isvalid(rows:@($str);ur:@($i64);uc:@($i64);k:$i64;cfg:$i64;nr:$i64;nc:$i64):$bool{lp(let r=0;r<nr;r=r+1){let row=rows.get(r);lp(let c=0;c<nc;c=c+1){let ch=s.slice(row;c;c+1);if(isdigit(ch)){let target=s.toint(ch);let cnt=countn(rows;ur;uc;k;cfg;nr;nc;r;c);if(cnt!=target){<false}}}};<true};
+f=cell(tag:$str;r:$i64;c:$i64):$str{<s.concat(s.concat(s.concat(tag;s.fromint(r));"_");s.fromint(c))};
+f=main():$i64{
+let rows=mut.@($str);
+lp(1=1){let l=io.readln();if(s.len(l)=0){br};let t=s.trimsuffix(l;"_");rows=rows+@(t)};
+let nr=rows.len();
+if(nr=0){io.println("_");<0};
+let nc=s.len(rows.get(0));
+let ur=mut.@($i64);
+let uc=mut.@($i64);
+lp(let r=0;r<nr;r=r+1){let row=rows.get(r);lp(let c=0;c<nc;c=c+1){let ch=s.slice(row;c;c+1);if(s.equals(ch;"_")){ur=ur+@(r);uc=uc+@(c)}}};
+let k=ur.len();
+if(k=0){io.println("_");<0};
+let total=mut.1;lp(let i=0;i<k;i=i+1){total=total*2};
+let alwaysmine=mut.@($i64);
+let alwayssafe=mut.@($i64);
+lp(let i=0;i<k;i=i+1){alwaysmine=alwaysmine+@(1);alwayssafe=alwayssafe+@(1)};
+let anyvalid=mut.0;
+lp(let cfg=0;cfg<total;cfg=cfg+1){
+if(isvalid(rows;ur;uc;k;cfg;nr;nc)){
+anyvalid=anyvalid+1;
+lp(let u=0;u<k;u=u+1){if(bitof(cfg;u)=1){alwayssafe=alwayssafe.set(u;0)}el{alwaysmine=alwaysmine.set(u;0)}}}};
+let out=mut.@($str);
+if(anyvalid>0){lp(let u=0;u<k;u=u+1){if(alwayssafe.get(u)=1){out=out+@(cell("_";ur.get(u);uc.get(u)))}el{if(alwaysmine.get(u)=1){out=out+@(cell("_";ur.get(u);uc.get(u)))}}}};
+if(out.len()=0){io.println("_");<0};
+lp(let i=0;i<out.len();i=i+1){io.println(out.get(i))};
+<0}

@@ -1,0 +1,63 @@
+m=dispatcher;
+i=io:std.io;
+i=s:std.str;
+f=stripend(w:$str):$str{
+  let n=s.len(w);
+  let out=mut.w;
+  lp(s.len(out)>0){
+    let last=s.slice(out;s.len(out)-1;s.len(out));
+    if(s.eq(last;"_")||s.eq(last;"_")||s.eq(last;"_")||s.eq(last;"_")){
+      out=s.slice(out;0;s.len(out)-1)
+    }el{
+      br
+    }
+  };
+  <out
+};
+f=titlecase(w:$str):$str{
+  if(s.len(w)=0){<w};
+  let first=s.upper(s.slice(w;0;1));
+  let rest=s.lower(s.slice(w;1;s.len(w)));
+  <s.concat(first;rest)
+};
+f=wordafter(query:$str;marker:$str):$str{
+  let words=s.split(query;"_");
+  let found=mut.false;
+  let res=mut."_";
+  lp(let idx=0;idx<words.len();idx=idx+1){
+    let word=words.get(idx);
+    if(found){
+      res=stripend(word);
+      br
+    };
+    if(s.eq(s.lower(word);marker)){
+      found=true
+    }
+  };
+  <res
+};
+f=parsestr(line:$str;key:$str):$str{
+  let pat=s.concat("_""_"\"_""_""_"\"_");
+  if(cl<0){<after};
+  <s.slice(after;0;cl)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let input=parsestr(line;"_");
+  let lowerquery=s.lower(input);
+  if(s.contains(lowerquery;"_")){
+    let city=mut.wordafter(input;"_");
+    if(s.len(city)=0){city=wordafter(input;"_")};
+    let tc=titlecase(city);
+    io.println("_"tool\"_"weather\"_"arguments\"_"city\"_"\(tc)\"_")
+  }el{
+    if(s.contains(lowerquery;"_")||s.contains(lowerquery;"_")){
+      let date=mut.wordafter(input;"_");
+      if(s.len(date)=0){date=wordafter(input;"_")};
+      io.println("_"tool\"_"calendar\"_"arguments\"_"date\"_"\(date)\"_")
+    }el{
+      io.println("_"tool\"_"arguments\"_")
+    }
+  };
+  <0
+}

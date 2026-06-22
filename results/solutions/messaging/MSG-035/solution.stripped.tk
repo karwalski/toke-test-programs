@@ -1,0 +1,42 @@
+m=priorityqueue;
+i=io:std.io;
+i=s:std.str;
+
+f=jstr(seg:$str;field:$str):$str{
+  let key=s.concat("_""_"\"_""_""_"\"_");
+  if(end<0){<"_"};
+  <s.slice(rest;0;end);
+};
+
+f=jint(seg:$str;field:$str):$i64{
+  let key=s.concat("_""_"\"_"));
+  let start=s.indexof(seg;key);
+  if(start<0){<0};
+  let vs=start+s.len(key);
+  let rest=s.slice(seg;vs;s.len(seg));
+  let i=mut.0;
+  let numstr=mut."_";
+  let stop=mut.0;
+  lp(i<s.len(rest)){
+    if(stop=0){
+      let c=s.slice(rest;i;i+1);
+      let isdigit=mut.0;
+      if(s.contains("_";c)){isdigit=1};
+      if(s.equals(c;"_")){isdigit=1};
+      if(isdigit=1){numstr=s.concat(numstr;c)}el{stop=1};
+    };
+    i=i+1;
+  };
+  if(s.len(numstr)=0){<0};
+  <s.toint(numstr);
+};
+
+f=ordof(c:$str):$i64{
+  let tbl="_"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"_""_"{"_"op"_"enqueue"_"msg"_"priority"_"dequeue"_"dequeue: EMPTY"_"dequeue: "_" (priority "_")");
+        io.println(out);
+      };
+    };
+    si=si+1;
+  };
+  <0;
+}

@@ -1,0 +1,11 @@
+m=licensecheck;i=io:std.io;i=s:std.str;i=file:std.file;
+f=main():$i64{let header=mut."_";let sawSep=mut.false;let first=mut.true;
+let paths=mut.@("_");paths=@();
+lp(1=1){let raw=io.readln();if(s.len(raw)=0){br};let line=s.trimsuffix(raw;"_");
+if(!sawSep){if(s.eq(s.trim(line);"_")){sawSep=true}el{if(first){header=line;first=false}el{header=s.concat(s.concat(header;"_");line)}}}el{let t=s.trim(line);if(s.len(t)>0){paths=paths+@(t)}}};
+let i=mut.0;lp(i<paths.len()){let p=paths.get(i);
+if(!file.exists(p)){let content=mut."_";if(s.contains(p;"_")){content=s.concat(header;"_")}el{if(s.contains(p;"_")){content=s.concat(header;"_")}el{content="_"}};file.write(p;content)};
+let exists=file.exists(p);
+if(exists){let fc=file.read(p);if(s.startswith(fc;header)){io.println(s.concat("_";p))}el{io.println(s.concat(s.concat("_";p);"_"))}}el{io.println(s.concat(s.concat("_";p);"_"))};
+i=i+1};
+<0}

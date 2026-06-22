@@ -1,0 +1,39 @@
+m=report;
+i=io:std.io;
+i=s:std.str;
+
+f=rawval(obj:$str;key:$str):$str{
+  let k=s.concat("_""_"\"_"));
+  let pos=s.indexof(obj;k);
+  if(pos<0){<"_"};
+  let vs=pos+s.len(k);
+  let rest=s.slice(obj;vs;s.len(obj));
+  if(s.startswith(rest;"_""_"\"_");
+    <s.slice(inner;0;e);
+  };
+  let i=mut.0;
+  let out=mut."_";
+  let stop=mut.0;
+  lp(i<s.len(rest)){
+    if(stop=0){
+      let c=s.slice(rest;i;i+1);
+      if(s.equals(c;"_")){stop=1}el{if(s.equals(c;"_")){stop=1}el{if(s.equals(c;"_")){stop=1}el{out=s.concat(out;c)}}};
+    };
+    i=i+1;
+  };
+  <s.trim(out);
+};
+
+f=israwstr(obj:$str;key:$str):$i64{
+  let k=s.concat("_""_"\"_"));
+  let pos=s.indexof(obj;k);
+  if(pos<0){<0};
+  let vs=pos+s.len(k);
+  let rest=s.slice(obj;vs;s.len(obj));
+  if(s.startswith(rest;"_""_"."_"."_"0"_"."_"{{"_"{{"_"}}"_""_"\n"_"\n"_""_"{{TABLE:"_","_""_"  "_"\n"_"\"_":"_"["_"{"_":"_""_"  "_"\n"_"\n";subbed))};
+    };
+    li=li+1;
+  };
+  io.println(out);
+  <0;
+}

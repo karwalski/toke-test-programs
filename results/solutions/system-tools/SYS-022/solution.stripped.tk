@@ -1,0 +1,1 @@
+m=fileperms;i=io:std.io;i=s:std.str;i=file:std.file;f=main():$i64{lp(1=1){let line=io.readln();if(s.len(line)=0){br};let path=s.trim(line);if(s.len(path)=0){br};if(file.exists(path)=false){io.println(s.concat(path;"_"))}el{let kind=mut."_";if(file.isdir(path)){kind="_"};io.println(s.concat(s.concat(path;"_");s.concat(kind;"_")))}};<0}

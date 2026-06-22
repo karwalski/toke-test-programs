@@ -1,0 +1,7 @@
+m=median;i=io:std.io;i=s:std.str;
+f=fmt4(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=v*10000.0+0.5;let q=scaled as $i64;let ip=q/10000;let fp=q-ip*10000;let fs=mut.s.fromint(fp);lp(s.len(fs)<4){fs=s.concat("_";fs)};let out=mut.s.concat(s.fromint(ip);"_");out=s.concat(out;fs);if(neg){out=s.concat("_";out)};<out};
+f=main():$i64{let line=s.trim(io.readln());let toks=s.split(line;"_");let nums=mut.@(0.0);nums=@();let i=mut.0;lp(i<toks.len()){let t=s.trim(toks.get(i));if(s.len(t)>0){nums=nums+@(s.tofloat(t))};i=i+1};
+let n=nums.len();
+let a=mut.0;lp(a<n){let b=mut.a+1;lp(b<n){if(nums.get(b)<nums.get(a)){let tmp=nums.get(a);let arr2=mut.@(0.0);arr2=@();let k=mut.0;lp(k<n){if(k=a){arr2=arr2+@(nums.get(b))}el{if(k=b){arr2=arr2+@(tmp)}el{arr2=arr2+@(nums.get(k))}};k=k+1};nums=arr2};b=b+1};a=a+1};
+let med=mut.0.0;if(n-n/2*2=1){med=nums.get(n/2)}el{med=(nums.get(n/2-1)+nums.get(n/2))/2.0};
+io.println(fmt4(med));<0}

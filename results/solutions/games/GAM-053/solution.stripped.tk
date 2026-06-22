@@ -1,0 +1,42 @@
+m=pegjump;i=io:std.io;i=s:std.str;
+f=cellat(grid:@$str;r:$i64;c:$i64):$str{<s.slice(grid.get(r);c;c+1)};
+f=setcell(grid:@$str;r:$i64;c:$i64;v:$str):@$str{let out=mut.@("_");let i=mut.0;lp(i<grid.len){let row=mut.grid.get(i);if(i=r){row=s.concat(s.concat(s.slice(row;0;c);v);s.slice(row;c+1;s.len(row)))};out=out+@(row);i=i+1};<out};
+f=main():$i64{
+let grid=mut.@("_");let ng=mut.0;
+let moves=mut.@("_");let nm=mut.0;
+let inmoves=mut.false;
+lp(1=1){
+let line=io.readln();
+let l=s.trim(line);
+if(s.len(l)=0){if(inmoves){br}el{inmoves=true}}el{
+if(inmoves){moves=moves+@(l);nm=nm+1}el{grid=grid+@(l);ng=ng+1}
+}};
+let rows=ng;let cols=mut.0;if(ng>0){cols=s.len(grid.get(1))};
+let g=mut.grid;
+let step=mut.0;let failed=mut.false;
+lp(step<nm){
+if(!failed){
+let mv=moves.get(step+1);
+let parts=s.split(mv;"_");
+let pos=parts.get(0);
+let dir=parts.get(1);
+let pp=s.split(pos;"_");
+let r=s.toint(s.trim(pp.get(0)));
+let c=s.toint(s.trim(pp.get(1)));
+let dr=mut.0;let dc=mut.0;
+if(s.equals(dir;"_")){dc=1}el{if(s.equals(dir;"_")){dc=0-1}el{if(s.equals(dir;"_")){dr=0-1}el{if(s.equals(dir;"_")){dr=1}}}};
+let mr=r+dr;let mc=c+dc;let er=r+2*dr;let ec=c+2*dc;
+let ok=mut.true;
+if(r<0){ok=false};if(c<0){ok=false};if(mr<0){ok=false};if(mc<0){ok=false};if(er<0){ok=false};if(ec<0){ok=false};
+if(r>=rows){ok=false};if(er>=rows){ok=false};if(mr>=rows){ok=false};
+if(c>=cols){ok=false};if(ec>=cols){ok=false};if(mc>=cols){ok=false};
+if(ok){
+if(s.equals(cellat(g;r+1;c);"_")){}el{ok=false};
+if(s.equals(cellat(g;mr+1;mc);"_")){}el{ok=false};
+if(s.equals(cellat(g;er+1;ec);"_")){}el{ok=false}
+};
+if(ok){g=setcell(g;r+1;c;"_");g=setcell(g;mr+1;mc;"_");g=setcell(g;er+1;ec;"_")}el{io.println(s.concat("_";s.fromint(step+1)));failed=true}
+};
+step=step+1};
+if(!failed){io.println("_")};
+<0}

@@ -1,0 +1,58 @@
+m=adventure;
+i=io:std.io;
+i=s:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_""_""_"\"_");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+
+f=blockafter(text:$str;startidx:$i64):$str{
+  let rest=s.slice(text;startidx as $u64;s.len(text));
+  let openidx=s.indexof(rest;"_");
+  let body=s.slice(rest;openidx as $u64;s.len(rest));
+  let depth=mut.0;
+  let i=mut.0;
+  let endd=mut.s.len(body) as $i64;
+  lp((i as $u64)<s.len(body)){
+    let c=s.slice(body;i as $u64;(i+1) as $u64);
+    if(s.eq(c;"_")){depth=depth+1};
+    if(s.eq(c;"_")){depth=depth-1;if(depth=0){endd=i+1;i=s.len(body) as $i64}};
+    i=i+1
+  };
+  <s.slice(body;0;endd as $u64)
+};
+
+f=roomblock(roomsbody:$str;id:$str):$str{
+  let pat=s.concat(s.concat("_""_"\"_");
+  let idx=s.indexof(roomsbody;pat);
+  if(idx<0){<"_"};
+  <blockafter(roomsbody;idx+(s.len(id) as $i64)+3)
+};
+
+f=exitskeys(roomblk:$str):$str{
+  let pat="_"exits\"_";
+  let idx=s.indexof(roomblk;pat);
+  if(idx<0){<"_"};
+  let blk=blockafter(roomblk;idx+(s.len(pat) as $i64));
+  let inner=s.slice(blk;1;s.len(blk)-1);
+  if(s.len(s.trim(inner))=0){<"_"};
+  let pairs=s.split(inner;"_");
+  let out=mut."_";
+  let i=mut.0;
+  lp((i as $u64)<pairs.len()){
+    let kv=pairs.get(i as $u64);
+    let kvt=s.trim(kv);
+    let rest=s.slice(kvt;1;s.len(kvt));
+    let q=s.indexof(rest;"_""_", "_"\"_":"_""_"\"_";dir);"_":\"_");
+  let di=s.indexof(blk;dpat);
+  if(di<0){<"_"};
+  let rest=s.slice(blk;(di as $u64)+s.len(dpat);s.len(blk));
+  let q=s.indexof(rest;"_""_""_"start"_"\"_":"_"look"_"desc"_"Exits: "_"desc"_"Exits: "_"No exit that way.")
+      }
+    };
+    c=c+1
+  };
+  <0
+}

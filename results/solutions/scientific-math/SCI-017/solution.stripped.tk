@@ -1,0 +1,115 @@
+m=astar;
+i=io:std.io;
+i=s:std.str;
+
+f=absi(n:$i64):$i64{if(n<0){<0-n};<n};
+
+f=main():$i64{
+  let dims=s.split(s.trim(io.readln());"_");
+  let rows=s.toint(dims.get(0));
+  let cols=s.toint(dims.get(1));
+  let grid=mut.@();
+  let r=mut.0;
+  lp(r<rows){grid=grid.push(io.readln());r=r+1};
+  let sp=s.split(s.trim(io.readln());"_");
+  let sr=s.toint(sp.get(0));
+  let scol=s.toint(sp.get(1));
+  let ep=s.split(s.trim(io.readln());"_");
+  let er=s.toint(ep.get(0));
+  let ec=s.toint(ep.get(1));
+  let total=rows*cols;
+  let inf=99999999;
+  let g=mut.@();
+  let camer=mut.@();
+  let camec=mut.@();
+  let q=mut.0;
+  lp(q<total){g=g.push(inf);camer=camer.push(0-1);camec=camec.push(0-1);q=q+1};
+  let startid=sr*cols+scol;
+  g=g.set(startid as $u64;0);
+  let openr=mut.@();
+  let openc=mut.@();
+  let openf=mut.@();
+  openr=openr.push(sr);openc=openc.push(scol);
+  openf=openf.push(absi(sr-er)+absi(scol-ec));
+  let found=mut.0;
+  lp(openr.len()>0){
+    let n=openr.len() as $i64;
+    let besti=mut.0;
+    let bestf=mut.openf.get(0);
+    let bestr=mut.openr.get(0);
+    let bestc=mut.openc.get(0);
+    let i=mut.1;
+    lp(i<n){
+      let cf=openf.get(i as $u64);
+      let cr=openr.get(i as $u64);
+      let cc=openc.get(i as $u64);
+      let better=mut.0;
+      if(cf<bestf){better=1}el{
+        if(cf=bestf){
+          if(cr<bestr){better=1}el{
+            if(cr=bestr){if(cc<bestc){better=1}}
+          }
+        }
+      };
+      if(better=1){besti=i;bestf=cf;bestr=cr;bestc=cc};
+      i=i+1
+    };
+    let curr=openr.get(besti as $u64);
+    let curc=openc.get(besti as $u64);
+    let newr=mut.@();let newc=mut.@();let newf=mut.@();
+    let k=mut.0;
+    lp(k<n){
+      if(k!=besti){newr=newr.push(openr.get(k as $u64));newc=newc.push(openc.get(k as $u64));newf=newf.push(openf.get(k as $u64))};
+      k=k+1
+    };
+    openr=newr;openc=newc;openf=newf;
+    if(curr=er){if(curc=ec){found=1}};
+    if(found=1){br};
+    let dr=@(0;0;1;0-1);
+    let dc=@(1;0-1;0;0);
+    let d=mut.0;
+    lp(d<4){
+      let nr=curr+dr.get(d as $u64);
+      let nc=curc+dc.get(d as $u64);
+      let ok=mut.0;
+      if(nr>=0){if(nr<rows){if(nc>=0){if(nc<cols){ok=1}}}};
+      if(ok=1){
+        let cell=s.slice(grid.get(nr as $u64);nc as $u64;(nc+1) as $u64);
+        if(s.eq(cell;"_")=false){
+          let curid=curr*cols+curc;
+          let nid=nr*cols+nc;
+          let tg=g.get(curid as $u64)+1;
+          if(tg<g.get(nid as $u64)){
+            camer=camer.set(nid as $u64;curr);
+            camec=camec.set(nid as $u64;curc);
+            g=g.set(nid as $u64;tg);
+            let nf=tg+absi(nr-er)+absi(nc-ec);
+            openr=openr.push(nr);openc=openc.push(nc);openf=openf.push(nf)
+          }
+        }
+      };
+      d=d+1
+    }
+  };
+  if(found=0){io.println("_");<0};
+  let pr=mut.@();let pc=mut.@();
+  let cr2=mut.er;let cc2=mut.ec;
+  lp(1=1){
+    pr=pr.push(cr2);pc=pc.push(cc2);
+    if(cr2=sr){if(cc2=scol){br}};
+    let id=cr2*cols+cc2;
+    let ppr=camer.get(id as $u64);
+    let ppc=camec.get(id as $u64);
+    if(ppr<0){br};
+    cr2=ppr;cc2=ppc
+  };
+  let out=mut."_";
+  let m=mut.(pr.len() as $i64)-1;
+  lp(m>=0){
+    out=s.concat(out;s.concat("_";s.concat(s.fromint(pr.get(m as $u64));s.concat("_";s.concat(s.fromint(pc.get(m as $u64));"_")))));
+    m=m-1
+  };
+  out=s.concat(out;s.concat("_";s.fromint(g.get((er*cols+ec) as $u64))));
+  io.println(out);
+  <0
+}

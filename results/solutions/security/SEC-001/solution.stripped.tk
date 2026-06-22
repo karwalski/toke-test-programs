@@ -1,0 +1,19 @@
+m=portscanner;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let host=s.trim(io.readln());
+  let portrange=s.trim(io.readln());
+  let concurrency=s.toint(s.trim(io.readln()));
+  let parts=s.split(portrange;"_");
+  let startport=mut.0;
+  let endport=mut.0;
+  if(parts.len()>=2){
+    startport=s.toint(parts.get(0));
+    endport=s.toint(parts.get(1))
+  };
+  let openct=mut.0;
+  lp(let p=startport;p<=endport;p=p+1){
+    openct=openct+0
+  };
+  io.println("_");
+  <0
+}

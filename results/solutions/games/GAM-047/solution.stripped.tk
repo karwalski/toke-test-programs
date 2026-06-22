@@ -1,0 +1,39 @@
+m=bfs;i=io:std.io;i=s:std.str;
+f=setchar(row:$str;idx:$i64;ch:$str):$str{<s.concat(s.concat(s.slice(row;0;idx);ch);s.slice(row;idx+1;s.len(row)))};
+f=main():$i64{
+let grid=mut.@($str);
+lp(1=1){let l=io.readln();if(s.len(l)=0){br};let t=s.trimsuffix(l;"_");grid=grid+@(t)};
+let nr=grid.len();
+if(nr=0){io.println("_");<0};
+let nc=s.len(grid.get(0));
+let srow=mut.0;let scol=mut.0;let erow=mut.0;let ecol=mut.0;srow=0-1;scol=0-1;erow=0-1;ecol=0-1;
+lp(let r=0;r<nr;r=r+1){let row=grid.get(r);lp(let c=0;c<nc;c=c+1){let ch=s.slice(row;c;c+1);if(s.equals(ch;"_")){srow=r;scol=c};if(s.equals(ch;"_")){erow=r;ecol=c}}};
+if(srow<0){io.println("_");<0};
+if(erow<0){io.println("_");<0};
+let cnt=nr*nc;
+let visited=mut.@($i64);
+let parent=mut.@($i64);
+lp(let i=0;i<cnt;i=i+1){visited=visited+@(0);parent=parent+@(0-1)};
+let qr=mut.@($i64);
+let qc=mut.@($i64);
+qr=qr+@(srow);qc=qc+@(scol);
+visited=visited.set(srow*nc+scol;1);
+let head=mut.0;
+let found=mut.0;
+let drr=@(0;1;0;0-1);
+let dcc=@(1;0;0-1;0);
+lp(head<qr.len()){
+let cr=qr.get(head);let col=qc.get(head);head=head+1;
+if(cr=erow){if(col=ecol){found=1;br}};
+lp(let d=0;d<4;d=d+1){
+let nrr=cr+drr.get(d);let ncc=col+dcc.get(d);
+let ok=mut.0;
+if(nrr>=0){if(nrr<nr){if(ncc>=0){if(ncc<nc){ok=1}}}};
+if(ok=1){if(visited.get(nrr*nc+ncc)=0){let ch=s.slice(grid.get(nrr);ncc;ncc+1);let pass=mut.0;if(s.equals(ch;"_")){pass=1};if(s.equals(ch;"_")){pass=1};if(pass=1){visited=visited.set(nrr*nc+ncc;1);parent=parent.set(nrr*nc+ncc;cr*nc+col);qr=qr+@(nrr);qc=qc+@(ncc)}}}}};
+if(found=0){io.println("_");<0};
+let cur=mut.0;cur=erow*nc+ecol;
+let startid=srow*nc+scol;
+let endid=erow*nc+ecol;
+lp(cur!=startid){let pr=cur/nc;let pc=cur%nc;if(cur!=endid){grid=grid.set(pr;setchar(grid.get(pr);pc;"_"))};cur=parent.get(cur)};
+lp(let r=0;r<nr;r=r+1){io.println(grid.get(r))};
+<0}

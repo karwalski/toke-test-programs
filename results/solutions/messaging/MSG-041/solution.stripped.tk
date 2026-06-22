@@ -1,0 +1,18 @@
+m=notif;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<"_"};let colon=s.indexof(s.slice(json;kp;n);"_");let q1=s.indexof(s.slice(json;kp+colon;n);"_""_"\"_");<s.slice(rest;0;q2)};
+f=getint(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<"_"};let colon=s.indexof(s.slice(json;kp;n);"_");let start=kp+colon+1;let rest=s.slice(json;start;n);let out=mut."_";let started=mut.0;lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;"_")){br};if(s.equals(c;"_")){br};if(s.equals(c;"_")){}el{out=s.concat(out;c)}};<out};
+f=main():$i64{
+let platform=s.trim(io.readln());
+let json=s.trim(io.readln());
+let sender=getstr(json;"_"sender\"_");
+let text=getstr(json;"_"text\"_");
+let badge=getint(json;"_"badge_count\"_");
+let sound=getstr(json;"_"sound\"_");
+let out=mut."_";
+if(s.equals(platform;"_")){
+out=s.concat(out;"_"aps\"_"alert\"_"title\"_""_"\"_"body\"_""_"\"_"badge\"_");
+out=s.concat(out;badge);
+out=s.concat(out;"_"sound\"_""_"\"_")}el{
+out=s.concat(out;"_"notification\"_"title\"_""_"\"_"body\"_""_"\"_"data\"_"badge\"_""_"\"_"sound\"_""_"\"_")};
+io.println(out);
+<0}

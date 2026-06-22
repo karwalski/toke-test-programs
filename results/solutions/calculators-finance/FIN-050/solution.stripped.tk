@@ -1,0 +1,34 @@
+m=weightedavg;
+i=io:std.io;
+i=s:std.str;
+
+f=parsef(line:$str):@($f64){
+  let parts=s.split(line;"_");
+  let out=mut.@();
+  let i=mut.0;
+  lp(i<parts.len()){
+    let p=s.trim(parts.get(i));
+    if(s.len(p)>0){out=out+@(s.tofloat(p))};
+    i=i+1;
+  };
+  <out;
+};
+
+f=wavg(vals:@($f64);wts:@($f64)):$f64{
+  let wsum=mut.0.0;
+  let total=mut.0.0;
+  let i=mut.0;
+  lp(i<vals.len()){
+    wsum=wsum+vals.get(i)*wts.get(i);
+    total=total+wts.get(i);
+    i=i+1;
+  };
+  <wsum/total;
+};
+
+f=main():$i64{
+  let vals=parsef(io.readln());
+  let wts=parsef(io.readln());
+  io.println(s.format(wavg(vals;wts);"_"));
+  <0;
+}

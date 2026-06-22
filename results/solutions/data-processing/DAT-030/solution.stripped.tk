@@ -1,0 +1,151 @@
+m=groupby;
+i=io:std.io;
+i=s:std.str;
+
+f=charcode(c:$str):$i64{
+  let digits="_";
+  let upper="_";
+  let lower="_";
+  let d=s.indexof(digits;c);if(d>=0){<48+d};
+  let u=s.indexof(upper;c);if(u>=0){<65+u};
+  let l=s.indexof(lower;c);if(l>=0){<97+l};
+  <0
+};
+
+f=strless(a:$str;b:$str):$bool{
+  let la=s.len(a) as $i64;
+  let lb=s.len(b) as $i64;
+  let n=mut.la;
+  if(lb<la){n=lb};
+  let i=mut.0;
+  lp(i<n){
+    let ca=charcode(s.slice(a;i as $u64;(i+1) as $u64));
+    let cb=charcode(s.slice(b;i as $u64;(i+1) as $u64));
+    if(ca<cb){<true};
+    if(ca>cb){<false};
+    i=i+1
+  };
+  <la<lb
+};
+
+f=colindex(headers:@$str;name:$str):$i64{
+  let i=mut.0;
+  lp((i as $u64)<headers.len()){
+    if(s.eq(headers.get(i as $u64);name)){<i};
+    i=i+1
+  };
+  <0-1
+};
+
+f=fmtnum(v:$f64;agf:$str):$str{
+  if(s.eq(agf;"_")){<s.format(v;"_")};
+  if(s.eq(agf;"_")){<s.fromint(v as $i64)};
+  let iv=v as $i64;
+  if((iv as $f64)=v){<s.fromint(iv)};
+  <s.format(v;"_")
+};
+
+f=main():$i64{
+  let header=s.trim(io.readln());
+  let headers=s.split(header;"_");
+  let rows=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let lt=s.trim(line);
+    if(s.len(lt)=0){br};
+    rows=rows.push(lt)
+  };
+  let config=s.trim(io.readln());
+  let tokens=s.split(config;"_");
+  let groupspec=tokens.get(0);
+  let gparts=s.split(groupspec;"_");
+  let groupcols=s.split(gparts.get(1);"_");
+  let aggcols=mut.@();
+  let aggfuncs=mut.@();
+  let t=mut.1;
+  lp((t as $u64)<tokens.len()){
+    let tok=tokens.get(t as $u64);
+    let pair=mut.tok;
+    if(s.startswith(tok;"_")){pair=s.slice(tok;4;s.len(tok))};
+    if(s.contains(pair;"_")){
+      let cf=s.split(pair;"_");
+      aggcols=aggcols.push(cf.get(0));
+      aggfuncs=aggfuncs.push(cf.get(1))
+    };
+    t=t+1
+  };
+  let gidx=colindex(headers;groupcols.get(0));
+  let keys=mut.@();
+  let rowkey=mut.@();
+  let i=mut.0;
+  lp((i as $u64)<rows.len()){
+    let cells=s.split(rows.get(i as $u64);"_");
+    let kv=cells.get(gidx as $u64);
+    rowkey=rowkey.push(kv);
+    let fidx=mut.0-1;
+    let j=mut.0;
+    lp(j<keys.len()){if(s.eq(keys.get(j);kv)){fidx=j};j=j+1};
+    if(fidx<0){keys=keys.push(kv)};
+    i=i+1
+  };
+  let nk=keys.len() as $i64;
+  let a=mut.0;
+  lp(a<nk-1){
+    let b=mut.0;
+    lp(b<nk-1-a){
+      if(strless(keys.get((b+1) as $u64);keys.get(b as $u64))){
+        let tmp=keys.get(b as $u64);
+        keys=keys.set(b as $u64;keys.get((b+1) as $u64));
+        keys=keys.set((b+1) as $u64;tmp)
+      };
+      b=b+1
+    };
+    a=a+1
+  };
+  let outhdr=mut.groupcols.get(0);
+  let h=mut.0;
+  lp((h as $u64)<aggcols.len()){
+    outhdr=s.concat(outhdr;s.concat("_";s.concat(aggcols.get(h as $u64);s.concat("_";aggfuncs.get(h as $u64)))));
+    h=h+1
+  };
+  io.println(outhdr);
+  let k=mut.0;
+  lp((k as $u64)<keys.len()){
+    let key=keys.get(k as $u64);
+    let outrow=mut.key;
+    let ac=mut.0;
+    lp((ac as $u64)<aggcols.len()){
+      let col=aggcols.get(ac as $u64);
+      let agf=aggfuncs.get(ac as $u64);
+      let cidx=colindex(headers;col);
+      let sum=mut.0.0;
+      let cnt=mut.0;
+      let mn=mut.0.0;
+      let mx=mut.0.0;
+      let first=mut.1;
+      let r=mut.0;
+      lp((r as $u64)<rows.len()){
+        if(s.eq(rowkey.get(r as $u64);key)){
+          let cells=s.split(rows.get(r as $u64);"_");
+          let x=s.tofloat(cells.get(cidx as $u64));
+          sum=sum+x;
+          cnt=cnt+1;
+          if(first=1){mn=x;mx=x;first=0}el{if(x<mn){mn=x};if(x>mx){mx=x}}
+        };
+        r=r+1
+      };
+      let val=mut.0.0;
+      if(s.eq(agf;"_")){val=sum};
+      if(s.eq(agf;"_")){val=sum/(cnt as $f64)};
+      if(s.eq(agf;"_")){val=cnt as $f64};
+      if(s.eq(agf;"_")){val=mn};
+      if(s.eq(agf;"_")){val=mx};
+      outrow=s.concat(outrow;s.concat("_";fmtnum(val;agf)));
+      ac=ac+1
+    };
+    io.println(outrow);
+    k=k+1
+  };
+  <0
+}

@@ -1,0 +1,60 @@
+m=cmddiff;
+i=io:std.io;
+i=s:std.str;
+i=p:std.process;
+
+f=runcmd(cmd:$str):$str{
+  let h=p.spawn(@("_";"_";cmd));
+  let code=p.wait(h);
+  <p.stdout(h);
+};
+
+f=splitlines(text:$str):@($str){
+  let out=mut.@();
+  if(s.len(text)=0){<out};
+  let t=mut.text;
+  if(s.endswith(t;"_")){t=s.slice(t;0;s.len(t)-1)};
+  let parts=s.split(t;"_");
+  let i=mut.0;
+  lp(i<parts.len()){out=out+@(parts.get(i));i=i+1};
+  <out;
+};
+
+f=main():$i64{
+  let cmd1=s.trim(io.readln());
+  let cmd2=s.trim(io.readln());
+  let out1=runcmd(cmd1);
+  let out2=runcmd(cmd2);
+  let a=splitlines(out1);
+  let b=splitlines(out2);
+  let na=a.len();
+  let nb=b.len();
+
+  let printed=mut.0;
+  let i=mut.0;
+  let j=mut.0;
+  lp(i<na){
+    if(j<nb){
+      if(s.equals(a.get(i);b.get(j))){
+        i=i+1;
+        j=j+1;
+      }el{
+        io.println(s.concat("_";a.get(i)));
+        io.println(s.concat("_";b.get(j)));
+        printed=1;
+        i=i+1;
+        j=j+1;
+      };
+    }el{
+      io.println(s.concat("_";a.get(i)));
+      printed=1;
+      i=i+1;
+    };
+  };
+  lp(j<nb){
+    io.println(s.concat("_";b.get(j)));
+    printed=1;
+    j=j+1;
+  };
+  <0;
+}

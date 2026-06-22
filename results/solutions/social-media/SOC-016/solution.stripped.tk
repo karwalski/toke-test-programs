@@ -1,0 +1,13 @@
+m=post;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<"_"};let colon=s.indexof(s.slice(json;kp;n);"_");let q1=s.indexof(s.slice(json;kp+colon;n);"_""_"\"_");<s.slice(rest;0;q2)};
+f=getarr(json:$str;key:$str):$str{let n=s.len(json);let kp=s.indexof(json;key);if(kp<0){<"_"};let ob=s.indexof(s.slice(json;kp;n);"_");let start=kp+ob;let cb=s.indexof(s.slice(json;start;n);"_");<s.slice(json;start;start+cb+1)};
+f=main():$i64{
+let json=s.trim(io.readln());
+let content=getstr(json;"_"content\"_");
+let tags=getarr(json;"_"tags\"_");
+let vis=getstr(json;"_"visibility\"_");
+let out=mut."_"id\"_"content\"_""_"\"_"tags\"_");
+out=s.concat(out;tags);
+out=s.concat(out;"_"visibility\"_""_"\"_"created_at\"_"2026-01-01T00:00:00Z\"_"status\"_"created\"_");
+io.println(out);
+<0}

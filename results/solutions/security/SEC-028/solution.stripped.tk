@@ -1,0 +1,28 @@
+m=smuggle;i=io:std.io;i=s:std.str;
+f=hexvalid(t:$str):$bool{if(s.len(t)=0){<false};lp(let i=0;i<s.len(t);i=i+1){let c=s.lower(s.slice(t;i;i+1));let ok=mut.0;if(s.contains("_";c)){ok=1};if(ok=0){<false}};<true};
+f=hexval(t:$str):$i64{let v=mut.0;lp(let i=0;i<s.len(t);i=i+1){let c=s.lower(s.slice(t;i;i+1));let d=s.indexof("_";c);v=v*16+d};<v};
+f=chunkbad(body:$str):$bool{let bt=s.trim(body);if(s.len(bt)=0){<false};let lines=s.split(body;"_");let i=mut.0;lp(i<lines.len()){let cs=s.trim(lines.get(i));if(s.len(cs)=0){i=i+1}el{if(hexvalid(cs)){let sz=hexval(cs);if(sz=0){<false};if(i+1>=lines.len()){<true};let data=lines.get(i+1);if(s.len(data)!=sz){<true};i=i+2}el{<true}}};<false};
+f=analyze(req:$str):$str{
+let lines=s.split(req;"_");
+if(lines.len()=0){<"_"};
+let cl=mut.0;
+let te=mut.0;
+let teval=mut."_";
+let bodystart=mut.lines.len();
+let i=mut.1;
+lp(i<lines.len()){let line=lines.get(i);if(s.len(s.trim(line))=0){bodystart=i+1;br};let cp=s.indexof(line;"_");if(cp>=0){let key=s.lower(s.trim(s.slice(line;0;cp)));let val=s.trim(s.slice(line;cp+1;s.len(line)));if(s.equals(key;"_")){cl=1};if(s.equals(key;"_")){te=1;teval=s.lower(val)}};i=i+1};
+let body=mut."_";
+if(bodystart<lines.len()){lp(let k=bodystart;k<lines.len();k=k+1){if(k>bodystart){body=s.concat(body;"_")};body=s.concat(body;lines.get(k))}};
+let chunked=mut.0;if(te=1){if(s.contains(teval;"_")){chunked=1}};
+if(cl=1){if(te=1){if(chunked=1){<"_"};<"_"}};
+if(chunked=1){if(chunkbad(body)){<"_"}};
+if(te=1){if(s.contains(teval;"_")){<"_"}};
+<"_"};
+f=main():$i64{
+let all=mut."_";
+let empties=mut.0;
+let count=mut.0;
+lp(count<2000){let l=io.readln();let t=s.trimsuffix(l;"_");if(s.len(t)=0){empties=empties+1;if(empties>=2){br}}el{empties=0};all=s.concat(all;s.concat(t;"_"));count=count+1};
+let reqs=s.split(all;"_");
+lp(let i=0;i<reqs.len();i=i+1){let req=s.trim(reqs.get(i));if(s.len(req)>0){io.println(analyze(req))}};
+<0}

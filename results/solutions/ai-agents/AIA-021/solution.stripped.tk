@@ -1,0 +1,20 @@
+m=rrf;i=io:std.io;i=s:std.str;
+f=getarr(json:$str;key:$str):@($str){let n=s.len(json);let kp=s.indexof(json;key);let res=mut.@($str);if(kp<0){<res};let ob=s.indexof(s.slice(json;kp;n);"_");let start=kp+ob+1;let rest=s.slice(json;start;n);let cb=s.indexof(rest;"_");let inner=s.slice(rest;0;cb);if(s.len(s.trim(inner))=0){<res};let i=mut.0;lp(i<s.len(inner)){let q1=s.indexof(s.slice(inner;i;s.len(inner));"_""_"\"_");let val=s.slice(r2;0;q2);res=res+@(val);i=qs+q2+1};<res};
+f=getk(json:$str):$i64{let n=s.len(json);let kp=s.indexof(json;"_"k\"_");if(kp<0){<60};let colon=s.indexof(s.slice(json;kp;n);"_");let start=kp+colon+1;let rest=s.slice(json;start;n);let out=mut."_";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;"_")){br};if(s.equals(c;"_")){br};if(s.equals(c;"_")){}el{out=s.concat(out;c)}};if(s.len(out)=0){<60};<s.toint(out)};
+f=main():$i64{
+let json=s.trim(io.readln());
+let kw=getarr(json;"_"keyword_results\"_");
+let sem=getarr(json;"_"semantic_results\"_");
+let k=getk(json);
+let docs=mut.@($str);
+let scores=mut.@($str);
+let kf=s.tofloat(s.fromint(k));
+lp(let i=0;i<kw.len();i=i+1){let doc=kw.get(i);let rank=i+1;let scr=1.0/(kf+s.tofloat(s.fromint(rank)));let fi=mut.0-1;lp(let p=0;p<docs.len();p=p+1){if(s.equals(docs.get(p);doc)){fi=p}};if(fi<0){docs=docs+@(doc);scores=scores+@(s.fromfloat(scr))}el{let old=s.tofloat(scores.get(fi));scores=scores.set(fi;s.fromfloat(old+scr))}};
+lp(let i=0;i<sem.len();i=i+1){let doc=sem.get(i);let rank=i+1;let scr=1.0/(kf+s.tofloat(s.fromint(rank)));let fi=mut.0-1;lp(let p=0;p<docs.len();p=p+1){if(s.equals(docs.get(p);doc)){fi=p}};if(fi<0){docs=docs+@(doc);scores=scores+@(s.fromfloat(scr))}el{let old=s.tofloat(scores.get(fi));scores=scores.set(fi;s.fromfloat(old+scr))}};
+let n=docs.len();
+lp(let a=0;a<n;a=a+1){lp(let b=0;b<n-1-a;b=b+1){let sb=s.tofloat(scores.get(b));let sb1=s.tofloat(scores.get(b+1));if(sb<sb1){let td=docs.get(b);let ts=scores.get(b);docs=docs.set(b;docs.get(b+1));scores=scores.set(b;scores.get(b+1));docs=docs.set(b+1;td);scores=scores.set(b+1;ts)}}};
+let out=mut."_";
+lp(let i=0;i<n;i=i+1){if(i>0){out=s.concat(out;"_")};out=s.concat(out;s.concat(s.concat("_""_"\"_"))};
+out=s.concat(out;"_");
+io.println(out);
+<0}

@@ -1,0 +1,18 @@
+m=polygon;i=io:std.io;i=s:std.str;i=math:std.math;
+f=main():$i64{
+let n=s.toint(s.trim(io.readln()));
+let xs=mut.@($str);
+let ys=mut.@($str);
+lp(let i=0;i<n;i=i+1){let line=s.trim(io.readln());let parts=s.split(line;"_");xs=xs+@(parts.get(0));ys=ys+@(parts.get(1))};
+let area=mut.0.0;
+lp(let i=0;i<n;i=i+1){let j=(i+1)%n;let xi=s.tofloat(xs.get(i));let yi=s.tofloat(ys.get(i));let xj=s.tofloat(xs.get(j));let yj=s.tofloat(ys.get(j));area=area+xi*yj;area=area-xj*yi};
+let signed=area;
+let absarea=mut.area;if(absarea<0.0){absarea=0.0-absarea};
+absarea=absarea/2.0;
+let perim=mut.0.0;
+lp(let i=0;i<n;i=i+1){let j=(i+1)%n;let xi=s.tofloat(xs.get(i));let yi=s.tofloat(ys.get(i));let xj=s.tofloat(xs.get(j));let yj=s.tofloat(ys.get(j));let dx=xj-xi;let dy=yj-yi;perim=perim+math.sqrt(dx*dx+dy*dy)};
+let winding=mut."_";if(signed>0.0){winding="_"};
+io.println(s.concat("_";s.format(absarea;"_")));
+io.println(s.concat("_";s.format(perim;"_")));
+io.println(s.concat("_";winding));
+<0}

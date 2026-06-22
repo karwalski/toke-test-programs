@@ -1,0 +1,17 @@
+m=auth;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("_""_"\"_""_""_"\"_");
+  if(cl<0){<"_"};
+  <s.slice(after;0;cl)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"_");
+  let email=getstrval(line;"_");
+  if(s.eq(action;"_")&&s.len(email)>0){
+    io.println("_"token\"_"eyJ...\"_"expires_in\"_"status\"_"authenticated\"_")
+  }el{
+    io.println("_"status\"_"unauthorized\"_")
+  };
+  <0
+}

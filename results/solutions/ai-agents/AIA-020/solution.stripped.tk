@@ -1,0 +1,151 @@
+m=filter;
+i=io:std.io;
+i=s:std.str;
+
+f=jstr(seg:$str;field:$str):$str{
+  let key=s.concat("_""_"\"_""_""_"\"_");
+  if(end<0){<"_"};
+  <s.slice(rest;0;end);
+};
+
+f=jnum(seg:$str;field:$str):$str{
+  let key=s.concat("_""_"\"_"));
+  let start=s.indexof(seg;key);
+  if(start<0){<"_"};
+  let vs=start+s.len(key);
+  let rest=s.slice(seg;vs;s.len(seg));
+  let i=mut.0;
+  let out=mut."_";
+  let stop=mut.0;
+  lp(i<s.len(rest)){
+    if(stop=0){
+      let c=s.slice(rest;i;i+1);
+      if(s.contains("_";c)){out=s.concat(out;c)}el{stop=1};
+    };
+    i=i+1;
+  };
+  if(s.len(out)=0){<"_"};
+  <out;
+};
+
+f=jaccard(t1:$str;t2:$str):$f64{
+  let w1=s.split(s.lower(t1);"_");
+  let w2=s.split(s.lower(t2);"_");
+  let u1=mut.@();
+  let a=mut.0;
+  lp(a<w1.len()){
+    let w=s.trim(w1.get(a));
+    if(s.len(w)>0){
+      let seen=mut.0;
+      let b=mut.0;
+      lp(b<u1.len()){if(s.equals(u1.get(b);w)){seen=1};b=b+1};
+      if(seen=0){u1=u1+@(w)};
+    };
+    a=a+1;
+  };
+  let u2=mut.@();
+  let c=mut.0;
+  lp(c<w2.len()){
+    let w=s.trim(w2.get(c));
+    if(s.len(w)>0){
+      let seen=mut.0;
+      let b=mut.0;
+      lp(b<u2.len()){if(s.equals(u2.get(b);w)){seen=1};b=b+1};
+      if(seen=0){u2=u2+@(w)};
+    };
+    c=c+1;
+  };
+  let inter=mut.0;
+  let i=mut.0;
+  lp(i<u1.len()){
+    let j=mut.0;
+    lp(j<u2.len()){if(s.equals(u1.get(i);u2.get(j))){inter=inter+1};j=j+1};
+    i=i+1;
+  };
+  let union=u1.len()+u2.len()-inter;
+  if(union=0){<1.0};
+  <s.tofloat(s.fromint(inter))/s.tofloat(s.fromint(union));
+};
+
+f=main():$i64{
+  let raw=mut."_";
+  let line=mut.io.readln();
+  lp(s.len(line)>0){raw=s.concat(raw;line);line=io.readln()};
+  let input=raw;
+
+  let minscore=s.tofloat(jnum(input;"_"));
+  let maxred=s.tofloat(jnum(input;"_"));
+
+  let ck="_"chunks\"_";
+  let cp=s.indexof(input;ck);
+  let afterc=s.slice(input;cp+s.len(ck);s.len(input));
+  let segs=s.split(afterc;"_");
+
+  let ids=mut.@();
+  let texts=mut.@();
+  let scores=mut.@();
+  let si=mut.0;
+  lp(si<segs.len()){
+    let seg=segs.get(si);
+    if(s.contains(seg;"_"id\"_")){
+      let id=jstr(seg;"_");
+      let txt=jstr(seg;"_");
+      let scval=s.tofloat(jnum(seg;"_"));
+      if(scval>=minscore){
+        ids=ids+@(id);
+        texts=texts+@(txt);
+        scores=scores+@(s.fromfloat(scval));
+      };
+    };
+    si=si+1;
+  };
+
+  let n=ids.len();
+  let order=mut.@();
+  let z=mut.0;
+  lp(z<n){order=order+@(z);z=z+1};
+  let p=mut.0;
+  lp(p<n){
+    let q=mut.p+1;
+    lp(q<n){
+      let oi=order.get(p);
+      let oj=order.get(q);
+      if(s.tofloat(scores.get(oj))>s.tofloat(scores.get(oi))){order=order.set(p;oj);order=order.set(q;oi)};
+      q=q+1;
+    };
+    p=p+1;
+  };
+
+  let keptids=mut.@();
+  let kepttexts=mut.@();
+  let k=mut.0;
+  lp(k<n){
+    let idx=order.get(k);
+    let txt=texts.get(idx);
+    let redundant=mut.0;
+    let e=mut.0;
+    lp(e<kepttexts.len()){
+      if(redundant=0){
+        let sim=jaccard(txt;kepttexts.get(e));
+        if(sim>=maxred){redundant=1};
+      };
+      e=e+1;
+    };
+    if(redundant=0){
+      keptids=keptids+@(ids.get(idx));
+      kepttexts=kepttexts+@(txt);
+    };
+    k=k+1;
+  };
+
+  let out=mut."_";
+  let o=mut.0;
+  lp(o<keptids.len()){
+    if(o>0){out=s.concat(out;"_")};
+    out=s.concat(out;"_""_"\"_");
+    o=o+1;
+  };
+  out=s.concat(out;"_");
+  io.println(out);
+  <0;
+}

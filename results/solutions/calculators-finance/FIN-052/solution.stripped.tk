@@ -1,0 +1,18 @@
+m=five;i=io:std.io;i=s:std.str;
+f=medslice(arr:@($str);lo:$i64;hi:$i64):$f64{let cnt=hi-lo;let mid=cnt/2;if(cnt%2=0){let a=s.tofloat(arr.get(lo+mid-1));let b=s.tofloat(arr.get(lo+mid));<(a+b)/2.0}el{<s.tofloat(arr.get(lo+mid))}};
+f=fmtnum(x:$f64):$str{<s.fromfloat(x)};
+f=main():$i64{
+let line=s.trim(io.readln());
+let parts=s.split(line;"_");
+let nums=mut.@($str);
+lp(let i=0;i<parts.len();i=i+1){let t=s.trim(parts.get(i));if(s.len(t)>0){nums=nums+@(t)}};
+let n=nums.len();
+lp(let a=0;a<n;a=a+1){lp(let b=0;b<n-1-a;b=b+1){let x=s.tofloat(nums.get(b));let y=s.tofloat(nums.get(b+1));if(x>y){let t=nums.get(b);nums=nums.set(b;nums.get(b+1));nums=nums.set(b+1;t)}}};
+let minv=s.tofloat(nums.get(0));
+let maxv=s.tofloat(nums.get(n-1));
+let median=medslice(nums;0;n);
+let q1=medslice(nums;0;n/2);
+let upperlo=mut.0;if(n%2=0){upperlo=n/2}el{upperlo=n/2+1};
+let q3=medslice(nums;upperlo;n);
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(fmtnum(minv);"_");fmtnum(q1));"_");fmtnum(median));"_");fmtnum(q3));"_");fmtnum(maxv)));
+<0}

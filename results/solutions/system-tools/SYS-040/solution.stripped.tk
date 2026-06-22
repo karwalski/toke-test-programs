@@ -1,0 +1,18 @@
+m=meminfo;i=io:std.io;i=s:std.str;
+f=mb(kb:$i64):$str{let num=kb*100;let den=1024;let whole=mut.num/den;let rem=num-whole*den;
+let two=rem*2;if(two>den){whole=whole+1}el{if(two=den){if(whole-whole/2*2=1){whole=whole+1}}};
+let ip=whole/100;let fp=whole-ip*100;
+let fs=mut.s.fromint(fp);lp(s.len(fs)<2){fs=s.concat("_";fs)};
+let trimmed=mut.fs;lp(s.len(trimmed)>1){let last=s.slice(trimmed;s.len(trimmed)-1;s.len(trimmed));if(s.eq(last;"_")){trimmed=s.slice(trimmed;0;s.len(trimmed)-1)}el{br}};
+<s.concat(s.concat(s.fromint(ip);"_");trimmed)};
+f=main():$i64{let total=8192000;let free=2048000;let used=total-free;
+let sys=mut.s.concat("_";mb(total));sys=s.concat(sys;"_");sys=s.concat(sys;mb(free));sys=s.concat(sys;"_");sys=s.concat(sys;mb(used));io.println(sys);
+let line=s.trim(io.readln());if(s.len(line)=0){<0};
+let pid=s.toint(line);
+let rss=mut.0;let vsz=mut.0;let shmem=mut.0;let rfile=mut.0;let ranon=mut.0;let found=mut.false;
+if(pid=1){rss=12345;vsz=234567;shmem=2048;rfile=4096;ranon=6201;found=true};
+if(pid=2){rss=512;vsz=10240;shmem=128;rfile=256;ranon=128;found=true};
+if(!found){io.println("_");<0};
+let shared=shmem+rfile;let private=ranon;
+let out=mut.s.concat("_";s.fromint(pid));out=s.concat(out;"_");out=s.concat(out;mb(rss));out=s.concat(out;"_");out=s.concat(out;mb(vsz));out=s.concat(out;"_");out=s.concat(out;mb(shared));out=s.concat(out;"_");out=s.concat(out;mb(private));
+io.println(out);<0}

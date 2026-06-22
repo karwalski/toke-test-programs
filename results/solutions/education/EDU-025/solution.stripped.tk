@@ -1,0 +1,6 @@
+m=seats;i=io:std.io;i=s:std.str;
+f=pad(name:$str):$str{let out=mut.name;let need=mut.11-s.len(name);if(need<0){need=0};let i=mut.0;lp(i<need){out=s.concat(out;"_");i=i+1};<out};
+f=main():$i64{let dim=s.split(s.trim(io.readln());"_");let rows=s.toint(s.trim(dim.get(0)));let cols=s.toint(s.trim(dim.get(1)));let seed=s.trim(io.readln());
+let students=mut.@("_");students=@();lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(s.len(t)>0){students=students+@(t)}};
+let idx=mut.0;let r=mut.0;lp(r<rows){let row=mut."_";let c=mut.0;lp(c<cols){let name=mut."_";if(idx<students.len()){name=students.get(idx);idx=idx+1};if(c=cols-1){row=s.concat(row;name)}el{row=s.concat(row;pad(name))};c=c+1};io.println(row);r=r+1};
+<0}

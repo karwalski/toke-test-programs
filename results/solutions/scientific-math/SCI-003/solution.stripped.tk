@@ -1,0 +1,37 @@
+m=fft;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmtval(x:$f64):$str{
+  let v=mut.x;
+  let r=mut.0;
+  if(v<0.0){r=0-((0.0-v)+0.5) as $i64}el{r=(v+0.5) as $i64};
+  let diff=v-(r as $f64);
+  let ad=mut.diff;
+  if(ad<0.0){ad=0.0-ad};
+  if(ad<0.000001){
+    if(r=0){<"_"};
+    <s.concat(s.fromint(r);"_")
+  };
+  <s.format(v;"_")
+};
+f=main():$i64{
+  let n=s.toint(s.trim(io.readln()));
+  let line=s.trim(io.readln());
+  let parts=s.split(line;"_");
+  let xr=mut.@(0.0);xr=@();
+  lp(let i=0;i<n;i=i+1){
+    if(i<parts.len()){xr=xr+@(s.tofloat(parts.get(i)))}el{xr=xr+@(0.0)}
+  };
+  let pi=3.14159265358979323846;
+  lp(let k=0;k<n;k=k+1){
+    let sumr=mut.0.0;
+    let sumi=mut.0.0;
+    lp(let j=0;j<n;j=j+1){
+      let angle=(0.0-2.0)*pi*(k as $f64)*(j as $f64)/(n as $f64);
+      let c=math.cos(angle);
+      let si=math.sin(angle);
+      sumr=sumr+xr.get(j)*c;
+      sumi=sumi+xr.get(j)*si
+    };
+    io.println(s.concat(fmtval(sumr);s.concat("_";fmtval(sumi))))
+  };
+  <0
+}

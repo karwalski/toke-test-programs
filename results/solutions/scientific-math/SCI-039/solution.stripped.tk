@@ -1,0 +1,56 @@
+m=heap;
+i=io:std.io;
+i=s:std.str;
+
+f=joinperm(state:@($str);n:$i64):$str{
+  let out=mut."_";
+  let i=mut.0;
+  lp(i<n){
+    if(i>0){out=s.concat(out;"_")};
+    out=s.concat(out;state.get(i));
+    i=i+1;
+  };
+  <out;
+};
+
+f=gen(state:@($str);n:$i64;k:$i64):@($str){
+  let st=mut.state;
+  if(k=1){
+    st=st+@(joinperm(st;n));
+    <st;
+  };
+  let i=mut.0;
+  lp(i<k){
+    st=gen(st;n;k-1);
+    if(k-(k/2)*2=0){
+      let tmp=st.get(i);
+      st=st.set(i;st.get(k-1));
+      st=st.set(k-1;tmp);
+    }el{
+      let tmp=st.get(0);
+      st=st.set(0;st.get(k-1));
+      st=st.set(k-1;tmp);
+    };
+    i=i+1;
+  };
+  <st;
+};
+
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let elems=s.split(line;"_");
+  let n=elems.len();
+  let state=mut.@();
+  let i=mut.0;
+  lp(i<n){state=state+@(elems.get(i));i=i+1};
+  let res=gen(state;n;n);
+  let total=mut.0;
+  let j=mut.n;
+  lp(j<res.len()){
+    io.println(res.get(j));
+    total=total+1;
+    j=j+1;
+  };
+  io.println(s.concat("_";s.fromint(total)));
+  <0;
+}

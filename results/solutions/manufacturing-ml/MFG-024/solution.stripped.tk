@@ -1,0 +1,108 @@
+m=dt;
+i=io:std.io;
+i=s:std.str;
+
+f=fmtacc(correct:$i64;total:$i64):$str{
+  if(total=0){<"_"};
+  if(correct=total){<"_"};
+  if(correct=0){<"_"};
+  let scaled=(correct*1000000)/total;
+  let ipart=scaled/1000000;
+  let fpart=scaled-ipart*1000000;
+  let fs=mut.s.fromint(fpart);
+  lp(s.len(fs)<6){fs=s.concat("_";fs)};
+  let endd=mut.s.len(fs) as $i64;
+  lp(endd>1){let last=s.slice(fs;(endd-1) as $u64;endd as $u64);if(s.eq(last;"_")){endd=endd-1}el{br}};
+  <s.concat(s.concat(s.fromint(ipart);"_");s.slice(fs;0;endd as $u64))
+};
+
+f=main():$i64{
+  let header=s.trim(io.readln());
+  let features=s.split(header;"_");
+  let ncols=features.len() as $i64;
+  let labelidx=ncols-1;
+  let rows=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let lt=s.trim(line);
+    if(s.len(lt)=0){br};
+    rows=rows.push(lt)
+  };
+  let nrows=rows.len() as $i64;
+  if(nrows=0){io.println("_"error\"_"No data\"_");<0};
+  let cells=mut.@();
+  let r=mut.0;
+  lp(r<nrows){cells=cells.push(s.split(rows.get(r as $u64);"_"));r=r+1};
+  let bestfeat=mut.0-1;
+  let bestval=mut."_";
+  let bestpure=mut.0-1;
+  let fi=mut.0;
+  lp(fi<labelidx){
+    let v=mut.0;
+    lp(v<nrows){
+      let fval=cells.get(v as $u64).get(fi as $u64);
+      let lyes=mut.0;let lno=mut.0;let ryes=mut.0;let rno=mut.0;
+      let k=mut.0;
+      lp(k<nrows){
+        let row=cells.get(k as $u64);
+        let cv=row.get(fi as $u64);
+        let lab=row.get(labelidx as $u64);
+        if(s.eq(cv;fval)){
+          if(s.eq(lab;"_")){lyes=lyes+1}el{lno=lno+1}
+        }el{
+          if(s.eq(lab;"_")){ryes=ryes+1}el{rno=rno+1}
+        };
+        k=k+1
+      };
+      let ltot=lyes+lno;let rtot=ryes+rno;
+      if(ltot>0){
+        if(rtot>0){
+          let lmax=mut.lyes;if(lno>lyes){lmax=lno};
+          let rmax=mut.ryes;if(rno>ryes){rmax=rno};
+          let pure=lmax+rmax;
+          if(pure>bestpure){
+            bestpure=pure;bestfeat=fi;bestval=fval
+          }
+        }
+      };
+      v=v+1
+    };
+    fi=fi+1
+  };
+  if(bestfeat<0){
+    let yc=mut.0;let nc=mut.0;
+    let k=mut.0;
+    lp(k<nrows){if(s.eq(cells.get(k as $u64).get(labelidx as $u64);"_")){yc=yc+1}el{nc=nc+1};k=k+1};
+    let lbl=mut."_";if(yc>=nc){lbl="_"};
+    io.println(s.concat(s.concat("_"root\"_""_"\"_"accuracy\"_";s.concat(fmtacc(nrows;nrows);"_"))));
+    <0
+  };
+  let lyes=mut.0;let lno=mut.0;let ryes=mut.0;let rno=mut.0;
+  let k=mut.0;
+  lp(k<nrows){
+    let row=cells.get(k as $u64);
+    let cv=row.get(bestfeat as $u64);
+    let lab=row.get(labelidx as $u64);
+    if(s.eq(cv;bestval)){if(s.eq(lab;"_")){lyes=lyes+1}el{lno=lno+1}}el{if(s.eq(lab;"_")){ryes=ryes+1}el{rno=rno+1}};
+    k=k+1
+  };
+  let leftlab=mut."_";if(lyes>=lno){leftlab="_"};
+  let rightlab=mut."_";if(ryes>=rno){rightlab="_"};
+  let correct=mut.0;
+  let c2=mut.0;
+  lp(c2<nrows){
+    let row=cells.get(c2 as $u64);
+    let cv=row.get(bestfeat as $u64);
+    let pred=mut.rightlab;
+    if(s.eq(cv;bestval)){pred=leftlab};
+    if(s.eq(pred;row.get(labelidx as $u64))){correct=correct+1};
+    c2=c2+1
+  };
+  let featname=features.get(bestfeat as $u64);
+  let out=mut."_"root\"_"feature\"_""_"\"_"split\"_""_"\"_"left\"_""_"\"_"right\"_""_"\"_"accuracy\"_");
+  out=s.concat(out;fmtacc(correct;nrows));
+  out=s.concat(out;"_");
+  io.println(out);
+  <0
+}

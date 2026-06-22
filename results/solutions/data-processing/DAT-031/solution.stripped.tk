@@ -1,0 +1,57 @@
+m=rollingstats;
+i=io:std.io;
+i=s:std.str;
+
+f=fmtval(v:$f64;stat:$str):$str{
+  if(s.eq(stat;"_")){
+    <s.format(v;"_")
+  };
+  let iv=v as $i64;
+  let back=iv as $f64;
+  if(back=v){
+    <s.fromint(iv)
+  };
+  <s.format(v;"_")
+};
+
+f=main():$i64{
+  let win=s.toint(s.trim(io.readln()));
+  let stat=s.trim(io.readln());
+  let vals=mut.@(0.0);
+  vals=@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let lt=s.trim(line);
+    if(s.len(lt)=0){br};
+    vals=vals.push(s.tofloat(lt))
+  };
+  let n=vals.len() as $i64;
+  let i=mut.0;
+  lp(i<n){
+    if(i<win-1){
+      io.println("_")
+    }el{
+      let start=i-win+1;
+      let acc=mut.vals.get(start as $u64);
+      let mn=mut.vals.get(start as $u64);
+      let mx=mut.vals.get(start as $u64);
+      let k=mut.start+1;
+      lp(k<=i){
+        let x=vals.get(k as $u64);
+        acc=acc+x;
+        if(x<mn){mn=x};
+        if(x>mx){mx=x};
+        k=k+1
+      };
+      let result=mut.0.0;
+      if(s.eq(stat;"_")){result=acc};
+      if(s.eq(stat;"_")){result=acc/(win as $f64)};
+      if(s.eq(stat;"_")){result=mn};
+      if(s.eq(stat;"_")){result=mx};
+      io.println(fmtval(result;stat))
+    };
+    i=i+1
+  };
+  <0
+}

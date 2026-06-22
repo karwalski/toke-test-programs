@@ -1,0 +1,120 @@
+m=eval;i=io:std.io;i=s:std.str;
+f=tokenize(expr:$str):@($str){
+  let tokens=mut.@();
+  let current=mut."_";
+  lp(let idx=0;idx<s.len(expr);idx=idx+1){
+    let ch=s.slice(expr;idx;idx+1);
+    if(s.eq(ch;"_")){
+      if(s.len(current)>0){tokens=tokens+@(current);current="_"}
+    }el{
+      if(s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")||s.eq(ch;"_")){
+        if(s.len(current)>0){tokens=tokens+@(current);current="_"};
+        tokens=tokens+@(ch)
+      }el{
+        current=s.concat(current;ch)
+      }
+    }
+  };
+  if(s.len(current)>0){tokens=tokens+@(current)};
+  <tokens
+};
+f=prec(op:$str):$i64{
+  if(s.eq(op;"_")){<4};
+  if(s.eq(op;"_")||s.eq(op;"_")){<3};
+  if(s.eq(op;"_")||s.eq(op;"_")){<2};
+  <0
+};
+f=isop(t:$str):$bool{
+  <s.eq(t;"_")||s.eq(t;"_")||s.eq(t;"_")||s.eq(t;"_")||s.eq(t;"_")
+};
+f=ipow(base:$i64;e:$i64):$i64{
+  let r=mut.1;
+  lp(let k=0;k<e;k=k+1){r=r*base};
+  <r
+};
+f=apply(a:$i64;b:$i64;op:$str):$i64{
+  if(s.eq(op;"_")){<a+b};
+  if(s.eq(op;"_")){<a-b};
+  if(s.eq(op;"_")){<a*b};
+  if(s.eq(op;"_")){<a/b};
+  <ipow(a;b)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let toks=tokenize(line);
+  let output=mut.@();
+  let ops=mut.@();
+  lp(let i=0;i<toks.len();i=i+1){
+    let t=toks.get(i);
+    if(isop(t)){
+      lp(ops.len()>0){
+        let top=ops.get(ops.len()-1);
+        if(isop(top)){
+          let pt=prec(top);
+          let pc=prec(t);
+          let popit=mut.false;
+          if(s.eq(t;"_")){
+            if(pt>pc){popit=true}
+          }el{
+            if(pt>=pc){popit=true}
+          };
+          if(popit){
+            output=output+@(top);
+            let no=mut.@();
+            lp(let k=0;k<ops.len()-1;k=k+1){no=no+@(ops.get(k))};
+            ops=no
+          }el{
+            br
+          }
+        }el{
+          br
+        }
+      };
+      ops=ops+@(t)
+    }el{
+      if(s.eq(t;"_")){
+        ops=ops+@(t)
+      }el{
+        if(s.eq(t;"_")){
+          lp(ops.len()>0){
+            let top=ops.get(ops.len()-1);
+            let no=mut.@();
+            lp(let k=0;k<ops.len()-1;k=k+1){no=no+@(ops.get(k))};
+            ops=no;
+            if(s.eq(top;"_")){
+              br
+            }el{
+              output=output+@(top)
+            }
+          }
+        }el{
+          output=output+@(t)
+        }
+      }
+    }
+  };
+  lp(ops.len()>0){
+    let top=ops.get(ops.len()-1);
+    output=output+@(top);
+    let no=mut.@();
+    lp(let k=0;k<ops.len()-1;k=k+1){no=no+@(ops.get(k))};
+    ops=no
+  };
+  let stk=mut.@();
+  lp(let i=0;i<output.len();i=i+1){
+    let t=output.get(i);
+    if(isop(t)){
+      let n=stk.len();
+      let b=stk.get(n-1);
+      let a=stk.get(n-2);
+      let r=apply(a;b;t);
+      let ns=mut.@();
+      lp(let k=0;k<n-2;k=k+1){ns=ns+@(stk.get(k))};
+      stk=ns+@(r)
+    }el{
+      stk=stk+@(s.toint(t))
+    }
+  };
+  io.println(s.fromint(stk.get(stk.len()-1)));
+  <0
+}

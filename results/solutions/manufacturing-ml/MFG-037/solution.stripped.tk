@@ -1,0 +1,18 @@
+m=yieldtrend;i=io:std.io;i=s:std.str;
+f=fmtslope(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};
+let scaled=v*1000000.0+0.5;let q=scaled as $i64;let ip=q/1000000;let fp=q-ip*1000000;
+let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("_";fs)};
+let trimmed=mut.fs;lp(s.len(trimmed)>1){let last=s.slice(trimmed;s.len(trimmed)-1;s.len(trimmed));if(s.eq(last;"_")){trimmed=s.slice(trimmed;0;s.len(trimmed)-1)}el{br}};
+let out=mut.s.concat(s.fromint(ip);"_");out=s.concat(out;trimmed);if(neg){out=s.concat("_";out)};<out};
+f=main():$i64{let bx=mut.@(0.0);bx=@();let by=mut.@(0.0);by=@();let first=mut.true;
+lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(s.len(t)=0){}el{if(first){first=false}el{let parts=s.split(t;"_");bx=bx+@(s.tofloat(s.trim(parts.get(0))));by=by+@(s.tofloat(s.trim(parts.get(1))))}}};
+let n=bx.len();
+let slope=mut.0.0;let dir=mut."_";let alert=mut.false;
+if(n<2){}el{let sx=mut.0.0;let sy=mut.0.0;let sxy=mut.0.0;let sxx=mut.0.0;let i=mut.0;lp(i<n){let xv=bx.get(i);let yv=by.get(i);sx=sx+xv;sy=sy+yv;sxy=sxy+xv*yv;sxx=sxx+xv*xv;i=i+1};
+let nf=n as $f64;slope=(nf*sxy-sx*sy)/(nf*sxx-sx*sx);
+if(slope>0.1){dir="_"}el{if(slope<0.0-0.1){dir="_"}el{dir="_"}};
+let mag=mut.slope;if(mag<0.0){mag=0.0-mag};
+if(s.eq(dir;"_")){alert=true};if(mag>0.5){alert=true}};
+let alertStr=mut."_";if(alert){alertStr="_"};
+let out=mut.s.concat("_"trend_direction\"_""_"\"_"slope\"_");out=s.concat(out;fmtslope(slope));out=s.concat(out;"_"alert\"_");out=s.concat(out;alertStr);out=s.concat(out;"_");
+io.println(out);<0}

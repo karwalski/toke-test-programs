@@ -1,0 +1,71 @@
+m=codeanalyzer;i=io:std.io;i=s:std.str;i=os:std.os;i=file:std.file;
+f=padright(str:$str;width:$i64):$str{
+  let out=mut.str;
+  lp(s.len(out)<width){out=s.concat(out;"_")};
+  <out
+};
+f=padleft(str:$str;width:$i64):$str{
+  let out=mut.str;
+  lp(s.len(out)<width){out=s.concat("_";out)};
+  <out
+};
+f=extof(path:$str):$str{
+  let dot=s.lastindex(path;"_");
+  if(dot<0){<"_"};
+  <s.slice(path;dot+1;s.len(path))
+};
+f=isregular(path:$str):$bool{
+  if(s.eq(path;"_")){<false};
+  let st=os.stat(path);
+  if(st<0){<false};
+  <true
+};
+f=main():$i64{
+  let exts=mut.@();
+  let files=mut.@();
+  let codes=mut.@();
+  let comments=mut.@();
+  let blanks=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let path=s.trim(line);
+    if(s.len(path)>0){
+      if(isregular(path)){
+        let ext=extof(path);
+        let content=file.read(path);
+        let lines=s.split(content;"_");
+        let code=mut.0;
+        let comment=mut.0;
+        let blank=mut.0;
+        lp(let i=0;i<lines.len();i=i+1){
+          let st=s.trim(lines.get(i));
+          if(s.len(st)=0){blank=blank+1}
+          el{if(s.startswith(st;"_")){comment=comment+1}el{code=code+1}}
+        };
+        let found=mut.0-1;
+        lp(let e=0;e<exts.len();e=e+1){if(s.eq(exts.get(e);ext)){found=e}};
+        if(found<0){
+          exts=exts+@(ext);files=files+@(1);codes=codes+@(code);comments=comments+@(comment);blanks=blanks+@(blank)
+        }
+      }
+    }
+  };
+  io.println("_");
+  lp(let i=0;i<exts.len();i=i+1){
+    let total=codes.get(i)+comments.get(i)+blanks.get(i);
+    let row=mut.padright(exts.get(i);6);
+    row=s.concat(row;"_");
+    row=s.concat(row;padleft(s.fromint(files.get(i));5));
+    row=s.concat(row;"_");
+    row=s.concat(row;padleft(s.fromint(codes.get(i));4));
+    row=s.concat(row;"_");
+    row=s.concat(row;padleft(s.fromint(comments.get(i));7));
+    row=s.concat(row;"_");
+    row=s.concat(row;padleft(s.fromint(blanks.get(i));5));
+    row=s.concat(row;"_");
+    row=s.concat(row;padleft(s.fromint(total);5));
+    io.println(row)
+  };
+  <0
+}

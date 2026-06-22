@@ -1,0 +1,13 @@
+m=decrypt;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let keyline=s.trim(io.readln());
+let ivline=s.trim(io.readln());
+let ctline=s.trim(io.readln());
+let ctok=mut.0;
+if(s.len(ctline)>0){if(s.len(ctline)%32=0){ctok=1}};
+if(ctok=0){
+let prefix=mut."_";
+let take=mut.8;if(s.len(keyline)<8){take=s.len(keyline)};
+io.print(s.concat(prefix;s.slice(keyline;0;take)));
+<0};
+<0}

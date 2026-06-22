@@ -1,0 +1,39 @@
+m=quiz;i=io:std.io;i=s:std.str;
+f=extractarr(text:$str;key:$str):$str{
+  let pat=s.concat("_""_"\"_"));
+  let idx=s.indexof(text;pat);
+  if(idx<0){<"_"};
+  let start=idx+s.len(pat)-1;
+  let depth=mut.0;
+  let i=mut.start;
+  let n=s.len(text);
+  let inq=mut.false;
+  lp(i<n){
+    let c=s.slice(text;i;i+1);
+    if(inq){
+      if(s.eq(c;"_""_"\"_")){inq=true};
+      if(s.eq(c;"_")){depth=depth+1};
+      if(s.eq(c;"_")){depth=depth-1;if(depth=0){<s.slice(text;start+1;i)}}
+    };
+    i=i+1
+  };
+  <"_"
+};
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("_""_"\"_""_""_"\"_");
+  if(cl<0){<"_"};
+  <s.slice(after;0;cl)
+};
+f=splitstrlist(arr:$str):@($str){
+  let out=mut.@();
+  let n=s.len(arr);
+  let i=mut.0;
+  let cur=mut."_";
+  let inq=mut.false;
+  lp(i<n){
+    let ch=s.slice(arr;i;i+1);
+    if(s.eq(ch;"_""_""_"\"_")){inq=false}
+    }el{
+      if(s.eq(c;"_""_"{"_"}"_"questions"_"q"_"Q"_": "_"options"_"answer"_"Correct!"_"Incorrect. Answer: "_"Score: "_"/"_" ("_"%)")))))));
+  <0
+}

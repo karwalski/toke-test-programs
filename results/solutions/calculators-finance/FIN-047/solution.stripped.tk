@@ -1,0 +1,49 @@
+m=pearson;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=parsef(line:$str):@($f64){
+  let parts=s.split(line;"_");
+  let out=mut.@();
+  let i=mut.0;
+  lp(i<parts.len()){
+    let p=s.trim(parts.get(i));
+    if(s.len(p)>0){out=out+@(s.tofloat(p))};
+    i=i+1;
+  };
+  <out;
+};
+
+f=corr(x:@($f64);y:@($f64)):$f64{
+  let n=x.len();
+  let sumx=mut.0.0;
+  let sumy=mut.0.0;
+  let i=mut.0;
+  lp(i<n){sumx=sumx+x.get(i);sumy=sumy+y.get(i);i=i+1};
+  let nf=s.tofloat(s.fromint(n));
+  let meanx=sumx/nf;
+  let meany=sumy/nf;
+  let num=mut.0.0;
+  let ssx=mut.0.0;
+  let ssy=mut.0.0;
+  let k=mut.0;
+  lp(k<n){
+    let dx=x.get(k)-meanx;
+    let dy=y.get(k)-meany;
+    num=num+dx*dy;
+    ssx=ssx+dx*dx;
+    ssy=ssy+dy*dy;
+    k=k+1;
+  };
+  let den=math.sqrt(ssx*ssy);
+  if(den=0.0){<0.0};
+  <num/den;
+};
+
+f=main():$i64{
+  let x=parsef(io.readln());
+  let y=parsef(io.readln());
+  io.println(s.format(corr(x;y);"_"));
+  <0;
+}

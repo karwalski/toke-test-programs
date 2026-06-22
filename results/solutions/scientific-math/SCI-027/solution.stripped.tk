@@ -1,0 +1,19 @@
+m=mergesort;i=io:std.io;i=s:std.str;
+f=slice(arr:@$i64;lo:$i64;hi:$i64):@$i64{let r=mut.@(0);r=@();let i=mut.lo;lp(i<hi){r=r+@(arr.get(i));i=i+1};<r};
+f=msort(arr:@$i64):@$i64{let n=arr.len();if(n<2){let base=mut.@(0;0);base=@(0;0);let i=mut.0;lp(i<n){base=base+@(arr.get(i));i=i+1};<base};
+let mid=n/2;let lpart=slice(arr;0;mid);let rpart=slice(arr;mid;n);
+let lres=msort(lpart);let rres=msort(rpart);
+let lc=lres.get(0);let ld=lres.get(1);let rc=rres.get(0);let rd=rres.get(1);
+let ln=lres.len();let rn=rres.len();
+let merged=mut.@(0);merged=@();let i=mut.2;let j=mut.2;let comp=mut.0;
+lp(i<ln){if(j<rn){comp=comp+1;if(lres.get(i)<=rres.get(j)){merged=merged+@(lres.get(i));i=i+1}el{merged=merged+@(rres.get(j));j=j+1}}el{merged=merged+@(lres.get(i));i=i+1}};
+lp(j<rn){merged=merged+@(rres.get(j));j=j+1};
+let dep=mut.ld;if(rd>dep){dep=rd};dep=dep+1;
+let total=lc+rc+comp;let out=mut.@(total;dep);out=@(total;dep);let k=mut.0;lp(k<merged.len()){out=out+@(merged.get(k));k=k+1};<out};
+f=main():$i64{let line=s.trim(io.readln());let toks=s.split(line;"_");let nums=mut.@(0);nums=@();let i=mut.0;lp(i<toks.len()){let t=s.trim(toks.get(i));if(s.len(t)>0){nums=nums+@(s.toint(t))};i=i+1};
+let n=nums.len();
+let res=msort(nums);let comps=res.get(0);let depth=res.get(1);
+let sortedStr=mut."_";let k=mut.2;lp(k<res.len()){if(k>2){sortedStr=s.concat(sortedStr;"_")};sortedStr=s.concat(sortedStr;s.fromint(res.get(k)));k=k+1};
+io.println(s.concat("_";sortedStr));
+io.println(s.concat("_";s.fromint(depth)));
+io.println(s.concat("_";s.fromint(comps)));<0}

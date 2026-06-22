@@ -1,0 +1,79 @@
+m=merge3way;
+i=io:std.io;
+i=s:std.str;
+
+f=readblock():@($str){
+  let out=mut.@();
+  let line=mut.io.readln();
+  lp(s.len(s.trim(line))>0){
+    out=out+@(s.trim(line));
+    line=io.readln();
+  };
+  <out;
+};
+
+f=fieldat(rows:@($str);rowidx:$i64;col:$i64):$str{
+  let row=rows.get(rowidx);
+  let parts=s.split(row;"_");
+  if(col<parts.len()){<parts.get(col)};
+  <"_";
+};
+
+f=findkey(rows:@($str);key:$str):$i64{
+  let i=mut.1;
+  lp(i<rows.len()){
+    let parts=s.split(rows.get(i);"_");
+    if(parts.len()>0){if(s.equals(parts.get(0);key)){<i}};
+    i=i+1;
+  };
+  <0-1;
+};
+
+f=main():$i64{
+  let base=readblock();
+  let vera=readblock();
+  let verb=readblock();
+  let keycolname=s.trim(io.readln());
+
+  let header=base.get(0);
+  let ncol=s.split(header;"_").len();
+
+  let out=mut.header;
+
+  let r=mut.1;
+  lp(r<base.len()){
+    let baseparts=s.split(base.get(r);"_");
+    let key=baseparts.get(0);
+    let ai=findkey(vera;key);
+    let bi=findkey(verb;key);
+    let merged=mut."_";
+    let c=mut.0;
+    lp(c<ncol){
+      let baseval=mut."_";
+      if(c<baseparts.len()){baseval=baseparts.get(c)};
+      let aval=mut.baseval;
+      if(ai>=0){aval=fieldat(vera;ai;c)};
+      let bval=mut.baseval;
+      if(bi>=0){bval=fieldat(verb;bi;c)};
+      let cell=mut.baseval;
+      let achg=mut.0;
+      let bchg=mut.0;
+      if(s.equals(aval;baseval)){}el{achg=1};
+      if(s.equals(bval;baseval)){}el{bchg=1};
+      if(achg=1){
+        if(bchg=1){
+          if(s.equals(aval;bval)){cell=aval}el{cell=s.concat("_";s.concat(aval;s.concat("_";s.concat(bval;"_"))))};
+        }el{cell=aval};
+      }el{
+        if(bchg=1){cell=bval}el{cell=baseval};
+      };
+      if(c>0){merged=s.concat(merged;"_")};
+      merged=s.concat(merged;cell);
+      c=c+1;
+    };
+    out=s.concat(out;s.concat("_";merged));
+    r=r+1;
+  };
+  io.println(out);
+  <0;
+}

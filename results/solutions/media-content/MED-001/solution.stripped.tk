@@ -1,0 +1,72 @@
+m=stripmd;i=io:std.io;i=s:std.str;
+f=stripheading(line:$str):$str{
+  let n=mut.0;
+  lp(n<6&&n<s.len(line)){
+    let c=s.slice(line;n;n+1);
+    if(s.eq(c;"_")){n=n+1}el{br}
+  };
+  if(n=0){<line};
+  let rest=s.slice(line;n;s.len(line));
+  let r=mut.rest;
+  lp(s.len(r)>0){
+    let c=s.slice(r;0;1);
+    if(s.eq(c;"_")||s.eq(c;"_")){r=s.slice(r;1;s.len(r))}el{br}
+  };
+  if(s.len(r)=s.len(rest)){<line};
+  <r
+};
+f=removelinks(line:$str):$str{
+  let out=mut."_";
+  let i=mut.0;
+  let n=s.len(line);
+  lp(i<n){
+    let c=s.slice(line;i;i+1);
+    if(s.eq(c;"_")){
+      let after=s.slice(line;i+1;n);
+      let close=s.indexof(after;"_");
+      if(close>=0){
+        let label=s.slice(after;0;close);
+        let rem=s.slice(after;close+1;s.len(after));
+        if(s.startswith(rem;"_")){
+          let pclose=s.indexof(rem;"_");
+          if(pclose>=0){
+            out=s.concat(out;label);
+            i=i+1+close+1+pclose+1
+          }el{
+            out=s.concat(out;c);i=i+1
+          }
+        }el{
+          out=s.concat(out;c);i=i+1
+        }
+      }el{
+        out=s.concat(out;c);i=i+1
+      }
+    }el{
+      out=s.concat(out;c);i=i+1
+    }
+  };
+  <out
+};
+f=stripline(line:$str):$str{
+  let r=mut.stripheading(line);
+  r=removelinks(r);
+  r=s.replace(r;"_";"_");
+  r=s.replace(r;"_";"_");
+  r=s.replace(r;"_";"_");
+  r=s.replace(r;"_";"_");
+  r=s.replace(r;"_";"_");
+  r=s.replace(r;"_";"_");
+  <r
+};
+f=main():$i64{
+  let result=mut."_";
+  let first=mut.true;
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let stripped=stripline(line);
+    if(first){result=stripped;first=false}el{result=s.concat(result;s.concat("_";stripped))}
+  };
+  io.println(result);
+  <0
+}

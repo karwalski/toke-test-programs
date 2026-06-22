@@ -1,0 +1,73 @@
+m=answer;
+i=io:std.io;
+i=s:std.str;
+
+f=jsonfield(input:$str;field:$str):$str{
+  let key=s.concat("_""_"\"_""_""_"\"_");
+  if(end<0){<"_"};
+  <s.slice(rest;0;end);
+};
+
+f=main():$i64{
+  let raw=mut."_";
+  let line=mut.io.readln();
+  lp(s.len(line)>0){raw=s.concat(raw;line);line=io.readln()};
+  let input=raw;
+  let qlow=s.lower(jsonfield(input;"_"));
+
+  let answer=mut."_";
+  let cite=mut."_";
+
+  if(s.contains(qlow;"_")){
+    if(s.contains(qlow;"_")){
+      let chunks=s.split(input;"_");
+      let i=mut.0;
+      lp(i<chunks.len()){
+        let part=chunks.get(i);
+        let tlow=s.lower(part);
+        if(s.contains(tlow;"_")){
+          if(s.contains(tlow;"_")){
+            let id=jsonfield(part;"_");
+            answer=s.concat("_";s.concat(id;"_"));
+            cite=id;
+          };
+        };
+        i=i+1;
+      };
+    };
+  };
+
+  if(s.equals(answer;"_")){
+    if(s.contains(qlow;"_")){
+      if(s.contains(qlow;"_")){
+        if(s.contains(qlow;"_")){
+          let chunks=s.split(input;"_");
+          let i=mut.0;
+          lp(i<chunks.len()){
+            let part=chunks.get(i);
+            let tlow=s.lower(part);
+            if(s.contains(tlow;"_")){
+              if(s.contains(tlow;"_")){
+                if(s.contains(tlow;"_")){
+                  let id=jsonfield(part;"_");
+                  answer=s.concat("_";s.concat(id;"_"));
+                  cite=id;
+                };
+              };
+            };
+            i=i+1;
+          };
+        };
+      };
+    };
+  };
+
+  let out=mut."_"answer\"_""_"\"_"cited_chunks\"_");
+  if(s.equals(cite;"_")){
+    out=s.concat(out;"_");
+  }el{
+    out=s.concat(out;"_""_"\"_");
+  };
+  io.println(out);
+  <0;
+}

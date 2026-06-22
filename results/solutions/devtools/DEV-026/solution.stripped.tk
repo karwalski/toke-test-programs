@@ -1,0 +1,51 @@
+m=memest;
+i=io:std.io;
+i=s:std.str;
+
+f=annotate(line:$str):$str{
+  let sep=s.indexof(line;"_");
+  if(sep<0){<line};
+  let before=s.slice(line;0;sep as $u64);
+  let after=s.slice(line;(sep as $u64)+3;s.len(line));
+  let numpart=mut.after;
+  let bpos=s.indexof(numpart;"_");
+  if(bpos>=0){numpart=s.slice(numpart;0;bpos as $u64)};
+  numpart=s.trim(numpart);
+  let digits=mut."_";
+  let i=mut.0;
+  lp((i as $u64)<s.len(numpart)){
+    let c=s.slice(numpart;i as $u64;(i as $u64)+1);
+    if(s.contains("_";c)){digits=s.concat(digits;c)}el{i=s.len(numpart) as $i64};
+    i=i+1
+  };
+  if(s.len(digits)=0){<line};
+  let count=s.toint(digits);
+  let perelem=mut.1;
+  if(s.contains(before;"_")){perelem=8};
+  let bytes=count*perelem;
+  let note=mut."_";
+  if(bytes>=1000000){
+    let mb=bytes/1000000;
+    note=s.concat(s.concat("_";s.fromint(mb));"_")
+  }el{
+    if(bytes>=1024){
+      let kb=bytes/1024;
+      note=s.concat(s.concat("_";s.fromint(kb));"_")
+    }
+  };
+  <s.concat(line;note)
+};
+
+f=main():$i64{
+  let lang=s.trim(io.readln());
+  lp(1=1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    if(s.eq(lang;"_")){
+      io.println(annotate(line))
+    }el{
+      io.println(line)
+    }
+  };
+  <0
+}

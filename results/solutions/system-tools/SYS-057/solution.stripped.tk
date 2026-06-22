@@ -1,0 +1,41 @@
+m=tz;i=io:std.io;i=s:std.str;
+f=offsetof(tzname:$str):$i64{
+if(s.equals(tzname;"_")){<0};
+if(s.equals(tzname;"_")){<11};
+if(s.equals(tzname;"_")){<11};
+if(s.equals(tzname;"_")){<8};
+if(s.equals(tzname;"_")){<0-5};
+if(s.equals(tzname;"_")){<0-6};
+if(s.equals(tzname;"_")){<0-7};
+if(s.equals(tzname;"_")){<0-8};
+if(s.equals(tzname;"_")){<0};
+if(s.equals(tzname;"_")){<1};
+if(s.equals(tzname;"_")){<9};
+if(s.equals(tzname;"_")){<8};
+<0};
+f=isleap(y:$i64):$bool{if(y%4!=0){<false};if(y%100!=0){<true};if(y%400=0){<true};<false};
+f=dim(y:$i64;m:$i64):$i64{if(m=2){if(isleap(y)){<29};<28};if(m=4){<30};if(m=6){<30};if(m=9){<30};if(m=11){<30};<31};
+f=pad2(n:$i64):$str{if(n<10){<s.concat("_";s.fromint(n))};<s.fromint(n)};
+f=main():$i64{
+let dtline=s.trim(io.readln());
+let srctz=s.trim(io.readln());
+let tgttz=s.trim(io.readln());
+let datepart=mut.dtline;let timepart=mut."_";
+let sep=s.indexof(dtline;"_");
+if(sep>=0){datepart=s.slice(dtline;0;sep);timepart=s.trim(s.slice(dtline;sep+1;s.len(dtline)))}el{let ts=s.indexof(dtline;"_");if(ts>=0){datepart=s.slice(dtline;0;ts);timepart=s.slice(dtline;ts+1;s.len(dtline))}};
+let dparts=s.split(datepart;"_");
+let year=mut.s.toint(dparts.get(0));let month=mut.s.toint(dparts.get(1));let day=mut.s.toint(dparts.get(2));
+let tparts=s.split(timepart;"_");
+let hour=mut.s.toint(tparts.get(0));let minute=mut.0;let sec=mut.0;
+if(tparts.len>=2){minute=s.toint(tparts.get(1))};
+if(tparts.len>=3){sec=s.toint(tparts.get(2))};
+let srcoff=offsetof(srctz);let tgtoff=offsetof(tgttz);
+let delta=tgtoff-srcoff;
+hour=hour+delta;
+lp(hour>=24){hour=hour-24;day=day+1;if(day>dim(year;month)){day=1;month=month+1;if(month>12){month=1;year=year+1}}};
+lp(hour<0){hour=hour+24;day=day-1;if(day<1){month=month-1;if(month<1){month=12;year=year-1};day=dim(year;month)}};
+let offstr=mut."_";
+if(tgtoff>=0){offstr=s.concat(s.concat("_";pad2(tgtoff));"_")}el{offstr=s.concat(s.concat("_";pad2(0-tgtoff));"_")};
+let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("_";s.fromint(year));"_");pad2(month));"_");pad2(day));"_");pad2(hour));"_");pad2(minute));s.concat(s.concat("_";pad2(sec));offstr));
+io.println(out);
+<0}

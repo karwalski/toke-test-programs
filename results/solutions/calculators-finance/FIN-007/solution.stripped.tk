@@ -1,1 +1,41 @@
-m=frac;i=io:std.io;i=s:std.str;f=gcd(a:$i64;b:$i64):$i64{if(b=0){<a};<gcd(b;a%b)};f=reduce(num:$i64;den:$i64):@($i64){let g=gcd(num;den);let rnum=num/g;let rden=den/g;if(rden<0){let newnum=0-rnum;let newden=0-rden;<@(newnum;newden)};<@(rnum;rden)};f=parsefrac(str:$str):@($i64){let parts=s.split(str;"_");if(parts.len()>=2){let num=s.toint(parts.get(0));let den=s.toint(parts.get(1));<@(num;den)};<@(0;1)};f=main():$i64{let line=s.trim(io.readln());let parts=s.split(line;"_");if(parts.len()>=3){let frac1=parsefrac(parts.get(0));let op=parts.get(1);let frac2=parsefrac(parts.get(2));let num1=frac1.get(0);let den1=frac1.get(1);let num2=frac2.get(0);let den2=frac2.get(1);let resnum=mut.0;let resden=mut.0;if(op="_"){resnum=num1*den2+num2*den1;resden=den1*den2}el{if(op="_"){resnum=num1*den2-num2*den1;resden=den1*den2}el{if(op="_"){resnum=num1*num2;resden=den1*den2}el{if(op="_"){resnum=num1*den2;resden=den1*num2}}}};let reduced=reduce(resnum;resden);let finalnum=reduced.get(0);let finalden=reduced.get(1);if(finalden=1){io.println(s.fromint(finalnum))}el{let output=s.concat(s.concat(s.fromint(finalnum);"_");s.fromint(finalden));io.println(output)}};<0}
+m=frac;i=io:std.io;i=s:std.str;
+f=iabs(x:$i64):$i64{if(x<0){<0-x};<x};
+f=gcd(a:$i64;b:$i64):$i64{let x=mut.iabs(a);let y=mut.iabs(b);lp(y!=0){let t=y;y=x%y;x=t};<x};
+f=parsenum(str:$str):$i64{
+  let idx=s.indexof(str;"_");
+  if(idx<0){<s.toint(str)};
+  <s.toint(s.slice(str;0;idx))
+};
+f=parseden(str:$str):$i64{
+  let idx=s.indexof(str;"_");
+  if(idx<0){<1};
+  <s.toint(s.slice(str;idx+1;s.len(str)))
+};
+f=printfrac(num:$i64;den:$i64):$void{
+  let n=mut.num;
+  let d=mut.den;
+  if(d<0){n=0-n;d=0-d};
+  let g=mut.gcd(n;d);
+  if(g=0){g=1};
+  n=n/g;
+  d=d/g;
+  if(d=1){io.println(s.fromint(n))}el{io.println(s.concat(s.fromint(n);s.concat("_";s.fromint(d))))}
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let parts=s.split(line;"_");
+  if(parts.len()<3){<0};
+  let n1=parsenum(parts.get(0));
+  let d1=parseden(parts.get(0));
+  let op=parts.get(1);
+  let n2=parsenum(parts.get(2));
+  let d2=parseden(parts.get(2));
+  let rn=mut.0;
+  let rd=mut.1;
+  if(s.eq(op;"_")){rn=n1*d2+n2*d1;rd=d1*d2};
+  if(s.eq(op;"_")){rn=n1*d2-n2*d1;rd=d1*d2};
+  if(s.eq(op;"_")){rn=n1*n2;rd=d1*d2};
+  if(s.eq(op;"_")){rn=n1*d2;rd=d1*n2};
+  printfrac(rn;rd);
+  <0
+}

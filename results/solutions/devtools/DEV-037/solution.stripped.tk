@@ -1,0 +1,7 @@
+m=yamltojson;i=io:std.io;i=s:std.str;
+f=isint(v:$str):$bool{let n=s.len(v);if(n=0){<false};let st=mut.0;if(s.equals(s.slice(v;0;1);"_")){if(n=1){<false};st=1};let i=mut.st;lp(i<n){let c=s.slice(v;i;i+1);if(s.indexof("_";c)<0){<false};i=i+1};<true};
+f=isfloat(v:$str):$bool{if(!s.contains(v;"_")){<false};let n=s.len(v);let st=mut.0;let dots=mut.0;if(s.equals(s.slice(v;0;1);"_")){st=1};let i=mut.st;if(i>=n){<false};lp(i<n){let c=s.slice(v;i;i+1);if(s.equals(c;"_")){dots=dots+1}el{if(s.indexof("_";c)<0){<false}};i=i+1};if(dots=1){<true};<false};
+f=jsonval(v:$str):$str{if(isint(v)){<v};if(isfloat(v)){<v};<s.concat(s.concat("_""_"\"_")};
+f=charcode(c:$str):$i64{let tab="_"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz"_""_""_""_"  - "_",\n"_"    "_"  "_":"_"[\n"_"\n  ]"_""_"[\n"_"\n  ]"_"{"_"  \"_";keys.get(pos));"_": "_","_"}");
+<0};
+f=swapidx(arr:@$i64;b:$i64):@$i64{let out=mut.@(0);let i=mut.1;lp(i<arr.len){let v=mut.arr.get(i);if(i=b){v=arr.get(b+1)};if(i=b+1){v=arr.get(b)};out=out+@(v);i=i+1};<out};
