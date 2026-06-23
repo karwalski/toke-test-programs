@@ -1,1 +1,87 @@
-m=golomb;f=buildgolomb(arr:@$i64):$i64{let n=arr.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let v=arr.get(i);if(v>m){m=v};};let s=mut.1;lp(let i=0;i<64;i=i+1){if(!(m<s)){s=s+1};};let result=mut.0;lp(let i=0;i<n;i=i+1){let v=arr.get(i);let q=v/s;let r=v-q*s;result=result+q;if(!(r=0)){result=result+1};};<result};f=isgolomb(g:$i64;n:$i64):$bool{let m=mut.0;lp(let i=0;i<n;i=i+1){let v=i+1;let q=v/g;let r=v-q*g;if(r=0){m=m+q}el{m=m+q+1}};<m=n};f=main():$i64{let arr=@(1;2;3;4;5;6;7;8
+m=golomb;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=lsr(x:$i64;n:$i64):$i64{if(n=0){<x};<(x>>n)&((1<<(64-n))-1)};
+f=wadd(a:$i64;b:$i64):$i64{let lo=(a&4294967295)+(b&4294967295);let hi=(lsr(a;32)&4294967295)+(lsr(b;32)&4294967295)+lsr(lo;32);<((hi&4294967295)<<32)|(lo&4294967295)};
+f=rotl(x:$i64;b:$i64):$i64{if(b=0){<x};<(x<<b)|lsr(x;64-b)};
+f=mulhismall(a:$i64;b:$i64):$i64{let al=a&4294967295;let ah=lsr(a;32);let lo=al*b;let hi=ah*b;let t=wadd(hi;lsr(lo;32));<lsr(t;32)};
+f=ldle64(d:@$i64;off:$i64;ln:$i64):$i64{let v=mut.0;lp(let j=0;j<ln;j=j+1){let by=d.get(off+j);v=v|(by<<(8*j))};<v};
+f=siphash(k0:$i64;k1:$i64;data:@$i64):$i64{
+let v0=mut.k0^8317987319222330741;
+let v1=mut.k1^7237128888997146477;
+let v2=mut.k0^7816392313619706465;
+let v3=mut.k1^8387220255154660723;
+let ln=data.len();
+let i=mut.0;
+lp(i+8<=ln){
+let mm=ldle64(data;i;8);
+v3=v3^mm;
+lp(let rr=0;rr<2;rr=rr+1){
+v0=wadd(v0;v1);v1=rotl(v1;13);v1=v1^v0;v0=rotl(v0;32);
+v2=wadd(v2;v3);v3=rotl(v3;16);v3=v3^v2;
+v0=wadd(v0;v3);v3=rotl(v3;21);v3=v3^v0;
+v2=wadd(v2;v1);v1=rotl(v1;17);v1=v1^v2;v2=rotl(v2;32)};
+v0=v0^mm;
+i=i+8};
+let last=ln&255;
+let tailn=ln-i;
+let b=mut.(last<<56);
+lp(let j=0;j<tailn;j=j+1){b=b|(data.get(i+j)<<(8*j))};
+v3=v3^b;
+lp(let rr=0;rr<2;rr=rr+1){
+v0=wadd(v0;v1);v1=rotl(v1;13);v1=v1^v0;v0=rotl(v0;32);
+v2=wadd(v2;v3);v3=rotl(v3;16);v3=v3^v2;
+v0=wadd(v0;v3);v3=rotl(v3;21);v3=v3^v0;
+v2=wadd(v2;v1);v1=rotl(v1;17);v1=v1^v2;v2=rotl(v2;32)};
+v0=v0^b;
+v2=v2^255;
+lp(let rr=0;rr<4;rr=rr+1){
+v0=wadd(v0;v1);v1=rotl(v1;13);v1=v1^v0;v0=rotl(v0;32);
+v2=wadd(v2;v3);v3=rotl(v3;16);v3=v3^v2;
+v0=wadd(v0;v3);v3=rotl(v3;21);v3=v3^v0;
+v2=wadd(v2;v1);v1=rotl(v1;17);v1=v1^v2;v2=rotl(v2;32)};
+<v0^v1^v2^v3};
+f=hashtorange(item:@$i64;f:$i64;k0:$i64;k1:$i64):$i64{let h=siphash(k0;k1;item);<mulhismall(h;f)};
+f=parseelems(line:$str):@$str{
+let inner=mut.line;
+let n=s.len(line);
+if(n>=2){inner=s.slice(line;1;n-1)};
+let res=mut.@("");res=@();
+let cur=mut."";let intok=mut.0;
+lp(let idx=0;idx<s.len(inner);idx=idx+1){
+let ch=s.slice(inner;idx;idx+1);
+if(s.eq(ch;"\"")){if(intok=1){res=res+@(cur);cur="";intok=0}el{intok=1}}
+el{if(intok=1){cur=s.concat(cur;ch)}}};
+<res};
+f=main():$i64{
+let line1=s.trim(io.readln());
+let query=io.readln();
+let kfull=cr.sha256(s.bytes("CRY-134-FIXED-KEY"));
+let k0=ldle64(kfull;0;8);
+let k1=ldle64(kfull;8;8);
+let elems=parseelems(line1);
+let nn=elems.len();
+let ff=nn*784931;
+let hashes=mut.@();
+lp(let e=0;e<nn;e=e+1){let hv=hashtorange(s.bytes(elems.get(e));ff;k0;k1);hashes=hashes+@(hv)};
+lp(let a=0;a<nn;a=a+1){lp(let b=0;b<nn-1-a;b=b+1){if(hashes.get(b)>hashes.get(b+1)){let tmp=hashes.get(b);hashes=hashes.set(b;hashes.get(b+1));hashes=hashes.set(b+1;tmp)}}};
+let bits=mut.@();bits=@();
+let last=mut.0;
+lp(let e=0;e<nn;e=e+1){
+let v=hashes.get(e);let delta=v-last;last=v;
+let q=lsr(delta;19);let r=delta&((1<<19)-1);
+lp(let u=0;u<q;u=u+1){bits=bits+@(1)};bits=bits+@(0);
+lp(let pp=18;pp>=0;pp=pp-1){bits=bits+@((r>>pp)&1)}};
+let nbits=bits.len();
+let bodylen=mut.nbits;let pad=mut.0;if(nbits-nbits/8*8!=0){pad=8-(nbits-nbits/8*8)};
+let body=mut.@();
+let bi=mut.0;
+lp(bi<nbits){let by=mut.0;lp(let j=0;j<8;j=j+1){let bit=mut.0;if(bi+j<nbits){bit=bits.get(bi+j)};by=(by<<1)|bit};body=body+@(by);bi=bi+8};
+let filt=mut.@(nn);
+lp(let z=0;z<body.len();z=z+1){filt=filt+@(body.get(z))};
+io.println(enc.hexencode(filt));
+let qh=hashtorange(s.bytes(s.trim(query));ff;k0;k1);
+let cur=mut.0;let matched=mut.0;let done=mut.0;
+lp(let e=0;e<nn;e=e+1){if(done=0){
+let v=hashes.get(e);
+if(v=qh){matched=1;done=1}el{if(v>qh){done=1}}}};
+if(matched=1){io.println("MATCH")}el{io.println("NO_MATCH")};
+<0}

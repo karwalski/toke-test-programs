@@ -1,1 +1,51 @@
-m=main;i=enc:std.encoding;i=str:std.str;i=math:std.math;f=checkwitness(wv:$str;wp:$str):$bool{let wlen=str.len(wv);let plen=str.len(wp);let result=mut.false;if(wlen=plen){let match=mut.true;lp(let i=0;i<wlen;i=i+1){let wch=str.charat(wv;i);let pch=str.charat(wp;i);if(!(wch=pch)){match=false}};if(match){result=true}}};f=main(wv:$str;wp:$str;hrp:$str):$str{let valid=checkwitness(wv;wp);let prefix=str.concat(hrp;":witness=");let result=mut."";if(valid){result=str.concat(prefix;wv)}el{result="invalid"};<result};
+m=bech32;i=io:std.io;i=s:std.str;i=enc:std.encoding;
+f=convertbits(data:@$i64;frm:$i64;to:$i64):@$i64{
+let acc=mut.0;let bits=mut.0;let ret=mut.@();
+let maxv=(1<<to)-1;
+lp(let i=0;i<data.len();i=i+1){
+let val=data.get(i);
+acc=(acc<<frm)|val;
+bits=bits+frm;
+lp(bits>=to){bits=bits-to;ret=ret+@((acc>>bits)&maxv)};
+};
+if(bits>0){ret=ret+@((acc<<(to-bits))&maxv)};
+<ret};
+f=polymod(values:@$i64):$i64{
+let chk=mut.1;
+let g0=996825010;let g1=642813549;let g2=513874426;let g3=1027748829;let g4=705979059;
+lp(let i=0;i<values.len();i=i+1){
+let b=(chk>>25)&127;
+chk=((chk&33554431)<<5)^values.get(i);
+if((b>>0)&1){chk=chk^g0};
+if((b>>1)&1){chk=chk^g1};
+if((b>>2)&1){chk=chk^g2};
+if((b>>3)&1){chk=chk^g3};
+if((b>>4)&1){chk=chk^g4};
+};
+<chk};
+f=hrpexpand(hrp:$str):@$i64{
+let hb=s.bytes(hrp);let ret=mut.@();
+lp(let i=0;i<hb.len();i=i+1){ret=ret+@((hb.get(i))>>5)};
+ret=ret+@(0);
+lp(let j=0;j<hb.len();j=j+1){ret=ret+@((hb.get(j))&31)};
+<ret};
+f=main():$i64{
+let witver=s.toint(s.trim(io.readln()));
+let hex=s.trim(io.readln());
+let hrp=s.trim(io.readln());
+let witprog=enc.hexdecode(hex);
+let pwitprog=mut.@();lp(let p=0;p<witprog.len();p=p+1){pwitprog=pwitprog+@(witprog.get(p))};
+let conv=convertbits(pwitprog;8;5);
+let data=mut.@(witver);lp(let i=0;i<conv.len();i=i+1){data=data+@(conv.get(i))};
+let pm=mut.@();
+let he=hrpexpand(hrp);
+lp(let a=0;a<he.len();a=a+1){pm=pm+@(he.get(a))};
+lp(let b=0;b<data.len();b=b+1){pm=pm+@(data.get(b))};
+lp(let z=0;z<6;z=z+1){pm=pm+@(0)};
+let mod=polymod(pm)^1;
+let charset="qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+let out=mut.s.concat(hrp;"1");
+lp(let d=0;d<data.len();d=d+1){let dv=data.get(d);out=s.concat(out;s.slice(charset;dv;dv+1))};
+lp(let k=0;k<6;k=k+1){let cv=(mod>>(5*(5-k)))&31;out=s.concat(out;s.slice(charset;cv;cv+1))};
+io.println(out);
+<0}

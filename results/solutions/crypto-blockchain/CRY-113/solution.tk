@@ -1,1 +1,70 @@
-m=otp;f=solve(p0:$str;p1:$str):$str{let secret=p0;let timestamp=p1;let base=32;let digits=6;let modval=100000;let result=mut."";let len=secret.len;let i=mut.0;let j=mut.0;let k=mut.0;let x=mut.0;let y=mut.0;let z=mut.0;let ch=mut."";let val=mut.0;let offset=mut.0;let code=mut.0;let pass1=mut."";let pass2=mut."";let pass3=mut."";let pass4=mut."";let pass5=mut."";let pass6=mut."";let len2=timestamp.len;let i2=mut.0;let j2=mut.0;let k2=mut.0;let x2=mut.0;let y2=mut.0;let z2=mut.0;let ch2=mut."";let val2=mut.0;let offset2=mut.0;let code2=mut.0;let pass12=mut."";let pass22=mut."";let pass32=mut."";let pass42=mut."";let pass52=mut."";let pass62=mut."";let len3=secret.len;let i3=mut.0;let j3=mut.0;let k3=mut.0;let x3=mut.0;let y3=mut.0;let z3=mut.0;let ch3=mut."";let val3=mut.0;let offset3=mut.0;let code3=mut.0;let pass13=mut."";let pass23=mut."";let pass33=mut."";let pass43=mut."";let pass53=mut."";let pass63=mut."";let len4=secret.len;let i4=mut.0;let j4=mut.0;let k4=mut.0;let x4=mut.0;let y4=mut.0;let z4=mut.0;let ch4=mut."";let val4=mut.0;let offset4=mut.0;let code4=mut.0;let pass14=mut."";let pass24=mut."";let pass34=mut."";let pass44=mut."";let pass54=mut."";let pass64=mut."";let len5=secret.len;let i5=mut.0;let j5=mut.0;let k5=mut.0;let x5=mut.0;let y5=mut.0;let z5=mut.0;let ch5=mut."";let val5=mut.0;let offset5=mut.0;let code5=mut.0;let pass15=mut."";let pass25=mut."";let pass35=mut."";let pass45=mut."";let pass55=mut."";let pass65=mut."";let len6=secret.len;let i6=mut.0;let j6=mut.0;let k6=mut.0;let x6=mut.0;let y6=mut.0;let z6=mut.0;let ch6=mut."";let val6=mut.0;let offset6=mut.0;let code6=mut.0;let pass16=mut."";let pass26=mut."";let pass36=mut."";let pass46=mut."";let pass56=mut."";let pass66=mut."";let len7=secret.len;let i7=mut.0;let j7=mut.0;let k7=mut.0;let x7=mut.0;let y7=mut.0;let z7=mut.0;let ch7=mut."";let val7=mut.0;let offset7=mut.0;let code7=mut.0;let pass17=mut."";let pass27=mut."";let pass37=mut."";let pass47=mut."";let pass57=mut."";let pass67=mut."";let len8=secret.len;let i8=mut.0;let j8=mut.0;let k8=mut.0;let x8=mut.0;let y8=mut.0;let z8=mut.0;let ch8=mut."";let val8=mut.0;let offset8=mut.0;let code8=mut.0;let pass18=mut."";let pass28=mut."";let pass38=mut."";let pass48=mut."";let pass58=mut."";let pass68=mut."";let len9=secret.len;let i9=mut.0;let j9=mut.0;let k9=mut.0;let x9=mut.0;let y9=mut.0;let z9=mut.0;let ch9=mut."";let val9=mut.0;let offset9=mut.0;let code9=mut.0;let pass19=mut."";let pass29=mut."";let pass39=mut."";let pass49=mut."";let pass59=mut."";let pass69=mut."";let len10=secret.len;let i10=mut.0;let j10=mut.0;let k10=mut.0;let x10=mut.0;let y10=mut.0;let z10=mut.0;let ch10=mut."";let val10=mut.0;let offset10=mut.0;let code10=mut.0;let pass11=mut."";let pass21=mut."";let pass31=mut."";let pass41=mut."";let pass51=mut."";let pass61=mut."";let len11=secret.len;let i11=mut.0;let j11=mut.0;let k11=mut.0;let x11=mut.0;let y11=mut.0;let z11=mut.0;let ch11=mut."";let val11=mut.0;let offset11=mut.0;let code11
+m=otp;i=io:std.io;i=s:std.str;i=enc:std.encoding;
+f=rotl(x:$i64;n:$i64):$i64{let m=4294967295;<(((x<<n)&m)|((x&m)>>(32-n)))&m};
+f=sha1(msg:@$i64):@$i64{
+let m=4294967295;
+let h0=mut.1732584193;let h1=mut.4023233417;let h2=mut.2562383102;let h3=mut.271733878;let h4=mut.3285377520;
+let ml=msg.len();
+let w8=mut.@();lp(let i=0;i<ml;i=i+1){w8=w8+@(msg.get(i))};
+w8=w8+@(128);
+lp((w8.len()-w8.len()/64*64)!=56){w8=w8+@(0)};
+let bitlen=ml*8;
+w8=w8+@((bitlen>>56)&255)+@((bitlen>>48)&255)+@((bitlen>>40)&255)+@((bitlen>>32)&255)+@((bitlen>>24)&255)+@((bitlen>>16)&255)+@((bitlen>>8)&255)+@(bitlen&255);
+let nb=w8.len()/64;
+lp(let blk=0;blk<nb;blk=blk+1){
+let wd=mut.@();
+lp(let t=0;t<16;t=t+1){let o=blk*64+t*4;let v=((w8.get(o)&255)<<24)|((w8.get(o+1)&255)<<16)|((w8.get(o+2)&255)<<8)|(w8.get(o+3)&255);wd=wd+@(v)};
+lp(let t=16;t<80;t=t+1){let v=rotl(wd.get(t-3)^wd.get(t-8)^wd.get(t-14)^wd.get(t-16);1);wd=wd+@(v)};
+let a=mut.h0;let b=mut.h1;let c=mut.h2;let d=mut.h3;let e=mut.h4;
+lp(let t=0;t<80;t=t+1){
+let fv=mut.0;let kc=mut.0;
+if(t<20){fv=(b&c)|(((~b)&m)&d);kc=1518500249}
+el{if(t<40){fv=b^c^d;kc=1859775393}
+el{if(t<60){fv=(b&c)|(b&d)|(c&d);kc=2400959708}
+el{fv=b^c^d;kc=3395469782}}};
+let tmp=(rotl(a;5)+fv+e+kc+wd.get(t))&m;
+e=d;d=c;c=rotl(b;30);b=a;a=tmp};
+h0=(h0+a)&m;h1=(h1+b)&m;h2=(h2+c)&m;h3=(h3+d)&m;h4=(h4+e)&m};
+let out=mut.@();
+out=out+@((h0>>24)&255)+@((h0>>16)&255)+@((h0>>8)&255)+@(h0&255);
+out=out+@((h1>>24)&255)+@((h1>>16)&255)+@((h1>>8)&255)+@(h1&255);
+out=out+@((h2>>24)&255)+@((h2>>16)&255)+@((h2>>8)&255)+@(h2&255);
+out=out+@((h3>>24)&255)+@((h3>>16)&255)+@((h3>>8)&255)+@(h3&255);
+out=out+@((h4>>24)&255)+@((h4>>16)&255)+@((h4>>8)&255)+@(h4&255);
+<out};
+f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
+f=hmacsha1(key:@$i64;msg:@$i64):@$i64{
+let k0=mut.@();
+lp(let i=0;i<64;i=i+1){if(i<key.len()){k0=k0+@(key.get(i))}el{k0=k0+@(0)}};
+let ipad=mut.@();let opad=mut.@();
+lp(let i=0;i<64;i=i+1){ipad=ipad+@(k0.get(i)^54)};
+lp(let i=0;i<64;i=i+1){opad=opad+@(k0.get(i)^92)};
+let inner=sha1(bcat(ipad;msg));
+<sha1(bcat(opad;inner))};
+f=b32dec(secret:$str):@$i64{
+let alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+let bits=mut.0;let acc=mut.0;
+let out=mut.@();
+let sl=s.len(secret);
+lp(let i=0;i<sl;i=i+1){
+let ch=s.slice(secret;i;i+1);
+let idx=mut.0;
+lp(let j=0;j<32;j=j+1){if(s.slice(alpha;j;j+1)=ch){idx=j}};
+acc=(acc<<5)|idx;
+bits=bits+5;
+if(bits>=8){bits=bits-8;out=out+@((acc>>bits)&255)}};
+<out};
+f=main():$i64{
+let secret=s.trim(io.readln());
+let ts=s.toint(s.trim(io.readln()));
+let counter=ts/30;
+let cb=mut.@();
+cb=cb+@((counter>>56)&255)+@((counter>>48)&255)+@((counter>>40)&255)+@((counter>>32)&255)+@((counter>>24)&255)+@((counter>>16)&255)+@((counter>>8)&255)+@(counter&255);
+let key=b32dec(secret);
+let dig=hmacsha1(key;cb);
+let offset=dig.get(19)&15;
+let code=((dig.get(offset)&127)<<24)|((dig.get(offset+1)&255)<<16)|((dig.get(offset+2)&255)<<8)|(dig.get(offset+3)&255);
+let totp=code-code/1000000*1000000;
+let st=mut.s.fromint(totp);
+lp(s.len(st)<6){st=s.concat("0";st)};
+io.println(st);
+<0}

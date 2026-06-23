@@ -1,1 +1,117 @@
-m=encryptbackup;f=encryptfile(key:$str;inputpath:$str;outputpath:$str):$void{let data=br.read(inputpath);let len=data.len;let encrypted=mut.@();lp(let i=0;i<len;i=i+1){let ch=data.get(i);let code=ch as i64;let klen=key.len;let idx=i as i64;let offset=idx-idx/klen*klen;let kcode=key.get(offset as u64)as i64;let xored=code+kcode;if(xored<0){let result=xored+92233720368547758;let modval=result-result/1844674407370955162*1844674407370955162;let finalval=modval as u8;encrypted=encrypted+@(finalval);}el{let modval=xored-xored/255*255
+m=msg044;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=slice(a:@$i64;n:$i64):@$i64{let r=mut.@();lp(let i=0;i<n;i=i+1){r=r+@(a.get(i))};<r};
+f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
+f=i32be(n:$i64):@$i64{<@((n>>24)&255;(n>>16)&255;(n>>8)&255;n&255)};
+f=pbkdf2(pw:@$i64;salt:@$i64;iters:$i64):@$i64{
+let u=cr.hmacsha256(pw;bcat(salt;i32be(1)));
+let t=mut.@();lp(let k=0;k<u.len();k=k+1){t=t+@(u.get(k))};
+let ui=mut.u;
+lp(let c=1;c<iters;c=c+1){
+ui=cr.hmacsha256(pw;ui);
+let nt=mut.@();lp(let k=0;k<t.len();k=k+1){nt=nt+@(t.get(k)^ui.get(k))};
+t=nt};
+<t};
+f=sbox():@$i64{<@(99;124;119;123;242;107;111;197;48;1;103;43;254;215;171;118;202;130;201;125;250;89;71;240;173;212;162;175;156;164;114;192;183;253;147;38;54;63;247;204;52;165;229;241;113;216;49;21;4;199;35;195;24;150;5;154;7;18;128;226;235;39;178;117;9;131;44;26;27;110;90;160;82;59;214;179;41;227;47;132;83;209;0;237;32;252;177;91;106;203;190;57;74;76;88;207;208;239;170;251;67;77;51;133;69;249;2;127;80;60;159;168;81;163;64;143;146;157;56;245;188;182;218;33;16;255;243;210;205;12;19;236;95;151;68;23;196;167;126;61;100;93;25;115;96;129;79;220;34;42;144;136;70;238;184;20;222;94;11;219;224;50;58;10;73;6;36;92;194;211;172;98;145;149;228;121;231;200;55;109;141;213;78;169;108;86;244;234;101;122;174;8;186;120;37;46;28;166;180;198;232;221;116;31;75;189;139;138;112;62;181;102;72;3;246;14;97;53;87;185;134;193;29;158;225;248;152;17;105;217;142;148;155;30;135;233;206;85;40;223;140;161;137;13;191;230;66;104;65;153;45;15;176;84;187;22)};
+f=rcon():@$i64{<@(1;2;4;8;16;32;64;128;27;54;108;216;171;77)};
+f=gmul(a:$i64;b:$i64):$i64{let p=mut.0;let aa=mut.a;let bb=mut.b;lp(let i=0;i<8;i=i+1){if((bb&1)!=0){p=p^aa};let hi=aa&128;aa=(aa<<1)&255;if(hi!=0){aa=aa^27};bb=bb>>1};<p&255};
+f=keyexp(key:@$i64):@$i64{
+let sb=sbox();let rc=rcon();
+let w=mut.@();lp(let i=0;i<32;i=i+1){w=w+@(key.get(i))};
+lp(let i=8;i<60;i=i+1){
+let t0=mut.w.get((i-1)*4+0);let t1=mut.w.get((i-1)*4+1);let t2=mut.w.get((i-1)*4+2);let t3=mut.w.get((i-1)*4+3);
+let im=i-i/8*8;
+if(im=0){
+let r0=t1;let r1=t2;let r2=t3;let r3=t0;
+t0=sb.get(r0)^rc.get(i/8-1);t1=sb.get(r1);t2=sb.get(r2);t3=sb.get(r3)}
+el{if(im=4){
+t0=sb.get(t0);t1=sb.get(t1);t2=sb.get(t2);t3=sb.get(t3)}};
+w=w+@(w.get((i-8)*4+0)^t0)+@(w.get((i-8)*4+1)^t1)+@(w.get((i-8)*4+2)^t2)+@(w.get((i-8)*4+3)^t3)};
+<w};
+f=aesblk(blk:@$i64;w:@$i64):@$i64{
+let sb=sbox();
+let st=mut.@();lp(let i=0;i<16;i=i+1){st=st+@(blk.get(i))};
+lp(let c=0;c<4;c=c+1){lp(let r=0;r<4;r=r+1){let v=st.get(r+4*c)^w.get(0*16+c*4+r);st=st.set(r+4*c;v)}};
+lp(let rnd=1;rnd<14;rnd=rnd+1){
+lp(let i=0;i<16;i=i+1){st=st.set(i;sb.get(st.get(i)))};
+let ns=mut.@();lp(let i=0;i<16;i=i+1){ns=ns+@(0)};
+lp(let r=0;r<4;r=r+1){lp(let c=0;c<4;c=c+1){let cc=c+r;let src=cc-cc/4*4;ns=ns.set(r+4*c;st.get(r+4*src))}};
+st=ns;
+let ms=mut.@();lp(let i=0;i<16;i=i+1){ms=ms+@(0)};
+lp(let c=0;c<4;c=c+1){
+let a0=st.get(0+4*c);let a1=st.get(1+4*c);let a2=st.get(2+4*c);let a3=st.get(3+4*c);
+ms=ms.set(0+4*c;gmul(a0;2)^gmul(a1;3)^a2^a3);
+ms=ms.set(1+4*c;a0^gmul(a1;2)^gmul(a2;3)^a3);
+ms=ms.set(2+4*c;a0^a1^gmul(a2;2)^gmul(a3;3));
+ms=ms.set(3+4*c;gmul(a0;3)^a1^a2^gmul(a3;2))};
+st=ms;
+lp(let c=0;c<4;c=c+1){lp(let r=0;r<4;r=r+1){let v=st.get(r+4*c)^w.get(rnd*16+c*4+r);st=st.set(r+4*c;v)}}};
+lp(let i=0;i<16;i=i+1){st=st.set(i;sb.get(st.get(i)))};
+let fs=mut.@();lp(let i=0;i<16;i=i+1){fs=fs+@(0)};
+lp(let r=0;r<4;r=r+1){lp(let c=0;c<4;c=c+1){let cc=c+r;let src=cc-cc/4*4;fs=fs.set(r+4*c;st.get(r+4*src))}};
+st=fs;
+lp(let c=0;c<4;c=c+1){lp(let r=0;r<4;r=r+1){let v=st.get(r+4*c)^w.get(14*16+c*4+r);st=st.set(r+4*c;v)}};
+let out=mut.@();lp(let c=0;c<4;c=c+1){lp(let r=0;r<4;r=r+1){out=out+@(st.get(r+4*c))}};
+<out};
+f=gfmul(x:@$i64;y:@$i64):@$i64{
+let z=mut.@();lp(let i=0;i<16;i=i+1){z=z+@(0)};
+let v=mut.@();lp(let i=0;i<16;i=i+1){v=v+@(y.get(i))};
+lp(let i=0;i<128;i=i+1){
+let byi=i/8;let biti=i-byi*8;
+let xb=(x.get(byi)>>(7-biti))&1;
+if(xb!=0){lp(let k=0;k<16;k=k+1){z=z.set(k;z.get(k)^v.get(k))}};
+let lsb=v.get(15)&1;
+let nv=mut.@();lp(let k=0;k<16;k=k+1){nv=nv+@(0)};
+let carry=mut.0;
+lp(let k=0;k<16;k=k+1){let cur=v.get(k);nv=nv.set(k;((cur>>1)&127)|(carry<<7));carry=cur&1};
+if(lsb!=0){nv=nv.set(0;nv.get(0)^225)};
+v=nv};
+<z};
+f=ghupd(yv:@$i64;blk:@$i64;h:@$i64):@$i64{
+let xored=mut.@();lp(let i=0;i<16;i=i+1){xored=xored+@(yv.get(i)^blk.get(i))};
+<gfmul(xored;h)};
+f=inc32(b:@$i64):@$i64{
+let r=mut.@();lp(let i=0;i<12;i=i+1){r=r+@(b.get(i))};
+let c=mut.(((b.get(12)&255)<<24)|((b.get(13)&255)<<16)|((b.get(14)&255)<<8)|(b.get(15)&255));
+c=(c+1)&4294967295;
+r=r+@((c>>24)&255)+@((c>>16)&255)+@((c>>8)&255)+@(c&255);
+<r};
+f=u64be(n:$i64):@$i64{<@((n>>56)&255;(n>>48)&255;(n>>40)&255;(n>>32)&255;(n>>24)&255;(n>>16)&255;(n>>8)&255;n&255)};
+f=main():$i64{
+let password=io.readln();
+let mj=s.trim(io.readln());
+let pwb=s.bytes(password);
+let salt=slice(cr.sha256(s.bytes(s.concat("salt:";password)));16);
+let nonce=slice(cr.sha256(s.bytes(s.concat("nonce:";password)));12);
+let key=pbkdf2(pwb;salt;100000);
+let w=keyexp(key);
+let zero16=mut.@();lp(let i=0;i<16;i=i+1){zero16=zero16+@(0)};
+let h=aesblk(zero16;w);
+let j0=bcat(nonce;@(0;0;0;1));
+let pt=s.bytes(mj);
+let ptlen=pt.len();
+let ct=mut.@();
+let ctr=mut.inc32(j0);
+let off=mut.0;
+lp(off<ptlen){
+let ks=aesblk(ctr;w);
+let blen=mut.16;if(ptlen-off<16){blen=ptlen-off};
+lp(let j=0;j<blen;j=j+1){ct=ct+@(pt.get(off+j)^ks.get(j))};
+ctr=inc32(ctr);
+off=off+16};
+let ctlen=ct.len();
+let y=mut.@();lp(let i=0;i<16;i=i+1){y=y+@(0)};
+let goff=mut.0;
+lp(goff<ctlen){
+let blk=mut.@();
+lp(let j=0;j<16;j=j+1){if(goff+j<ctlen){blk=blk+@(ct.get(goff+j))}el{blk=blk+@(0)}};
+y=ghupd(y;blk;h);
+goff=goff+16};
+let lenblk=bcat(u64be(0);u64be(ctlen*8));
+y=ghupd(y;lenblk;h);
+let ej0=aesblk(j0;w);
+let tag=mut.@();lp(let i=0;i<16;i=i+1){tag=tag+@(y.get(i)^ej0.get(i))};
+let outb=bcat(ct;tag);
+let enc64=enc.b64encode(outb);
+let out=s.concat("{\"encrypted_data\":\"";s.concat(enc64;s.concat("\",\"key_params\":{\"algorithm\":\"argon2id\",\"iterations\":3,\"memory\":65536,\"parallelism\":4},\"nonce\":\"";s.concat(enc.hexencode(nonce);s.concat("\",\"salt\":\"";s.concat(enc.hexencode(salt);"\"}"))))));
+io.println(out);
+<0}

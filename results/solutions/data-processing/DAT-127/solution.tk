@@ -1,1 +1,81 @@
-m=bloom;f=hash1(val:$str):$i64{let hash=mut.0;let len=val.len;lp(let idx=0;idx<len;idx=idx+1){let charcode=val.get(idx)as$i64;hash=hash+charcode;hash=hash-hash/33*33;};<hash};f=hash2
+m=dat127;i=io:std.io;i=s:std.str;
+f=rotl(x:$i64;n:$i64):$i64{<((x<<n)|((x&4294967295)>>(32-n)))&4294967295};
+f=md5dig(msg:@$i64):@$i64{
+let ks=@(3614090360;3905402710;606105819;3250441966;4118548399;1200080426;2821735955;4249261313;1770035416;2336552879;4294925233;2304563134;1804603682;4254626195;2792965006;1236535329;4129170786;3225465664;643717713;3921069994;3593408605;38016083;3634488961;3889429448;568446438;3275163606;4107603335;1163531501;2850285829;4243563512;1735328473;2368359562;4294588738;2272392833;1839030562;4259657740;2763975236;1272893353;4139469664;3200236656;681279174;3936430074;3572445317;76029189;3654602809;3873151461;530742520;3299628645;4096336452;1126891415;2878612391;4237533241;1700485571;2399980690;4293915773;2240044497;1873313359;4264355552;2734768916;1309151649;4149444226;3174756917;718787259;3951481745);
+let shs=@(7;12;17;22;7;12;17;22;7;12;17;22;7;12;17;22;5;9;14;20;5;9;14;20;5;9;14;20;5;9;14;20;4;11;16;23;4;11;16;23;4;11;16;23;4;11;16;23;6;10;15;21;6;10;15;21;6;10;15;21;6;10;15;21);
+let ml=msg.len();
+let msgb=mut.@();lp(let i=0;i<ml;i=i+1){msgb=msgb+@(msg.get(i))};
+msgb=msgb+@(128);
+lp((msgb.len()-msgb.len()/64*64)!=56){msgb=msgb+@(0)};
+let bitlen=ml*8;
+let bl=mut.bitlen;
+lp(let i=0;i<8;i=i+1){msgb=msgb+@(bl&255);bl=(bl>>8)&72057594037927935};
+let a0=mut.1732584193;let b0=mut.4023233417;let c0=mut.2562383102;let d0=mut.271733878;
+let nch=msgb.len()/64;
+lp(let ch=0;ch<nch;ch=ch+1){
+let wd=mut.@();
+lp(let j=0;j<16;j=j+1){
+let base=ch*64+j*4;
+let val=(msgb.get(base))|(msgb.get(base+1)<<8)|(msgb.get(base+2)<<16)|(msgb.get(base+3)<<24);
+wd=wd+@(val&4294967295)};
+let aa=mut.a0;let bb=mut.b0;let cc=mut.c0;let dd=mut.d0;
+lp(let i=0;i<64;i=i+1){
+let fv=mut.0;let g=mut.0;
+if(i<16){fv=(bb&cc)|((~bb)&dd);g=i}
+el{if(i<32){fv=(dd&bb)|((~dd)&cc);g=(5*i+1)-(5*i+1)/16*16}
+el{if(i<48){fv=bb^cc^dd;g=(3*i+5)-(3*i+5)/16*16}
+el{fv=cc^(bb|((~dd)&4294967295));g=(7*i)-(7*i)/16*16}}};
+fv=fv&4294967295;
+let tmp=dd;
+dd=cc;
+cc=bb;
+let sm=(aa+fv+ks.get(i)+wd.get(g))&4294967295;
+bb=(bb+rotl(sm;shs.get(i)))&4294967295;
+aa=tmp};
+a0=(a0+aa)&4294967295;
+b0=(b0+bb)&4294967295;
+c0=(c0+cc)&4294967295;
+d0=(d0+dd)&4294967295};
+let dig=mut.@();
+let st=@(a0;b0;c0;d0);
+lp(let k=0;k<4;k=k+1){
+let w=st.get(k);
+dig=dig+@(w&255);
+dig=dig+@((w>>8)&255);
+dig=dig+@((w>>16)&255);
+dig=dig+@((w>>24)&255)};
+<dig};
+f=hashidx(item:$str;seed:$i64;size:$i64):$i64{
+let comb=s.concat(item;s.fromint(seed));
+let dig=md5dig(s.bytes(comb));
+let acc=mut.0;
+lp(let i=0;i<16;i=i+1){
+acc=(acc*256+dig.get(i))-((acc*256+dig.get(i))/size)*size};
+<acc};
+f=main():$i64{
+let first=io.readln();
+let parts=s.split(first;" ");
+let size=s.toint(parts.get(0));
+let hc=s.toint(parts.get(1));
+let bits=mut.@();lp(let i=0;i<size;i=i+1){bits=bits+@(0)};
+lp(let go=1;go=1;go=go){
+let line=io.readln();
+let e=io.eof();
+if(s.len(line)>0){
+let p=s.split(line;" ");
+let cmd=p.get(0);
+let item=p.get(1);
+if(cmd="add"){
+lp(let k=0;k<hc;k=k+1){
+let idx=hashidx(item;k;size);
+bits=bits.set(idx;1)};
+io.println(s.concat("Added: ";item))}
+el{
+let all=mut.1;
+lp(let k=0;k<hc;k=k+1){
+let idx=hashidx(item;k;size);
+if(bits.get(idx)=0){all=0}};
+if(all=1){io.println(s.concat("Possibly in set: ";item))}
+el{io.println(s.concat("Definitely not in set: ";item))}}};
+if(e=1){go=0}};
+<0}

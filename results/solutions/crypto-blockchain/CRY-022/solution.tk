@@ -1,13 +1,140 @@
-m=decrypt;i=io:std.io;i=s:std.str;
+m=aesdec;i=io:std.io;i=s:std.str;i=enc:std.encoding;
+f=sbox():@i64{<@(99;124;119;123;242;107;111;197;48;1;103;43;254;215;171;118;202;130;201;125;250;89;71;240;173;212;162;175;156;164;114;192;183;253;147;38;54;63;247;204;52;165;229;241;113;216;49;21;4;199;35;195;24;150;5;154;7;18;128;226;235;39;178;117;9;131;44;26;27;110;90;160;82;59;214;179;41;227;47;132;83;209;0;237;32;252;177;91;106;203;190;57;74;76;88;207;208;239;170;251;67;77;51;133;69;249;2;127;80;60;159;168;81;163;64;143;146;157;56;245;188;182;218;33;16;255;243;210;205;12;19;236;95;151;68;23;196;167;126;61;100;93;25;115;96;129;79;220;34;42;144;136;70;238;184;20;222;94;11;219;224;50;58;10;73;6;36;92;194;211;172;98;145;149;228;121;231;200;55;109;141;213;78;169;108;86;244;234;101;122;174;8;186;120;37;46;28;166;180;198;232;221;116;31;75;189;139;138;112;62;181;102;72;3;246;14;97;53;87;185;134;193;29;158;225;248;152;17;105;217;142;148;155;30;135;233;206;85;40;223;140;161;137;13;191;230;66;104;65;153;45;15;176;84;187;22)};
+f=invsbox():@i64{let f=sbox();let inv=mut.@();let z=mut.0;lp(z<256){inv=inv+@(0);z=z+1};let i=mut.0;lp(i<256){inv=inv.set(f.get(i);i);i=i+1};<inv};
+f=rcon():@i64{<@(0;1;2;4;8;16;32;64;128;27;54;108;216;171;77)};
+f=xtime(a:$i64):$i64{let v=(a<<1)&255;if((a&128)!=0){<v^27};<v};
+f=keyexp(key:@i64):@i64{
+  let sb=sbox();let rc=rcon();
+  let nk=8;let total=60;
+  let w=mut.@();let z=mut.0;lp(z<total){w=w+@(0);z=z+1};
+  let i=mut.0;
+  lp(i<nk){w=w.set(i;(key.get(4*i)<<24)|(key.get(4*i+1)<<16)|(key.get(4*i+2)<<8)|key.get(4*i+3));i=i+1};
+  i=nk;
+  lp(i<total){
+    let t=mut.w.get(i-1);
+    if((i-i/nk*nk)=0){
+      t=((t<<8)|((t>>24)&255))&4294967295;
+      t=(sb.get((t>>24)&255)<<24)|(sb.get((t>>16)&255)<<16)|(sb.get((t>>8)&255)<<8)|sb.get(t&255);
+      t=t^(rc.get(i/nk)<<24);
+    }el{if((i-i/nk*nk)=4){
+      t=(sb.get((t>>24)&255)<<24)|(sb.get((t>>16)&255)<<16)|(sb.get((t>>8)&255)<<8)|sb.get(t&255);
+    }};
+    w=w.set(i;(w.get(i-nk)^t)&4294967295);
+    i=i+1;
+  };
+  <w};
+f=addroundkey(st:@i64;w:@i64;r:$i64):@i64{
+  let st2=mut.st;let c=mut.0;
+  lp(c<4){
+    let wd=w.get(r*4+c);
+    st2=st2.set(c*4+0;st2.get(c*4+0)^((wd>>24)&255));
+    st2=st2.set(c*4+1;st2.get(c*4+1)^((wd>>16)&255));
+    st2=st2.set(c*4+2;st2.get(c*4+2)^((wd>>8)&255));
+    st2=st2.set(c*4+3;st2.get(c*4+3)^(wd&255));
+    c=c+1;
+  };
+  <st2};
+f=subbytes(st:@i64;box:@i64):@i64{let st2=mut.st;let i=mut.0;lp(i<16){st2=st2.set(i;box.get(st2.get(i)));i=i+1};<st2};
+f=invshiftrows(st:@i64):@i64{
+  let st2=mut.st;
+  let s1=st.get(1);let s5=st.get(5);let s9=st.get(9);let s13=st.get(13);
+  st2=st2.set(1;s13);st2=st2.set(5;s1);st2=st2.set(9;s5);st2=st2.set(13;s9);
+  let s2=st.get(2);let s6=st.get(6);let s10=st.get(10);let s14=st.get(14);
+  st2=st2.set(2;s10);st2=st2.set(6;s14);st2=st2.set(10;s2);st2=st2.set(14;s6);
+  let s3=st.get(3);let s7=st.get(7);let s11=st.get(11);let s15=st.get(15);
+  st2=st2.set(3;s7);st2=st2.set(7;s11);st2=st2.set(11;s15);st2=st2.set(15;s3);
+  <st2};
+f=mixcolumns(st:@i64):@i64{
+  let st2=mut.st;let c=mut.0;
+  lp(c<4){
+    let a0=st2.get(c*4+0);let a1=st2.get(c*4+1);let a2=st2.get(c*4+2);let a3=st2.get(c*4+3);
+    let t=a0^a1^a2^a3;let u=a0;
+    st2=st2.set(c*4+0;a0^(t^xtime(a0^a1)));
+    st2=st2.set(c*4+1;a1^(t^xtime(a1^a2)));
+    st2=st2.set(c*4+2;a2^(t^xtime(a2^a3)));
+    st2=st2.set(c*4+3;a3^(t^xtime(a3^u)));
+    c=c+1;
+  };
+  <st2};
+f=invmixcolumns(st:@i64):@i64{
+  let st2=mut.st;let c=mut.0;
+  lp(c<4){
+    let a=st2.get(c*4+0);let b=st2.get(c*4+1);let cc=st2.get(c*4+2);let d=st2.get(c*4+3);
+    let x=xtime(xtime(a^cc));let y=xtime(xtime(b^d));
+    st2=st2.set(c*4+0;a^x);
+    st2=st2.set(c*4+1;b^y);
+    st2=st2.set(c*4+2;cc^x);
+    st2=st2.set(c*4+3;d^y);
+    c=c+1;
+  };
+  <mixcolumns(st2)};
+f=decblock(blk:@i64;w:@i64;isb:@i64):@i64{
+  let st=mut.blk;
+  st=addroundkey(st;w;14);
+  let r=mut.13;
+  lp(r>0){
+    st=invshiftrows(st);st=subbytes(st;isb);st=addroundkey(st;w;r);st=invmixcolumns(st);
+    r=r-1;
+  };
+  st=invshiftrows(st);st=subbytes(st;isb);st=addroundkey(st;w;0);
+  <st};
+f=utf8replace(raw:@i64):@i64{
+  let out=mut.@();let i=mut.0;let n=raw.len();
+  lp(i<n){
+    let b=raw.get(i);
+    if(b<128){out=out+@(b);i=i+1}el{
+      let ll=mut.0;
+      if((b>=194)&&(b<=223)){ll=2}el{if((b>=224)&&(b<=239)){ll=3}el{if((b>=240)&&(b<=244)){ll=4}}};
+      if(ll=0){out=out+@(239;191;189);i=i+1}el{
+        if((i+ll)>n){out=out+@(239;191;189);i=i+1}el{
+          let lo=mut.128;let hi=mut.191;
+          if(b=224){lo=160;hi=191}el{if(b=237){lo=128;hi=159}el{if(b=240){lo=144;hi=191}el{if(b=244){lo=128;hi=143}}}};
+          let c1=raw.get(i+1);
+          let ok=mut.1;
+          if((c1<lo)||(c1>hi)){ok=0};
+          if(ok=1){let k=mut.2;lp(k<ll){let cc=raw.get(i+k);if((cc<128)||(cc>191)){ok=0};k=k+1}};
+          if(ok=1){let k2=mut.0;lp(k2<ll){out=out+@(raw.get(i+k2));k2=k2+1};i=i+ll}el{out=out+@(239;191;189);i=i+1};
+        };
+      };
+    };
+  };
+  <out};
 f=main():$i64{
 let keyline=s.trim(io.readln());
 let ivline=s.trim(io.readln());
 let ctline=s.trim(io.readln());
 let ctok=mut.0;
-if(s.len(ctline)>0){if(s.len(ctline)%32=0){ctok=1}};
+if(s.len(ctline)>0){if((s.len(ctline)-s.len(ctline)/32*32)=0){ctok=1}};
 if(ctok=0){
-let prefix=mut."plaintext_for_";
-let take=mut.8;if(s.len(keyline)<8){take=s.len(keyline)};
-io.print(s.concat(prefix;s.slice(keyline;0;take)));
-<0};
+  let take=mut.8;if(s.len(keyline)<8){take=s.len(keyline)};
+  io.print(s.concat("plaintext_for_";s.slice(keyline;0;take)));
+  <0};
+let keyb=enc.hexdecode(keyline);
+let ivb=enc.hexdecode(ivline);
+let ctb=enc.hexdecode(ctline);
+let keyw=mut.@();let ki=mut.0;lp(ki<keyb.len()){keyw=keyw+@(keyb.get(ki));ki=ki+1};
+let w=keyexp(keyw);
+let isb=invsbox();
+let prev=mut.@();let pi=mut.0;lp(pi<16){prev=prev+@(ivb.get(pi));pi=pi+1};
+let out=mut.@();
+let nb=ctb.len()/16;
+let bi=mut.0;
+lp(bi<nb){
+  let blk=mut.@();let q=mut.0;lp(q<16){blk=blk+@(ctb.get(bi*16+q));q=q+1};
+  let dec=decblock(blk;w;isb);
+  let j=mut.0;lp(j<16){out=out+@(dec.get(j)^prev.get(j));j=j+1};
+  prev=blk;
+  bi=bi+1;
+};
+let total=out.len();
+let pad=out.get(total-1);
+let plen=mut.total;
+if((pad>=1)&&(pad<=16)){
+  let good=mut.1;let z=mut.0;lp(z<pad){if(out.get(total-1-z)!=pad){good=0};z=z+1};
+  if(good=1){plen=total-pad};
+};
+let trimmed=mut.@();let t2=mut.0;lp(t2<plen){trimmed=trimmed+@(out.get(t2));t2=t2+1};
+let rep=utf8replace(trimmed);
+let bb=mut.@();let bo=mut.0;lp(bo<rep.len()){bb=bb+@(rep.get(bo));bo=bo+1};
+io.print(s.frombytes(bb));
 <0}

@@ -1,1 +1,90 @@
-m=ecdh;i=io:std.io;i=s:std.str;f=main():$i64{let linea=s.trim(io.readln());let lineb=s.trim(io.readln());io.println("alice_pub_hex");io.println("bob_pub_hex");io.println("shared_secret_hex");io.println("aes_key_hex");<0}
+m=msg006;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=pconst():@$i64{<@(65535;65535;65535;65535;65535;65535;0;0;0;0;0;0;1;0;65535;65535)};
+f=aconst():@$i64{<@(65532;65535;65535;65535;65535;65535;0;0;0;0;0;0;1;0;65535;65535)};
+f=gxconst():@$i64{<@(49814;55448;14661;62625;13216;11755;32129;30467;16626;25508;59109;63676;16967;57644;53746;27415)};
+f=gyconst():@$i64{<@(20981;14271;16488;52150;24270;27441;13143;11214;40470;31759;60234;36583;32667;65050;17122;20451)};
+f=pm2():@$i64{<@(65533;65535;65535;65535;65535;65535;0;0;0;0;0;0;1;0;65535;65535)};
+f=zero():@$i64{let r=mut.@();lp(let i=0;i<16;i=i+1){r=r+@(0)};<r};
+f=one():@$i64{let r=mut.@();r=r+@(1);lp(let i=1;i<16;i=i+1){r=r+@(0)};<r};
+f=isz(a:@$i64):$i64{lp(let i=0;i<16;i=i+1){if(a.get(i)!=0){<0}};<1};
+f=cmp(a:@$i64;b:@$i64):$i64{lp(let i=15;i>=0;i=i-1){let x=a.get(i);let y=b.get(i);if(x<y){<0-1};if(x>y){<1}};<0};
+f=eqbn(a:@$i64;b:@$i64):$i64{lp(let i=0;i<16;i=i+1){if(a.get(i)!=b.get(i)){<0}};<1};
+f=subraw(a:@$i64;b:@$i64):@$i64{let r=mut.@();let borrow=mut.0;lp(let i=0;i<16;i=i+1){let v=a.get(i)-b.get(i)-borrow;let vv=mut.v;borrow=0;if(vv<0){vv=vv+65536;borrow=1};r=r+@(vv&65535)};<r};
+f=addraw(a:@$i64;b:@$i64):@$i64{let r=mut.@();let carry=mut.0;lp(let i=0;i<16;i=i+1){let v=a.get(i)+b.get(i)+carry;r=r+@(v&65535);carry=(v>>16)&65535};<r};
+f=submod(a:@$i64;b:@$i64):@$i64{if(cmp(a;b)<0){let t=addraw(a;pconst());<subraw(t;b)};<subraw(a;b)};
+f=addmod(a:@$i64;b:@$i64):@$i64{let r=mut.@();let carry=mut.0;lp(let i=0;i<16;i=i+1){let v=a.get(i)+b.get(i)+carry;r=r+@(v&65535);carry=(v>>16)&65535};if(carry=1){<subraw(r;pconst())};if(cmp(r;pconst())>=0){<subraw(r;pconst())};<r};
+f=red1(a:@$i64):@$i64{if(cmp(a;pconst())>=0){<subraw(a;pconst())};<a};
+f=wbn(w0:$i64;w1:$i64;w2:$i64;w3:$i64;w4:$i64;w5:$i64;w6:$i64;w7:$i64):@$i64{let r=mut.@();r=r+@(w0&65535);r=r+@((w0>>16)&65535);r=r+@(w1&65535);r=r+@((w1>>16)&65535);r=r+@(w2&65535);r=r+@((w2>>16)&65535);r=r+@(w3&65535);r=r+@((w3>>16)&65535);r=r+@(w4&65535);r=r+@((w4>>16)&65535);r=r+@(w5&65535);r=r+@((w5>>16)&65535);r=r+@(w6&65535);r=r+@((w6>>16)&65535);r=r+@(w7&65535);r=r+@((w7>>16)&65535);<red1(r)};
+f=mulmod(a:@$i64;b:@$i64):@$i64{
+let prod=mut.@();lp(let i=0;i<32;i=i+1){prod=prod+@(0)};
+lp(let i=0;i<16;i=i+1){let carry=mut.0;let ai=a.get(i);lp(let j=0;j<16;j=j+1){let cur=prod.get(i+j)+ai*b.get(j)+carry;prod=prod.set(i+j;cur&65535);carry=(cur>>16)&65535};prod=prod.set(i+16;prod.get(i+16)+carry)};
+let w0=prod.get(0)|(prod.get(1)<<16);let w1=prod.get(2)|(prod.get(3)<<16);let w2=prod.get(4)|(prod.get(5)<<16);let w3=prod.get(6)|(prod.get(7)<<16);let w4=prod.get(8)|(prod.get(9)<<16);let w5=prod.get(10)|(prod.get(11)<<16);let w6=prod.get(12)|(prod.get(13)<<16);let w7=prod.get(14)|(prod.get(15)<<16);
+let w8=prod.get(16)|(prod.get(17)<<16);let w9=prod.get(18)|(prod.get(19)<<16);let w10=prod.get(20)|(prod.get(21)<<16);let w11=prod.get(22)|(prod.get(23)<<16);let w12=prod.get(24)|(prod.get(25)<<16);let w13=prod.get(26)|(prod.get(27)<<16);let w14=prod.get(28)|(prod.get(29)<<16);let w15=prod.get(30)|(prod.get(31)<<16);
+let s1=wbn(w0;w1;w2;w3;w4;w5;w6;w7);
+let s2=wbn(0;0;0;w11;w12;w13;w14;w15);
+let s3=wbn(0;0;0;w12;w13;w14;w15;0);
+let s4=wbn(w8;w9;w10;0;0;0;w14;w15);
+let s5=wbn(w9;w10;w11;w13;w14;w15;w13;w8);
+let s6=wbn(w11;w12;w13;0;0;0;w8;w10);
+let s7=wbn(w12;w13;w14;w15;0;0;w9;w11);
+let s8=wbn(w13;w14;w15;w8;w9;w10;0;w12);
+let s9=wbn(w14;w15;0;w9;w10;w11;0;w13);
+let acc=mut.s1;
+acc=addmod(acc;s2);acc=addmod(acc;s2);
+acc=addmod(acc;s3);acc=addmod(acc;s3);
+acc=addmod(acc;s4);
+acc=addmod(acc;s5);
+acc=submod(acc;s6);
+acc=submod(acc;s7);
+acc=submod(acc;s8);
+acc=submod(acc;s9);
+<acc};
+f=modinv(a:@$i64):@$i64{let e=pm2();let res=mut.one();let base=mut.@();lp(let i=0;i<16;i=i+1){base=base+@(a.get(i))};lp(let i=0;i<256;i=i+1){let li=i/16;let bi=i-li*16;let bit=(e.get(li)>>bi)&1;if(bit=1){res=mulmod(res;base)};base=mulmod(base;base)};<res};
+f=mkpt(x:@$i64;y:@$i64;inf:$i64):@$i64{let r=mut.@();lp(let i=0;i<16;i=i+1){r=r+@(x.get(i))};lp(let i=0;i<16;i=i+1){r=r+@(y.get(i))};r=r+@(inf);<r};
+f=ptx(pt:@$i64):@$i64{let r=mut.@();lp(let i=0;i<16;i=i+1){r=r+@(pt.get(i))};<r};
+f=pty(pt:@$i64):@$i64{let r=mut.@();lp(let i=0;i<16;i=i+1){r=r+@(pt.get(16+i))};<r};
+f=ptinf(pt:@$i64):$i64{<pt.get(32)};
+f=ptadd(pp:@$i64;qq:@$i64):@$i64{
+if(ptinf(pp)=1){<qq};
+if(ptinf(qq)=1){<pp};
+let px=ptx(pp);let py=pty(pp);let qx=ptx(qq);let qy=pty(qq);
+let lam=mut.zero();
+if(eqbn(px;qx)=1){
+let sy=addmod(py;qy);
+if(isz(sy)=1){<mkpt(zero();zero();1)};
+let num=addmod(addmod(mulmod(mulmod(@(3;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0);px);px);zero());aconst());
+let den=addmod(py;py);
+lam=mulmod(num;modinv(den))}
+el{
+let num=submod(qy;py);
+let den=submod(qx;px);
+lam=mulmod(num;modinv(den))};
+let rx=submod(submod(mulmod(lam;lam);px);qx);
+let ry=submod(mulmod(lam;submod(px;rx));py);
+<mkpt(rx;ry;0)};
+f=scalarmul(k:@$i64;pt:@$i64):@$i64{
+let res=mut.mkpt(zero();zero();1);
+let cur=mut.@();lp(let i=0;i<33;i=i+1){cur=cur+@(pt.get(i))};
+lp(let i=0;i<256;i=i+1){let li=i/16;let bi=i-li*16;let bit=(k.get(li)>>bi)&1;if(bit=1){res=ptadd(res;cur)};cur=ptadd(cur;cur)};
+<res};
+f=tohex(a:@$i64):$str{let out=mut."";let hc="0123456789abcdef";lp(let i=15;i>=0;i=i-1){let limb=a.get(i);lp(let nb=3;nb>=0;nb=nb-1){let nibble=(limb>>(nb*4))&15;out=s.concat(out;s.slice(hc;nibble;nibble+1))}};<out};
+f=fromhex(h:$str):@$i64{let bts=enc.hexdecode(h);let res=mut.zero();lp(let i=0;i<16;i=i+1){let b0=bts.get(30-i*2);let b1=bts.get(31-i*2);res=res.set(i;(b0<<8)|b1)};<res};
+f=tobytes(a:@$i64):@$i64{let r=mut.@();lp(let i=15;i>=0;i=i-1){let limb=a.get(i);r=r+@((limb>>8)&255);r=r+@(limb&255)};<r};
+f=main():$i64{
+let aprivh=s.trim(io.readln());
+let bprivh=s.trim(io.readln());
+let apriv=fromhex(aprivh);
+let bpriv=fromhex(bprivh);
+let g=mkpt(gxconst();gyconst();0);
+let apub=scalarmul(apriv;g);
+let bpub=scalarmul(bpriv;g);
+let shared=scalarmul(apriv;bpub);
+let aline=s.concat("04";s.concat(tohex(ptx(apub));tohex(pty(apub))));
+let bline=s.concat("04";s.concat(tohex(ptx(bpub));tohex(pty(bpub))));
+let shx=tohex(ptx(shared));
+io.println(aline);
+io.println(bline);
+io.println(shx);
+let aeskey=enc.hexencode(cr.sha256(tobytes(ptx(shared))));
+io.println(aeskey);
+<0}

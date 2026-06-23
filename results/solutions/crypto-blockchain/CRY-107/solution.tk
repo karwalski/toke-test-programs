@@ -1,1 +1,141 @@
-m=checksum;f=solve(p0:$str):$str{let lhs=mut."";let rhs=mut.p0;lp(let i=0;i<rhs.len;i=i+1){let c=rhs.get(i);let lhslen=lhs.len;let rem=lhslen-lhslen/2*2;if(rem=0){if(c>96){if(c<123){lhs=lhs+c-32;}}}}el{if(c>96){if(c<123){lhs=lhs+c-32;}}}}};<lhs};f=main():$void{let result=solve("0000000000000000000001");<result};
+m=core;i=io:std.io;i=s:std.str;i=enc:std.encoding;
+f=lshr(x:$i64;k:$i64):$i64{if(k=0){<x};let hi=(0-1)<<(64-k);<(x>>k)&(~hi)};
+f=rotl64(x:$i64;n:$i64):$i64{if(n=0){<x};<(x<<n)|lshr(x;64-n)};
+f=md5(a:$i64):$i64{let m=a-a/5*5;if(m<0){<m+5};<m};
+f=keccakf(st:@i64):@i64{
+  let stt=mut.st;
+  let rcs=@(1;32898;-9223372036854742902;-9223372034707259392;32907;2147483649;-9223372034707259263;-9223372036854743031;138;136;2147516425;2147483658;2147516555;-9223372036854775669;-9223372036854742903;-9223372036854743037;-9223372036854743038;-9223372036854775680;32778;-9223372034707292150;-9223372034707259263;-9223372036854742912;2147483649;-9223372034707259384);
+  let ros=@(0;1;62;28;27;36;44;6;55;20;3;10;43;25;39;41;45;15;21;8;18;2;61;56;14);
+  let rnd=mut.0;
+  lp(rnd<24){
+    let cc=mut.@(0;0;0;0;0);
+    let x=mut.0;
+    lp(x<5){
+      let v=stt.get(x)^stt.get(x+5)^stt.get(x+10)^stt.get(x+15)^stt.get(x+20);
+      cc=cc.set(x;v);
+      x=x+1;
+    };
+    let dd=mut.@(0;0;0;0;0);
+    x=0;
+    lp(x<5){
+      let d=cc.get(md5(x-1))^rotl64(cc.get(md5(x+1));1);
+      dd=dd.set(x;d);
+      x=x+1;
+    };
+    x=0;
+    lp(x<5){
+      let y=mut.0;
+      lp(y<5){
+        let idx=x+5*y;
+        stt=stt.set(idx;stt.get(idx)^dd.get(x));
+        y=y+1;
+      };
+      x=x+1;
+    };
+    let bb=mut.@(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0);
+    x=0;
+    lp(x<5){
+      let y=mut.0;
+      lp(y<5){
+        let bx=y;
+        let by=md5(2*x+3*y);
+        let bidx=bx+5*by;
+        let sidx=x+5*y;
+        bb=bb.set(bidx;rotl64(stt.get(sidx);ros.get(sidx)));
+        y=y+1;
+      };
+      x=x+1;
+    };
+    x=0;
+    lp(x<5){
+      let y=mut.0;
+      lp(y<5){
+        let idx=x+5*y;
+        let b0=bb.get(idx);
+        let b1=bb.get(md5(x+1)+5*y);
+        let b2=bb.get(md5(x+2)+5*y);
+        stt=stt.set(idx;b0^((~b1)&b2));
+        y=y+1;
+      };
+      x=x+1;
+    };
+    stt=stt.set(0;stt.get(0)^rcs.get(rnd));
+    rnd=rnd+1;
+  };
+  <stt
+};
+f=getbyte(data:@byte;i:$i64):$i64{if(i<data.len()){<data.get(i)&255};<0};
+f=keccak256(msg:@byte;padbyte:$i64):@byte{
+  let st=mut.@(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0);
+  let rate=136;
+  let mlen=msg.len();
+  let padded=mut.msg;
+  let padlen=rate-(mlen-mlen/rate*rate);
+  if(padlen=1){
+    padded=padded+@(padbyte|128);
+  }el{
+    padded=padded+@(padbyte);
+    let z=mut.0;
+    lp(z<padlen-2){padded=padded+@(0);z=z+1};
+    padded=padded+@(128);
+  };
+  let tot=padded.len();
+  let bs=mut.0;
+  lp(bs<tot){
+    let li=mut.0;
+    lp(li<17){
+      let base=bs+li*8;
+      let lane=mut.0;
+      let j=mut.0;
+      lp(j<8){
+        lane=lane|(getbyte(padded;base+j)<<(8*j));
+        j=j+1;
+      };
+      st=st.set(li;st.get(li)^lane);
+      li=li+1;
+    };
+    st=keccakf(st);
+    bs=bs+rate;
+  };
+  let out=mut.@(0&255);
+  out=@();
+  let oi=mut.0;
+  lp(oi<4){
+    let lane=st.get(oi);
+    let j=mut.0;
+    lp(j<8){
+      let bv=lshr(lane;8*j)&255;
+      out=out+@(bv&255);
+      j=j+1;
+    };
+    oi=oi+1;
+  };
+  <out
+};
+f=main():$void{
+  let line=io.readln();
+  let low=s.lower(line);
+  let addr=s.bytes(low);
+  let hash=keccak256(addr;1);
+  let outb=mut.@(48;120);
+  let n=addr.len();
+  let i=mut.0;
+  lp(i<n){
+    let ch=addr.get(i)&255;
+    let hb=hash.get(i/2)&255;
+    let nib=mut.0;
+    let rem=i-i/2*2;
+    if(rem=0){nib=lshr(hb;4)&15}el{nib=hb&15};
+    let outc=mut.ch;
+    if(nib>=8){
+      if(ch>=97){
+        if(ch<=102){
+          outc=ch-32;
+        }
+      }
+    };
+    outb=outb+@(outc&255);
+    i=i+1;
+  };
+  io.println(s.frombytes(outb));
+};

@@ -1,11 +1,27 @@
-To prove that a committed value \( v \) is in the range \([0, 2^n))\) without revealing it, we can use a zero-knowledge proof (ZK-proof). Specifically, we can use a range proof, which is a type of ZK-proof.
-
-Here are the components of the proof:
-
-1. **Commitment**: The value \( v \) is committed using a cryptographic hash function. Let \( h \) be the hash function, and let \( c = h(v) \) be the commitment.
-
-2. **Range Proof**: The commitment \( c \) is proven to be the hash of a value \( v \) that lies within the range \([0, 2^n))\). This is done using a range proof protocol, such as the Bulletproofs protocol.
-
-3. **Challenge and Response**: The prover generates a challenge \( e \) that is used to verify the range proof. The verifier then generates a response \( r \) that is used to verify the range proof. The range proof is verified if the verifier's response \( r \) satisfies the verification equation \( e = h(r) \).
-
-In summary, the components of the proof are the commitment \( c \), the range proof
+m=rangeproof;i=io:std.io;i=s:std.str;i=cr:std.crypto;i=enc:std.encoding;
+f=be32(v:$i64):@byte{let r=mut.@();let i=mut.31;lp(i>=0){let b=mut.0;if(i<8){b=(v>>(i*8))&255};r=r+@(b);i=i-1};<r};
+f=be4(v:$i64):@byte{<@((v>>24)&255;(v>>16)&255;(v>>8)&255;v&255)};
+f=one(v:$i64):@byte{<@(v&255)};
+f=cat(a:@byte;b:@byte):@byte{let r=mut.a;let i=mut.0;lp(i<b.len()){r=r+@(b.get(i));i=i+1};<r};
+f=main():$i64{
+let value=s.toint(s.trim(io.readln()));
+let n=s.toint(s.trim(io.readln()));
+let bhex=s.trim(io.readln());
+let upper=1<<n;
+if(value<0||value>=upper){io.println(s.concat(s.concat("{\"error\":\"Value ";s.fromint(value));s.concat(" not in range [0, ";s.concat(s.fromint(upper);")\"}"))));<0};
+let r=enc.hexdecode(bhex);
+let cmsg=cat(be32(value);r);
+let commitment=enc.hexencode(cr.sha256(cmsg));
+let out=mut.s.concat("{\"commitment\":\"";s.concat(commitment;"\",\"range_bits\":"));
+out=s.concat(out;s.concat(s.fromint(n);",\"bit_commitments\":["));
+let i=mut.0;
+lp(i<n){
+let bit=(value>>i)&1;
+let bmsg=cat(cat(one(bit);be4(i));r);
+let bc=enc.hexencode(cr.sha256(bmsg));
+if(i>0){out=s.concat(out;",")};
+out=s.concat(out;s.concat("\"";s.concat(bc;"\"")));
+i=i+1};
+out=s.concat(out;"],\"proof_valid\":true}");
+io.println(out);
+<0}

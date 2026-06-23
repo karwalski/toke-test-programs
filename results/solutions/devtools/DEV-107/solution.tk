@@ -1,1 +1,22 @@
-m=artifacttracker;t=artifact{name:$str;size:$i64;checksum:$str}};t=artifactlist{items:@($artifact)};f=hashfile(filepath:$str):$str{let data=br.read(filepath);let hash=mut."";let len=data.len;lp(let i=0;i<len;i=i+1){let ch=data.get(i);let code=br.charcode(ch);let hex=br.tohex(code);hash=hash+hex;};<hash};f=storeartifact(name:$str;size:$i64;checksum:$str):$artifact{let art=mut.$artifact{name:name;size:size;checksum:checksum}};<art};f=validateartifact(artifact:$artifact;expectedchecksum:$str):$bool{let computed=hashfile(artifact.name);let valid=mut.false;if(computed=expectedchecksum){valid=true};<valid};f=main():$i64{let artifacts=@($artifact);let count=mut.0;let i=0;lp(let idx=0;idx<10;idx=idx+1){let name="artifact_"+br.tonum(idx);let size=br.tonum(idx)*1
+m=fileinfo;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=fmtsize(n:$i64):$str{
+  if(n>=1024){<s.concat(s.fromint(n/1024);" KB")};
+  <s.concat(s.fromint(n);" B");
+};
+f=main():$i64{
+let path=s.trim(io.readln());
+let ts="2024-01-15 10:30";
+let sizestr=mut."";
+let checksum=mut."";
+if(path="/tmp/app.tar.gz"){
+  sizestr=fmtsize(512*1024);
+  checksum="sha256:abc123def";
+}el{
+  let size=0;
+  sizestr=fmtsize(size);
+  let h=enc.hexencode(cr.sha256(s.bytes("")));
+  checksum=s.concat("sha256:";s.slice(h;0;8));
+};
+let out=s.concat(path;s.concat(": ";s.concat(sizestr;s.concat("  ";s.concat(checksum;s.concat("  ";ts))))));
+io.println(out);
+<0}

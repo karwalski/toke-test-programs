@@ -1,1 +1,57 @@
-m=shamir;f=binomial(n:$i64;k:$i64):$i64{if(k<0){<0};if(k>n){<0};let res=mut.1;lp(let i=0;i<k;i=i+1){res=res*(n-i)/(i+1))};<res};f=modpow(base:$i64;exp:$i64;m:$i64):$i64{let result=mut.1;let baseval=mut.base;let expval=mut.exp;lp(let i=0;expval>0;i=i+1){let odd=expval-expval/2*2;if(odd=1){result=result*baseval;result=result-m*(result-m*(result-m*(result-m*(result-m*(
+m=shamir;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=gfmul(a:$i64;b:$i64):$i64{
+  let p=mut.0;let aa=mut.a;let bb=mut.b;
+  lp(let i=0;i<8;i=i+1){
+    if(bb-bb/2*2=1){p=p^aa};
+    let hi=aa&128;
+    aa=(aa<<1)&255;
+    if(hi!=0){aa=aa^27};
+    bb=bb>>1
+  };
+  <p
+};
+f=evalpoly(co:@$i64;x:$i64):$i64{
+  let r=mut.0;let n=co.len();
+  lp(let i=0;i<n;i=i+1){
+    let c=co.get(n-1-i);
+    r=gfmul(r;x)^c
+  };
+  <r
+};
+f=main():$i64{
+  let secret=enc.hexdecode(s.trim(io.readln()));
+  let n=s.toint(s.trim(io.readln()));
+  let k=s.toint(s.trim(io.readln()));
+  let slen=secret.len();
+  let seed=mut.@();
+  lp(let i=0;i<slen;i=i+1){seed=seed+@(secret.get(i))};
+  seed=seed+@(n)+@(k);
+  let need=(k-1)*slen;
+  let rnd=mut.@();
+  let blk=mut.0;
+  lp(rnd.len()<need){
+    let inp=mut.@();
+    let sl=seed.len();
+    lp(let j=0;j<sl;j=j+1){inp=inp+@(seed.get(j))};
+    lp(let j=0;j<blk;j=j+1){inp=inp+@(120)};
+    let h=cr.sha256(inp);
+    lp(let j=0;j<h.len();j=j+1){rnd=rnd+@(h.get(j))};
+    blk=blk+1
+  };
+  let out=mut."";
+  lp(let x=1;x<=n;x=x+1){
+    let line=mut.@();
+    lp(let bi=0;bi<slen;bi=bi+1){
+      let co=mut.@(secret.get(bi));
+      lp(let c=0;c<k-1;c=c+1){
+        co=co+@(rnd.get(bi*(k-1)+c))
+      };
+      line=line+@(evalpoly(co;x))
+    };
+    let hex=enc.hexencode(line);
+    out=s.concat(out;s.concat("share ";s.concat(s.fromint(x);s.concat(": ";s.concat(hex;"\n")))))
+  };
+  out=s.concat(out;s.concat("reconstruction requires any ";s.concat(s.fromint(k);s.concat(" of ";s.concat(s.fromint(n);" shares")))));
+  io.println(out);
+  <0
+};

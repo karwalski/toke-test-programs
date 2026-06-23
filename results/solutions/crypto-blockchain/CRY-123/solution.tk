@@ -1,1 +1,174 @@
-m=signhash;f=hashstep(state:$i64;data:$i64):$i64{let result=mut.state+data;result=result-result/256*256;<result};f=signhash(chainid:$i64;nonce:$i64):$i64{let chainpart=chainid*32768;let noncepart=nonce*789;let base=mut.0;base=base+chainpart;base=base+noncepart;base=base+123456789;let result=mut.0;lp(let idx=0;idx<64;idx=idx+1){let part=base-base/256*256;result=result+part;base=base/256;};<result};
+m=eip155;i=io:std.io;i=s:std.str;i=enc:std.encoding;
+f=lsr(x:$i64;n:$i64):$i64{if(n=0){<x};<(x>>n)&((1<<(64-n))-1)};
+f=rotl(x:$i64;b:$i64):$i64{if(b=0){<x};<(x<<b)|lsr(x;64-b)};
+f=rc(i:$i64):$i64{
+let t=mut.@(1;32898;-9223372036854742902;-9223372034707259392;32907;2147483649;-9223372034707259263;-9223372036854743031;138;136;2147516425;2147483658;2147516555;-9223372036854775669;-9223372036854742903;-9223372036854743037;-9223372036854743038;-9223372036854775680;32778;-9223372034707292150;-9223372034707259263;-9223372036854742912;2147483649;-9223372034707259384);
+<t.get(i)};
+f=rfl(i:$i64):$i64{
+let t=mut.@(0;1;62;28;27;36;44;6;55;20;3;10;43;25;39;41;45;15;21;8;18;2;61;56;14);
+<t.get(i)};
+f=keccakf(st:@$i64):@$i64{
+let a=mut.st;
+lp(let rnd=0;rnd<24;rnd=rnd+1){
+let c=mut.@(0;0;0;0;0);
+lp(let x=0;x<5;x=x+1){
+let v=a.get(x)^a.get(x+5)^a.get(x+10)^a.get(x+15)^a.get(x+20);
+c=c.set(x;v)};
+let d=mut.@(0;0;0;0;0);
+lp(let x=0;x<5;x=x+1){
+let xm=x+4-(x+4)/5*5;
+let xp=x+1-(x+1)/5*5;
+let v=c.get(xm)^rotl(c.get(xp);1);
+d=d.set(x;v)};
+lp(let x=0;x<5;x=x+1){
+lp(let y=0;y<5;y=y+1){
+let idx=x+5*y;
+a=a.set(idx;a.get(idx)^d.get(x))}};
+let b=mut.@(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0);
+lp(let x=0;x<5;x=x+1){
+lp(let y=0;y<5;y=y+1){
+let src=x+5*y;
+let nx=y;
+let ny=2*x+3*y-(2*x+3*y)/5*5;
+let dst=nx+5*ny;
+b=b.set(dst;rotl(a.get(src);rfl(src)))}};
+lp(let x=0;x<5;x=x+1){
+lp(let y=0;y<5;y=y+1){
+let idx=x+5*y;
+let x1=x+1-(x+1)/5*5;
+let x2=x+2-(x+2)/5*5;
+let v=b.get(idx)^((~b.get(x1+5*y))&b.get(x2+5*y));
+a=a.set(idx;v)}};
+a=a.set(0;a.get(0)^rc(rnd))};
+<a};
+f=keccak256(msg:@$i64):@$i64{
+let m=mut.msg;
+m=m+@(1);
+lp(m.len()-m.len()/136*136!=0){m=m+@(0)};
+let ml=m.len();
+m=m.set(ml-1;m.get(ml-1)^128);
+let state=mut.@(0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0);
+let off=mut.0;
+lp(off<m.len()){
+lp(let i=0;i<17;i=i+1){
+let lane=mut.0;
+lp(let j=0;j<8;j=j+1){
+let bb=m.get(off+i*8+j);
+lane=lane|(bb<<(8*j))};
+state=state.set(i;state.get(i)^lane)};
+state=keccakf(state);
+off=off+136};
+let out=mut.@();
+lp(let i=0;i<4;i=i+1){
+let lane=state.get(i);
+lp(let j=0;j<8;j=j+1){
+out=out+@(lsr(lane;8*j)&255)}};
+<out};
+f=hexval(c:$i64):$i64{
+if(c>=48){if(c<=57){<c-48}};
+if(c>=97){if(c<=102){<c-87}};
+if(c>=65){if(c<=70){<c-55}};
+<0};
+f=encint(n:$i64):@$i64{
+if(n=0){<@(128)};
+let tmp=mut.@();
+let v=mut.n;
+lp(v>0){tmp=tmp+@(v-v/256*256);v=v/256};
+let bs=mut.@();
+let tl=tmp.len();
+lp(let i=0;i<tl;i=i+1){bs=bs+@(tmp.get(tl-1-i))};
+<rlpstr(bs)};
+f=enchex(hx:@$i64):@$i64{
+let bs=mut.@();
+let nh=hx.len();
+let start=mut.0;
+let cnt=mut.nh;
+if(nh-nh/2*2!=0){
+bs=bs+@(hexval(hx.get(0)));
+start=1;cnt=nh-1};
+lp(let i=start;i+1<hx.len()+1;i=i+2){
+if(i+1<=hx.len()){
+let hi=hexval(hx.get(i));
+let lo=hexval(hx.get(i+1));
+bs=bs+@(hi*16+lo)}};
+if(nh=0){bs=@()};
+<rlpstr(bs)};
+f=rlpstr(b:@$i64):@$i64{
+let ln=b.len();
+if(ln=1){if(b.get(0)<128){<b}};
+if(ln<56){
+let r=mut.@(128+ln);
+lp(let i=0;i<ln;i=i+1){r=r+@(b.get(i))};
+<r};
+let lb=mut.@();
+let v=mut.ln;
+lp(v>0){lb=@(v-v/256*256)+lb;v=v/256};
+let r=mut.@(183+lb.len());
+lp(let i=0;i<lb.len();i=i+1){r=r+@(lb.get(i))};
+lp(let i=0;i<ln;i=i+1){r=r+@(b.get(i))};
+<r};
+f=rlplist(payload:@$i64):@$i64{
+let ln=payload.len();
+if(ln<56){
+let r=mut.@(192+ln);
+lp(let i=0;i<ln;i=i+1){r=r+@(payload.get(i))};
+<r};
+let lb=mut.@();
+let v=mut.ln;
+lp(v>0){lb=@(v-v/256*256)+lb;v=v/256};
+let r=mut.@(247+lb.len());
+lp(let i=0;i<lb.len();i=i+1){r=r+@(lb.get(i))};
+lp(let i=0;i<ln;i=i+1){r=r+@(payload.get(i))};
+<r};
+f=jsonint(j:$str;key:$str):$i64{
+let pat=s.concat(s.concat("\"";key);"\":");
+let idx=s.indexof(j;pat);
+let p=mut.idx+s.len(pat);
+let n=s.len(j);
+let val=mut.0;
+let started=mut.0;
+lp(p<n){
+let ch=s.slice(j;p;p+1);
+let cb=s.bytes(ch).get(0);
+if(cb>=48){if(cb<=57){val=val*10+(cb-48);started=1;p=p+1}el{p=n}}el{if(started=1){p=n}el{p=p+1}}};
+<val};
+f=jsonstr(j:$str;key:$str):$str{
+let pat=s.concat(s.concat("\"";key);"\":\"");
+let idx=s.indexof(j;pat);
+if(idx<0){<""};
+let p=mut.idx+s.len(pat);
+let n=s.len(j);
+let out=mut."";
+lp(p<n){
+let ch=s.slice(j;p;p+1);
+if(s.eq(ch;"\"")){p=n}el{out=s.concat(out;ch);p=p+1}};
+<out};
+f=striphex(hs:$str):@$i64{
+let body=mut.hs;
+if(s.len(hs)>=2){
+let pre=s.slice(hs;0;2);
+if(s.eq(pre;"0x")){body=s.slice(hs;2;s.len(hs))}};
+<s.bytes(body)};
+f=main():$i64{
+let line1=s.trim(io.readln());
+let chain=s.toint(s.trim(io.readln()));
+let nonce=jsonint(line1;"nonce");
+let gp=jsonint(line1;"gas_price");
+let gl=jsonint(line1;"gas_limit");
+let value=jsonint(line1;"value");
+let toh=striphex(jsonstr(line1;"to"));
+let datah=striphex(jsonstr(line1;"data"));
+let payload=mut.@();
+payload=payload+encint(nonce);
+payload=payload+encint(gp);
+payload=payload+encint(gl);
+payload=payload+enchex(toh);
+payload=payload+encint(value);
+payload=payload+enchex(datah);
+payload=payload+encint(chain);
+payload=payload+encint(0);
+payload=payload+encint(0);
+let rlp=rlplist(payload);
+let h=keccak256(rlp);
+io.println(enc.hexencode(h));
+<0}

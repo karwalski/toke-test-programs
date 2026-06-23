@@ -1,1 +1,146 @@
-m=ring;i=io:std.io;i=s:std.str;f=tohex(n:$i64):$str{let digits="0123456789abcdef";let v=mut.n;if(v<0){v=0-v};let out=mut."";if(v=0){<"0"};lp(v>0){let d=v-(v/16)*16;out=s.concat(s.slice(digits;d;d+1);out);v=v/16};<out};f=main():$i64{let msg=io.readln();let idxline=io.readln();let priv=io.readln();let keysline=io.readln();let idx=s.toint(s.trim(idxline));let cleaned=s.trim(keysline);let inner=s.slice(cleaned;1;s.len(cleaned)-1);let parts=s.split(inner;",");let n=parts.len();let msgseed=s.len(s.trim(msg));let privseed=s.len(s.trim(priv));let ki=tohex(msgseed*31+privseed*17+101);let c0=tohex(msgseed*13+idx*7+59);let out=mut."{\"key_image\":\"";out=s.concat(out;ki);out=s.concat(out;"\",\"c0\":\"");out=s.concat(out;c0);out=s.concat(out;"\",\"s_values\":[");let j=mut.0;lp(j<n){let sv=tohex(msgseed*3+privseed*5+j*23+idx*11+7);if(j>0){out=s.concat(out;",")};out=s.concat(out;"\"");out=s.concat(out;sv);out=s.concat(out;"\"");j=j+1};out=s.concat(out;"]}");io.println(out);<0}
+m=ring;i=io:std.io;i=s:std.str;i=cr:std.crypto;i=enc:std.encoding;
+f=cat(a:@byte;b:@byte):@byte{let r=mut.a;let i=mut.0;lp(i<b.len()){r=r+@(b.get(i));i=i+1};<r};
+f=u32be(v:$i64):@byte{<@((v>>24)&255;(v>>16)&255;(v>>8)&255;v&255)};
+f=hpart(acc:@byte;p:@byte):@byte{let withlen=cat(acc;u32be(p.len()));<cat(withlen;p)};
+f=sb(str:$str):@byte{let b=s.bytes(str);let r=mut.@();let i=mut.0;lp(i<b.len()){r=r+@(b.get(i));i=i+1};<r};
+f=digbytes(d:@byte):@byte{let r=mut.@();let i=mut.0;lp(i<d.len()){r=r+@(d.get(i));i=i+1};<r};
+f=zero16():@i64{let z=mut.@();let i=mut.0;lp(i<16){z=z+@(0);i=i+1};<z};
+f=tobig(d:@byte):@i64{
+  let limbs=mut.zero16();
+  let k=mut.0;
+  lp(k<32){let limbidx=15-k/2;let v=limbs.get(limbidx);limbs=limbs.set(limbidx;(v<<8)|d.get(k));k=k+1};
+  <limbs};
+f=geq(a:@i64;b:@i64):$i64{let i=mut.15;lp(i>=0){if(a.get(i)>b.get(i)){<1};if(a.get(i)<b.get(i)){<0};i=i-1};<1};
+f=qmod():@i64{<@(65347;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535)};
+f=sub256(a:@i64;b:@i64):@i64{let r=mut.@();let borrow=mut.0;let i=mut.0;lp(i<16){let d=mut.a.get(i)-b.get(i)-borrow;if(d<0){d=d+65536;borrow=1}el{borrow=0};r=r+@(d);i=i+1};<r};
+f=reduceq(a:@i64):@i64{let q=qmod();let r=mut.a;lp(geq(r;q)=1){r=sub256(r;q)};<r};
+f=mul256(a:@i64;b:@i64):@i64{
+  let prod=mut.@();let z=mut.0;lp(z<32){prod=prod+@(0);z=z+1};
+  let i=mut.0;
+  lp(i<16){
+    let carry=mut.0;let j=mut.0;
+    lp(j<16){
+      let cur=prod.get(i+j)+a.get(i)*b.get(j)+carry;
+      prod=prod.set(i+j;cur&65535);
+      carry=(cur>>16);
+      j=j+1;
+    };
+    let p2=prod.get(i+16)+carry;
+    prod=prod.set(i+16;p2);
+    i=i+1;
+  };
+  <prod};
+f=add256(a:@i64;b:@i64):@i64{let sum=mut.@();let carry=mut.0;let i=mut.0;lp(i<16){let cur=a.get(i)+b.get(i)+carry;sum=sum+@(cur&65535);carry=(cur>>16);i=i+1};<sum};
+f=addfold(a:@i64;b:@i64):@i64{let sum=mut.@();let carry=mut.0;let i=mut.0;lp(i<16){let cur=a.get(i)+b.get(i)+carry;sum=sum+@(cur&65535);carry=(cur>>16);i=i+1};let res=mut.sum;if(carry>0){let cc=mut.0;lp(cc<carry){res=add189(res);cc=cc+1}};<res};
+f=foldq(prod:@i64):@i64{
+  let lo=mut.@();let hi=mut.@();let i=mut.0;
+  lp(i<16){lo=lo+@(prod.get(i));i=i+1};
+  i=0;lp(i<16){hi=hi+@(prod.get(i+16));i=i+1};
+  let res=mut.lo;
+  let rounds=mut.0;
+  lp(rounds<4){
+    let allzero=mut.1;let z=mut.0;lp(z<16){if(hi.get(z)!=0){allzero=0};z=z+1};
+    if(allzero=1){rounds=4}el{
+      let m189=mut.zero16();m189=m189.set(0;189);
+      let t=mul256(hi;m189);
+      let newlo=mut.@();let k=mut.0;lp(k<16){newlo=newlo+@(t.get(k));k=k+1};
+      let newhi=mut.@();k=0;lp(k<16){newhi=newhi+@(t.get(k+16));k=k+1};
+      res=addfold(res;newlo);
+      hi=newhi;
+      rounds=rounds+1;
+    };
+  };
+  <reduceq(res)};
+f=mulmod(a:@i64;b:@i64):@i64{<foldq(mul256(a;b))};
+f=add189(a:@i64):@i64{let sum=mut.@();let carry=mut.189;let i=mut.0;lp(i<16){let cur=a.get(i)+carry;sum=sum+@(cur&65535);carry=(cur>>16);i=i+1};<sum};
+f=submod(a:@i64;b:@i64):@i64{
+  let q=qmod();
+  let qmb=sub256(q;b);
+  let sum=mut.@();let carry=mut.0;let i=mut.0;
+  lp(i<16){let cur=a.get(i)+qmb.get(i)+carry;sum=sum+@(cur&65535);carry=(cur>>16);i=i+1};
+  let res=mut.sum;
+  if(carry>0){res=add189(res)};
+  <reduceq(res)};
+f=one256():@i64{let o=mut.zero16();o=o.set(0;1);<o};
+f=modexp(base:@i64;ex:@i64):@i64{
+  let result=mut.one256();
+  let b=mut.reduceq(base);
+  let bit=mut.0;
+  lp(bit<256){
+    let limb=bit/16;let off=bit-limb*16;
+    if(((ex.get(limb)>>off)&1)=1){result=mulmod(result;b)};
+    b=mulmod(b;b);
+    bit=bit+1;
+  };
+  <result};
+f=tobytes32(a:@i64):@byte{let out=mut.@();let i=mut.15;lp(i>=0){let v=a.get(i);out=out+@((v>>8)&255;v&255);i=i-1};<out};
+f=tohex64(a:@i64):$str{let hx="0123456789abcdef";let out=mut."";let i=mut.15;lp(i>=0){let v=a.get(i);let sh=mut.12;lp(sh>=0){let d=(v>>sh)&15;out=s.concat(out;s.slice(hx;d;d+1));sh=sh-4};i=i-1};<out};
+f=isz(a:@i64):$i64{let i=mut.0;lp(i<16){if(a.get(i)!=0){<0};i=i+1};<1};
+f=divsmall(a:@i64;d:$i64):@i64{let q=mut.zero16();let rem=mut.0;let i=mut.15;lp(i>=0){let cur=rem*65536+a.get(i);q=q.set(i;cur/d);rem=cur-(cur/d)*d;i=i-1};<q};
+f=modsmall(a:@i64;d:$i64):$i64{let rem=mut.0;let i=mut.15;lp(i>=0){let cur=rem*65536+a.get(i);rem=cur-(cur/d)*d;i=i-1};<rem};
+f=todec(a:@i64):$str{if(isz(a)=1){<"0"};let digs="0123456789";let out=mut."";let v=mut.a;lp(isz(v)=0){let r=modsmall(v;10);out=s.concat(s.slice(digs;r;r+1);out);v=divsmall(v;10)};<out};
+f=hashparts(parts:@byte):@i64{<tobig(cr.sha256(parts))};
+f=main():$i64{
+let msg=io.readln();
+let signerline=io.readln();
+let privhex=s.trim(io.readln());
+let keysline=io.readln();
+let signer=s.toint(s.trim(signerline));
+let cleaned=s.trim(keysline);
+let inner=s.slice(cleaned;1;s.len(cleaned)-1);
+let rawparts=s.split(inner;",");
+let n=rawparts.len();
+let pubs=mut.@();
+let pi=mut.0;
+lp(pi<n){let pstr=rawparts.get(pi);let trimmed=s.slice(pstr;1;s.len(pstr)-1);pubs=pubs+@(trimmed);pi=pi+1};
+let kiacc=mut.@();
+kiacc=hpart(kiacc;sb("KI"));
+kiacc=hpart(kiacc;sb(privhex));
+let concatpubs=mut."";let cp=mut.0;lp(cp<n){concatpubs=s.concat(concatpubs;pubs.get(cp));cp=cp+1};
+kiacc=hpart(kiacc;sb(concatpubs));
+let kibytes=cr.sha256(kiacc);
+let keyimage=enc.hexencode(kibytes);
+let mseed=mut.@();
+let msb=s.bytes(msg);let mi=mut.0;lp(mi<msb.len()){mseed=mseed+@(msb.get(mi));mi=mi+1};
+let ssb=s.bytes(s.fromint(signer));let si=mut.0;lp(si<ssb.len()){mseed=mseed+@(ssb.get(si));si=si+1};
+let psb=s.bytes(privhex);let pii=mut.0;lp(pii<psb.len()){mseed=mseed+@(psb.get(pii));pii=pii+1};
+cp=0;lp(cp<n){let pb=s.bytes(pubs.get(cp));let qi=mut.0;lp(qi<pb.len()){mseed=mseed+@(pb.get(qi));qi=qi+1};cp=cp+1};
+let seed=cr.sha256(mseed);
+let s0=cr.sha256(cat(cat(seed;sb("|"));sb(s.fromint(0))));
+let alpha=reduceq(tobig(s0));
+let svals=mut.@();let cvals=mut.@();let ai=mut.0;lp(ai<n){svals=svals+@(zero16());cvals=cvals+@(zero16());ai=ai+1};
+let two=mut.zero16();two=two.set(0;2);
+let lsigner=modexp(two;alpha);
+let hpacc=mut.@();hpacc=hpart(hpacc;sb("HP"));hpacc=hpart(hpacc;digbytes(kibytes));hpacc=hpart(hpacc;sb(todec(alpha)));
+let rsigner=reduceq(hashparts(hpacc));
+let idx=mut.signer+1;if(idx>=n){idx=idx-n};
+let cacc=mut.@();cacc=hpart(cacc;sb("C"));cacc=hpart(cacc;sb(msg));cacc=hpart(cacc;sb(keyimage));cacc=hpart(cacc;tobytes32(lsigner));cacc=hpart(cacc;tobytes32(rsigner));cacc=hpart(cacc;sb(s.fromint(idx)));
+cvals=cvals.set(idx;reduceq(hashparts(cacc)));
+let jj=mut.idx;
+lp(jj!=signer){
+  let sjraw=cr.sha256(cat(cat(seed;sb("|"));sb(s.fromint(jj+1))));
+  let sj=reduceq(tobig(sjraw));
+  svals=svals.set(jj;sj);
+  let pubj=reduceq(tobig(enc.hexdecode(pubs.get(jj))));
+  let term1=modexp(two;sj);
+  let term2=modexp(pubj;cvals.get(jj));
+  let lj=mulmod(term1;term2);
+  let hp2=mut.@();hp2=hpart(hp2;sb("HP"));hp2=hpart(hp2;digbytes(kibytes));hp2=hpart(hp2;sb(todec(sj)));hp2=hpart(hp2;sb(todec(cvals.get(jj))));hp2=hpart(hp2;sb(s.fromint(jj)));
+  let rj=reduceq(hashparts(hp2));
+  let nxt=mut.jj+1;if(nxt>=n){nxt=nxt-n};
+  let cacc2=mut.@();cacc2=hpart(cacc2;sb("C"));cacc2=hpart(cacc2;sb(msg));cacc2=hpart(cacc2;sb(keyimage));cacc2=hpart(cacc2;tobytes32(lj));cacc2=hpart(cacc2;tobytes32(rj));cacc2=hpart(cacc2;sb(s.fromint(nxt)));
+  cvals=cvals.set(nxt;reduceq(hashparts(cacc2)));
+  jj=nxt;
+};
+let privint=reduceq(tobig(enc.hexdecode(privhex)));
+let cs=cvals.get(signer);
+let prod=mulmod(cs;privint);
+let ssigner=submod(alpha;prod);
+svals=svals.set(signer;ssigner);
+let out=mut.s.concat("{\"key_image\": \"";s.concat(keyimage;"\", \"c0\": \""));
+out=s.concat(out;tohex64(cvals.get(0)));
+out=s.concat(out;"\", \"s_values\": [");
+let oi=mut.0;lp(oi<n){if(oi>0){out=s.concat(out;", ")};out=s.concat(out;s.concat("\"";s.concat(tohex64(svals.get(oi));"\"")));oi=oi+1};
+out=s.concat(out;"]}");
+io.println(out);
+<0}

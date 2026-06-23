@@ -1,1 +1,68 @@
-m=memprof;f=solve(p0:$str;p1:i64):$str{let lines=p0.split("\n");let total=mut.0;let count=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let isalloc=line.contains("alloc");if(isalloc){let parts=line.split(" ");let val=parts.get(1);let addr=parts.get(3);let size=parts.get(5);let cost=mut.0;let szval=size.toi64();if(szval>1024){let kbval=szval/1024;cost=kbval}el{cost=szval}};total=total+cost;count=count+1}};let avg=mut.0;if(count>0){avg=total/count}el{avg=0};let result=mut."";let avgs=avg.toi64();let avgsval=avgs;result=s.concat(result;"Total: ");result=s.concat(result;avgsval) as$str;result=s.concat(result;" MB");<result};
+m=allocprof;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let a=s.split(obj;pat);
+  if(a.len()<2){<""};
+  let rest=a.get(1);
+  let b=s.split(rest;"\"");
+  <b.get(0);
+};
+f=getint(obj:$str;key:$str):$i64{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let a=s.split(obj;pat);
+  if(a.len()<2){<0};
+  let rest=a.get(1);
+  let b=s.split(rest;",");
+  let c=s.split(b.get(0);"}");
+  <s.toint(c.get(0));
+};
+f=fmtbytes(v:$i64):$str{
+  if(v>=1048576){
+    let f=v;
+    <s.concat(s.format(f/1048576.0;"%.1f");" MB");
+  };
+  if(v>=1024){
+    let f=v;
+    <s.concat(s.format(f/1024.0;"%.1f");" KB");
+  };
+  <s.concat(s.fromint(v);" B");
+};
+f=main():$i64{
+let line=s.trim(io.readln());
+let objs=s.split(line;"}");
+let n=objs.len()-1;
+let fns=mut.@("");
+let files=mut.@("");
+let lines=mut.@(0);
+let bytes=mut.@(0);
+let counts=mut.@(0);
+lp(let i=0;i<n;i=i+1){
+  let o=objs.get(i);
+  fns=fns+@(getstr(o;"function"));
+  files=files+@(getstr(o;"file"));
+  lines=lines+@(getint(o;"line"));
+  bytes=bytes+@(getint(o;"alloc_bytes"));
+  counts=counts+@(getint(o;"alloc_count"));
+};
+let idx=mut.@(0);
+lp(let i=0;i<n;i=i+1){idx=idx+@(i+1)};
+lp(let a=0;a<n;a=a+1){
+  lp(let b=0;b<n-1-a;b=b+1){
+    let i0=idx.get(b+1);
+    let i1=idx.get(b+2);
+    if(bytes.get(i0)<bytes.get(i1)){
+      idx=idx.set(b+1;i1);
+      idx=idx.set(b+2;i0);
+    };
+  };
+};
+let top=mut.n;
+if(n>10){top=10};
+lp(let r=0;r<top;r=r+1){
+  let k=idx.get(r+1);
+  let l1=s.concat(s.fromint(r+1);s.concat(". ";s.concat(fns.get(k);s.concat(" (";s.concat(files.get(k);s.concat(":";s.concat(s.fromint(lines.get(k));")")))))));
+  io.println(l1);
+  let l2=s.concat("   ";s.concat(fmtbytes(bytes.get(k));s.concat(" in ";s.concat(s.fromint(counts.get(k));" allocs"))));
+  io.println(l2);
+};
+<0}

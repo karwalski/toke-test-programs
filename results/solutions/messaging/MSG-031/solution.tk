@@ -1,17 +1,24 @@
-m=x3dh;i=io:std.io;i=s:std.str;i=crypto:std.crypto;i=enc:std.encoding;
-f=hexbyte(n:$i64):$str{let d="0123456789abcdef";let hi=s.slice(d;n/16;n/16+1);let lo=s.slice(d;n-n/16*16;n-n/16*16+1);<s.concat(hi;lo)};
-f=strhex(str:$str):$str{<enc.hexencode(s.bytes(str))};
-f=sha256hex(hexin:$str):$str{<s.frombytes(crypto.sha256(enc.hexdecode(hexin)))};
-f=hmacsha256hex(keyhex:$str;msghex:$str):$str{<s.frombytes(crypto.hmacsha256(enc.hexdecode(keyhex);enc.hexdecode(msghex)))};
-f=simdh(k1:$str;k2:$str):$str{let a=mut.k1;let b=mut.k2;if(s.eq(a;b)){}el{let i=mut.0;let swap=mut.false;let decided=mut.false;lp(i<s.len(a)){if(!decided){let ca=s.slice(a;i;i+1);let cb=s.slice(b;i;i+1);if(!s.eq(ca;cb)){if(!(ca<cb)){swap=true};decided=true}};i=i+1};if(swap){let t=a;a=b;b=t}};<sha256hex(s.concat(a;b))};
-f=hkdf(salthex:$str;ikmhex:$str;infohex:$str):$str{let prk=hmacsha256hex(salthex;ikmhex);let okm=mut."";let t=mut."";let i=mut.1;lp(s.len(okm)<64){let msg=s.concat(s.concat(t;infohex);hexbyte(i));t=hmacsha256hex(prk;msg);okm=s.concat(okm;t);i=i+1};<s.slice(okm;0;64)};
-f=main():$i64{let ikA=s.trim(io.readln());let ikB=s.trim(io.readln());let spkB=s.trim(io.readln());let opkB=s.trim(io.readln());
-let ekA=sha256hex(s.concat(s.concat(strhex("EK_A");ikA);ikB));
-let dh1=simdh(ikA;spkB);let dh2=simdh(ekA;ikB);let dh3=simdh(ekA;spkB);let dh4=simdh(ekA;opkB);
-let shared=s.concat(s.concat(s.concat(dh1;dh2);dh3);dh4);
-let salt="0000000000000000000000000000000000000000000000000000000000000000";
-let info=strhex("X3DH-SHA256");
-let sessionkey=hkdf(salt;shared;info);
-let ad=s.concat(ikA;ikB);
-let out=mut.s.concat("{\"shared_secret\": \"";shared);out=s.concat(out;"\", \"session_key\": \"");out=s.concat(out;sessionkey);out=s.concat(out;"\", \"associated_data\": \"");out=s.concat(out;ad);out=s.concat(out;"\"}");
-io.println(out);<0}
+m=x3dh;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
+f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1=1};if(y<x){<1=0}};<la<lb};
+f=simdh(k1:@$i64;k2:@$i64):@$i64{let lo=mut.k1;let hi=mut.k2;if(blt(k2;k1)){lo=k2;hi=k1};<cr.sha256(bcat(lo;hi))};
+f=main():$i64{
+let ika=enc.hexdecode(s.trim(io.readln()));
+let ikb=enc.hexdecode(s.trim(io.readln()));
+let spkb=enc.hexdecode(s.trim(io.readln()));
+let opkb=enc.hexdecode(s.trim(io.readln()));
+let pre=bcat(s.bytes("EK_A");ika);
+let eka=cr.sha256(bcat(pre;ikb));
+let dh1=simdh(ika;spkb);
+let dh2=simdh(eka;ikb);
+let dh3=simdh(eka;spkb);
+let dh4=simdh(eka;opkb);
+let ss=bcat(bcat(bcat(dh1;dh2);dh3);dh4);
+let salt=mut.@(0);lp(let i=0;i<31;i=i+1){salt=salt+@(0)};
+let prk=cr.hmacsha256(salt;ss);
+let info=bcat(s.bytes("X3DH-SHA256");@(1));
+let sk=cr.hmacsha256(prk;info);
+let ad=bcat(ika;ikb);
+let out=s.concat("{\"shared_secret\": \"";s.concat(enc.hexencode(ss);s.concat("\", \"session_key\": \"";s.concat(enc.hexencode(sk);s.concat("\", \"associated_data\": \"";s.concat(enc.hexencode(ad);"\"}"))))));
+io.println(out);
+<0}

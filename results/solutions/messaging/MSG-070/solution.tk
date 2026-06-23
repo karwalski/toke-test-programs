@@ -1,10 +1,47 @@
-m=rotkey;
-i=io:std.io;
-i=s:std.str;
-i=enc:std.encoding;
-f=tohex(n:$i64):$str{let d="0123456789abcdef";let hi=n/16;let lo=n-hi*16;<s.concat(s.slice(d;hi;hi+1);s.slice(d;lo;lo+1))};
-f=xorb(a:$i64;b:$i64):$i64{let r=mut.0;let bit=mut.1;let x=mut.a;let y=mut.b;lp(let i=0;i<8;i=i+1){let xb=x-(x/2)*2;let yb=y-(y/2)*2;if(xb!=yb){r=r+bit};bit=bit*2;x=x/2;y=y/2};<r};
-f=findkey(ring:$str;version:$i64):$str{let pat=s.concat(s.concat("\"version\":";s.fromint(version));",");let ki=s.indexof(ring;pat);if(ki<0){<""};let rest=s.slice(ring;ki;s.len(ring));let kp=s.indexof(rest;"\"key\":\"");let after=s.slice(rest;kp+7;s.len(rest));let qe=s.indexof(after;"\"");<s.slice(after;0;qe)};
-f=main():$i64{let ringline=io.readln();let active=s.toint(s.trim(io.readln()));let op=s.trim(io.readln());let payload=io.readln();let payload2=s.trim(payload);
-let keyhex=findkey(ringline;active);let key=enc.hexdecode(keyhex);let klen=key.len();
-if(s.equals(op;"encrypt")){let pt=s.bytes(payload2);let out=mut.enc.hexdecode("");let i=mut.0;lp(i<pt.len()){let kb=key.get(i-(i/klen)*klen) as$i64;let pb=pt.get(i) as$i64;let x=xorb(pb;kb);out=out+enc.hexdecode(tohex(x));i=i+1};io.println(s.concat(s.concat(s.concat("v";s.fromint(active));":");enc.b64encode(out)))}el{let ci=s.indexof(payload2;":");let prefix=s.slice(payload2;0;ci);let b64=s.slice(payload2;ci+1;s.len(payload2));let version=s.toint(s.slice(prefix;1;s.len(prefix)));let vkeyhex=findkey(ringline;version);let vkey=enc.hexdecode(vkeyhex);let vklen=vkey.len();let ct=enc.b64decode(b64);let out=mut.enc.hexdecode("");let i=mut.0;lp(i<ct.len()){let kb=vkey.get(i-(i/vklen)*vklen) as$i64;let cb=ct.get(i) as$i64;let x=xorb(cb;kb);out=out+enc.hexdecode(tohex(x));i=i+1};let pt=s.frombytes(out);io.println(s.concat(s.concat(s.concat(pt;" (decrypted with key v");s.fromint(version));")"))};<0}
+m=rotkey;i=io:std.io;i=s:std.str;i=enc:std.encoding;
+f=xorcyc(p:@$i64;k:@$i64):@$i64{let r=mut.@();let kl=k.len();lp(let i=0;i<p.len();i=i+1){let kb=k.get(i-i/kl*kl);r=r+@(p.get(i)^kb)};<r};
+f=getkey(js:$str;ver:$i64):$str{
+  let tok=s.concat("\"version\":";s.fromint(ver));
+  let vi=s.indexof(js;tok);
+  let rest=s.slice(js;vi;s.len(js));
+  let kmark=s.indexof(rest;"\"key\":\"");
+  let after=s.slice(rest;kmark+7;s.len(rest));
+  let endq=s.indexof(after;"\"");
+  <s.slice(after;0;endq)
+};
+f=render(b:@$i64):$str{
+  let out=mut.@();
+  lp(let i=0;i<b.len();i=i+1){
+    let c=b.get(i);
+    if(c<32){out=out+@(63)}el{
+      if(c<128){out=out+@(c)}el{out=out+@(239)+@(191)+@(189)}
+    }
+  };
+  <s.frombytes(out)
+};
+f=main():$i64{
+  let keyring=s.trim(io.readln());
+  let active=s.toint(s.trim(io.readln()));
+  let op=s.trim(io.readln());
+  let payload=s.trim(io.readln());
+  if(s.eq(op;"encrypt")){
+    let kh=getkey(keyring;active);
+    let kb=enc.hexdecode(kh);
+    let pb=s.bytes(payload);
+    let ct=xorcyc(pb;kb);
+    let b64=enc.b64encode(ct);
+    io.println(s.concat("v";s.concat(s.fromint(active);s.concat(":";b64))));
+    <0
+  };
+  let ci=s.indexof(payload;":");
+  let prefix=s.slice(payload;0;ci);
+  let body=s.slice(payload;ci+1;s.len(payload));
+  let ver=s.toint(s.slice(prefix;1;s.len(prefix)));
+  let kh=getkey(keyring;ver);
+  let kb=enc.hexdecode(kh);
+  let ct=enc.b64decode(body);
+  let pt=xorcyc(ct;kb);
+  let txt=render(pt);
+  io.println(s.concat(txt;s.concat(" (decrypted with key v";s.concat(s.fromint(ver);")"))));
+  <0
+};

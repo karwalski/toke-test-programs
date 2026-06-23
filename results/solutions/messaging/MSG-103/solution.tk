@@ -1,1 +1,27 @@
-m=encverify;f=solve(p0:$str;p1:$str):$str{let a=p0;let b=p1;let alen=a.len;let blen=b.len;let halfalen=alen/2;let halfblen=blen/2;let prefix="encverify:";let halfa=a.substr(0;halfalen);let halfb=b.substr(0;halfblen);let result=s.concat(s.concat(s.concat(prefix;halfa);"...");halfb);let resultlen=result.len;let maxlen=64;if(resultlen>maxlen){let truncated=result.substr(0;maxlen-3);let final=s.concat(truncated;"...");<final}el{<result}}
+m=qrkey;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
+f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
+f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1=1};if(y<x){<1=0}};<la<lb};
+f=todec(b:@$i64):$str{let dig=mut.@(0);let n=b.len();lp(let i=0;i<n;i=i+1){let by=b.get(i);let carry=mut.by;let m=dig.len();let nd=mut.@();lp(let j=0;j<m;j=j+1){let v=dig.get(j)*256+carry;nd=nd+@(v-v/10*10);carry=v/10};lp(carry>0){nd=nd+@(carry-carry/10*10);carry=carry/10};dig=nd};
+let out=mut."";let ln=dig.len();lp(let k=0;k<ln;k=k+1){let d=dig.get(ln-1-k);out=s.concat(out;s.fromint(d))};
+if(s.len(out)=0){out="0"};<out};
+f=main():$i64{
+let version=s.toint(s.trim(io.readln()));
+let ka=s.trim(io.readln());
+let kb=s.trim(io.readln());
+let ba=enc.hexdecode(ka);let bb=enc.hexdecode(kb);
+let loB=mut.ba;let hiB=mut.bb;
+if(blt(bb;ba)){loB=bb;hiB=ba};
+let combined=bcat(loB;hiB);
+let fp=cr.sha256(combined);
+let fphex=enc.hexencode(fp);
+let payload=bcat(@(version);fp);
+let qr=enc.b64encode(payload);
+let dec=todec(fp);
+let padded=mut.dec;lp(s.len(padded)<78){padded=s.concat("0";padded)};
+let first30=s.slice(padded;0;30);
+let groups=mut."";lp(let g=0;g<6;g=g+1){let piece=s.slice(first30;g*5;g*5+5);if(g>0){groups=s.concat(groups;" ")};groups=s.concat(groups;piece)};
+io.println(s.concat("qr_payload: ";qr));
+io.println(s.concat("numeric_code: ";groups));
+io.println(s.concat("version: ";s.fromint(version)));
+io.println(s.concat("fingerprint: ";fphex));
+<0}

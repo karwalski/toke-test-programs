@@ -1,7 +1,108 @@
-{
-  "subject": "CN=alice@example.com",
-  "issuer": "CN=ca@example.com",
-  "public_key": "RSA_2048",
-  "valid_from": "2026-01-01",
-  "valid_to": "2027-01-01"
-}
+m=cert;i=io:std.io;i=s:std.str;i=cr:std.crypto;i=enc:std.encoding;
+f=m32(x:$i64):$i64{<x&4294967295};
+f=initgenrand(seed:$i64):@i64{
+  let mtab=mut.@();mtab=mtab+@(seed&4294967295);
+  let i=mut.1;
+  lp(i<624){
+    let prev=mtab.get(i-1);
+    let v=m32(1812433253*(prev^((prev>>30)&3))+i);
+    mtab=mtab+@(v);
+    i=i+1;
+  };
+  <mtab};
+f=initbyarray(keyarr:@i64):@i64{
+  let mtab=mut.initgenrand(19650218);
+  let klen=keyarr.len();
+  let i=mut.1;let j=mut.0;
+  let kk=mut.624;if(klen>624){kk=klen};
+  lp(kk>0){
+    let prev=mtab.get(i-1);
+    let mixed=mtab.get(i)^m32((prev^((prev>>30)&3))*1664525);
+    mtab=mtab.set(i;m32(m32(mixed+keyarr.get(j))+j));
+    i=i+1;j=j+1;
+    if(i>=624){mtab=mtab.set(0;mtab.get(623));i=1};
+    if(j>=klen){j=0};
+    kk=kk-1;
+  };
+  kk=623;
+  lp(kk>0){
+    let prev=mtab.get(i-1);
+    let mixed=mtab.get(i)^m32((prev^((prev>>30)&3))*1566083941);
+    mtab=mtab.set(i;m32(mixed-i));
+    i=i+1;
+    if(i>=624){mtab=mtab.set(0;mtab.get(623));i=1};
+    kk=kk-1;
+  };
+  mtab=mtab.set(0;2147483648);
+  <mtab};
+f=genrand(mtab:@i64;idx:$i64):@i64{
+  let st=mut.mtab;
+  let kk=mut.0;
+  lp(kk<227){
+    let y=(st.get(kk)&2147483648)|(st.get(kk+1)&2147483647);
+    let mag=mut.0;if((y&1)!=0){mag=2567483615};
+    st=st.set(kk;st.get(kk+397)^((y>>1)&2147483647)^mag);
+    kk=kk+1;
+  };
+  lp(kk<623){
+    let y=(st.get(kk)&2147483648)|(st.get(kk+1)&2147483647);
+    let mag=mut.0;if((y&1)!=0){mag=2567483615};
+    st=st.set(kk;st.get(kk+(397-624))^((y>>1)&2147483647)^mag);
+    kk=kk+1;
+  };
+  let y2=(st.get(623)&2147483648)|(st.get(0)&2147483647);
+  let mag2=mut.0;if((y2&1)!=0){mag2=2567483615};
+  st=st.set(623;st.get(396)^((y2>>1)&2147483647)^mag2);
+  <st};
+f=temper(y0:$i64):$i64{
+  let y=mut.y0;
+  y=y^((y>>11)&2097151);
+  y=y^((y<<7)&2636928640);
+  y=y^((y<<15)&4022730752);
+  y=y^((y>>18)&16383);
+  <y&4294967295};
+f=serial(line:$str):$str{
+  let sb=s.bytes(line);
+  let dig=cr.sha512(sb);
+  let allb=mut.@();let a=mut.0;lp(a<sb.len()){allb=allb+@(sb.get(a));a=a+1};
+  let b=mut.0;lp(b<dig.len()){allb=allb+@(dig.get(b));b=b+1};
+  let total=allb.len();
+  let words=mut.@();
+  let pos=mut.total-1;
+  lp(pos>=0){
+    let w=mut.0;let shift=mut.0;let cnt=mut.0;
+    lp((cnt<4)&&(pos>=0)){w=w|(allb.get(pos)<<shift);shift=shift+8;pos=pos-1;cnt=cnt+1};
+    words=words+@(w&4294967295);
+  };
+  let mtab=initbyarray(words);
+  let state=mut.mtab;let index=mut.624;
+  let out=mut."";
+  let hexd="0123456789abcdef";
+  let cc=mut.0;
+  lp(cc<16){
+    let val=mut.0;let done=mut.0;
+    lp(done<1){
+      if(index>=624){state=genrand(state;0);index=0};
+      let raw=temper(state.get(index));index=index+1;
+      let bits9=(raw>>23)&511;
+      if(bits9<256){val=bits9;done=1};
+    };
+    out=s.concat(out;s.slice(hexd;(val>>4)&15;((val>>4)&15)+1));
+    out=s.concat(out;s.slice(hexd;val&15;(val&15)+1));
+    cc=cc+1;
+  };
+  <out};
+f=main():$i64{
+  let subject=s.trim(io.readln());
+  let issuer=s.trim(io.readln());
+  let pk=s.trim(io.readln());
+  let nb=s.trim(io.readln());
+  let na=s.trim(io.readln());
+  let sm=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(subject;"|");issuer);"|");pk);"|");nb);"|");na);
+  let ser=serial(sm);
+  let body=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("\"issuer\":\"";issuer);"\",\"public_key\":\"");pk);"\",\"serial\":\"");ser);"\",\"subject\":\"");subject);"\",\"validity\":{\"not_after\":\"");na);"\",\"not_before\":\"");nb);
+  let canon=s.concat(s.concat("{";body);"\"}}");
+  let fp=enc.hexencode(cr.sha256(s.bytes(canon)));
+  let full=s.concat(s.concat(s.concat(s.concat(s.concat("{\"fingerprint\":\"";fp);"\",");body);"\"}}");"");
+  io.println(full);
+  <0}

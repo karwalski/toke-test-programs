@@ -1,10 +1,10 @@
 {
   "counters": {
-    "GENUINE": 1104,
-    "TRIVIAL": 162,
-    "REGRESSED-RUN": 75,
-    "REGRESSED-COMPILE": 663,
-    "REGRESSED-BUILD": 46,
+    "GENUINE": 1124,
+    "TRIVIAL": 174,
+    "REGRESSED-RUN": 64,
+    "REGRESSED-COMPILE": 651,
+    "REGRESSED-BUILD": 37,
     "SUSPECT": 6,
     "DUAL-BRANCH-SAME-OUTPUT": 1
   },
@@ -137,24 +137,14 @@
     {
       "id": "AIA-013",
       "category": "ai-agents",
-      "verdict": "GENUINE",
-      "src_len": 1886,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1886
     },
     {
       "id": "AIA-014",
       "category": "ai-agents",
-      "verdict": "GENUINE",
-      "src_len": 3207,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 3207
     },
     {
       "id": "AIA-015",
@@ -1383,13 +1373,8 @@
     {
       "id": "FIN-008",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
-      "src_len": 1671,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1671
     },
     {
       "id": "FIN-009",
@@ -1654,13 +1639,8 @@
     {
       "id": "FIN-032",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
-      "src_len": 1706,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1706
     },
     {
       "id": "FIN-033",
@@ -2816,18 +2796,23 @@
       "id": "CRY-011",
       "category": "crypto-blockchain",
       "verdict": "GENUINE",
-      "src_len": 613,
+      "src_len": 209,
       "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
+        "loop": false,
+        "if": false,
+        "helpers": false
       }
     },
     {
       "id": "CRY-012",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 388
+      "verdict": "GENUINE",
+      "src_len": 3021,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-013",
@@ -2854,14 +2839,24 @@
     {
       "id": "CRY-015",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 189
+      "verdict": "GENUINE",
+      "src_len": 3155,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-016",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1442
+      "verdict": "GENUINE",
+      "src_len": 496,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-017",
@@ -2872,8 +2867,13 @@
     {
       "id": "CRY-018",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 676
+      "verdict": "GENUINE",
+      "src_len": 796,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-019",
@@ -2908,12 +2908,12 @@
       "id": "CRY-022",
       "category": "crypto-blockchain",
       "verdict": "REGRESSED-RUN",
-      "src_len": 380,
+      "src_len": 6203,
       "failed_tests": [
         {
           "test": 1,
-          "actual": "",
-          "expected": "6\ufffd\u0596v\u001be\ufffd\u001a[( U\u0003u\ufffd.|2\ufffd\u0013\ufffd\ufffd\u0005\ufffd\u0482y\ufffdI\u0012\ufffd"
+          "actual": "6\ufffd\u0596v\u001be\ufffd\u001a[( U\u0003u\ufffd.|2\ufffd\u0013\ufffd\ufffd\u0005\ufffd\u0482y\ufffdI\u0012\ufffd",
+          "expected": "6\ufffd\u0596v?e\ufffd?[( U?u\ufffd.|2\ufffd?\ufffd\ufffd?\ufffd\u0482y\ufffdI?\ufffd"
         }
       ]
     },
@@ -2932,8 +2932,13 @@
     {
       "id": "CRY-025",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 649
+      "verdict": "GENUINE",
+      "src_len": 5912,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-026",
@@ -3027,20 +3032,8 @@
     {
       "id": "CRY-038",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 350,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "<16-char password with mixed chars>"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "<32-char password with mixed chars>"
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 350
     },
     {
       "id": "CRY-039",
@@ -3062,8 +3055,13 @@
     {
       "id": "CRY-041",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 577
+      "verdict": "GENUINE",
+      "src_len": 4195,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-042",
@@ -3074,15 +3072,13 @@
     {
       "id": "CRY-043",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 2281,
-      "failed_tests": [
-        {
-          "test": 2,
-          "actual": "5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnu5qPN",
-          "expected": "5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1217,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-044",
@@ -3411,8 +3407,13 @@
     {
       "id": "CRY-077",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 158
+      "verdict": "GENUINE",
+      "src_len": 3690,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-078",
@@ -3434,8 +3435,13 @@
     {
       "id": "CRY-080",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 1017
+      "verdict": "GENUINE",
+      "src_len": 1222,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-081",
@@ -3464,25 +3470,13 @@
     {
       "id": "CRY-083",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 977,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "{\"key_image\":\"540\",\"c0\":\"7c\",\"s_values\":[\"156\",\"16d\",\"184\"]}",
-          "expected": "{\"key_image\": \"6340d0bfee2e9d04fcc13ecdaf9830b17a22e57eb817f8b64830c23481fa57d6\", \"c0\": \"7435735cc5bdfd69708a024561b7693"
-        },
-        {
-          "test": 2,
-          "actual": "{\"key_image\":\"521\",\"c0\":\"76\",\"s_values\":[\"15e\",\"175\"]}",
-          "expected": "{\"key_image\": \"89f232f3e2c8514e2eff9193d8d0937ee8d7c3beae4962a03f6bfd98c8bf5bd6\", \"c0\": \"3dc3e166fbe82efacb7054109364bb1"
-        },
-        {
-          "test": 3,
-          "actual": "{\"key_image\":\"657\",\"c0\":\"ff\",\"s_values\":[\"187\",\"19e\",\"1b5\",\"1cc\"]}",
-          "expected": "{\"key_image\": \"6cc67a634c27cf88293601959574c5288decc13677db6a9fe8d0f2bae967e07a\", \"c0\": \"ee6387003fdea4e7ae0a29e1978dee8"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 7680,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-084",
@@ -3511,7 +3505,7 @@
     {
       "id": "CRY-087",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 260
     },
     {
@@ -3717,50 +3711,37 @@
     {
       "id": "CRY-106",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 659
+      "verdict": "TRIVIAL",
+      "src_len": 1053,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "CRY-107",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 313
+      "verdict": "GENUINE",
+      "src_len": 3509,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-108",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 513,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1782,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-109",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 513,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "<base64 signature>"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "<base64 signature>"
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 513
     },
     {
       "id": "CRY-110",
@@ -3788,8 +3769,13 @@
     {
       "id": "CRY-113",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2991
+      "verdict": "GENUINE",
+      "src_len": 3069,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-114",
@@ -3878,8 +3864,13 @@
     {
       "id": "CRY-123",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 400
+      "verdict": "GENUINE",
+      "src_len": 4890,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-124",
@@ -3977,8 +3968,13 @@
     {
       "id": "CRY-134",
       "category": "crypto-blockchain",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 477
+      "verdict": "GENUINE",
+      "src_len": 3619,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "CRY-135",
@@ -4450,8 +4446,13 @@
     {
       "id": "DAT-046",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 599
+      "verdict": "GENUINE",
+      "src_len": 2597,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-047",
@@ -5205,8 +5206,13 @@
     {
       "id": "DAT-127",
       "category": "data-processing",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 182
+      "verdict": "GENUINE",
+      "src_len": 3257,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DAT-128",
@@ -5415,9 +5421,8 @@
     {
       "id": "DEV-020",
       "category": "devtools",
-      "verdict": "TRIVIAL",
-      "src_len": 1368,
-      "reason": "input-discriminator hardcoded output"
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1368
     },
     {
       "id": "DEV-021",
@@ -5467,13 +5472,8 @@
     {
       "id": "DEV-026",
       "category": "devtools",
-      "verdict": "GENUINE",
-      "src_len": 1229,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1229
     },
     {
       "id": "DEV-027",
@@ -6320,8 +6320,13 @@
     {
       "id": "DEV-107",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 763
+      "verdict": "GENUINE",
+      "src_len": 653,
+      "structural": {
+        "loop": false,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-108",
@@ -6446,8 +6451,13 @@
     {
       "id": "DEV-123",
       "category": "devtools",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 640
+      "verdict": "GENUINE",
+      "src_len": 1793,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "DEV-124",
@@ -6659,13 +6669,8 @@
     {
       "id": "EDU-016",
       "category": "education",
-      "verdict": "GENUINE",
-      "src_len": 1390,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1390
     },
     {
       "id": "EDU-017",
@@ -7971,25 +7976,8 @@
     {
       "id": "GAM-015",
       "category": "games",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 556,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "BBGBB"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "GGGGG"
-        },
-        {
-          "test": 3,
-          "actual": "",
-          "expected": "GYBGB"
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 556
     },
     {
       "id": "GAM-016",
@@ -8582,13 +8570,20 @@
     {
       "id": "GAM-085",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1333,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "1 20  9 14  3\n10 15  2 19 24\n21  8 23  4 13\n16 11  6 25 18\n 7 22 17 12  5",
+          "expected": "1 12 21 18 13\n20 17 14  7 22\n11  2 19  4 25\n16  5  8 23  6\n 9 10  3 24 15"
+        },
+        {
+          "test": 2,
+          "actual": "1 16 31 40  3 18 21 56\n30 39  2 17 42 55  4 19\n15 32 41 46 53 20 57 22\n38 29 48 43 58 45 54  5\n33 14 37 52 47 60 23 62\n2",
+          "expected": "1 60 39 34 31 18  9 64\n38 35 32 61 10 63 30 17\n59  2 37 40 33 28 19  8\n36 49 42 27 62 11 16 29\n43 58  3 50 41 24  7 20\n4"
+        }
+      ]
     },
     {
       "id": "GAM-086",
@@ -8771,7 +8766,7 @@
     {
       "id": "GAM-107",
       "category": "games",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 302
     },
     {
@@ -10322,20 +10317,8 @@
     {
       "id": "MED-009",
       "category": "media-content",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 541,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "fog: 0.0",
-          "expected": "fog: 1.6"
-        },
-        {
-          "test": 2,
-          "actual": "fog: 0.0",
-          "expected": "fog: 17.0"
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 541
     },
     {
       "id": "MED-010",
@@ -11405,11 +11388,6 @@
           "test": 1,
           "actual": "Hello",
           "expected": "HelloWorld"
-        },
-        {
-          "test": 2,
-          "actual": "Normal text",
-          "expected": "Normaltext"
         }
       ]
     },
@@ -11461,7 +11439,7 @@
     {
       "id": "MED-115",
       "category": "media-content",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 299
     },
     {
@@ -11637,22 +11615,17 @@
       "id": "MSG-006",
       "category": "messaging",
       "verdict": "REGRESSED-RUN",
-      "src_len": 220,
+      "src_len": 6167,
       "failed_tests": [
         {
           "test": 1,
-          "actual": "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex",
+          "actual": "TIMEOUT",
           "expected": "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c2"
         },
         {
           "test": 2,
-          "actual": "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex",
+          "actual": "TIMEOUT",
           "expected": "044491633d71f2a5b9a12de562118352abd28a601c9e4c775643f8b7ec00bb4a71f3406d41c88ee6a05773bfa7e6832dd9b7afd7c22935dda88fe3d6"
-        },
-        {
-          "test": 3,
-          "actual": "alice_pub_hex\nbob_pub_hex\nshared_secret_hex\naes_key_hex",
-          "expected": "046b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c2964fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb640"
         }
       ]
     },
@@ -11909,20 +11882,13 @@
     {
       "id": "MSG-031",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1820,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "{\"shared_secret\": \"7e0381d5c644fa626f561fc894a9d8d8d3bcbd5a420e1bbcdd851bbd8333feea85d490be7a490672f8090ac0f99fc81a86b20",
-          "expected": "{\"shared_secret\": \"46e7a40d1c7b3cd811478b9b8cef201528eb0e14ba10d7584794f939998e5239f0917d3afb110a88e4e85a72665d520d684f8"
-        },
-        {
-          "test": 2,
-          "actual": "{\"shared_secret\": \"283a87cf2763e14b14387d787e6f7bf44fa854510e8d36e5cba83791132c88904044e910fce58da3f7bcb82aeb60d122441ba",
-          "expected": "{\"shared_secret\": \"74a09476dfee81566010dce337e1db3a7ac1f4b8d48a4d1299f84ed740da4df4ae1d0567b7b2987db7297e9048d4635716685"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1274,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-032",
@@ -12037,8 +12003,13 @@
     {
       "id": "MSG-044",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 533
+      "verdict": "GENUINE",
+      "src_len": 6162,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-045",
@@ -12258,30 +12229,13 @@
     {
       "id": "MSG-070",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 1823,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "v2:",
-          "expected": "v2:t4uxoNSKzucFCjE="
-        },
-        {
-          "test": 2,
-          "actual": "v1:",
-          "expected": "v1:VHlHEzUgDxTjucjJo6qA32Z+Wg=="
-        },
-        {
-          "test": 3,
-          "actual": "(decrypted with key v1)",
-          "expected": "\u0018c2\u0010VDf`\ufffd\ufffd\ufffd\ufffd\ufffd (decrypted with key v1)"
-        },
-        {
-          "test": 4,
-          "actual": "v2:",
-          "expected": "v2:rbnZ6hMg"
-        }
-      ]
+      "verdict": "GENUINE",
+      "src_len": 1541,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-071",
@@ -12338,20 +12292,8 @@
     {
       "id": "MSG-077",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 659,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "",
-          "expected": "msg 1: epoch=0, key=abcdef...\nmsg 2: epoch=0, key=123456...\nmsg 3: epoch=0, key=789abc...\n[KEY ROTATION: epoch 0 -> 1]\nm"
-        },
-        {
-          "test": 2,
-          "actual": "",
-          "expected": "msg 1: epoch=0, key=hash1...\nmsg 2: epoch=0, key=hash2...\n[KEY ROTATION: epoch 0 -> 1]\nmsg 3: epoch=1, key=hash3...\nmsg "
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 659
     },
     {
       "id": "MSG-078",
@@ -12406,8 +12348,13 @@
     {
       "id": "MSG-083",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 368
+      "verdict": "GENUINE",
+      "src_len": 1566,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-084",
@@ -12530,8 +12477,13 @@
     {
       "id": "MSG-096",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 623
+      "verdict": "GENUINE",
+      "src_len": 858,
+      "structural": {
+        "loop": true,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-097",
@@ -12593,8 +12545,13 @@
     {
       "id": "MSG-103",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 437
+      "verdict": "GENUINE",
+      "src_len": 1599,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-104",
@@ -12693,7 +12650,7 @@
     {
       "id": "MSG-115",
       "category": "messaging",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 433
     },
     {
@@ -12705,20 +12662,8 @@
     {
       "id": "MSG-117",
       "category": "messaging",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 620,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "LTR (Latin)\nLTR (Latin)\nLTR (Latin)",
-          "expected": "LTR (Latin)\nRTL (Arabic)\nMIXED (Latin+Arabic, primary: LTR)"
-        },
-        {
-          "test": 2,
-          "actual": "LTR (Latin)\nLTR (Latin)",
-          "expected": "RTL (Hebrew)\nLTR (Latin)"
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 620
     },
     {
       "id": "MSG-118",
@@ -12751,8 +12696,13 @@
     {
       "id": "MSG-121",
       "category": "messaging",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 654
+      "verdict": "GENUINE",
+      "src_len": 1063,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": true
+      }
     },
     {
       "id": "MSG-122",
@@ -13264,8 +13214,9 @@
     {
       "id": "NET-055",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 757
+      "verdict": "TRIVIAL",
+      "src_len": 128,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-056",
@@ -13319,8 +13270,9 @@
     {
       "id": "NET-064",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 505
+      "verdict": "TRIVIAL",
+      "src_len": 172,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-065",
@@ -13463,14 +13415,16 @@
     {
       "id": "NET-086",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 751
+      "verdict": "TRIVIAL",
+      "src_len": 150,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-087",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 757
+      "verdict": "TRIVIAL",
+      "src_len": 148,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-088",
@@ -13487,20 +13441,9 @@
     {
       "id": "NET-090",
       "category": "networking-rest",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 591,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "Listening on :8169\ntraceparent: 00-12345678901234567890123456789012/1234567890123456\ntracestate: otlp;version=1.0.0",
-          "expected": "Listening on :8169"
-        },
-        {
-          "test": 2,
-          "actual": "Listening on :7083\ntraceparent: 00-12345678901234567890123456789012/1234567890123456\ntracestate: otlp;version=1.0.0",
-          "expected": "Listening on :7083"
-        }
-      ]
+      "verdict": "TRIVIAL",
+      "src_len": 152,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-091",
@@ -13707,14 +13650,20 @@
     {
       "id": "NET-121",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 789
+      "verdict": "GENUINE",
+      "src_len": 320,
+      "structural": {
+        "loop": false,
+        "if": false,
+        "helpers": false
+      }
     },
     {
       "id": "NET-122",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 515
+      "verdict": "TRIVIAL",
+      "src_len": 137,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-123",
@@ -13939,8 +13888,9 @@
     {
       "id": "NET-156",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 462
+      "verdict": "TRIVIAL",
+      "src_len": 177,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-157",
@@ -14011,8 +13961,9 @@
     {
       "id": "NET-168",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 695
+      "verdict": "TRIVIAL",
+      "src_len": 194,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-169",
@@ -14053,7 +14004,7 @@
     {
       "id": "NET-175",
       "category": "networking-rest",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 561
     },
     {
@@ -14190,8 +14141,9 @@
     {
       "id": "NET-198",
       "category": "networking-rest",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 590
+      "verdict": "TRIVIAL",
+      "src_len": 127,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "NET-199",
@@ -14966,13 +14918,8 @@
     {
       "id": "SCI-080",
       "category": "scientific-math",
-      "verdict": "GENUINE",
-      "src_len": 1904,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1904
     },
     {
       "id": "SCI-081",
@@ -15399,13 +15346,8 @@
     {
       "id": "SCI-120",
       "category": "scientific-math",
-      "verdict": "GENUINE",
-      "src_len": 1332,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 1332
     },
     {
       "id": "SCI-121",
@@ -16086,8 +16028,13 @@
     {
       "id": "SEC-071",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 788
+      "verdict": "GENUINE",
+      "src_len": 978,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SEC-072",
@@ -16100,7 +16047,7 @@
       "id": "SEC-073",
       "category": "security",
       "verdict": "GENUINE",
-      "src_len": 1214,
+      "src_len": 1182,
       "structural": {
         "loop": false,
         "if": true,
@@ -16228,8 +16175,9 @@
     {
       "id": "SEC-088",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 2303
+      "verdict": "TRIVIAL",
+      "src_len": 647,
+      "reason": "input-discriminator hardcoded output"
     },
     {
       "id": "SEC-089",
@@ -16282,8 +16230,9 @@
     {
       "id": "SEC-097",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 493
+      "verdict": "TRIVIAL",
+      "src_len": 173,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "SEC-098",
@@ -16388,8 +16337,15 @@
     {
       "id": "SEC-112",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 844
+      "verdict": "REGRESSED-RUN",
+      "src_len": 453,
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Error occurred during request",
+          "expected": "200"
+        }
+      ]
     },
     {
       "id": "SEC-113",
@@ -16441,8 +16397,9 @@
     {
       "id": "SEC-120",
       "category": "security",
-      "verdict": "REGRESSED-COMPILE",
-      "src_len": 553
+      "verdict": "TRIVIAL",
+      "src_len": 154,
+      "reason": "tiny no-logic single-main"
     },
     {
       "id": "SEC-121",
@@ -17635,7 +17592,7 @@
     {
       "id": "SOC-130",
       "category": "social-media",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 593
     },
     {
@@ -17670,8 +17627,13 @@
     {
       "id": "SOC-135",
       "category": "social-media",
-      "verdict": "REGRESSED-BUILD",
-      "src_len": 356
+      "verdict": "GENUINE",
+      "src_len": 1861,
+      "structural": {
+        "loop": true,
+        "if": true,
+        "helpers": true
+      }
     },
     {
       "id": "SOC-136",
@@ -17906,6 +17868,11 @@
       "verdict": "REGRESSED-RUN",
       "src_len": 979,
       "failed_tests": [
+        {
+          "test": 1,
+          "actual": "LOCKED_BY 36440",
+          "expected": "ACQUIRED"
+        },
         {
           "test": 2,
           "actual": "LOCKED_BY 36440",
@@ -18241,7 +18208,7 @@
     {
       "id": "SYS-055",
       "category": "system-tools",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 737
     },
     {
@@ -18425,7 +18392,7 @@
       "failed_tests": [
         {
           "test": 1,
-          "actual": "Job 8 queued.",
+          "actual": "Job 11 queued.",
           "expected": "Job 1 queued."
         },
         {
@@ -18438,15 +18405,8 @@
     {
       "id": "SYS-075",
       "category": "system-tools",
-      "verdict": "REGRESSED-RUN",
-      "src_len": 904,
-      "failed_tests": [
-        {
-          "test": 1,
-          "actual": "No differences",
-          "expected": "(diff lines or 'No differences')"
-        }
-      ]
+      "verdict": "REGRESSED-COMPILE",
+      "src_len": 904
     },
     {
       "id": "SYS-076",
