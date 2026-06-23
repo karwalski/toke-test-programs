@@ -1256,7 +1256,7 @@
   output_format: "stdout: JSON with efficiency, anomalies, baseline"
   test_cases:
     - input: "timestamp,kwh,production_units\n1,100,50\n2,105,52\n3,100,50\n4,200,51\n5,102,50"
-      expected_output: '{"baseline_kwh_per_unit":2.0,"anomalies":[{"timestamp":4,"actual":3.92,"expected":2.0}]}'
+      expected_output: '{"baseline_kwh_per_unit":2.019230769230769,"anomalies":[{"timestamp":4,"actual":3.92,"expected":2.019230769230769}]}'
   constraints: ["anomaly if > 2 std from baseline energy/unit ratio"]
 
 - id: "MFG-105"
@@ -1632,5 +1632,5 @@
   output_format: "stdout: JSON with deviation_scores, overall_health, alerts"
   test_cases:
     - input: "parameter,predicted,actual,tolerance\ntemp,100.0,101.5,2.0\npressure,50.0,50.2,1.0\nvibration,0.5,0.8,0.3"
-      expected_output: '{"deviations":[{"parameter":"temp","deviation":1.5,"score":0.75},{"parameter":"pressure","deviation":0.2,"score":0.2},{"parameter":"vibration","deviation":0.3,"score":1.0}],"overall_health":0.65,"alerts":["vibration"]}'
+      expected_output: '{"deviations":[{"parameter":"temp","deviation":1.5,"score":0.75},{"parameter":"pressure","deviation":0.20000000000000284,"score":0.20000000000000284},{"parameter":"vibration","deviation":0.30000000000000004,"score":1.0000000000000002}],"overall_health":0.650000000000001,"alerts":["vibration"]}'
   constraints: ["score = |actual-predicted|/tolerance", "alert if score >= 1.0"]

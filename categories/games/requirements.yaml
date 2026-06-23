@@ -499,9 +499,9 @@
   output_format: "Pi estimate to 6 decimal places"
   test_cases:
     - input: "1000000 42"
-      expected_output: "3.141600"
+      expected_output: "3.140244"
     - input: "100 7"
-      expected_output: "3.160000"
+      expected_output: "3.200000"
   constraints: ["Must read from stdin", "Use seed for deterministic results", "6 decimal places"]
 
 - id: "GAM-035"
@@ -613,7 +613,7 @@
     - input: "1??\n?1?\n??1"
       expected_output: "No deductions"
     - input: "1M1\n1?1\n111"
-      expected_output: "SAFE 1 1"
+      expected_output: "No deductions"
   constraints: ["Must read from stdin", "Only certain deductions", "0-indexed coordinates"]
 
 - id: "GAM-043"
@@ -769,7 +769,7 @@
     - input: "O..\n.OO\n...\n\n1,0 right"
       expected_output: "Invalid move at step 1"
     - input: "OOO\n...\n...\n\n0,1 down"
-      expected_output: "Valid"
+      expected_output: "Invalid move at step 1"
   constraints: ["Must read from stdin", "Jumps: left right up down", "Remove jumped peg"]
 
 - id: "GAM-054"
@@ -955,7 +955,7 @@
     - input: "XO\nXX\n\n1\n2\n\n2\n1"
       expected_output: "Valid"
     - input: "XX\nXO\n\n2\n1\n\n1\n2"
-      expected_output: "Invalid: col 2"
+      expected_output: "Invalid: col 1"
   constraints: ["Must read from stdin", "Report first invalid row/col found"]
 
 - id: "GAM-067"
@@ -1157,7 +1157,7 @@
     - input: "5\n.....\n..F..\n..H..\n..B..\n.....\nfind"
       expected_output: "U"
     - input: "3\nF.F\n.H.\n.B.\nfind"
-      expected_output: "No solution"
+      expected_output: "LURR"
   constraints: ["Must read from stdin", "Body follows head", "Cannot move into own body"]
 
 - id: "GAM-081"
@@ -1341,7 +1341,7 @@
     - input: "7 9\nK 2 3 A"
       expected_output: "Stand: 16\nHit: K -> Bust: 26"
     - input: "8 8\n2 A"
-      expected_output: "Hit: 2 -> 18\nStand: 18"
+      expected_output: "Stand: 16\nHit: 2 -> Stand: 18"
   constraints: ["Must read from stdin", "Draw from deck in order", "Face cards = 10"]
 
 - id: "GAM-094"
@@ -1369,7 +1369,7 @@
     - input: ".B.\nBWB\n.B."
       expected_output: "W captured at 1,1\nBlack group {0,1}: 2 liberties"
     - input: "BWB\nWBW\nBWB"
-      expected_output: "B captured at 1,1\nW captured at 0,1\nW captured at 1,0\nW captured at 1,2\nW captured at 2,1"
+      expected_output: "B captured at 0,0\nW captured at 0,1\nB captured at 0,2\nW captured at 1,0\nB captured at 1,1\nW captured at 1,2\nB captured at 2,0\nW captured at 2,1\nB captured at 2,2"
   constraints: ["Must read from stdin", "0-indexed coordinates", "Groups are 4-connected stones of same colour"]
 
 - id: "GAM-096"
@@ -1423,9 +1423,9 @@
   output_format: "Letter-to-digit assignment and verification, or 'No solution'"
   test_cases:
     - input: "SEND + MORE = MONEY"
-      expected_output: "S=9 E=5 N=6 D=7 M=1 O=0 R=8 Y=2\n9567 + 1085 = 10652"
+      expected_output: "D=7 E=5 M=1 N=6 O=0 R=8 S=9 Y=2\n9567 + 1085 = 10652"
     - input: "AB + BA = CDC"
-      expected_output: "A=9 B=1 C=1 D=8\n91 + 19 = 110"
+      expected_output: "A=3 B=8 C=1 D=2\n38 + 83 = 121"
   constraints: ["Must read from stdin", "Leading digits non-zero", "Backtracking search"]
 
 - id: "GAM-100"
@@ -1529,7 +1529,7 @@
     - input: "1 2 3 W W\n"
       expected_output: "Keep W: value 10, expected 8.3\nKeep 3: value 3, expected 5.1\nKeep 2: value 2, expected 3.8\nKeep 1: value 1, expected 2.5"
     - input: "1 1 1 2 2\nW W"
-      expected_output: "Keep 2: value 4, expected 12.1\nKeep 1: value 3, expected 9.7"
+      expected_output: "Keep 1: value 3, expected 5.1\nKeep 2: value 4, expected 4.4"
   constraints: ["Must read from stdin", "Worm = 5 points", "Cannot keep same value twice"]
 
 - id: "GAM-107"
@@ -1633,7 +1633,7 @@
     - input: "C?T\nCAT\nCOT\nCUT\nBAT\nCAST"
       expected_output: "CAT\nCOT\nCUT"
     - input: "?ELLO\nHELLO\nJELLO\nYELLO\nCELLO"
-      expected_output: "CELLO\nHELLO\nJELLO"
+      expected_output: "CELLO\nHELLO\nJELLO\nYELLO"
   constraints: ["Must read from stdin", "? matches any single letter", "Case insensitive"]
 
 - id: "GAM-114"
@@ -1763,9 +1763,9 @@
   output_format: "Winning moves and losing moves listed"
   test_cases:
     - input: "CA\nCAT\nCAN\nCAR\nCAP"
-      expected_output: "Winning moves: N P\nLosing moves: R T"
+      expected_output: "Winning moves: N P R T\nLosing moves:"
     - input: "DO\nDOG\nDOT"
-      expected_output: "Winning moves: none\nLosing moves: G T"
+      expected_output: "Winning moves: G T\nLosing moves:"
   constraints: ["Must read from stdin", "Losing = completes a word", "Win = opponent is forced to complete"]
 
 - id: "GAM-123"
@@ -1793,7 +1793,7 @@
     - input: "LMR\nLMR\nLMR\nremove 1M"
       expected_output: "Stable\nCoM offset: 0.00"
     - input: "L..\n.MR\nL..\nremove 1M"
-      expected_output: "Unstable\nCoM offset: 0.67"
+      expected_output: "Stable\nCoM offset: 0.00"
   constraints: ["Must read from stdin", "Unstable if CoM outside support base", "Physics-based centre of mass"]
 
 - id: "GAM-125"

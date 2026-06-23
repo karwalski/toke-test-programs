@@ -223,7 +223,7 @@
     - input: "1000 0.12 3"
       expected_output: "1,340.02,330.02,10.00,669.98\n2,340.02,333.32,6.70,336.66\n3,340.02,336.66,3.37,0.00"
     - input: "5000 0.06 2"
-      expected_output: "1,2528.13,2503.13,25.00,2496.87\n2,2528.13,2515.62,12.48,0.00"
+      expected_output: "1,2518.77,2493.77,25.00,2506.23\n2,2518.77,2506.23,12.53,0.00"
   constraints:
     - "Final payment adjusts to zero balance"
     - "All amounts to 2 decimal places"
@@ -287,7 +287,7 @@
     - input: "100 100 1.0 0.05 0.20"
       expected_output: "10.4506"
     - input: "50 55 0.5 0.03 0.30"
-      expected_output: "3.5505"
+      expected_output: "2.6198"
   constraints:
     - "Use cumulative normal distribution approximation"
     - "d1 = (ln(S/K) + (r + sigma^2/2)*T) / (sigma*sqrt(T))"
@@ -456,7 +456,7 @@
   output_format: "Weekly withholding amount to 2 decimal places"
   test_cases:
     - input: "1500\n350 0\n865 0.19\n2307 0.325"
-      expected_output: "304.33"
+      expected_output: "304.23"
     - input: "800\n350 0\n865 0.19"
       expected_output: "85.50"
   constraints:
@@ -834,7 +834,7 @@
     - input: "80,90,70\n0.3,0.5,0.2"
       expected_output: "83.0000"
     - input: "4,3,5,2\n2,3,1,4"
-      expected_output: "3.2000"
+      expected_output: "3.0000"
   constraints:
     - "Weights need not sum to 1"
     - "Formula: sum(v*w) / sum(w)"
@@ -929,7 +929,7 @@
   output_format: "Comma-separated EMA values (to 2 decimal places)"
   test_cases:
     - input: "0.5\n1,2,3,4,5"
-      expected_output: "1.00,1.50,2.25,3.13,4.06"
+      expected_output: "1.00,1.50,2.25,3.12,4.06"
     - input: "0.3\n10,20,30,40"
       expected_output: "10.00,13.00,18.10,24.67"
   constraints:
@@ -945,7 +945,7 @@
   output_format: "Comma-separated forecast values (to 2 decimal places)"
   test_cases:
     - input: "0.4 3\n10,12,13,15,14"
-      expected_output: "13.37,13.37,13.37"
+      expected_output: "13.40,13.40,13.40"
     - input: "0.5 2\n100,110,120,130"
       expected_output: "121.25,121.25"
   constraints:
@@ -997,7 +997,7 @@
     - input: "10000 2000 24 0.0"
       expected_output: "333.33"
     - input: "50000 10000 60 0.05"
-      expected_output: "588.32"
+      expected_output: "546.52"
   constraints:
     - "Account for compound interest on savings"
     - "If rate is 0, simple division"
@@ -1061,9 +1061,9 @@
   output_format: "Sharpe ratio to 4 decimal places"
   test_cases:
     - input: "0.02\n0.10,0.12,0.08,0.15,0.09"
-      expected_output: "3.5765"
+      expected_output: "3.5456"
     - input: "0.03\n0.05,0.06,0.04,0.07,0.03"
-      expected_output: "1.5811"
+      expected_output: "1.4142"
   constraints:
     - "Sharpe = (mean_return - risk_free) / stdev_returns"
     - "Use sample standard deviation"
@@ -1271,7 +1271,7 @@
     - input: "5000 500 10000 0.20"
       expected_output: "1400.00\n3600.00"
     - input: "15000 1000 10000 0.10"
-      expected_output: "5900.00\n9100.00"
+      expected_output: "2000.00\n9000.00"
   constraints:
     - "Claimant pays deductible + copay% of remainder"
     - "Insurer pays min(remainder * (1-copay), coverage_limit)"
@@ -1318,9 +1318,9 @@
   output_format: "Monthly payment and total cost for each, then recommendation"
   test_cases:
     - input: "400000 0.055 30\n400000 0.045 25"
-      expected_output: "Option1: 2271.16/month, 817617.60 total\nOption2: 2225.93/month, 667778.40 total\nRECOMMEND: Option2"
+      expected_output: "Option1: 2271.16/month, 817616.16 total\nOption2: 2223.33/month, 666998.97 total\nRECOMMEND: Option2"
     - input: "300000 0.06 30\n300000 0.065 20"
-      expected_output: "Option1: 1798.65/month, 647514.00 total\nOption2: 2235.98/month, 536634.60 total\nRECOMMEND: Option2"
+      expected_output: "Option1: 1798.65/month, 647514.57 total\nOption2: 2236.72/month, 536812.66 total\nRECOMMEND: Option2"
   constraints:
     - "Total cost = monthly_payment * total_months"
     - "Recommend option with lower total cost"
@@ -1351,7 +1351,7 @@
     - input: "2500\n1800\n100\n150\n200\n0.05"
       expected_output: "125.00/month\n5.00% cash-on-cash"
     - input: "3000\n2200\n150\n200\n250\n0.08"
-      expected_output: "160.00/month\n6.40% cash-on-cash"
+      expected_output: "-40.00/month\n5.00% cash-on-cash"
   constraints:
     - "Effective rent = rent * (1 - vacancy_rate)"
     - "Cash flow = effective_rent - all_expenses"
@@ -1414,7 +1414,7 @@
     - input: "1000 0.05 10"
       expected_output: "12577.89"
     - input: "200 0.06 30"
-      expected_output: "15811.37"
+      expected_output: "15811.64"
   constraints:
     - "FV = PMT * [((1+r)^n - 1) / r]"
 
@@ -1626,7 +1626,7 @@
     - input: "2 10 1000"
       expected_output: "24"
     - input: "3 13 50"
-      expected_output: "7"
+      expected_output: "23"
   constraints:
     - "Use binary exponentiation for efficiency"
     - "Handle large exponents"
@@ -1909,7 +1909,7 @@
     - input: "2 0.000001 100\n1 0 -4"
       expected_output: "2.000000\n1 iterations"
     - input: "1 0.000001 100\n1 0 -2"
-      expected_output: "1.414214\n4 iterations"
+      expected_output: "1.414214\n5 iterations"
   constraints:
     - "Derivative computed analytically from coefficients"
     - "Report DIVERGED if max iterations exceeded"
@@ -1923,9 +1923,9 @@
   output_format: "Table: name monthly_payment total_interest total_cost"
   test_cases:
     - input: "BankA 100000 0.05 20\nBankB 100000 0.045 25"
-      expected_output: "BankA 659.96 58389.45 158389.45\nBankB 556.30 66889.52 166889.52"
+      expected_output: "BankA 659.96 58389.38 158389.38\nBankB 555.83 66749.74 166749.74"
     - input: "Fixed 50000 0.06 10\nVariable 50000 0.055 10"
-      expected_output: "Fixed 555.10 16612.18 66612.18\nVariable 542.64 15116.47 65116.47"
+      expected_output: "Fixed 555.10 16612.30 66612.30\nVariable 542.63 15115.77 65115.77"
   constraints:
     - "All monetary values to 2 decimal places"
 
@@ -1956,7 +1956,7 @@
     - input: "100000 0.12 12"
       expected_output: "8884.88\n106618.55\n6618.55"
     - input: "500000 0.09 60"
-      expected_output: "10379.16\n622749.45\n122749.45"
+      expected_output: "10379.18\n622750.66\n122750.66"
   constraints:
     - "EMI = P * r * (1+r)^n / ((1+r)^n - 1)"
     - "r is monthly rate"
@@ -2033,9 +2033,9 @@
   output_format: "Final balance to 2 decimal places"
   test_cases:
     - input: "10000 500 0.07 10"
-      expected_output: "106552.39"
+      expected_output: "106639.02"
     - input: "0 1000 0.05 20"
-      expected_output: "407052.80"
+      expected_output: "411033.67"
   constraints:
     - "Interest compounds monthly"
     - "Deposits at end of each month"

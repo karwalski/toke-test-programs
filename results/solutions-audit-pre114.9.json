@@ -1,12 +1,11 @@
 {
   "counters": {
-    "GENUINE": 1104,
-    "TRIVIAL": 162,
-    "REGRESSED-RUN": 75,
-    "REGRESSED-COMPILE": 663,
-    "REGRESSED-BUILD": 46,
-    "SUSPECT": 6,
-    "DUAL-BRANCH-SAME-OUTPUT": 1
+    "GENUINE": 1033,
+    "TRIVIAL": 158,
+    "REGRESSED-RUN": 151,
+    "REGRESSED-COMPILE": 664,
+    "REGRESSED-BUILD": 45,
+    "SUSPECT": 6
   },
   "results": [
     {
@@ -80,7 +79,7 @@
         {
           "test": 2,
           "actual": "{\"selected\":\"resize_image\",\"confidence\":0.13,\"reasoning\":\"Best available option among given tools\"}",
-          "expected": "{\"selected\":\"resize_image\",\"confidence\":0.012000000000000002,\"reasoning\":\"Best available option among given tools\"}"
+          "expected": "{\"selected\":\"resize_image\",\"confidence\":0.85,\"reasoning\":\"Resize is the most likely interpretation of making an image sm"
         }
       ]
     },
@@ -220,13 +219,15 @@
     {
       "id": "AIA-021",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2318,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "[\"x\",\"z\",\"y\"]",
+          "expected": "[\"x\",\"y\",\"z\"]"
+        }
+      ]
     },
     {
       "id": "AIA-022",
@@ -394,13 +395,15 @@
     {
       "id": "AIA-039",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2383,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"emotions\":[]}",
+          "expected": "{\"emotions\":[{\"label\":\"sadness\",\"intensity\":0.8},{\"label\":\"fear\",\"intensity\":0.7}]}"
+        }
+      ]
     },
     {
       "id": "AIA-040",
@@ -451,7 +454,7 @@
         {
           "test": 2,
           "actual": "{\"level\":\"expert\",\"metrics\":{\"avg_sentence_length\":26,\"vocabulary_complexity\":\"technical\",\"technical_terms_count\":8}}",
-          "expected": "{\"level\":\"expert\",\"metrics\":{\"avg_sentence_length\":26,\"vocabulary_complexity\":\"complex\",\"technical_terms_count\":8}}"
+          "expected": "{\"level\":\"expert\",\"metrics\":{\"avg_sentence_length\":28,\"vocabulary_complexity\":\"technical\",\"technical_terms_count\":7}}"
         }
       ]
     },
@@ -526,13 +529,15 @@
     {
       "id": "AIA-052",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1426,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "[]",
+          "expected": "[{\"assignee\":\"John\",\"task\":\"review PR #45\",\"deadline\":null},{\"assignee\":\"Sarah\",\"task\":\"deploy to staging\",\"deadline\":\"E"
+        }
+      ]
     },
     {
       "id": "AIA-053",
@@ -610,24 +615,28 @@
     {
       "id": "AIA-061",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2354,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"summary\":\"The cat sat on the mat.\",\"sentence_count\":1}",
+          "expected": "{\"summary\":\"A cat sat on a warm mat.\",\"sentence_count\":1}"
+        }
+      ]
     },
     {
       "id": "AIA-062",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2927,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"summary\":\"Report 1 reports that Sales grew 10% in Q4.... Report 2 reports that Q4 sales declined by 5%....\",\"agreement",
+          "expected": "{\"summary\":\"The reports disagree on Q4 sales performance, with one claiming 10% growth and another reporting a 5% declin"
+        }
+      ]
     },
     {
       "id": "AIA-063",
@@ -676,13 +685,15 @@
     {
       "id": "AIA-067",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 3530,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"summary\":\"Team decided to use PostgreSQL for the new service due to better JSON support.\",\"decisions\":[],\"open_questio",
+          "expected": "{\"summary\":\"Deploy failure reported by Carol. Dave is investigating.\",\"decisions\":[],\"open_questions\":[\"Root cause of de"
+        }
+      ]
     },
     {
       "id": "AIA-068",
@@ -704,7 +715,7 @@
         {
           "test": 2,
           "actual": ".",
-          "expected": "The committee voted 7-3 to approve the new park design featuring a playground, walking trails, and community garden, wit"
+          "expected": "Committee approved a new park with playground, trails, and garden; construction starts in spring."
         }
       ]
     },
@@ -778,13 +789,15 @@
     {
       "id": "AIA-077",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1910,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"translated_text\":\"Click Speichern to store your Einstellungen.\"}",
+          "expected": "{\"translated_text\":\"Klicken Sie auf Speichern, um Ihre Einstellungen zu speichern.\"}"
+        }
+      ]
     },
     {
       "id": "AIA-078",
@@ -796,24 +809,28 @@
     {
       "id": "AIA-079",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1806,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{}",
+          "expected": "{\"heading_hello\":\"Hello World\",\"login_prompt\":\"Please log in to continue.\"}"
+        }
+      ]
     },
     {
       "id": "AIA-080",
       "category": "ai-agents",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2966,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"1\":\"1 file\",\"2\":\"2 files\",\"5\":\"5 files\"}",
+          "expected": "{\"1\":\"1 \u0444\u0430\u0439\u043b\",\"2\":\"2 \u0444\u0430\u0439\u043b\u0430\",\"5\":\"5 \u0444\u0430\u0439\u043b\u043e\u0432\"}"
+        }
+      ]
     },
     {
       "id": "AIA-081",
@@ -871,7 +888,7 @@
         {
           "test": 2,
           "actual": "",
-          "expected": "fn gcd(a: u64, b: u64) -> u64 {\n    if b == 0 { a } else { gcd(b, a % b) }\n}"
+          "expected": "/// Computes the greatest common divisor of two numbers using Euclid's algorithm.\n///\n/// # Arguments\n/// * `a` - First "
         }
       ]
     },
@@ -889,7 +906,7 @@
         {
           "test": 2,
           "actual": "",
-          "expected": "{\"translated_code\":\"result = [x**2 for x in range(10) if x % 2 == 0]\",\"notes\":[\"Direct translation - no adaptations need"
+          "expected": "{\"translated_code\":\"let result: Vec<i32> = (0..10).filter(|x| x % 2 == 0).map(|x| x * x).collect();\",\"notes\":[\"Used iter"
         }
       ]
     },
@@ -1013,7 +1030,7 @@
         {
           "test": 2,
           "actual": "",
-          "expected": "{\"action\":\"escalate\",\"reason\":\"auth_error errors require escalation\",\"next_agent\":\"supervisor\"}"
+          "expected": "{\"action\":\"escalate\",\"reason\":\"Auth errors require supervisor intervention\",\"next_agent\":\"supervisor\"}"
         }
       ]
     },
@@ -1438,13 +1455,15 @@
     {
       "id": "FIN-013",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 829,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "1,2518.77,2493.77,25.00,2506.23\n2,2518.77,2506.23,12.53,0.00",
+          "expected": "1,2528.13,2503.13,25.00,2496.87\n2,2528.13,2515.62,12.48,0.00"
+        }
+      ]
     },
     {
       "id": "FIN-014",
@@ -1491,13 +1510,15 @@
     {
       "id": "FIN-017",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1059,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "2.6198",
+          "expected": "3.5505"
+        }
+      ]
     },
     {
       "id": "FIN-018",
@@ -1603,13 +1624,15 @@
     {
       "id": "FIN-027",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 678,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "304.23",
+          "expected": "304.33"
+        }
+      ]
     },
     {
       "id": "FIN-028",
@@ -1842,13 +1865,15 @@
     {
       "id": "FIN-050",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 611,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "3.0000",
+          "expected": "3.2000"
+        }
+      ]
     },
     {
       "id": "FIN-051",
@@ -1908,24 +1933,28 @@
     {
       "id": "FIN-056",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 361,
-      "structural": {
-        "loop": true,
-        "if": false,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "1.00,1.50,2.25,3.12,4.06",
+          "expected": "1.00,1.50,2.25,3.13,4.06"
+        }
+      ]
     },
     {
       "id": "FIN-057",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 459,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "13.40,13.40,13.40",
+          "expected": "13.37,13.37,13.37"
+        }
+      ]
     },
     {
       "id": "FIN-058",
@@ -1952,13 +1981,15 @@
     {
       "id": "FIN-060",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 545,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "546.52",
+          "expected": "588.32"
+        }
+      ]
     },
     {
       "id": "FIN-061",
@@ -1996,13 +2027,20 @@
     {
       "id": "FIN-064",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 592,
-      "structural": {
-        "loop": true,
-        "if": false,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "3.5456",
+          "expected": "3.5765"
+        },
+        {
+          "test": 2,
+          "actual": "1.4142",
+          "expected": "1.5811"
+        }
+      ]
     },
     {
       "id": "FIN-065",
@@ -2119,13 +2157,15 @@
     {
       "id": "FIN-077",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 586,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "2000.00\n9000.00",
+          "expected": "5900.00\n9100.00"
+        }
+      ]
     },
     {
       "id": "FIN-078",
@@ -2158,12 +2198,12 @@
         {
           "test": 1,
           "actual": "Option1: 2271.16/month, 817617.60 total\nOption2: 2223.33/month, 666999.00 total\nRECOMMEND: Option2",
-          "expected": "Option1: 2271.16/month, 817616.16 total\nOption2: 2223.33/month, 666998.97 total\nRECOMMEND: Option2"
+          "expected": "Option1: 2271.16/month, 817617.60 total\nOption2: 2225.93/month, 667778.40 total\nRECOMMEND: Option2"
         },
         {
           "test": 2,
           "actual": "Option1: 1798.65/month, 647514.00 total\nOption2: 2236.72/month, 536812.80 total\nRECOMMEND: Option2",
-          "expected": "Option1: 1798.65/month, 647514.57 total\nOption2: 2236.72/month, 536812.66 total\nRECOMMEND: Option2"
+          "expected": "Option1: 1798.65/month, 647514.00 total\nOption2: 2235.98/month, 536634.60 total\nRECOMMEND: Option2"
         }
       ]
     },
@@ -2222,13 +2262,15 @@
     {
       "id": "FIN-086",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 356,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "15811.64",
+          "expected": "15811.37"
+        }
+      ]
     },
     {
       "id": "FIN-087",
@@ -2372,13 +2414,15 @@
     {
       "id": "FIN-099",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 445,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "23",
+          "expected": "7"
+        }
+      ]
     },
     {
       "id": "FIN-100",
@@ -2559,24 +2603,33 @@
     {
       "id": "FIN-116",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1284,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "1.414214\n5 iterations",
+          "expected": "1.414214\n4 iterations"
+        }
+      ]
     },
     {
       "id": "FIN-117",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 969,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "BankA 659.96 58389.38 158389.38\nBankB 555.83 66749.74 166749.74",
+          "expected": "BankA 659.96 58389.45 158389.45\nBankB 556.30 66889.52 166889.52"
+        },
+        {
+          "test": 2,
+          "actual": "Fixed 555.10 16612.30 66612.30\nVariable 542.63 15115.77 65115.77",
+          "expected": "Fixed 555.10 16612.18 66612.18\nVariable 542.64 15116.47 65116.47"
+        }
+      ]
     },
     {
       "id": "FIN-118",
@@ -2587,13 +2640,15 @@
     {
       "id": "FIN-119",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 602,
-      "structural": {
-        "loop": false,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "10379.18\n622750.66\n122750.66",
+          "expected": "10379.16\n622749.45\n122749.45"
+        }
+      ]
     },
     {
       "id": "FIN-120",
@@ -2644,13 +2699,20 @@
     {
       "id": "FIN-124",
       "category": "calculators-finance",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 504,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "106639.02",
+          "expected": "106552.39"
+        },
+        {
+          "test": 2,
+          "actual": "411033.67",
+          "expected": "407052.80"
+        }
+      ]
     },
     {
       "id": "FIN-125",
@@ -2711,13 +2773,15 @@
     {
       "id": "CRY-001",
       "category": "crypto-blockchain",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 224,
-      "structural": {
-        "loop": false,
-        "if": false,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "ef7797e13d3a75526946a3bcf00daec9fc9c9c4d51ddc7cc5df888f74dd434d1",
+          "expected": "625da44e4eaf58d61cf048d168aa6f5e492dea166d8bb54ec06c30de07db57e1"
+        }
+      ]
     },
     {
       "id": "CRY-002",
@@ -2913,7 +2977,7 @@
         {
           "test": 1,
           "actual": "",
-          "expected": "6\ufffd\u0596v\u001be\ufffd\u001a[( U\u0003u\ufffd.|2\ufffd\u0013\ufffd\ufffd\u0005\ufffd\u0482y\ufffdI\u0012\ufffd"
+          "expected": "6\ufffd\u0596v?e\ufffd?[( U?u\ufffd.|2\ufffd?\ufffd\ufffd?\ufffd\u0482y\ufffdI?\ufffd"
         }
       ]
     },
@@ -3003,13 +3067,15 @@
     {
       "id": "CRY-034",
       "category": "crypto-blockchain",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 410,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "46",
+          "expected": "44"
+        }
+      ]
     },
     {
       "id": "CRY-036",
@@ -3080,7 +3146,7 @@
         {
           "test": 2,
           "actual": "5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnu5qPN",
-          "expected": "5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf"
+          "expected": "KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn"
         }
       ]
     },
@@ -3276,13 +3342,15 @@
     {
       "id": "CRY-063",
       "category": "crypto-blockchain",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 990,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "43",
+          "expected": "42"
+        }
+      ]
     },
     {
       "id": "CRY-064",
@@ -3567,13 +3635,15 @@
     {
       "id": "CRY-093",
       "category": "crypto-blockchain",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 290,
-      "structural": {
-        "loop": false,
-        "if": false,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "12711.99",
+          "expected": "12712.03"
+        }
+      ]
     },
     {
       "id": "CRY-094",
@@ -3740,7 +3810,7 @@
         {
           "test": 2,
           "actual": "",
-          "expected": "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3"
+          "expected": "bc1qrp33g0q5b5698ahp5jnf5yzjm9w4sk6e4v45nm3zarvary0c5xw7k5w69hf"
         }
       ]
     },
@@ -4172,13 +4242,15 @@
     {
       "id": "DAT-018",
       "category": "data-processing",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2373,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "1,cat\n2,car\n3,bat",
+          "expected": "1,cat\n2,car\n\n1,cat\n3,bat"
+        }
+      ]
     },
     {
       "id": "DAT-019",
@@ -4399,13 +4471,15 @@
     {
       "id": "DAT-040",
       "category": "data-processing",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 3707,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "Report for Acme\nDate: 2024-01\nproduct  qty  price\nWidget  10  5\nGadget  3  15",
+          "expected": "Report for Acme\nDate: 2024-01\nproduct  qty  price\nWidget    10   5.00\nGadget     3  15.00"
+        }
+      ]
     },
     {
       "id": "DAT-041",
@@ -4456,13 +4530,15 @@
     {
       "id": "DAT-047",
       "category": "data-processing",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 562,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+          "expected": "b94d27b9934d3e08a52e52d7da7dabfac484efe04294e576f3d0b6279e7e06d7"
+        }
+      ]
     },
     {
       "id": "DAT-048",
@@ -4517,7 +4593,7 @@
         {
           "test": 2,
           "actual": "id,name\n4,Dave\n1,Alice",
-          "expected": "id,name\n1,Alice\n4,Dave"
+          "expected": "id,name\n3,Carol\n1,Alice"
         }
       ]
     },
@@ -4876,13 +4952,20 @@
     {
       "id": "DAT-089",
       "category": "data-processing",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 3102,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "kitten sitting\t3\t-\t0.7460\nhello hello\t0\t0\t1.0000",
+          "expected": "kitten sitting\t3\t-\t0.7467\nhello hello\t0\t0\t1.0000"
+        },
+        {
+          "test": 2,
+          "actual": "ABCDE ABFDE\t1\t1\t0.8933",
+          "expected": "ABCDE ABFDE\t1\t1\t0.9333"
+        }
+      ]
     },
     {
       "id": "DAT-090",
@@ -5229,9 +5312,15 @@
     {
       "id": "DEV-001",
       "category": "devtools",
-      "verdict": "TRIVIAL",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2130,
-      "reason": "input-discriminator hardcoded output"
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "ext    | files | code | comment | blank | total",
+          "expected": "py     | 2     | N    | N       | N     | N"
+        }
+      ]
     },
     {
       "id": "DEV-002",
@@ -5393,13 +5482,15 @@
     {
       "id": "DEV-018",
       "category": "devtools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1712,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "",
+          "expected": "lib.js:5: unreferenced symbol: unusedFunction"
+        }
+      ]
     },
     {
       "id": "DEV-019",
@@ -5610,13 +5701,15 @@
     {
       "id": "DEV-039",
       "category": "devtools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 734,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "{\"FOO\":\"bar\",\"BAZ\":\"\\\"quoted value\\\"\"}",
+          "expected": "{\"BAZ\":\"quoted value\",\"FOO\":\"bar\"}"
+        }
+      ]
     },
     {
       "id": "DEV-040",
@@ -5984,24 +6077,28 @@
     {
       "id": "DEV-074",
       "category": "devtools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 849,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "chars: 44\nwords: 9\napprox_tokens: 10",
+          "expected": "chars: 44\nwords: 9\napprox_tokens: 11"
+        }
+      ]
     },
     {
       "id": "DEV-075",
       "category": "devtools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2117,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "[42]",
+          "expected": "[1,2,3]"
+        }
+      ]
     },
     {
       "id": "DEV-076",
@@ -6764,13 +6861,20 @@
     {
       "id": "EDU-026",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 3279,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "Time        | Monday | Tuesday\n09:00-10:00 | Math   | Science",
+          "expected": "Time     | Monday | Tuesday\n09:00-10:00 | Math   | Science"
+        },
+        {
+          "test": 2,
+          "actual": "Time        | Wednesday\n14:00-15:00 | Art",
+          "expected": "Time     | Wednesday\n14:00-15:00 | Art"
+        }
+      ]
     },
     {
       "id": "EDU-027",
@@ -7223,13 +7327,15 @@
     {
       "id": "EDU-070",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1813,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Bob:\n  Total errors: 3\n  Top error: spelling (3)\n  Recommendation: Use spell-check and practice spelling",
+          "expected": "Bob:\n  Total errors: 3\n  Top error: spelling (3)\n  Recommendation: Practice spelling drills"
+        }
+      ]
     },
     {
       "id": "EDU-071",
@@ -7444,13 +7550,15 @@
     {
       "id": "EDU-091",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1890,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "X: 2 points",
+          "expected": "X: 4 points"
+        }
+      ]
     },
     {
       "id": "EDU-092",
@@ -7498,13 +7606,20 @@
     {
       "id": "EDU-096",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2404,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "Topic     | REMEMBER | APPLY   \nAlgebra   | 2        | 2       \nGeometry  | 2        | 2",
+          "expected": "Topic     | REMEMBER | APPLY\nAlgebra   | 2        | 2\nGeometry  | 2        | 2"
+        },
+        {
+          "test": 2,
+          "actual": "Topic     | UNDERSTAND\nHistory   | 4",
+          "expected": "Topic   | UNDERSTAND\nHistory | 4"
+        }
+      ]
     },
     {
       "id": "EDU-097",
@@ -7595,13 +7710,15 @@
     {
       "id": "EDU-106",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2896,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Lesson Hook: Pi (Math, Grade 9)\nOpening Fact: Did you know that Pi affects our daily lives in surprising ways?\nPurpose: ",
+          "expected": "Lesson Hook: Pi (Math, Grade 9)\nInteresting Fact: Pi has been calculated to over 100 trillion digits and never repeats.\n"
+        }
+      ]
     },
     {
       "id": "EDU-107",
@@ -7634,13 +7751,15 @@
     {
       "id": "EDU-110",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2211,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Q2 Original: This process is called ___.\nQ2 Improved: This process is called ___.\nReason: No improvement needed",
+          "expected": "Q2 Original: This process is called ___.\nQ2 Improved: What is the name of this process?\nReason: Use direct questions rat"
+        }
+      ]
     },
     {
       "id": "EDU-111",
@@ -7725,13 +7844,15 @@
     {
       "id": "EDU-119",
       "category": "education",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1809,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "fractions: 2 errors\nalgebra: 1 errors\ndecimals: 1 errors",
+          "expected": "fractions: 2 errors\ndecimals: 1 errors\nalgebra: 1 errors"
+        }
+      ]
     },
     {
       "id": "EDU-120",
@@ -8221,8 +8342,15 @@
     {
       "id": "GAM-042",
       "category": "games",
-      "verdict": "DUAL-BRANCH-SAME-OUTPUT",
-      "src_len": 2668
+      "verdict": "REGRESSED-RUN",
+      "src_len": 2668,
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "No deductions",
+          "expected": "SAFE 1 1"
+        }
+      ]
     },
     {
       "id": "GAM-043",
@@ -8303,13 +8431,15 @@
     {
       "id": "GAM-053",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1799,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Invalid move at step 1",
+          "expected": "Valid"
+        }
+      ]
     },
     {
       "id": "GAM-054",
@@ -8423,13 +8553,15 @@
     {
       "id": "GAM-066",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1143,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Invalid: col 1",
+          "expected": "Invalid: col 2"
+        }
+      ]
     },
     {
       "id": "GAM-067",
@@ -8542,13 +8674,15 @@
     {
       "id": "GAM-080",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 3649,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "LURR",
+          "expected": "No solution"
+        }
+      ]
     },
     {
       "id": "GAM-081",
@@ -8582,13 +8716,20 @@
     {
       "id": "GAM-085",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1333,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "1 20  9 14  3\n10 15  2 19 24\n21  8 23  4 13\n16 11  6 25 18\n 7 22 17 12  5",
+          "expected": "1 12 21 18 13\n20 17 14  7 22\n11  2 19  4 25\n16  5  8 23  6\n 9 10  3 24 15"
+        },
+        {
+          "test": 2,
+          "actual": "1 16 31 40  3 18 21 56\n30 39  2 17 42 55  4 19\n15 32 41 46 53 20 57 22\n38 29 48 43 58 45 54  5\n33 14 37 52 47 60 23 62\n2",
+          "expected": "1 60 39 34 31 18  9 64\n38 35 32 61 10 63 30 17\n59  2 37 40 33 28 19  8\n36 49 42 27 62 11 16 29\n43 58  3 50 41 24  7 20\n4"
+        }
+      ]
     },
     {
       "id": "GAM-086",
@@ -8664,13 +8805,15 @@
     {
       "id": "GAM-095",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2590,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "B captured at 0,0\nW captured at 0,1\nB captured at 0,2\nW captured at 1,0\nB captured at 1,1\nW captured at 1,2\nB captured a",
+          "expected": "B captured at 1,1\nW captured at 0,1\nW captured at 1,0\nW captured at 1,2\nW captured at 2,1"
+        }
+      ]
     },
     {
       "id": "GAM-096",
@@ -8703,13 +8846,20 @@
     {
       "id": "GAM-099",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2337,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "D=7 E=5 M=1 N=6 O=0 R=8 S=9 Y=2\n9567 + 1085 = 10652",
+          "expected": "S=9 E=5 N=6 D=7 M=1 O=0 R=8 Y=2\n9567 + 1085 = 10652"
+        },
+        {
+          "test": 2,
+          "actual": "A=3 B=8 C=1 D=2\n38 + 83 = 121",
+          "expected": "A=9 B=1 C=1 D=8\n91 + 19 = 110"
+        }
+      ]
     },
     {
       "id": "GAM-100",
@@ -8817,13 +8967,15 @@
     {
       "id": "GAM-113",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1294,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "CELLO\nHELLO\nJELLO\nYELLO",
+          "expected": "CELLO\nHELLO\nJELLO"
+        }
+      ]
     },
     {
       "id": "GAM-114",
@@ -8901,13 +9053,20 @@
     {
       "id": "GAM-122",
       "category": "games",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2660,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "Winning moves: N P R T\nLosing moves:",
+          "expected": "Winning moves: N P\nLosing moves: R T"
+        },
+        {
+          "test": 2,
+          "actual": "Winning moves: G T\nLosing moves:",
+          "expected": "Winning moves: none\nLosing moves: G T"
+        }
+      ]
     },
     {
       "id": "GAM-123",
@@ -8924,7 +9083,7 @@
         {
           "test": 2,
           "actual": "Stable\nCoM offset: 0.25",
-          "expected": "Stable\nCoM offset: 0.00"
+          "expected": "Unstable\nCoM offset: 0.67"
         }
       ]
     },
@@ -10227,7 +10386,7 @@
         {
           "test": 1,
           "actual": "{\"deviations\":[{\"parameter\":\"temp\",\"deviation\":1.5,\"score\":0.75},{\"parameter\":\"pressure\",\"deviation\":0.2,\"score\":0.2},{\"",
-          "expected": "{\"deviations\":[{\"parameter\":\"temp\",\"deviation\":1.5,\"score\":0.75},{\"parameter\":\"pressure\",\"deviation\":0.20000000000000284"
+          "expected": "{\"deviations\":[{\"parameter\":\"temp\",\"deviation\":1.5,\"score\":0.75},{\"parameter\":\"pressure\",\"deviation\":0.2,\"score\":0.2},{\""
         }
       ]
     },
@@ -10311,13 +10470,15 @@
     {
       "id": "MED-008",
       "category": "media-content",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1565,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "score: -74.0",
+          "expected": "score: 10.2"
+        }
+      ]
     },
     {
       "id": "MED-009",
@@ -10505,24 +10666,28 @@
     {
       "id": "MED-025",
       "category": "media-content",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1263,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "\"one two three\": 1",
+          "expected": "\"one two three\": 1\n\"two three four\": 1"
+        }
+      ]
     },
     {
       "id": "MED-026",
       "category": "media-content",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 901,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Dr.\nSmith went home.\nHe was tired.",
+          "expected": "Dr. Smith went home.\nHe was tired."
+        }
+      ]
     },
     {
       "id": "MED-027",
@@ -11154,13 +11319,15 @@
     {
       "id": "MED-087",
       "category": "media-content",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 914,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "ASCFII",
+          "expected": "ASCII"
+        }
+      ]
     },
     {
       "id": "MED-088",
@@ -11182,12 +11349,7 @@
         {
           "test": 1,
           "actual": "alpha  beta     gamma\ndelta  epsilon",
-          "expected": "alpha beta    gamma\ndelta epsilon"
-        },
-        {
-          "test": 2,
-          "actual": "a  b\nc",
-          "expected": "a b\nc"
+          "expected": "alpha  beta   gamma\ndelta  epsilon"
         }
       ]
     },
@@ -11405,11 +11567,6 @@
           "test": 1,
           "actual": "Hello",
           "expected": "HelloWorld"
-        },
-        {
-          "test": 2,
-          "actual": "Normal text",
-          "expected": "Normaltext"
         }
       ]
     },
@@ -11738,13 +11895,15 @@
     {
       "id": "MSG-015",
       "category": "messaging",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1359,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "0ms: ALIVE",
+          "expected": "0ms: ALIVE\n1000ms: MISSED(1)\n2000ms: MISSED(2)\n3000ms: TIMEOUT"
+        }
+      ]
     },
     {
       "id": "MSG-016",
@@ -12274,7 +12433,7 @@
         {
           "test": 3,
           "actual": "(decrypted with key v1)",
-          "expected": "\u0018c2\u0010VDf`\ufffd\ufffd\ufffd\ufffd\ufffd (decrypted with key v1)"
+          "expected": "?c2?VDf`\ufffd\ufffd\ufffd\ufffd\ufffd (decrypted with key v1)"
         },
         {
           "test": 4,
@@ -12547,13 +12706,15 @@
     {
       "id": "MSG-098",
       "category": "messaging",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2857,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "CRITICAL (95% full)\nrate: in=50/s, out=10/s (deficit: 40/s)\nlag: 30000ms\ntime to full: 0.125s\naction: reduce producer ra",
+          "expected": "CRITICAL (95% full)\nrate: in=50/s, out=10/s (deficit: 40/s)\nlag: 30000ms\ntime to full: 0.1s\naction: pause producers, sca"
+        }
+      ]
     },
     {
       "id": "MSG-099",
@@ -14258,13 +14419,15 @@
     {
       "id": "SCI-005",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 770,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "Integral: 0.500000",
+          "expected": "Integral: 0.500001"
+        }
+      ]
     },
     {
       "id": "SCI-006",
@@ -14291,13 +14454,15 @@
     {
       "id": "SCI-008",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 740,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "0.000000 1.000000\n0.100000 1.105171\n0.200000 1.221403\n0.300000 1.349858\n0.400000 1.491824",
+          "expected": "0.000000 1.000000\n0.100000 1.105171\n0.200000 1.221403\n0.300000 1.349859\n0.400000 1.491825"
+        }
+      ]
     },
     {
       "id": "SCI-009",
@@ -14578,24 +14743,28 @@
     {
       "id": "SCI-038",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1684,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Suffix array: 3 0 4 1 5 2\nPattern found at: 1 4",
+          "expected": "Suffix array: 0 3 1 4 2 5\nPattern found at: 1 4"
+        }
+      ]
     },
     {
       "id": "SCI-039",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 997,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "1 2 3\n2 1 3\n3 1 2\n1 3 2\n2 3 1\n3 2 1\nTotal: 6",
+          "expected": "1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1\nTotal: 6"
+        }
+      ]
     },
     {
       "id": "SCI-040",
@@ -14715,13 +14884,15 @@
     {
       "id": "SCI-053",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1010,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Area: 3.000000\nPerimeter: 8.000000\nWinding: CCW",
+          "expected": "Area: 3.000000\nPerimeter: ...\nWinding: CCW"
+        }
+      ]
     },
     {
       "id": "SCI-054",
@@ -14909,13 +15080,15 @@
     {
       "id": "SCI-073",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2040,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Max value: 15\nItems: Y\nTotal weight: 8",
+          "expected": "Max value: 10\nItems: X\nTotal weight: 5"
+        }
+      ]
     },
     {
       "id": "SCI-074",
@@ -14983,13 +15156,20 @@
     {
       "id": "SCI-082",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 4442,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 1,
+          "actual": "a 0\nd 10\nc 110\nb 111",
+          "expected": "a 0\nd 10\nb 110\nc 111"
+        },
+        {
+          "test": 2,
+          "actual": "011110",
+          "expected": "0 110 10"
+        }
+      ]
     },
     {
       "id": "SCI-083",
@@ -15252,7 +15432,7 @@
         {
           "test": 2,
           "actual": "0\n1",
-          "expected": "0\n0"
+          "expected": "0\n(root of 0 and 1)"
         }
       ]
     },
@@ -15309,13 +15489,15 @@
     {
       "id": "SCI-112",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1000,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Minimum multiplications: 26000\nParenthesisation: ((A0 x (A1 x A2)) x A3)",
+          "expected": "Minimum multiplications: 26000\nParenthesisation: (A0 x (A1 x (A2 x A3)))"
+        }
+      ]
     },
     {
       "id": "SCI-113",
@@ -15353,13 +15535,15 @@
     {
       "id": "SCI-116",
       "category": "scientific-math",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1553,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Schedule: Z X\nTotal weight: 90",
+          "expected": "Schedule: Y X\nTotal weight: 90"
+        }
+      ]
     },
     {
       "id": "SCI-117",
@@ -15570,13 +15754,15 @@
     {
       "id": "SEC-009",
       "category": "security",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 742,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "issues",
+          "expected": "summary"
+        }
+      ]
     },
     {
       "id": "SEC-010",
@@ -15855,16 +16041,28 @@
     {
       "id": "SEC-043",
       "category": "security",
-      "verdict": "TRIVIAL",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1714,
-      "reason": "input-discriminator hardcoded output"
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "",
+          "expected": "findings"
+        }
+      ]
     },
     {
       "id": "SEC-044",
       "category": "security",
-      "verdict": "TRIVIAL",
+      "verdict": "REGRESSED-RUN",
       "src_len": 112,
-      "reason": "tiny no-logic single-main"
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "hstsEnabled",
+          "expected": "grade"
+        }
+      ]
     },
     {
       "id": "SEC-045",
@@ -17757,7 +17955,7 @@
     {
       "id": "SOC-147",
       "category": "social-media",
-      "verdict": "REGRESSED-BUILD",
+      "verdict": "REGRESSED-COMPILE",
       "src_len": 409
     },
     {
@@ -17907,8 +18105,13 @@
       "src_len": 979,
       "failed_tests": [
         {
+          "test": 1,
+          "actual": "LOCKED_BY 99275",
+          "expected": "ACQUIRED"
+        },
+        {
           "test": 2,
-          "actual": "LOCKED_BY 36440",
+          "actual": "LOCKED_BY 99275",
           "expected": "LOCKED_BY (pid) | NOT_LOCKED"
         }
       ]
@@ -18206,13 +18409,15 @@
     {
       "id": "SYS-051",
       "category": "system-tools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 1120,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "",
+          "expected": "(no differences)"
+        }
+      ]
     },
     {
       "id": "SYS-052",
@@ -18254,13 +18459,15 @@
     {
       "id": "SYS-057",
       "category": "system-tools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 2328,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": true
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Converted: 2026-06-01T12:00:00+00:00",
+          "expected": "Converted: 2026-06-01T08:00:00-04:00"
+        }
+      ]
     },
     {
       "id": "SYS-058",
@@ -18425,12 +18632,12 @@
       "failed_tests": [
         {
           "test": 1,
-          "actual": "Job 8 queued.",
+          "actual": "Job 3 queued.",
           "expected": "Job 1 queued."
         },
         {
           "test": 2,
-          "actual": "1 queued echo hello\n2 queued echo hello\n3 queued echo hello\n4 queued echo hello\n5 queued echo hello\n6 queued echo hello\n",
+          "actual": "1 queued echo hello\n2 queued echo hello\n3 queued echo hello",
           "expected": "(job list or 'Queue empty')"
         }
       ]
@@ -18474,9 +18681,15 @@
     {
       "id": "SYS-079",
       "category": "system-tools",
-      "verdict": "TRIVIAL",
+      "verdict": "REGRESSED-RUN",
       "src_len": 948,
-      "reason": "input-discriminator hardcoded output"
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "(no secrets found)",
+          "expected": "(filepath:line: TYPE pattern)"
+        }
+      ]
     },
     {
       "id": "SYS-080",
@@ -18697,13 +18910,15 @@
     {
       "id": "SYS-111",
       "category": "system-tools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 402,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "chown root:root /tmp/testfile\nSummary: 1 items changed.",
+          "expected": "(actual chown or error if permission denied)"
+        }
+      ]
     },
     {
       "id": "SYS-112",
@@ -18844,13 +19059,15 @@
     {
       "id": "SYS-128",
       "category": "system-tools",
-      "verdict": "GENUINE",
+      "verdict": "REGRESSED-RUN",
       "src_len": 648,
-      "structural": {
-        "loop": true,
-        "if": true,
-        "helpers": false
-      }
+      "failed_tests": [
+        {
+          "test": 2,
+          "actual": "Patched 1 bytes at 1 offsets. Output written to /tmp/p.bin.",
+          "expected": "ERROR: offset 9999 out of range (file is N bytes)"
+        }
+      ]
     },
     {
       "id": "SYS-129",
