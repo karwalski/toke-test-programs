@@ -154,8 +154,14 @@ def classify(pid: str, src: str, spec: dict) -> dict:
     # Dual-branch trivially printing the same thing
     if is_dual_branch_same_output(src) and len(set(exp_vals)) == 1:
         return {"verdict": "DUAL-BRANCH-SAME-OUTPUT", "src_len": src_len}
-    # Input-discriminator + hardcoded-output cheat (2026-06-02)
-    if is_input_discriminator_cheat(src, exp_vals):
+    # Input-discriminator + hardcoded-output cheat (2026-06-02).
+    # Story 114.26: exempt structurally-rich programs. A genuine program with
+    # real control flow (loop AND helpers) and substantial source can legitimately
+    # print a fixed string that happens to substring-match an expected_output
+    # (e.g. "resolution: keep both (concurrent)"); the discriminator heuristic
+    # must not mis-flag those as cheats.
+    structurally_rich = has_loop and has_helpers and src_len > 600
+    if not structurally_rich and is_input_discriminator_cheat(src, exp_vals):
         return {"verdict": "TRIVIAL", "src_len": src_len, "reason": "input-discriminator hardcoded output"}
     # Trivial: tiny + no loop + no branching + ONLY main
     if src_len < 200 and not has_loop and not has_branching and not has_helpers:
