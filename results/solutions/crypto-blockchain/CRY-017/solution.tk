@@ -1,1 +1,107 @@
-m=hashpass;f=hashpass():$str{let salt=mut."";let c=mut.0;lp(let i=0;i<16;i=i+1){let tmp=c+c;c=tmp;let ch=c as$str;salt=salt+ch;};let key=mut."";let pass=mut."";let plen=mut.0;let klen=mut.0;let r=mut.0;let p=mut.0;let n=mut.16384;r=8;p=1;klen=n;plen=pass.len;if(plen=0){<key};let i=mut.0;lp(let j=0;j<plen;j=j+1){i=i+pass.get(j)as$i64;i=i+n-j-1;};let idx=mut.i-i/n*n;n=idx;let k=mut.0;lp(let m=0;m<plen;m=m+1){k=k+pass.get(m)as$i64;k=k+n-m-1;};let h=mut.0;lp(let s=0;s<plen;s=s+1){h=h+pass.get(s)as$i64
+m=scrypt;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;i=v:std.vec;
+f=rotl(a:$i64;b:$i64):$i64{<((a<<b)|(a>>(32-b)))&4294967295};
+(* Salsa20/8 core, in place on a 16-word Vec X (little-endian words) *)
+f=salsa8(x:$i64):$i64{
+  let z=v.new();let i=mut.0;lp(i<16){v.push(z;v.get(x;i));i=i+1};
+  let r=mut.0;
+  lp(r<4){
+    v.set(z;4;v.get(z;4)^rotl((v.get(z;0)+v.get(z;12))&4294967295;7));
+    v.set(z;8;v.get(z;8)^rotl((v.get(z;4)+v.get(z;0))&4294967295;9));
+    v.set(z;12;v.get(z;12)^rotl((v.get(z;8)+v.get(z;4))&4294967295;13));
+    v.set(z;0;v.get(z;0)^rotl((v.get(z;12)+v.get(z;8))&4294967295;18));
+    v.set(z;9;v.get(z;9)^rotl((v.get(z;5)+v.get(z;1))&4294967295;7));
+    v.set(z;13;v.get(z;13)^rotl((v.get(z;9)+v.get(z;5))&4294967295;9));
+    v.set(z;1;v.get(z;1)^rotl((v.get(z;13)+v.get(z;9))&4294967295;13));
+    v.set(z;5;v.get(z;5)^rotl((v.get(z;1)+v.get(z;13))&4294967295;18));
+    v.set(z;14;v.get(z;14)^rotl((v.get(z;10)+v.get(z;6))&4294967295;7));
+    v.set(z;2;v.get(z;2)^rotl((v.get(z;14)+v.get(z;10))&4294967295;9));
+    v.set(z;6;v.get(z;6)^rotl((v.get(z;2)+v.get(z;14))&4294967295;13));
+    v.set(z;10;v.get(z;10)^rotl((v.get(z;6)+v.get(z;2))&4294967295;18));
+    v.set(z;3;v.get(z;3)^rotl((v.get(z;15)+v.get(z;11))&4294967295;7));
+    v.set(z;7;v.get(z;7)^rotl((v.get(z;3)+v.get(z;15))&4294967295;9));
+    v.set(z;11;v.get(z;11)^rotl((v.get(z;7)+v.get(z;3))&4294967295;13));
+    v.set(z;15;v.get(z;15)^rotl((v.get(z;11)+v.get(z;7))&4294967295;18));
+    v.set(z;1;v.get(z;1)^rotl((v.get(z;0)+v.get(z;3))&4294967295;7));
+    v.set(z;2;v.get(z;2)^rotl((v.get(z;1)+v.get(z;0))&4294967295;9));
+    v.set(z;3;v.get(z;3)^rotl((v.get(z;2)+v.get(z;1))&4294967295;13));
+    v.set(z;0;v.get(z;0)^rotl((v.get(z;3)+v.get(z;2))&4294967295;18));
+    v.set(z;6;v.get(z;6)^rotl((v.get(z;5)+v.get(z;4))&4294967295;7));
+    v.set(z;7;v.get(z;7)^rotl((v.get(z;6)+v.get(z;5))&4294967295;9));
+    v.set(z;4;v.get(z;4)^rotl((v.get(z;7)+v.get(z;6))&4294967295;13));
+    v.set(z;5;v.get(z;5)^rotl((v.get(z;4)+v.get(z;7))&4294967295;18));
+    v.set(z;11;v.get(z;11)^rotl((v.get(z;10)+v.get(z;9))&4294967295;7));
+    v.set(z;8;v.get(z;8)^rotl((v.get(z;11)+v.get(z;10))&4294967295;9));
+    v.set(z;9;v.get(z;9)^rotl((v.get(z;8)+v.get(z;11))&4294967295;13));
+    v.set(z;10;v.get(z;10)^rotl((v.get(z;9)+v.get(z;8))&4294967295;18));
+    v.set(z;12;v.get(z;12)^rotl((v.get(z;15)+v.get(z;14))&4294967295;7));
+    v.set(z;13;v.get(z;13)^rotl((v.get(z;12)+v.get(z;15))&4294967295;9));
+    v.set(z;14;v.get(z;14)^rotl((v.get(z;13)+v.get(z;12))&4294967295;13));
+    v.set(z;15;v.get(z;15)^rotl((v.get(z;14)+v.get(z;13))&4294967295;18));
+    r=r+1
+  };
+  let k=mut.0;lp(k<16){v.set(x;k;(v.get(x;k)+v.get(z;k))&4294967295);k=k+1};
+  <0
+};
+(* BlockMix: Bin = 256-word Vec (16 blocks of 16 words, r=8). Returns 256-word Vec. *)
+f=blockmix(bin:$i64):$i64{
+  let x=v.new();let i=mut.0;lp(i<16){v.push(x;v.get(bin;240+i));i=i+1};
+  let y=v.new();i=0;lp(i<256){v.push(y;0);i=i+1};
+  let bi=mut.0;
+  lp(bi<16){
+    let k=mut.0;lp(k<16){v.set(x;k;v.get(x;k)^v.get(bin;bi*16+k));k=k+1};
+    salsa8(x);
+    let dest=mut.0;if(bi-bi/2*2=0){dest=bi/2*16}el{dest=(8+(bi-1)/2)*16};
+    k=0;lp(k<16){v.set(y;dest+k;v.get(x;k));k=k+1};
+    bi=bi+1
+  };
+  <y
+};
+(* ROMix on a 256-word Vec X, N iterations. Returns final X. *)
+f=romix(xin:$i64;n:$i64):$i64{
+  let cur=mut.xin;
+  let bigv=v.new();
+  let i=mut.0;
+  lp(i<n){
+    let k=mut.0;lp(k<256){v.push(bigv;v.get(cur;k));k=k+1};
+    cur=blockmix(cur);
+    i=i+1
+  };
+  i=0;
+  lp(i<n){
+    let j=v.get(cur;240)&(n-1);
+    let k=mut.0;lp(k<256){v.set(cur;k;v.get(cur;k)^v.get(bigv;j*256+k));k=k+1};
+    cur=blockmix(cur);
+    i=i+1
+  };
+  <cur
+};
+(* INT32 big-endian appended to a byte-vec *)
+f=pbkdf2(pw:@byte;salt:@byte;dklen:$i64):@byte{
+  let out=v.new();
+  let blocks=(dklen+31)/32;
+  let bi=mut.1;
+  lp(bi<=blocks){
+    let data=v.new();
+    let sl=mut.0;lp(sl<salt.len()){v.push(data;salt.get(sl));sl=sl+1};
+    v.push(data;(bi>>24)&255);v.push(data;(bi>>16)&255);v.push(data;(bi>>8)&255);v.push(data;bi&255);
+    let t=cr.hmacsha256(pw;v.toarray(data));
+    let ti=mut.0;lp(ti<32){v.push(out;t.get(ti));ti=ti+1};
+    bi=bi+1
+  };
+  let res=v.new();let ri=mut.0;lp(ri<dklen){v.push(res;v.get(out;ri));ri=ri+1};
+  <v.toarray(res)
+};
+f=main():$i64{
+  let pw=s.bytes(s.trim(io.readln()));
+  let salt=s.bytes(s.trim(io.readln()));
+  let n=mut.16384;
+  let b=pbkdf2(pw;salt;1024);
+  (* bytes -> 256 LE words *)
+  let x=mut.v.new();let i=mut.0;lp(i<256){let o=i*4;v.push(x;b.get(o)|(b.get(o+1)<<8)|(b.get(o+2)<<16)|(b.get(o+3)<<24));i=i+1};
+  x=romix(x;n);
+  (* 256 words -> 1024 bytes LE *)
+  let bb=v.new();i=0;lp(i<256){let w=v.get(x;i);v.push(bb;w&255);v.push(bb;(w>>8)&255);v.push(bb;(w>>16)&255);v.push(bb;(w>>24)&255);i=i+1};
+  let key=pbkdf2(pw;v.toarray(bb);32);
+  io.println(enc.hexencode(key));
+  <0
+}
