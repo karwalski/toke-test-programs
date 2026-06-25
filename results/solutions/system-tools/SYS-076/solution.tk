@@ -1,1 +1,45 @@
-m=shellrunner;f=runshellcmd(cmd:$str):$i64{let result=mut.0;let code=mut.0;if(cmd.len>0){code=1;}el{code=0;};result=code;<result};f=main():$i64{let cmd1="echo hello";let cmd2="date";let cmd3="ls";let cmd4="pwd";let cmd5="whoami";let cmd6="uname -a";let cmd7="cat /etc/hosts";let cmd8="ps aux";let cmd9="kill -9 1234";let cmd10="mkdir /tmp/test";let cmd11="rm -rf /tmp/test";let cmd12="cp /etc/hosts /tmp/";let cmd13="mv /tmp/hosts /etc/";let cmd14="chmod 644 /etc/hosts";let cmd15="chown root:root /etc/hosts";let cmd16="grep example /etc/hosts";let cmd17="sort /etc/hosts";let cmd18="uniq /etc/hosts";let cmd19="diff /etc
+m=batchrunner;
+i=io:std.io;
+i=s:std.str;
+i=process:std.process;
+i=time:std.time;
+
+f=runcmd(cmd:$str):$i64{
+  let argv=s.split(s.trim(cmd);" ");
+  let code=mt process.spawn(argv){
+    Handle:h (mt process.wait(h){ $i32:c (c as $i64); ProcessErr:e (0-1) });
+    ProcessErr:e (0-127)
+  };
+  if(code<0){<0};
+  <code
+};
+
+f=main():$i64{
+  let mode=s.trim(io.readln());
+  let cmds=mut.@();
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()){
+      if(s.eq(s.trim(line);"")){ br; };
+    };
+    let t=s.trim(line);
+    if(!s.eq(t;"")){
+      cmds=cmds+@(t);
+    };
+  };
+
+  let n=cmds.len;
+  let ok=mut.0;
+  let failed=mut.0;
+  lp(let i=0;(i as $u64)<n;i=i+1){
+    let cmd=cmds.get(i);
+    let t0=time.now();
+    let code=runcmd(cmd);
+    let ms=(time.since(t0) as $i64);
+    if(code=0){ ok=ok+1; }el{ failed=failed+1; };
+    io.println(s.concat(s.concat(cmd;": exit=");s.concat(s.fromint(code);s.concat(" time=";s.concat(s.fromint(ms);"ms")))));
+  };
+
+  io.println(s.concat(s.concat("Summary: ";s.fromint(ok));s.concat(s.concat(" ok, ";s.fromint(failed));" failed.")));
+  <0
+}

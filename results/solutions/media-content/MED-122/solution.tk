@@ -1,1 +1,85 @@
-m=jaccardsim;f=tokenize(s:$str):@$str{let words=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<s.len;idx=idx+1){let ch=s.get(idx);if(ch=" "){if(!(current="")){words=words+@(current);current="";};}el{current=current+ch;};};if(!(current="")){words=words+@(current);};<words};f=setfromarr(arr:@$str):@$str{let s=mut.@();lp(let i=0;i<arr.len;i=i+1){let item=arr.get(i);let found=mut.false;lp(let j=0;j<s.len;j=j+1){if(s.get(j)=item){found=true;};};if(!(found)){s=s+@(item);};};<s};f=jaccardsim(arr:@$str):$f64{let a=mut.arr;let b=mut.arr;let alen=mut.a.len;let blen=mut.b.len;let inter=mut.@();lp(let i=0;i<alen;i=i+1){let ia
+m=jaccardsim;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=tokenize(doc:$str):@$str{
+  let words=mut.@();
+  let cur=mut."";
+  let b=s.bytes(doc);
+  let n=b.len;
+  lp(let i=0;i<n;i=i+1){
+    let c=b.get(i);
+    if(c=32||c=10||c=9||c=13){
+      if(s.len(cur)>0){words=words+@(cur);cur="";};
+    }el{
+      cur=s.concat(cur;s.substr(doc;i;i+1));
+    };
+  };
+  if(s.len(cur)>0){words=words+@(cur)};
+  <words
+};
+
+f=contains(set:@$str;w:$str):$bool{
+  lp(let i=0;i<set.len;i=i+1){
+    if(s.eq(set.get(i);w)){<true};
+  };
+  <false
+};
+
+f=toset(arr:@$str):@$str{
+  let set=mut.@();
+  lp(let i=0;i<arr.len;i=i+1){
+    let w=arr.get(i);
+    if(!contains(set;w)){set=set+@(w)};
+  };
+  <set
+};
+
+f=fmt3(v:$f64):$str{
+  let x=mut.0.0; x=v;
+  let scaled=mut.0.0; scaled=math.round(x*1000.0);
+  let total=scaled as i64;
+  let ip=total/1000;
+  let frac=total-ip*1000;
+  let res=mut.s.concat(s.fromint(ip);".");
+  if(frac<100){res=s.concat(res;"0")};
+  if(frac<10){res=s.concat(res;"0")};
+  res=s.concat(res;s.fromint(frac));
+  <res
+};
+
+f=main():$i64{
+  let doc1=mut."";
+  let doc2=mut."";
+  let insecond=mut.false;
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(s.eq(line;"---")){
+      insecond=true;
+      first=true;
+    }el{
+      if(insecond){
+        if(!first){doc2=s.concat(doc2;"\n")};
+        doc2=s.concat(doc2;line);
+      }el{
+        if(!first){doc1=s.concat(doc1;"\n")};
+        doc1=s.concat(doc1;line);
+      };
+      first=false;
+    };
+  };
+  let w1=toset(tokenize(s.lower(doc1)));
+  let w2=toset(tokenize(s.lower(doc2)));
+  let inter=mut.0;
+  lp(let i=0;i<w1.len;i=i+1){
+    if(contains(w2;w1.get(i))){inter=inter+1};
+  };
+  let uni=w1.len+w2.len-inter;
+  let score=mut.0.0;
+  if(uni>0){score=(inter as f64)/(uni as f64)};
+  io.println(s.concat("similarity: ";fmt3(score)));
+  <0
+};

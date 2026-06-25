@@ -1,1 +1,63 @@
-m=crontab;f=solve(p0:$str;p1:i64):$str{let lines=p0.split("\n");let result=mut."";let i=mut.0;lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);let trimmed=line.trim();let isempty=trimmed.len=0;if(!(isempty)){let parts=trimmed.split(" ");let hour=parts.get(1);let minute=parts.get(2);let command=parts.get(5);let nexttime=mut."";let found=mut.false;lp(let jdx=0;jdx<60;jdx=jdx+1){if(!(found)){if(jdx=minute){found=true;nexttime=jdx as$str;lp(let kdx=0;kdx<24;kdx=kdx+1){if(!(found)){if(kdx=hour){found=true;nexttime=jdx as$str;lp(let mdx=0;mdx<24;mdx=mdx+1){if(!(found)){if(mdx=hour){found=true;nexttime=jdx as$str;lp(let ndx=0;ndx<60;
+m=crontab;i=io:std.io;i=s:std.str;i=time:std.time;
+f=minmatch(field:$str;minute:$i64):$bool{
+if(s.eq(field;"*")){<true};
+if(s.startswith(field;"*/")){
+let step=s.toint(s.substr(field;2;s.len(field) as $i64));
+if(step<=0){<false};
+<(minute%step)=0
+};
+<minute=s.toint(field)
+};
+f=hourmatch(field:$str;hour:$i64):$bool{
+if(s.eq(field;"*")){<true};
+if(s.startswith(field;"*/")){
+let step=s.toint(s.substr(field;2;s.len(field) as $i64));
+if(step<=0){<false};
+<(hour%step)=0
+};
+<hour=s.toint(field)
+};
+f=main():$i64{
+let entry=s.trim(io.readln());
+let nstr=s.trim(io.readln());
+let count=s.toint(nstr);
+let toks=s.split(entry;" ");
+(* cron: min hour dom mon dow label *)
+let minf=s.trim(toks.get(0));
+let hourf=s.trim(toks.get(1));
+let label=mut."";
+if(toks.len()>5){
+lp(let i=5;i<toks.len();i=i+1){
+let t=s.trim(toks.get(i));
+if(s.len(t)>0){
+if(s.len(label)>0){label=s.concat(label;" ")};
+label=s.concat(label;t)
+}
+}
+};
+(* iterate from now+60s, minute granularity *)
+let nowms=time.now();
+let nowsec=(nowms/1000) as $i64;
+(* align to next minute boundary *)
+let startsec=mut.(nowsec/60)*60+60;
+let found=mut.0;
+let out=mut.s.concat(label;": ");
+let iter=mut.0;
+lp(found<count){
+if(iter>100000){br};
+let tsms=(startsec as $i64)*1000;
+let minute=s.toint(time.format(tsms as $u64;"%M"));
+let hour=s.toint(time.format(tsms as $u64;"%H"));
+if(minmatch(minf;minute)){
+if(hourmatch(hourf;hour)){
+let iso=time.format(tsms as $u64;"%Y-%m-%dT%H:%M:%SZ");
+if(found>0){out=s.concat(out;", ")};
+out=s.concat(out;iso);
+found=found+1
+}
+};
+startsec=startsec+60;
+iter=iter+1
+};
+io.println(out);
+<0}

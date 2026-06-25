@@ -1,1 +1,101 @@
-m=stability;f=compute(a:$i64;b:$i64;c:$i64):$i64{let r=mut.0;if(!(a=0))){r=r+1};if(!(b=0))){r=r+1};if(!(c=0))){r=r+1};<r};f=stabilityindex(a:$i64;b:$i64;c:$i64):$i64{let r=mut.0;let t=compute(a;b;c);if(!(t=0))){r=r+1};<r};
+m=stability;
+i=io:std.io;
+i=s:std.str;
+f=parsef(str:$str):$f64{
+  let v=mt s.tofloat(s.trim(str)){$ok:v v;$err:e 0.0};
+  let w=mut.0.0; w=v; <w
+};
+f=round2even(x:$f64):$i64{
+  let neg=mut.false; let v=mut.0.0; v=x;
+  if(v<0.0){neg=true; v=0.0-v};
+  let p=mut.0.0; p=v*1000.0+0.5;
+  let m3=p as$i64;
+  let h=m3/10; let r=m3-h*10;
+  let res=mut.h;
+  if(r<5){res=h}el{
+    if(r>5){res=h+1}el{
+      let half=h/2; let twice=half*2;
+      if(twice=h){res=h}el{res=h+1}
+    }
+  };
+  if(neg){res=0-res};
+  <res
+};
+f=jfloat2(cents:$i64):$str{
+  let neg=mut.false; let c=mut.cents;
+  if(c<0){neg=true; c=0-c};
+  let whole=c/100; let frac=c-whole*100;
+  let out=mut.s.fromint(whole);
+  out=s.concat(out;".");
+  if(frac=0){
+    out=s.concat(out;"0")
+  }el{
+    let tens=frac/10; let ones=frac-tens*10;
+    if(ones=0){
+      out=s.concat(out;s.fromint(tens))
+    }el{
+      let fs=mut.s.fromint(frac);
+      if(frac<10){fs=s.concat("0";fs)};
+      out=s.concat(out;fs)
+    }
+  };
+  if(neg){out=s.concat("-";out)};
+  <out
+};
+f=main():$i64{
+  let names=mut.@();
+  let stabs=mut.@();
+  let first=mut.true;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let l=s.trim(line);
+    if(s.len(l)<1){
+      first=first
+    }el{
+      if(first){
+        first=false
+      }el{
+        let parts=s.split(l;",");
+        if(parts.len<6){
+          first=first
+        }el{
+          let name=s.trim(parts.get(0));
+          let mean=parsef(parts.get(1));
+          let std=parsef(parts.get(2));
+          let lsl=parsef(parts.get(4));
+          let usl=parsef(parts.get(5));
+          let upd=mut.0.0; upd=usl-mean;
+          let lod=mut.0.0; lod=mean-lsl;
+          let mn=mut.0.0; mn=upd; if(lod<upd){mn=lod};
+          let cpk=mut.0.0; cpk=mn/(3.0*std);
+          let st=mut.0.0; st=1.0-1.0/(12.0*cpk);
+          names=names+@(name);
+          stabs=stabs+@(round2even(st))
+        }
+      }
+    }
+  };
+  let n=stabs.len;
+  let sum=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    sum=sum+stabs.get(i)
+  };
+  let ov=mut.0.0;
+  if(n>0){ov=sum as$f64/(n as$f64)/100.0};
+  let overall=round2even(ov);
+  let out=mut."{\"parameters\":[";
+  lp(let i=0;i<n;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;"{\"parameter\":\"");
+    out=s.concat(out;names.get(i));
+    out=s.concat(out;"\",\"stability\":");
+    out=s.concat(out;jfloat2(stabs.get(i)));
+    out=s.concat(out;"}")
+  };
+  out=s.concat(out;"],\"overall_stability\":");
+  out=s.concat(out;jfloat2(overall));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

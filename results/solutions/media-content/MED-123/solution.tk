@@ -1,1 +1,107 @@
-m=countbycategory;f=countbycategory(s:$str):$str{let n=s.len;let count=mut.0;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);let cat=mut."";if(c>64){if(c<91){cat="Lu";}}};if(c>96){if(c<123){cat="Ll";}}};if(c>47){if(c<58){cat="Nd";}}};if(c>349){if(c<351){cat="Pc";}}};if(c>45){if(c<47){cat="Ps";}}};if(c>47){if(c<58){cat="Po";}}};if(c>9){if(c<13){cat="Zs";}}};if(c>32){if(c<127){cat="C";}}};if(cat="Lu"){count=count+1;};if(cat="Ll"){count=count+1;};if(cat="Nd"){count=count+1;};if(cat="Ps"){result=s.concat(result;cat);};if(cat="
+m=unicat;
+i=io:std.io;
+i=s:std.str;
+
+f=classify(cp:$i64):$str{
+  if(cp=32||cp=9||cp=10||cp=13||cp=12||cp=11){<"Space"};
+  if(cp>=48&&cp<=57){<"DecimalDigit"};
+  if(cp>=65&&cp<=90){<"Letter"};
+  if(cp>=97&&cp<=122){<"Letter"};
+  if(cp=33||cp=34||cp=35||cp=37||cp=38||cp=39||cp=40||cp=41||cp=42||cp=44||cp=45||cp=46||cp=47||cp=58||cp=59||cp=63||cp=64||cp=91||cp=92||cp=93||cp=95||cp=123||cp=125){<"Punctuation"};
+  if(cp=36||cp=43||cp=60||cp=61||cp=62||cp=94||cp=96||cp=124||cp=126){<"Symbol"};
+  if(cp>=128){
+    if(cp>=160&&cp<=191){<"Symbol"};
+    <"Letter"
+  };
+  <"Other"
+};
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let b=s.bytes(all);
+  let n=b.len;
+  let names=mut.@();
+  let counts=mut.@();
+  let firstpos=mut.@();
+  let pos=mut.0;
+  let i=mut.0;
+  lp(i<n){
+    let b0=b.get(i);
+    let cp=mut.0;
+    let adv=mut.1;
+    if(b0<128){
+      cp=b0; adv=1;
+    }el{
+      if(b0>=240){
+        cp=b0-240; adv=4;
+      }el{
+        if(b0>=224){
+          cp=b0-224; adv=3;
+        }el{
+          if(b0>=192){
+            cp=b0-192; adv=2;
+          }el{
+            cp=b0; adv=1;
+          };
+        };
+      };
+    };
+    if(adv>1){
+      lp(let k=1;k<adv;k=k+1){
+        if(i+k<n){
+          let bx=b.get(i+k);
+          cp=cp*64+(bx-128);
+        };
+      };
+    };
+    let cat=classify(cp);
+    let found=mut.false;
+    lp(let j=0;j<names.len;j=j+1){
+      if(s.eq(names.get(j);cat)){
+        counts=counts.set(j;counts.get(j)+1);
+        found=true;
+        br;
+      };
+    };
+    if(!found){
+      names=names+@(cat);
+      counts=counts+@(1);
+      firstpos=firstpos+@(pos);
+    };
+    pos=pos+1;
+    i=i+adv;
+  };
+  let m=names.len;
+  let order=mut.@();
+  lp(let a=0;a<m;a=a+1){order=order+@(a)};
+  lp(let a=0;a<m;a=a+1){
+    lp(let bb=0;bb<m-1-a;bb=bb+1){
+      let x=order.get(bb);
+      let y=order.get(bb+1);
+      let swap=mut.false;
+      if(counts.get(x)<counts.get(y)){swap=true};
+      if(counts.get(x)=counts.get(y)){
+        if(firstpos.get(x)>firstpos.get(y)){swap=true};
+      };
+      if(swap){
+        order=order.set(bb;y);
+        order=order.set(bb+1;x);
+      };
+    };
+  };
+  lp(let a=0;a<m;a=a+1){
+    let idx=order.get(a);
+    if(counts.get(idx)>0){
+      io.println(s.concat(s.concat(names.get(idx);": ");s.fromint(counts.get(idx))));
+    };
+  };
+  <0
+};

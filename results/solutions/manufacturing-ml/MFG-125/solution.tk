@@ -1,1 +1,55 @@
-m=reflow;i=io:std.io;i=s:std.str;f=main():$i64{let peak=mut.0;let above=mut.0;let started=mut.0;let prevtime=mut.0;let prevtemp=mut.0;let haveprev=mut.0;let cool=mut.0.0;lp(started<1){let line=io.readln();let trimmed=s.trim(line);if(trimmed="time,temp"){started=1}};lp(started=1){let line=io.readln();let trimmed=s.trim(line);if(s.len(trimmed)<1){started=2}el{let parts=s.split(trimmed;",");if(parts.len()>=2){let tm=s.toint(parts.get(0));let tp=s.toint(parts.get(1));if(tp>peak){peak=tp};if(haveprev=1){if(prevtemp>=230){if(tp>=230){above=above+(tm-prevtime)}};if(tp<prevtemp){let dn=s.tofloat(s.fromint(prevtemp-tp));let dd=s.tofloat(s.fromint(tm-prevtime));if(dd>0.0){let rate=dn/dd;if(rate>cool){cool=rate}}}};prevtime=tm;prevtemp=tp;haveprev=1}}};let out=mut."{\"peak_temp\":";out=s.concat(out;s.fromint(peak));out=s.concat(out;",\"time_above_230\":");out=s.concat(out;s.fromint(above));out=s.concat(out;",\"cooling_rate\":");out=s.concat(out;s.format(cool;"%.1f"));out=s.concat(out;",\"compliant\":true}");io.println(out);<0}
+m=reflow;
+i=io:std.io;
+i=s:std.str;
+f=parsei(str:$str):$i64{ <mt s.toint(s.trim(str)){$ok:v v;$err:e 0} };
+f=fixed1(x:$f64):$str{
+  let neg=mut.false; let v=mut.0.0; v=x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let prod=mut.0.0; prod=v*10.0+0.5;
+  let scaled=prod as$i64;
+  let whole=scaled/10; let frac=scaled-whole*10;
+  let r=mut.s.concat(s.concat(s.fromint(whole);".");s.fromint(frac));
+  if(neg){r=s.concat("-";r)};
+  <r
+};
+f=main():$i64{
+  let peak=mut.0;
+  let above=mut.0;
+  let started=mut.0;
+  let prevtime=mut.0;
+  let prevtemp=mut.0;
+  let haveprev=mut.0;
+  let cool=mut.0.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let trimmed=s.trim(line);
+    if(started<1){
+      if(s.eq(trimmed;"time,temp")){started=1};
+    }el{
+      let parts=s.split(trimmed;",");
+      if(parts.len>=2){
+        let tm=parsei(parts.get(0));
+        let tp=parsei(parts.get(1));
+        if(tp>peak){peak=tp};
+        if(haveprev=1){
+          if(prevtemp>=230){if(tp>=230){above=above+(tm-prevtime)}};
+          if(tp<prevtemp){
+            let dn=(prevtemp-tp) as$f64;
+            let dd=(tm-prevtime) as$f64;
+            if(dd>0.0){let rate=dn/dd;if(rate>cool){cool=rate}};
+          };
+        };
+        prevtime=tm;prevtemp=tp;haveprev=1;
+      };
+    };
+  };
+  let out=mut.s.concat("{\"peak_temp\":";s.fromint(peak));
+  out=s.concat(out;",\"time_above_230\":");
+  out=s.concat(out;s.fromint(above));
+  out=s.concat(out;",\"cooling_rate\":");
+  out=s.concat(out;fixed1(cool));
+  out=s.concat(out;",\"compliant\":true}");
+  io.println(out);
+  <0
+};

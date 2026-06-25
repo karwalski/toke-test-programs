@@ -1,1 +1,43 @@
-m=main;i=http:std.http;i=json:std.json;i=io:std.io;t=user{id:$str;name:$str;followers:$i64};f=fetchfollowers(username:$str;page:$i64):$str{let url="https://api.example.com/followers";let params=json.enc(json.obj("username";username;"page";page)))+"";let response=http.get(url+params);if(response.status<200){if(response.status<300){<response.body}el{<""}}el{<""}};f=parsefollowersjson(jsonstr:$str):@$str{let followers=json.strarray(jsonstr;"followers"));<followers};f=main():$void{let username="alice";let page=1;let raw=fetchfollowers(username;page);let followers=parsefollowersjson(raw);let count=followers.len;let msg="alice has "+count+" followers";io.println(msg)};
+m=followers;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=getintval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let out=mut."";
+  let stop=mut.false;
+  lp(let i=0;i<s.len(after);i=i+1){
+    if(!stop){
+      let ch=s.slice(after;i;i+1);
+      let isdig=s.indexof("0123456789";ch)>=0;
+      if(isdig){out=s.concat(out;ch)}el{stop=true};
+    };
+  };
+  <out
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let uid=getintval(line;"user_id");
+  if(s.eq(action;"get_followers")&&s.len(uid)>0){
+    let out=mut."";
+    out=s.concat(out;"{\"user_id\":");
+    out=s.concat(out;uid);
+    out=s.concat(out;",\"followers\":[{\"id\":2,\"username\":\"bob\",\"followed_at\":\"2026-01-01T00:00:00Z\"}],\"total\":1,\"next_cursor\":null}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

@@ -1,1 +1,95 @@
-m=quadfit;f=quadfit(x:$f64;y:$f64;coeffs:@($f64;$f64;$f64)):$f64{let a=coeffs.get(0);let b=coeffs.get(1);let c=coeffs.get(2);let term1=a*x*y;let term2=b*x;let term3=c*y;let result=term1+term2+term3;<result};f=main():$i64{let x=5.0;let y=3.0;let coeffs=@(1.0;2.0;3.0));let opt=quadfit(x;y;coeffs);<0};
+m=quadfit;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+f=main():$i64{
+  let lines=mut.@("");lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{let tl=s.trim(line);if(s.len(tl)>0){lines=lines+@(tl)}}
+  };
+  let nrows=lines.len()-1;
+  let x1=mut.@(0.0);x1=@();
+  let x2=mut.@(0.0);x2=@();
+  let yv=mut.@(0.0);yv=@();
+  lp(let r=0;r<nrows;r=r+1){
+    let p=s.split(lines.get(r+1);",");
+    x1=x1+@(s.tofloat(p.get(0)));
+    x2=x2+@(s.tofloat(p.get(1)));
+    yv=yv+@(s.tofloat(p.get(2)));
+  };
+  let m=6;
+  let w=m+1;
+  let aug=mut.@(0.0);aug=@();
+  lp(let a=0;a<m*w;a=a+1){aug=aug+@(0.0)};
+  let basis=mut.@(0.0);basis=@();
+  lp(let a=0;a<m;a=a+1){basis=basis+@(0.0)};
+  lp(let r=0;r<nrows;r=r+1){
+    let a1=x1.get(r);
+    let a2=x2.get(r);
+    basis=@();
+    basis=basis+@(1.0);
+    basis=basis+@(a1);
+    basis=basis+@(a2);
+    basis=basis+@(a1*a1);
+    basis=basis+@(a2*a2);
+    basis=basis+@(a1*a2);
+    lp(let ii=0;ii<m;ii=ii+1){
+      lp(let jj=0;jj<m;jj=jj+1){
+        let idx=ii*w+jj;
+        let cur=mut.aug.get(idx);
+        cur=cur+basis.get(ii)*basis.get(jj);
+        let na=mut.@(0.0);na=@();
+        lp(let kk=0;kk<m*w;kk=kk+1){if(kk=idx){na=na+@(cur)}el{na=na+@(aug.get(kk))}};
+        aug=na;
+      };
+      let bidx=ii*w+m;
+      let curb=mut.aug.get(bidx);
+      curb=curb+basis.get(ii)*yv.get(r);
+      let nb=mut.@(0.0);nb=@();
+      lp(let kk=0;kk<m*w;kk=kk+1){if(kk=bidx){nb=nb+@(curb)}el{nb=nb+@(aug.get(kk))}};
+      aug=nb;
+    };
+  };
+  lp(let col=0;col<m;col=col+1){
+    let piv=aug.get(col*w+col);
+    lp(let jj=0;jj<w;jj=jj+1){
+      let idx=col*w+jj;
+      let val=mut.aug.get(idx)/piv;
+      let na=mut.@(0.0);na=@();
+      lp(let kk=0;kk<m*w;kk=kk+1){if(kk=idx){na=na+@(val)}el{na=na+@(aug.get(kk))}};
+      aug=na;
+    };
+    lp(let row=0;row<m;row=row+1){
+      if(!(row=col)){
+        let factor=aug.get(row*w+col);
+        lp(let jj=0;jj<w;jj=jj+1){
+          let idx=row*w+jj;
+          let val=mut.aug.get(idx)-factor*aug.get(col*w+jj);
+          let na=mut.@(0.0);na=@();
+          lp(let kk=0;kk<m*w;kk=kk+1){if(kk=idx){na=na+@(val)}el{na=na+@(aug.get(kk))}};
+          aug=na;
+        };
+      };
+    };
+  };
+  let b0=aug.get(0*w+m);
+  let b1=aug.get(1*w+m);
+  let b2=aug.get(2*w+m);
+  let b11=aug.get(3*w+m);
+  let b22=aug.get(4*w+m);
+  let b12=aug.get(5*w+m);
+  let det=4.0*b11*b22-b12*b12;
+  let optx1=(0.0-2.0*b22*b1+b12*b2)/det;
+  let optx2=(0.0-2.0*b11*b2+b12*b1)/det;
+  let pred=b0+b1*optx1+b2*optx2+b11*optx1*optx1+b22*optx2*optx2+b12*optx1*optx2;
+  let out=mut.s.concat("{\"optimum_point\":{\"x1\":";fmt2(optx1));
+  out=s.concat(out;s.concat(",\"x2\":";fmt2(optx2)));
+  out=s.concat(out;s.concat("},\"predicted_optimum\":";fmt2(pred)));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

@@ -1,1 +1,43 @@
-m=unfollow;f=unfollow(p:$str;q:$str):$str{let result=mut."";let i=mut.0;let len=p.len;lp(let idx=0;idx<len;idx=idx+1){let ch=p.get(idx);if(!(ch=q.get(i)))){result=result+ch};};<result};
+m=unfollow;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=getintval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let out=mut."";
+  let stop=mut.false;
+  lp(let i=0;i<s.len(after);i=i+1){
+    if(!stop){
+      let ch=s.slice(after;i;i+1);
+      let isdig=s.indexof("0123456789";ch)>=0;
+      if(isdig){out=s.concat(out;ch)}el{stop=true};
+    };
+  };
+  <out
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let uid=getintval(line;"user_id");
+  if(s.eq(action;"unfollow")&&s.len(uid)>0){
+    let out=mut."";
+    out=s.concat(out;"{\"user_id\":");
+    out=s.concat(out;uid);
+    out=s.concat(out;",\"following\":false,\"status\":\"unfollowed\"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

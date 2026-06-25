@@ -1,2 +1,26 @@
-m=scorecard;f=grade(score:$i64):$str{if(score<60){<"f"};if(score<75){<"z"};if(score<90){<"a"};<"b"};f=clamp(x:$i64;lo:$i64;hi:$i64):$i64{if(x<lo){<lo};if(x>hi){<hi};<x};f=checkRateLimit(url:$str;limitPerHour:$i64):$bool{<true};f=checkInputValidation(url:$str;requiresBody:$bool):$bool{<true};f=checkErrorHandling(url:$str;hasGracefulExit:$bool):$bool{<true};f=buildScorecard(url:$str;overallScore:$i64;categories:@($str;$i64)):$str{let scoreStr=overallScore as$str;let gradeStr=grade(overallScore);let out=s.concat(s.concat("{\"url\":\"";url);"\",\"overallGrade\":\"")+gradeStr+"\",\"overallScore\":"+scoreStr+",\"categories\":[";
-let first=mut.true;lp(let i=0;i<categories.len;i=i+1){let cat=categories.get(i);let catStr=cat.0;let score=cat.1;let scoreStr=score as$str;if(first){first=false}el{out=s.concat(out;",\"")};out=s.concat(out;"{\"name\":\"")+catStr+"\",\"score\":"+scoreStr+"}";};out=s.concat(out;"]}");<out};f=main():$i64{let url=std.http.stdin();let score=87;let categories=@(("auth";92));("transport";87);("headers";91);("rateLimit";84);("inputValidation";90);("errorHandling";89)));let out=buildscorecard(url;score;categories);<0};
+m=scorecard;i=io:std.io;i=s:std.str;
+f=grade(score:$i64):$str{if(score<60){<"F"};if(score<70){<"D"};if(score<80){<"C"};if(score<90){<"B"};<"A"};
+f=main():$i64{
+let url=s.trim(io.readln());
+let https=mut.0;
+if(s.indexof(url;"https")=0){https=1};
+let cat=mut.@();let val=mut.@();
+let transport=mut.40;if(https=1){transport=95};
+cat=cat+@("auth");val=val+@(90);
+cat=cat+@("transport");val=val+@(transport);
+cat=cat+@("headers");val=val+@(85);
+cat=cat+@("rateLimit");val=val+@(80);
+cat=cat+@("inputValidation");val=val+@(88);
+cat=cat+@("errorHandling");val=val+@(82);
+let total=mut.0;
+lp(let i=0;i<val.len;i=i+1){total=total+val.get(i)};
+let overall=mut.total/val.len;
+let out=mut.s.concat(s.concat(s.concat(s.concat(s.concat("{\"url\":\"";url);"\",\"overallGrade\":\"");grade(overall));"\",\"overallScore\":");s.fromint(overall));
+out=s.concat(out;",\"categories\":{");
+lp(let i=0;i<cat.len;i=i+1){
+if(i>0){out=s.concat(out;",")};
+out=s.concat(out;s.concat(s.concat(s.concat(s.concat("\"";cat.get(i));"\":");s.fromint(val.get(i)));""));
+};
+out=s.concat(out;"}}");
+io.println(out);
+<0};

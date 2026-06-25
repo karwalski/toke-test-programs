@@ -1,1 +1,45 @@
-m=jsonlog;f=processline(line:$str):$void{let isencrypted=mut.false;let key=mut."";let nonce=mut."";let ct=mut."";let i=mut.0;let len=line.len;lp(let j=0;j<len;j=j+1){let ch=line.get(j);if(ch=":"){i=j+1;};};let fieldname=line.substr(0;i);let valuestart=i+1;let valueend=mut.len;lp(let k=valuestart;k<len;k=k+1){let ch=line.get(k);if(ch="\n"){valueend=k;k=len;};};let value=line.substr(valuestart;valueend);if(fieldname="is_encrypted"){if(value="true"){isencrypted=true;};};if(fieldname="key"){key=value;};if(fieldname="nonce"){nonce=value;};if(fieldname="ct"){ct=value;};if(isencrypted){let valid=mut.true;if(key.len=0){valid=false;};if(nonce.len=0){valid=false;};if(ct.len=0){valid=false;};if(valid){let found=mut.false;let i=0;let len=0;lp(let
+m=nonce;i=io:std.io;i=s:std.str;
+f=nextval(str:$str;key:$str;from:$i64):$i64{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let sub=s.slice(str;from;s.len(str));
+  let idx=s.indexof(sub;pat);
+  if(idx<0){<-1};
+  <from+idx
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let pairs=mut."";
+  let reuse=mut.false;
+  let pos=mut.0;
+  let go=mut.true;
+  lp(let n=0;n<10000;n=n+1){
+    if(go){
+      let kpat="\"key_id\":\"";
+      let sub=s.slice(line;pos;s.len(line));
+      let ki=s.indexof(sub;kpat);
+      if(ki<0){go=false}el{
+        let kstart=pos+ki+s.len(kpat);
+        let kafter=s.slice(line;kstart;s.len(line));
+        let kend=s.indexof(kafter;"\"");
+        let keyid=s.slice(kafter;0;kend);
+        let np="\"nonce_hex\":\"";
+        let nsub=s.slice(line;kstart;s.len(line));
+        let ni=s.indexof(nsub;np);
+        if(ni<0){go=false}el{
+          let nstart=kstart+ni+s.len(np);
+          let nafter=s.slice(line;nstart;s.len(line));
+          let nend=s.indexof(nafter;"\"");
+          let nonce=s.slice(nafter;0;nend);
+          let combo=s.concat("|";s.concat(keyid;s.concat("#";s.concat(nonce;"|"))));
+          if(s.indexof(pairs;combo)>=0){reuse=true};
+          pairs=s.concat(pairs;combo);
+          pos=nstart+nend;
+        };
+      };
+    };
+  };
+  if(reuse){
+    io.println("CRITICAL")
+  };
+  <0
+}

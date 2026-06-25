@@ -1,1 +1,32 @@
-m=envmod;f=runchild(env:$str;varname:$str;varvalue:$str):$str{let newenv=s.concat(s.concat(s.concat(env;varname);"=");varvalue);let childout=mut."";let childerr=mut."";let childpid=mut.0;let childrunning=mut.false;let childexitcode=mut.0;let childterm=mut.false;let childreaped=mut.false;let childreap=mut.false;let childreapdone=mut.false;let childreapfailed=mut.false;let childreapretry=mut.false;let childreapretrycount=mut.0;let childreapretryfailed=mut.false;let childreapretrydone=mut.false;let childreapretrycountmax=mut.0;let childreapretrycountmaxreached=mut.false;let childreapretrycountmaxreachedfailed=mut.false;let childreapretrycountmaxreacheddone=mut.false;let childreapretrycountmaxreachedcount=mut.0;let childreapretrycountmaxreachedcountmax=mut.0;let childreapretrycountmaxreachedcountmaxreached=
+m=envmod;i=io:std.io;i=s:std.str;i=process:std.process;i=env:std.env;
+f=runcmd(argv:@$str):$str{
+<mt process.spawn(argv){
+Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
+ProcessErr:e ""
+}
+};
+f=main():$i64{
+let cmd=s.trim(io.readln());
+(* read KEY=VALUE lines, set env *)
+lp(io.eof()=false){
+let raw=io.readln();
+if(io.eof()){if(s.len(raw)=0){br}};
+let line=s.trim(raw);
+if(s.len(line)>0){
+let eq=s.indexof(line;"=");
+if(eq>0){
+let k=s.substr(line;0;eq);
+let v=s.substr(line;eq+1;s.len(line) as $i64);
+env.set(k;v)
+}
+}
+};
+let parts=s.split(cmd;" ");
+let argv=mut.@();
+lp(let i=0;i<parts.len();i=i+1){
+let t=s.trim(parts.get(i));
+if(s.len(t)>0){argv=argv+@(t)}
+};
+let out=runcmd(argv);
+io.print(out);
+<0}

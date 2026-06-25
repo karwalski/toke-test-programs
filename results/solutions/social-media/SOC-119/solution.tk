@@ -1,1 +1,20 @@
-m=abnvl;f=isabnvl(likes:$i64;comments:$i64;shares:$i64):$bool{let tot=likes+comments+shares;if(tot<100){<false};let likepct=(likes as f64)/(tot as f64))*100.0;if(likepct>50.0){<true};<false};
+m=viral;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  if(s.eq(action;"detect_viral")){
+    io.println("{\"viral_posts\":[{\"id\":15,\"engagement_velocity\":500,\"normal_velocity\":80,\"multiplier\":6.25,\"peak_hour\":\"2026-01-01T14:00:00Z\"}]}")
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

@@ -1,1 +1,44 @@
-m=perms;f=fixperms(path:$str):$bool{let stat=mut.stat(path);if(stat=0){<false};let isdir=mut.isdirectory(path);if(isdir){let result=mut.setdirectorypermissions(path;755);if(result=false){<false}}el{let result=mut.setfilepermissions(path;644);if(result=false){<false}};<true};
+m=permfix;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=shell(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=main():$i64{
+  let dir=s.trim(io.readln());
+  let fmode=mut.s.trim(io.readln());
+  if(s.len(fmode)=0){fmode="644"};
+  let dmode=mut.s.trim(io.readln());
+  if(s.len(dmode)=0){dmode="755"};
+  let dryraw=s.trim(io.readln());
+  let dryrun=s.eq(dryraw;"yes");
+  if(file.exists(dir)=(1=0)){
+    io.println("Summary: 0 files changed.");
+    <0
+  };
+  let listing=shell(s.concat("find '";s.concat(dir;"' ! -type l")));
+  let entries=s.split(listing;"\n");
+  let changed=mut.0;
+  lp(let i=0;i<entries.len;i=i+1){
+    let path=s.trim(entries.get(i));
+    if(s.len(path)>0){
+      let isdir=file.isdir(path);
+      let target=mut.fmode;
+      if(isdir){target=dmode};
+      let cur=s.trim(shell(s.concat("stat -f '%Lp' '";s.concat(path;"'"))));
+      if(s.eq(cur;target)=(1=0)){
+        io.println(s.concat("chmod ";s.concat(target;s.concat(" ";path))));
+        changed=changed+1;
+        if(dryrun=(1=0)){
+          let r=shell(s.concat("chmod ";s.concat(target;s.concat(" '";s.concat(path;"'")))))
+        }
+      }
+    }
+  };
+  io.println(s.concat("Summary: ";s.concat(s.fromint(changed);" files changed.")));
+  <0
+}

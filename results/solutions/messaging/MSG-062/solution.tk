@@ -1,1 +1,99 @@
-m=wire;f=wiretype(val:$i64):$str{if(val=0){<"varint"};if(val=1){<"fixed64"};if(val=2){<"length-delimited"};if(val=3){<"start-group"};if(val=4){<"end-group"};if(val=5){<"packed"};<"unknown"};f=serialize(msg:$str):$str{let len=msg.len;let lenbytes=encodevarint(len);let result=lenbytes+msg;<result};f=encodevarint(n:$i64):$str{if(n=0){<"0"};let bytes=mut.@();let mutval=mut.n;lp(let i=0;i<10;i=i+1){if(mutval=0){br};let rem=mutval-(mutval/128)*128;let byte=rem as u8;bytes=bytes+@(byte);mutval=mutval/128;};let result=mut."";lp(let i=0;i<bytes.len;i=i+1){let byte=bytes.get(i);let bstr=byte as$str;result=result+bstr;
+m=wire;
+i=io:std.io;
+i=s:std.str;
+f=hex2(n:$i64):$str{
+  let digs="0123456789abcdef";
+  let hi=n/16; let lo=n-hi*16;
+  let h=mt s.slice(digs;hi as$u64;(hi+1) as$u64){$ok:v v;$err:e "?"};
+  let l=mt s.slice(digs;lo as$u64;(lo+1) as$u64){$ok:v v;$err:e "?"};
+  <s.concat(h;l)
+};
+f=hexbytes(txt:$str):$str{
+  let bs=s.bytes(txt);
+  let r=mut."";
+  lp(let i=0;i<bs.len;i=i+1){ r=s.concat(r;hex2(bs.get(i) as$i64)); };
+  <r
+};
+f=varinttoks(n:$i64):$str{
+  if(n=0){<"00"};
+  let val=mut.n;
+  let toks=mut."";
+  lp(let i=0;i<10;i=i+1){
+    if(val=0){br};
+    let low=val-(val/128)*128;
+    let next=val/128;
+    let byteval=mut.low;
+    if(next>0){byteval=low+128};
+    if(s.len(toks)>0){toks=s.concat(toks;" ")};
+    toks=s.concat(toks;hex2(byteval));
+    val=next;
+  };
+  <toks
+};
+f=jstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx as$u64 + s.len(pat);
+  let rest=mt s.slice(obj;start;s.len(obj)){$ok:v v;$err:e ""};
+  let endi=s.indexof(rest;"\"");
+  if(endi<0){<rest};
+  <mt s.slice(rest;0;endi as$u64){$ok:v v;$err:e ""}
+};
+f=jnum(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx as$u64 + s.len(pat);
+  let rest=mt s.slice(obj;start;s.len(obj)){$ok:v v;$err:e ""};
+  let r=mut."";
+  lp(let i=0;i<s.len(rest) as$i64;i=i+1){
+    let c=mt s.slice(rest;i as$u64;(i+1) as$u64){$ok:v v;$err:e ""};
+    let b=s.bytes(c).get(0) as$i64;
+    if(b>=48){if(b<=57){r=s.concat(r;c)}el{br}}el{br};
+  };
+  <r
+};
+f=parsei(txt:$str):$i64{ <mt s.toint(s.trim(txt)){$ok:v v;$err:e 0} };
+f=main():$i64{
+  let schemaline=io.readln();
+  let dataline=io.readln();
+  let fstart=s.indexof(schemaline;"[");
+  let fieldsraw=mt s.slice(schemaline;(fstart+1) as$u64;s.len(schemaline)){$ok:v v;$err:e ""};
+  let parts=s.split(fieldsraw;"},{");
+  let hexline=mut."";
+  let bdown=mut."";
+  lp(let i=0;i<parts.len;i=i+1){
+    let fld=parts.get(i);
+    let tag=parsei(jnum(fld;"tag"));
+    let name=jstr(fld;"name");
+    let ftype=jstr(fld;"type");
+    let wiretype=mut.0;
+    if(s.eq(ftype;"string")){wiretype=2}el{wiretype=0};
+    let tagbyte=tag*8+wiretype;
+    if(s.len(hexline)>0){hexline=s.concat(hexline;" ")};
+    hexline=s.concat(hexline;hex2(tagbyte));
+    if(s.eq(ftype;"string")){
+      let v=jstr(dataline;name);
+      let vlen=s.len(v) as$i64;
+      hexline=s.concat(hexline;s.concat(" ";hex2(vlen)));
+      let vhex=hexbytes(v);
+      if(s.len(vhex)>0){hexline=s.concat(hexline;s.concat(" ";vhex))};
+      bdown=s.concat(bdown;s.concat(s.concat(s.concat("field ";s.fromint(tag));" (string): ");v));
+    }el{
+      let numval=mut.0;
+      if(s.eq(ftype;"bool")){
+        let raw=s.indexof(dataline;s.concat(s.concat("\"";name);"\":true"));
+        if(raw>=0){numval=1}el{numval=0};
+      }el{
+        numval=parsei(jnum(dataline;name));
+      };
+      hexline=s.concat(hexline;s.concat(" ";varinttoks(numval)));
+      bdown=s.concat(bdown;s.concat(s.concat(s.concat("field ";s.fromint(tag));" (varint): ");s.fromint(numval)));
+    };
+    bdown=s.concat(bdown;"\n");
+  };
+  io.println(hexline);
+  io.print(bdown);
+  <0
+};

@@ -1,1 +1,48 @@
-m=annotator;i=io:std.io;i=s:std.str;f=annotate(text:$str):$str{let n=text.len;let result=mut."";lp(let i=0;i<n;i=i+1){let ch=text.get(i);result=result+ch;if(ch="."){result=s.concat(result;"|");};};<result};f=main():$i64{let input=io.readln();let annotated=annotate(input);let parts=s.split(annotated;"|");let output=mut."";lp(let i=0;i<parts.len;i=i+1){let part=parts.get(i);if(part.len>0){if(output.len>0){output=s.concat(output;" ");}output=s.concat(output;"<S>")+part+"</S>";};}io.println(output);<0};
+m=annotator;
+i=io:std.io;
+i=s:std.str;
+f=annotate(text:$str):$str{
+  let n=s.len(text);
+  let b=s.bytes(text);
+  let output=mut."";
+  let cur=mut."";
+  let count=mut.0;
+  let i=mut.0;
+  lp(i<n){
+    let c=b.get(i);
+    if(c=32&&s.len(cur)=0){
+      i=i+1;
+    }el{
+      cur=s.concat(cur;s.substr(text;i;i+1));
+      if(c=46||c=63||c=33){
+        if(count>0){output=s.concat(output;" ")};
+        output=s.concat(output;"<S>");
+        output=s.concat(output;cur);
+        output=s.concat(output;"</S>");
+        count=count+1;
+        cur="";
+      };
+      i=i+1;
+    };
+  };
+  if(s.len(cur)>0){
+    if(count>0){output=s.concat(output;" ")};
+    output=s.concat(output;"<S>");
+    output=s.concat(output;cur);
+    output=s.concat(output;"</S>");
+  };
+  <output
+};
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;" ")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  io.println(annotate(all));
+  <0
+};

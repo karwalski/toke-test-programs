@@ -1,1 +1,25 @@
-m=dm;f=upload(id:$str;size:$i64):$str{let did=id;let dsz=size;let now=0;let ds=mut.dsz;let tds=mut.0;lp(let idx=0;idx<10;idx=idx+1){tds=ds;ds=ds+1;};let finalds=tds;let result=did;<result;};f=viewonce(id:$str):$str{let now=0;let result=id;<result;};f=ssdetection(pixels:$str):$str{let now=0;let result="screenshot";<result;};f=delet
+m=dm;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let needle=s.concat(s.concat("\"";key);"\":\"");let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"\"");<s.slice(rest;0;endidx)};
+f=main():$i64{let raw=s.trim(io.readln());let inner=mut.raw;
+if(s.startswith(inner;"[")){inner=s.slice(inner;1;s.len(inner))};
+if(s.endswith(inner;"]")){inner=s.slice(inner;0;s.len(inner)-1)};
+let chunks=s.split(inner;"},{");
+let events=mut.@();
+lp(let i=0;i<chunks.len();i=i+1){let c=mut."";c=chunks.get(i);if(!s.startswith(c;"{")){c=s.concat("{";c)};if(!s.endswith(c;"}")){c=s.concat(c;"}")};events=events+@(c)};
+let ids=mut.@();
+lp(let i=0;i<events.len();i=i+1){let mid=getstr(events.get(i);"msg_id");let seen=mut.false;lp(let j=0;j<ids.len();j=j+1){if(s.equals(ids.get(j);mid)){seen=true}};if(!seen){ids=ids+@(mid)}};
+lp(let k=0;k<ids.len();k=k+1){let mid=ids.get(k);
+let state=mut."ACTIVE";let upTime=mut."";let upUser=mut."";let viewCount=mut.0;let viewer=mut."";let viewTime=mut."";let ssUser=mut."";let ssTime=mut."";let hasSS=mut.false;let endLabel=mut."";let endTime=mut."";
+lp(let i=0;i<events.len();i=i+1){let ev=events.get(i);if(!s.equals(getstr(ev;"msg_id");mid)){}el{let etype=getstr(ev;"event");let etime=getstr(ev;"time");let euser=getstr(ev;"user");
+if(s.equals(etype;"upload")){upTime=etime;upUser=euser};
+if(s.equals(etype;"view")){if(viewCount=0){viewCount=1;viewer=euser;viewTime=etime}};
+if(s.equals(etype;"screenshot")){hasSS=true;ssUser=euser;ssTime=etime};
+if(s.equals(etype;"expire")){state="EXPIRED";endLabel="expired";endTime=etime};
+if(s.equals(etype;"delete")){state="DELETED";endLabel="deleted";endTime=etime}}};
+io.println(s.concat(mid;":"));
+io.println(s.concat("  state: ";state));
+io.println(s.concat(s.concat("  uploaded: ";upTime);s.concat(" by ";upUser)));
+if(viewCount=0){io.println("  views: 0")}el{io.println(s.concat(s.concat("  views: ";s.fromint(viewCount));s.concat(s.concat(" (";viewer);s.concat(s.concat(" at ";viewTime);")"))))};
+if(hasSS){io.println(s.concat(s.concat("  ALERT: screenshot by ";ssUser);s.concat(" at ";ssTime)))};
+if(!s.equals(endLabel;"")){io.println(s.concat(s.concat("  ";endLabel);s.concat(": ";endTime)))}};
+<0};

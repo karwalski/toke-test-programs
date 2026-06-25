@@ -1,1 +1,32 @@
-m=runner;f=run(cmd:$str;n:$i64;interval:$i64):$void{lp(let i=0;i<n;i=i+1){let output=cmd;let delay=interval;let clear=true;if(clear){<""};<output};<""};f=main():$void{let cmd="echo hello";let n=5;let interval=1000;let clear=true;run(cmd;n;interval);<""};
+m=watch;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runshell(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=toi(v:$str):$i64{
+  <mt s.toint(s.trim(v)){
+    $i64:n n;
+    ParseErr:e 0
+  }
+};
+f=main():$i64{
+  let interval=toi(io.readln());
+  let iterations=toi(io.readln());
+  let cmd=s.trim(io.readln());
+  if(interval<=0){
+    io.println("ERROR: interval must be > 0");
+    <0
+  };
+  lp(let k=1;k<=iterations;k=k+1){
+    let ts=s.trim(runshell("date"));
+    io.println(s.concat(s.concat(s.concat("--- Run ";s.fromint(k));" at ");s.concat(ts;" ---")));
+    let out=runshell(cmd);
+    io.print(out)
+  };
+  <0
+}

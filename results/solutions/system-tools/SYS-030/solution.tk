@@ -1,1 +1,111 @@
-m=hashfs;f=hashfile(path:$str):$str{let data=br(path);let hash=mut."";lp(let i=0;i<data.len;i=i+1){let ch=data.get(i);hash=hash+ch;};<hash};f=snapshotdir(path:$str):$str{let files=br(path);let hash=mut."";lp(let i=0;i<files.len;i=i+1){let f=files.get(i);let fp=s.concat(path;"/")+f;let h=hashfile(fp);hash=hash+f+"="+h+"\n";};<hash};f=comparehashes(a:$str;b:$str):$str{let alines=a.split("\n");let blines=b.split("\n");let result=mut."";lp(let i=0;i<alines.len;i=i+1){let aline=alines.get(i);let parts=aline.split("=");if(parts.len=2){let fname=parts.get(0);let ahash=parts.get(1);let bpart=blines.get(i);let bfname=bpart.split("=").get(0);if(fname=bfname){let bhash=bpart.split("=").get(
+m=hashfs;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=hashfile(path:$str):$i64{
+let r=fl.read(path);
+if(r){
+let bs=s.bytes(r);
+let h=mut.0;
+lp(let i=0;i<bs.len();i=i+1){h=(h*31+(bs.get(i) as $i64))%1000000007};
+<h
+};
+<0
+};
+f=collect(dir:$str;prefix:$str):$str{
+(* returns lines "relpath=hash\n" *)
+let out=mut."";
+let lst=fl.list(dir);
+lp(let i=0;i<lst.len();i=i+1){
+let name=lst.get(i);
+let skip=mut.false;
+if(s.eq(name;".snapshot.json")){skip=true};
+if(skip=false){
+let p=s.concat(s.concat(dir;"/");name);
+let rel=mut.name;
+if(s.len(prefix)>0){rel=s.concat(s.concat(prefix;"/");name)};
+if(fl.isdir(p)){
+out=s.concat(out;collect(p;rel))
+}el{
+out=s.concat(out;s.concat(s.concat(s.concat(rel;"=");s.fromint(hashfile(p)));"\n"))
+}
+}
+};
+<out
+};
+f=hashfor(snap:$str;key:$str):$str{
+let lines=s.split(snap;"\n");
+lp(let i=0;i<lines.len();i=i+1){
+let line=s.trim(lines.get(i));
+if(s.len(line)>0){
+let eq=s.indexof(line;"=");
+if(eq>0){
+let k=s.substr(line;0;eq);
+if(s.eq(k;key)){<s.substr(line;eq+1;s.len(line) as $i64)}
+}
+}
+};
+<""
+};
+f=main():$i64{
+let dir=s.trim(io.readln());
+let cmd=s.trim(io.readln());
+if(fl.exists(dir)){}el{
+io.println(s.concat("ERROR: directory not found: ";dir));
+<0
+};
+if(s.eq(cmd;"snapshot")){
+let snap=collect(dir;"");
+let outfile=s.concat(dir;"/.snapshot.json");
+fl.write(outfile;snap);
+let nlines=s.split(s.trim(snap);"\n");
+let cnt=mut.0;
+if(s.len(s.trim(snap))>0){cnt=nlines.len() as $i64};
+io.println(s.concat(s.concat(s.concat("Snapshot saved to ";outfile);" (");s.concat(s.fromint(cnt);" files)")));
+<0
+};
+if(s.eq(cmd;"diff")){
+let prevpath=s.trim(io.readln());
+let prev=mut."";
+let pr=fl.read(prevpath);
+if(pr){prev=pr};
+let cur=collect(dir;"");
+let changes=mut.0;
+(* ADDED or MODIFIED: iterate current *)
+let curlines=s.split(cur;"\n");
+lp(let i=0;i<curlines.len();i=i+1){
+let line=s.trim(curlines.get(i));
+if(s.len(line)>0){
+let eq=s.indexof(line;"=");
+if(eq>0){
+let k=s.substr(line;0;eq);
+let v=s.substr(line;eq+1;s.len(line) as $i64);
+let ph=hashfor(prev;k);
+if(s.len(ph)=0){
+io.println(s.concat("ADDED ";k));
+changes=changes+1
+}el{if(s.eq(ph;v)=false){
+io.println(s.concat("MODIFIED ";k));
+changes=changes+1
+}}
+}
+}
+};
+(* DELETED: in prev not in cur *)
+let prevlines=s.split(prev;"\n");
+lp(let i=0;i<prevlines.len();i=i+1){
+let line=s.trim(prevlines.get(i));
+if(s.len(line)>0){
+let eq=s.indexof(line;"=");
+if(eq>0){
+let k=s.substr(line;0;eq);
+let ch=hashfor(cur;k);
+if(s.len(ch)=0){
+io.println(s.concat("DELETED ";k));
+changes=changes+1
+}
+}
+}
+};
+if(changes=0){io.println("No changes")};
+<0
+};
+io.println("ERROR: unknown command");
+<0}

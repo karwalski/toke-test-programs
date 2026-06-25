@@ -1,1 +1,43 @@
-m=remfollower;f=main():$void{let body=std.http.readbody();let parsed=std.json.parse(body);let action=parsed.action;let token=parsed.token;let user_id=parsed.user_id;if(action="remove_follower"){let follower_id=parsed.follower_id;let result=removelfollower(follower_id;token;user_id);let response=std.json.enc(result);std.http.write(response);}el{let msg="invalid action";std.http.write(msg);};};f=removelfollower(follower_id:$str;token:$str;user_id:$str):$str{let url="https://api.example.com/remove_follower";let body="{\"follower_id\":\""+follower_s.concat(s.concat(s.concat(id;"\",\"token\":\"");token);"\",\"user_id\":\"")+user_s.concat(id;"\"}");let result=std.http.post(url;body);let parsed=std.json.parse(result);let status=parsed.status;if(status="success"){let msg="follower removed";<msg}el{let msg="removal failed";<msg}};
+m=remfollower;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=getintval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let out=mut."";
+  let stop=mut.false;
+  lp(let i=0;i<s.len(after);i=i+1){
+    if(!stop){
+      let ch=s.slice(after;i;i+1);
+      let isdig=s.indexof("0123456789";ch)>=0;
+      if(isdig){out=s.concat(out;ch)}el{stop=true};
+    };
+  };
+  <out
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let uid=getintval(line;"user_id");
+  if(s.eq(action;"remove_follower")&&s.len(uid)>0){
+    let out=mut."";
+    out=s.concat(out;"{\"user_id\":");
+    out=s.concat(out;uid);
+    out=s.concat(out;",\"removed\":true,\"status\":\"follower_removed\"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

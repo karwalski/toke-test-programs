@@ -1,1 +1,54 @@
-m=hopcroftkarp;f=buildgraph(left:$str;right:$str;edges:@($str;$str)):$str{let result=mut."";lp(let i=0;i<edges.len;i=i+1){let e=edges.get(i);let l=e.from;let r=e.to;if(result.len=0){result=l+" "+r}el{result=s.concat(result;"\n")+l+" "+r}};<result};f=hopcroftkarp(g:$str):$i64{let lines=g.split("\n");let left=mut.@();let right=mut.@();lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let parts=line.split(" ");if(parts.len=2){let l=parts.get(0);let r=parts.get(1);if(left.len=0){left=@(l)}el{let found=mut.false;lp(let j=0;j<left.len;j=j+1){if(left.get(j)=l){found=true}};if(!found){left=left+@(l)}};if(right.len=0){right=@(r)}el{let found=mut.false;lp(let j=0;j
+m=bipartite;i=io:std.io;i=s:std.str;i=v:std.vec;
+f=tryaug(u:$i64;e:$i64;eu:Vec;ev:Vec;seen:Vec;matchr:Vec):$bool{
+let res=mut.false;
+let done=mut.false;
+lp(let i=0;i<e;i=i+1){
+if(done=false){
+if(eu.get(i)=u){
+let r=ev.get(i);
+if(seen.get(r)=0){
+seen.set(r;1);
+let mr=matchr.get(r);
+if(mr<0){
+matchr.set(r;u);
+res=true;done=true;
+}el{
+if(tryaug(mr;e;eu;ev;seen;matchr)){
+matchr.set(r;u);
+res=true;done=true;
+};
+};
+};
+};
+};
+};
+<res};
+f=main():$i64{
+let first=s.split(s.trim(io.readln());" ");
+let u=s.toint(first.get(0));
+let vv=s.toint(first.get(1));
+let e=s.toint(first.get(2));
+let eu=v.new();let ev=v.new();
+lp(let i=0;i<e;i=i+1){
+let p=s.split(s.trim(io.readln());" ");
+eu.push(s.toint(p.get(0)));
+ev.push(s.toint(p.get(1)));
+};
+let matchr=v.new();
+lp(let i=0;i<vv;i=i+1){matchr.push(0-1)};
+let size=mut.0;
+lp(let lu=0;lu<u;lu=lu+1){
+let seen=v.new();
+lp(let i=0;i<vv;i=i+1){seen.push(0)};
+if(tryaug(lu;e;eu;ev;seen;matchr)){size=size+1};
+};
+let out=mut."Matching:";
+lp(let r=0;r<vv;r=r+1){
+let mr=matchr.get(r);
+if(mr>=0){
+out=s.concat(out;s.concat(s.concat(s.concat(" ";s.fromint(mr));"-");s.fromint(r)));
+};
+};
+io.println(out);
+io.println(s.concat("Size: ";s.fromint(size)));
+<0};

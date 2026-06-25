@@ -1,1 +1,33 @@
-m=hashchain;f=hashfn(msg:$str):$i64{let hash=mut.0;let len=msg.len;lp(let i=0;i<len;i=i+1){let char=msg.get(i);let code=char.code;hash=hash*31+code;};<hash};f=verifychain(msgs:@$str):$bool{let n=msgs.len;if(n<2){<false};lp(let i=1;i<n;i=i+1){let msg1=msgs.get(i-1);let msg2=msgs.get(i);let h1=hashfn(msg1);let h2=hashfn(msg2);if(h2=h1){<false};};<true};f=main():$i64{let msgs=@("hello";"world";"hash"));let result=verifychain(msgs);if(result){<0}el{<1}};
+m=hc;i=io:std.io;i=s:std.str;
+f=gdisplay(g:$str):$str{let n=s.len(g);if(n>8){let a=s.slice(g;0;4);let b=s.slice(g;n-4;n);<s.concat(s.concat(a;"...");b)};<g};
+f=main():$i64{
+let genesis=s.trim(io.readln());
+let jarr=s.trim(io.readln());
+let texts=mut.@($str);
+let body=jarr;
+let pos=mut.0;
+lp(true){
+let ti=s.indexof(s.slice(body;pos;s.len(body));"\"text\":\"");
+if(ti<0){br};
+let start=pos+ti+8;
+let rest=s.slice(body;start;s.len(body));
+let endi=s.indexof(rest;"\"");
+let t=s.slice(rest;0;endi);
+texts=texts+@(t);
+pos=start+endi+1;
+};
+let gd=gdisplay(genesis);
+io.println("chain:");
+io.println(s.concat("  [0] genesis: ";gd));
+let n=texts.len();
+lp(let i=0;i<n;i=i+1){
+let idx=i+1;
+let prev=mut."";
+if(i=0){prev=gd}el{prev=s.concat("hash";s.fromint(i))};
+let line=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("  [";s.fromint(idx));"] ");texts.get(i));" -> hash: sha256(");prev);s.concat(" || msg";s.concat(s.fromint(idx);")")));
+io.println(line);
+};
+let label=mut."messages";
+if(n=1){label="message"};
+io.println(s.concat(s.concat(s.concat(s.concat("verification: INTACT (";s.fromint(n));" ");label);", no breaks)"));
+<0}

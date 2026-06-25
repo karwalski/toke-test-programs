@@ -1,1 +1,96 @@
-m=anomaly;f=correlate(x:@$f64;y:@$f64):$f64{let sumxy=mut.0;let sumx=mut.0;let sumy=mut.0;let n=x.len as$f64;lp(let i=0;i<x.len;i=i+1){let xi=x.get(i);let yi=y.get(i);sumxy=sumxy+xi*yi;sumx=sumx+xi;sumy=sumy+yi;};let num=sumxy-sumx*sumy/n;let den=(((sumx*sumx/n)-sumx*sumx/n)+(sumy*sumy/n)-sumy*sumy/n))*
+m=anomaly;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt2(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)};
+    };
+  };
+  let nl=lines.len();
+  let x1=mut.@(0.0); x1=@();
+  let x2=mut.@(0.0); x2=@();
+  lp(let i=1;i<nl;i=i+1){
+    let row=lines.get(i);
+    let p=s.split(row;",");
+    x1=x1+@(s.tofloat(s.trim(p.get(0))));
+    x2=x2+@(s.tofloat(s.trim(p.get(1))));
+  };
+  let n=x1.len();
+  let nf=(n as $f64);
+  let m1=mut.0.0;
+  let m2=mut.0.0;
+  lp(let i=0;i<n;i=i+1){ m1=m1+x1.get(i); m2=m2+x2.get(i); };
+  m1=m1/nf; m2=m2/nf;
+  let denom=mut.0.0;
+  denom=nf-1.0;
+  if(denom<1.0){denom=1.0};
+  let v1=mut.0.0;
+  let v2=mut.0.0;
+  let cv=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let d1=x1.get(i)-m1;
+    let d2=x2.get(i)-m2;
+    v1=v1+d1*d1;
+    v2=v2+d2*d2;
+    cv=cv+d1*d2;
+  };
+  v1=v1/denom; v2=v2/denom; cv=cv/denom;
+  let det=mut.0.0;
+  det=v1*v2-cv*cv;
+  let useoff=mut.1;
+  let ad=mut.det;
+  if(ad<0.0){ad=0.0-ad};
+  if(ad<0.000001){ useoff=0; };
+  let dists=mut.@(0.0); dists=@();
+  let thr=math.sqrt(5.991);
+  let anom=mut.@(0); anom=@();
+  lp(let i=0;i<n;i=i+1){
+    let d1=x1.get(i)-m1;
+    let d2=x2.get(i)-m2;
+    let m=mut.0.0;
+    if(useoff=1){
+      let i11=mut.0.0; i11=v2/det;
+      let i22=mut.0.0; i22=v1/det;
+      let i12=mut.0.0; i12=(0.0-cv)/det;
+      m=d1*d1*i11+2.0*d1*d2*i12+d2*d2*i22;
+    }el{
+      let q1=mut.0.0;
+      let q2=mut.0.0;
+      if(v1>0.000001){q1=d1*d1/v1};
+      if(v2>0.000001){q2=d2*d2/v2};
+      m=q1+q2;
+    };
+    if(m<0.0){m=0.0};
+    let dist=mut.0.0;
+    dist=math.sqrt(m);
+    dists=dists+@(dist);
+    if(dist>thr){ anom=anom+@(i); };
+  };
+  let out=mut."{\"distances\":[";
+  lp(let i=0;i<dists.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;fmt2(dists.get(i)));
+  };
+  out=s.concat(out;"],\"anomaly_indices\":[");
+  lp(let i=0;i<anom.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;s.fromint(anom.get(i)));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

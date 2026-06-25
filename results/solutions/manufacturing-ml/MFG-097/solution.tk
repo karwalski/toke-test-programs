@@ -1,1 +1,70 @@
-m=windowfinder;t=$point{x:$i64;y:$i64};f=findwindow(qlist:@($i64;$i64));targetq:$i64):$point{let beststart=mut.0;let bestend=mut.0;let bestlen=mut.92233720368547758;lp(let i=0;i<qlist.len;i=i+1){let q=qlist.get(i);let start=q.x;let end=q.y;let len=end-start;if(!(len<bestlen)){bestlen=len;beststart=start;bestend=end}};let result=$point{x:beststart;y:bestend};<result};
+m=windowfinder;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+  let nlines=lines.len();
+  let temps=mut.@(0.0);
+  temps=@();
+  let minq=mut.@(0.0);
+  minq=@();
+  let ncols=mut.0;
+  let header=lines.get(0);
+  let hparts=s.split(header;",");
+  ncols=hparts.len();
+  lp(let i=1;i<nlines;i=i+1){
+    let parts=s.split(lines.get(i);",");
+    let t=s.tofloat(parts.get(0));
+    let lo=mut.0.0;
+    let firstq=mut.1;
+    lp(let c=1;c<ncols;c=c+1){
+      let q=s.tofloat(parts.get(c));
+      if(firstq=1){lo=q;firstq=0}el{if(q<lo){lo=q}};
+    };
+    temps=temps+@(t);
+    minq=minq+@(lo);
+  };
+  let n=temps.len();
+  let spec=85.0;
+  let wmin=mut.0.0;
+  let wmax=mut.0.0;
+  let haswin=mut.0;
+  let bestt=mut.0.0;
+  let bestq=mut.0.0;
+  let qualcount=mut.0;
+  let strictcount=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let t=temps.get(i);
+    let lo=minq.get(i);
+    if(!(lo<spec)){
+      qualcount=qualcount+1;
+      if(haswin=0){wmin=t;wmax=t;haswin=1}el{
+        if(t<wmin){wmin=t};
+        if(t>wmax){wmax=t};
+      };
+      if(qualcount=1){bestt=t;bestq=lo}el{if(lo>bestq){bestq=lo;bestt=t}};
+      if(lo>spec){strictcount=strictcount+1};
+    }
+  };
+  let robust=(strictcount as $f64)/(qualcount as $f64);
+  let out=mut."{\"optimal_window\":{\"temp\":{\"min\":";
+  out=s.concat(out;s.fromint((wmin as $i64)));
+  out=s.concat(out;",\"max\":");
+  out=s.concat(out;s.fromint((wmax as $i64)));
+  out=s.concat(out;"}},\"best_point\":{\"temp\":");
+  out=s.concat(out;s.fromint((bestt as $i64)));
+  out=s.concat(out;"},\"robustness\":");
+  out=s.concat(out;s.format(robust;"%.2f"));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

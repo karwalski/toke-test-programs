@@ -1,1 +1,31 @@
-m=fdlist;f=usage():$str{<"Usage: fdlist <pid>";};f=isnumeric(s:$str):$bool{if(s.len=0){<false};lp(let i=0;i<s.len;i=i+1){let c=s.get(i);let isdig=mut.false;if(c>47){if(c<58){isdig=true}};if(!(isdig=true))){<false}};<true};f=listfd(pid:$str):$str{let cmd=s.concat(s.concat("ls -l /proc/";pid);"/fd");let res=cmd;let out=mut."";lp(let i=0;i<res.len;i=i+1){let c=res.get(i);out=out+c;};<out};f=main():$i64{let argc=0 as$i64;let argv=@(0 as$str));if(argc<2){<0};let pid=argv.get(1);let isnum=isnumeric(pid);if(!(isnum=true))){<0};let result=listfd(pid);<0};
+m=fdlist;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(c:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";c)){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
+    ProcessErr:e ""
+  }
+};
+f=main():$i64{
+  let pid=s.trim(io.readln());
+  if(s.len(pid)=0){
+    io.println("ERROR: no PID provided");
+    <0
+  };
+  let chk=s.concat(s.concat("if ps -p ";pid);" >/dev/null 2>&1; then echo EXISTS; else echo NOTFOUND; fi");
+  let exists=s.trim(runcmd(chk));
+  if(s.eq(exists;"NOTFOUND")){
+    io.println(s.concat("ERROR: PID not found: ";pid));
+    <0
+  };
+  let cmd=s.concat(s.concat("lsof -p ";pid);" -Fftn 2>/dev/null | awk '/^f/{fd=substr($0,2)} /^t/{ty=substr($0,2)} /^n/{print fd, ty, substr($0,2)}'");
+  let out=runcmd(cmd);
+  let lines=s.split(out;"\n");
+  let warm=lines.get(0);
+  lp(let i=0;i<(s.len(lines) as $i64);i=i+1){
+    let line=s.trim(lines.get(i));
+    if(s.len(line)>0){
+      io.println(line)
+    }
+  };
+  <0
+}

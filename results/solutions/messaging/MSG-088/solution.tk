@@ -1,1 +1,115 @@
-m=enclog;f=encrypt(key:$str;plaintext:$str):$str{let result=mut."";lp(let i=0;i<plaintext.len;i=i+1){let ch=plaintext.get(i);let kidx=i-i/2*2;let shift=key.get(kidx)as i64;let basech=ch as i64;let shifted=basech+shift;let wrapped=shifted-shifted/128*128;let finalch=wrapped as$str;result=result+finalch;};<result};f=logencrypt(keylen:$i64;plaintextlen:$i64):$str{let msg=mut."encrypt: keylen=";msg=s.concat(msg;keylen) as$str;msg=s.concat(msg;" plaintextlen=");msg=s.concat(msg;plaintextlen) as$str;<msg};f=main():$str{let key="secretkey";let pt="confidential";let result=encrypt(key;pt);let logmsg=logencrypt(key.len;pt.len);<logmsg};
+m=enclog;
+i=io:std.io;
+i=s:std.str;
+f=jstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx as$u64 + s.len(pat);
+  let rest=mt s.slice(obj;start;s.len(obj)){$ok:v v;$err:e ""};
+  let endi=s.indexof(rest;"\"");
+  if(endi<0){<rest};
+  <mt s.slice(rest;0;endi as$u64){$ok:v v;$err:e ""}
+};
+f=jbool(obj:$str;key:$str):$bool{
+  let pat=s.concat(s.concat("\"";key);"\":true");
+  <s.indexof(obj;pat)>=0
+};
+f=strless(a:$str;b:$str):$bool{
+  let ba=s.bytes(a); let bb=s.bytes(b);
+  let n=mut.ba.len; if(bb.len<n){n=bb.len};
+  lp(let i=0;i<n;i=i+1){
+    let ca=ba.get(i) as$i64; let cb=bb.get(i) as$i64;
+    if(ca<cb){<true};
+    if(ca>cb){<false};
+  };
+  <ba.len<bb.len
+};
+f=timeonly(ts:$str):$str{
+  let tpos=s.indexof(ts;"T");
+  if(tpos<0){<ts};
+  let st=(tpos+1) as$u64;
+  <mt s.slice(ts;st;st+8){$ok:v v;$err:e ""}
+};
+f=pct1(num:$i64;den:$i64):$str{
+  let scaled=num*1000;
+  let q=scaled/den;
+  let r=scaled-q*den;
+  let q2=mut.q;
+  if(r*2>=den){q2=q+1};
+  let whole=q2/10; let frac=q2-whole*10;
+  <s.concat(s.concat(s.concat(s.fromint(whole);".");s.fromint(frac));"%")
+};
+f=main():$i64{
+  let line=io.readln();
+  let inner=s.trim(line);
+  let lb=s.indexof(inner;"[");
+  let raw=mut.mt s.slice(inner;(lb+1) as$u64;s.len(inner)){$ok:v v;$err:e ""};
+  let rb=s.indexof(raw;"]");
+  if(rb>=0){raw=mt s.slice(raw;0;rb as$u64){$ok:v v;$err:e ""}};
+  let parts=s.split(raw;"},{");
+  let ops=mut.@();
+  let kids=mut.@();
+  let mids=mut.@();
+  let tss=mut.@();
+  let oks=mut.@();
+  lp(let i=0;i<parts.len;i=i+1){
+    let obj=parts.get(i);
+    if(s.indexof(obj;"\"operation\"")<0){br};
+    ops=ops+@(jstr(obj;"operation"));
+    kids=kids+@(jstr(obj;"key_id"));
+    mids=mids+@(jstr(obj;"msg_id"));
+    tss=tss+@(jstr(obj;"timestamp"));
+    let okv=mut.0; if(jbool(obj;"success")){okv=1};
+    oks=oks+@(okv);
+  };
+  let n=ops.len as$i64;
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-1-i;j=j+1){
+      let a=order.get(j); let b=order.get(j+1);
+      if(strless(tss.get(b);tss.get(a))){order=order.set(j;b);order=order.set(j+1;a)};
+    };
+  };
+  io.println("AUDIT LOG:");
+  let optypes=mut.@();
+  let opcounts=mut.@();
+  let keynames=mut.@();
+  let keycounts=mut.@();
+  let nsucc=mut.0;
+  lp(let oi=0;oi<n;oi=oi+1){
+    let idx=order.get(oi);
+    let op=ops.get(idx);
+    let kid=kids.get(idx);
+    let mid=mids.get(idx);
+    let ok=oks.get(idx);
+    let stat=mut."FAILED"; if(ok=1){stat="OK";nsucc=nsucc+1};
+    io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("[";timeonly(tss.get(idx)));"] ");op);s.concat(" ";mid));s.concat(" with ";kid));": ");stat));
+    let of=mut.false;
+    lp(let j=0;j<optypes.len;j=j+1){
+      if(s.eq(optypes.get(j);op)){opcounts=opcounts.set(j;opcounts.get(j)+1);of=true;br};
+    };
+    if(!of){optypes=optypes+@(op);opcounts=opcounts+@(1)};
+    let kf=mut.false;
+    lp(let j=0;j<keynames.len;j=j+1){
+      if(s.eq(keynames.get(j);kid)){keycounts=keycounts.set(j;keycounts.get(j)+1);kf=true;br};
+    };
+    if(!kf){keynames=keynames+@(kid);keycounts=keycounts+@(1)};
+  };
+  io.println("---");
+  let opstr=mut."";
+  lp(let j=0;j<optypes.len;j=j+1){
+    if(j>0){opstr=s.concat(opstr;", ")};
+    opstr=s.concat(opstr;s.concat(s.concat(optypes.get(j);"=");s.fromint(opcounts.get(j))));
+  };
+  io.println(s.concat("operations: ";opstr));
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat("success rate: ";pct1(nsucc;n));" (");s.fromint(nsucc));"/");s.concat(s.fromint(n);")")));
+  let kstr=mut."";
+  lp(let j=0;j<keynames.len;j=j+1){
+    if(j>0){kstr=s.concat(kstr;", ")};
+    kstr=s.concat(kstr;s.concat(s.concat(keynames.get(j);"=");s.fromint(keycounts.get(j))));
+  };
+  io.println(s.concat("keys used: ";kstr));
+  <0
+};

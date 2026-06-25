@@ -1,1 +1,56 @@
-m=timeout;f=runwithtimeout(code:$str;limit:i64):$str{let start=mut.0;let elapsed=mut.0;let result=mut."";let timer=mut.0;let codearr=mut.@();lp(let idx=0;idx<code.len;idx=idx+1){codearr=codearr+@(code.get(idx))};let codeidx=mut.0;let codelen=codearr.len;let running=mut.true;let timeoutflag=mut.false;let timerstart=mut.0;let timerelapsed=mut.0;let timerlimit=mut.limit;let timerrunning=mut.true;let timercodeidx=mut.0;let timercodelen=mut.codelen;let timerelapsed=mut.0;let timerlimit=mut.timerlimit;let timerrunning=mut.timerrunning;let timercodeidx=mut.timercodeidx;let timercodelen=mut.timercodelen;let timerelapsed=mut.timerelapsed
+m=scripttimeout;
+i=io:std.io;
+i=s:std.str;
+i=process:std.process;
+i=time:std.time;
+
+f=buildwrapper(secs:$str;cmd:$str):$str{
+  let w=mut."";
+  w=s.concat(w;"tmpd=$(mktemp -d); ");
+  w=s.concat(w;"( ");
+  w=s.concat(w;cmd);
+  w=s.concat(w;" > \"$tmpd/out\" 2>&1; echo \"$?\" > \"$tmpd/rc\" ) & cpid=$!; ");
+  w=s.concat(w;"i=0; limit=$(awk \"BEGIN{print int(");
+  w=s.concat(w;secs);
+  w=s.concat(w;"*20)}\"); ");
+  w=s.concat(w;"while [ \"$i\" -lt \"$limit\" ]; do [ -f \"$tmpd/rc\" ] && break; sleep 0.05; i=$((i+1)); done; ");
+  w=s.concat(w;"if [ -f \"$tmpd/rc\" ]; then rc=$(cat \"$tmpd/rc\"); cat \"$tmpd/out\"; echo \"__RC__$rc\"; ");
+  w=s.concat(w;"else kill -TERM \"$cpid\" 2>/dev/null; sleep 0.1; kill -KILL \"$cpid\" 2>/dev/null; cat \"$tmpd/out\" 2>/dev/null; echo \"__RC__124\"; fi; ");
+  w=s.concat(w;"rm -rf \"$tmpd\"");
+  <w
+};
+
+f=main():$i64{
+  let secs=s.trim(io.readln());
+  let cmd=s.trim(io.readln());
+  let wrapped=buildwrapper(secs;cmd);
+
+  let t0=time.now();
+  let raw=mt process.spawn(@("/bin/sh";"-c";wrapped)){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "__RC__127" });
+    ProcessErr:e "__RC__127"
+  };
+  let ms=(time.since(t0) as $i64);
+
+  let marker=s.indexof(raw;"__RC__");
+  let body=mut."";
+  let rc=mut.0;
+  if(marker>=0){
+    body=s.slice(raw;0;(marker as $u64));
+    let after=s.slice(raw;((marker+6) as $u64);s.len(raw));
+    let rcstr=s.trim(after);
+    rc=mt s.toint(rcstr){ $i64:v v; ParseErr:e 0 };
+  };
+
+  io.print(body);
+
+  let timedout=(rc=124);
+  let line=mut."";
+  line=s.concat(line;s.concat("exit=";s.fromint(rc)));
+  line=s.concat(line;s.concat(" time=";s.concat(s.fromint(ms);"ms")));
+  if(timedout){
+    line=s.concat(line;" TIMEOUT");
+  };
+  io.println(line);
+  <0
+}

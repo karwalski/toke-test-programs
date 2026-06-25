@@ -1,1 +1,91 @@
-m=abnorm;f=threshold(val:$i64;other:$i64):$bool{if(val=other){<true};if(val>other){<true};<false};f=abnormal(vals:@$i64;thresh:$i64):$bool{let n=vals.len;if(n<10){<false};let s=mut.0;lp(let i=0;i<n;i=i+1){s=s+vals.get(i)};let avg=s/n as$i64;let dev=mut.0;lp(let i=0;i<n;i=i+1){let v=vals.get(i);dev=dev+(v-avg)*(v-avg))};let var=dev/n as$i64;let std=var as$f64;let lo=avg-std*2.0;let hi=avg+std*2.0;let zc=mut.0;lp(let i=0;i<n-1;i=i+1){let v1=vals.get(i);let v2=vals.get(i+1);if(v1<lo){if(v2>lo){zc=zc+1}};if(v1>hi
+m=energy;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+  let n=lines.len();
+  let ts=mut.@(0.0);
+  ts=@();
+  let ratios=mut.@(0.0);
+  ratios=@();
+  lp(let i=1;i<n;i=i+1){
+    let row=lines.get(i);
+    let parts=s.split(row;",");
+    let t=s.tofloat(parts.get(0));
+    let kwh=s.tofloat(parts.get(1));
+    let pu=s.tofloat(parts.get(2));
+    ts=ts+@(t);
+    ratios=ratios+@(kwh/pu);
+  };
+  let m=ratios.len();
+  let sorted=mut.@(0.0);
+  sorted=@();
+  lp(let i=0;i<m;i=i+1){
+    sorted=sorted+@(ratios.get(i));
+  };
+  lp(let i=0;i<m;i=i+1){
+    lp(let j=0;j<m-1;j=j+1){
+      let a=sorted.get(j);
+      let b=sorted.get(j+1);
+      if(a>b){
+        let tmp=mut.@(0.0);
+        tmp=@();
+        lp(let k=0;k<m;k=k+1){
+          if(k=j){tmp=tmp+@(b)}el{if(k=j+1){tmp=tmp+@(a)}el{tmp=tmp+@(sorted.get(k))}}
+        };
+        sorted=tmp;
+      }
+    }
+  };
+  let median=mut.0.0;
+  let half=m/2;
+  if(m-half*2=0){
+    median=(sorted.get(half-1)+sorted.get(half))/2.0;
+  }el{
+    median=sorted.get(half);
+  };
+  let sum=mut.0.0;
+  lp(let i=0;i<m;i=i+1){sum=sum+ratios.get(i)};
+  let mean=sum/(m as $f64);
+  let ss=mut.0.0;
+  lp(let i=0;i<m;i=i+1){let d=ratios.get(i)-mean;ss=ss+d*d};
+  let std=math.sqrt(ss/(m as $f64));
+  let med=median;
+  let thr=2.0*std;
+  let basestr=s.format(med;"%.15f");
+  let out=mut."{\"baseline_kwh_per_unit\":";
+  out=s.concat(out;basestr);
+  out=s.concat(out;",\"anomalies\":[");
+  let first=mut.1;
+  lp(let i=0;i<m;i=i+1){
+    let r=ratios.get(i);
+    let diff=mut.0.0;
+    diff=r-med;
+    if(diff<0.0){diff=0.0-diff};
+    if(diff>thr){
+      if(first=0){out=s.concat(out;",")};
+      first=0;
+      let ti=(ts.get(i) as $i64);
+      out=s.concat(out;"{\"timestamp\":");
+      out=s.concat(out;s.fromint(ti));
+      out=s.concat(out;",\"actual\":");
+      out=s.concat(out;s.format(r;"%.2f"));
+      out=s.concat(out;",\"expected\":");
+      out=s.concat(out;basestr);
+      out=s.concat(out;"}");
+    }
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

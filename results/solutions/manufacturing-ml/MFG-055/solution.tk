@@ -1,1 +1,149 @@
-m=graddesc;t=$str;f=clamp(val:$f64;lo:$f64;hi:$f64):$f64{if(val<lo){<lo};if(val>hi){<hi};<val};f=linearinterp(x:$f64;xa:$f64;xb:$f64;ya:$f64;yb:$f64):$f64{let dx=x-xa;let dy=yb-ya;let t=dx/(xb-xa);let result=ya+t*dy;<result};f=abs(val:$f64):$f64{if(val<0.0){<-val};<val};f=relui(x:$f64):$f64{if(x>0.0){<x};<0.0};f=dot3(lhs:@$f64;rhs:@$f64):$f64{let result=mut.0.0;lp(let idx=0;idx<3;idx=idx+1){result=result+lhs.get(idx)*rhs.get(idx)};<result};f=gdstep(gain:$f64;grad:$
+m=graddesc;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt1(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.1f")
+};
+
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+
+  let nlines=lines.len();
+  if(nlines<2){io.println("{}");<0};
+
+  // parse data (skip header line 0)
+  let nrows=nlines-1;
+  let xs=mut.@(0.0);
+  xs=@();
+  let ys=mut.@(0.0);
+  ys=@();
+  lp(let r=0;r<nrows;r=r+1){
+    let parts=s.split(lines.get(r+1);",");
+    xs=xs+@(s.tofloat(parts.get(0)));
+    ys=ys+@(s.tofloat(parts.get(1)))
+  };
+
+  // normalize x to [0,1]
+  let xmin=mut.xs.get(0);
+  let xmax=mut.xs.get(0);
+  lp(let r=1;r<nrows;r=r+1){
+    let v=xs.get(r);
+    if(v<xmin){xmin=v};
+    if(v>xmax){xmax=v}
+  };
+  let xrange=mut.xmax-xmin;
+  if(xrange<0.0000001){xrange=1.0};
+  let xn=mut.@(0.0);
+  xn=@();
+  lp(let r=0;r<nrows;r=r+1){
+    xn=xn+@((xs.get(r)-xmin)/xrange)
+  };
+
+  // build normal equations for basis [x^2, x, 1]
+  // A^T A (3x3), A^T y (3)
+  let s0=mut.0.0; // sum 1
+  let s1=mut.0.0; // sum x
+  let s2=mut.0.0; // sum x^2
+  let s3=mut.0.0; // sum x^3
+  let s4=mut.0.0; // sum x^4
+  let by=mut.0.0; // sum y
+  let bxy=mut.0.0; // sum x*y
+  let bx2y=mut.0.0; // sum x^2*y
+  lp(let r=0;r<nrows;r=r+1){
+    let xv=xn.get(r);
+    let yv=ys.get(r);
+    let x2=xv*xv;
+    s0=s0+1.0;
+    s1=s1+xv;
+    s2=s2+x2;
+    s3=s3+x2*xv;
+    s4=s4+x2*x2;
+    by=by+yv;
+    bxy=bxy+xv*yv;
+    bx2y=bx2y+x2*yv
+  };
+
+  // matrix M rows: [s4 s3 s2 | bx2y], [s3 s2 s1 | bxy], [s2 s1 s0 | by]
+  // unknowns: a (x^2), b (x), c (1)
+  let m=mut.@(0.0);
+  m=@();
+  m=m+@(s4);m=m+@(s3);m=m+@(s2);m=m+@(bx2y);
+  m=m+@(s3);m=m+@(s2);m=m+@(s1);m=m+@(bxy);
+  m=m+@(s2);m=m+@(s1);m=m+@(s0);m=m+@(by);
+
+  // Gaussian elimination on 3x4, stored row-major width 4
+  lp(let col=0;col<3;col=col+1){
+    // pivot
+    let piv=mut.m.get(col*4+col);
+    if(piv<0.0){if(piv>-0.0000000001){piv=0.0000000001}};
+    if(piv>=0.0){if(piv<0.0000000001){piv=0.0000000001}};
+    // normalize pivot row
+    lp(let k=0;k<4;k=k+1){
+      m=setarr(m;col*4+k;m.get(col*4+k)/piv)
+    };
+    // eliminate other rows
+    lp(let row=0;row<3;row=row+1){
+      if(!(row=col)){
+        let factor=m.get(row*4+col);
+        lp(let k=0;k<4;k=k+1){
+          m=setarr(m;row*4+k;m.get(row*4+k)-factor*m.get(col*4+k))
+        }
+      }
+    }
+  };
+
+  let a=mut.m.get(0*4+3);
+  let b=mut.m.get(1*4+3);
+  let c=mut.m.get(2*4+3);
+
+  // gradient ascent on parabola y=a*xn^2+b*xn+c in normalized space
+  // dy/dxn = 2a*xn + b
+  let xx=mut.0.0;
+  let iters=mut.0;
+  let go=mut.1;
+  lp(go>0){
+    let g=2.0*a*xx+b;
+    let step=0.01*g;
+    xx=xx+step;
+    iters=iters+1;
+    let ast=mut.step;
+    if(ast<0.0){ast=0.0-ast};
+    if(ast<0.001){go=0};
+    if(iters>=1000){go=0}
+  };
+
+  let yopt=a*xx*xx+b*xx+c;
+  let xopt=xmin+xx*xrange;
+
+  let out=mut."{\"optimal_x\":";
+  out=s.concat(out;fmt1(xopt));
+  out=s.concat(out;",\"optimal_y\":");
+  out=s.concat(out;fmt1(yopt));
+  out=s.concat(out;",\"iterations\":");
+  out=s.concat(out;s.fromint(iters));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};
+
+f=setarr(arr:@$f64;idx:$i64;val:$f64):@$f64{
+  let out=mut.@(0.0);
+  out=@();
+  lp(let i=0;i<arr.len();i=i+1){
+    if(i=idx){out=out+@(val)}el{out=out+@(arr.get(i))}
+  };
+  <out
+};

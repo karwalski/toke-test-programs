@@ -1,1 +1,104 @@
-m=kw;f=wordcount(text:$str):$i64{let wc=mut.0;let n=text.len;lp(let i=0;i<n;i=i+1){let c=text.get(i);if(c=32){wc=wc+1}};wc=wc+1;<wc};f=kwcount(text:$str;keywords:@$str):$i64{let n=text.len;let m=keywords.len;let cnt=mut.0;lp(let i=0;i<m;i=i+1){let kw=keywords.get(i);let kwl=kw.len;let found=mut.false;lp(let j=0;j<n;j=j+1){let c=text.get(j);if(c=32){if(found){cnt=cnt+1;found=false}}el{if(!found){if(kwl>0){if(c=kw.get(0)){let match=mut.true;lp(let k=1;k<kwl;k=k+1){let c2=text.get(j+k);if(!(c2=kw.get(k)))){match=false}};if(match){found=true}}}}}};<cnt};f=perc(n:$i64;m:$i6
+m=kw;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt1(v:$f64):$str{
+  let x=mut.0.0; x=v;
+  let neg=mut.false; if(x<0.0){neg=true;x=0.0-x};
+  let scaled=mut.0.0; scaled=math.round(x*10.0);
+  let total=scaled as i64;
+  let ip=total/10; let frac=total-ip*10;
+  let res=mut.s.concat(s.fromint(ip);".");
+  res=s.concat(res;s.fromint(frac));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+
+f=trim(str:$str):$str{
+  let n=s.len(str);
+  let b=s.bytes(str);
+  let start=mut.0;
+  let end=mut.n;
+  lp(start<end){
+    let c=b.get(start);
+    if(c=32||c=9||c=10||c=13){start=start+1}el{br};
+  };
+  lp(end>start){
+    let c=b.get(end-1);
+    if(c=32||c=9||c=10||c=13){end=end-1}el{br};
+  };
+  <s.substr(str;start;end)
+};
+
+f=tokenize(text:$str):@$str{
+  let words=mut.@();
+  let parts=s.split(text;" ");
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=trim(parts.get(i));
+    if(s.len(p)>0){words=words+@(s.lower(p))};
+  };
+  <words
+};
+
+f=main():$i64{
+  let kwline=io.readln();
+  let rawkw=s.split(kwline;",");
+  let keywords=mut.@();
+  lp(let i=0;i<rawkw.len;i=i+1){
+    let k=trim(rawkw.get(i));
+    if(s.len(k)>0){keywords=keywords+@(s.lower(k))};
+  };
+
+  let all=mut."";
+  let firstl=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!firstl){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    firstl=false;
+  };
+  let text=all;
+
+  let words=tokenize(text);
+  let total=words.len;
+
+  let densities=mut.@();
+  lp(let i=0;i<keywords.len;i=i+1){
+    let kw=keywords.get(i);
+    let cnt=mut.0;
+    lp(let j=0;j<words.len;j=j+1){
+      if(s.eq(words.get(j);kw)){cnt=cnt+1};
+    };
+    let d=mut.0.0;
+    if(total>0){d=(cnt as f64)/(total as f64)*100.0};
+    densities=densities+@(d);
+  };
+
+  let nk=keywords.len;
+  let order=mut.@();
+  lp(let i=0;i<nk;i=i+1){order=order+@(i)};
+
+  lp(let a=0;a<nk;a=a+1){
+    lp(let b=0;b<nk-1;b=b+1){
+      let i0=order.get(b);
+      let i1=order.get(b+1);
+      let d0=densities.get(i0);
+      let d1=densities.get(i1);
+      if(d1>d0){
+        order=order.set(b;i1);
+        order=order.set(b+1;i0);
+      };
+    };
+  };
+
+  lp(let i=0;i<nk;i=i+1){
+    let idx=order.get(i);
+    let out=mut.s.concat(keywords.get(idx);": ");
+    out=s.concat(out;fmt1(densities.get(idx)));
+    out=s.concat(out;"%");
+    io.println(out);
+  };
+  <0
+};

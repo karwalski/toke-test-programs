@@ -1,1 +1,99 @@
-m=spc;f=mean(arr:@$f64):$f64{let sum=mut.0.0;lp(let i=0;i<arr.len;i=i+1){sum=sum+arr.get(i);};<sum/(arr.len as$f64))};f=stddev(arr:@$f64):$f64{let m=mean(arr);let sumsq=mut.0.0;lp(let i=0;i<arr.len;i=i+1){let diff=arr.get(i)-m;sumsq=sumsq+diff*diff;};let var=mut.0.0;if(!(arr.len<2 as u64)){}el{var=sumsq/(arr.len as$f64));};<var as$f64}};f=uppercontrol(limit:$f64;zscore:$f64):$f64{let tmp=mut.0.0;if(limit>0.0){tmp=limit+3.0*zscore;}el{tmp=0.0;};<tmp}};f=low
+m=spc;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=fixed2(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.0.0;
+  v=x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let prod=mut.0.0;
+  prod=v*100.0+0.5;
+  let scaled=prod as$i64;
+  let whole=scaled/100;
+  let frac=scaled-whole*100;
+  let fs=mut.s.fromint(frac);
+  if(frac<10){fs=s.concat("0";fs)};
+  let r=mut.s.concat(s.concat(s.fromint(whole);".");fs);
+  if(neg){r=s.concat("-";r)};
+  <r
+};
+f=round2(x:$f64):$f64{
+  let neg=mut.false;
+  let v=mut.0.0;
+  v=x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let prod=mut.0.0;
+  prod=v*100.0+0.5;
+  let scaled=prod as$i64;
+  let res=mut.0.0;
+  res=scaled as$f64/100.0;
+  if(neg){res=0.0-res};
+  <res
+};
+f=parsef(str:$str):$f64{
+  let v=mt s.tofloat(s.trim(str)){$ok:v v;$err:e 0.0};
+  let w=mut.0.0;
+  w=v;
+  <w
+};
+f=meanof(vals:@$f64):$f64{
+  let sum=mut.0.0;
+  lp(let i=0;i<vals.len;i=i+1){let t=mut.0.0;t=vals.get(i);sum=sum+t};
+  let n=mut.0.0;
+  n=vals.len as$f64;
+  <sum/n
+};
+f=stdof(vals:@$f64;m:$f64):$f64{
+  let sumsq=mut.0.0;
+  lp(let i=0;i<vals.len;i=i+1){let t=mut.0.0;t=vals.get(i);let d=t-m;sumsq=sumsq+d*d};
+  let n=mut.0.0;
+  n=vals.len as$f64;
+  let varr=mut.0.0;
+  varr=sumsq/(n-1.0);
+  <math.sqrt(varr)
+};
+f=main():$i64{
+  let p1=mut.@();
+  let p2=mut.@();
+  let first=mut.true;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let l=s.trim(line);
+    if(s.len(l)=0){}el{
+      if(first){first=false}el{
+        let parts=s.split(l;",");
+        let ph=parts.get(0);
+        let valstr=parts.get(1);
+        let v=parsef(valstr);
+        if(s.eq(ph;"1")){p1=p1+@(v)}el{p2=p2+@(v)};
+      };
+    };
+  };
+  let m1=meanof(p1);
+  let s1=stdof(p1;m1);
+  let m2=meanof(p2);
+  let s2=stdof(p2;m2);
+  let rm1=round2(m1);
+  let rs1=round2(s1);
+  let rm2=round2(m2);
+  let rs2=round2(s2);
+  let shift=round2(rm2-rm1);
+  let vred=mut.0.0;
+  vred=round2(1.0-rs2/rs1);
+  let out=mut.s.concat("{\"phase1\":{\"mean\":";fixed2(rm1));
+  out=s.concat(out;",\"std\":");
+  out=s.concat(out;fixed2(rs1));
+  out=s.concat(out;"},\"phase2\":{\"mean\":");
+  out=s.concat(out;fixed2(rm2));
+  out=s.concat(out;",\"std\":");
+  out=s.concat(out;fixed2(rs2));
+  out=s.concat(out;"},\"improvement\":{\"mean_shift\":");
+  out=s.concat(out;fixed2(shift));
+  out=s.concat(out;",\"variability_reduction\":");
+  out=s.concat(out;fixed2(vred));
+  out=s.concat(out;"}}");
+  io.println(out);
+  <0
+};

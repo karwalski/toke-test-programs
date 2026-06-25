@@ -1,1 +1,58 @@
-m=env;f=storeenvvars(n:$str;m:$str):$void{let s=mut."";lp(let i=0;i<n;i=i+1){let c=n.get(i);s=s+c;};let result=mut."";lp(let j=0;j<m;j=j+1){let d=m.get(j);result=result+d;};let final=mut."";lp(let k=0;k<result.len;k=k+1){let ch=result.get(k);final=final+ch;};let out=mut."";lp(let idx=0;idx<final.len;idx=idx+1){let c=final.get(idx);out=out+c;};let path=mut."";lp(let idx=0;idx<out.len;idx=idx+1){let c=out.get(idx);path=path+c;};let env=mut."";lp(let idx=0;idx<path.len;idx=idx+1){let c=path.get(idx);env=env+c;};let finalenv=mut."";lp(let idx=0;idx<env.len;idx=idx+1){let c=env.get(idx);finalenv=finalenv+c;};let resultenv=
+m=envsnap;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;i=process:std.process;
+f=runenv():$str{
+  <mt process.spawn(@("/usr/bin/env")){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=jsonescape(v:$str):$str{
+  let a=s.replace(v;"\\";"\\\\");
+  <s.replace(a;"\"";"\\\"")
+};
+f=main():$i64{
+  let cmd=s.trim(io.readln());
+  let path=s.trim(io.readln());
+  if(s.eq(cmd;"snapshot")){
+    let raw=runenv();
+    let lines=s.split(raw;"\n");
+    let json=mut."{";
+    let count=mut.0;
+    lp(let i=0;i<lines.len;i=i+1){
+      let line=lines.get(i);
+      if(s.len(line)>0){
+        let eq=s.indexof(line;"=");
+        if(eq>0){
+          let k=s.slice(line;0 as $u64;eq as $u64);
+          let v=s.slice(line;(eq+1) as $u64;s.len(line));
+          if(count>0){json=s.concat(json;",")};
+          json=s.concat(json;"\"");
+          json=s.concat(json;jsonescape(k));
+          json=s.concat(json;"\":\"");
+          json=s.concat(json;jsonescape(v));
+          json=s.concat(json;"\"");
+          count=count+1
+        }
+      }
+    };
+    json=s.concat(json;"}");
+    let wrote=mt file.write(path;json){
+      $bool:b b;
+      FileErr:e (1=0)
+    };
+    let out=mut."Saved ";
+    out=s.concat(out;s.fromint(count));
+    out=s.concat(out;" variables to ");
+    out=s.concat(out;path);
+    io.println(out)
+  }el{
+    let runcmd=s.trim(io.readln());
+    let out=mut."Running ";
+    out=s.concat(out;runcmd);
+    out=s.concat(out;" with restored environment.");
+    io.println(out)
+  };
+  <0
+}

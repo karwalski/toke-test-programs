@@ -1,1 +1,44 @@
-m=anomalydetector;f=parsefield(row:$str;col:$i64):$str{let fields=row.split(",");if(col<fields.len as i64){<fields.get(col)}el{<""}};f=parseint(row:$str;col:$i64):$i64{let val=parsefield(row;col);if(val.len=0){<0};<val.toi64()};f=isportscan(dstports:$str):$bool{let count=dstports.split(",").len;if(count>5){<true};<false};f=isbeaconing(timestamps:$str):$bool{let count=timestamps.split(",").len;if(count>10){<true};<false};f=checkdataexfil(bytestransferred:$str):$bool{let bytesval=parseint(bytestransferred;0);if(bytesval>1048576){<true};<false};f=classifyanomaly(row:$str):$str{let dstports=parsefield(row;4);if(isportscan(dstports)){<"port-scan"};let timestamps=parsefield(row;0);if(isbeaconing(timestamps
+m=anomalydetector;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let srcs=mut.@();
+let ports=mut.@();
+let maxbytes=mut.@();
+let counts=mut.@();
+lp(1=1){
+let line=s.trim(io.readln());
+if(s.len(line)=0){br};
+let f=s.split(line;",");
+if(f.len>=6){
+let src=f.get(1);
+let port=f.get(3);
+let bytes=s.toint(f.get(4));
+let found=mut.0-1;
+lp(let i=0;i<srcs.len;i=i+1){if(s.eq(srcs.get(i);src)){found=i}};
+if(found<0){
+srcs=srcs+@(src);
+ports=ports+@(port);
+maxbytes=maxbytes+@(bytes);
+counts=counts+@(1);
+}el{
+ports=ports.set(found;s.concat(s.concat(ports.get(found);",");port));
+if(bytes>maxbytes.get(found)){maxbytes=maxbytes.set(found;bytes)};
+counts=counts.set(found;counts.get(found)+1);
+};
+};
+};
+let anomalies=mut.0;
+let out=mut."{\"anomalies\":[";
+lp(let i=0;i<srcs.len;i=i+1){
+let distinct=s.split(ports.get(i);",").len;
+let kind=mut."";
+if(distinct>10){kind="port-scan"};
+if(maxbytes.get(i)>104857600){kind="exfiltration"};
+if(s.len(kind)>0){
+if(anomalies>0){out=s.concat(out;",")};
+out=s.concat(out;s.concat(s.concat(s.concat(s.concat("{\"type\":\"";kind);"\",\"src_ip\":\"");srcs.get(i));"\"}"));
+anomalies=anomalies+1;
+};
+};
+out=s.concat(out;s.concat(s.concat("],\"summary\":\"";s.fromint(anomalies));" anomalies detected\"}"));
+io.println(out);
+<0};

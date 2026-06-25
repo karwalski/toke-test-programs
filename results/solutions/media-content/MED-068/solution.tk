@@ -1,1 +1,100 @@
-m=unicode;f=isunicodechar(c:$str):$bool{let islookalike=mut.false;if(c="０"){islookalike=true};if(c="１"){islookalike=true};if(c="２"){islookalike=true};if(c="３"){islookalike=true};if(c="４"){islookalike=true};if(c="５"){islookalike=true};if(c="６"){islookalike=true};if(c="７"){islookalike=true};if(c="８"){islookalike=true};if(c="９"){islookalike=true};if(c="Ａ"){islookalike=true};if(c="Ｂ"){islookalike=true};if(c="Ｃ"){islookalike=true};if(c="Ｄ"){islookalike=true};if(c="Ｅ"){islookalike=true};if(c="Ｆ"){islookalike=true};if(c="Ｇ"){islookalike=true};if(c="Ｈ"){islookalike=true};if(c="Ｉ"){islookalike=true};if(c="Ｊ"){islookalike=true};if(c="Ｋ"){islookalike=true};if(c
+m=unicode;
+i=io:std.io;
+i=s:std.str;
+
+f=hex4(cp:$i64):$str{
+  let digits="0123456789ABCDEF";
+  let db=s.bytes(digits);
+  let res=mut."";
+  lp(let shift=12;shift>=0;shift=shift-4){
+    let nib=(cp/pow16(shift))-((cp/pow16(shift))/16)*16;
+    let ch=s.substr(digits;nib;nib+1);
+    res=s.concat(res;ch);
+  };
+  <res
+};
+
+f=pow16(shift:$i64):$i64{
+  let r=mut.1;
+  lp(let i=0;i<shift;i=i+4){r=r*16};
+  <r
+};
+
+f=asciifor(cp:$i64):$str{
+  if(cp=1072){<"a"}; if(cp=1077){<"e"}; if(cp=1086){<"o"};
+  if(cp=1088){<"p"}; if(cp=1089){<"c"}; if(cp=1091){<"y"};
+  if(cp=1093){<"x"}; if(cp=1110){<"i"}; if(cp=1112){<"j"};
+  if(cp=1109){<"s"};
+  if(cp=1040){<"A"}; if(cp=1042){<"B"}; if(cp=1045){<"E"};
+  if(cp=1050){<"K"}; if(cp=1052){<"M"}; if(cp=1053){<"H"};
+  if(cp=1054){<"O"}; if(cp=1056){<"P"}; if(cp=1057){<"C"};
+  if(cp=1058){<"T"}; if(cp=1061){<"X"};
+  if(cp=945){<"a"}; if(cp=959){<"o"}; if(cp=961){<"p"};
+  if(cp=957){<"v"}; if(cp=965){<"u"};
+  if(cp=913){<"A"}; if(cp=914){<"B"}; if(cp=917){<"E"};
+  if(cp=918){<"Z"}; if(cp=919){<"H"}; if(cp=921){<"I"};
+  if(cp=922){<"K"}; if(cp=924){<"M"}; if(cp=925){<"N"};
+  if(cp=927){<"O"}; if(cp=929){<"P"}; if(cp=932){<"T"};
+  if(cp=933){<"Y"}; if(cp=935){<"X"};
+  <""
+};
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let text=all;
+  let bytes=s.bytes(text);
+  let n=bytes.len;
+
+  let charpos=mut.0;
+  let i=mut.0;
+  lp(i<n){
+    let b0=bytes.get(i);
+    let cp=mut.0;
+    let blen=mut.1;
+    if(b0<128){
+      cp=b0; blen=1;
+    }el{
+      if(b0>=240){
+        let b1=bytes.get(i+1); let b2=bytes.get(i+2); let b3=bytes.get(i+3);
+        cp=(b0-240)*262144+(b1-128)*4096+(b2-128)*64+(b3-128);
+        blen=4;
+      }el{
+        if(b0>=224){
+          let b1=bytes.get(i+1); let b2=bytes.get(i+2);
+          cp=(b0-224)*4096+(b1-128)*64+(b2-128);
+          blen=3;
+        }el{
+          let b1=bytes.get(i+1);
+          cp=(b0-192)*64+(b1-128);
+          blen=2;
+        };
+      };
+    };
+
+    let glyph=s.substr(text;i;i+blen);
+    let ascii=asciifor(cp);
+    if(!s.eq(ascii;"")){
+      let out=mut."";
+      out=s.concat("U+";hex4(cp));
+      out=s.concat(out;" ");
+      out=s.concat(out;glyph);
+      out=s.concat(out;" looks like ");
+      out=s.concat(out;ascii);
+      out=s.concat(out;" at position ");
+      out=s.concat(out;s.fromint(charpos));
+      io.println(out);
+    };
+
+    i=i+blen;
+    charpos=charpos+1;
+  };
+  <0
+};

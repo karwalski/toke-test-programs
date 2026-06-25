@@ -1,1 +1,72 @@
-m=feature;f=mean(arr:@$f64):$f64{let sum=mut.0.0;lp(let i=0;i<arr.len;i=i+1){sum=sum+arr.get(i);};<sum/(arr.len as$f64))};f=variance(arr:@$f64):$f64{let m=mean(arr);let sum=mut.0.0;lp(let i=0;i<arr.len;i=i+1){let diff=arr.get(i)-m;sum=sum+diff*diff;};<sum/(arr.len as$f64))};f=stddev(arr:@$f64):$f64{<variance(arr)};f=normalise(arr:@$f64):@f64{let m=mean(arr);let s=stddev(arr);let result=mut.@();lp(let i=0;i<arr.len;i=i+1){let z=(arr.get(i)-m)/s;result=result+@(z);};<result};
+m=feature;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+f=fmtnum(x:$f64):$str{
+  let r=mut.(x+0.5) as $i64;
+  if(x<0.0){r=0-((0.0-x)+0.5) as $i64};
+  let diff=x-(r as $f64);
+  let ad=mut.diff;if(ad<0.0){ad=0.0-ad};
+  if(ad<0.0001){<s.fromint(r)};
+  <s.format(x;"%.2f")
+};
+f=main():$i64{
+  let lines=mut.@("");lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{let tl=s.trim(line);if(s.len(tl)>0){lines=lines+@(tl)}}
+  };
+  let nrows=lines.len()-1;
+  let header=s.split(lines.get(0);",");
+  let ncols=header.len();
+  let means=mut.@(0.0);means=@();
+  let stds=mut.@(0.0);stds=@();
+  let pstds=mut.@(0.0);pstds=@();
+  lp(let c=0;c<ncols;c=c+1){
+    let sum=mut.0.0;
+    lp(let r=0;r<nrows;r=r+1){
+      let parts=s.split(lines.get(r+1);",");
+      sum=sum+s.tofloat(parts.get(c));
+    };
+    let mean=sum/(nrows as $f64);
+    means=means+@(mean);
+    let ss=mut.0.0;
+    lp(let r=0;r<nrows;r=r+1){
+      let parts=s.split(lines.get(r+1);",");
+      let d=s.tofloat(parts.get(c))-mean;
+      ss=ss+d*d;
+    };
+    let pvar=ss/(nrows as $f64);
+    pstds=pstds+@(math.sqrt(pvar));
+    let svar=ss/((nrows-1) as $f64);
+    stds=stds+@(math.sqrt(svar));
+  };
+  let out=mut.s.concat("{";"\"standardised\":[");
+  lp(let r=0;r<nrows;r=r+1){
+    let parts=s.split(lines.get(r+1);",");
+    if(r>0){out=s.concat(out;",")};
+    out=s.concat(out;"[");
+    lp(let c=0;c<ncols;c=c+1){
+      if(c>0){out=s.concat(out;",")};
+      let z=(s.tofloat(parts.get(c))-means.get(c))/pstds.get(c);
+      out=s.concat(out;fmt2(z));
+    };
+    out=s.concat(out;"]");
+  };
+  out=s.concat(out;"],\"means\":[");
+  lp(let c=0;c<ncols;c=c+1){
+    if(c>0){out=s.concat(out;",")};
+    out=s.concat(out;fmtnum(means.get(c)));
+  };
+  out=s.concat(out;"],\"stds\":[");
+  lp(let c=0;c<ncols;c=c+1){
+    if(c>0){out=s.concat(out;",")};
+    out=s.concat(out;fmtnum(stds.get(c)));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+}

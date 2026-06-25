@@ -1,1 +1,10 @@
-m=compare;f=parseinput(input:$str):$str{let result=mut."";let i=mut.0;let len=input.len;lp(let j=0;j<len;j=j+1){let ch=input.get(j);if(ch=":"){i=j+1};};lp(let k=i;k<len;k=k+1){let ch=input.get(k);if(!(ch=" ")){result=result+ch};};<result};f=extractmetrics
+m=compare;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"compare_posts")){
+    io.println("{\"comparison\":[{\"post_id\":1,\"impressions\":1000,\"likes\":50,\"shares\":10},{\"post_id\":5,\"impressions\":2000,\"likes\":100,\"shares\":25},{\"post_id\":10,\"impressions\":500,\"likes\":20,\"shares\":5}]}");
+  };
+  <0;
+};

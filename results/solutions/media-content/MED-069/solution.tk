@@ -1,1 +1,111 @@
-m=summarise;f=summarise(text:$str;n:$i64):$str{let sentences=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<text.len;idx=idx+1){let ch=text.get(idx);if(ch="."){sentences=sentences+@(current);current="";}el{current=current+ch;};};if(!(current.len=0 as u64))){sentences=sentences+@(current);};let scores=mut.@();lp(let idx=0;idx<sentences.len;idx=idx+1){let s=sentences.get(idx);let l=s.len as f64;let lw=1.0/l;let score=lw;scores=scores+@(score);};let sorted=mut.@();lp(let idx=0;idx<scores.len;idx=idx+1){let i=idx;let j=mut.i-1;lp(let k=0;!(k=0));k=0){if(!(j<0 as i64))){br;};let sj=scores.get(j as u64);let si=scores.get(i as u
+m=summarise;
+i=io:std.io;
+i=s:std.str;
+
+f=trim(str:$str):$str{
+  let n=s.len(str);
+  let b=s.bytes(str);
+  let start=mut.0;
+  let end=mut.n;
+  lp(start<end){
+    let c=b.get(start);
+    if(c=32||c=9||c=10||c=13){start=start+1}el{br};
+  };
+  lp(end>start){
+    let c=b.get(end-1);
+    if(c=32||c=9||c=10||c=13){end=end-1}el{br};
+  };
+  <s.substr(str;start;end)
+};
+
+f=wordfreq(words:@$str;target:$str):$i64{
+  let cnt=mut.0;
+  lp(let i=0;i<words.len;i=i+1){
+    if(s.eq(words.get(i);target)){cnt=cnt+1};
+  };
+  <cnt
+};
+
+f=main():$i64{
+  let nline=io.readln();
+  let n=s.toint(trim(nline));
+
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let text=all;
+
+  let raw=s.split(text;".");
+  let sentences=mut.@();
+  lp(let i=0;i<raw.len;i=i+1){
+    let t=trim(raw.get(i));
+    if(s.len(t)>0){
+      sentences=sentences+@(s.concat(t;"."));
+    };
+  };
+
+  let nsent=sentences.len;
+
+  let allwords=mut.@();
+  lp(let i=0;i<nsent;i=i+1){
+    let lc=s.lower(sentences.get(i));
+    let parts=s.split(lc;" ");
+    lp(let j=0;j<parts.len;j=j+1){
+      let w=trim(parts.get(j));
+      if(s.len(w)>0){allwords=allwords+@(w)};
+    };
+  };
+
+  let scores=mut.@();
+  lp(let i=0;i<nsent;i=i+1){
+    let lc=s.lower(sentences.get(i));
+    let parts=s.split(lc;" ");
+    let tot=mut.0;
+    lp(let j=0;j<parts.len;j=j+1){
+      let w=trim(parts.get(j));
+      if(s.len(w)>0){tot=tot+wordfreq(allwords;w)};
+    };
+    scores=scores+@(tot);
+  };
+
+  let pick=mut.n;
+  if(pick>nsent){pick=nsent};
+
+  let chosen=mut.@();
+  let used=mut.@();
+  lp(let i=0;i<nsent;i=i+1){used=used+@(false)};
+
+  lp(let k=0;k<pick;k=k+1){
+    let best=mut.0-1;
+    lp(let i=0;i<nsent;i=i+1){
+      if(!used.get(i)){
+        if(best<0){
+          best=i;
+        }el{
+          let sb=scores.get(best);
+          let si=scores.get(i);
+          if(si>sb){best=i}el{if(si=sb&&i>best){best=i}};
+        };
+      };
+    };
+    if(best>=0){
+      used=used.set(best;true);
+      chosen=chosen+@(best);
+    };
+  };
+
+  lp(let i=0;i<nsent;i=i+1){
+    let isc=mut.false;
+    lp(let k=0;k<chosen.len;k=k+1){
+      if(chosen.get(k)=i){isc=true};
+    };
+    if(isc){io.println(sentences.get(i))};
+  };
+  <0
+};

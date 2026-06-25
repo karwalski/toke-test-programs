@@ -1,1 +1,84 @@
-m=mountinfo;f=parsepart(line:$str):$str{let idx=line.find("=");if(idx<0){<""};let val=line.substr(idx+1;line.len());<val};f=getfield(line:$str;field:$i64):$str{let parts=line.split(" ");let count=parts.len();if(field<1){<""};if(field>count){<""};<parts.get((field-1)as u64))};f=extractfield(line:$str;field:$i64
+m=mountinfo;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=field(line:$str;n:$i64):$str{
+  let parts=s.split(line;" ");
+  let idx=mut.0;
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=parts.get(i as $u64);
+    if(s.len(p)>0){
+      idx=idx+1;
+      if(idx=n){<p};
+    };
+  };
+  <""
+};
+f=gb2(kb:$i64):$str{
+  let h100=mut.(kb*100)/1048576;
+  let whole=h100/100;
+  let frac=h100-(whole*100);
+  let fs=mut.s.fromint(frac);
+  if(frac<10){fs=s.concat("0";fs)};
+  <s.concat(s.concat(s.fromint(whole);".");fs)
+};
+f=fstypefor(mounttext:$str;mountpoint:$str):$str{
+  let lines=s.split(mounttext;"\n");
+  lp(let i=0;i<lines.len;i=i+1){
+    let line=lines.get(i as $u64);
+    let onpos=s.indexof(line;" on ");
+    if(onpos>0){
+      let rest=s.slice(line;(onpos+4) as $u64;s.len(line));
+      let pp=s.indexof(rest;" (");
+      if(pp>0){
+        let mp=s.slice(rest;0 as $u64;pp as $u64);
+        if(s.eq(mp;mountpoint)){
+          let after=s.slice(rest;(pp+2) as $u64;s.len(rest));
+          let comma=s.indexof(after;",");
+          let paren=s.indexof(after;")");
+          let cut=mut.comma;
+          if(cut<0){cut=paren};
+          if(paren>=0){if(paren<cut){cut=paren}};
+          if(cut<0){<after};
+          <s.slice(after;0 as $u64;cut as $u64)
+        };
+      };
+    };
+  };
+  <"unknown"
+};
+f=main():$i64{
+  let mounttext=runcmd("mount");
+  let dftext=runcmd("df -P -k");
+  let lines=s.split(dftext;"\n");
+  lp(let i=1;i<lines.len;i=i+1){
+    let line=s.trim(lines.get(i as $u64));
+    if(s.len(line)>0){
+      let device=field(line;1);
+      let totalkb=mt s.toint(field(line;2)){ $i64:v v; ParseErr:e 0 };
+      let usedkb=mt s.toint(field(line;3)){ $i64:v v; ParseErr:e 0 };
+      let freekb=mt s.toint(field(line;4)){ $i64:v v; ParseErr:e 0 };
+      let cap=field(line;5);
+      let mp=field(line;6);
+      if((totalkb*100)/1048576>0){
+        let ft=fstypefor(mounttext;mp);
+        let out=mut."";
+        out=s.concat(out;device);out=s.concat(out;" ");
+        out=s.concat(out;mp);out=s.concat(out;" ");
+        out=s.concat(out;ft);out=s.concat(out;" ");
+        out=s.concat(out;gb2(totalkb));out=s.concat(out;" ");
+        out=s.concat(out;gb2(usedkb));out=s.concat(out;" ");
+        out=s.concat(out;gb2(freekb));out=s.concat(out;" ");
+        out=s.concat(out;cap);
+        io.println(out);
+      };
+    };
+  };
+  <0
+}

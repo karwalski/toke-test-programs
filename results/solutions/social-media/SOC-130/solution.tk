@@ -1,1 +1,24 @@
-m=markallread;f=markallread(store:$str):$str{let items=mut.@();let idx=mut.0;lp(let i=0;i<store.len;i=i+1){let ch=store.get(i);if(ch=","){let item=store.slice(idx;i);items=items+@(item);idx=i+1;};};let lastitem=store.slice(idx;store.len);items=items+@(lastitem);let n=items.len;lp(let i=0;i<n;i=i+1){let item=items.get(i);let id=mut.0;let len=mut.0;lp(let j=0;j<item.len;j=j+1){let ch=item.get(j);if(ch=":"){len=j;};};id=item.slice(0;len);let readpart=mut."false";lp(let k=len+1;k<item.len;k=k+1){let ch=item.get(k);readpart=readpart+ch;};let newitem=id+":true";items.get(i)=newitem;};<store};
+m=markread;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  let conv=getstr(input;"conversation_id");
+  if(s.eq(action;"mark_conv_read")){
+    let out=mut."{\"conversation_id\":\"";
+    out=s.concat(out;conv);
+    out=s.concat(out;"\",\"all_read\":true,\"status\":\"marked_read\"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

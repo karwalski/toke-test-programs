@@ -1,1 +1,62 @@
-m=extract;f=solve(p0:$str):$str{let lhs=mut."";let rhs=mut."";let sepfound=mut.false;lp(let i=0;i<p0.len;i=i+1){let c=p0.get(i);if(!(sepfound)){if(c=58){sepfound=true}el{lhs=lhs+c}}el{rhs=rhs+c}}};<lhs>;};f=extractbytes(s:$str):$str{let parts=s.split(58);if(parts.len=0){<""};let lhs=parts.get(0);let rhs=parts.get(1);<s.concat(s.concat(lhs;":");rhs)};f=main():$str{let input="text:hello world";let step1=solve(input);let step2=extractbytes(step1);<step2>};
+m=decompress;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=runshell(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=detect(path:$str):$str{
+  let data=mt file.read(path){
+    $str:v v;
+    FileErr:e ""
+  };
+  let b=s.bytes(data);
+  let nb=(b.len as $i64);
+  if(nb<2){<"unknown"};
+  let b0=(b.get(0) as $i64);
+  let b1=(b.get(1) as $i64);
+  if(b0=31){if(b1=139){<"gzip"}};
+  if(nb<3){<"unknown"};
+  let b2=(b.get(2) as $i64);
+  if(b0=66){if(b1=90){if(b2=104){<"bzip2"}}};
+  if(nb<4){<"unknown"};
+  let b3=(b.get(3) as $i64);
+  if(b0=253){if(b1=55){if(b2=122){if(b3=88){<"xz"}}}};
+  if(b0=40){if(b1=181){if(b2=47){if(b3=253){<"zstd"}}}};
+  <"unknown"
+};
+f=tool(fmt:$str):$str{
+  if(s.eq(fmt;"gzip")){<"gzip -dc"};
+  if(s.eq(fmt;"bzip2")){<"bzip2 -dc"};
+  if(s.eq(fmt;"xz")){<"xz -dc"};
+  if(s.eq(fmt;"zstd")){<"zstd -dc"};
+  <""
+};
+f=main():$i64{
+  let infile=s.trim(io.readln());
+  let outfile=s.trim(io.readln());
+  let fmt=detect(infile);
+  if(s.eq(fmt;"unknown")){
+    io.println("ERROR: unrecognized format");
+    <0
+  };
+  let dc=tool(fmt);
+  if(s.eq(outfile;"-")){
+    let cmd=s.concat(s.concat(dc;" ");infile);
+    let content=runshell(cmd);
+    io.print(content)
+  }el{
+    let cmd=s.concat(s.concat(s.concat(s.concat(dc;" ");infile);" > ");outfile);
+    let dummy=runshell(cmd);
+    let outdata=mt file.read(outfile){
+      $str:v v;
+      FileErr:e ""
+    };
+    let n=(s.len(outdata) as $i64);
+    io.println(s.concat(s.concat(s.concat("Decompressed: ";s.fromint(n));" bytes to ");outfile))
+  };
+  <0
+}

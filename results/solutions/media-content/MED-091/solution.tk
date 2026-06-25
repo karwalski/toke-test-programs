@@ -1,1 +1,59 @@
-m=sentencescore;f=sentencescore(lhs:$str):$i64{let rhs=mut.lhs;let n=mut.0;lp(let idx=0;idx<rhs.len;idx=idx+1){let c=rhs.get(idx);if(c=44){n=n+1};if(c=32){let nextidx=idx+1;if(nextidx<rhs.len){let nextc=rhs.get(nextidx);if(nextc=44){n=n+1};if(nextc=32){n=n+1}}}}};let count
+m=sentencescore;
+i=io:std.io;
+i=s:std.str;
+f=isconj(w:$str):$bool{
+  let lw=s.lower(w);
+  if(s.eq(lw;"and")){<true};
+  if(s.eq(lw;"but")){<true};
+  if(s.eq(lw;"or")){<true};
+  if(s.eq(lw;"nor")){<true};
+  if(s.eq(lw;"for")){<true};
+  if(s.eq(lw;"yet")){<true};
+  if(s.eq(lw;"so")){<true};
+  if(s.eq(lw;"although")){<true};
+  if(s.eq(lw;"because")){<true};
+  if(s.eq(lw;"if")){<true};
+  if(s.eq(lw;"when")){<true};
+  <false
+};
+f=score(line:$str):$i64{
+  let n=s.len(line);
+  let b=s.bytes(line);
+  let total=mut.0;
+  let word=mut."";
+  let i=mut.0;
+  lp(i<=n){
+    let isalpha=mut.false;
+    let c=mut.0;
+    if(i<n){
+      c=b.get(i);
+      if((c>=65&&c<=90)||(c>=97&&c<=122)){isalpha=true};
+    };
+    if(isalpha){
+      word=s.concat(word;s.substr(line;i;i+1));
+    }el{
+      if(s.len(word)>0){
+        if(isconj(word)){total=total+1};
+        word="";
+      };
+      if(i<n){
+        if(c=44){total=total+1};
+      };
+    };
+    i=i+1;
+  };
+  <total
+};
+f=main():$i64{
+  let num=mut.0;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    num=num+1;
+    let out=s.concat("sentence ";s.fromint(num));
+    let out2=s.concat(out;": score ");
+    let out3=s.concat(out2;s.fromint(score(line)));
+    io.println(out3);
+  };
+  <0
+};

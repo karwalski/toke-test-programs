@@ -1,1 +1,38 @@
-m=monitor;i=io:std.io;i=s:std.str;i=j:std.json;f=checkheart(cons:@$str):@$str{let result=mut.@();lp(let i=0;i<cons.len;i=i+1){let consumer=cons.get(i);let found=mut.false;lp(let j=0;j<consumer.len;j=j+1){let ch=consumer.get(j);if(ch=";"){found=true};};if(!(found)){result=result+@(consumer)};};<result};f=triggerrebal(cons:@$str):$str{let dead=checkheart(cons);let action=mut."no action";if(dead.len>0){action="rebalance needed"};<action};f=main():$i64{let timeout=s.toint(io.readln());let eventsline=io.readln();let checktime=s.toint(io.readln());let events=j.parse(eventsline);let lastheartbeats=mut.@();lp(let i=0;i<events.len;i=i+1){let event=events.get(i);let consumer=event.get("consumer");let time=s.toint(event.get("time"));lastheartbeats=lastheartbeats+@(consumer+s.concat(";";s.fromint(time)));};let deadcount=mut.0;lp(let i=0;i<lastheartbeats.len;i=i+1){let entry=lastheartbeats.get(i);let parts=s.split(entry;";");let consumer=parts.get(0);let lasttime=s.toint(parts.get(1));let timediff=checktime-lasttime;if(timediff>timeout){io.println(consumer+s.concat(s.concat(s.concat(s.concat(": DEAD (last heartbeat ";s.fromint(timediff));"ms ago at t=");s.fromint(lasttime));")"));deadcount=deadcount+1;}else{io.println(consumer+": alive");};};if(deadcount>0){io.println(s.concat(s.concat("ACTION: rebalance triggered (";s.fromint(deadcount));" dead consumers)"));};io.println(triggerrebal(@()));io.println(checkheart(@()).len);<0};
+m=monitor;i=io:std.io;i=s:std.str;
+f=getint(json:$str;key:$str):$i64{let needle=s.concat(s.concat("\"";key);"\":");let idx=s.indexof(json;needle);if(idx<0){<0};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let num=mut."";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;",")){br};if(s.equals(c;"}")){br};if(s.equals(c;"]")){br};num=s.concat(num;c)};<s.toint(s.trim(num))};
+f=getstr(json:$str;key:$str):$str{let needle=s.concat(s.concat("\"";key);"\":\"");let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"\"");<s.slice(rest;0;endidx)};
+f=findidx(names:@$str;name:$str):$i64{lp(let i=0;i<names.len();i=i+1){if(s.equals(names.get(i);name)){<i}};<-1};
+f=main():$i64{
+let timeout=mut.0;timeout=s.toint(s.trim(io.readln()));
+let eventsline=io.readln();
+let checktime=mut.0;checktime=s.toint(s.trim(io.readln()));
+let names=mut.@($str);
+let times=mut.@($i64);
+let body=mut."";
+let lb=s.indexof(eventsline;"[");
+if(lb>=0){body=s.slice(eventsline;lb+1;s.len(eventsline))}el{body=eventsline};
+let objs=s.split(body;"}");
+lp(let i=0;i<objs.len();i=i+1){
+let o=objs.get(i);
+if(s.indexof(o;"\"consumer\"")>=0){
+let cons=getstr(o;"consumer");
+let t=getint(o;"time");
+let idx=findidx(names;cons);
+if(idx<0){names=names+@(cons);times=times+@(t)}el{times=times.set(idx;t)}
+}
+};
+let deadcount=mut.0;
+lp(let i=0;i<names.len();i=i+1){
+let cons=names.get(i);
+let lasttime=times.get(i);
+let ago=checktime-lasttime;
+let status=mut."";
+if(ago*2>timeout){status="DEAD";deadcount=deadcount+1}el{status="ALIVE"};
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(cons;": ");status);" (last heartbeat ");s.fromint(ago));"ms ago at t=");s.fromint(lasttime));")"))
+};
+if(deadcount>0){
+let word=mut."consumers";
+if(deadcount=1){word="consumer"};
+io.println(s.concat(s.concat(s.concat(s.concat("ACTION: rebalance triggered (";s.fromint(deadcount));" dead ");word);")"))
+};
+<0}

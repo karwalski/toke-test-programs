@@ -1,1 +1,55 @@
-m=maxflow;f=bfs(n:$i64;s:$i64;t:$i64;cap:$@($i64))):$i64{let q=mut.@($i64));let visited=mut.@($bool);lp(let i=0;i<n;i=i+1){visited=visited+@(false)};q=q+@(s);visited.get(s)=true;lp(let u=0;u<n;u=u+1){if(visited.get(u)=false)){let v=mut.u;let mincap=mut.cap.get(u).get(u);lp(let w=0;w<n;w=w+1){if(visited.get(w)=false)){let tmp=cap.get(u).get(w);if(tmp<mincap){mincap=tmp};v=w}}};if(mincap=0){<0};let path=mut.@($i64));let current=mut.u;lp(let i=0;i<n;i=i+1){path=path+@(current);current=current-1};let result=mut.0;lp(let i=0;i<n;i=i+1){let idx=path.len()-1-i;let u=path.get(idx);let v
+m=maxflow;i=io:std.io;i=s:std.str;i=v:std.vec;
+f=bfs(n:$i64;src:$i64;snk:$i64;cap:Vec;parent:Vec):$bool{
+lp(let i=0;i<n;i=i+1){parent.set(i;0-1)};
+parent.set(src;src);
+let q=v.new();q.push(src);
+let head=mut.0;
+lp(head<q.len()){
+let u=q.get(head);head=head+1;
+lp(let w=0;w<n;w=w+1){
+if(parent.get(w)<0){
+if(cap.get(u*n+w)>0){
+parent.set(w;u);
+if(w=snk){<true};
+q.push(w);
+};
+};
+};
+};
+<false};
+f=main():$i64{
+let first=s.split(s.trim(io.readln());" ");
+let vn=s.toint(first.get(0));
+let e=s.toint(first.get(1));
+let cap=v.new();let orig=v.new();
+lp(let i=0;i<vn*vn;i=i+1){cap.push(0);orig.push(0)};
+let ea=v.new();let eb=v.new();
+lp(let i=0;i<e;i=i+1){
+let p=s.split(s.trim(io.readln());" ");
+let a=s.toint(p.get(0));let b=s.toint(p.get(1));let c=s.toint(p.get(2));
+cap.set(a*vn+b;cap.get(a*vn+b)+c);
+orig.set(a*vn+b;orig.get(a*vn+b)+c);
+ea.push(a);eb.push(b);
+};
+let src=s.toint(s.trim(io.readln()));
+let snk=s.toint(s.trim(io.readln()));
+let parent=v.new();
+lp(let i=0;i<vn;i=i+1){parent.push(0-1)};
+let total=mut.0;
+lp(bfs(vn;src;snk;cap;parent)){
+let pathflow=mut.1000000000;
+let w=mut.snk;
+lp(w!=src){let u=parent.get(w);let c=cap.get(u*vn+w);if(c<pathflow){pathflow=c};w=u;};
+w=snk;
+lp(w!=src){let u=parent.get(w);cap.set(u*vn+w;cap.get(u*vn+w)-pathflow);cap.set(w*vn+u;cap.get(w*vn+u)+pathflow);w=u;};
+total=total+pathflow;
+};
+io.println(s.concat("Max flow: ";s.fromint(total)));
+let line=mut."Flow on edges:";
+lp(let i=0;i<e;i=i+1){
+let a=ea.get(i);let b=eb.get(i);
+let f=orig.get(a*vn+b)-cap.get(a*vn+b);
+line=s.concat(line;s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(" ";s.fromint(a));"->");s.fromint(b));": ");s.fromint(f));s.concat("/";s.fromint(orig.get(a*vn+b)))));
+};
+io.println(line);
+<0};

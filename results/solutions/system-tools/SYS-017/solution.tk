@@ -1,1 +1,13 @@
-m=pidfile;f=start(path:$str;pid:$i64):$str{let result=mut."";let pidstr=pid as$str;let writeok=std.file.write(path;pidstr);if(writeok){result="PID written: "+pidstr;}el{result="Failed to write PID."};<result};f=check(path:$str):$str{let result=mut."";let content=std.file.read(path);if(content.len>0){let pidstr=content as$str;let pid=pidstr as i64;result="RUNNING pid="+pidstr;}el{result="NOT_RUNNING";};<result};f=stop(path:$str):$str{let result=mut."";let deleteok=std.file.delete(path);if(deleteok){result="PID file removed.";}el{result="Failed to remove PID file."};<result};f=main(args:@$str):$i64{let path=args.get(0);let cmd=args.get(1);let result=mut."";if(cmd="start"){let pid=std.process.pid();result=start(path;pid);};if(cmd="check"){result=check(path);};if(cmd="stop"){result=stop(path);};<0};
+m=pidfile;i=io:std.io;i=s:std.str;i=fl:std.file;i=os:std.os;
+f=start(path:$str):$str{let pid=os.getpid();fl.write(path;s.fromint(pid));<s.concat("PID written: ";s.fromint(pid))};
+f=check(path:$str):$str{if(fl.exists(path)){}el{<"NOT_RUNNING"};let r=fl.read(path);if(r){let pidstr=s.trim(r);<s.concat("RUNNING pid=";pidstr)}el{<"NOT_RUNNING"}};
+f=stop(path:$str):$str{if(fl.exists(path)){fl.delete(path)};<"PID file removed."};
+f=main():$i64{
+let path=s.trim(io.readln());
+let cmd=s.trim(io.readln());
+let out=mut."";
+if(s.eq(cmd;"start")){out=start(path)};
+if(s.eq(cmd;"check")){out=check(path)};
+if(s.eq(cmd;"stop")){out=stop(path)};
+io.println(out);
+<0}

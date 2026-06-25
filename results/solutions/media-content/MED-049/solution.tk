@@ -1,1 +1,82 @@
-m=docstats;i=io:std.io;i=str:std.str;f=countchars(s:$str):i64{let n=str.len(s);<n};f=countwords(s:$str):i64{let n=str.len(s);let words=mut.0;let inword=mut.false;lp(let i=0;i<n;i=i+1){let c=str.charat(s;i);if(!(inword)){if(!(c=" ")){words=words+1;inword=true;};}el{if(c=" "){inword=false;}el{inword=true;};};};<words};f=countsentences(s:$str):i64{let n=str.len(s);let sentences=mut.0;let inword=mut.false;lp(let i=0;i<n;i=i+1){let c=str.charat(s;i);if(c="."){sentences=sentences+1;inword=false;}el{inword=true;};};<sentences};f=countparagraphs(s:$str):i64{let n=str.len(s);let paragraphs=mut.0;let inword=mut.false;lp(let i=0;i<n;i=i+1){let c=str.charat(s;i);if(c="\n"){paragraphs=paragraphs+1;inword=false;}el{inword=true;};};<paragraphs};f=avgwordlength(s:$str):f
+m=docstats;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt1(v:$f64):$str{
+  let x=mut.0.0; x=v;
+  let neg=mut.false; if(x<0.0){neg=true;x=0.0-x};
+  let scaled=mut.0.0; scaled=math.round(x*10.0);
+  let total=scaled as i64;
+  let ip=total/10; let frac=total-ip*10;
+  let res=mut.s.concat(s.fromint(ip);".");
+  res=s.concat(res;s.fromint(frac));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let text=all;
+  let n=s.len(text);
+  let bytes=s.bytes(text);
+
+  let chars=n;
+
+  let words=mut.0;
+  let inword=mut.false;
+  let wordcharsum=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=bytes.get(i);
+    let isalpha=(c>=65&&c<=90)||(c>=97&&c<=122);
+    if(isalpha){
+      if(!inword){words=words+1};
+      inword=true;
+      wordcharsum=wordcharsum+1;
+    }el{
+      inword=false;
+    };
+  };
+
+  let sentences=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=bytes.get(i);
+    if(c=46||c=33||c=63){sentences=sentences+1};
+  };
+
+  let paragraphs=mut.0;
+  let inpara=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    let c=bytes.get(i);
+    let isnl=(c=10);
+    if(isnl){
+      let nxt=mut.0;
+      if(i+1<n){nxt=bytes.get(i+1)};
+      if(i+1<n&&nxt=10){inpara=false};
+    }el{
+      let isspace=(c=32||c=9||c=13);
+      if(!isspace){
+        if(!inpara){paragraphs=paragraphs+1};
+        inpara=true;
+      };
+    };
+  };
+
+  let avg=mut.0.0;
+  if(words>0){avg=(wordcharsum as f64)/(words as f64)};
+
+  io.println(s.concat("chars: ";s.fromint(chars)));
+  io.println(s.concat("words: ";s.fromint(words)));
+  io.println(s.concat("sentences: ";s.fromint(sentences)));
+  io.println(s.concat("paragraphs: ";s.fromint(paragraphs)));
+  io.println(s.concat("avg_word_length: ";fmt1(avg)));
+  <0
+};

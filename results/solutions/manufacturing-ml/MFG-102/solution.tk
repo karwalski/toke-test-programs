@@ -1,1 +1,92 @@
-m=hotellings;f=mean2d(arr:@($i64;$i64))):$i64{let n=arr.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let v=arr.get(i);m=m+v;};<m};f=var2d(arr:@($i64;$i64));m:$i64):$i64{let n=arr.len;let s=mut.0;lp(let i=0;i<n;i=i+1){let v=arr.get(i);let diff=v-m;s=s+diff*diff;};<s/n as$f64};f=hotellings(arr:@($i64;$i64))):$f64{let n=arr.len;let m=mean2d(arr);let s=var2d(arr;m);let xbar=0 as$f64;let diff=m-xbar;let result=diff*diff/s;<result};
+m=hotellings;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+  let nlines=lines.len();
+  let x1=mut.@(0.0);
+  x1=@();
+  let x2=mut.@(0.0);
+  x2=@();
+  lp(let i=1;i<nlines;i=i+1){
+    let parts=s.split(lines.get(i);",");
+    x1=x1+@(s.tofloat(parts.get(0)));
+    x2=x2+@(s.tofloat(parts.get(1)));
+  };
+  let n=x1.len();
+  let nf=(n as $f64);
+  let m1=mut.0.0;
+  let m2=mut.0.0;
+  lp(let i=0;i<n;i=i+1){m1=m1+x1.get(i);m2=m2+x2.get(i)};
+  m1=m1/nf;
+  m2=m2/nf;
+  let s11=mut.0.0;
+  let s22=mut.0.0;
+  let s12=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let d1=x1.get(i)-m1;
+    let d2=x2.get(i)-m2;
+    s11=s11+d1*d1;
+    s22=s22+d2*d2;
+    s12=s12+d1*d2;
+  };
+  let denom=nf-1.0;
+  let c11=s11/denom;
+  let c22=s22/denom;
+  let c12=s12/denom;
+  let det=c11*c22-c12*c12;
+  let absdet=mut.det;
+  if(absdet<0.0){absdet=0.0-absdet};
+  let i11=mut.0.0;
+  let i22=mut.0.0;
+  let i12=mut.0.0;
+  if(absdet<0.000001){
+    if(c11>0.0){i11=1.0/c11};
+    if(c22>0.0){i22=1.0/c22};
+    i12=0.0;
+  }el{
+    i11=c22/det;
+    i22=c11/det;
+    i12=(0.0-c12)/det;
+  };
+  let t2arr=mut.@(0.0);
+  t2arr=@();
+  let ucl=10.65;
+  let ooc=mut.@(0);
+  ooc=@();
+  let oochas=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let d1=x1.get(i)-m1;
+    let d2=x2.get(i)-m2;
+    let t2=d1*(i11*d1+i12*d2)+d2*(i12*d1+i22*d2);
+    t2arr=t2arr+@(t2);
+    if(t2>ucl){ooc=ooc+@(i);oochas=1};
+  };
+  let out=mut."{\"t_squared\":[";
+  lp(let i=0;i<n;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    let v=mut.t2arr.get(i);
+    if(v<0.0){if(v>0.0-0.000001){v=0.0}};
+    out=s.concat(out;s.format(v;"%.1f"));
+  };
+  out=s.concat(out;"],\"ucl\":");
+  out=s.concat(out;s.format(ucl;"%.2f"));
+  out=s.concat(out;",\"out_of_control\":[");
+  let no=ooc.len();
+  lp(let i=0;i<no;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;s.fromint(ooc.get(i)));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

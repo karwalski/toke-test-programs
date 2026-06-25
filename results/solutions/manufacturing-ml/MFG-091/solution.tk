@@ -1,1 +1,75 @@
-m=pyyield;f=processrow(row:$str):$str{let vals=row.split(",");let pid=vals.get(0);let yieldstr=vals.get(1);let yieldval=yieldstr.toi64();let result=s.concat(pid;",")+yieldstr;<result};f=buildmodel(rows:$str):$str{let header=rows.get(0);let cols=header.split(",");let targetcol=cols.get(cols.len()-1);let featurecols=cols.slice(0;cols.len()-1));let n=featurecols.len();let modeltype="linear";let coefficients=mut."";lp(let i=0;i<n;i=i+1){let fc=featurecols.get(i);let cval="0.1";if(i>0){coefficients=s.concat(s.concat(coefficients;",");cval)}el{coefficients=cval};};let r2="0.95";let predictions=mut."";lp(let i=0;i<10;i=i+1){let pid=s.concat("P00";i) as$str;let predval="98";if(i>0){predictions=s.concat(s.concat(s.concat(s.concat(predictions;",");pid);":");predval)}el{predictions=s.concat(s.concat(pid;":");predval)};};let result=s.concat(s.concat("{\"model_type\":\"";modeltype);"\",\"coefficients\":[0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,)
+m=pyyield;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{ let v=mut.x; if(v<0.0){if(v>-0.000001){v=0.0}}; <s.format(v;"%.2f") };
+f=main():$i64{
+  let f0=mut.@(0.0); f0=@();
+  let f1=mut.@(0.0); f1=@();
+  let f2=mut.@(0.0); f2=@();
+  let ys=mut.@(0.0); ys=@();
+  let done=mut.0;
+  let first=mut.1;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){
+        if(first=1){ first=0; }el{
+          let parts=s.split(tl;",");
+          f0=f0+@(s.tofloat(parts.get(0)));
+          f1=f1+@(s.tofloat(parts.get(1)));
+          f2=f2+@(s.tofloat(parts.get(2)));
+          ys=ys+@(s.tofloat(parts.get(3)));
+        };
+      };
+    };
+  };
+  let n=f0.len();
+  let nf=n as $f64;
+  let m0=mut.0.0; let m1=mut.0.0; let m2=mut.0.0; let my=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    m0=m0+f0.get(i); m1=m1+f1.get(i); m2=m2+f2.get(i); my=my+ys.get(i);
+  };
+  m0=m0/nf; m1=m1/nf; m2=m2/nf; my=my/nf;
+  let c0=mut.0.0; let c1=mut.0.0; let c2=mut.0.0;
+  let lr=0.000001;
+  lp(let it=0;it<50000;it=it+1){
+    let g0=mut.0.0; let g1=mut.0.0; let g2=mut.0.0;
+    lp(let i=0;i<n;i=i+1){
+      let d0=f0.get(i)-m0;
+      let d1=f1.get(i)-m1;
+      let d2=f2.get(i)-m2;
+      let pred=c0*d0+c1*d1+c2*d2;
+      let err=pred-(ys.get(i)-my);
+      g0=g0+err*d0;
+      g1=g1+err*d1;
+      g2=g2+err*d2;
+    };
+    c0=c0-lr*g0;
+    c1=c1-lr*g1;
+    c2=c2-lr*g2;
+  };
+  let intercept=my-(c0*m0+c1*m1+c2*m2);
+  let sse=mut.0.0;
+  let sst=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let pred=c0*f0.get(i)+c1*f1.get(i)+c2*f2.get(i)+intercept;
+    let e=ys.get(i)-pred;
+    sse=sse+e*e;
+    let dy=ys.get(i)-my;
+    sst=sst+dy*dy;
+  };
+  let r2=mut.1.0;
+  if(sst>0.0){r2=1.0-sse/sst};
+  let r2i=((r2*100.0)+0.5) as $i64;
+  let r2r=(r2i as $f64)/100.0;
+  let out=mut."{\"model_type\":\"linear\"";
+  out=s.concat(out;s.concat(",\"r_squared\":";s.format(r2r;"%.1f")));
+  out=s.concat(out;",\"coefficients\":[");
+  out=s.concat(out;fmt2(c0));
+  out=s.concat(out;s.concat(",";fmt2(c1)));
+  out=s.concat(out;s.concat(",";fmt2(c2)));
+  out=s.concat(out;"]");
+  out=s.concat(out;s.concat(",\"intercept\":";fmt2(intercept)));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

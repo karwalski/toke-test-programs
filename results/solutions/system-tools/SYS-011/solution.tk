@@ -1,1 +1,26 @@
-m=pack;f=solve(p0:$str;p1:$str):$str{let dir=p0;let outpath=p1;let files=std.file.list(dir);let count=files.len;let added=mut."";lp(let i=0;i<count;i=i+1){let f=files.get(i);let path=std.path.join(dir;f);let size=std.file.size(path);let line="added: "+path+" (size: "+size+" bytes)";added=s.concat(s.concat(added;line);"\n");};let final="Archive created: "+outpath+"\n";let result=s.concat(added;final);<result};
+m=pack;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=addfiles(dir:$str):$i64{
+let count=mut.0;
+let lst=fl.list(dir);
+lp(let i=0;i<lst.len();i=i+1){
+let name=lst.get(i);
+let p=s.concat(s.concat(dir;"/");name);
+if(fl.isdir(p)){
+count=count+addfiles(p)
+}el{
+io.println(s.concat("added: ";p));
+count=count+1
+}
+};
+<count
+};
+f=main():$i64{
+let dir=s.trim(io.readln());
+let outpath=s.trim(io.readln());
+if(fl.exists(dir)){}el{
+io.println(s.concat("ERROR: source not found: ";dir));
+<0
+};
+let n=addfiles(dir);
+io.println(s.concat(s.concat(s.concat("Archive created: ";outpath);" (");s.concat(s.fromint(n);" files)")));
+<0}

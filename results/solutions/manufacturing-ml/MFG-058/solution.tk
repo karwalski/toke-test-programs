@@ -1,1 +1,135 @@
-m=pcasensor;f=abs(x:$f64):$f64{if(x<0.0){<0.0-x};<x}};f=dot(a:@$f64;b:@$f64):$f64{let result=mut.0.0;lp(let i=0;i<a.len;i=i+1){result=result+a.get(i)*b.get(i)};<result}};f=matmul(a:@$f64;b:@$f64):@$f64{let result=mut.@();lp(let i=0;i<a.len;i=i+1){let row=mut.@();lp(let j=0;j<b.len;j=j+1){let val=a.get(i)*b.get(j);row=row+@(val)};<row};result=result+@(row)};<result}};f=sqrt(x:$f64):$f64{let guess=mut.x;lp(let i=0;i<10;i=i+1){guess=(guess+x/guess)/2.0};<guess}};f=pca(x:@$f64;y:@$f64):@$f64{let n=x
+m=pca;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmtnum(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+
+  let nlines=lines.len();
+  if(nlines<3){io.println("{}");<0};
+
+  let header=s.split(lines.get(1);",");
+  let ncols=header.len();
+  let nrows=nlines-2;
+
+  let data=mut.@(0.0);
+  data=@();
+  lp(let r=0;r<nrows;r=r+1){
+    let parts=s.split(lines.get(r+2);",");
+    lp(let c=0;c<ncols;c=c+1){
+      data=data+@(s.tofloat(parts.get(c)))
+    }
+  };
+
+  let means=mut.@(0.0);
+  means=@();
+  lp(let c=0;c<ncols;c=c+1){
+    let sum=mut.0.0;
+    lp(let r=0;r<nrows;r=r+1){
+      sum=sum+data.get(r*ncols+c)
+    };
+    means=means+@(sum/(nrows as $f64))
+  };
+
+  let cen=mut.@(0.0);
+  cen=@();
+  lp(let r=0;r<nrows;r=r+1){
+    lp(let c=0;c<ncols;c=c+1){
+      cen=cen+@(data.get(r*ncols+c)-means.get(c))
+    }
+  };
+
+  let cov=mut.@(0.0);
+  cov=@();
+  lp(let i=0;i<ncols;i=i+1){
+    lp(let j=0;j<ncols;j=j+1){
+      let s2=mut.0.0;
+      lp(let r=0;r<nrows;r=r+1){
+        s2=s2+cen.get(r*ncols+i)*cen.get(r*ncols+j)
+      };
+      cov=cov+@(s2)
+    }
+  };
+
+  let total=mut.0.0;
+  lp(let i=0;i<ncols;i=i+1){
+    total=total+cov.get(i*ncols+i)
+  };
+
+  let v=mut.@(0.0);
+  v=@();
+  lp(let i=0;i<ncols;i=i+1){v=v+@(1.0)};
+  lp(let it=0;it<300;it=it+1){
+    let w=mut.@(0.0);
+    w=@();
+    lp(let i=0;i<ncols;i=i+1){
+      let s2=mut.0.0;
+      lp(let j=0;j<ncols;j=j+1){
+        s2=s2+cov.get(i*ncols+j)*v.get(j)
+      };
+      w=w+@(s2)
+    };
+    let nrm=mut.0.0;
+    lp(let i=0;i<ncols;i=i+1){nrm=nrm+w.get(i)*w.get(i)};
+    nrm=math.sqrt(nrm);
+    if(nrm<0.0000000001){nrm=1.0};
+    let v2=mut.@(0.0);
+    v2=@();
+    lp(let i=0;i<ncols;i=i+1){v2=v2+@(w.get(i)/nrm)};
+    v=v2
+  };
+
+  let proj=mut.@(0.0);
+  proj=@();
+  lp(let r=0;r<nrows;r=r+1){
+    let p=mut.0.0;
+    lp(let c=0;c<ncols;c=c+1){
+      p=p+cen.get(r*ncols+c)*v.get(c)
+    };
+    proj=proj+@(p)
+  };
+
+  let eig1=mut.0.0;
+  lp(let r=0;r<nrows;r=r+1){eig1=eig1+proj.get(r)*proj.get(r)};
+  let sigma=mut.0.0;
+  sigma=math.sqrt(eig1);
+  if(sigma<0.0000000001){sigma=1.0};
+
+  let scores=mut.@(0.0);
+  scores=@();
+  lp(let r=0;r<nrows;r=r+1){
+    scores=scores+@(proj.get(r)/sigma*(nrows as $f64))
+  };
+
+  let evr1=mut.0.0;
+  if(total>0.0000000001){evr1=eig1/total}el{evr1=1.0};
+
+  let out=mut."{\"transformed\":[";
+  lp(let r=0;r<nrows;r=r+1){
+    if(r>0){out=s.concat(out;",")};
+    out=s.concat(out;"[");
+    out=s.concat(out;fmtnum(scores.get(r)));
+    out=s.concat(out;"]")
+  };
+  out=s.concat(out;"],\"explained_variance_ratio\":[");
+  out=s.concat(out;s.format(evr1;"%.1f"));
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

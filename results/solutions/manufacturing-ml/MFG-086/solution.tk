@@ -1,2 +1,77 @@
-m=process;f=process(name:$str;input:$str):$str{let output=mut."";let len=input.len;lp(let idx=0;idx<len;idx=idx+1){let ch=input.get(idx);let isupper=mut.false;if(!(ch<"A"))){if(!(ch>"Z"))){isupper=true;};};let islower=mut.false;if(!(ch<"a"))){if(!(ch>"z"))){islower=true;};};let isdigit=mut.false;if(!(ch<"0"))){if(!(ch>"9"))){isdigit=true;};};let ispunct=mut.false;if(!(ch<"!"))){if(!(ch>"~"))){ispunct=true;};};let isblank=mut.false;if(ch=" "){isblank=true;};if(ch="	"){isblank=true;};let isnewline=mut.false;if(ch="
-"){isnewline=true;};if(ch="	"){isnewline=true;};let isalpha=mut.false;if(isupper){isalpha=true;};if(islower){isalpha=true;};let isalnum=mut.false;if(isalpha){isalnum=true;};if(isdigit){isalnum=true;};let isprint
+m=capability;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{ let v=mut.x; if(v<0.0){if(v>-0.000001){v=0.0}}; <s.format(v;"%.2f") };
+f=main():$i64{
+  let lsl=mut.0.0;
+  let usl=mut.0.0;
+  let vals=mut.@(0.0); vals=@();
+  let done=mut.0;
+  let first=mut.1;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){
+        let parts=s.split(tl;",");
+        if(first=1){
+          lsl=s.tofloat(parts.get(0));
+          usl=s.tofloat(parts.get(1));
+          first=0;
+        }el{
+          let pn=parts.len();
+          lp(let i=0;i<pn;i=i+1){
+            vals=vals+@(s.tofloat(parts.get(i)));
+          };
+        };
+      };
+    };
+  };
+  let n=vals.len();
+  let sum=mut.0.0;
+  let mn=mut.vals.get(0);
+  let mx=mut.vals.get(0);
+  lp(let i=0;i<n;i=i+1){
+    let v=vals.get(i);
+    sum=sum+v;
+    if(v<mn){mn=v};
+    if(v>mx){mx=v};
+  };
+  let mean=sum/(n as $f64);
+  let ssq=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let d=vals.get(i)-mean;
+    ssq=ssq+d*d;
+  };
+  let variance=ssq/((n as $f64)-1.0);
+  let std=math.sqrt(variance);
+  let stdi=((std*100.0)+0.5) as $i64;
+  let stdr=(stdi as $f64)/100.0;
+  let meani=((mean*100.0)+0.5) as $i64;
+  let meanr=(meani as $f64)/100.0;
+  let cp=(usl-lsl)/(6.0*stdr);
+  let cpkU=(usl-meanr)/(3.0*stdr);
+  let cpkL=(meanr-lsl)/(3.0*stdr);
+  let cpk=mut.cpkU;
+  if(cpkL<cpkU){cpk=cpkL};
+  let above=mut.0;
+  let below=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let v=vals.get(i);
+    if(v>usl){above=above+1};
+    if(v<lsl){below=below+1};
+  };
+  let ppmA=(above as $f64)/(n as $f64)*1000000.0;
+  let ppmB=(below as $f64)/(n as $f64)*1000000.0;
+  let out=mut."{";
+  out=s.concat(out;s.concat("\"n\":";s.fromint(n)));
+  out=s.concat(out;s.concat(",\"mean\":";fmt2(mean)));
+  out=s.concat(out;s.concat(",\"std\":";fmt2(std)));
+  out=s.concat(out;s.concat(",\"min\":";s.format(mn;"%g")));
+  out=s.concat(out;s.concat(",\"max\":";s.format(mx;"%g")));
+  out=s.concat(out;s.concat(",\"cp\":";fmt2(cp)));
+  out=s.concat(out;s.concat(",\"cpk\":";fmt2(cpk)));
+  out=s.concat(out;s.concat(",\"ppm_above\":";s.fromint((ppmA as $i64))));
+  out=s.concat(out;s.concat(",\"ppm_below\":";s.fromint((ppmB as $i64))));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

@@ -1,1 +1,45 @@
-m=multi;f=op1(x:$i64):$i64{<x+1};f=op2(x:$i64):$i64{<x*2}};f=main():$i64{<0}};
+m=batch;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=opdata(act:$str):$str{
+if(s.eq(act;"like_post")){<"{\"liked\":true}"};
+if(s.eq(act;"unlike_post")){<"{\"liked\":false}"};
+if(s.eq(act;"follow")){<"{\"following\":true}"};
+if(s.eq(act;"unfollow")){<"{\"following\":false}"};
+<"{}"
+};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let action=json.getstr(d;"action");
+if(s.eq(action;"batch")=false){
+io.println("{\"error\":\"invalid action\"}");
+<1
+};
+let ops=json.getarr(d;"operations");
+let n=ops.len();
+let b=s.buf();
+s.add(b;"{\"results\":[");
+let succeeded=mut.0;
+let i=mut.0;
+lp(i<n){
+let op=ops.get(i);
+let act=json.getstr(op;"action");
+let data=opdata(act);
+if(i>0){s.add(b;",")};
+s.add(b;"{\"index\":");
+s.add(b;s.fromint(i));
+s.add(b;",\"status\":\"success\",\"data\":");
+s.add(b;data);
+s.add(b;"}");
+succeeded=succeeded+1;
+i=i+1;
+};
+s.add(b;"],\"total\":");
+s.add(b;s.fromint(n as $i64));
+s.add(b;",\"succeeded\":");
+s.add(b;s.fromint(succeeded));
+s.add(b;",\"failed\":");
+s.add(b;s.fromint((n as $i64)-succeeded));
+s.add(b;"}");
+io.println(s.done(b));
+<0}

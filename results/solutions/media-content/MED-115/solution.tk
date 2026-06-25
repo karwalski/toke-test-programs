@@ -1,1 +1,38 @@
-m=runlen;f=decode(s:$str):$str{let n=s.len;let m=mut.0;let result=mut."";lp(let idx=0;idx<n;idx=idx+1){let ch=s.get(idx);if(ch>47){if(ch<58){let times=ch-48;let sym=s.get(idx-1);let tmp=mut."";lp(let j=0;j<times;j=j+1){tmp=tmp+sym};result=s.concat(result;tmp)}el{m=1}}el{m=1}};if(m=0){<result};<""};
+m=runlen;
+i=io:std.io;
+i=s:std.str;
+f=decode(str:$str):$str{
+  let n=s.len(str);
+  let b=s.bytes(str);
+  let result=mut."";
+  let idx=mut.0;
+  lp(idx<n){
+    let c=b.get(idx);
+    let count=mut.0;
+    let hasdigit=mut.false;
+    lp(idx<n){
+      let d=b.get(idx);
+      if(d>=48&&d<=57){
+        count=count*10+(d-48);
+        hasdigit=true;
+        idx=idx+1;
+      }el{br};
+    };
+    if(idx<n){
+      if(!hasdigit){count=1};
+      let sym=s.substr(str;idx;idx+1);
+      let k=mut.0;
+      lp(k<count){
+        result=s.concat(result;sym);
+        k=k+1;
+      };
+      idx=idx+1;
+    };
+  };
+  <result
+};
+f=main():$i64{
+  let line=io.readln();
+  io.println(decode(line));
+  <0
+};

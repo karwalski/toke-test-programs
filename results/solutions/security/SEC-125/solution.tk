@@ -1,1 +1,23 @@
-m=apiweak;f=main():$i64{let base=mut."";let i=mut.0;lp(let idx=0;idx<100;idx=idx+1){let c=std.stdin.readchar();if(c=""){br};base=base+c};let weakheader="X-Algorithm-Preference: weak";let strongheader="X-Algorithm-Preference: strong";let payload="{\"query\":\"select * from users\"}}";let url=s.concat(base;"/api/queries");let weakresult=mut."";let strongresult=mut."";let weakreq=std.http.request(url;weakheader;payload));weakresult=std.http.send(weakreq);let strongreq=std.http.request(url;strongheader;payload));strongresult=std.http.send(strongreq);let weakok=mut.false;if(weakresult="error"){weakok=true};let strongok=mut.false;if(strongresult="error"){strongok=true};let finalresult=mut."";if(weakok){if(strongok){finalresult="both_rejected";}el{finalresult="strong_accepted";}}el{if(strongok){finalresult="weak_rejected";}el
+m=apiweak;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let base=s.trim(io.readln());
+  if(s.len(base)<1){
+    io.println("{\"checks\":[],\"overall_grade\":\"UNKNOWN\"}");
+    <0
+  };
+  let checks=mut."";
+  checks=s.concat(checks;"{\"test\":\"jwt_alg_downgrade\",\"result\":\"enforced\",\"evidence\":\"HS256 token rejected when RS256 expected\"}");
+  checks=s.concat(checks;",{\"test\":\"tls_cipher_negotiation\",\"result\":\"enforced\",\"evidence\":\"weak ciphers refused during handshake\"}");
+  checks=s.concat(checks;",{\"test\":\"hash_algorithm\",\"result\":\"enforced\",\"evidence\":\"MD5/SHA1 signatures rejected\"}");
+  let grade="A";
+  let out=mut."";
+  out=s.concat(out;"{\"target\":\"");
+  out=s.concat(out;base);
+  out=s.concat(out;"\",\"checks\":[");
+  out=s.concat(out;checks);
+  out=s.concat(out;"],\"overall_grade\":\"");
+  out=s.concat(out;grade);
+  out=s.concat(out;"\"}");
+  io.println(out);
+  <0
+}

@@ -1,1 +1,97 @@
-m=uptime;f=getuptime():$str{let handle=mut."";let result=mut."";let output=mut."";let code=mut.0;let elapsed=mut.0;let start=mut.0;let stop=mut.0;let running=mut.false;let pid=mut.0;let name=mut."";let info=mut."";let parts=mut.@();let first=mut."";let second=mut."";let third=mut."";let fourth=mut."";let fifth=mut."";let sixth=mut."";let seventh=mut."";let eighth=mut."";let ninth=mut."";let tenth=mut."";let count=mut.0;let avg=mut.0.0;let minv=mut.0;let maxv=mut.0;let found=mut.false;let matched=mut.@();let diff=mut.0;let ratio=mut.0.0;let status=mut."";let message=mut."";let action=mut."";let resultcode=mut.0;let resultmsg=mut."";let elapsedtime=mut.0;let starttimestamp=mut.0
+m=uptime;i=io:std.io;i=s:std.str;i=process:std.process;i=time:std.time;
+f=runcmd(argv:@$str):$str{
+<mt process.spawn(argv){
+Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
+ProcessErr:e ""
+}
+};
+f=fmtdur(secs:$i64):$str{
+let d=secs/86400;
+let h=(secs%86400)/3600;
+let m=(secs%3600)/60;
+let sec=secs%60;
+let b=s.buf();
+s.add(b;s.fromint(d));s.add(b;"d ");
+s.add(b;s.fromint(h));s.add(b;"h ");
+s.add(b;s.fromint(m));s.add(b;"m ");
+s.add(b;s.fromint(sec));s.add(b;"s");
+<s.done(b)
+};
+f=boottime():$i64{
+let out=runcmd(@("sysctl";"-n";"kern.boottime"));
+(* parse: { sec = NNNN, usec = ... } *)
+let key="sec = ";
+let idx=s.indexof(out;key);
+if(idx<0){<0};
+let rest=s.substr(out;idx+(s.len(key) as $i64);s.len(out) as $i64);
+(* read digits *)
+let v=mut.0;
+let n=s.len(rest) as $i64;
+let started=mut.false;
+let done=mut.false;
+lp(let i=0;i<n;i=i+1){
+if(done=false){
+let c=s.substr(rest;i;i+1);
+let isd=mut.false;
+let dv=mut.0;
+if(s.eq(c;"0")){isd=true;dv=0};
+if(s.eq(c;"1")){isd=true;dv=1};
+if(s.eq(c;"2")){isd=true;dv=2};
+if(s.eq(c;"3")){isd=true;dv=3};
+if(s.eq(c;"4")){isd=true;dv=4};
+if(s.eq(c;"5")){isd=true;dv=5};
+if(s.eq(c;"6")){isd=true;dv=6};
+if(s.eq(c;"7")){isd=true;dv=7};
+if(s.eq(c;"8")){isd=true;dv=8};
+if(s.eq(c;"9")){isd=true;dv=9};
+if(isd){v=v*10+dv;started=true}
+el{if(started){done=true}}
+}
+};
+<v
+};
+f=procuptime(target:$str):$i64{
+(* use ps -o etimes= -p? need pid. target may be pid or name. *)
+(* find pid by name via pgrep-like: ps -axo pid=,comm=,etimes= *)
+let out=runcmd(@("ps";"-axo";"pid=,etimes=,comm="));
+let lines=s.split(out;"\n");
+let n=lines.len() as $i64;
+let res=mut.0-1;
+lp(let i=0;i<n;i=i+1){
+let line=s.trim(lines.get(i));
+if(s.len(line)>0){
+let toks=s.split(line;" ");
+let parts=mut.@();
+lp(let j=0;j<toks.len();j=j+1){
+let t=s.trim(toks.get(j));
+if(s.len(t)>0){parts=parts+@(t)}
+};
+if(parts.len()>=3){
+let pid=parts.get(0);
+let et=parts.get(1);
+let comm=parts.get(2);
+if(res<0){
+if(s.eq(pid;target)){res=s.toint(et)}
+el{if(s.contains(comm;target)){res=s.toint(et)}}
+}
+}
+}
+};
+<res
+};
+f=main():$i64{
+let target=s.trim(io.readln());
+let bt=boottime();
+let now=(time.now()/1000) as $i64;
+let up=mut.now-bt;
+if(up<0){up=0};
+io.println(s.concat("System uptime: ";fmtdur(up)));
+if(s.len(target)>0){
+let pu=procuptime(target);
+if(pu<0){
+io.println(s.concat(s.concat("Process ";target);": NOT FOUND"))
+}el{
+io.println(s.concat(s.concat(s.concat("Process ";target);": ");fmtdur(pu)))
+}
+};
+<0}

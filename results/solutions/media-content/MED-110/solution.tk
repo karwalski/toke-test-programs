@@ -1,1 +1,55 @@
-m=wordcontext;f=main(args:@$str):i64{if(args.len<3){<1};let word=args.get(1);let n=6;let text=args.get(2);let found=mut.false;let result=mut."";let pos=mut.0;lp(let i=0;i<text.len;i=i+1){let ch=text.get(i);if(ch=" "){if(found){result=s.concat(result;"\n");};found=false;pos=0;}el{if(!(found)){if(ch=word.get(0))){let match=mut.true;lp(let j=0;j<word.len;j=j+1){if(!(match)){br;};let tc=text.get(i+j);if(!(tc=word.get(j)))){match=false;};};if(match){found=true;let start=mut.i;lp(let k=0;k<pos;k=k+1){if(start>0){start=start-1;};};let end=mut.i+word.len-1;lp(let k=0;k<pos;k=k+1){if(end<text.len-1){end=end+1;};};result=s.concat(result;"...");lp(let k=0;k<start;k=k+1){result=result+text.get(k);};result=s.concat(result;" [")+word+"] ";lp(let k=start+1;k<end
+m=wordcontext;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let header=io.readln();
+  let hparts=s.split(header;" ");
+  if(hparts.len<2){<0};
+  let word=hparts.get(0);
+  let nstr=hparts.get(1);
+  let n=s.parseint(nstr);
+  let text=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){text=s.concat(text;" ")};
+    text=s.concat(text;line);
+    first=false;
+  };
+  let words=s.split(text;" ");
+  let wcount=words.len;
+  let lword=s.lower(word);
+  lp(let p=0;p<wcount;p=p+1){
+    let cw=s.lower(words.get(p));
+    if(s.eq(cw;lword)){
+      let out=mut."...";
+      let li=mut.p-n;
+      let leftfirst=mut.true;
+      lp(li<p){
+        if(li<0){
+          if(leftfirst){out=s.concat(out;"<START>");leftfirst=false}el{out=s.concat(out;" <START>")};
+        }el{
+          if(leftfirst){out=s.concat(out;words.get(li));leftfirst=false}el{out=s.concat(out;s.concat(" ";words.get(li)))};
+        };
+        li=li+1;
+      };
+      out=s.concat(out;" [");
+      out=s.concat(out;words.get(p));
+      out=s.concat(out;"] ");
+      let ri=mut.p+1;
+      let rightfirst=mut.true;
+      lp(ri<=p+n){
+        if(ri>=wcount){
+          if(rightfirst){out=s.concat(out;"<END>");rightfirst=false}el{out=s.concat(out;" <END>")};
+        }el{
+          if(rightfirst){out=s.concat(out;words.get(ri));rightfirst=false}el{out=s.concat(out;s.concat(" ";words.get(ri)))};
+        };
+        ri=ri+1;
+      };
+      out=s.concat(out;"...");
+      io.println(out);
+    };
+  };
+  <0
+};

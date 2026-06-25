@@ -1,1 +1,37 @@
-m=removeuser;f=removeuser(users:@$str;id:$str):@$str{let result=mut.@();lp(let i=0;i<users.len;i=i+1){let current=users.get(i);if(current=id){<result};result=result+@(current)};<result};f=main():$void{let users=@("alice";"bob";"charlie"));let id="bob";let updated=removeuser(users;id);lp(let i=0;i<updated.len;i=i+1){let user=updated.get(i);<user}};
+m=rmmember;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=getint(obj:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let p=s.indexof(obj;pat);
+  if(p<0){<0};
+  let st=(p as $u64)+s.len(pat);
+  let n=s.len(obj);
+  let en=mut.st;
+  lp(let e=st;e<n;e=e+1){let c=s.slice(obj;e;e+1);let isdig=s.contains("0123456789";c);if(!(isdig)){en=e;e=n}};
+  <s.toint(s.slice(obj;st;en))
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  let lid=getstr(input;"list_id");
+  let uid=getint(input;"user_id");
+  if(s.eq(action;"remove_from_list")){
+    let out=mut."{\"list_id\":\"";
+    out=s.concat(out;lid);
+    out=s.concat(out;"\",\"user_id\":");
+    out=s.concat(out;s.fromint(uid));
+    out=s.concat(out;",\"member_count\":0,\"status\":\"removed\"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

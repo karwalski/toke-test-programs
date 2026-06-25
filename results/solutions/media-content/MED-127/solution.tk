@@ -1,1 +1,70 @@
-m=validate;t=$str;f=countvars(template:$str):i64{let count=mut.0;let len=template.len;lp(let i=0;i<len;i=i+1){let ch=template.get(i);if(ch="{"){let j=mut.i+1;lp(let k=j;k<len;k=k+1){let c=template.get(k);if(c="}"){j=k+1;i=j-1;count=count+1;br;};};};};<count};f=validate(template:$str;vars:@$str):bool{let count=countvars(template);let provided=vars.len;if(!(count=provided)){<false};let i=mut.0;lp(let idx=0;idx<count;idx=idx+1){let varname=vars.get(i);let open="{";let close="}";let marker=open+varname+close;let found=template.contains(marker);if(!(found=true)){<false};i=i+1};<true};
+m=validate;
+i=io:std.io;
+i=s:std.str;
+
+f=contains(set:@$str;w:$str):$bool{
+  lp(let i=0;i<set.len;i=i+1){
+    if(s.eq(set.get(i);w)){<true};
+  };
+  <false
+};
+
+f=main():$i64{
+  let lines=mut.@();
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    lines=lines+@(line);
+  };
+  let template=mut."";
+  let keys=mut.@();
+  let insecond=mut.false;
+  let firstt=mut.true;
+  lp(let li=0;li<lines.len;li=li+1){
+    let line=lines.get(li);
+    if(s.eq(line;"---")){
+      insecond=true;
+    }el{
+      if(insecond){
+        let parts=s.split(line;"=");
+        if(parts.len>=1){
+          let k=parts.get(0);
+          if(s.len(k)>0){keys=keys+@(k)};
+        };
+      }el{
+        if(!firstt){template=s.concat(template;"\n")};
+        template=s.concat(template;line);
+        firstt=false;
+      };
+    };
+  };
+  let b=s.bytes(template);
+  let n=b.len;
+  let missing=mut.@();
+  let i=mut.0;
+  lp(i<n){
+    if(i+1<n&&b.get(i)=123&&b.get(i+1)=123){
+      let start=i+2;
+      let j=mut.start;
+      lp(j<n){
+        if(j+1<n&&b.get(j)=125&&b.get(j+1)=125){br};
+        j=j+1;
+      };
+      let varname=s.substr(template;start;j);
+      if(!contains(keys;varname)){
+        if(!contains(missing;varname)){missing=missing+@(varname)};
+      };
+      i=j+2;
+    }el{
+      i=i+1;
+    };
+  };
+  if(missing.len=0){
+    io.println("VALID");
+  }el{
+    lp(let mi=0;mi<missing.len;mi=mi+1){
+      io.println(s.concat("MISSING: ";missing.get(mi)));
+    };
+  };
+  <0
+};

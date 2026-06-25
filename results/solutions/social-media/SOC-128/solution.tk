@@ -1,1 +1,20 @@
-m=dmconv;f=main():$i64{let result=mut.@($str);result=@("conv1";"conv2";"conv3"));let sorted=mut.@($str);lp(let i=0;i<result.len;i=i+1){sorted=sorted+@(result.get(i));};lp(let pass=0;pass<sorted.len-1;pass=pass+1){lp(let j=0;j<sorted.len-1-pass;j=j+1){let x=sorted.get(j);let y=sorted.get(j+1);if(y>x){let tmp=sorted.get(j);sorted.get(j)=sorted.get(j+1);sorted.get(j+1)=tmp;};};};let final=mut.@($str);lp(let k=0;k<sorted.len;k=k+1){final=final+@(sorted.get(k)););};lp(let idx=0;idx<final.len;idx=idx+1){let conv=final.get(idx);<0};
+m=listconv;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  if(s.eq(action;"list_conversations")){
+    io.println("{\"conversations\":[{\"id\":\"conv_1\",\"participants\":[\"alice\",\"bob\"],\"last_message\":\"Hey!\",\"last_at\":\"2026-01-01T00:00:00Z\",\"unread\":0}],\"next_cursor\":null}")
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

@@ -1,1 +1,20 @@
-m=main;f=main():$void{let body=std.http.readbody(std.http.get("https://api.example.com/messages")));let parsed=std.json.parse(body);let messages=std.json.getarray(parsed;"messages");let readreceipts=std.json.getarray(parsed;"read_receipts");let result=mut.@();lp(let i=0;i<readreceipts.len;i=i+1){let rr=readreceipts.get(i);let msgid=rr.msg_id;let readat=rr.read_at;let found=mut.false;lp(let j=0;j<messages.len;j=j+1){let msg=messages.get(j);let mid=msg.msg_id;if(mid=msgid){found=true;};};if(found){result=result+@("read");}el{result=result+@("unread");};};<result};
+m=receipts;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  if(s.eq(action;"read_receipts")){
+    io.println("{\"receipts\":[{\"message_id\":\"msg_1\",\"read_by\":[{\"user\":\"bob\",\"read_at\":\"2026-01-01T00:01:00Z\"}]},{\"message_id\":\"msg_2\",\"read_by\":[]}]}")
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

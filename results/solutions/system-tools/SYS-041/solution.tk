@@ -1,1 +1,125 @@
-m=ifaces;i=process:std.process;i=str:std.str;i=io:std.io;f=parseif(line:$str):$str{let parts=str.split(line;":");let num1=str.trim(parts.get(0)));let num2=str.trim(parts.get(1)));let result=s.concat(s.concat(num1;":");num2);let final=str.trim(result);<final};f=run():$str{let handle=process.spawn("ifconfig";@()));let out=process.stdout(handle);let lines=str.split(out;"\n");let result=mut."";lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);let iface=parseif(line);if(!(iface.len=0 as u64))){if(!(result.len=0 as u64))){result=s.concat(result;"\n");};result=result+iface;};};<result};f=main():$void{let out=run();io.println(out);};
+m=ifaces;i=io:std.io;i=s:std.str;i=process:std.process;
+f=getout():$str{
+<mt process.spawn(@("ifconfig")){
+Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
+ProcessErr:e ""
+}
+};
+f=hexprefix(hx:$str):$i64{
+(* hx like 0xffffff00 -> count 1 bits *)
+let v=mut.0;
+let n=s.len(hx) as $i64;
+let i=mut.0;
+(* skip 0x *)
+if(n>=2){i=2};
+lp(i<n){
+let ch=s.substr(hx;i;i+1);
+let d=mut.0;
+if(s.eq(ch;"0")){d=0};
+if(s.eq(ch;"1")){d=1};
+if(s.eq(ch;"2")){d=2};
+if(s.eq(ch;"3")){d=3};
+if(s.eq(ch;"4")){d=4};
+if(s.eq(ch;"5")){d=5};
+if(s.eq(ch;"6")){d=6};
+if(s.eq(ch;"7")){d=7};
+if(s.eq(ch;"8")){d=8};
+if(s.eq(ch;"9")){d=9};
+if(s.eq(ch;"a")){d=10};
+if(s.eq(ch;"b")){d=11};
+if(s.eq(ch;"c")){d=12};
+if(s.eq(ch;"d")){d=13};
+if(s.eq(ch;"e")){d=14};
+if(s.eq(ch;"f")){d=15};
+(* count bits in d *)
+lp(let k=0;k<4;k=k+1){
+v=v+(d&1);
+d=d>>1
+};
+i=i+1
+};
+<v
+};
+f=field(line:$str;key:$str):$str{
+(* return token after key on this line, else "" *)
+let toks=s.split(line;" ");
+let n=toks.len() as $i64;
+let res=mut."";
+lp(let i=0;i<n;i=i+1){
+if(s.eq(s.trim(toks.get(i));key)){
+if(i+1<n){res=s.trim(toks.get(i+1))}
+}
+};
+<res
+};
+f=main():$i64{
+let filter=s.trim(io.readln());
+let out=getout();
+let lines=s.split(out;"\n");
+let n=lines.len() as $i64;
+let curname=mut."";
+let curip=mut."";
+let curprefix=mut.0;
+let curmac=mut."";
+let curmtu=mut."";
+let curup=mut.false;
+let have=mut.false;
+lp(let i=0;i<n;i=i+1){
+let line=lines.get(i);
+let isheader=mut.false;
+if(s.len(line)>0){
+let c0=s.substr(line;0;1);
+if(s.eq(c0;" ")=false){if(s.eq(c0;"\t")=false){isheader=true}}
+};
+if(isheader){
+(* flush previous *)
+if(have){
+emit(curname;curip;curprefix;curmac;curmtu;curup;filter)
+};
+have=false;
+(* parse header: name is up to first ':' *)
+let colon=s.indexof(line;":");
+if(colon>0){
+curname=s.substr(line;0;colon);
+curip="";curprefix=0;curmac="";curmtu="";curup=false;
+have=true;
+(* mtu *)
+let m=field(line;"mtu");
+curmtu=m;
+(* UP flag *)
+if(s.contains(line;"UP")){curup=true}
+}
+}el{
+let t=s.trim(line);
+if(s.startswith(t;"inet ")){
+let toks=s.split(t;" ");
+if(toks.len()>1){curip=s.trim(toks.get(1))};
+let nm=field(t;"netmask");
+if(s.len(nm)>0){curprefix=hexprefix(nm)}
+};
+if(s.startswith(t;"ether ")){
+let toks=s.split(t;" ");
+if(toks.len()>1){curmac=s.trim(toks.get(1))}
+}
+}
+};
+if(have){emit(curname;curip;curprefix;curmac;curmtu;curup;filter)};
+<0
+};
+f=emit(name:$str;ip:$str;prefix:$i64;mac:$str;mtu:$str;up:$bool;filter:$str):$i64{
+if(s.len(filter)>0){if(s.eq(name;filter)=false){<0}};
+if(s.len(ip)=0){<0};
+let b=s.buf();
+s.add(b;name);
+s.add(b;": ");
+s.add(b;ip);
+s.add(b;"/");
+s.add(b;s.fromint(prefix));
+if(s.len(mac)>0){s.add(b;" ");s.add(b;mac)};
+s.add(b;" mtu=");
+s.add(b;mtu);
+s.add(b;" ");
+if(up){s.add(b;"UP")}el{s.add(b;"DOWN")};
+io.println(s.done(b));
+<0
+};

@@ -1,1 +1,50 @@
-m=hashqueue;f=hashfn(val:$str):$i64{let hash=mut.0;let len=val.len;lp(let idx=0;idx<len;idx=idx+1){let charcode=val.get(idx)as$i64;hash=hash*33+charcode;hash=hash-hash/2*2;};<hash};f=enqueue(queue:$str;val:$str):$str{let len=queue.len;let idx=mut.0;lp(let i=0;i<len;i=i+1){let ch=queue.get(i);if(ch="\n"){idx=i+1;};};let result=mut."";lp(let i=0;i<idx;i=i+1){let ch=queue.get(i);result=result+ch;};let hashval=hashfn(val);let targetidx=mut.idx;lp(let i=idx;i<len;i=i+1){let ch=queue.get(i);if(ch="\n"){let nextidx=i+1;let nextch=queue.get(nextidx);if(nextch="\n"){let nextnextidx=nextidx+1;let nextnextch=queue.get(nextnextidx);if(nextnextch
+m=hashqueue;
+i=io:std.io;
+i=s:std.str;
+f=parsei(txt:$str):$i64{ <mt s.toint(s.trim(txt)){$ok:v v;$err:e 0} };
+f=jstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx as$u64 + s.len(pat);
+  let rest=mt s.slice(obj;start;s.len(obj)){$ok:v v;$err:e ""};
+  let endi=s.indexof(rest;"\"");
+  if(endi<0){<rest};
+  <mt s.slice(rest;0;endi as$u64){$ok:v v;$err:e ""}
+};
+f=hashfn(val:$str):$i64{
+  let bs=s.bytes(val);
+  let sum=mut.0;
+  lp(let i=0;i<bs.len;i=i+1){ sum=sum+(bs.get(i) as$i64); };
+  <sum*31+1
+};
+f=main():$i64{
+  let nline=io.readln();
+  let nparts=parsei(nline);
+  let dataline=io.readln();
+  let inner=s.trim(dataline);
+  let lb=s.indexof(inner;"[");
+  let raw=mut.mt s.slice(inner;(lb+1) as$u64;s.len(inner)){$ok:v v;$err:e ""};
+  let rb=s.indexof(raw;"]");
+  if(rb>=0){raw=mt s.slice(raw;0;rb as$u64){$ok:v v;$err:e ""}};
+  let parts=s.split(raw;"},{");
+  let buckets=mut.@();
+  lp(let p=0;p<nparts;p=p+1){buckets=buckets+@("")};
+  lp(let i=0;i<parts.len;i=i+1){
+    let obj=parts.get(i);
+    if(s.indexof(obj;"\"partition_key\"")<0){br};
+    let pkey=jstr(obj;"partition_key");
+    let text=jstr(obj;"text");
+    let h=hashfn(pkey);
+    let p=mut.h-(h/nparts)*nparts;
+    if(p<0){p=p+nparts};
+    let entry=s.concat(s.concat(text;" (");s.concat(pkey;")"));
+    let cur=buckets.get(p);
+    if(s.len(cur)>0){buckets=buckets.set(p;s.concat(s.concat(cur;", ");entry))}el{buckets=buckets.set(p;entry)};
+  };
+  lp(let p=0;p<nparts;p=p+1){
+    let body=buckets.get(p);
+    io.println(s.concat(s.concat(s.concat("partition ";s.fromint(p));": [");s.concat(body;"]")));
+  };
+  <0
+};

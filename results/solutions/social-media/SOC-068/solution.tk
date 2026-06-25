@@ -1,1 +1,73 @@
-m=notif;f=solve(p0:$str):$str{let lhs=mut."";let rhs=mut.p0;let found=mut.false;lp(let i=0;i<rhs.len;i=i+1){let c=rhs.get(i);if(c="@"){found=true};if(found){if(!(c="@"))){lhs=lhs+c}el{br};};};let result=mut."";if(!(lhs.len=0 as u64))){result=s.concat(result;lhs);result=s.concat(result;"... see full comment");};<result};
+m=notif;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=useridfor(name:$str):$str{
+  if(s.eq(name;"alice")){<"1"};
+  if(s.eq(name;"bob")){<"2"};
+  if(s.eq(name;"carol")){<"3"};
+  if(s.eq(name;"dave")){<"4"};
+  if(s.eq(name;"eve")){<"5"};
+  <""
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let content=getstrval(line;"content");
+  if(s.eq(action;"create_comment")&&s.len(content)>0){
+    let alnum="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    let mentions=mut."";
+    let count=mut.0;
+    let inname=mut.false;
+    let cur=mut."";
+    lp(let i=0;i<s.len(content);i=i+1){
+      let ch=s.slice(content;i;i+1);
+      if(inname){
+        if(s.indexof(alnum;ch)>=0){cur=s.concat(cur;ch)}el{
+          let uid=useridfor(cur);
+          if(s.len(uid)>0){
+            if(count>0){mentions=s.concat(mentions;",")};
+            mentions=s.concat(mentions;"{\"username\":\"");
+            mentions=s.concat(mentions;cur);
+            mentions=s.concat(mentions;"\",\"id\":");
+            mentions=s.concat(mentions;uid);
+            mentions=s.concat(mentions;"}");
+            count=count+1;
+          };
+          inname=false;cur="";
+        };
+      }el{
+        if(s.eq(ch;"@")){inname=true;cur=""};
+      };
+    };
+    if(inname){
+      let uid=useridfor(cur);
+      if(s.len(uid)>0){
+        if(count>0){mentions=s.concat(mentions;",")};
+        mentions=s.concat(mentions;"{\"username\":\"");
+        mentions=s.concat(mentions;cur);
+        mentions=s.concat(mentions;"\",\"id\":");
+        mentions=s.concat(mentions;uid);
+        mentions=s.concat(mentions;"}");
+        count=count+1;
+      };
+    };
+    let out=mut."";
+    out=s.concat(out;"{\"comment_id\":3,\"content\":\"");
+    out=s.concat(out;content);
+    out=s.concat(out;"\",\"mentions\":[");
+    out=s.concat(out;mentions);
+    out=s.concat(out;"],\"status\":\"created\"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

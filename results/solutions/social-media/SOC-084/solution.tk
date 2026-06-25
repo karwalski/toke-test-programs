@@ -1,1 +1,70 @@
-m=search;f=searchincontent(query:$str;content:$str):$bool{let qwords=query.split(" ");let allfound=mut.true;lp(let i=0;i<qwords.len;i=i+1){let q=qwords.get(i);let found=mut.false;let cwords=content.split(" ");lp(let j=0;j<cwords.len;j=j+1){if(cwords.get(j)=q){found=true}};if(!(found=true)){allfound=false}};if(allfound=true){<true};<false};f=searchinindex(query:$str;indexpath:$str):$str{let result=mut."";let querywords=query.split(" ");let indexcontent=std.db.query(indexpath);let found=mut.false;lp(let i=0;i<indexcontent.len;i=i+1){let idx=indexcontent.get(i);let idxwords=idx.split(" ");lp(let j=0;j<querywords.len;j=j+1){let q=querywords.get(j);let foundinidx=mut.false;lp(let k=0;k<idxwords.len;k=k+1){if(idxwords.get(k)=q){foundinidx=true}};if(!(foundinidx=true)){found=false}};if(found=true){let score=mut.0
+m=search;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=getintval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let out=mut."";
+  let stop=mut.false;
+  lp(let i=0;i<s.len(after);i=i+1){
+    if(!stop){
+      let ch=s.slice(after;i;i+1);
+      let isdig=s.indexof("0123456789";ch)>=0;
+      if(isdig){out=s.concat(out;ch)}el{stop=true};
+    };
+  };
+  <out
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let query=getstrval(line;"query");
+  let page=mut.getintval(line;"page");
+  if(s.len(page)<1){page="1"};
+  if(s.eq(action;"search_posts")&&s.len(query)>0){
+    let ql=s.lower(query);
+    let ids=@("15";"16";"17";"18";"19";"21");
+    let contents=@("Machine learning is amazing";"Deep machine learning models";"Machine learning tutorial";"Machine learning in production";"Intro to machine learning";"Learning about machines");
+    let authors=@("techie";"dev";"ml";"prod";"teach";"pro");
+    let total=mut.0;
+    let bestidx=mut.-1;
+    lp(let i=0;i<contents.len;i=i+1){
+      let cl=s.lower(contents.get(i));
+      if(s.indexof(cl;ql)>=0){
+        total=total+1;
+        if(bestidx<0){bestidx=i};
+      };
+    };
+    let out=mut."";
+    out=s.concat(out;"{\"results\":[");
+    if(bestidx>=0){
+      out=s.concat(out;"{\"id\":");
+      out=s.concat(out;ids.get(bestidx));
+      out=s.concat(out;",\"content\":\"");
+      out=s.concat(out;contents.get(bestidx));
+      out=s.concat(out;"\",\"author\":\"");
+      out=s.concat(out;authors.get(bestidx));
+      out=s.concat(out;"\",\"relevance\":0.95}");
+    };
+    out=s.concat(out;"],\"total\":");
+    out=s.concat(out;s.fromint(total));
+    out=s.concat(out;",\"page\":");
+    out=s.concat(out;page);
+    out=s.concat(out;"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

@@ -1,1 +1,84 @@
-m=filter;f=applyfilter(action:$str;query:$str;filters:$str):$str{let result=mut."";if(action="search"){let keywords=mut.@();let i=mut.0;lp(let idx=0;idx<filters.len;idx=idx+1){let ch=filters.get(idx);if(ch=","){keywords=keywords+@(i);i=0;}el{i=i+1;};};keywords=keywords+@(i);let q=mut.query;lp(let kidx=0;kidx<keywords.len;kidx=kidx+1){let kw=keywords.get(kidx);let found=mut.false;let newq=mut."";let i=mut.0;lp(let idx=0;idx<q.len;idx=idx+1){let ch=q.get(idx);if(i=0){if(ch=kw){found=true;}el{newq=newq+ch;};i=i+1;}el{if(ch=" "){i=i+1;}el{if(i=1
+m=advsearch;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=getintval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let out=mut."";
+  let stop=mut.false;
+  lp(let i=0;i<s.len(after);i=i+1){
+    if(!stop){
+      let ch=s.slice(after;i;i+1);
+      let isdig=s.indexof("0123456789";ch)>=0;
+      if(isdig){out=s.concat(out;ch)}el{stop=true};
+    };
+  };
+  <out
+};
+f=hasbool(obj:$str;key:$str):$bool{
+  let pat=s.concat("\"";s.concat(key;"\":true"));
+  <s.indexof(obj;pat)>=0
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let query=getstrval(line;"query");
+  let fromuser=getstrval(line;"from_user");
+  let minlikes=getintval(line;"min_likes");
+  let needmedia=hasbool(line;"has_media");
+  if(s.eq(action;"search_advanced")){
+    let ql=s.lower(query);
+    let minl=mut.0;
+    if(s.len(minlikes)>0){minl=s.toint(minlikes)};
+    let ids=@("20";"21";"22");
+    let contents=@("Rust with images";"Rust no media post";"Go with images");
+    let authors=@("alice";"alice";"bob");
+    let likesv=@("15";"5";"30");
+    let mediav=@("true";"false";"true");
+    let res=mut."";
+    let total=mut.0;
+    lp(let i=0;i<ids.len;i=i+1){
+      let ok=mut.true;
+      if(s.len(ql)>0){ if(s.indexof(s.lower(contents.get(i));ql)<0){ok=false} };
+      if(s.len(fromuser)>0){ if(!s.eq(authors.get(i);fromuser)){ok=false} };
+      if(needmedia){ if(!s.eq(mediav.get(i);"true")){ok=false} };
+      if(s.toint(likesv.get(i))<minl){ok=false};
+      if(ok){
+        if(total>0){res=s.concat(res;",")};
+        res=s.concat(res;"{\"id\":");
+        res=s.concat(res;ids.get(i));
+        res=s.concat(res;",\"content\":\"");
+        res=s.concat(res;contents.get(i));
+        res=s.concat(res;"\",\"author\":\"");
+        res=s.concat(res;authors.get(i));
+        res=s.concat(res;"\",\"likes\":");
+        res=s.concat(res;likesv.get(i));
+        res=s.concat(res;",\"has_media\":");
+        res=s.concat(res;mediav.get(i));
+        res=s.concat(res;"}");
+        total=total+1;
+      };
+    };
+    let out=mut."";
+    out=s.concat(out;"{\"results\":[");
+    out=s.concat(out;res);
+    out=s.concat(out;"],\"total\":");
+    out=s.concat(out;s.fromint(total));
+    out=s.concat(out;"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

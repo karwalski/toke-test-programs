@@ -1,1 +1,69 @@
-m=wordfilter;f=filterwords(text:$str;filter:$str):$str{let result=mut."";let i=mut.0;let n=text.len;lp(let idx=0;idx<n;idx=idx+1){let ch=text.get(idx);if(ch=32){result=result+ch;i=0;}el{if(i<filter.len){if(ch=filter.get(i)){i=i+1;}el{i=0;};}el{i=0;};};};if(i=0){result=s.concat(result;text);}el{if(i<filter.len){result=s.concat(result;text.get(i));};};<result};f=main():$void{let text="hello world hello";let filter="hello";let result=filterwords(text;filter);<};
+m=wordfilter;
+i=io:std.io;
+i=s:std.str;
+
+f=iswordchar(c:$i64):$bool{
+  if(c>=65&&c<=90){<true};
+  if(c>=97&&c<=122){<true};
+  if(c>=48&&c<=57){<true};
+  <false
+};
+
+f=contains(set:@$str;w:$str):$bool{
+  lp(let i=0;i<set.len;i=i+1){
+    if(s.eq(set.get(i);w)){<true};
+  };
+  <false
+};
+
+f=main():$i64{
+  let lines=mut.@();
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    lines=lines+@(line);
+  };
+  if(lines.len=0){io.println("CLEAN");<0};
+  let flaggedline=lines.get(0);
+  let rawparts=s.split(flaggedline;",");
+  let flagged=mut.@();
+  lp(let i=0;i<rawparts.len;i=i+1){
+    let p=s.lower(rawparts.get(i));
+    if(s.len(p)>0){flagged=flagged+@(p)};
+  };
+  let any=mut.false;
+  lp(let li=1;li<lines.len;li=li+1){
+    let line=lines.get(li);
+    let b=s.bytes(line);
+    let n=b.len;
+    let lineno=li;
+    let i=mut.0;
+    lp(i<n){
+      let c=b.get(i);
+      if(iswordchar(c)){
+        let start=i;
+        let j=mut.i;
+        lp(j<n){
+          if(iswordchar(b.get(j))){j=j+1}el{br};
+        };
+        let word=s.lower(s.substr(line;start;j));
+        if(contains(flagged;word)){
+          let col=start+1;
+          let out=mut.s.concat("Line ";s.fromint(lineno));
+          out=s.concat(out;", col ");
+          out=s.concat(out;s.fromint(col));
+          out=s.concat(out;": ");
+          out=s.concat(out;word);
+          io.println(out);
+          any=true;
+        };
+        i=j;
+      }el{
+        i=i+1;
+      };
+    };
+  };
+  if(!any){io.println("CLEAN")};
+  <0
+};

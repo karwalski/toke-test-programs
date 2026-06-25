@@ -1,1 +1,112 @@
-m=segcheck;f=solve(p0:$str;p1:$str):$str{let p=mut.p0;let q=mut.p1;let result=mut."";let found=mut.false;lp(let i=0;i<p.len;i=i+1){let ch=p.get(i);if(ch=":"){found=true;let j=i+1;lp(let k=j;k<p.len;k=k+1){let c=p.get(k);if(c=","){i=k;br};if(k=p.len-1){i=k;br};};br};};if(found){let segname=mut.""
+m=segcheck;i=io:std.io;i=s:std.str;
+f=octet(ip:$str;n:$i64):$i64{
+  let cur=mut."";
+  let idx=mut.0;
+  let res=mut.0;
+  let str=s.concat(ip;".");
+  lp(let i=0;i<s.len(str);i=i+1){
+    let ch=s.slice(str;i;i+1);
+    if(s.eq(ch;".")){
+      if(idx=n){res=s.toint(cur)};
+      idx=idx+1;
+      cur="";
+    }el{cur=s.concat(cur;ch)};
+  };
+  <res
+};
+f=ipint(ip:$str):$i64{
+  let a=octet(ip;0);
+  let b=octet(ip;1);
+  let c=octet(ip;2);
+  let d=octet(ip;3);
+  <((a*256+b)*256+c)*256+d
+};
+f=incidr(ip:$str;cidr:$str):$bool{
+  let slash=s.indexof(cidr;"/");
+  if(slash<0){<false};
+  let net=s.slice(cidr;0;slash);
+  let preflen=s.toint(s.slice(cidr;slash+1;s.len(cidr)));
+  let ipv=ipint(ip);
+  let netv=ipint(net);
+  let hostbits=32-preflen;
+  let mask=mut.0;
+  lp(let i=0;i<32;i=i+1){ if(i<preflen){mask=mask*2+1}el{mask=mask*2} };
+  <((ipv&mask)=(netv&mask))
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let out=mut."";
+  let passcount=mut.0;
+  let failcount=mut.0;
+  let pos=mut.0;
+  let go=mut.true;
+  lp(let n=0;n<1000;n=n+1){
+    if(go){
+      let sub=s.slice(line;pos;s.len(line));
+      let sp="\"src\":\"";
+      let si=s.indexof(sub;sp);
+      if(si<0){go=false}el{
+        let sstart=pos+si+s.len(sp);
+        let safter=s.slice(line;sstart;s.len(line));
+        let send=s.indexof(safter;"\"");
+        let src=s.slice(safter;0;send);
+        let dpat="\"dst\":\"";
+        let dsub=s.slice(line;sstart;s.len(line));
+        let di=s.indexof(dsub;dpat);
+        let dstart=sstart+di+s.len(dpat);
+        let dafter=s.slice(line;dstart;s.len(line));
+        let dend=s.indexof(dafter;"\"");
+        let dst=s.slice(dafter;0;dend);
+        let epat="\"expected\":\"";
+        let esub=s.slice(line;dstart;s.len(line));
+        let ei=s.indexof(esub;epat);
+        let estart=dstart+ei+s.len(epat);
+        let eafter=s.slice(line;estart;s.len(line));
+        let eend=s.indexof(eafter;"\"");
+        let expected=s.slice(eafter;0;eend);
+        let allowed=mut.false;
+        let cpos=mut.0;
+        let cgo=mut.true;
+        lp(let m=0;m<1000;m=m+1){
+          if(cgo){
+            let csub=s.slice(line;cpos;s.len(line));
+            let aopat="\"allowed_outbound\":[";
+            let ai=s.indexof(csub;aopat);
+            if(ai<0){cgo=false}el{
+              let astart=cpos+ai+s.len(aopat);
+              let aafter=s.slice(line;astart;s.len(line));
+              let aend=s.indexof(aafter;"]");
+              let block=s.slice(aafter;0;aend);
+              let qpos=mut.0;
+              let qgo=mut.true;
+              lp(let z=0;z<100;z=z+1){
+                if(qgo){
+                  let qsub=s.slice(block;qpos;s.len(block));
+                  let q1=s.indexof(qsub;"\"");
+                  if(q1<0){qgo=false}el{
+                    let q1abs=qpos+q1+1;
+                    let qa=s.slice(block;q1abs;s.len(block));
+                    let q2=s.indexof(qa;"\"");
+                    let cidr=s.slice(qa;0;q2);
+                    if(incidr(dst;cidr)){allowed=true};
+                    qpos=q1abs+q2+1;
+                  };
+                };
+              };
+              cpos=astart+aend;
+            };
+          };
+        };
+        let actual=mut."deny";
+        if(allowed){actual="allow"};
+        let verdict=mut."FAIL";
+        if(s.eq(actual;expected)){verdict="PASS";passcount=passcount+1}el{failcount=failcount+1};
+        if(s.len(out)>0){out=s.concat(out;"\n")};
+        out=s.concat(out;verdict);
+        pos=estart+eend;
+      };
+    };
+  };
+  if(s.len(out)>0){io.println(out)};
+  <0
+}

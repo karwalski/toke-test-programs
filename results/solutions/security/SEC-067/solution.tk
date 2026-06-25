@@ -1,1 +1,42 @@
-m=apikeyanalyzer;f=entropy(val:$str):$f64{let len=val.len as$f64;if(len=0.0){<0.0};let freq=mut.@(0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0);lp(let i=0;i<len;i=i+1){let ch=val.get(i);let code=ch as$f64;let idx=code-97.0;freq.get(idx as$i64)=freq.get(idx as$i64)+1.0};lp(let i=0;i<freq.len;i=i+1){freq.get(i)=freq.get(i)/len};let sum=mut.0.0;lp(let i=0;i<freq.len;i=i+1){if(freq.get(i)=0.0){<0.0};sum=sum-freq.get(i)*freq.get(i)*2.32192809488736;};<sum};f=
+m=apikeyanalyzer;i=io:std.io;i=s:std.str;i=math:std.math;
+f=v0(n:$i64):@$i64{let a=mut.@();lp(let i=0;i<n;i=i+1){a=a+@(0)};<a};
+f=entropy(val:$str):$f64{
+let bs=s.bytes(val);
+let n=bs.len;
+if(n=0){<0.0};
+let freq=mut.v0(256);
+lp(let i=0;i<n;i=i+1){freq=freq.set(bs.get(i);freq.get(bs.get(i))+1)};
+let h=mut.0.0;
+let nf=mut.0.0;nf=n as$f64;
+lp(let i=0;i<256;i=i+1){
+let c=freq.get(i);
+if(c>0){
+let pf=mut.0.0;pf=(c as$f64)/nf;
+let lg=mut.0.0;lg=math.log(pf)/0.6931471805599453;
+let term=mut.0.0;term=pf*lg;
+h=h-term;
+};
+};
+let bits=mut.0.0;bits=h*nf;
+<bits};
+f=haspredictable(val:$str):$bool{
+if(s.indexof(val;"test")>=0){<true};
+if(s.indexof(val;"key")>=0){<true};
+if(s.indexof(val;"demo")>=0){<true};
+if(s.indexof(val;"1234")>=0){<true};
+<false};
+f=main():$i64{
+lp(1=1){
+let line=s.trim(io.readln());
+if(s.len(line)=0){br};
+let ent=mut.entropy(line);
+let pred=mut.haspredictable(line);
+let strength=mut."weak";
+if(ent>=80.0){strength="fair"};
+if(ent>=128.0){if(pred=false){strength="strong"}};
+let prefix=mut."";
+if(s.len(line)>=4){prefix=s.substr(line;0;4)}el{prefix=line};
+let eb=mut.0;eb=ent as$i64;
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"key_prefix\":\"";prefix);"\",\"length\":");s.fromint(s.len(line)));",\"entropy_bits\":");s.fromint(eb));s.concat(",\"strength\":\"";s.concat(strength;"\"}"))));
+};
+<0};

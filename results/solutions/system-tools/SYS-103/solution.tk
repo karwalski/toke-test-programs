@@ -1,1 +1,37 @@
-m=password;f=passwordgen(len:$i64):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<len;idx=idx+1){let ch=mut."";if(i=0){ch="A"}el{if(i=1){ch="B"}el{if(i=2){ch="C"}el{if(i=3){ch="D"}el{if(i=4){ch="E"}el{if(i=5){ch="F"}el{if(i=6){ch="G"}el{if(i=7){ch="H"}el{if(i=8){ch="I"}el{if(i=9){ch="J"}el{if(i=10){ch="K"}el{if(i=11){ch="L"}el{if(i=12){ch="M"}el{if(i=13){ch="N"}el{if(i=14){ch="O"}el{if(i=15){ch="P"}el{if(i=16){ch="Q"}el{if(i=17){ch="R"}el{if
+m=password;i=io:std.io;i=s:std.str;
+f=charsetfor(name:$str):$str{
+  let alpha="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let numeric="0123456789";
+  let alnum=s.concat(alpha;numeric);
+  let symbols="!@#$%^&*()_+-=[]{}";
+  if(s.eq(name;"alpha")){<alpha};
+  if(s.eq(name;"numeric")){<numeric};
+  if(s.eq(name;"alnum")){<alnum};
+  if(s.eq(name;"symbols")){<symbols};
+  <s.concat(alnum;symbols)
+};
+f=main():$i64{
+  let lenstr=s.trim(io.readln());
+  let setname=s.trim(io.readln());
+  let countstr=s.trim(io.readln());
+  let seedstr=s.trim(io.readln());
+  let length=mt s.toint(lenstr){ $i64:v v; StrErr:e 16 };
+  let count=mt s.toint(countstr){ $i64:v v; StrErr:e 1 };
+  let seed=mt s.toint(seedstr){ $i64:v v; StrErr:e 0 };
+  let charset=charsetfor(setname);
+  let setlen=(s.len(charset) as $i64);
+  let modulus=2147483647;
+  let state=mut.(((seed%modulus)+1)%modulus);
+  lp(let p=0;p<count;p=p+1){
+    let pw=mut."";
+    lp(let c=0;c<length;c=c+1){
+      state=(((state*16807)+17)%modulus);
+      if(state<0){state=(0-state)};
+      let modv=(state-((state/setlen)*setlen));
+      let ch=s.slice(charset;(modv as $u64);(modv+1) as $u64);
+      pw=s.concat(pw;ch)
+    };
+    io.println(pw)
+  };
+  <0
+}

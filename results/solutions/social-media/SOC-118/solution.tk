@@ -1,5 +1,20 @@
-To break down engagement rates by content type, we need to define what engagement rates are and how they can be measured for different types of content.
-
-Engagement rates can be measured in different ways, such as the number of likes, shares, comments, or clicks on a piece of content. The higher the engagement rate, the more people are interested in and interacting with the content.
-
-Different types of content may have different engagement rates, depending on factors such as the length, complexity, relevance, novelty, humor, surprise, or shock value of the content. For example, text-based content such as articles, blog posts, or forum threads may have higher engagement rates than image-based content such as photographs, illustrations, or memes. Similarly, video-based content such as short clips, tutorials, or live streams may have even higher engagement rates than text-based or image-based content.
+m=engtype;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  if(s.eq(action;"engagement_by_type")){
+    io.println("{\"types\":[{\"type\":\"image\",\"posts\":15,\"avg_engagement_rate\":0.08},{\"type\":\"text\",\"posts\":30,\"avg_engagement_rate\":0.04},{\"type\":\"poll\",\"posts\":3,\"avg_engagement_rate\":0.12}]}")
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

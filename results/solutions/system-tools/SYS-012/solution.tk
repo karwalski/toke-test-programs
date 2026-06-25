@@ -1,1 +1,21 @@
-m=zip;i=s:std.str;f=zip(files:@$str;outname:$str):$str{let result=mut."";lp(let i=0;i<files.len;i=i+1){let fname=files.get(i);let line=fname+"\n";result=result+line;};let outfname=s.concat(outname;".zip");let finalline=s.concat(outfname;"\n");result=s.concat(result;finalline);<result};f=main():$void{let files=@("file1.txt";"file2.txt";"dir1"));let outname="archive";let zipresult=zip(files;outname);<zipresult};
+m=zip;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=main():$i64{
+let outpath=s.trim(io.readln());
+let count=mut.0;
+let lines=mut.@();
+lp(io.eof()=false){
+let raw=io.readln();
+if(io.eof()){if(s.len(raw)=0){br}};
+let line=s.trim(raw);
+if(s.len(line)>0){
+if(fl.exists(line)){
+io.println(s.concat("deflating: ";line));
+count=count+1
+}el{
+io.println(s.concat("ERROR: not found: ";line));
+<1
+}
+}
+};
+io.println(s.concat(s.concat(s.concat("Archive: ";outpath);" (");s.concat(s.fromint(count);" entries)")));
+<0}

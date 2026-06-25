@@ -1,1 +1,37 @@
-m=gitstat;f=commitcount(repo:$str):$i64{let out=br("git");let count=br("git rev-list --count master");<count};f=contributors(repo:$str):$str{let out=br("git");let count=br("git shortlog -s -e");<count};f=mostchangedfiles(repo:$str):$str{let out=br("git");let count=br("git diff --name-only");<count};f=branch
+m=gitstat;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=countlines(text:$str):$i64{
+  let t=s.trim(text);
+  if(s.len(t)=0){<0};
+  let parts=s.split(t;"\n");
+  <(parts.len as $i64)
+};
+f=main():$i64{
+  let repo=s.trim(io.readln());
+  if(file.exists(s.concat(repo;"/.git"))=(1=0)){
+    io.println(s.concat("ERROR: not a git repository: ";repo));
+    <0
+  };
+  let commitsout=runcmd(s.concat(s.concat("git -C ";repo);" rev-list --count HEAD 2>/dev/null"));
+  let commits=mut.s.trim(commitsout);
+  if(s.len(commits)=0){commits="0"};
+  let contribout=runcmd(s.concat(s.concat("git -C ";repo);" shortlog -s -n HEAD 2>/dev/null"));
+  let contributors=countlines(contribout);
+  let branchout=runcmd(s.concat(s.concat("git -C ";repo);" branch -a 2>/dev/null"));
+  let branches=countlines(branchout);
+  let topout=runcmd(s.concat(s.concat("git -C ";repo);" log --pretty=format: --name-only 2>/dev/null | sort | uniq -c | sort -rn | head -5"));
+  io.println(s.concat("Commits: ";commits));
+  io.println(s.concat("Contributors: ";s.fromint(contributors)));
+  io.println(s.concat("Branches: ";s.fromint(branches)));
+  io.print("Top files: ");
+  io.println(s.trim(topout));
+  <0
+}

@@ -1,1 +1,44 @@
-m=scanner;f=scanfile(filepath:$str):$str{let content=mut."";let size=mut.0;let chunk=mut."";let i=mut.0;lp(let idx=0;idx<1;idx=idx+1){chunk="";i=0;lp(let j=0;j<1;j=j+1){chunk=s.concat(chunk;"a");i=i+1;};};content=chunk;size=i;let result=mut."";let found=mut.false;lp(let idx=0;idx<1;idx=idx+1){if(found){<result};let ch=content.get(idx);if(ch="P"){if(content.get(idx+1)="U"){if(content.get(idx+2)="B"){if(content.get(idx+3)="L"){if(content.get(idx+4)="I"){if(content.get(idx+5)="T"){if(content.get(idx+6)=" "){if(content.get(idx+7)="A"){if(content.get(idx+8)="C"){if(content.get(idx+9)="E"){if(content.get(idx+10)=" "){if(content.get(idx+11)="S"){if(content.get(idx+12)="E"){if(content
+m=scanner;i=io:std.io;i=fs:std.file;i=s:std.str;
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let fmt=s.trim(io.readln());
+  let content=fs.read(path);
+  let findings=mut."";
+  let count=mut.0;
+  if(s.eq(fmt;"terraform")){
+    if(s.indexof(content;"acl")>=0){ if(s.indexof(content;"public")>=0){
+      if(count>0){findings=s.concat(findings;",")};
+      findings=s.concat(findings;"{\"resource\":\"aws_s3_bucket\",\"property\":\"acl\",\"issue\":\"public bucket ACL\",\"severity\":\"HIGH\",\"recommendation\":\"set acl=private\"}");
+      count=count+1;
+    }};
+    if(s.indexof(content;"0.0.0.0/0")>=0){
+      if(count>0){findings=s.concat(findings;",")};
+      findings=s.concat(findings;"{\"resource\":\"aws_security_group\",\"property\":\"cidr_blocks\",\"issue\":\"unrestricted ingress 0.0.0.0/0\",\"severity\":\"HIGH\",\"recommendation\":\"restrict CIDR range\"}");
+      count=count+1;
+    };
+    if(s.indexof(content;"aws_db_instance")>=0){ if(s.indexof(content;"storage_encrypted")<0){
+      if(count>0){findings=s.concat(findings;",")};
+      findings=s.concat(findings;"{\"resource\":\"aws_db_instance\",\"property\":\"storage_encrypted\",\"issue\":\"database not encrypted\",\"severity\":\"HIGH\",\"recommendation\":\"set storage_encrypted=true\"}");
+      count=count+1;
+    }};
+  }el{
+    if(s.indexof(content;"BlockPublicAcls")>=0){ if(s.indexof(content;"false")>=0){
+      if(count>0){findings=s.concat(findings;",")};
+      findings=s.concat(findings;"{\"resource\":\"AWS::S3::Bucket\",\"property\":\"BlockPublicAcls\",\"issue\":\"public ACLs not blocked\",\"severity\":\"HIGH\",\"recommendation\":\"set BlockPublicAcls=true\"}");
+      count=count+1;
+    }};
+    if(s.indexof(content;"0.0.0.0/0")>=0){
+      if(count>0){findings=s.concat(findings;",")};
+      findings=s.concat(findings;"{\"resource\":\"AWS::EC2::SecurityGroup\",\"property\":\"CidrIp\",\"issue\":\"unrestricted ingress 0.0.0.0/0\",\"severity\":\"HIGH\",\"recommendation\":\"restrict CidrIp\"}");
+      count=count+1;
+    };
+  };
+  let out=mut."";
+  out=s.concat(out;"{\"findings\":[");
+  out=s.concat(out;findings);
+  out=s.concat(out;"],\"summary\":{\"total\":");
+  out=s.concat(out;s.fromint(count));
+  out=s.concat(out;"}}");
+  io.println(out);
+  <0
+}

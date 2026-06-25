@@ -1,1 +1,182 @@
-m=percentile;f=percentile(n:$i64;m:$i64):$i64{let sum=mut.0;lp(let i=0;i<n;i=i+1){sum=sum+m;};<sum/n};
+m=percentile;i=io:std.io;i=s:std.str;
+f=fmt2(val:$f64):$str{
+  let v=mut.0.0;
+  v=val;
+  let neg=mut.(1=0);
+  if(v<0.0){neg=(1=1);v=0.0-v};
+  let scaled=mut.0.0;
+  scaled=v*100.0+0.5;
+  let asi=mut.0;
+  asi=scaled as $i64;
+  let ip=mut.0;
+  ip=asi/100;
+  let fp=mut.0;
+  fp=asi-ip*100;
+  let out=mut."";
+  if(neg){out="-"};
+  out=s.concat(out;s.fromint(ip));
+  out=s.concat(out;".");
+  if(fp<10){out=s.concat(out;"0")};
+  out=s.concat(out;s.fromint(fp));
+  <out
+};
+f=main():$i64{
+  let pline=io.readln();
+  let p=mt s.toint(s.trim(pline)){ $i64:x x; StrErr:e 50 };
+  let pf=mut.0.0;
+  pf=(p as $f64)/100.0;
+
+  let count=mut.0;
+  let o0=mut.0.0;
+  let o1=mut.0.0;
+  let o2=mut.0.0;
+  let o3=mut.0.0;
+  let o4=mut.0.0;
+
+  let q0=mut.0.0;
+  let q1=mut.0.0;
+  let q2=mut.0.0;
+  let q3=mut.0.0;
+  let q4=mut.0.0;
+  let n0=mut.1;
+  let n1=mut.2;
+  let n2=mut.3;
+  let n3=mut.4;
+  let n4=mut.5;
+  let p0=mut.0.0;
+  let p1=mut.0.0;
+  let p2=mut.0.0;
+  let p3=mut.0.0;
+  let p4=mut.0.0;
+  let d0=mut.0.0;
+  let d1=mut.0.0;
+  let d2=mut.0.0;
+  let d3=mut.0.0;
+  let d4=mut.0.0;
+
+  lp(io.eof()=(1=0)){
+    let raw=io.readln();
+    if(io.eof()){if(s.len(s.trim(raw))=0){br}};
+    let line=s.trim(raw);
+    if(s.len(line)>0){
+      let xi=mt s.toint(line){ $i64:x x; StrErr:e 0 };
+      let x=mut.0.0;
+      x=xi as $f64;
+      count=count+1;
+
+      if(count<6){
+        io.println("null");
+        if(count=1){o0=x};
+        if(count=2){o1=x};
+        if(count=3){o2=x};
+        if(count=4){o3=x};
+        if(count=5){
+          o4=x;
+          let a=mut.0.0;
+          let b=mut.0.0;
+          let c=mut.0.0;
+          let dd=mut.0.0;
+          let e=mut.0.0;
+          a=o0;b=o1;c=o2;dd=o3;e=o4;
+          let tmp=mut.0.0;
+          if(b<a){tmp=a;a=b;b=tmp};
+          if(c<a){tmp=a;a=c;c=tmp};
+          if(dd<a){tmp=a;a=dd;dd=tmp};
+          if(e<a){tmp=a;a=e;e=tmp};
+          if(c<b){tmp=b;b=c;c=tmp};
+          if(dd<b){tmp=b;b=dd;dd=tmp};
+          if(e<b){tmp=b;b=e;e=tmp};
+          if(dd<c){tmp=c;c=dd;dd=tmp};
+          if(e<c){tmp=c;c=e;e=tmp};
+          if(e<dd){tmp=dd;dd=e;e=tmp};
+          q0=a;q1=b;q2=c;q3=dd;q4=e;
+          n0=1;n1=2;n2=3;n3=4;n4=5;
+          p0=1.0;
+          p1=1.0+2.0*pf;
+          p2=1.0+4.0*pf;
+          p3=3.0+2.0*pf;
+          p4=5.0;
+          d0=0.0;
+          d1=pf/2.0;
+          d2=pf;
+          d3=(1.0+pf)/2.0;
+          d4=1.0
+        }
+      }el{
+        let k=mut.0;
+        if(x<q0){q0=x;k=0}
+        el{if(x<q1){k=0}
+        el{if(x<q2){k=1}
+        el{if(x<q3){k=2}
+        el{if(x<q4){k=3}
+        el{q4=x;k=3}}}}};
+
+        if(k<1){n1=n1+1};
+        if(k<2){n2=n2+1};
+        if(k<3){n3=n3+1};
+        if(k<4){n4=n4+1};
+
+        p0=p0+d0;
+        p1=p1+d1;
+        p2=p2+d2;
+        p3=p3+d3;
+        p4=p4+d4;
+
+        let i=mut.1;
+        lp(let mi=1;mi<4;mi=mi+1){
+          let qi=mut.0.0;
+          let qim=mut.0.0;
+          let qip=mut.0.0;
+          let nim=mut.0;
+          let ni=mut.0;
+          let nip=mut.0;
+          let pdes=mut.0.0;
+          if(mi=1){qi=q1;qim=q0;qip=q2;nim=n0;ni=n1;nip=n2;pdes=p1};
+          if(mi=2){qi=q2;qim=q1;qip=q3;nim=n1;ni=n2;nip=n3;pdes=p2};
+          if(mi=3){qi=q3;qim=q2;qip=q4;nim=n2;ni=n3;nip=n4;pdes=p3};
+
+          let diff=mut.0.0;
+          diff=pdes-(ni as $f64);
+          let dsi=mut.0;
+          let go=mut.(1=0);
+          if(diff>=1.0){if((nip-ni)>1){dsi=1;go=(1=1)}};
+          if(diff<=(0.0-1.0)){if((nim-ni)<(0-1)){dsi=(0-1);go=(1=1)}};
+
+          if(go){
+            let dsf=mut.0.0;
+            dsf=dsi as $f64;
+            let nif=mut.0.0;
+            let nimf=mut.0.0;
+            let nipf=mut.0.0;
+            nif=ni as $f64;
+            nimf=nim as $f64;
+            nipf=nip as $f64;
+            let qp=mut.0.0;
+            let term1=mut.0.0;
+            let term2=mut.0.0;
+            term1=(nif-nimf+dsf)*(qip-qi)/(nipf-nif);
+            term2=(nipf-nif-dsf)*(qi-qim)/(nif-nimf);
+            qp=qi+dsf/(nipf-nimf)*(term1+term2);
+
+            let newq=mut.0.0;
+            if(qim<qp){if(qp<qip){newq=qp}el{
+              if(dsi=1){newq=qi+(qip-qi)/(nipf-nif)}el{newq=qi+(qim-qi)/(nimf-nif)}
+            }}el{
+              if(dsi=1){newq=qi+(qip-qi)/(nipf-nif)}el{newq=qi+(qim-qi)/(nimf-nif)}
+            };
+
+            ni=ni+dsi;
+            qi=newq;
+
+            if(mi=1){q1=qi;n1=ni};
+            if(mi=2){q2=qi;n2=ni};
+            if(mi=3){q3=qi;n3=ni}
+          }
+        };
+
+        io.println(fmt2(q2))
+      }
+    }
+  };
+  <0
+}

@@ -1,1 +1,53 @@
-m=autoclean;f=mktempdir():$str{let tmp="tmp_";let num=1;let dir=s.concat(tmp;num) as$str;let exists=checkdir(dir);if(exists){<mktempdir()}el{<dir}};f=checkdir(dir:$str):$bool{let exists=dir.exists;let isdir=dir.isdir;if(exists){if(isdir){<true}el{<false}}el{<false}};f=cleanup(dir:$str):$void{let exists=checkdir(dir);if(exists){let files=dir.listfiles;lp(let i=0;i<files.len;i=i+1){let file=files.get(i);let removed=file.remove;};let removedir=dir.remove;};};f=main():$void{let tempdir=mktempdir();let cleanuponexit=true;let timeout=30000;let start=0;let elapsed=0;if(cleanuponexit){let onexit=true;if(onexit){let cleanupresult=cleanup(tempdir);};};};
+m=tmpmgr;i=io:std.io;i=s:std.str;i=file:std.file;
+f=main():$i64{
+  let names=mut.@();
+  let ttls=mut.@();
+  lp(io.eof()=(1=0)){
+    let raw=io.readln();
+    if(io.eof()){if(s.len(raw)=0){br}};
+    let line=s.trim(raw);
+    if(s.len(line)>0){
+      let parts=s.split(line;" ");
+      let cmd=parts.get(0);
+      if(s.eq(cmd;"CREATE")){
+        let name=parts.get(1);
+        let ttlstr=parts.get(2);
+        let ttl=mt s.toint(ttlstr){ $i64:v v; StrErr:e 0 };
+        let path=s.concat("/tmp/managed/";name);
+        let made=file.mkdir(path);
+        names=names+@(name);
+        ttls=ttls+@(ttl);
+        io.println(path)
+      }el{
+        if(s.eq(cmd;"LIST")){
+          lp(let i=0;i<names.len;i=i+1){
+            let nm=names.get(i);
+            let p=s.concat("/tmp/managed/";nm);
+            let lst=mut.nm;
+            lst=s.concat(lst;" ");
+            lst=s.concat(lst;p);
+            lst=s.concat(lst;" ttl=");
+            lst=s.concat(lst;s.fromint(ttls.get(i)));
+            io.println(lst)
+          }
+        }el{
+          if(s.eq(cmd;"CLEANUP")){
+            let removed=mut.0;
+            lp(let i=0;i<names.len;i=i+1){
+              if(ttls.get(i)=0){
+                let p=s.concat("/tmp/managed/";names.get(i));
+                let d=file.delete(p);
+                removed=removed+1
+              }
+            };
+            let msg=mut."Removed ";
+            msg=s.concat(msg;s.fromint(removed));
+            msg=s.concat(msg;" directories.");
+            io.println(msg)
+          }
+        }
+      }
+    }
+  };
+  <0
+}

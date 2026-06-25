@@ -1,1 +1,64 @@
-m=acf;f=autocorr(arr:@$f64;n:$i64;m:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<m;i=i+1){let idx=i+n;if(!(idx>arr.len as i64))){let val=arr.get(idx as u64);let other=arr.get(i as u64);sum=sum+val*other;};};let denom=mut.0.0;lp(let i=0;i<arr.len;i=i+1){let val=arr.get(i as u64));denom=denom+val*val;};let corr=mut.0.0;if(!(denom=0.0))){corr=sum/denom;};<corr};
+m=acf;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmtnum(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+
+f=main():$i64{
+  let first=io.readln();
+  let maxlag=s.toint(s.trim(first));
+  let dataline=io.readln();
+  let parts=s.split(s.trim(dataline);",");
+  let n=parts.len();
+  let vals=mut.@(0.0);
+  vals=@();
+  lp(let i=0;i<n;i=i+1){
+    vals=vals+@(s.tofloat(s.trim(parts.get(i))));
+  };
+  let nf=(n as $f64);
+  let mean=mut.0.0;
+  lp(let i=0;i<n;i=i+1){ mean=mean+vals.get(i); };
+  mean=mean/nf;
+  let c0=mut.0.0;
+  lp(let i=0;i<n;i=i+1){ let d=vals.get(i)-mean; c0=c0+d*d; };
+  let thr=2.0/math.sqrt(nf);
+  let acf=mut.@(0.0);
+  acf=@();
+  let siglags=mut.@(0);
+  siglags=@();
+  let k=mut.0;
+  lp(k<maxlag+1){
+    let ck=mut.0.0;
+    let lim=n-k;
+    lp(let i=0;i<lim;i=i+1){
+      let d1=vals.get(i)-mean;
+      let d2=vals.get(i+k)-mean;
+      ck=ck+d1*d2;
+    };
+    let a=mut.0.0;
+    a=ck/c0;
+    acf=acf+@(a);
+    let aa=mut.a;
+    if(aa<0.0){aa=0.0-aa};
+    if(aa>thr){ siglags=siglags+@(k); };
+    k=k+1;
+  };
+  let out=mut."{\"acf\":[";
+  lp(let i=0;i<acf.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;fmtnum(acf.get(i)));
+  };
+  out=s.concat(out;"],\"significant_lags\":[");
+  lp(let i=0;i<siglags.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;s.fromint(siglags.get(i)));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

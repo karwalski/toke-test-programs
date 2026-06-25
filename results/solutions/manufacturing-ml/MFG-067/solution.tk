@@ -1,1 +1,106 @@
-m=silhouette;f=silhouette(vals:@$f64;labels:@$i64):$f64{let n=vals.len;let clusters=mut.@();lp(let i=0;i<n;i=i+1){let label=labels.get(i);let found=mut.false;lp(let j=0;j<clusters.len;j=j+1){if(clusters.get(j)=label)){found=true};};if(!(found)){clusters=clusters+@(label)};};let s=mut.0.0;lp(let i=0;i<n;i=i+1){let val=vals.get(i);let label=labels.get(i);let a=mut.0.0;let b=mut.0.0;let minab=mut.0.0;lp(let j=0;j<n;j=j+1){let otherlabel=labels.get(j);if(!(otherlabel=label)){}el{let otherval=vals.get(j);let diff=otherval-val;if(diff<0){let tmp=diff;diff=0-diff;};a=a+diff;};}
+m=silhouette;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt2(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+
+f=dist(ax:$f64;ay:$f64;bx:$f64;by:$f64):$f64{
+  let dx=ax-bx;
+  let dy=ay-by;
+  <math.sqrt(dx*dx+dy*dy)
+};
+
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)};
+    };
+  };
+  let nl=lines.len();
+  let xs=mut.@(0.0); xs=@();
+  let ys=mut.@(0.0); ys=@();
+  let cs=mut.@(0); cs=@();
+  lp(let i=1;i<nl;i=i+1){
+    let p=s.split(lines.get(i);",");
+    xs=xs+@(s.tofloat(s.trim(p.get(0))));
+    ys=ys+@(s.tofloat(s.trim(p.get(1))));
+    cs=cs+@(s.toint(s.trim(p.get(2))));
+  };
+  let n=xs.len();
+  let labels=mut.@(0); labels=@();
+  lp(let i=0;i<n;i=i+1){
+    let lab=cs.get(i);
+    let found=mut.0;
+    lp(let j=0;j<labels.len();j=j+1){ if(labels.get(j)=lab){found=1}; };
+    if(found=0){ labels=labels+@(lab); };
+  };
+  let nc=labels.len();
+  let scores=mut.@(0.0); scores=@();
+  let total=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let px=xs.get(i);
+    let py=ys.get(i);
+    let pc=cs.get(i);
+    let a=mut.0.0;
+    let acnt=mut.0;
+    lp(let j=0;j<n;j=j+1){
+      if(!(j=i)){
+        if(cs.get(j)=pc){
+          a=a+dist(px;py;xs.get(j);ys.get(j));
+          acnt=acnt+1;
+        };
+      };
+    };
+    if(acnt>0){ a=a/(acnt as $f64); };
+    let b=mut.0.0;
+    let bset=mut.0;
+    lp(let li=0;li<nc;li=li+1){
+      let lab=labels.get(li);
+      if(!(lab=pc)){
+        let bd=mut.0.0;
+        let bc=mut.0;
+        lp(let j=0;j<n;j=j+1){
+          if(cs.get(j)=lab){
+            bd=bd+dist(px;py;xs.get(j);ys.get(j));
+            bc=bc+1;
+          };
+        };
+        if(bc>0){
+          let mean=mut.0.0;
+          mean=bd/(bc as $f64);
+          if(bset=0){ b=mean; bset=1; }el{ if(mean<b){b=mean}; };
+        };
+      };
+    };
+    let sil=mut.0.0;
+    if(acnt>0){
+      let mx=mut.a;
+      if(b>mx){mx=b};
+      if(mx>0.0){ sil=(b-a)/mx; };
+    };
+    scores=scores+@(sil);
+    total=total+sil;
+  };
+  let mean=mut.0.0;
+  mean=total/(n as $f64);
+  let out=mut."{\"silhouette_score\":";
+  out=s.concat(out;fmt2(mean));
+  out=s.concat(out;",\"per_point_scores\":[");
+  lp(let i=0;i<scores.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;fmt2(scores.get(i)));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

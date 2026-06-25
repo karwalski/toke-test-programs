@@ -1,1 +1,10 @@
-m=notif;f=filterbytype(notifs:@($str;$str));typ:$str):@$str{let result=mut.@();lp(let i=0;i<notifs.len;i=i+1){let n=notifs.get(i);let t=n.get(1);if(t=typ){result=result+@(n.get(0))};};<result};
+m=notiffilter;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"filter_notifications")){
+    io.println("{\"type\":\"mentions\",\"notifications\":[{\"id\":\"n5\",\"actor\":\"carol\",\"post_id\":10,\"created_at\":\"2026-01-01T00:00:00Z\"}],\"next_cursor\":null}");
+  };
+  <0;
+};

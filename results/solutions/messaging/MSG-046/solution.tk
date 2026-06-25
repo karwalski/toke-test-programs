@@ -1,1 +1,99 @@
-m=typingindicator;f=buildresponse(body:$str):$str{<s.concat(s.concat("{\"response\":";body);"}")};f=indicatorhtml(user:$str):$str{<s.concat(s.concat("<div class=\"typing-indicator\" id=\"typing-indicator-";user);"\"><span class=\"dot\"></span><span class=\"dot\"></span><span class=\"dot\"></span></div>")}};f=css():$str{<"<style>.typing-indicator {display: none;position: absolute;bottom: 10px;right: 10px;z-index: 1000;}.typing-indicator .dot {display: inline-block;width: 10px;height: 10px;border-radius: 50%;background-color: #333;margin-right: 5px;}.typing-indicator .typing {display: inline-block;padding-left: 5px;}.typing-indicator.show {display: block;}.typing-indicator.show .dot {animation: typing 1.5s steps(5,end) infinite;}.typing-indicator.show .typing {animation: typing 1.5s steps(5,end) infinite;}</style><script>document.addEventListener(\"DOMContentLoaded\",function
+m=typingindicator;
+i=io:std.io;
+i=s:std.str;
+f=parsei(str:$str):$i64{ <mt s.toint(s.trim(str)){$ok:v v;$err:e 0} };
+f=sub(str:$str;start:$u64;len:$u64):$str{ <mt s.slice(str;start;start+len){$ok:v v;$err:e ""} };
+(* extract value of a quoted string field like "user":"alice" starting search at obj *)
+f=fieldstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let p=s.indexof(obj;pat);
+  if(p<0){<""};
+  let start=(p as$i64)+(s.len(pat) as$i64);
+  let rest=sub(obj;start as$u64;(s.len(obj) as$i64-start) as$u64);
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <sub(rest;0 as$u64;q as$u64)
+};
+(* extract numeric field like "time":0 *)
+f=fieldnum(obj:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let p=s.indexof(obj;pat);
+  if(p<0){<0};
+  let start=(p as$i64)+(s.len(pat) as$i64);
+  let rest=sub(obj;start as$u64;(s.len(obj) as$i64-start) as$u64);
+  (* read digits until non-digit *)
+  let num=mut."";
+  let bs=s.bytes(rest);
+  let done=mut.false;
+  lp(let i=0;i<bs.len;i=i+1){
+    if(!(done)){
+      let c=bs.get(i);
+      if(c>47){
+        if(c<58){num=s.concat(num;sub(rest;i as$u64;1 as$u64))}el{done=true}
+      }el{done=true}
+    }
+  };
+  <parsei(num)
+};
+f=main():$i64{
+  let timeout=parsei(s.trim(io.readln()));
+  let arr=s.trim(io.readln());
+  (* split JSON array of objects on "},{" boundaries; strip outer [ ] *)
+  let inner=mut.arr;
+  inner=s.replace(inner;"[";"");
+  inner=s.replace(inner;"]";"");
+  (* now objects separated by },{ ; re-split *)
+  let objs=s.split(inner;"},{");
+  (* state: parallel arrays of user names and expiry times; active flag via removal *)
+  let users=mut.@();
+  let expiry=mut.@();
+  lp(let ei=0;ei<objs.len;ei=ei+1){
+    let raw=objs.get(ei);
+    let obj=s.concat(s.concat("{";raw);"}");
+    let user=fieldstr(obj;"user");
+    let etype=fieldstr(obj;"type");
+    let time=fieldnum(obj;"time");
+    (* expire users whose expiry <= time *)
+    let nu=mut.@();
+    let ne=mut.@();
+    lp(let k=0;k<users.len;k=k+1){
+      let exp=expiry.get(k);
+      if(exp>time){ nu=nu+@(users.get(k)); ne=ne+@(exp) }
+    };
+    users=nu; expiry=ne;
+    (* apply event *)
+    if(s.eq(etype;"stop")){
+      let nu2=mut.@();
+      let ne2=mut.@();
+      lp(let k=0;k<users.len;k=k+1){
+        if(!(s.eq(users.get(k);user))){ nu2=nu2+@(users.get(k)); ne2=ne2+@(expiry.get(k)) }
+      };
+      users=nu2; expiry=ne2
+    }el{
+      (* start or keystroke: set/reset expiry *)
+      let idx=mut.0-1;
+      lp(let k=0;k<users.len;k=k+1){
+        if(s.eq(users.get(k);user)){idx=k}
+      };
+      let newexp=time+timeout;
+      if(idx<0){
+        users=users+@(user);
+        expiry=expiry+@(newexp)
+      }el{
+        let ne3=mut.@();
+        lp(let k=0;k<users.len;k=k+1){
+          if(k=idx){ne3=ne3+@(newexp)}el{ne3=ne3+@(expiry.get(k))}
+        };
+        expiry=ne3
+      }
+    };
+    (* output line *)
+    let lst=mut."";
+    lp(let k=0;k<users.len;k=k+1){
+      if(k=0){lst=users.get(k)}el{lst=s.concat(s.concat(lst;", ");users.get(k))}
+    };
+    let line=s.concat(s.concat(s.concat(s.fromint(time);"ms: [");lst);"]");
+    io.println(line)
+  };
+  <0
+};

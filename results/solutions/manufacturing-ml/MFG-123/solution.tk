@@ -1,1 +1,97 @@
-m=mixexp;f=parseinput(input:$str):$str{let parts=input.split(" ");let n=parts.get(0);let m=parts.get(1);<n};f=computeoutput(n:$str):$str{let sum=100;let m=100-n;let result=s.concat(n;" ")+m;<result};f=main():$void{let input="50";let n=parseinput(input);let output=computeoutput(n);<output};
+m=mixexp;
+i=io:std.io;
+i=s:std.str;
+f=parsef(str:$str):$f64{
+  let v=mt s.tofloat(s.trim(str)){$ok:v v;$err:e 0.0};
+  let w=mut.0.0; w=v; <w
+};
+f=minfloat(x:$f64):$str{
+  let neg=mut.false; let v=mut.0.0; v=x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let prod=mut.0.0; prod=v*100.0+0.5;
+  let scaled=prod as$i64;
+  let whole=scaled/100; let frac=scaled-whole*100;
+  let r=mut."";
+  if(frac=0){
+    r=s.concat(s.fromint(whole);".0");
+  }el{
+    let last=mut.0; last=frac-(frac/10)*10;
+    if(last=0){
+      r=s.concat(s.concat(s.fromint(whole);".");s.fromint(frac/10));
+    }el{
+      let fs=mut.s.fromint(frac);
+      if(frac<10){fs=s.concat("0";fs)};
+      r=s.concat(s.concat(s.fromint(whole);".");fs);
+    };
+  };
+  if(neg){r=s.concat("-";r)};
+  <r
+};
+f=main():$i64{
+  let ca=mut.@(); let cb=mut.@(); let cc=mut.@(); let ys=mut.@();
+  let seenheader=mut.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)<1){}el{
+      if(seenheader=0){seenheader=1}el{
+        let parts=s.split(t;",");
+        if(parts.len>=4){
+          ca=ca+@(parsef(parts.get(0)));
+          cb=cb+@(parsef(parts.get(1)));
+          cc=cc+@(parsef(parts.get(2)));
+          ys=ys+@(parsef(parts.get(3)));
+        };
+      };
+    };
+  };
+  let n=mut.ca.len;
+  let m00=mut.0.0; let m01=mut.0.0; let m02=mut.0.0;
+  let m11=mut.0.0; let m12=mut.0.0; let m22=mut.0.0;
+  let r0=mut.0.0; let r1=mut.0.0; let r2=mut.0.0;
+  let k=mut.0;
+  lp(k<n){
+    let a=mut.0.0; a=ca.get(k);
+    let b=mut.0.0; b=cb.get(k);
+    let c=mut.0.0; c=cc.get(k);
+    let yv=mut.0.0; yv=ys.get(k);
+    m00=m00+a*a; m01=m01+a*b; m02=m02+a*c;
+    m11=m11+b*b; m12=m12+b*c; m22=m22+c*c;
+    r0=r0+a*yv; r1=r1+b*yv; r2=r2+c*yv;
+    k=k+1;
+  };
+  let a00=mut.0.0; a00=m00; let a01=mut.0.0; a01=m01; let a02=mut.0.0; a02=m02; let b0=mut.0.0; b0=r0;
+  let a10=mut.0.0; a10=m01; let a11=mut.0.0; a11=m11; let a12=mut.0.0; a12=m12; let b1=mut.0.0; b1=r1;
+  let a20=mut.0.0; a20=m02; let a21=mut.0.0; a21=m12; let a22=mut.0.0; a22=m22; let b2=mut.0.0; b2=r2;
+  let f1=mut.0.0; f1=a10/a00;
+  a11=a11-f1*a01; a12=a12-f1*a02; b1=b1-f1*b0;
+  let f2=mut.0.0; f2=a20/a00;
+  a21=a21-f2*a01; a22=a22-f2*a02; b2=b2-f2*b0;
+  let f3=mut.0.0; f3=a21/a11;
+  a22=a22-f3*a12; b2=b2-f3*b1;
+  let xc=mut.0.0; xc=b2/a22;
+  let xb=mut.0.0; xb=(b1-a12*xc)/a11;
+  let xa=mut.0.0; xa=(b0-a01*xb-a02*xc)/a00;
+  let oa=mut.0.0; let ob=mut.0.0; let oc=mut.0.0;
+  if(xa>=xb){
+    if(xa>=xc){oa=1.0}el{oc=1.0};
+  }el{
+    if(xb>=xc){ob=1.0}el{oc=1.0};
+  };
+  let out=mut."{\"model\":\"linear\",\"coefficients\":{\"A\":";
+  out=s.concat(out;minfloat(xa));
+  out=s.concat(out;",\"B\":");
+  out=s.concat(out;minfloat(xb));
+  out=s.concat(out;",\"C\":");
+  out=s.concat(out;minfloat(xc));
+  out=s.concat(out;"},\"optimal_mixture\":{\"A\":");
+  out=s.concat(out;minfloat(oa));
+  out=s.concat(out;",\"B\":");
+  out=s.concat(out;minfloat(ob));
+  out=s.concat(out;",\"C\":");
+  out=s.concat(out;minfloat(oc));
+  out=s.concat(out;"}}");
+  io.println(out);
+  <0
+};

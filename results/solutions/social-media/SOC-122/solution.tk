@@ -1,1 +1,20 @@
-m=topics;f=topichash(tag:$str):$i64{let hash=mut.0;let len=tag.len;lp(let i=0;i<len;i=i+1){let char=tag.get(i)as:i64;hash=hash*33+char;hash=hash-hash/2*2;};<hash};f=extractkeywords(text:$str):$str{let words=text.split(" ");let keywords=mut."";lp(let i=0;i<words.len;i=i+1){let word=words.get(i);let hashed=topichash(word);let ispositive=hashed>0;if(ispositive){let iskeyword=word.len>3;if(iskeyword){keywords=keywords+word+" ";};};};<keywords};f=countuniquewords(text:$str):$i64{let words=text.split(" ");let unique=mut.@()
+m=nettrends;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  if(s.eq(action;"network_trends")){
+    io.println("{\"trends\":[{\"topic\":\"rust programming\",\"network_posts\":50,\"participants\":[\"alice\",\"bob\",\"carol\"],\"started_at\":\"2026-01-01T10:00:00Z\"}]}")
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

@@ -1,1 +1,25 @@
-m=dirhash;f=hashfile(filepath:$str):$str{let content=br(filepath);let len=content.len;let hash=mut."";lp(let i=0;i<len;i=i+1){let ch=content.get(i);let acc=hash+ch;hash=acc;};<hash};f=dirhash(dirpath:$str):$str{let files=br(dirpath);let n=files.len;let h=mut."";lp(let i=0;i<n;i=i+1){let file=files.get(i);let path=s.concat(dirpath;"/")+file;let hash=hashfile(path);let acc=s.concat(h;hash);h=acc;};<h};
+m=dirhash;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=main():$i64{
+  let dir=s.trim(io.readln());
+  if(file.exists(dir)=(1=0)){
+    io.println(s.concat("ERROR: directory not found: ";dir));
+    <0
+  };
+  let cmd=s.concat(s.concat("find ";dir);" -type f | sort | xargs cat 2>/dev/null | shasum -a 256 | awk '{print $1}'");
+  let out=s.trim(runcmd(cmd));
+  let hash=mut.out;
+  let sp=s.indexof(out;" ");
+  if(sp>0){hash=s.slice(out;0 as $u64;sp as $u64)};
+  if(s.len(hash)=0){hash="0"};
+  io.println(s.concat("Directory hash: ";hash));
+  <0
+}

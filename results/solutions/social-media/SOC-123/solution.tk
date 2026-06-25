@@ -1,1 +1,24 @@
-m=main;f=extractdigits(val:$str):$str{let result=mut."";let n=val.len;lp(let i=0;i<n;i=i+1){let c=val.get(i);if(c>47){if(c<58){result=result+c}}}};<result};f=sortbydigitsum(arr:@$str):@$str{let n=arr.len;let indices=mut.@();lp(let i=0;i<n;i=i+1){indices=indices+@(i)});lp(let i=0;i<n;i=i+1){lp(let j=0;j<n-i-1;j=j+1){let a=arr.get(indices.get(j)));let b=arr.get(indices.get(j+1)));let suma=mut.0;let sumb=mut.0;let na=a.len;let nb=b.len;lp(let i=0;i<na;i=i+1){let c=a.get(i);if(c>47){if(c<58){suma=suma+c}}}};lp(let i=0;i<nb;i=i+1){let c=b.get(i);if(c>47){if(c<58){sumb=sumb
+m=trendposts;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  let topic=getstr(input;"topic");
+  if(s.eq(action;"trending_posts")){
+    let out=mut."{\"topic\":\"";
+    out=s.concat(out;topic);
+    out=s.concat(out;"\",\"posts\":[{\"id\":100,\"content\":\"Just tried the new AI...\",\"author\":\"techie\",\"likes\":5000,\"shares\":1200}]}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

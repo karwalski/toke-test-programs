@@ -1,1 +1,85 @@
-m=spam;f=containsall(lhs:$str;rhs:$str):$bool{let arr=rhs.split(" ");let n=arr.len;lp(let i=0;i<n;i=i+1){if(lhs.contains(arr.get(i)))){}el{<false}};<true};f=containsany
+m=spam;
+i=io:std.io;
+i=s:std.str;
+f=getweight(cfg:$str;key:$str):$i64{
+  let pat=s.concat(s.concat("\"";key);"\":");
+  let k=s.indexof(cfg;pat);
+  if(k<0){<0};
+  let startp=(k as$u64)+s.len(pat);
+  let rest=mt s.slice(cfg;startp;s.len(cfg)){$ok:v v;$err:e ""};
+  let num=mut."";
+  let bytes=s.bytes(rest);
+  lp(let i=0;i<bytes.len;i=i+1){
+    let c=bytes.get(i);
+    let isdig=mut.false;
+    if(c>=48){if(c<=57){isdig=true}};
+    if(!(isdig)){br};
+    num=s.concat(num;mt s.slice(rest;i as$u64;(i as$u64)+1){$ok:v v;$err:e ""});
+  };
+  <mt s.toint(num){$ok:v v;$err:e 0}
+};
+f=countocc(text:$str;sub:$str):$i64{
+  let n=mut.0;
+  let rest=mut.text;
+  let sl=s.len(sub);
+  lp(1=1){
+    let k=s.indexof(rest;sub);
+    if(k<0){br};
+    n=n+1;
+    let startp=(k as$u64)+sl;
+    rest=mt s.slice(rest;startp;s.len(rest)){$ok:v v;$err:e ""};
+  };
+  <n
+};
+f=main():$i64{
+  let cfg=io.readln();
+  let msg=io.readln();
+  let wcaps=getweight(cfg;"caps_ratio");
+  let wlink=getweight(cfg;"link_count");
+  let wkey=getweight(cfg;"keyword_match");
+
+  let bytes=s.bytes(msg);
+  let upper=mut.0;
+  let alpha=mut.0;
+  lp(let i=0;i<bytes.len;i=i+1){
+    let c=bytes.get(i);
+    if(c>=65){if(c<=90){upper=upper+1;alpha=alpha+1}};
+    if(c>=97){if(c<=122){alpha=alpha+1}};
+  };
+  let capsscore=mut.0;
+  if(alpha>0){
+    let num=wcaps*upper;
+    capsscore=(num+alpha/2)/alpha;
+  };
+  let capspct=mut.0;
+  if(wcaps>0){capspct=(capsscore*100+wcaps/2)/wcaps};
+
+  let nlinks=countocc(msg;"http");
+  let linkscore=mut.0;
+  linkscore=nlinks*10;
+  if(linkscore>wlink){linkscore=wlink};
+
+  let lower=s.lower(msg);
+  let nmatch=mut.0;
+  if(s.indexof(lower;"free money")>=0){nmatch=nmatch+1};
+  if(s.indexof(lower;"buy now")>=0){nmatch=nmatch+1};
+  if(s.indexof(lower;"click here")>=0){nmatch=nmatch+1};
+  if(s.indexof(lower;"act now")>=0){nmatch=nmatch+1};
+  if(s.indexof(lower;"limited time")>=0){nmatch=nmatch+1};
+  let keyscore=mut.0;
+  keyscore=nmatch*20;
+  if(keyscore>wkey){keyscore=wkey};
+
+  let total=mut.0;
+  total=capsscore+linkscore+keyscore;
+  if(total>100){total=100};
+  if(total<0){total=0};
+
+  let out=mut."";
+  out=s.concat(out;s.concat(s.concat("score: ";s.fromint(total));"\n"));
+  out=s.concat(out;s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("caps_ratio: ";s.fromint(capsscore));"/");s.fromint(wcaps));" (");s.fromint(capspct));"% caps)\n"));
+  out=s.concat(out;s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("link_count: ";s.fromint(linkscore));"/");s.fromint(wlink));" (");s.fromint(nlinks));" links)\n"));
+  out=s.concat(out;s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("keyword_match: ";s.fromint(keyscore));"/");s.fromint(wkey));" (");s.fromint(nmatch));" matches)\n"));
+  io.print(out);
+  <0
+};

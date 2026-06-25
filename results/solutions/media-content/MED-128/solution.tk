@@ -1,1 +1,106 @@
-m=xmltojson;f=xmltojson(s:$str):$str{let n=s.len;let i=mut.0;let out=mut."";lp(let j=0;j<n;j=j+1){let c=s.get(j);if(c=">"){i=i+1}el{if(c="<"){if(i>0){out=s.concat(out;"\"");out=s.concat(out;s.slice(j+1;n));out=s.concat(out;"}");j=n}}el{if(!(i>0))){out=s.concat(out;"{")}}}}};<out};
+m=xmltojson;
+i=io:std.io;
+i=s:std.str;
+i=v:std.vec;
+
+f=indexof(hay:$str;needle:$str;from:$i64):$i64{
+  let hn=s.len(hay);let nn=s.len(needle);
+  if(nn=0){<from};
+  lp(let i=from;i<=hn-nn;i=i+1){
+    if(s.eq(s.substr(hay;i;i+nn);needle)){<i};
+  };
+  <0-1
+};
+
+f=hastag(content:$str):$bool{
+  <indexof(content;"<";0)>=0
+};
+
+f=escape(text:$str):$str{
+  let n=s.len(text);
+  let b=s.bytes(text);
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let c=b.get(i);
+    if(c=34){out=s.concat(out;"\\\"")}el{
+    if(c=92){out=s.concat(out;"\\\\")}el{
+      out=s.concat(out;s.substr(text;i;i+1));
+    }};
+  };
+  <out
+};
+
+f=parseval(content:$str):$str{
+  if(!hastag(content)){
+    <s.concat("\"";s.concat(escape(content);"\""))
+  };
+  let keys=v.new();
+  let valsv=v.new();
+  let n=s.len(content);
+  let pos=mut.0;
+  lp(pos<n){
+    let lt=indexof(content;"<";pos);
+    if(lt<0){br};
+    let gt=indexof(content;">";lt);
+    if(gt<0){br};
+    let tag=s.substr(content;lt+1;gt);
+    let opentag=s.concat("<";s.concat(tag;">"));
+    let closetag=s.concat("</";s.concat(tag;">"));
+    let oplen=s.len(opentag);
+    let cllen=s.len(closetag);
+    let depth=mut.1;
+    let scan=mut.gt+1;
+    let innerstart=gt+1;
+    let innerend=mut.0-1;
+    lp(scan<n&&depth>0){
+      let no=indexof(content;opentag;scan);
+      let nc=indexof(content;closetag;scan);
+      if(nc<0){br};
+      if(no>=0&&no<nc){
+        depth=depth+1;scan=no+oplen;
+      }el{
+        depth=depth-1;
+        if(depth=0){innerend=nc;scan=nc+cllen}el{scan=nc+cllen};
+      };
+    };
+    if(innerend<0){br};
+    let inner=s.substr(content;innerstart;innerend);
+    let jval=parseval(inner);
+    keys.push(tag);
+    valsv.push(jval);
+    pos=innerend+cllen;
+  };
+  let m=v.len(keys);
+  let out=mut."{";
+  let firstout=mut.true;
+  lp(let i=0;i<m;i=i+1){
+    let k=keys.get(i);
+    let lastidx=mut.i;
+    lp(let j=i+1;j<m;j=j+1){
+      if(s.eq(keys.get(j);k)){lastidx=0-1};
+    };
+    if(lastidx>=0){
+      if(!firstout){out=s.concat(out;",")};
+      out=s.concat(out;s.concat("\"";s.concat(k;"\":")));
+      out=s.concat(out;valsv.get(i));
+      firstout=false;
+    };
+  };
+  out=s.concat(out;"}");
+  <out
+};
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let trimmed=s.trim(all);
+  io.println(parseval(trimmed));
+  <0
+};

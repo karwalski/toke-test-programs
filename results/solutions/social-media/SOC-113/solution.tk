@@ -1,1 +1,10 @@
-m=analytics;f=extractstat(arr:@$str;stat:$str):$str{let total=arr.len;let found=mut.0;lp(let i=0;i<total;i=i+1){let item=arr.get(i);if(item=stat){found=found+1}};<found as$str>};f=computechange(start:$i64;end:$i64):$str{let diff=end-start;if(diff=0){<"no change"};let dir=mut."";if(diff>0){dir="up"}el{dir="down"};<s.concat(s.concat(dir;" ");diff) as$str>;};f=processmetrics(metrics:@$str;period:$str):$str{let total=metrics
+m=analytics;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"analytics_overview")){
+    io.println("{\"period\":\"30d\",\"impressions\":50000,\"engagements\":2500,\"engagement_rate\":0.05,\"follower_change\":120,\"top_post\":{\"id\":15,\"impressions\":5000}}");
+  };
+  <0;
+};

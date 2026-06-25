@@ -1,1 +1,70 @@
-m=process;f=solve(p0:$str):$str{let data=mut.@();let lines=p0.split("\n");let hdr=lines.get(0);let cols=hdr.split(",");let valcol=cols.get(0);let lslcol=cols.get(1);let uslcol=cols.get(2);lp(let i=1;i<lines.len;i=i+1){let line=lines.get(i);let vals=line.split(",");let val=vals.get(0);let lsl=vals.get(1);let usl=vals.get(2);data=data+@(val);};let n=data.len;let sum=mut.0;lp(let i=0;i<n;i=i+1){let v=data.get(i);sum=sum+v;};let mean=sum/n as$f64;let var=mut.0;lp(let i=0;i<n;i=i+1){let v=data.get(i);let diff=v-mean;var=var+diff*diff;};let sd=var/n as$f64;let minv=mut.999999999.0;lp(let i=0;i<n;i=i+1){let v=data.get(i);if(v<minv){minv=v};};let maxv=mut.0.0;lp(let i=0;i<n;i=i+1){let v=data.get(i);if(v>maxv){maxv=v};};let lsl=mut.0.0;let usl
+m=process;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt2(v:$f64):$str{
+  let x=mut.v;
+  let neg=mut.false; if(x<0.0){neg=true;x=0.0-x};
+  let scaled=mut.0.0; scaled=(x*100.0)+0.5;
+  let total=scaled as$i64;
+  let ip=total/100; let frac=total-ip*100;
+  let res=mut.s.concat(s.fromint(ip);".");
+  if(frac<10){res=s.concat(res;"0")};
+  res=s.concat(res;s.fromint(frac));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let lines=s.split(all;"\n");
+  let lsl=mut.0.0;
+  let usl=mut.0.0;
+  let n=mut.0;
+  let sum=mut.0.0;
+  lp(let i=1;i<lines.len;i=i+1){
+    let line=s.trim(lines.get(i));
+    if(s.len(line)=0){}el{
+      let cols=s.split(line;",");
+      let val=s.tofloat(s.trim(cols.get(0)));
+      lsl=s.tofloat(s.trim(cols.get(1)));
+      usl=s.tofloat(s.trim(cols.get(2)));
+      sum=sum+val;
+      n=n+1;
+    };
+  };
+  let mean=sum/(n as$f64);
+  let ss=mut.0.0;
+  lp(let i=1;i<lines.len;i=i+1){
+    let line=s.trim(lines.get(i));
+    if(s.len(line)=0){}el{
+      let cols=s.split(line;",");
+      let val=s.tofloat(s.trim(cols.get(0)));
+      let d=val-mean;
+      ss=ss+d*d;
+    };
+  };
+  let variance=ss/(n as$f64);
+  let sigma=math.sqrt(variance);
+  let pp=(usl-lsl)/(6.0*sigma);
+  let upper=usl-mean;
+  let lower=mean-lsl;
+  let mn=mut.upper;
+  if(lower<upper){mn=lower};
+  let ppk=mn/(3.0*sigma);
+  let out=mut.s.concat("{\"pp\":";fmt2(pp));
+  out=s.concat(out;",\"ppk\":");
+  out=s.concat(out;fmt2(ppk));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

@@ -1,1 +1,95 @@
-m=mostsimilar;f=cosinesim(a:@$i64;b:@$i64):$f64{let dot=mut.0;let maga=mut.0;let magb=mut.0;lp(let i=0;i<a.len;i=i+1){dot=dot+(a.get(i)*b.get(i)));maga=maga+(a.get(i)*a.get(i)));magb=magb+(b.get(i)*b.get(i)));};let result=dot/(maga*magb));<result};f=mostsimilar(batches:@$str;newbatch:$str):$str{let maxsim=mut.0.0;let bestbatch=mut."";lp(let i=0;i<batches.len;i=i+1){let sim=cosinesim(batches.get(i).chars;batches.get(i).chars);if(sim>maxsim){maxsim=sim;bestbatch=batches.get(i);};};<bestbatch};
+m=mostsimilar;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=parsef(str:$str):$f64{
+  let v=mt s.tofloat(s.trim(str)){$ok:v v;$err:e 0.0};
+  let w=mut.0.0; w=v; <w
+};
+f=fixed2(x:$f64):$str{
+  let neg=mut.false; let v=mut.0.0; v=x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let prod=mut.0.0; prod=v*100.0+0.5;
+  let scaled=prod as$i64;
+  let whole=scaled/100; let frac=scaled-whole*100;
+  let r=mut."";
+  if(frac=0){
+    r=s.concat(s.fromint(whole);".0");
+  }el{
+    let fs=mut.s.fromint(frac);
+    if(frac<10){fs=s.concat("0";fs)};
+    let last=mut.0; last=frac-(frac/10)*10;
+    if(last=0){fs=s.fromint(frac/10)};
+    r=s.concat(s.concat(s.fromint(whole);".");fs);
+  };
+  if(neg){r=s.concat("-";r)};
+  <r
+};
+f=cosine(a:@$f64;b:@$f64):$f64{
+  let dot=mut.0.0; let na=mut.0.0; let nb=mut.0.0;
+  let n=mut.a.len; if(b.len<n){n=b.len};
+  lp(let i=0;i<n;i=i+1){
+    let x=mut.0.0; x=a.get(i);
+    let y=mut.0.0; y=b.get(i);
+    dot=dot+x*y; na=na+x*x; nb=nb+y*y;
+  };
+  let denom=math.sqrt(na)*math.sqrt(nb);
+  let r=mut.0.0;
+  if(denom>0.0){r=dot/denom};
+  <r
+};
+f=feats(line:$str;skipfirst:$bool):@$f64{
+  let parts=s.split(line;",");
+  let out=mut.@();
+  let start=mut.0; if(skipfirst){start=1};
+  lp(let i=start;i<parts.len;i=i+1){
+    out=out+@(parsef(parts.get(i)));
+  };
+  <out
+};
+f=main():$i64{
+  let names=mut.@();
+  let vecs=mut.@();
+  let testvec=mut.@();
+  let phase=mut.0;
+  let seenheader=mut.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)<1){}el{
+      if(s.eq(t;"---")){phase=1}el{
+        if(phase=0){
+          if(seenheader=0){seenheader=1}el{
+            let parts=s.split(t;",");
+            names=names+@(parts.get(0));
+            vecs=vecs+@(feats(t;true));
+          };
+        }el{
+          testvec=feats(t;false);
+        };
+      };
+    };
+  };
+  let out=mut."{\"similarities\":[";
+  let best=mut.""; let bestsim=mut.0.0-1.0; let havebest=mut.0;
+  lp(let i=0;i<names.len;i=i+1){
+    let nm=mut.""; nm=names.get(i);
+    let v=vecs.get(i);
+    let sim=cosine(v;testvec);
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;"{\"batch\":\"");
+    out=s.concat(out;nm);
+    out=s.concat(out;"\",\"similarity\":");
+    out=s.concat(out;fixed2(sim));
+    out=s.concat(out;"}");
+    if(havebest=0){best=nm;bestsim=sim;havebest=1}el{
+      if(sim>bestsim){best=nm;bestsim=sim};
+    };
+  };
+  out=s.concat(out;"],\"best_match\":\"");
+  out=s.concat(out;best);
+  out=s.concat(out;"\"}");
+  io.println(out);
+  <0
+};

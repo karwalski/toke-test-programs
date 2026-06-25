@@ -1,1 +1,31 @@
-m=term;f=main():$i64{let rows=mut.0;let cols=mut.0;let i=mut.0;lp(let idx=0;idx<100;idx=idx+1){let r=rows;let c=cols;let zor=mut.false;if(r<0){zor=true};if(c<0){zor=true};if(zor){rows=100;cols=200};let msg=s.concat("rows=";rows) as$str+s.concat(" cols=";cols) as$str;let out=mut.msg;let final=mut.out;let result=mut.final;<result;};
+m=term;i=io:std.io;i=s:std.str;i=process:std.process;
+f=main():$i64{
+  let dur=io.readln();
+  let rows=mut.24;
+  let cols=mut.80;
+  let out=mt process.spawn(@("/bin/sh";"-c";"stty size 2>/dev/null")){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  };
+  let trimmed=s.trim(out);
+  if(s.len(trimmed)>0){
+    let sp=s.indexof(trimmed;" ");
+    if(sp>0){
+      let rstr=s.slice(trimmed;0 as $u64;sp as $u64);
+      let cstr=s.slice(trimmed;(sp+1) as $u64;s.len(trimmed));
+      let rv=mt s.toint(rstr){ $i64:v v; StrErr:e 24 };
+      let cv=mt s.toint(cstr){ $i64:v v; StrErr:e 80 };
+      rows=rv;
+      cols=cv
+    }
+  };
+  let line=mut."Rows: ";
+  line=s.concat(line;s.fromint(rows));
+  line=s.concat(line;" Cols: ");
+  line=s.concat(line;s.fromint(cols));
+  io.println(line);
+  <0
+}

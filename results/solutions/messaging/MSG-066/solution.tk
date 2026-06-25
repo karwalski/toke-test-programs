@@ -1,7 +1,51 @@
 m=validateid;
 i=io:std.io;
 i=s:std.str;
-i=crypto:std.crypto;
-f=validateid(id:$str):$bool{let len=id.len;if(len<32){if(len>0){<true};<false};<false};
-f=generatekey(sender:$str;recipient:$str;content:$str;timestamp:$str):$str{let data=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(sender;"|");recipient);"|");content);"|");timestamp);let hash=crypto.sha256(data);<hash};
-f=main():$i64{let operation=io.readln();if(operation=="generate"){let sender=io.readln();let recipient=io.readln();let content=io.readln();let timestamp=io.readln();let key=generatekey(sender;recipient;content;timestamp);io.println(key)}else{if(operation=="validate"){let key=io.readln();let stored=io.readln();let keys=s.split(stored;",");let isdupe=false;let index=0;while(index<keys.len){if(keys[index]==key){isdupe=true;index=keys.len}else{index=index+1}};if(isdupe){io.println("DUPLICATE")}else{io.println("UNIQUE")}}else{io.println("INVALID")}};< 0}
+f=joinpipe(sender:$str;recipient:$str;content:$str;timestamp:$str):$str{
+  let a=s.concat(sender;"|");
+  let b=s.concat(a;recipient);
+  let c=s.concat(b;"|");
+  let d=s.concat(c;content);
+  let e=s.concat(d;"|");
+  let f=s.concat(e;timestamp);
+  <f
+};
+f=stripbracketsquotes(raw:$str):$str{
+  let r=mut.raw;
+  r=s.replace(r;"[";"");
+  r=s.replace(r;"]";"");
+  r=s.replace(r;"\"";"");
+  <r
+};
+f=main():$i64{
+  let operation=s.trim(io.readln());
+  if(s.eq(operation;"generate")){
+    let sender=s.trim(io.readln());
+    let recipient=s.trim(io.readln());
+    let content=s.trim(io.readln());
+    let timestamp=s.trim(io.readln());
+    let data=joinpipe(sender;recipient;content;timestamp);
+    let line=s.concat(s.concat("key: sha256(";data);") = hex_hash");
+    io.println(line)
+  }el{
+    if(s.eq(operation;"validate")){
+      let key=s.trim(io.readln());
+      let stored=s.trim(io.readln());
+      let cleaned=stripbracketsquotes(stored);
+      let keys=s.split(cleaned;",");
+      let isdupe=mut.false;
+      lp(let idx=0;idx<keys.len;idx=idx+1){
+        let k=s.trim(keys.get(idx));
+        if(s.eq(k;key)){isdupe=true}
+      };
+      if(isdupe){
+        io.println("DUPLICATE (matches existing key)")
+      }el{
+        io.println("UNIQUE")
+      }
+    }el{
+      io.println("INVALID")
+    }
+  };
+  <0
+};

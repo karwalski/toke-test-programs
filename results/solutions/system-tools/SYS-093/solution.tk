@@ -1,1 +1,51 @@
-m=loadavg;f=loadavg():$str{let result=mut."";let handle=mut.sys.stdin;let data=sys.stdin.read(1024);let lines=data.split("\n");let idx=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);if(line.len>0){let parts=line.split(" ");if(parts.len>2){let avg1=parts.get(0);let avg5=parts.get(1);let avg15=parts.get(2);let cpucount=parts.get(3);result="1min="+avg1+" 5min="+avg5+" 15min="+avg15+" cpu="+cpucount;};};};<result};
+m=loadavg;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(c:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";c)){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
+    ProcessErr:e ""
+  }
+};
+f=tohund(x:$str):$i64{
+  let dot=s.indexof(x;".");
+  let whole=mut.0;
+  let frac=mut.0;
+  if(dot<0){
+    whole=s.toint(x)
+  }el{
+    let ws=s.slice(x;0 as $u64;dot as $u64);
+    whole=s.toint(ws);
+    let fs=mut.s.slice(x;(dot+1) as $u64;s.len(x));
+    if((s.len(fs) as $i64)>=2){fs=s.slice(fs;0 as $u64;2 as $u64)}el{fs=s.concat(fs;"0")};
+    frac=s.toint(fs)
+  };
+  <whole*100+frac
+};
+f=fmth(h:$i64):$str{
+  let whole=h/100;
+  let frac=h-whole*100;
+  let fs=mut.s.fromint(frac);
+  if(frac<10){fs=s.concat("0";fs)};
+  <s.concat(s.concat(s.fromint(whole);".");fs)
+};
+f=main():$i64{
+  let la=s.trim(runcmd("sysctl -n vm.loadavg"));
+  let nc=s.trim(runcmd("sysctl -n hw.ncpu"));
+  let parts=s.split(la;" ");
+  let m1=mut."0.00";
+  let m5=mut."0.00";
+  let m15=mut."0.00";
+  if((s.len(parts) as $i64)>=4){
+    m1=parts.get(1);
+    m5=parts.get(2);
+    m15=parts.get(3)
+  };
+  let cpus=mut.s.toint(nc);
+  if(cpus<1){cpus=1};
+  io.println(s.concat(s.concat(s.concat("Load avg: 1m=";m1);s.concat(" 5m=";m5));s.concat(" 15m=";m15)));
+  let p1=fmth(tohund(m1)/cpus);
+  let p5=fmth(tohund(m5)/cpus);
+  let p15=fmth(tohund(m15)/cpus);
+  io.println(s.concat(s.concat(s.concat("Per-CPU: 1m=";p1);s.concat(" 5m=";p5));s.concat(" 15m=";p15)));
+  io.println(s.concat("CPUs: ";s.fromint(cpus)));
+  <0
+}

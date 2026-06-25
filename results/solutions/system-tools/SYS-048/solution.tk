@@ -1,1 +1,109 @@
-m=sshconfig;f=parseconfig(path:$str):$str{let content=mut."";let i=io:std.io;let handle=i:open(path);if(handle<0){<""};let result=i:read(handle);if(result<0){<""};content=i:close(handle);let hosts=mut."";let lines=content.split("\n");lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);let trimmed=mut.line.trim();if(trimmed.len=0){<""};let iscomment=mut.false;if(trimmed.len>0){let firstchar=trimmed.get(0);if(firstchar="#"){iscomment=true}};if(iscomment){<""};let ishos
+m=sshconfig;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;
+f=kvvalue(line:$str;key:$str):$str{
+  let eq=s.indexof(line;"=");
+  if(eq<0){<""};
+  let k=s.trim(s.slice(line;0 as $u64;eq as $u64));
+  if(s.eq(s.lower(k);s.lower(key))=(1=0)){<""};
+  <s.trim(s.slice(line;(eq+1) as $u64;s.len(line)))
+};
+f=tokenval(line:$str;n:$i64):$str{
+  let parts=s.split(line;" ");
+  let idx=mut.0;
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=parts.get(i as $u64);
+    if(s.len(p)>0){
+      idx=idx+1;
+      if(idx=n){<p};
+    };
+  };
+  <""
+};
+f=configpath():$str{
+  let home=mt env.get("HOME"){
+    $str:v v;
+    EnvErr:e ""
+  };
+  <s.concat(home;"/.ssh/config")
+};
+f=dolist():$i64{
+  let path=configpath();
+  if(file.exists(path)=(1=0)){
+    io.println("No hosts configured");
+    <0
+  };
+  let content=mt file.read(path){
+    $str:c c;
+    FileErr:e ""
+  };
+  let lines=s.split(content;"\n");
+  let curalias=mut."";
+  let curhost=mut."-";
+  let curuser=mut."-";
+  let curport=mut."22";
+  let have=mut.(1=0);
+  let printed=mut.0;
+  lp(let i=0;i<lines.len;i=i+1){
+    let line=s.trim(lines.get(i as $u64));
+    if(s.len(line)>0){
+      let kw=s.lower(tokenval(line;1));
+      if(s.eq(kw;"host")){
+        if(have){
+          io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(curalias;" ");curhost);" ");curuser);" ");curport));
+          printed=printed+1;
+        };
+        curalias=tokenval(line;2);
+        curhost="-";curuser="-";curport="22";
+        have=(1=1);
+      }el{
+        if(s.eq(kw;"hostname")){curhost=tokenval(line;2)};
+        if(s.eq(kw;"user")){curuser=tokenval(line;2)};
+        if(s.eq(kw;"port")){curport=tokenval(line;2)};
+      };
+    };
+  };
+  if(have){
+    io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(curalias;" ");curhost);" ");curuser);" ");curport));
+    printed=printed+1;
+  };
+  if(printed=0){io.println("No hosts configured")};
+  <0
+};
+f=doadd():$i64{
+  let host=mut."";
+  let hostname=mut."";
+  let user=mut."";
+  let port=mut."";
+  lp(io.eof()=(1=0)){
+    let raw=io.readln();
+    if(io.eof()){if(s.len(raw)=0){br}};
+    let line=s.trim(raw);
+    if(s.len(line)>0){
+      let h=kvvalue(line;"Host");
+      let hn=kvvalue(line;"HostName");
+      let u=kvvalue(line;"User");
+      let p=kvvalue(line;"Port");
+      if(s.len(h)>0){host=h};
+      if(s.len(hn)>0){hostname=hn};
+      if(s.len(u)>0){user=u};
+      if(s.len(p)>0){port=p};
+    };
+  };
+  if(s.len(host)=0){
+    io.println("ERROR: no Host specified");
+    <0
+  };
+  let path=configpath();
+  let block=mut."";
+  block=s.concat(block;"\nHost ");block=s.concat(block;host);block=s.concat(block;"\n");
+  if(s.len(hostname)>0){block=s.concat(block;"    HostName ");block=s.concat(block;hostname);block=s.concat(block;"\n")};
+  if(s.len(user)>0){block=s.concat(block;"    User ");block=s.concat(block;user);block=s.concat(block;"\n")};
+  if(s.len(port)>0){block=s.concat(block;"    Port ");block=s.concat(block;port);block=s.concat(block;"\n")};
+  file.append(path;block);
+  io.println(s.concat(s.concat("Added host ";host);" to config."));
+  <0
+};
+f=main():$i64{
+  let cmd=s.trim(io.readln());
+  if(s.eq(cmd;"add")){<doadd()};
+  <dolist()
+}

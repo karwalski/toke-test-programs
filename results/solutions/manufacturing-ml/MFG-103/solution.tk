@@ -1,1 +1,72 @@
-m=warranty;f=parseinput(input:$str):$str{let parts=input.split(" ");let model=parts.get(0);let failures=parts.get(1);let volume=parts.get(2);<model};f=computeexpectedfailures(model:$str;volume:$i64):$i64{let base=10;let exp=base-volume;let failures=exp;if(failures<0){<0};<failures};f=estimatetotalfailures(model:$str;volume:$i64):$i64{let expected=computeexpectedfailures(model;volume);let safetyfactor=1.5;let adjusted=safetyfactor*expected;let result=adjusted as$i64;if(result<0){<0};<result};f=buildoutput(model:$str;totalfailures:$i64):$str{let line1=model;let line2="total estimated failures:";let failurestr=totalfailures as$str;let result=line1+s.concat(s.concat("\n";line2);"\n")+failurestr;<result};f=main(input:$str):$str{let model=parseinput(input);let totalfailures=estimatetotalfailures
+m=warranty;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+  let n=lines.len();
+  let months=mut.@(0.0);
+  months=@();
+  let fails=mut.@(0.0);
+  fails=@();
+  let lastunits=mut.0.0;
+  let lastcost=mut.0.0;
+  let lastfail=mut.0.0;
+  lp(let i=1;i<n;i=i+1){
+    let row=lines.get(i);
+    let parts=s.split(row;",");
+    let mo=s.tofloat(parts.get(0));
+    let fa=s.tofloat(parts.get(1));
+    let un=s.tofloat(parts.get(2));
+    let co=s.tofloat(parts.get(3));
+    months=months+@(mo);
+    fails=fails+@(fa);
+    lastunits=un;
+    lastcost=co;
+    lastfail=fa;
+  };
+  let m=months.len();
+  let sx=mut.0.0;
+  let sy=mut.0.0;
+  let sxx=mut.0.0;
+  let sxy=mut.0.0;
+  lp(let i=0;i<m;i=i+1){
+    let x=months.get(i);
+    let y=fails.get(i);
+    sx=sx+x;
+    sy=sy+y;
+    sxx=sxx+x*x;
+    sxy=sxy+x*y;
+  };
+  let mf=(m as $f64);
+  let denom=mf*sxx-sx*sx;
+  let slope=mut.0.0;
+  if(denom>0.0001){slope=(mf*sxy-sx*sy)/denom}el{slope=0.0};
+  let intercept=(sy-slope*sx)/mf;
+  let nextmonth=months.get(m-1)+1.0;
+  let predfail=slope*nextmonth+intercept;
+  let predcost=predfail*lastcost;
+  let frateraw=lastfail/lastunits;
+  let fratei=((frateraw*100000.0) as $i64);
+  let frate=(fratei as $f64)/100000.0;
+  let trend=mut."stable";
+  if(slope>0.0001){trend="increasing"}el{if(slope<0.0-0.0001){trend="decreasing"}el{trend="stable"}};
+  let costi=((predcost+0.5) as $i64);
+  let out=mut."{\"predicted_next_month_cost\":";
+  out=s.concat(out;s.fromint(costi));
+  out=s.concat(out;",\"failure_rate\":");
+  out=s.concat(out;s.format(frate;"%.5f"));
+  out=s.concat(out;",\"trend\":\"");
+  out=s.concat(out;trend);
+  out=s.concat(out;"\"}");
+  io.println(out);
+  <0
+};

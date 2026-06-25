@@ -1,1 +1,52 @@
-m=extract;f=extractall(path:$str;dest:$str):$void{let files=mut.@();let i=io:std.io;let handle=i:i64;let read=i:i64;let close=i:i64;let list=i:i64;let extract=i:i64;let append=i:i64;let prepend=i:i64;let sort=i:i64;let filter=i:i64;let map=i:i64;let reduce=i:i64;let count=i:i64;let max=i:i64;let min=i:i64;let sum=i:i64;let avg=i:i64;let var=i:i64;let std=i:i64;let cov=i:i64;let corr=i:i64;let pval=i:i64;let effect=i:i64;let conf=into:i64;let margin=into:i64;let risk=into:i64;let score=into:i64;let rank=into:i64;let flag=bool;let ok=bool;let err=$str;let info=$str;let debug=$str;let trace=$str;
+m=extract;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=listcmd(path:$str):$str{
+  let lo=s.lower(path);
+  if(s.endswith(lo;".tar.gz")){<s.concat(s.concat("tar tzf '";path);"'")};
+  if(s.endswith(lo;".tgz")){<s.concat(s.concat("tar tzf '";path);"'")};
+  if(s.endswith(lo;".tar.bz2")){<s.concat(s.concat("tar tjf '";path);"'")};
+  if(s.endswith(lo;".zip")){<s.concat(s.concat("unzip -Z1 '";path);"'")};
+  <s.concat(s.concat("tar tf '";path);"'")
+};
+f=extractcmd(path:$str;dest:$str):$str{
+  let lo=s.lower(path);
+  let q=s.concat(s.concat("'";path);"'");
+  let d=s.concat(s.concat("'";dest);"'");
+  if(s.endswith(lo;".tar.gz")){<s.concat(s.concat(s.concat("tar xzf ";q);" -C ");d)};
+  if(s.endswith(lo;".tgz")){<s.concat(s.concat(s.concat("tar xzf ";q);" -C ");d)};
+  if(s.endswith(lo;".tar.bz2")){<s.concat(s.concat(s.concat("tar xjf ";q);" -C ");d)};
+  if(s.endswith(lo;".zip")){<s.concat(s.concat(s.concat("unzip -o -q ";q);" -d ");d)};
+  <s.concat(s.concat(s.concat("tar xf ";q);" -C ");d)
+};
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let dest=s.trim(io.readln());
+  if(file.exists(path)=(1=0)){
+    io.println(s.concat("ERROR: archive not found: ";path));
+    <0
+  };
+  runcmd(s.concat("mkdir -p '";s.concat(dest;"'")));
+  runcmd(extractcmd(path;dest));
+  let listing=runcmd(listcmd(path));
+  let lines=s.split(listing;"\n");
+  let count=mut.0;
+  lp(let i=0;i<lines.len;i=i+1){
+    let entry=s.trim(lines.get(i as $u64));
+    if(s.len(entry)>0){
+      if(s.endswith(entry;"/")=(1=0)){
+        io.println(s.concat("extracted: ";entry));
+        count=count+1;
+      };
+    };
+  };
+  io.println(s.concat(s.concat(s.concat("Done: ";s.fromint(count));" files extracted to ");s.concat(dest;".")));
+  <0
+}

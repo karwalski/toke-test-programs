@@ -1,1 +1,29 @@
-m=main;f=main():$void{let req=std.http.readrequest();let action=req.body.action;let token=req.body.token;let message_id=req.body.message_id;let emoji=req.body.emoji;let resp=std.http.writeresponse();let ok=std.http.writeok(resp);let reaction=std.json.encodestr(emoji);let msg="Reaction added: ";let fullmsg=msg+reaction;let out=std.http.writebody(resp;fullmsg);let done=std.http.writeclose(resp);};
+m=react;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  let mid=getstr(input;"message_id");
+  let emoji=getstr(input;"emoji");
+  if(s.eq(action;"react_message")){
+    let out=mut."{\"message_id\":\"";
+    out=s.concat(out;mid);
+    out=s.concat(out;"\",\"emoji\":\"");
+    out=s.concat(out;emoji);
+    out=s.concat(out;"\",\"reactions\":{\"");
+    out=s.concat(out;emoji);
+    out=s.concat(out;"\":1},\"status\":\"reacted\"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

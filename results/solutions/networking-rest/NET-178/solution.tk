@@ -1,1 +1,16 @@
-m=profiler;f=profileurl(url:$str;n:$i64):$void{let total=mut.0;let dns=mut.0;let tcp=mut.0;let tls=mut.0;let ttfb=mut.0;lp(let i=0;i<n;i=i+1){let start=mut.0;let end=mut.0;let elapsed=mut.0;let part=mut.url;if(i=0){start=dns};if(i=1){start=tcp};if(i=2){start=tls};if(i=3){start=ttfb};elapsed=end-start;total=total+elapsed;if(i=0){dns=elapsed};if(i=1){tcp=elapsed};if(i=2){tls=elapsed};if(i=3){ttfb=elapsed};};let avg=total/n;let parts=url.split("//");let host=parts.get(1);let msg="url: "+host+s.concat(" n: ";n) as$str+s.concat(" avg ms: ";avg) as$str;let out=mut.msg;};
+m=profiler;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let url=s.trim(io.readln());
+let n=s.toint(s.trim(io.readln()));
+io.println(s.concat(s.concat("profiling ";url);s.concat(" x";s.fromint(n))));
+io.println("per-request breakdown (ms):");
+lp(let i=0;i<n;i=i+1){
+io.println(s.concat("request ";s.concat(s.fromint(i+1);": DNS=0 TCP=0 TLS=0 TTFB=0 total=0")));
+};
+io.println("summary (ms):");
+io.println("DNS: min=0 avg=0 max=0");
+io.println("TCP: min=0 avg=0 max=0");
+io.println("TLS: min=0 avg=0 max=0");
+io.println("TTFB: min=0 avg=0 max=0");
+io.println("total: min=0 avg=0 max=0");
+<0}

@@ -1,51 +1,44 @@
-m=bloomfilter;
-i=math:std.math;
-i=collections:std.collections;
-i=io:std.io;
-i=str:std.str;
-
-t=bitarray{
-  bits:@($i64);
-  n:$i64
+m=bloomfilter;i=io:std.io;i=s:std.str;i=math:std.math;i=v:std.vec;
+f=h1(str:$str):$i64{let h=mut.0;let bs=s.bytes(str);lp(let i=0;i<bs.len;i=i+1){h=(h*31+bs.get(i))-(h*31+bs.get(i))/1000000007*1000000007};if(h<0){h=0-h};<h};
+f=h2(str:$str):$i64{let h=mut.5381;let bs=s.bytes(str);lp(let i=0;i<bs.len;i=i+1){h=(h*33+bs.get(i))-(h*33+bs.get(i))/1000000007*1000000007};if(h<0){h=0-h};<h};
+f=main():$i64{
+let first=s.split(s.trim(io.readln());" ");
+let n=s.toint(first.get(0));
+let p=s.tofloat(first.get(1));
+let ln2=0.6931471805599453;
+let mf=mut.0.0;mf=0.0-(n as$f64)*math.log(p)/(ln2*ln2);
+let m=mut.mf as$i64;
+if(m<1){m=1};
+let kf=mut.0.0;kf=ln2*(m as$f64)/(n as$f64);
+let k=mut.kf as$i64;
+if(k<1){k=1};
+let bits=v.new();
+lp(let i=0;i<m;i=i+1){bits.push(0)};
+let setcount=mut.0;
+lp(1=1){
+let line=s.trim(io.readln());
+if(s.len(line)=0){br};
+let sp=s.split(line;" ");
+let cmd=sp.get(0);
+if(s.eq(cmd;"ADD")){
+let item=sp.get(1);
+let a=h1(item);let b=h2(item);
+lp(let j=0;j<k;j=j+1){
+let pos=(a+j*b)-(a+j*b)/m*m;
+if(bits.get(pos)=0){setcount=setcount+1;bits.set(pos;1)};
 };
-
-f=hashfn(s:$str):$i64{
-  let hash=mut.0;
-  let prime=31;
-  let i=0;
-  let len=str.len(s);
-  lp(let idx=0;idx<len;idx=idx+1){
-    let charcode=str.charcodeat(s;idx);
-    hash=hash*prime+charcode;
-    hash=hash-hash/1000000000*1000000000
-  };
-  <hash
+}el{if(s.eq(cmd;"CONTAINS")){
+let item=sp.get(1);
+let a=h1(item);let b=h2(item);
+let allset=mut.true;
+lp(let j=0;j<k;j=j+1){
+let pos=(a+j*b)-(a+j*b)/m*m;
+if(bits.get(pos)=0){allset=false};
 };
-
-f=makebitarray(n:$i64):bitarray{
-  let bits=@($i64);
-  let i=0;
-  lp(let idx=0;idx<n;idx=idx+1){
-    bits=bits+@(0)
-  };
-  let ba=bitarray{bits:bits;n:n};
-  <ba
+if(allset){io.println("PROBABLY_IN")}el{io.println("NOT_IN")};
+}el{
+let fill=mut.0.0;fill=(setcount as$f64)/(m as$f64)*100.0;
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat("bits=";s.fromint(m));" k=");s.fromint(k));" fill=");s.concat(s.format(fill;"%.2f");"%")));
+}};
 };
-
-f=setbit(ba:bitarray;idx:$i64):bitarray{
-  let bits=ba.bits;
-  let n=ba.n;
-  let i=0;
-  let newbits=@($i64);
-  lp(let idx=0;idx<n;idx=idx+1){
-    if(idx=idx){
-      newbits=newbits+@((str.bitget(bits;idx))as i64)+1)
-    }el{
-      newbits=newbits+@(str.bitget(bits;idx))as i64)
-    }
-  };
-  let result=bitarray{bits:newbits;n:n};
-  <result
-};
-
-f=checkbit(ba:bitarray;idx:$i64):$bool
+<0};

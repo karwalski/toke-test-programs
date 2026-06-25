@@ -1,1 +1,95 @@
-m=compress;f=buildfreqmap(chars:@$str):$str{let freq=mut."";lp(let i=0;i<chars.len;i=i+1){let c=chars.get(i);let found=mut.false;lp(let j=0;j<freq.len;j=j+1){let ch=freq.get(j);if(ch=c){found=true};};if(!(found)){freq=freq+c};};<freq};f=buildcodemap(freq:$str):$str{let chars=mut.@$str;let codes=mut.@$str;lp(let i=0;i<freq.len;i=i+1){let c=freq.get(i);chars=chars+@(c);codes=codes+@(c);}
+m=compress;
+i=io:std.io;
+i=s:std.str;
+f=countocc(text:$str;sub:$str):$i64{
+  let n=mut.0;
+  let rest=mut.text;
+  let sl=s.len(sub);
+  lp(1=1){
+    let k=s.indexof(rest;sub);
+    if(k<0){br};
+    n=n+1;
+    let startp=(k as$u64)+sl;
+    rest=mt s.slice(rest;startp;s.len(rest)){$ok:v v;$err:e ""};
+  };
+  <n
+};
+f=main():$i64{
+  let line1=io.readln();
+  let minlen=mt s.toint(s.trim(line1)){$ok:v v;$err:e 0};
+  let msgs=mut.@();
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    msgs=msgs+@(line);
+  };
+  let nm=msgs.len;
+  let origbytes=mut.0;
+  lp(let i=0;i<nm;i=i+1){
+    origbytes=origbytes+(s.len(msgs.get(i)) as$i64);
+    if(i<nm-1){origbytes=origbytes+1};
+  };
+  let comp=mut.@();
+  lp(let i=0;i<nm;i=i+1){comp=comp+@(msgs.get(i))};
+  let dict=mut.@();
+  lp(1=1){
+    let best=mut."";
+    let bestlen=mut.0;
+    let bestcnt=mut.0;
+    lp(let mi=0;mi<nm;mi=mi+1){
+      let toks=s.split(comp.get(mi);" ");
+      let nt=toks.len;
+      lp(let a=0;a<nt;a=a+1){
+        let phrase=mut."";
+        lp(let b=a;b<nt;b=b+1){
+          if(b>a){phrase=s.concat(phrase;" ")};
+          phrase=s.concat(phrase;toks.get(b));
+          let pl=s.len(phrase) as$i64;
+          if(pl>=minlen){
+            if(s.indexof(phrase;"{D")<0){
+              let cnt=mut.0;
+              lp(let ci=0;ci<nm;ci=ci+1){
+                cnt=cnt+countocc(comp.get(ci);phrase);
+              };
+              if(cnt>=2){
+                let better=mut.false;
+                if(pl>bestlen){better=true};
+                if(pl=bestlen){if(cnt>bestcnt){better=true}};
+                if(better){
+                  best=phrase;bestlen=pl;bestcnt=cnt;
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+    if(bestlen=0){br};
+    dict=dict+@(best);
+    let token=s.concat(s.concat("{D";s.fromint(dict.len));"}");
+    lp(let ci=0;ci<nm;ci=ci+1){
+      comp=comp.set(ci;s.replace(comp.get(ci);best;token));
+    };
+  };
+  let out=mut."DICT:\n";
+  lp(let i=0;i<dict.len;i=i+1){
+    let lineo=s.concat(s.concat(s.concat("  D";s.fromint(i+1));"=");dict.get(i));
+    out=s.concat(out;s.concat(lineo;"\n"));
+  };
+  out=s.concat(out;"COMPRESSED:\n");
+  let compbytes=mut.0;
+  lp(let i=0;i<dict.len;i=i+1){compbytes=compbytes+(s.len(dict.get(i)) as$i64)};
+  lp(let i=0;i<nm;i=i+1){
+    out=s.concat(out;s.concat(s.concat("  ";comp.get(i));"\n"));
+    compbytes=compbytes+(s.len(comp.get(i)) as$i64);
+  };
+  let saved=origbytes-compbytes;
+  let pct=mut.0;
+  if(origbytes>0){
+    let num=saved*100;
+    pct=(num+origbytes/2)/origbytes;
+  };
+  out=s.concat(out;s.concat(s.concat("Savings: ";s.fromint(pct));"%\n"));
+  io.print(out);
+  <0
+};

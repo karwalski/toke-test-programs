@@ -1,1 +1,47 @@
-m=autocomplete;f=extractkeywords(s:$str):@$str{let n=s.len;let keywords=mut.@();let current=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=32){if(!(current.len=0))){keywords=keywords+@(current)};current=""}el{current=current+(c as$str))}}
+m=autocomplete;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=startswith(str:$str;pre:$str):$bool{
+  if(s.len(pre)>s.len(str)){<false};
+  <s.eq(s.slice(str;0;s.len(pre));pre)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let pq=getstrval(line;"partial_query");
+  if(s.eq(action;"search_suggest")){
+    let pql=s.lower(pq);
+    let types=@("query";"query";"user";"user";"hashtag";"hashtag");
+    let texts=@("machine learning";"deep learning";"@macdev";"@bob";"#macos";"#rust");
+    let keys=@("machine learning";"deep learning";"macdev";"bob";"macos";"rust");
+    let res=mut."";
+    let n=mut.0;
+    lp(let i=0;i<types.len;i=i+1){
+      if(startswith(s.lower(keys.get(i));pql)){
+        if(n>0){res=s.concat(res;",")};
+        res=s.concat(res;"{\"type\":\"");
+        res=s.concat(res;types.get(i));
+        res=s.concat(res;"\",\"text\":\"");
+        res=s.concat(res;texts.get(i));
+        res=s.concat(res;"\"}");
+        n=n+1;
+      };
+    };
+    let out=mut."";
+    out=s.concat(out;"{\"suggestions\":[");
+    out=s.concat(out;res);
+    out=s.concat(out;"]}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

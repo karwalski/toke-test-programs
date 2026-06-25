@@ -1,1 +1,65 @@
-m=watcher;f=watchdir(dirpath:$str;cmd:$str):$void{let handle=mut.0;let result=mut.0;let filepath=mut.dirpath;let len=filepath.len as i64;if(len>0){let lastchar=filepath.get(len-1));if(lastchar="/"){let newlen=len-1;filepath=filepath.slice(0;newlen);};};let cmdstr=mut.cmd;if(cmdstr.len>0){let firstchar=cmdstr.get(0);if(firstchar="@"){let newcmd=cmdstr.slice(1;cmdstr.len);cmdstr=newcmd;};};let watchresult=mut.0;let watchhandle=mut.0;let watchcmd=mut.cmdstr;let watchdirpath=mut.dirpath;let watchlen=mut.watchdirpath.len as i64;if(watchlen>0){let watchlastchar=mut.watchdirpath.get(watchlen-1));if(watchlastchar="/"){let watchnewlen=mut.watchlen-1;watchdirpath=mut.watchdirpath.slice(0;watchnewlen));};};let watchcmdstr=mut.watchcmd;if(watchcmd
+m=filewatcher;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+i=process:std.process;
+i=time:std.time;
+
+f=shellout(cmd:$str):$str{
+  let res=mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
+    ProcessErr:e ""
+  };
+  <res
+};
+
+f=mtimeof(path:$str):$str{
+  let cmd=s.concat(s.concat("stat -f %m \"";path);"\" 2>/dev/null || stat -c %Y \"");
+  let full=s.concat(cmd;s.concat(path;"\" 2>/dev/null"));
+  <s.trim(shellout(full))
+};
+
+f=runargv(cmd:$str):$str{
+  let argv=s.split(s.trim(cmd);" ");
+  let res=mt process.spawn(argv){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
+    ProcessErr:e ""
+  };
+  <res
+};
+
+f=main():$i64{
+  let path=s.trim(io.readln());
+  let cmd=s.trim(io.readln());
+  let maxstr=s.trim(io.readln());
+  let maxtrig=mt s.toint(maxstr){ $i64:v v; ParseErr:e 0 };
+
+  if(!file.exists(path)){
+    io.println(s.concat("ERROR: path not found: ";path));
+    <0
+  };
+
+  let last=mut.mtimeof(path);
+  let triggers=mut.0;
+  let polls=mut.0;
+  let watching=mut.(1=1);
+
+  lp(watching){
+    let cur=mtimeof(path);
+    if(!s.eq(cur;last)){
+      last=cur;
+      let now=time.now();
+      io.println(s.concat("Change detected: ";time.format(now;"%Y-%m-%d %H:%M:%S")));
+      io.println(s.concat("Running: ";cmd));
+      let output=runargv(cmd);
+      io.print(s.concat("Output: ";output));
+      triggers=triggers+1;
+      if(maxtrig>0){
+        if(triggers>=maxtrig){ watching=(1=0); };
+      };
+    };
+    polls=polls+1;
+    if(polls>20){ watching=(1=0); };
+  };
+  <0
+}

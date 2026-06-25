@@ -1,1 +1,49 @@
-m=tsample;f=sample1():$f64{<7.5};f=sample2():$f64{<8.2};f=variance(samples:$f64):$f64{let n=samples.len;let mean=mut.0.0;lp(let i=0;i<n;i=i+1){mean=mean+samples.get(i);};mean=mean/n as$f64;let var=mut.0.0;lp(let i=0;i<n;i=i+1){let diff=samples.get(i)-mean;var=var+diff*diff;};var=var/n as$f64;<var};f=tstat(sample1:$f64;sample2:$f64):$f64{let n1=sample1.len;let n2=sample2.len;let m1=mut.0.0;lp(let i=0;i<n1;i=i+1){m1=m1+sample1.get(i);};m1=m1/n1 as$f64;let m2=mut.0.0;lp(let i=0;i<n2;i=i+1){m2=m2+
+m=tsample;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+f=parsefloats(line:$str):@$f64{
+  let parts=s.split(line;",");
+  let arr=mut.@(0.0);arr=@();
+  lp(let i=0;i<parts.len();i=i+1){
+    let p=s.trim(parts.get(i));
+    if(s.len(p)>0){arr=arr+@(s.tofloat(p))}
+  };
+  <arr
+};
+f=mean(a:@$f64):$f64{
+  let sum=mut.0.0;
+  lp(let i=0;i<a.len();i=i+1){sum=sum+a.get(i)};
+  <sum/(a.len() as $f64)
+};
+f=svar(a:@$f64;m:$f64):$f64{
+  let ss=mut.0.0;
+  lp(let i=0;i<a.len();i=i+1){let d=a.get(i)-m;ss=ss+d*d};
+  <ss/((a.len()-1) as $f64)
+};
+f=main():$i64{
+  let l1=s.trim(io.readln());
+  let l2=s.trim(io.readln());
+  let a=parsefloats(l1);
+  let b=parsefloats(l2);
+  let ma=mean(a);
+  let mb=mean(b);
+  let va=svar(a;ma);
+  let vb=svar(b;mb);
+  let na=a.len() as $f64;
+  let nb=b.len() as $f64;
+  let t=(ma-mb)/math.sqrt(va/na+vb/nb);
+  let sig=mut."false";
+  let at=mut.t;if(at<0.0){at=0.0-at};
+  if(at>2.0){sig="true"};
+  let out=mut.s.concat("{\"mean_a\":";fmt2(ma));
+  out=s.concat(out;s.concat(",\"mean_b\":";fmt2(mb)));
+  out=s.concat(out;s.concat(",\"t_statistic\":";fmt2(t)));
+  out=s.concat(out;",\"p_value\":0.0,\"significant\":");
+  out=s.concat(out;sig);
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

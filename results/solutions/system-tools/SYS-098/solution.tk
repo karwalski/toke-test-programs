@@ -1,30 +1,40 @@
-To list all Linux namespaces for a given PID, you can use the following Python script:
-
-```python
-import os
-
-def get_namespace(pid, namespace):
-    try:
-        with open(f"/proc/{pid}/ns/{namespace}"), "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return None
-
-def list_namespaces(pid):
-    namespaces = [
-        "pid", "net", "mnt", "uts", "ipc", "user"
-    ]
-    results = {}
-    for namespace in namespaces:
-        result = get_namespace(pid, namespace)
-        results[namespace] = result
-    return results
-
-# Example usage
-pid = 1234
-namespaces = list_namespaces(pid)
-for namespace, result in namespaces.items():
-    print(f"{namespace}: {result}")
-```
-
-This script defines functions to get the namespace for a given PID and to list all namespaces for a given PID. The script then demonstrates how to use these functions.
+m=nslist;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=runcmd(c:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";c)){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
+    ProcessErr:e ""
+  }
+};
+f=nsinode(pid:$str;name:$str):$str{
+  let path=s.concat(s.concat(s.concat("/proc/";pid);"/ns/");name);
+  if(file.exists(path)){
+    let cmd=s.concat(s.concat("readlink ";path);" 2>/dev/null");
+    let r=s.trim(runcmd(cmd));
+    if(s.len(r)>0){<r}el{<"unavailable"}
+  };
+  <"unavailable"
+};
+f=emit(pid:$str;name:$str):$i64{
+  io.println(s.concat(s.concat(name;": ");nsinode(pid;name)));
+  <0
+};
+f=main():$i64{
+  let pid=s.trim(io.readln());
+  if(s.len(pid)=0){
+    io.println("ERROR: no PID provided");
+    <0
+  };
+  let chk=s.concat(s.concat("if ps -p ";pid);" >/dev/null 2>&1; then echo EXISTS; else echo NOTFOUND; fi");
+  let exists=s.trim(runcmd(chk));
+  if(s.eq(exists;"NOTFOUND")){
+    io.println(s.concat("ERROR: PID not found: ";pid));
+    <0
+  };
+  emit(pid;"pid");
+  emit(pid;"net");
+  emit(pid;"mnt");
+  emit(pid;"uts");
+  emit(pid;"ipc");
+  emit(pid;"user");
+  <0
+}

@@ -1,1 +1,61 @@
-m=certpin;f=validatecert(certpem:$str;pinsha256:$str):$bool{let cert=parsepem(certpem);let pubkey=extractpubkey(cert);let pubkeyhash=hashpubkey(pubkey);let matched=verifyhash(pubkeyhash;pinsha256);<matched};f=parsepem(pem:$str):$str{let lines=splitlines(pem);let header=lines.get(0);let body=lines.get(1);let footer=lines.get(2);<body};f=splitlines(s:$str):$str{let parts=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<s.len;idx=idx+1){let ch=s.get(idx);if(ch="\n"){parts=parts+@(current);current="";}el{current=current+ch;};};parts=parts+@(current);<parts};f=extractpubkey(certpem:$str):$str{let lines=splitlines(certpem);let startline=mut.0;let found=mut.false;lp(let idx=0;idx<lines.len;idx=
+m=certpin;
+i=io:std.io;
+i=s:std.str;
+i=crypto:std.crypto;
+i=enc:std.encoding;
+(* strip [ ] and split a JSON string array into trimmed unquoted elements *)
+f=splitjsonarr(raw:$str):@$str{
+  let inner=mut.s.trim(raw);
+  inner=s.replace(inner;"[";"");
+  inner=s.replace(inner;"]";"");
+  let parts=s.split(inner;",");
+  let out=mut.@();
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=mut.s.trim(parts.get(i));
+    p=s.replace(p;"\"";"");
+    if(s.len(p)>0){out=out+@(p)}
+  };
+  <out
+};
+(* compute the SPKI pin for a cert: sha256/<base64(sha256(cert-bytes))> *)
+f=certpinval(cert:$str):$str{
+  let h=crypto.sha256(s.bytes(cert));
+  let b64=enc.b64encode(h);
+  <s.concat("sha256/";b64)
+};
+f=certlabel(idx:$i64):$str{
+  if(idx=0){<"leaf"};
+  <"intermediate"
+};
+f=main():$i64{
+  let pinsraw=io.readln();
+  let chainraw=io.readln();
+  let pins=splitjsonarr(pinsraw);
+  let chain=splitjsonarr(chainraw);
+  let matchidx=mut.0-1;
+  (* check each cert in chain against all pins; report first match *)
+  lp(let c=0;c<chain.len;c=c+1){
+    if(matchidx<0){
+      let pinval=certpinval(chain.get(c));
+      lp(let p=0;p<pins.len;p=p+1){
+        if(s.eq(pins.get(p);pinval)){
+          if(matchidx<0){matchidx=c}
+        }
+      }
+    }
+  };
+  if(matchidx>=0){
+    let lbl=mut.certlabel(matchidx);
+    let full=mut.s.concat(lbl;" certificate");
+    let line=s.concat(s.concat(s.concat("VALID: pin matched at position ";s.fromint(matchidx));" (");full);
+    io.println(s.concat(line;")"))
+  }el{
+    io.println("INVALID: no pin matched");
+    (* report the leaf cert's actual computed pin *)
+    if(chain.len>0){
+      let pinval=certpinval(chain.get(0));
+      io.println(s.concat("checked: leaf (";s.concat(pinval;")")))
+    }
+  };
+  <0
+};

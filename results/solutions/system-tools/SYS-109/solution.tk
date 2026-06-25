@@ -1,1 +1,44 @@
-m=route;f=route():$str{let result=mut."";let lines=std.process.run("netstat -r");lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let parts=std.str.split(line;10);if(parts.len<2){result=result+line;}el{let dst=parts.get(0);let gw=parts.get(1);let iface=parts.get(2);let metric=parts.get(3);result=result+dst+" "+gw+" "+iface+" "+metric+"\n";};};<result};
+m=route;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=main():$i64{
+  let out=runcmd("netstat -rn 2>/dev/null");
+  let lines=s.split(out;"\n");
+  lp(let i=0;i<lines.len;i=i+1){
+    let line=s.trim(lines.get(i));
+    if(s.len(line)>0){
+      let parts=s.split(line;" ");
+      let fields=mut.@();
+      lp(let j=0;j<parts.len;j=j+1){
+        let p=s.trim(parts.get(j));
+        if(s.len(p)>0){fields=fields+@(p)}
+      };
+      if((fields.len as $i64)>=2){
+        let dst=fields.get(0);
+        let gw=fields.get(1);
+        let netif=mut."-";
+        let metric=mut."-";
+        if((fields.len as $i64)>=4){netif=fields.get(3)};
+        if((fields.len as $i64)>=3){
+          if((fields.len as $i64)<4){netif=fields.get(2)}
+        };
+        let outline=mut.dst;
+        outline=s.concat(outline;" ");
+        outline=s.concat(outline;gw);
+        outline=s.concat(outline;" ");
+        outline=s.concat(outline;netif);
+        outline=s.concat(outline;" ");
+        outline=s.concat(outline;metric);
+        io.println(outline)
+      }
+    }
+  };
+  <0
+}

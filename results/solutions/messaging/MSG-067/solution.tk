@@ -1,1 +1,129 @@
-m=summarise;f=summarise(msgs:@$str):$str{let mcount=msgs.len;let byname=@();lp(let i=0;i<mcount;i=i+1){let name=mut."unknown";let msg=msgs.get(i);if(msg.len>10){name=msg.sub(0;10)};let found=mut.false;lp(let j=0;j<byname.len;j=j+1){if(byname.get(j)=name)){found=true;br};};if(!found){byname.push(name)};};let mtypes=@($str);lp(let i=0;i<mcount;i=i+1){let msg=msgs.get(i);let found=mut.false;lp(let j=0;j<mtypes.len;j=j+1){if(mtypes.get(j)=msg)){found=true;br};};if(!found){mtypes.push(msg)};};let summary=mut."";summary=s.concat(summary;"");summary=s.concat(summary;"");summary=summary+
+m=summarise;
+i=io:std.io;
+i=s:std.str;
+f=substr(txt:$str;start:$i64;len:$i64):$str{
+  <mt s.slice(txt;start as$u64;(start+len) as$u64){$ok:v v;$err:e ""}
+};
+f=parsei(txt:$str):$i64{ <mt s.toint(s.trim(txt)){$ok:v v;$err:e 0} };
+f=jstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx as$u64 + s.len(pat);
+  let rest=mt s.slice(obj;start;s.len(obj)){$ok:v v;$err:e ""};
+  let endi=s.indexof(rest;"\"");
+  if(endi<0){<rest};
+  <mt s.slice(rest;0;endi as$u64){$ok:v v;$err:e ""}
+};
+f=isleap(yr:$i64):$bool{
+  if(yr-yr/4*4=0){
+    if(yr-yr/100*100=0){
+      if(yr-yr/400*400=0){<true}el{<false}
+    }el{<true}
+  }el{<false}
+};
+f=epochsecs(ts:$str):$i64{
+  let yr=parsei(substr(ts;0;4));
+  let mo=parsei(substr(ts;5;2));
+  let dy=parsei(substr(ts;8;2));
+  let hh=parsei(substr(ts;11;2));
+  let mm=parsei(substr(ts;14;2));
+  let ss=parsei(substr(ts;17;2));
+  let days=mut.0;
+  lp(let y=1970;y<yr;y=y+1){
+    if(isleap(y)){days=days+366}el{days=days+365};
+  };
+  let mdays=@(31;28;31;30;31;30;31;31;30;31;30;31);
+  lp(let m=1;m<mo;m=m+1){
+    days=days+mdays.get(m-1);
+    if(m=2){if(isleap(yr)){days=days+1}};
+  };
+  days=days+(dy-1);
+  <days*86400+hh*3600+mm*60+ss
+};
+f=fmtdur(secs:$i64):$str{
+  if(secs=0){<"0s"};
+  let v=mut.secs;
+  let d=v/86400; v=v-d*86400;
+  let h=v/3600; v=v-h*3600;
+  let m=v/60; v=v-m*60;
+  let secv=v;
+  let r=mut."";
+  if(d>0){r=s.concat(r;s.concat(s.fromint(d);"d"))};
+  if(h>0){r=s.concat(r;s.concat(s.fromint(h);"h"))};
+  if(m>0){r=s.concat(r;s.concat(s.fromint(m);"m"))};
+  if(secv>0){r=s.concat(r;s.concat(s.fromint(secv);"s"))};
+  <r
+};
+f=main():$i64{
+  let line=io.readln();
+  let inner=s.trim(line);
+  let lb=s.indexof(inner;"[");
+  let raw=mut.mt s.slice(inner;(lb+1) as$u64;s.len(inner)){$ok:v v;$err:e ""};
+  let rb=s.indexof(raw;"]");
+  if(rb>=0){raw=mt s.slice(raw;0;rb as$u64){$ok:v v;$err:e ""}};
+  let parts=s.split(raw;"},{");
+  let count=mut.0;
+  let pnames=mut.@();
+  let pcounts=mut.@();
+  let tnames=mut.@();
+  let tcounts=mut.@();
+  let firstts=mut."";
+  let lastts=mut."";
+  lp(let i=0;i<parts.len;i=i+1){
+    let obj=parts.get(i);
+    if(s.indexof(obj;"\"sender\"")<0){br};
+    count=count+1;
+    let sender=jstr(obj;"sender");
+    let mtype=jstr(obj;"type");
+    let ts=jstr(obj;"time");
+    let found=mut.false;
+    lp(let j=0;j<pnames.len;j=j+1){
+      if(s.eq(pnames.get(j);sender)){pcounts=pcounts.set(j;pcounts.get(j)+1);found=true;br};
+    };
+    if(!found){pnames=pnames+@(sender);pcounts=pcounts+@(1)};
+    let tfound=mut.false;
+    lp(let j=0;j<tnames.len;j=j+1){
+      if(s.eq(tnames.get(j);mtype)){tcounts=tcounts.set(j;tcounts.get(j)+1);tfound=true;br};
+    };
+    if(!tfound){tnames=tnames+@(mtype);tcounts=tcounts+@(1)};
+    if(count=1){firstts=ts};
+    lastts=ts;
+  };
+  if(count=0){
+    io.println("messages: 0");
+    io.println("participants: 0 ()");
+    io.println("duration: 0s");
+    io.println("types: ");
+    io.println("first: ");
+    io.println("last: ");
+    <0
+  };
+  let npart=pnames.len as$i64;
+  let order=mut.@();
+  lp(let i=0;i<npart;i=i+1){order=order+@(i)};
+  lp(let i=0;i<npart;i=i+1){
+    lp(let j=0;j<npart-1-i;j=j+1){
+      let a=order.get(j); let b=order.get(j+1);
+      if(pcounts.get(a)<pcounts.get(b)){order=order.set(j;b);order=order.set(j+1;a)};
+    };
+  };
+  let pstr=mut."";
+  lp(let i=0;i<npart;i=i+1){
+    let idx=order.get(i);
+    if(i>0){pstr=s.concat(pstr;", ")};
+    pstr=s.concat(pstr;s.concat(s.concat(pnames.get(idx);": ");s.fromint(pcounts.get(idx))));
+  };
+  let tstr=mut."";
+  lp(let i=0;i<tnames.len;i=i+1){
+    if(i>0){tstr=s.concat(tstr;", ")};
+    tstr=s.concat(tstr;s.concat(s.concat(tnames.get(i);"=");s.fromint(tcounts.get(i))));
+  };
+  io.println(s.concat("messages: ";s.fromint(count)));
+  io.println(s.concat(s.concat(s.concat(s.concat("participants: ";s.fromint(npart));" (");pstr);")"));
+  io.println(s.concat("duration: ";fmtdur(epochsecs(lastts)-epochsecs(firstts))));
+  io.println(s.concat("types: ";tstr));
+  io.println(s.concat("first: ";firstts));
+  io.println(s.concat("last: ";lastts));
+  <0
+};

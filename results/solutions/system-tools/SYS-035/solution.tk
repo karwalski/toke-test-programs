@@ -1,1 +1,43 @@
-m=tree;f=printtree(path:$str):$void{let files=mut.@();let dirs=mut.@();let idx=mut.0;let len=path.len;lp(let i=0;i<len;i=i+1){let ch=path.get(i);if(ch="/"){idx=i+1;};};let rest=path.slice(idx;len);let parts=rest.split("/");let n=parts.len;lp(let i=0;i<n;i=i+1){let part=parts.get(i);let isdir=mut.true;let size=mut.0;let ext=mut.part.slice(part.len-4;part.len));if(ext=".txt"){isdir=false;size=100;};if(ext=".jpg"){isdir=false;size=500;};if(ext=".mp3"){isdir=false;size=200;};if(isdir){dirs=dirs+@(part);};if(!(isdir)){files=files+@(part);};};let totalfiles=files.len;let totalsize=mut.0;lp(let i=0;i<totalfiles;i=i+1){let file=files.get(i);let ext=file.slice(file.len-4;
+m=tree;i=io:std.io;i=s:std.str;i=fl:std.file;
+f=fsize(path:$str):$i64{let r=fl.read(path);if(r){<s.len(r) as $i64}el{<0}};
+f=walk(dir:$str;prefix:$str;depth:$i64;maxdepth:$i64):$i64{
+let dcount=mut.0;
+let fcount=mut.0;
+if(maxdepth>0){if(depth>maxdepth){<0}};
+let lst=fl.list(dir);
+let n=lst.len() as $i64;
+lp(let i=0;i<n;i=i+1){
+let name=lst.get(i);
+let p=s.concat(s.concat(dir;"/");name);
+let connector=mut."|-- ";
+if(i=n-1){connector="`-- "};
+if(fl.isdir(p)){
+dcount=dcount+1;
+io.println(s.concat(s.concat(prefix;connector);name));
+let nextpref=mut.s.concat(prefix;"|   ");
+if(i=n-1){nextpref=s.concat(prefix;"    ")};
+let sub=walk(p;nextpref;depth+1;maxdepth);
+dcount=dcount+(sub/10000000);
+fcount=fcount+(sub%10000000)
+}el{
+fcount=fcount+1;
+let sz=fsize(p);
+io.println(s.concat(s.concat(s.concat(prefix;connector);name);s.concat(" (";s.concat(s.fromint(sz);" bytes)"))))
+}
+};
+<dcount*10000000+fcount
+};
+f=main():$i64{
+let dir=s.trim(io.readln());
+let depthstr=s.trim(io.readln());
+let maxdepth=s.toint(depthstr);
+if(fl.exists(dir)){}el{
+io.println(s.concat("ERROR: directory not found: ";dir));
+<0
+};
+io.println(dir);
+let packed=walk(dir;"";1;maxdepth);
+let dirs=packed/10000000;
+let files=packed%10000000;
+io.println(s.concat(s.concat(s.fromint(dirs);" directories, ");s.concat(s.fromint(files);" files")));
+<0}

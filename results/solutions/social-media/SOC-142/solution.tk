@@ -1,1 +1,17 @@
-m=ltdelete;f=deletegroup(gid:$str):$bool{let found=mut.false;let alen=groups.len;lp(let i=0;i<alen;i=i+1){let g=groups.get(i);if(g.gid=gid){groups.remove(i);found=true;i=alen}};<found};f=ltdelete(gid:$str):$i64{let r=deletegroup(gid);if(r){<0};<1};
+m=ltdelete;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let action=json.getstr(d;"action");
+let listid=json.getstr(d;"list_id");
+if(s.eq(action;"delete_list")=false){
+io.println("{\"error\":\"invalid action\"}");
+<1
+};
+let b=s.buf();
+s.add(b;"{\"list_id\":");
+s.add(b;json.enc(listid));
+s.add(b;",\"status\":\"deleted\"}");
+io.println(s.done(b));
+<0}

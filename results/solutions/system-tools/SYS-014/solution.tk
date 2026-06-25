@@ -1,1 +1,52 @@
-m=tempmgr;i=fs:std.fs;f=gentmpname():$str{let chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";let len=chars.len;let name="tmp_";let suffix="";let full=s.concat(name;suffix);<full};f=createtmpfile(name:$str):$str{let path="/tmp/";let full=s.concat(path;name);<full};f=writefilecontent(file:$str;content:$str):$void{let out=fs.write(file;content);<void};f=gentmpfile():$str{let name=gentmpname();let path=createtmpfile(name);let content="temporary data";writefilecontent(path;content);<path};f=listtmpfiles():@$str{let files=fs.listdir("/tmp");let tmpfiles=mut.@();lp(let i=0;i<files.len;i=i+1){let f=files.get(i);let isdot=f.len>1;if(!(isdot)){tmpfiles=tmpfiles+@(f);};};<tmpfiles};f=cleantmpfiles():$i64{let files=listtmpfiles();let count=files.len;lp(let i=0;i<
+m=tempmgr;i=io:std.io;i=s:std.str;i=fl:std.file;i=process:std.process;i=time:std.time;
+f=runcmd(argv:@$str):$str{
+<mt process.spawn(argv){
+Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
+ProcessErr:e ""
+}
+};
+f=mtimeof(path:$str):$i64{
+let out=s.trim(runcmd(@("stat";"-f";"%m";path)));
+if(s.len(out)=0){<0};
+<s.toint(out)
+};
+f=main():$i64{
+let base="/tmp/managed";
+if(fl.exists(base)){}el{fl.mkdir(base)};
+lp(io.eof()=false){
+let raw=io.readln();
+if(io.eof()){if(s.len(raw)=0){br}};
+let line=s.trim(raw);
+if(s.len(line)>0){
+if(s.startswith(line;"CREATE ")){
+let name=s.trim(s.substr(line;7;s.len(line) as $i64));
+let path=s.concat(s.concat(base;"/");name);
+fl.write(path;"");
+io.println(path)
+}
+el{if(s.eq(line;"LIST")){
+let lst=fl.list(base);
+lp(let i=0;i<lst.len();i=i+1){
+let p=s.concat(s.concat(base;"/");lst.get(i));
+io.println(s.concat(s.concat(p;" ");s.fromint(mtimeof(p))))
+}
+}
+el{if(s.startswith(line;"CLEANUP ")){
+let agestr=s.trim(s.substr(line;8;s.len(line) as $i64));
+let age=s.toint(agestr);
+let now=(time.now()/1000) as $i64;
+let lst=fl.list(base);
+let removed=mut.0;
+lp(let i=0;i<lst.len();i=i+1){
+let p=s.concat(s.concat(base;"/");lst.get(i));
+let mtim=mtimeof(p);
+if((now-mtim)>=age){
+fl.delete(p);
+removed=removed+1
+}
+};
+io.println(s.concat(s.concat("Removed ";s.fromint(removed));" files."))
+}}}
+}
+};
+<0}

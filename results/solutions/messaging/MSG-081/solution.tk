@@ -1,1 +1,89 @@
-m=emoji;f=encodeemoji(s:$str):$str{let n=s.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=s.get(i);let zor=mut.false;if(c>127){zor=true};if(!(zor=false)){m=m+1};};let r=mut.""
+m=emoji;
+i=io:std.io;
+i=s:std.str;
+f=codefor(name:$str):$str{
+  if(s.eq(name;"thumbsup")){<"U+1F44D"};
+  if(s.eq(name;"heart")){<"U+2764"};
+  if(s.eq(name;"fire")){<"U+1F525"};
+  if(s.eq(name;"smile")){<"U+1F642"};
+  <"U+0000"
+};
+f=strless(a:$str;b:$str):$bool{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  let n=mut.la;
+  if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let ca=ba.get(i);
+    let cb=bb.get(i);
+    if(ca<cb){<true};
+    if(cb<ca){<false};
+  };
+  if(la<lb){<true};
+  <false
+};
+f=main():$i64{
+  let data=mut."";
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    data=s.concat(data;s.trim(line));
+  };
+  let names=mut.@();
+  let counts=mut.@();
+  let total=mut.0;
+  let parts=s.split(data;"\"emoji\":\"");
+  let np=parts.len;
+  lp(let i=1;i<np;i=i+1){
+    let seg=parts.get(i);
+    let q=s.indexof(seg;"\"");
+    let nm=mut."";
+    if(q<0){nm=seg}el{nm=mt s.slice(seg;0;q as$u64){$ok:v v;$err:e seg}};
+    total=total+1;
+    let found=mut.false;
+    lp(let j=0;j<names.len;j=j+1){
+      if(s.eq(names.get(j);nm)){
+        let cur=counts.get(j);
+        counts=counts.set(j;cur+1);
+        found=true;
+      };
+    };
+    if(!(found)){
+      names=names+@(nm);
+      counts=counts+@(1);
+    };
+  };
+  let n=names.len;
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=0;b<n-1;b=b+1){
+      let ia=order.get(b);
+      let ib=order.get(b+1);
+      let ca=counts.get(ia);
+      let cb=counts.get(ib);
+      let swap=mut.false;
+      if(cb>ca){swap=true};
+      if(cb=ca){
+        if(strless(names.get(ib);names.get(ia))){swap=true};
+      };
+      if(swap){
+        order=order.set(b;ib);
+        order=order.set(b+1;ia);
+      };
+    };
+  };
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let idx=order.get(i);
+    let nm=names.get(idx);
+    let cnt=counts.get(idx);
+    let lineo=s.concat(s.concat(s.concat(s.concat(s.concat(nm;" (");codefor(nm));"): ");s.fromint(cnt));"\n");
+    out=s.concat(out;lineo);
+  };
+  out=s.concat(out;s.concat(s.concat(s.concat(s.concat("total: ";s.fromint(total));", unique: ");s.fromint(n));"\n"));
+  io.print(out);
+  <0
+};

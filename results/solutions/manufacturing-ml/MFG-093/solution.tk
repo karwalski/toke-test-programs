@@ -1,1 +1,94 @@
-m=elbow;f=distance(x1:$f64;y1:$f64;x2:$f64;y2:$f64):$f64{let dx=x2-x1;let dy=y2-y1;if(dx<0 as$f64){let dx=0 as$f64-dx;if(dy<0 as$f64){let dy=0 as$f64-dy;let sumsq=dx*dx+dy*dy;if(sumsq<0 as$f64){<0 as$f64};<sumsq};<dx*dx};};f=kmeans(k:$i64;maxiter:$i64):$i64{let clusters=mut.@();let assignments=mut.@();let i=mut.0;lp(let idx=0;idx<k;idx=idx+1){let cluster=mut.@();lp(let jdx=0;jdx<10;jdx=jdx+1){let point=mut.@();point.push(idx as$f64);point.push(jdx as$f64);cluster.push(point);};clusters.push(cluster);};lp(let iter=0;iter<maxiter;iter=iter+1){
+m=elbow;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{ let v=mut.x; if(v<0.0){if(v>-0.000001){v=0.0}}; <s.format(v;"%.2f") };
+f=main():$i64{
+  let xs=mut.@(0.0); xs=@();
+  let ys=mut.@(0.0); ys=@();
+  let done=mut.0;
+  let first=mut.1;
+  let maxk=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){
+        if(first=1){
+          maxk=s.toint(tl);
+          first=0;
+        }el{
+          let parts=s.split(tl;",");
+          xs=xs+@(s.tofloat(parts.get(0)));
+          ys=ys+@(s.tofloat(parts.get(1)));
+        };
+      };
+    };
+  };
+  let n=xs.len();
+  let wcss=mut.@(0.0); wcss=@();
+  lp(let k=1;k<maxk+1;k=k+1){
+    let cx=mut.@(0.0); cx=@();
+    let cy=mut.@(0.0); cy=@();
+    lp(let j=0;j<k;j=j+1){
+      let idx=mut.0;
+      if(k>1){
+        let f=(j as $f64)*((n-1) as $f64)/((k-1) as $f64);
+        idx=(f+0.5) as $i64;
+      };
+      cx=cx+@(xs.get(idx));
+      cy=cy+@(ys.get(idx));
+    };
+    let asg=mut.@(0); asg=@();
+    lp(let i=0;i<n;i=i+1){ asg=asg+@(0); };
+    lp(let iter=0;iter<50;iter=iter+1){
+      lp(let i=0;i<n;i=i+1){
+        let bestj=mut.0;
+        let bestd=mut.1000000000.0;
+        lp(let j=0;j<k;j=j+1){
+          let dx=xs.get(i)-cx.get(j);
+          let dy=ys.get(i)-cy.get(j);
+          let d=dx*dx+dy*dy;
+          if(d<bestd){bestd=d; bestj=j};
+        };
+        asg=asg.set(i;bestj);
+      };
+      lp(let j=0;j<k;j=j+1){
+        let sx=mut.0.0; let sy=mut.0.0; let cnt=mut.0;
+        lp(let i=0;i<n;i=i+1){
+          if(asg.get(i)=j){ sx=sx+xs.get(i); sy=sy+ys.get(i); cnt=cnt+1; };
+        };
+        if(cnt>0){
+          cx=cx.set(j;sx/(cnt as $f64));
+          cy=cy.set(j;sy/(cnt as $f64));
+        };
+      };
+    };
+    let w=mut.0.0;
+    lp(let i=0;i<n;i=i+1){
+      let j=asg.get(i);
+      let dx=xs.get(i)-cx.get(j);
+      let dy=ys.get(i)-cy.get(j);
+      w=w+dx*dx+dy*dy;
+    };
+    wcss=wcss+@(w);
+  };
+  let kk=wcss.len();
+  let suggested=mut.1;
+  let bestratio=mut.0.0;
+  lp(let i=1;i<kk;i=i+1){
+    let prev=wcss.get(i-1);
+    let cur=wcss.get(i);
+    let drop=prev-cur;
+    let ratio=mut.0.0;
+    if(cur>0.0001){ratio=drop/cur}el{ratio=drop};
+    if(ratio>bestratio){bestratio=ratio; suggested=i+1};
+  };
+  let out=mut."{\"wcss\":[";
+  lp(let i=0;i<kk;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;fmt2(wcss.get(i)));
+  };
+  out=s.concat(out;"]");
+  out=s.concat(out;s.concat(",\"suggested_k\":";s.fromint(suggested)));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

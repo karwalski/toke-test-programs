@@ -1,1 +1,85 @@
-m=memstat;f=parsebytes(s:$str):$i64{let n=s.len;let v=mut.0;let i=mut.0;lp(let j=0;j<n;j=j+1){let c=s.get(j);if(c>47){if(c<58){let d=c-48;v=v*10+d;i=j+1;}}}};if(i<n){let c=s.get(i);if(c>64){if(c<91){let d=c+32;v=v*10+d;i=i+1;}}}};};<v};f=totalbytes(p:$i64;q:$i64):$i64{let b=mut.0;lp(let i=0;i<q;i=i+1){b=b+p;};<b};f=avgbytes(arr:@$i64):$i64{let n=arr.len;let m=mut.0;lp(let i=0;i<n;i=i+1){m=m+arr.get(i);};<m/n};f=maxbytes(arr:@$i64):$i64{let n=arr.len
+m=resmon;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(argv:@$str):$str{
+<mt process.spawn(argv){
+Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
+ProcessErr:e ""
+}
+};
+f=dosleep(secs:$i64):$i64{
+if(secs<=0){<0};
+runcmd(@("sleep";s.fromint(secs)));
+<0
+};
+f=sample():@$i64{
+(* returns @(cpux100_total; memmb_total) *)
+let out=runcmd(@("ps";"-axo";"%cpu=,rss="));
+let lines=s.split(out;"\n");
+let n=lines.len() as $i64;
+let cpu=mut.0;
+let mem=mut.0;
+lp(let i=0;i<n;i=i+1){
+let line=s.trim(lines.get(i));
+if(s.len(line)>0){
+let toks=s.split(line;" ");
+let parts=mut.@();
+lp(let j=0;j<toks.len();j=j+1){
+let t=s.trim(toks.get(j));
+if(s.len(t)>0){parts=parts+@(t)}
+};
+if(parts.len()>=2){
+cpu=cpu+cpux100(parts.get(0));
+mem=mem+(s.toint(parts.get(1))/1024)
+}
+}
+};
+<@(cpu;mem)
+};
+f=cpux100(cpu:$str):$i64{
+let dot=s.indexof(cpu;".");
+if(dot<0){<s.toint(cpu)*100};
+let whole=s.toint(s.substr(cpu;0;dot));
+let fs=s.substr(cpu;dot+1;s.len(cpu) as $i64);
+let frac=mut.0;
+if(s.len(fs)>=2){frac=s.toint(s.substr(fs;0;2))}
+el{if(s.len(fs)=1){frac=s.toint(fs)*10}};
+<whole*100+frac
+};
+f=fmtcpu(x100:$i64):$str{
+let w=x100/100;
+let f=x100%100;
+let fp=mut.s.fromint(f);
+if(f<10){fp=s.concat("0";fp)};
+<s.concat(s.concat(s.fromint(w);".");fp)
+};
+f=main():$i64{
+let interval=s.toint(s.trim(io.readln()));
+let duration=s.toint(s.trim(io.readln()));
+if(interval<=0){
+io.println("ERROR: interval must be > 0");
+<0
+};
+let nsamples=mut.duration/interval;
+if(nsamples<1){nsamples=1};
+let cpumin=mut.0-1;
+let cpumax=mut.0-1;
+let cpusum=mut.0;
+let memmin=mut.0-1;
+let memmax=mut.0-1;
+let memsum=mut.0;
+lp(let i=0;i<nsamples;i=i+1){
+let smp=sample();
+let c=smp.get(0);
+let m=smp.get(1);
+if(cpumin<0){cpumin=c}el{if(c<cpumin){cpumin=c}};
+if(cpumax<0){cpumax=c}el{if(c>cpumax){cpumax=c}};
+cpusum=cpusum+c;
+if(memmin<0){memmin=m}el{if(m<memmin){memmin=m}};
+if(memmax<0){memmax=m}el{if(m>memmax){memmax=m}};
+memsum=memsum+m;
+if(i<nsamples-1){dosleep(interval)}
+};
+let cpuavg=cpusum/nsamples;
+let memavg=memsum/nsamples;
+io.println(s.concat(s.concat(s.concat("CPU%: min=";fmtcpu(cpumin));s.concat(" max=";fmtcpu(cpumax)));s.concat(" avg=";fmtcpu(cpuavg))));
+io.println(s.concat(s.concat(s.concat("MEM_MB: min=";s.fromint(memmin));s.concat(" max=";s.fromint(memmax)));s.concat(" avg=";s.fromint(memavg))));
+<0}

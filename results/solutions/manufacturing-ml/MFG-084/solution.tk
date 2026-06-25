@@ -1,1 +1,87 @@
-m=decompose;f=decompose(vals:@$i64;period:$i64):@$i64{let n=vals.len;let trend=mut.@($i64);let seasonal=mut.@($i64);let residual=mut.@($i64);let sum=mut.0;lp(let i=0;i<n;i=i+1){let v=vals.get(i);sum=sum+v;if(i<period){trend=trend+@(v);seasonal=seasonal+@(v);residual=residual+@(0);}el{let idx=i-i/period*period;let base=i/period*period;let s=mut.0;lp(let j=0;j<period;j=j+1){let k=base+j;if(k<n){s=s+vals.get(k);};};let avg=s/period;let diff=v-avg;let tidx=i-i/period*period;let tbase=i/period*period;let sidx=i-i/period*period;let sbase=i/period*period;let ridx=i-i/period*period;let rbase=i/period*period;let t=trend.get(tidx);
+m=decompose;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=fmt1(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.0000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+
+f=main():$i64{
+  let first=io.readln();
+  let period=s.toint(s.trim(first));
+  let dataline=io.readln();
+  let parts=s.split(s.trim(dataline);",");
+  let n=parts.len();
+  let vals=mut.@(0.0);
+  vals=@();
+  lp(let i=0;i<n;i=i+1){
+    vals=vals+@(s.tofloat(s.trim(parts.get(i))));
+  };
+  let half=period/2;
+  let trend=mut.@(0.0);
+  trend=@();
+  let hastrend=mut.@(0);
+  hastrend=@();
+  lp(let k=0;k<n;k=k+1){
+    let lo=k-half;
+    let hi=k+half;
+    if(lo<0){
+      trend=trend+@(0.0); hastrend=hastrend+@(0);
+    }el{
+      if(hi>n-1){
+        trend=trend+@(0.0); hastrend=hastrend+@(0);
+      }el{
+        let sm=mut.0.0;
+        let cnt=mut.0;
+        lp(let j=lo;j<hi;j=j+1){ sm=sm+vals.get(j); cnt=cnt+1; };
+        let avg=mut.0.0;
+        avg=sm/(cnt as $f64);
+        trend=trend+@(avg); hastrend=hastrend+@(1);
+      };
+    };
+  };
+  let posavg=mut.@(0.0);
+  posavg=@();
+  let total=mut.0.0;
+  lp(let p=0;p<period;p=p+1){
+    let sm=mut.0.0;
+    let cnt=mut.0;
+    lp(let k=0;k<n;k=k+1){
+      let pos=k-k/period*period;
+      if(pos=p){
+        if(hastrend.get(k)=1){
+          let det=mut.0.0;
+          det=vals.get(k)-trend.get(k);
+          sm=sm+det;
+          cnt=cnt+1;
+        };
+      };
+    };
+    let av=mut.0.0;
+    if(cnt>0){ av=sm/(cnt as $f64); };
+    posavg=posavg+@(av);
+    total=total+av;
+  };
+  let center=mut.0.0;
+  center=total/(period as $f64);
+  let seasonal=mut.@(0.0);
+  seasonal=@();
+  lp(let p=0;p<period;p=p+1){ seasonal=seasonal+@(posavg.get(p)-center); };
+  let out=mut."{\"trend\":[";
+  lp(let k=0;k<n;k=k+1){
+    if(k>0){out=s.concat(out;",")};
+    if(hastrend.get(k)=1){ out=s.concat(out;fmt1(trend.get(k))); }el{ out=s.concat(out;"null"); };
+  };
+  out=s.concat(out;"],\"seasonal\":[");
+  lp(let k=0;k<n;k=k+1){
+    if(k>0){out=s.concat(out;",")};
+    let pos=k-k/period*period;
+    out=s.concat(out;fmt1(seasonal.get(pos)));
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
+};

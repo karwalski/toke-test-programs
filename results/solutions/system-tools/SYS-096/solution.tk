@@ -1,14 +1,25 @@
-To list all zombie (defunct) processes on a Unix-like system, you can use the `ps` command. Here is a step-by-step guide to achieve this:
-
-1. Open a terminal.
-2. Run the following command to list all processes, including zombies:
-
-   ```sh
-   ps aux | awk '{if ($8 == "Z")) {print $2, $3, $10}}'
-   ```
-
-   This command uses `ps aux` to get a list of all processes. The `awk` command filters this list to show only processes that are zombies (indicated by `Z` in the 8th column)).
-
-3. The output will show the PID, parent PID, and command name of all zombie processes.
-
-This method provides a quick and effective way to identify and list all zombie processes on a Unix-like system.
+m=zombie;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(c:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";c)){
+    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
+    ProcessErr:e ""
+  }
+};
+f=main():$i64{
+  let out=runcmd("ps -axo pid=,ppid=,state=,comm= | awk '$3 ~ /^Z/ {print $1, $2, $4}'");
+  let lines=s.split(out;"\n");
+  let warm=lines.get(0);
+  let count=mut.0;
+  lp(let i=0;i<(s.len(lines) as $i64);i=i+1){
+    let line=s.trim(lines.get(i));
+    if(s.len(line)>0){
+      io.println(line);
+      count=count+1
+    }
+  };
+  if(count=0){
+    io.println("No zombie processes found")
+  };
+  io.println(s.concat(s.concat("Summary: ";s.fromint(count));" zombie processes."));
+  <0
+}

@@ -1,1 +1,159 @@
-m=logreg;f=train(x:@($i64;$i64));y:@($i64):$i64):$i64{let n=x.len;let m=x.get(0).len+1;let beta=mut.@($i64):$i64;lp(let i=0;i<m;i=i+1){beta=beta+@(0.0)};let lr=0.01;let epochs=1000;lp(let e=0;e<epochs;e=e+1){lp(let i=0;i<n;i=i+1){let pred=mut.0.0;lp(let j=0;j<m;j=j+1){pred=pred+beta.get(j)*x.get(i).get(j)};pred=pred+beta.get(m-1);let label=y.get(i);let err=mut.0.0;if(label=1){err=pred-label}el{err=pred-label};lp(let j=0;j<m;j=j+1){let xj=x.get(i).get(j);beta.get(j)=beta.get(j)-lr*err*xj;};beta.get(m-1)=beta.get(m-1
+m=logreg;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=sigmoid(z:$f64):$f64{
+  let zz=mut.z;
+  if(zz>500.0){zz=500.0};
+  if(zz<-500.0){zz=-500.0};
+  <1.0/(1.0+math.exp(0.0-zz))
+};
+
+f=fmtnum(x:$f64):$str{
+  let v=mut.x;
+  if(v<0.0){if(v>-0.000001){v=0.0}};
+  <s.format(v;"%.2f")
+};
+
+f=main():$i64{
+  let lines=mut.@("");
+  lines=@();
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){lines=lines+@(tl)}
+    }
+  };
+
+  let nlines=lines.len();
+  if(nlines<2){io.println("{}");<0};
+
+  let header=s.split(lines.get(0);",");
+  let ncols=header.len();
+  let nfeat=ncols-1;
+  let nrows=nlines-1;
+
+  // parse data row-major features and labels
+  let feat=mut.@(0.0);
+  feat=@();
+  let lab=mut.@(0.0);
+  lab=@();
+  lp(let r=0;r<nrows;r=r+1){
+    let parts=s.split(lines.get(r+1);",");
+    lp(let c=0;c<nfeat;c=c+1){
+      feat=feat+@(s.tofloat(parts.get(c)))
+    };
+    lab=lab+@(s.tofloat(parts.get(nfeat)))
+  };
+
+  // feature means and stds
+  let mean=mut.@(0.0);
+  mean=@();
+  let std=mut.@(0.0);
+  std=@();
+  lp(let c=0;c<nfeat;c=c+1){
+    let sum=mut.0.0;
+    lp(let r=0;r<nrows;r=r+1){sum=sum+feat.get(r*nfeat+c)};
+    let mu=sum/(nrows as $f64);
+    mean=mean+@(mu);
+    let sd=mut.0.0;
+    lp(let r=0;r<nrows;r=r+1){
+      let d=feat.get(r*nfeat+c)-mu;
+      sd=sd+d*d
+    };
+    sd=math.sqrt(sd/(nrows as $f64));
+    if(sd<0.0000001){sd=1.0};
+    std=std+@(sd)
+  };
+
+  // standardized features
+  let xs=mut.@(0.0);
+  xs=@();
+  lp(let r=0;r<nrows;r=r+1){
+    lp(let c=0;c<nfeat;c=c+1){
+      xs=xs+@((feat.get(r*nfeat+c)-mean.get(c))/std.get(c))
+    }
+  };
+
+  // weights (standardized space) + bias, GD
+  let w=mut.@(0.0);
+  w=@();
+  lp(let c=0;c<nfeat;c=c+1){w=w+@(0.0)};
+  let bias=mut.0.0;
+  let lr=0.1;
+  lp(let it=0;it<1000;it=it+1){
+    // gradients
+    let gw=mut.@(0.0);
+    gw=@();
+    lp(let c=0;c<nfeat;c=c+1){gw=gw+@(0.0)};
+    let gb=mut.0.0;
+    lp(let r=0;r<nrows;r=r+1){
+      let z=mut.bias;
+      lp(let c=0;c<nfeat;c=c+1){
+        z=z+w.get(c)*xs.get(r*nfeat+c)
+      };
+      let p=sigmoid(z);
+      let err=p-lab.get(r);
+      lp(let c=0;c<nfeat;c=c+1){
+        gw=setarr(gw;c;gw.get(c)+err*xs.get(r*nfeat+c))
+      };
+      gb=gb+err
+    };
+    let nf=nrows as $f64;
+    lp(let c=0;c<nfeat;c=c+1){
+      w=setarr(w;c;w.get(c)-lr*gw.get(c)/nf)
+    };
+    bias=bias-lr*gb/nf
+  };
+
+  // convert to original feature space:
+  // z = sum w_c*(x_c-mean_c)/std_c + bias
+  //   = sum (w_c/std_c)*x_c + (bias - sum w_c*mean_c/std_c)
+  let coef=mut.@(0.0);
+  coef=@();
+  let intercept=mut.bias;
+  lp(let c=0;c<nfeat;c=c+1){
+    let co=w.get(c)/std.get(c);
+    coef=coef+@(co);
+    intercept=intercept-w.get(c)*mean.get(c)/std.get(c)
+  };
+
+  // accuracy
+  let correct=mut.0.0;
+  lp(let r=0;r<nrows;r=r+1){
+    let z=mut.intercept;
+    lp(let c=0;c<nfeat;c=c+1){
+      z=z+coef.get(c)*feat.get(r*nfeat+c)
+    };
+    let p=sigmoid(z);
+    let pred=mut.0.0;
+    if(p>=0.5){pred=1.0}el{pred=0.0};
+    if(pred=lab.get(r)){correct=correct+1.0}
+  };
+  let acc=correct/(nrows as $f64);
+
+  let out=mut."{\"coefficients\":[";
+  lp(let c=0;c<nfeat;c=c+1){
+    if(c>0){out=s.concat(out;",")};
+    out=s.concat(out;fmtnum(coef.get(c)))
+  };
+  out=s.concat(out;"],\"intercept\":");
+  out=s.concat(out;fmtnum(intercept));
+  out=s.concat(out;",\"accuracy\":");
+  out=s.concat(out;s.format(acc;"%.1f"));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};
+
+f=setarr(arr:@$f64;idx:$i64;val:$f64):@$f64{
+  let out=mut.@(0.0);
+  out=@();
+  lp(let i=0;i<arr.len();i=i+1){
+    if(i=idx){out=out+@(val)}el{out=out+@(arr.get(i))}
+  };
+  <out
+};

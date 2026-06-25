@@ -1,1 +1,85 @@
-m=hashcheck;f=hashfile(filepath:$str):$str{let result=mut."";let content=mut.std.io:readfile(filepath);let length=content.len;lp(let i=0;i<length;i=i+1){let ch=content.get(i);let tmp=result+ch;result=tmp;};<result};f=hashmanifest(manifest
+m=integrity;i=io:std.io;i=s:std.str;i=file:std.file;i=path:std.path;i=crypto:std.crypto;
+f=listfiles(dir:$str):@$str{
+  let out=mut.@($str);
+  let entries=mt file.list(dir){ $ok:v v; $err:e @($str) };
+  lp(let i=0;i<(entries.len as $i64);i=i+1){
+    let name=entries.get(i);
+    let full=path.join(dir;name);
+    if(file.isdir(full)=(1=0)){out=out+@(full)}
+  };
+  <out
+};
+f=hashof(filepath:$str):$str{
+  <crypto.sha256file(filepath)
+};
+f=build(dir:$str;manifestpath:$str):$i64{
+  let files=listfiles(dir);
+  let body=mut."";
+  lp(let i=0;i<(files.len as $i64);i=i+1){
+    let fp=files.get(i);
+    let h=hashof(fp);
+    body=s.concat(body;fp);
+    body=s.concat(body;"\t");
+    body=s.concat(body;h);
+    body=s.concat(body;"\n")
+  };
+  let wrote=mt file.write(manifestpath;body){ $ok:v v; $err:e (1=0) };
+  let out=mut."Manifest saved: ";
+  out=s.concat(out;manifestpath);
+  out=s.concat(out;" (");
+  out=s.concat(out;s.fromint(files.len as $i64));
+  out=s.concat(out;" files)");
+  io.println(out);
+  <0
+};
+f=hashfor(manifest:$str;target:$str):$str{
+  let lines=s.split(manifest;"\n");
+  lp(let i=0;i<(lines.len as $i64);i=i+1){
+    let line=lines.get(i);
+    if(s.len(line)>0){
+      let parts=s.split(line;"\t");
+      if((parts.len as $i64)>=2){
+        if(s.eq(parts.get(0);target)){<parts.get(1)}
+      }
+    }
+  };
+  <""
+};
+f=check(dir:$str;manifestpath:$str):$i64{
+  let manifest=mt file.read(manifestpath){ $ok:v v; $err:e "" };
+  let okcount=mut.0;
+  let mlines=s.split(manifest;"\n");
+  lp(let i=0;i<(mlines.len as $i64);i=i+1){
+    let line=mlines.get(i);
+    if(s.len(line)>0){
+      let parts=s.split(line;"\t");
+      if((parts.len as $i64)>=2){
+        let fp=parts.get(0);
+        let oldhash=parts.get(1);
+        if(file.exists(fp)){
+          let newhash=hashof(fp);
+          if(s.eq(newhash;oldhash)){okcount=okcount+1}el{io.println(s.concat("MODIFIED ";fp))}
+        }el{io.println(s.concat("MISSING ";fp))}
+      }
+    }
+  };
+  let current=listfiles(dir);
+  lp(let i=0;i<(current.len as $i64);i=i+1){
+    let fp=current.get(i);
+    let known=hashfor(manifest;fp);
+    if(s.len(known)=0){io.println(s.concat("NEW ";fp))}
+  };
+  io.println(s.concat("OK ";s.fromint(okcount)));
+  <0
+};
+f=main():$i64{
+  let dir=s.trim(io.readln());
+  let cmd=s.trim(io.readln());
+  if(s.eq(cmd;"check")){
+    let manifestpath=s.trim(io.readln());
+    <check(dir;manifestpath)
+  };
+  let defaultpath=mut."/tmp/manifest.json";
+  build(dir;defaultpath);
+  <0
+}

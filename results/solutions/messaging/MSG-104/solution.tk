@@ -1,1 +1,73 @@
-m=relay;f=selectrelay(nodes:@$str;latency:@$i64;capacity:@$i64;targetlatency:$i64):$str{let n=nodes.len;let best=mut."";let bestlatency=mut.targetlatency+1;lp(let i=0;i<n;i=i+1){let node=nodes.get(i);let lat=latency.get(i);let cap=capacity.get(i);let isbetter=mut.false;if(lat<bestlatency){isbetter=true};if(!(isbetter=true)){if(lat=bestlatency){if(cap>bestcap){isbetter=true}}}};if(isbetter){best=node;bestlatency=lat;}}};};};};};};};};};};};};};};};};};};};};};};};};}
+m=relay;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let needle=s.concat(s.concat("\"";key);"\":\"");let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"\"");<s.slice(rest;0;endidx)};
+f=getnum(json:$str;key:$str):$str{let needle=s.concat(s.concat("\"";key);"\":");let idx=s.indexof(json;needle);if(idx<0){<"0"};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let num=mut."";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;",")){br};if(s.equals(c;"}")){br};if(s.equals(c;"]")){br};if(s.equals(c;"\"")){br};num=s.concat(num;c)};<s.trim(num)};
+f=scaled(json:$str;key:$str):$i64{let v=getnum(json;key);let fl=s.tofloat(v);let scaled=fl*10.0;<s.toint(s.fromfloat(scaled))};
+f=absi(x:$i64):$i64{if(x<0){<0-x};<x};
+f=main():$i64{
+let senderline=io.readln();
+let recipline=io.readln();
+let nodesline=io.readln();
+let slat=scaled(senderline;"lat");
+let slng=scaled(senderline;"lng");
+let rlat=scaled(recipline;"lat");
+let rlng=scaled(recipline;"lng");
+let direct=absi(slat-rlat)+absi(slng-rlng);
+let body=mut."";
+let lb=s.indexof(nodesline;"[");
+if(lb>=0){body=s.slice(nodesline;lb+1;s.len(nodesline))}el{body=nodesline};
+let objs=s.split(body;"}");
+let ids=mut.@($str);
+let regions=mut.@($str);
+let lats=mut.@($i64);
+let caps=mut.@($i64);
+let scores=mut.@($i64);
+lp(let i=0;i<objs.len();i=i+1){
+let o=objs.get(i);
+if(s.indexof(o;"\"id\"")>=0){
+let id=getstr(o;"id");
+let region=getstr(o;"region");
+let latency=mut.0;latency=s.toint(getnum(o;"latency_ms"));
+let cap=mut.0;cap=s.toint(getnum(o;"capacity_pct"));
+if(cap<=95){
+let nlat=scaled(o;"lat");
+let nlng=scaled(o;"lng");
+let via=absi(slat-nlat)+absi(slng-nlng)+absi(nlat-rlat)+absi(nlng-rlng);
+let detour=via-direct;
+let proxscore=mut.0;
+proxscore=100-detour/10;
+if(proxscore<0){proxscore=0};
+let latscore=mut.0;
+latscore=100-latency;
+if(latscore<0){latscore=0};
+let capscore=100-cap;
+let score=mut.0;
+score=(proxscore*40+latscore*30+capscore*30)/100;
+ids=ids+@(id);
+regions=regions+@(region);
+lats=lats+@(latency);
+caps=caps+@(cap);
+scores=scores+@(score)
+}
+}
+};
+let n=ids.len();
+lp(let i=0;i<n;i=i+1){
+lp(let k=0;k<n-1;k=k+1){
+if(scores.get(k)<scores.get(k+1)){
+let ts=scores.get(k);scores=scores.set(k;scores.get(k+1));scores=scores.set(k+1;ts);
+let ti=ids.get(k);ids=ids.set(k;ids.get(k+1));ids=ids.set(k+1;ti);
+let tr=regions.get(k);regions=regions.set(k;regions.get(k+1));regions=regions.set(k+1;tr);
+let tl=lats.get(k);lats=lats.set(k;lats.get(k+1));lats=lats.set(k+1;tl);
+let tc=caps.get(k);caps=caps.set(k;caps.get(k+1));caps=caps.set(k+1;tc)
+}
+}
+};
+lp(let i=0;i<n;i=i+1){
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.fromint(i+1);". ");ids.get(i));" (score: ");s.fromint(scores.get(i)));") - ");regions.get(i));s.concat(", ";s.fromint(lats.get(i))));"ms, ");s.concat(s.fromint(caps.get(i));"% cap")))
+};
+if(n>0){
+io.println(s.concat(s.concat("recommended path: sender -> ";ids.get(0));" -> recipient"))
+}el{
+io.println("no relay available")
+};
+<0}

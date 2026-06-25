@@ -1,1 +1,168 @@
-m=md2html;f=version():$str{<""};f=htmltag(cls:$str):$str{<""};f=csslink(href:$str):$str{<""};f=isempty(s:$str):$bool{<false};f=trim(s:$str):$str{<""};f=tolower(s:$str):$str{<""};f=charat(s:$str;i:$i64):$str{<""};f=strlen(s:$str):$i64{<0};f=replace(s:$str;old:$str;new:$str):$str{<""};f=isemptyor(s:$str):$bool{<false};f=trimand(s:$str):$str{<""};f=tolowerand(s:$str):$str{<""};f=charatand(s:$str;i:$i64):$str{<""};f=strlenand(s:$str):$i64{<0};f=replaceand(s:$str;old:$str;new:$str):$str{<""};f=isemptyorand(s:$str):$bool{<false};f=trim
+m=md2html;
+i=io:std.io;
+i=s:std.str;
+
+f=escape(text:$str):$str{
+  let n=s.len(text);
+  let b=s.bytes(text);
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let c=b.get(i);
+    if(c=38){out=s.concat(out;"&amp;")}el{
+    if(c=60){out=s.concat(out;"&lt;")}el{
+    if(c=62){out=s.concat(out;"&gt;")}el{
+      out=s.concat(out;s.substr(text;i;i+1));
+    }}};
+  };
+  <out
+};
+
+f=inline(text:$str):$str{
+  let esc=escape(text);
+  let n=s.len(esc);
+  let b=s.bytes(esc);
+  let out=mut."";
+  let open=mut.true;
+  let i=mut.0;
+  lp(i<n){
+    let c=b.get(i);
+    if(i+1<n&&c=42&&b.get(i+1)=42){
+      if(open){out=s.concat(out;"<strong>")}el{out=s.concat(out;"</strong>")};
+      open=!open;
+      i=i+2;
+    }el{
+      if(i+1<n&&c=95&&b.get(i+1)=95){
+        out=s.concat(out;"_");
+        i=i+1;
+      }el{
+        out=s.concat(out;s.substr(esc;i;i+1));
+        i=i+1;
+      };
+    };
+  };
+  <out
+};
+
+f=headlevel(line:$str):$i64{
+  let n=s.len(line);
+  let b=s.bytes(line);
+  let lvl=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    if(b.get(i)=35){lvl=lvl+1}el{br};
+  };
+  if(lvl>0&&lvl<n&&b.get(lvl)=32){<lvl};
+  <0
+};
+
+f=startsdash(line:$str):$bool{
+  let n=s.len(line);
+  if(n<2){<false};
+  let b=s.bytes(line);
+  <b.get(0)=45&&b.get(1)=32
+};
+
+f=startsnum(line:$str):$bool{
+  let n=s.len(line);
+  if(n<3){<false};
+  let b=s.bytes(line);
+  let i=mut.0;
+  lp(i<n){
+    let c=b.get(i);
+    if(c>=48&&c<=57){i=i+1}el{br};
+  };
+  if(i=0){<false};
+  if(i+1<n&&b.get(i)=46&&b.get(i+1)=32){<true};
+  <false
+};
+
+f=numcontent(line:$str):$str{
+  let n=s.len(line);
+  let b=s.bytes(line);
+  let i=mut.0;
+  lp(i<n){
+    let c=b.get(i);
+    if(c>=48&&c<=57){i=i+1}el{br};
+  };
+  <s.substr(line;i+2;n)
+};
+
+f=renderblock(block:$str):$str{
+  let lines=s.split(block;"\n");
+  let firstline=lines.get(0);
+  let hl=headlevel(firstline);
+  if(hl>0){
+    let content=inline(s.substr(firstline;hl+1;s.len(firstline)));
+    let tag=s.fromint(hl);
+    let out=mut.s.concat("<h";tag);
+    out=s.concat(out;">");
+    out=s.concat(out;content);
+    out=s.concat(out;"</h");
+    out=s.concat(out;tag);
+    out=s.concat(out;">");
+    <out
+  };
+  if(startsdash(firstline)){
+    let out=mut."<ul>";
+    lp(let i=0;i<lines.len;i=i+1){
+      let ln=lines.get(i);
+      if(startsdash(ln)){
+        let item=inline(s.substr(ln;2;s.len(ln)));
+        out=s.concat(out;"\n<li>");
+        out=s.concat(out;item);
+        out=s.concat(out;"</li>");
+      };
+    };
+    out=s.concat(out;"\n</ul>");
+    <out
+  };
+  if(startsnum(firstline)){
+    let out=mut."<ol>";
+    lp(let i=0;i<lines.len;i=i+1){
+      let ln=lines.get(i);
+      if(startsnum(ln)){
+        let item=inline(numcontent(ln));
+        out=s.concat(out;"\n<li>");
+        out=s.concat(out;item);
+        out=s.concat(out;"</li>");
+      };
+    };
+    out=s.concat(out;"\n</ol>");
+    <out
+  };
+  let joined=mut."";
+  let firstj=mut.true;
+  lp(let i=0;i<lines.len;i=i+1){
+    if(!firstj){joined=s.concat(joined;" ")};
+    joined=s.concat(joined;lines.get(i));
+    firstj=false;
+  };
+  let out=mut.s.concat("<p>";inline(joined));
+  out=s.concat(out;"</p>");
+  <out
+};
+
+f=main():$i64{
+  let all=mut."";
+  let first=mut.true;
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    if(!first){all=s.concat(all;"\n")};
+    all=s.concat(all;line);
+    first=false;
+  };
+  let blocks=s.split(all;"\n\n");
+  let body=mut."";
+  lp(let i=0;i<blocks.len;i=i+1){
+    let blk=s.trim(blocks.get(i));
+    if(s.len(blk)=0){}el{
+      body=s.concat(body;"\n");
+      body=s.concat(body;renderblock(blk));
+    };
+  };
+  let out=mut."<!DOCTYPE html>\n<html>\n<head><meta charset=\"utf-8\"></head>\n<body>";
+  out=s.concat(out;body);
+  out=s.concat(out;"\n</body>\n</html>");
+  io.println(out);
+  <0
+};

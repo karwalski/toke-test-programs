@@ -1,1 +1,73 @@
-m=lastlog;i=lastlog():$str{let out=mut."";let h=mut.0;lp(let i=0;i<100;i=i+1){let s=mut."";lp(let j=0;j<10;j=j+1){s=s.concat(s;"*");};out=s.concat(out;s);h=h+1;};<out};
+m=lastlog;i=io:std.io;i=s:std.str;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=field(line:$str;n:$i64):$str{
+  let parts=s.split(line;" ");
+  let idx=mut.0;
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=parts.get(i as $u64);
+    if(s.len(p)>0){
+      idx=idx+1;
+      if(idx=n){<p};
+    };
+  };
+  <""
+};
+f=monthnum(mon:$str):$str{
+  if(s.eq(mon;"Jan")){<"01"};
+  if(s.eq(mon;"Feb")){<"02"};
+  if(s.eq(mon;"Mar")){<"03"};
+  if(s.eq(mon;"Apr")){<"04"};
+  if(s.eq(mon;"May")){<"05"};
+  if(s.eq(mon;"Jun")){<"06"};
+  if(s.eq(mon;"Jul")){<"07"};
+  if(s.eq(mon;"Aug")){<"08"};
+  if(s.eq(mon;"Sep")){<"09"};
+  if(s.eq(mon;"Oct")){<"10"};
+  if(s.eq(mon;"Nov")){<"11"};
+  if(s.eq(mon;"Dec")){<"12"};
+  <"01"
+};
+f=pad2(x:$str):$str{
+  if(s.len(x)<(2 as $u64)){<s.concat("0";x)};
+  <x
+};
+f=main():$i64{
+  let year=s.trim(runcmd("date +%Y"));
+  let whotext=runcmd("who");
+  let lines=s.split(whotext;"\n");
+  lp(let i=0;i<lines.len;i=i+1){
+    let line=s.trim(lines.get(i as $u64));
+    if(s.len(line)>0){
+      let user=field(line;1);
+      let tty=field(line;2);
+      let day=field(line;3);
+      let mon=field(line;4);
+      let tm=field(line;5);
+      let from=mut.field(line;6);
+      if(s.len(from)=0){from="local"};
+      let logintime=mut."";
+      logintime=s.concat(logintime;year);
+      logintime=s.concat(logintime;"-");
+      logintime=s.concat(logintime;monthnum(mon));
+      logintime=s.concat(logintime;"-");
+      logintime=s.concat(logintime;pad2(day));
+      logintime=s.concat(logintime;" ");
+      logintime=s.concat(logintime;tm);
+      let out=mut."";
+      out=s.concat(out;user);out=s.concat(out;" ");
+      out=s.concat(out;tty);out=s.concat(out;" ");
+      out=s.concat(out;logintime);out=s.concat(out;" ");
+      out=s.concat(out;from);
+      io.println(out);
+    };
+  };
+  <0
+}

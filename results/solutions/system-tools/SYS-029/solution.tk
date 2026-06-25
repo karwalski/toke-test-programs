@@ -1,1 +1,37 @@
-m=procmon;i=process:std.process;i=log:std.log;f=spawnandmonitor(cmd:$str):$void{let h=process.spawn(cmd);let signals=@("SIGINT";"SIGTERM";"SIGHUP");lp(let i=0;i<signals.len;i=i+1){let s=signals.get(i);let handled=mut.false;let handler=process.on(s;h);if(handler=handler){handled=true};if(handled){log.info("procmon: intercepted "+s)}el{log.warn("procmon: failed to intercept "+s))};let exitcode=process.wait(h);log.info(s.concat("procmon: child process exited with code ";exitcode) as$str)};f=main():$void{let cmd="sleep 3600";spawnandmonitor(cmd)};
+m=procmon;i=io:std.io;i=s:std.str;i=process:std.process;i=os:std.os;
+f=run(argv:@$str;prog:$str):$i64{
+<mt process.spawn(argv){
+Handle:h (run2(h));
+ProcessErr:e (notfound(prog))
+}
+};
+f=notfound(prog:$str):$i64{
+io.println(s.concat("ERROR: command not found: ";prog));
+<1
+};
+f=run2(h:Handle):$i64{
+io.println(s.concat("Child started: ";s.fromint(os.getpid())));
+let out=mt process.stdout(h){
+$str:x x;
+ProcessErr:e ""
+};
+if(s.len(out)>0){io.print(out)};
+let code=mt process.wait(h){
+i32:c c;
+ProcessErr:e 0
+};
+io.println(s.concat("Child exited: code=";s.fromint(code as $i64)));
+<0
+};
+f=main():$i64{
+let cmd=s.trim(io.readln());
+if(s.len(cmd)=0){<0};
+let parts=s.split(cmd;" ");
+let prog=parts.get(0);
+let argv=mut.@(prog);
+lp(let i=1;i<parts.len();i=i+1){
+let a=s.trim(parts.get(i));
+if(s.len(a)>0){argv=argv+@(a)}
+};
+run(argv;prog);
+<0}

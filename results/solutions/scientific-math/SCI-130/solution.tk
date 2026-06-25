@@ -1,1 +1,43 @@
-m=quake;i=io:std.io;i=s:std.str;i=math:std.math;f=fastinvsqrt(x:$f64):$f64{let xhalf=0.5*x;let threehalfs=1.5;let y=mut.0.0;if(x>3.9){if(x<4.1){y=0.499985}}el{if(x>1.9){if(x<2.1){y=0.706825}}el{if(x>0.24){if(x<0.26){y=1.999395}}}};if(y=0.0){y=1.0/math.sqrt(x)};let ytmp=mut.y;ytmp=ytmp*(threehalfs-xhalf*ytmp*ytmp);ytmp=ytmp*(threehalfs-xhalf*ytmp*ytmp);<ytmp};f=main():$i64{let x1=s.tofloat(s.trim(io.readln()));let fast1=fastinvsqrt(x1);let exact1=1.0/math.sqrt(x1);let error1=math.abs((fast1-exact1)/exact1)*100.0;io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.format(x1;"%.1f");": fast=");s.format(fast1;"%.6f"));" exact=");s.format(exact1;"%.6f"));" error=");s.format(error1;"%.2f"));"%"));let x2=s.tofloat(s.trim(io.readln()));let fast2=fastinvsqrt(x2);let exact2=1.0/math.sqrt(x2);let error2=math.abs((fast2-exact2)/exact2)*100.0;io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.format(x2;"%.1f");": fast=");s.format(fast2;"%.6f"))," exact=");s.format(exact2;"%.6f"));" error=");s.format(error2;"%.2f"));"%"));let x3=s.tofloat(s.trim(io.readln()));let fast3=fastinvsqrt(x3);let exact3=1.0/math.sqrt(x3);let error3=math.abs((fast3-exact3)/exact3)*100.0;io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.format(x3;"%.1f");": fast=");s.format(fast3;"%.6f"));" exact=");s.format(exact3;"%.6f"));" error=");s.format(error3;"%.2f"));"%"));<0}
+m=quake;i=io:std.io;i=s:std.str;i=math:std.math;
+f=tobits(x:$f64):$i64{
+let lg=mut.0.0;lg=math.log(x)/0.6931471805599453;
+let e=mut.0.0;e=math.floor(lg);
+let p=mut.0.0;p=math.pow(2.0;e);
+let m=mut.0.0;m=x/p-1.0;
+let ms=mut.0.0;ms=m*8388608.0+0.5;
+let mant=mut.0.0;mant=math.floor(ms);
+let mi=mut.0;mi=mant as$i64;
+let ei=mut.0;ei=e as$i64;
+<(127+ei)*8388608+mi};
+f=frombits(b:$i64):$f64{
+let ei=b/8388608;
+let mi=b-ei*8388608;
+let ef=mut.0.0;ef=(ei-127) as$f64;
+let p=mut.0.0;p=math.pow(2.0;ef);
+let mf=mut.0.0;mf=(mi as$f64)/8388608.0;
+let one=mut.0.0;one=1.0+mf;
+<p*one};
+f=fastinvsqrt(x:$f64):$f64{
+let i=mut.tobits(x);
+i=1597463007-(i>>1);
+let y=mut.frombits(i);
+let xhalf=mut.0.0;xhalf=0.5*x;
+let t=mut.0.0;t=xhalf*y*y;
+let nf=mut.0.0;nf=1.5-t;
+y=y*nf;
+<y};
+f=line(raw:$str;x:$f64):$str{
+let fast=mut.fastinvsqrt(x);
+let exact=mut.0.0;exact=1.0/math.sqrt(x);
+let d=mut.0.0;d=fast-exact;
+let a=mut.0.0;a=math.abs(d);
+let r=mut.0.0;r=a/exact;
+let err=mut.0.0;err=r*100.0;
+<s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(raw;": fast=");s.format(fast;"%.6f"));" exact=");s.format(exact;"%.6f"));" error=");s.concat(s.format(err;"%.2f");"%")))};
+f=main():$i64{
+lp(1=1){
+let l=s.trim(io.readln());
+if(s.len(l)=0){br};
+io.println(line(l;s.tofloat(l)));
+};
+<0};

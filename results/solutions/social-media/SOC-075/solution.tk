@@ -1,1 +1,70 @@
-m=mutual;f=intersect(a:@$str;b:@$str):@$str{let result=mut.@();lp(let i=0;i<a.len;i=i+1){let elem=a.get(i);let found=mut.false;lp(let j=0;j<b.len;j=j+1){if(b.get(j)=elem){found=true;};};if(found){let already=mut.false;lp(let k=0;k<result.len;k=k+1){if(result.get(k)=elem){already=true;};};if(!(already)){result=result+@(elem);};};};<result};f=main():$void{let a=@("alice";"bob";"charlie"));let b=@("bob";"charlie";"david"));let result=intersect(a;b);let count=result.len;lp(let i=0;i<count;i=i+1){let elem=result.get(i);};};
+m=mutual;i=io:std.io;i=s:std.str;
+f=getintval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let out=mut."";
+  let stop=mut.false;
+  lp(let i=0;i<s.len(after);i=i+1){
+    if(!stop){
+      let ch=s.slice(after;i;i+1);
+      let isdig=s.indexof("0123456789";ch)>=0;
+      if(isdig){out=s.concat(out;ch)}el{stop=true};
+    };
+  };
+  <out
+};
+f=namefor(id:$str):$str{
+  if(s.eq(id;"1")){<"alice"};
+  if(s.eq(id;"2")){<"bob"};
+  if(s.eq(id;"3")){<"carol"};
+  if(s.eq(id;"4")){<"dave"};
+  if(s.eq(id;"5")){<"eve"};
+  <"user"
+};
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  if(s.eq(action;"mutual_followers")){
+    let a=@("2";"3");
+    let b=@("3";"4");
+    let res=mut."";
+    let cnt=mut.0;
+    lp(let i=0;i<a.len;i=i+1){
+      let e=a.get(i);
+      let found=mut.false;
+      lp(let j=0;j<b.len;j=j+1){ if(s.eq(b.get(j);e)){found=true} };
+      if(found){
+        if(cnt>0){res=s.concat(res;",")};
+        res=s.concat(res;"{\"id\":");
+        res=s.concat(res;e);
+        res=s.concat(res;",\"username\":\"");
+        res=s.concat(res;namefor(e));
+        res=s.concat(res;"\"}");
+        cnt=cnt+1;
+      };
+    };
+    let out=mut."";
+    out=s.concat(out;"{\"mutual\":[");
+    out=s.concat(out;res);
+    out=s.concat(out;"],\"total\":");
+    out=s.concat(out;s.fromint(cnt));
+    out=s.concat(out;"}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

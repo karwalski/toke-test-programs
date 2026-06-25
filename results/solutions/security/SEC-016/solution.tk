@@ -1,1 +1,26 @@
-m=securecheck;f=checksecure(url:$str):$str{let result=mut."";let https=url.contains("https");if(https){result="Secure"}el{result="Insecure"};<result};f=main():$void{let url=mut."";let line=mut."";let i=mut.0;lp(let idx=0;idx<1;idx=idx+1){let tmp=mut."";lp(let ch=0;ch<1;ch=ch+1){tmp=tmp+ch;};line=s.concat(line;tmp);};url=line;<url};f=run():$void{let url=main();let report=checksecure(url);<report};
+m=securecheck;i=io:std.io;i=s:std.str;
+f=grade(score:$i64):$str{if(score<50){<"F"};if(score<65){<"D"};if(score<80){<"C"};if(score<90){<"B"};<"A"};
+f=main():$i64{
+let url=s.trim(io.readln());
+let https=mut.0;if(s.indexof(url;"https")=0){https=1};
+let score=mut.0;
+if(https=1){score=40};
+let out=mut.s.concat(s.concat("{\"url\":\"";url);"\",");
+out=s.concat(out;s.concat(s.concat("\"score\":";s.fromint(score));","));
+out=s.concat(out;s.concat(s.concat("\"grade\":\"";grade(score));"\","));
+out=s.concat(out;"\"headers\":{");
+let names=mut.@();
+names=names+@("Strict-Transport-Security");
+names=names+@("Content-Security-Policy");
+names=names+@("X-Frame-Options");
+names=names+@("X-Content-Type-Options");
+names=names+@("Referrer-Policy");
+names=names+@("Permissions-Policy");
+names=names+@("Cross-Origin-Opener-Policy");
+lp(let i=0;i<names.len;i=i+1){
+if(i>0){out=s.concat(out;",")};
+out=s.concat(out;s.concat(s.concat("\"";names.get(i));"\":{\"present\":false,\"status\":\"missing\"}"));
+};
+out=s.concat(out;"}}");
+io.println(out);
+<0};

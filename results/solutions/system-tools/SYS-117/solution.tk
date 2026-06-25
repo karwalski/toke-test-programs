@@ -1,34 +1,92 @@
-To list all executables in PATH directories, you can use the following Python script. This script will search through each directory listed in the `PATH` environment variable. It will then list all executable files found in these directories. You can optionally filter the results by a specific name prefix.
-
-```python
-import os
-import sys
-
-def is_executable(file_path):
-    """Check if the file is executable."""
-    return os.access(file_path, os.X_OK))
-
-def list_executables_in_path(prefix=''):
-    """List all executable files in PATH directories."""
-    path_directories = os.environ.get('PATH', '').split(os.pathsep)
-    executables = []
-
-    for dir_path in path_directories:
-        if not os.path.isdir(dir_path)):
-            continue
-        for file_name in os.listdir(dir_path):
-            if prefix and not file_name.startswith(prefix):
-                continue
-            file_path = os.path.join(dir_path, file_name))
-            if is_executable(file_path):
-                executables.append(file_path)
-
-    return executables
-
-def main(prefix=''):
-    executables = list_executables_in_path(prefix)
-    for executable in executables:
-        print(executable)
-
-if __name__ == '__main__':
-    prefix = sys.argv[1] if
+m=pathscan;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;
+f=listdir(dir:$str):@$str{
+  <mt file.list(dir){
+    Ok:v v;
+    FileErr:e @()
+  }
+};
+f=contains(arr:@$str;needle:$str):$bool{
+  let found=mut.(1=0);
+  lp(let i=0;i<(arr.len as $i64);i=i+1){
+    if(s.eq(arr.get(i as $u64);needle)){found=(1=1)}
+  };
+  <found
+};
+f=strless(a:$str;b:$str):$bool{
+  let la=(s.len(a) as $i64);
+  let lb=(s.len(b) as $i64);
+  let n=mut.la;
+  if(lb<la){n=lb};
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  let res=mut.0;
+  let done=mut.(1=0);
+  lp(let i=0;i<n;i=i+1){
+    if(done=(1=0)){
+      let ca=(ba.get(i as $u64) as $i64);
+      let cb=(bb.get(i as $u64) as $i64);
+      if(ca<cb){res=0-1;done=(1=1)}
+      el{if(ca>cb){res=1;done=(1=1)}}
+    }
+  };
+  if(done=(1=0)){if(la<lb){res=0-1}el{if(la>lb){res=1}}};
+  <(res<0)
+};
+f=main():$i64{
+  let prefix=mut."";
+  if(io.eof()=(1=0)){
+    let raw=io.readln();
+    prefix=s.trim(raw)
+  };
+  let path=mt env.get("PATH"){
+    $str:v v;
+    EnvErr:e ""
+  };
+  let dirs=s.split(path;":");
+  let seen=mut.@();
+  let outs=mut.@();
+  lp(let d=0;d<(dirs.len as $i64);d=d+1){
+    let dir=dirs.get(d as $u64);
+    if(s.len(dir)>0){
+      let names=listdir(dir);
+      lp(let n=0;n<(names.len as $i64);n=n+1){
+        let name=names.get(n as $u64);
+        let keep=mut.(1=1);
+        if(s.len(prefix)>0){
+          if(s.startswith(name;prefix)=(1=0)){keep=(1=0)}
+        };
+        if(keep){
+          if(contains(seen;name)){keep=(1=0)}
+        };
+        if(keep){
+          seen=seen+@(name);
+          let full=s.concat(s.concat(dir;"/");name);
+          outs=outs+@(full)
+        }
+      }
+    }
+  };
+  let cnt=(outs.len as $i64);
+  let sorted=mut.@();
+  lp(let k=0;k<cnt;k=k+1){
+    let cur=outs.get(k as $u64);
+    let pos=mut.0;
+    let placed=mut.(1=0);
+    let slen=(sorted.len as $i64);
+    lp(let j=0;j<slen;j=j+1){
+      if(placed=(1=0)){
+        if(strless(cur;sorted.get(j as $u64))){pos=j;placed=(1=1)}
+      }
+    };
+    if(placed=(1=0)){pos=slen};
+    let rebuilt=mut.@();
+    lp(let j=0;j<pos;j=j+1){rebuilt=rebuilt+@(sorted.get(j as $u64))};
+    rebuilt=rebuilt+@(cur);
+    lp(let j=pos;j<slen;j=j+1){rebuilt=rebuilt+@(sorted.get(j as $u64))};
+    sorted=rebuilt
+  };
+  lp(let i=0;i<cnt;i=i+1){
+    io.println(sorted.get(i as $u64))
+  };
+  <0
+}

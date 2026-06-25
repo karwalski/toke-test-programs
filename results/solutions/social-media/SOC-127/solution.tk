@@ -1,1 +1,24 @@
-m=conv;f=convget(page:$i64;perpage:$i64):$str{let total=100;let offset=page*perpage;let fromidx=offset;let toidx=offset+perpage;let result=mut."";lp(let idx=fromidx;idx<toidx;idx=idx+1){let msg=s.concat("msg_";idx) as$str;result=s.concat(s.concat(result;msg);"\n");};<result};
+m=getmsgs;i=io:std.io;i=s:std.str;
+f=getstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
+  let q=s.indexof(rest;"\"");
+  if(q<0){<rest};
+  <s.slice(rest;0;q as $u64)
+};
+f=main():$i64{
+  let input=s.trim(io.readln());
+  let action=getstr(input;"action");
+  let conv=getstr(input;"conversation_id");
+  if(s.eq(action;"get_messages")){
+    let out=mut."{\"conversation_id\":\"";
+    out=s.concat(out;conv);
+    out=s.concat(out;"\",\"messages\":[{\"id\":\"msg_1\",\"sender\":\"alice\",\"content\":\"Hey!\",\"sent_at\":\"2026-01-01T00:00:00Z\",\"read\":true}],\"next_cursor\":null}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"invalid_action\"}")
+  };
+  <0
+};

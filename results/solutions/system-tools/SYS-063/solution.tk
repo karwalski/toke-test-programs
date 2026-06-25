@@ -1,1 +1,50 @@
-m=encode;f=caesarencrypt(s:$str;shift:$i64):$str{let n=s.len;let result=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);let islower=mut.false;if(c>96){if(c<123){islower=true}};if(islower){let base=97;let offset=c-base;let newoffset=offset+shift;let wrapped=newoffset-(newoffset/26)*26;let newc=base+wrapped;result=s.concat(result;newc) as$str}el{result=s.concat(result;c) as$str}}};<result};f=solve(p0:$str;p1:$i64):$str{let encoded=caesarencrypt(p0;p1);let len=encoded.len;let pass2=mut."";lp(let i=0;i<len;i=i+1){let ch=encoded.get(i);let islower=mut.false;if(ch>96){if(ch<123){islower=true}};if(islower){let newch=ch-32;pass2=s.concat(pass2;newch) as$str}el{pass2
+m=randgen;i=io:std.io;i=s:std.str;i=crypto:std.crypto;
+f=randint(min:$i64;max:$i64):$i64{
+  let span=mut.1;
+  if(max>=min){span=max-min+1};
+  let b=crypto.randombytes(4 as $u64);
+  let r=mut.0;
+  lp(let i=0;i<4;i=i+1){r=(r*256)+(b.get(i) as $i64)};
+  if(r<0){r=0-r};
+  <min+(r-((r/span)*span))
+};
+f=randchar():$str{
+  let charset=mut."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let idx=randint(0;61);
+  <s.slice(charset;idx as $u64;(idx+1) as $u64)
+};
+f=main():$i64{
+  let typ=s.trim(io.readln());
+  let countraw=s.trim(io.readln());
+  let count=mt s.toint(countraw){$i64:v v; ParseErr:e 0};
+  if(s.eq(typ;"string")){
+    let length=mt s.toint(s.trim(io.readln())){$i64:v v; ParseErr:e 8};
+    lp(let n=0;n<count;n=n+1){
+      let out=mut."";
+      lp(let i=0;i<length;i=i+1){out=s.concat(out;randchar())};
+      io.println(out)
+    };
+    <0
+  };
+  let rangeraw=s.trim(io.readln());
+  let rparts=s.split(rangeraw;" ");
+  let mn=mut.0;
+  let mx=mut.100;
+  if((rparts.len as $i64)>0){mn=mt s.toint(s.trim(rparts.get(0))){$i64:v v; ParseErr:e 0}};
+  if((rparts.len as $i64)>1){mx=mt s.toint(s.trim(rparts.get(1))){$i64:v v; ParseErr:e 100}};
+  if(s.eq(typ;"bytes")){
+    let b=crypto.randombytes(count as $u64);
+    lp(let i=0;i<(b.len as $i64);i=i+1){io.println(s.fromint(b.get(i) as $i64))};
+    <0
+  };
+  if(s.eq(typ;"float")){
+    lp(let n=0;n<count;n=n+1){
+      let iv=randint(mn;mx);
+      let frac=randint(0;999);
+      io.println(s.concat(s.concat(s.fromint(iv);".");s.fromint(frac)))
+    };
+    <0
+  };
+  lp(let n=0;n<count;n=n+1){io.println(s.fromint(randint(mn;mx)))};
+  <0
+}

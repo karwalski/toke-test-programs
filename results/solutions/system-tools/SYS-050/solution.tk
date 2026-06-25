@@ -1,1 +1,70 @@
-m=fmt;f=solve(p0:$str;p1:$str;p2:$str):$str{let n=p0.len;let m=p1.len;let l=p2.len;let maxlen=mut.n;if(m>maxlen){maxlen=m};if(l>maxlen){maxlen=l};let result=mut."";lp(let i=0;i<n;i=i+1){let ch=p0.charat(i);result=s.concat(result;ch);};lp(let i=n;i<maxlen;i=i+1){result=s.concat(result;p1.charat(i-n));};result=s.concat(result;p2);lp(let i=0;i<result.len;i=i+1){let ch=result.charat(i);print(ch);};<""};
+m=fmt;i=io:std.io;i=s:std.str;
+f=pad(cell:$str;width:$i64;align:$str):$str{
+  let clen=s.len(cell) as $i64;
+  let total=mut.0;
+  if(width>clen){total=width-clen};
+  let out=mut."";
+  if(s.eq(align;"right")){
+    lp(let i=0;i<total;i=i+1){out=s.concat(out;" ")};
+    out=s.concat(out;cell)
+  }el{
+    if(s.eq(align;"center")){
+      let left=total/2;
+      let right=total-left;
+      lp(let i=0;i<left;i=i+1){out=s.concat(out;" ")};
+      out=s.concat(out;cell);
+      lp(let i=0;i<right;i=i+1){out=s.concat(out;" ")}
+    }el{
+      out=s.concat(out;cell);
+      lp(let i=0;i<total;i=i+1){out=s.concat(out;" ")}
+    }
+  };
+  <out
+};
+f=main():$i64{
+  let header=io.readln();
+  let parts=s.split(s.trim(header);"\t");
+  let sepin=mut."|";
+  let align=mut."left";
+  if((parts.len as $i64)>0){sepin=parts.get(0)};
+  if((parts.len as $i64)>2){align=parts.get(2)};
+  let rows=mut.@();
+  lp(io.eof()=(1=0)){
+    let raw=io.readln();
+    if(io.eof()){if(s.len(raw)=0){br}};
+    let line=mut.raw;
+    if(s.endswith(line;"\n")){line=s.slice(line;0 as $u64;((s.len(line) as $i64) - 1) as $u64)};
+    if(s.len(line)>0){rows=rows+@(line)}
+  };
+  let nrows=rows.len as $i64;
+  let ncol=mut.0;
+  lp(let r=0;r<nrows;r=r+1){
+    let cols=s.split(rows.get(r);sepin);
+    if((cols.len as $i64)>ncol){ncol=cols.len as $i64}
+  };
+  let widths=mut.@();
+  lp(let c=0;c<ncol;c=c+1){
+    let w=mut.0;
+    lp(let r=0;r<nrows;r=r+1){
+      let cols=s.split(rows.get(r);sepin);
+      if(c<(cols.len as $i64)){
+        let cell=cols.get(c);
+        if((s.len(cell) as $i64)>w){w=s.len(cell) as $i64}
+      }
+    };
+    widths=widths+@(w)
+  };
+  lp(let r=0;r<nrows;r=r+1){
+    let cols=s.split(rows.get(r);sepin);
+    let outline=mut."";
+    lp(let c=0;c<ncol;c=c+1){
+      if(c>0){outline=s.concat(outline;"  ")};
+      let cval=mut."";
+      if(c<(cols.len as $i64)){cval=cols.get(c)};
+      let w=widths.get(c);
+      outline=s.concat(outline;pad(cval;w;align))
+    };
+    io.println(outline)
+  };
+  <0
+}

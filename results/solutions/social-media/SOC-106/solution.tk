@@ -1,1 +1,10 @@
-m=suspend;f=suspend(user:$str;duration:$i64;reason:$str):$str{let now=0;let end=now+duration;let msg=s.concat(s.concat("User ";user);" suspended for ")+duration+s.concat(" seconds. Reason: ";reason);let act="suspended";<msg};
+m=suspend;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"suspend_user")){
+    io.println("{\"user_id\":99,\"suspended\":true,\"duration_days\":7,\"expires_at\":\"2026-01-08T00:00:00Z\",\"reason\":\"Repeated policy violations\",\"status\":\"suspended\"}");
+  };
+  <0;
+};

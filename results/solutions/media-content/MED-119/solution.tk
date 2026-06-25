@@ -1,1 +1,32 @@
-m=markdown;f=isempty(s:$str):$bool{let len=std.str.len(s);if(len=0){<true};<false};f=isspace(c:$str):$bool{let len=std.str.len(c);if(!(len=1))){<false};let ch=std.str.charat(c;0);if(ch=" "){<true};if(ch="\t"){<true};<false};f=firstnonspace(s:$str):$str{let len=std.str.len(s);let start=mut.0;lp(let idx=0;idx<len;idx=idx+1){let ch=std.str.charat(s;idx);if(!(isspace(ch))){start=idx;br}};let result=mut."";let end=mut.len;lp(let idx=start;idx<len;idx=idx+1){let ch=std.str.charat(s;idx);if(isspace(ch)){end=idx;br};result=s.concat(result;ch);};let finalresult=mut."";lp(let idx=0;idx<result.len;idx=idx+1){let ch=result.charat(idx);if(!(isspace(ch)))){finalresult=s.concat(finalresult;ch);};};<finalresult};f=classifyfirstline(line:$str):$str{let len=std.str.len(line);if(len=0){<""};let firstchar=std.str.charat(line;0);if(firstchar="#"){let secondchar=std.str.charat(line;1);if(secondchar=" "){<""};<""};if(firstchar="-"){let secondchar=std.str.charat(line;1);if(secondchar=" "){<""};<""};if(firstchar="*"){let secondchar=std.str.charat(line;1);if(secondchar=" "){<""};<""};if(firstchar="1"){let secondchar=std.str.charat(line;1);if(secondchar="."){let thirdchar=std.str.charat(line;2);if(thirdchar=" "){<""};<""};<""};<""};f=classifyline(line:$str):$str{let len=std.str.len(line);if(len=0){<""};let firstchar=std.str.charat(line;0);if(firstchar="#"){let secondchar=std.str.charat(line;1);if(secondchar=" "){<""};<""};if(firstchar="-"){let secondchar=std.str.charat(line;1);if(secondchar=" "){<""};<""};if(firstchar="*"){let secondchar=std.str.charat(line;1);if(secondchar=" "){<""};<""};if(firstchar="1"){let secondchar=std.str.charat(line;1);if(secondchar="."){let thirdchar=std.str.charat(line;2);if(thirdchar=" "){<""};<""};<""};<""};f=classifyparagraph(lines:@$str):$str{let len=lines.len;if(len=0){<""};let firstline=lines.get(0);let firstchar=std.str.charat(firstline;0);if(firstchar="#"){let secondchar=std.str.charat(firstline;1);if(secondchar=" "){<""};<""};if(firstchar="-"){let secondchar=std.str.charat(firstline;1);if(secondchar=" "){<""};<""};if(firstchar="*"){let secondchar=std.str.charat(firstline;1);if(secondchar=" "){<""};<""};if(firstchar="1"){let secondchar=std.str.charat(firstline;1);if(secondchar="."){let thirdchar=std.str.charat(firstline;2);if(thirdchar=" "){<""};<""};<""};<""};f=isemptystr
+m=markdown;
+i=io:std.io;
+i=s:std.str;
+
+f=isallcaps(line:$str):$bool{
+  let b=s.bytes(line);
+  let n=b.len;
+  let hasletter=mut.false;
+  let ok=mut.true;
+  lp(let i=0;i<n;i=i+1){
+    let c=b.get(i);
+    if(c>=65&&c<=90){hasletter=true};
+    if(c>=97&&c<=122){ok=false};
+  };
+  if(!hasletter){<false};
+  <ok
+};
+
+f=main():$i64{
+  lp(!io.eof()){
+    let line=io.readln();
+    if(io.eof()&&s.len(line)=0){br};
+    let out=mut.line;
+    if(s.len(line)>0){
+      if(isallcaps(line)){
+        out=s.concat("# ";line);
+      };
+    };
+    io.println(out);
+  };
+  <0
+};

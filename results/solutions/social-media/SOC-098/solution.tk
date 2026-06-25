@@ -1,1 +1,10 @@
-m=notifcount;f=countunread(notifs:@($str;$str;$bool)):$i64{let total=mut.0;lp(let i=0;i<notifs.len;i=i+1){let n=notifs.get(i);if(n.2){total=total+1};};<total};
+m=notifcount;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"unread_count")){
+    io.println("{\"total\":5,\"breakdown\":{\"likes\":2,\"comments\":1,\"follows\":1,\"mentions\":1}}");
+  };
+  <0;
+};

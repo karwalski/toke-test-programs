@@ -1,1 +1,30 @@
-m=enc;f=simpleencode(n:$i64):$i64{if(n<0){<n};let mod2=n-n/2*2;if(mod2=0){<n+1};<n-1};f=rotateleft(arr:@$i64;n:$i64):@$i64{let len=arr.len;let m=n-n/len*len;let result=mut.@();lp(let i=0;i<len;i=i+1){let newidx=i+m;let newidx2=newidx-newidx/len*len;result=result+@(arr.get(newidx2)));};<result};f=encryptround(key:@$i64;val:$i64):$i64{let idx=val-val/4*4;let pass1=key.get(idx)+val;let pass2=pass1+key.get(idx);let m=pass2-pass2/4*4;<m};f=encrypt(key:@$i64;val:$i64):$i64{let r=mut.val;lp(let i=0;i<4;i=i+1){r=encryptround(key;r);};<r};f
+m=onion;i=io:std.io;i=s:std.str;
+f=relayname(elem:$str):$str{let u=s.indexof(elem;"_");if(u<0){<elem};<s.slice(elem;0;u)};
+f=main():$i64{
+let arrline=s.trim(io.readln());
+let recipient=s.trim(io.readln());
+let plaintext=s.trim(io.readln());
+let inner=s.slice(arrline;1;s.len(arrline)-1);
+let parts=s.split(inner;",");
+let names=mut.@($str);
+lp(let i=0;i<parts.len();i=i+1){
+let p=s.trim(parts.get(i));
+let q=mut.p;
+if(s.startswith(p;"\"")){q=s.slice(p;1;s.len(p)-1)};
+names=names+@(relayname(q));
+};
+let r=names.len();
+lp(let li=r;li>0;li=li-1){
+let i=r-li;
+let nm=names.get(i);
+let lbl=mut."";
+if(li=r){lbl=s.concat("layer ";s.concat(s.fromint(li);s.concat(" (outermost, for ";s.concat(nm;"):"))))}el{lbl=s.concat("layer ";s.concat(s.fromint(li);s.concat(" (for ";s.concat(nm;"):"))))};
+io.println(lbl);
+let nexthop=mut."";
+if(i+1<r){nexthop=names.get(i+1)}el{nexthop="recipient"};
+io.println(s.concat("  next_hop: ";nexthop));
+io.println("  encrypted: base64");
+};
+io.println("layer 0 (for recipient):");
+io.println(s.concat("  plaintext: ";plaintext));
+<0}

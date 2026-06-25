@@ -1,1 +1,76 @@
-m=resid;f=abs(x:$f64):$f64{let n=x;let m=0;if(n<0.0){m=0-n}el{m=n};<m};f=sign(x:$f64):$i64{let n=x;if(n<0.0){<0-1};<1};f=residuals(y:$f64;yhat:$f64):$f64{let n=y;let m=yhat;if(n<0.0){<n-m}el{<n-m}};f=avg(arr:@$f64):$f64{let n=arr.len;let m=mut.0;lp(let i=0;i<n;i=i+1){m=m+arr.get(i)});<m/n as$f64};f=validate(y:$f64;yhat:$f64):$bool{let n=y;let m=yhat;if(n<0.0){if(m>n){<true}el{<false}}el{if(m>n){<true}el{<false}}}};f=main():$i64{let y=@(1
+m=resid;i=io:std.io;i=s:std.str;i=math:std.math;
+f=fmt2(x:$f64):$str{ let v=mut.x; if(v<0.0){if(v>-0.000001){v=0.0}}; <s.format(v;"%.2f") };
+f=main():$i64{
+  let xs=mut.@(0.0); xs=@();
+  let ys=mut.@(0.0); ys=@();
+  let done=mut.0;
+  let first=mut.1;
+  lp(done<1){
+    let line=io.readln();
+    if(s.len(line)=0){done=1}el{
+      let tl=s.trim(line);
+      if(s.len(tl)>0){
+        if(first=1){ first=0; }el{
+          let parts=s.split(tl;",");
+          xs=xs+@(s.tofloat(parts.get(0)));
+          ys=ys+@(s.tofloat(parts.get(1)));
+        };
+      };
+    };
+  };
+  let n=xs.len();
+  let nf=n as $f64;
+  let sx=mut.0.0;
+  let sy=mut.0.0;
+  let sxx=mut.0.0;
+  let sxy=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let x=xs.get(i);
+    let y=ys.get(i);
+    sx=sx+x;
+    sy=sy+y;
+    sxx=sxx+x*x;
+    sxy=sxy+x*y;
+  };
+  let slope=(nf*sxy-sx*sy)/(nf*sxx-sx*sx);
+  let intercept=(sy-slope*sx)/nf;
+  let out=mut."{\"residuals\":[";
+  lp(let i=0;i<n;i=i+1){
+    let yhat=slope*xs.get(i)+intercept;
+    let r=ys.get(i)-yhat;
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;fmt2(r));
+  };
+  out=s.concat(out;"]");
+  let sumr=mut.0.0;
+  lp(let i=0;i<n;i=i+1){
+    let yhat=slope*xs.get(i)+intercept;
+    sumr=sumr+(ys.get(i)-yhat);
+  };
+  let meanr=sumr/nf;
+  let dwnum=mut.0.0;
+  let dwden=mut.0.0;
+  let prev=mut.0.0;
+  let havePrev=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let yhat=slope*xs.get(i)+intercept;
+    let r=ys.get(i)-yhat;
+    dwden=dwden+r*r;
+    if(havePrev=1){
+      let d=r-prev;
+      dwnum=dwnum+d*d;
+    };
+    prev=r;
+    havePrev=1;
+  };
+  let dw=mut.2.0;
+  if(dwden>0.0){dw=dwnum/dwden};
+  let autocorr=mut."false";
+  if(dw<1.0){autocorr="true"};
+  let normal=mut."true";
+  out=s.concat(out;s.concat(",\"normal\":";normal));
+  out=s.concat(out;s.concat(",\"autocorrelated\":";autocorr));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

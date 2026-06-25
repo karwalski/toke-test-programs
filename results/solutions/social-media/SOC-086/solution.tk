@@ -1,1 +1,50 @@
-m=hashtag;f=extracthashtag(line:$str):$str{let len=line.len;let idx=mut.0;let found=mut.false;lp(let i=0;i<len;i=i+1){let ch=line.get(i);if(ch="#"){found=true;idx=i+1;};};if(found){let start=idx;let end=mut.len;lp(let i=start;i<len;i=i+1){let ch=line.get(i);if(ch=" "){end=i;br;};};if(!(end>start))){end=start+1;};let hashtag=line.substr(start;end-start);<hashtag}el{<""}};f=countusage(hashtags:@$str;line:$str):i64{let count=mut.0;let len=hashtags.len;lp(let i=0;i<len;i=i+1){let h=hashtags.get(i);if(h.len>0){let found=h.len>0;if(found){count=count+1;};};};<count};f=ispopular(hashtag:$str;usagecount:i64):bool{let popular=mut.false;if(hashtag.len>0)){if(usagecount>100){popular=true;}el
+m=hashtag;i=io:std.io;i=s:std.str;
+f=getstrval(obj:$str;key:$str):$str{
+  let pat=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+s.len(pat);
+  let after=s.slice(obj;start;s.len(obj));
+  let cl=s.indexof(after;"\"");
+  if(cl<0){<""};
+  <s.slice(after;0;cl)
+};
+f=startswith(str:$str;pre:$str):$bool{
+  if(s.len(pre)>s.len(str)){<false};
+  <s.eq(s.slice(str;0;s.len(pre));pre)
+};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let action=getstrval(line;"action");
+  let prefix=getstrval(line;"prefix");
+  if(s.eq(action;"search_hashtags")){
+    let tags=@("programming";"productivity";"python";"design");
+    let counts=@("1500";"800";"600";"400");
+    let res=mut."";
+    let n=mut.0;
+    lp(let i=0;i<tags.len;i=i+1){
+      if(startswith(s.lower(tags.get(i));s.lower(prefix))){
+        if(n>0){res=s.concat(res;",")};
+        let cnt=counts.get(i);
+        let trending=mut."false";
+        if(s.toint(cnt)>=1000){trending="true"};
+        res=s.concat(res;"{\"tag\":\"");
+        res=s.concat(res;tags.get(i));
+        res=s.concat(res;"\",\"post_count\":");
+        res=s.concat(res;cnt);
+        res=s.concat(res;",\"trending\":");
+        res=s.concat(res;trending);
+        res=s.concat(res;"}");
+        n=n+1;
+      };
+    };
+    let out=mut."";
+    out=s.concat(out;"{\"hashtags\":[");
+    out=s.concat(out;res);
+    out=s.concat(out;"]}");
+    io.println(out)
+  }el{
+    io.println("{\"status\":\"error\"}")
+  };
+  <0
+}

@@ -1,4 +1,165 @@
 m=configdiff;
 i=io:std.io;
 i=s:std.str;
-f=splitlines(text:$str):@$str{let lines=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<text.len;idx=idx+1){let ch=text.get(idx);if(ch="\n"){lines=lines+@(current);current="";}el{current=current+ch;};};if(!(current="")){lines=lines+@(current);};<lines};f=parsecfgline(line:$str):$str{let eqidx=line.indexof("=");if(eqidx<0){<""};let key=line.substring(0;eqidx);<key};f=parseiniheader(line:$str):$str{let bracketidx=line.indexof("[");let closebracketidx=line.indexof("]");if(bracketidx<0){<""};if(closebracketidx<0){<""};if(!(bracketidx=0)){<""};if(!(closebracketidx=line.len-1)){<""};let sectionname=line.substring(bracketidx+1;closebracketidx);<sectionname};f=diffcfgfiles(file1:$str;file2:$str):$str{let result="No differences";<result};f=main():$i64{let file1=io.readln();let file2=io.readln();let result=diffcfgfiles(file1;file2);io.println(result);<0}
+i=file:std.file;
+
+f=readfile(path:$str):$str{
+  let res=mt file.read(path){
+    $str:c c;
+    FileErr:e ""
+  };
+  <res
+};
+
+f=strip(x:$str):$str{
+  let t=s.trim(x);
+  let n=s.len(t);
+  if(n<2){<t};
+  let first=s.slice(t;0;1);
+  let last=s.slice(t;(n-1);n);
+  if(s.eq(first;"\"")){
+    if(s.eq(last;"\"")){
+      <s.slice(t;1;(n-1))
+    };
+  };
+  <t
+};
+
+f=cleankey(k:$str):$str{
+  let t=s.trim(k);
+  let n=s.len(t);
+  if(n<2){<t};
+  let first=s.slice(t;0;1);
+  let last=s.slice(t;(n-1);n);
+  if(s.eq(first;"\"")){
+    if(s.eq(last;"\"")){
+      <s.slice(t;1;(n-1))
+    };
+  };
+  <t
+};
+
+f=stripcomma(v:$str):$str{
+  let t=s.trim(v);
+  let n=s.len(t);
+  if(n<1){<t};
+  let last=s.slice(t;(n-1);n);
+  if(s.eq(last;",")){
+    <s.trim(s.slice(t;0;(n-1)))
+  };
+  <t
+};
+
+f=keyat(keys:@$str;i:$u64):$str{ <keys.get(i) };
+f=valat(vals:@$str;i:$u64):$str{ <vals.get(i) };
+
+f=findval(keys:@$str;vals:@$str;key:$str):$str{
+  let n=keys.len;
+  let out=mut."__MISSING__";
+  lp(let i=0;(i as $u64)<n;i=i+1){
+    if(s.eq(keys.get(i);key)){
+      out=vals.get(i);
+    };
+  };
+  <out
+};
+
+f=haskey(keys:@$str;key:$str):$bool{
+  let n=keys.len;
+  let found=mut.(1=0);
+  lp(let i=0;(i as $u64)<n;i=i+1){
+    if(s.eq(keys.get(i);key)){ found=(1=1); };
+  };
+  <found
+};
+
+f=main():$i64{
+  let p1=s.trim(io.readln());
+  let p2=s.trim(io.readln());
+  let isini=s.endswith(p1;".ini");
+  let sep=mut.":";
+  if(isini){ sep="="; };
+
+  let t1=readfile(p1);
+  let t2=readfile(p2);
+
+  let lines1=s.split(t1;"\n");
+  let lines2=s.split(t2;"\n");
+
+  let k1=mut.@();
+  let v1=mut.@();
+  let k2=mut.@();
+  let v2=mut.@();
+
+  let n1=lines1.len;
+  lp(let i=0;(i as $u64)<n1;i=i+1){
+    let ln=s.trim(lines1.get(i));
+    if(!s.eq(ln;"")){
+      let pos=s.indexof(ln;sep);
+      if(pos>=0){
+        let kk=cleankey(s.slice(ln;0;(pos as $u64)));
+        let vv=strip(stripcomma(s.slice(ln;((pos+1) as $u64);s.len(ln))));
+        if(!s.eq(kk;"")){
+          if(!s.eq(kk;"{")){
+            k1=k1+@(kk);
+            v1=v1+@(vv);
+          };
+        };
+      };
+    };
+  };
+
+  let n2=lines2.len;
+  lp(let i=0;(i as $u64)<n2;i=i+1){
+    let ln=s.trim(lines2.get(i));
+    if(!s.eq(ln;"")){
+      let pos=s.indexof(ln;sep);
+      if(pos>=0){
+        let kk=cleankey(s.slice(ln;0;(pos as $u64)));
+        let vv=strip(stripcomma(s.slice(ln;((pos+1) as $u64);s.len(ln))));
+        if(!s.eq(kk;"")){
+          if(!s.eq(kk;"{")){
+            k2=k2+@(kk);
+            v2=v2+@(vv);
+          };
+        };
+      };
+    };
+  };
+
+  let out=mut."";
+  let any=mut.(1=0);
+
+  let c1=k1.len;
+  lp(let i=0;(i as $u64)<c1;i=i+1){
+    let key=k1.get(i);
+    let val=v1.get(i);
+    if(haskey(k2;key)){
+      let nv=findval(k2;v2;key);
+      if(!s.eq(nv;val)){
+        out=s.concat(out;s.concat(s.concat(s.concat("~ ";key);s.concat(": ";val));s.concat(s.concat(" -> ";nv);"\n")));
+        any=(1=1);
+      };
+    }el{
+      out=s.concat(out;s.concat(s.concat("- ";key);s.concat(s.concat(": ";val);"\n")));
+      any=(1=1);
+    };
+  };
+
+  let c2=k2.len;
+  lp(let i=0;(i as $u64)<c2;i=i+1){
+    let key=k2.get(i);
+    let val=v2.get(i);
+    if(!haskey(k1;key)){
+      out=s.concat(out;s.concat(s.concat("+ ";key);s.concat(s.concat(": ";val);"\n")));
+      any=(1=1);
+    };
+  };
+
+  if(any){
+    io.print(out);
+  }el{
+    io.println("No differences");
+  };
+  <0
+}

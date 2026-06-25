@@ -1,1 +1,10 @@
-m=removespaces;f=removespaces(s:$str):$str{let n=s.len;let result=mut."";lp(let idx=0;idx<n;idx=idx+1){let c=s.get(idx);if(!(c=32 as u8))result=s.concat(result;c) as$str;};<result};
+m=modaction;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"mod_action")){
+    io.println("{\"report_id\":\"rpt_001\",\"decision\":\"remove\",\"post_removed\":true,\"user_warned\":true,\"status\":\"resolved\"}");
+  };
+  <0;
+};

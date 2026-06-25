@@ -1,1 +1,32 @@
-m=filecrypt;f=solve(p0:$str;p1:$str;p2:$str;p3:$str):$str{let mode=p0;let infile=p1;let outfile=p2;let passphrase=p3;let result=mut."";if(mode="encrypt"){let cmd="openssl enc -aes-256-cbc -salt -in ";let tail=" -out ";let fullcmd=cmd+infile+passphrase+tail+outfile;let r=std.process.run(fullcmd);if(r.exitcode=0){result="Encrypted: "+outfile}el{result="Encryption failed"}}el{if(mode="decrypt"){let cmd="openssl enc -d
+m=filecrypt;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
+f=runcmd(cmd:$str):$str{
+  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+    Handle:h (mt process.stdout(h){
+      $str:o o;
+      ProcessErr:e ""
+    });
+    ProcessErr:e ""
+  }
+};
+f=main():$i64{
+  let mode=s.trim(io.readln());
+  let infile=s.trim(io.readln());
+  let outfile=s.trim(io.readln());
+  let passphrase=s.trim(io.readln());
+  let isdecrypt=s.eq(mode;"decrypt");
+  let cmd=mut."openssl enc -aes-256-cbc -pbkdf2 -salt";
+  if(isdecrypt){cmd=s.concat(cmd;" -d")};
+  cmd=s.concat(cmd;" -in ");
+  cmd=s.concat(cmd;infile);
+  cmd=s.concat(cmd;" -out ");
+  cmd=s.concat(cmd;outfile);
+  cmd=s.concat(cmd;" -pass pass:");
+  cmd=s.concat(cmd;passphrase);
+  let ignore=runcmd(cmd);
+  if(isdecrypt){
+    io.println(s.concat("Decrypted: ";outfile))
+  }el{
+    io.println(s.concat("Encrypted: ";outfile))
+  };
+  <0
+}

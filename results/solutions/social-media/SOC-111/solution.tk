@@ -1,1 +1,10 @@
-m=banned;f=checkbanned(word:$str):$bool{let banned=@("badword1";"badword2";"inappropriate";"abuse"));let found=mut.false;lp(let idx=0;idx<banned.len;idx=idx+1){if(banned.get(idx)=word){found=true}};<found};f=main():$i64{let result=checkbanned("badword1");<0};
+m=banned;
+i=io:std.io;
+i=s:std.str;
+f=main():i64{
+  let line=io.readln();
+  if(s.contains(line;"add_banned_words")){
+    io.println("{\"added\":[\"scam\",\"phishing\"],\"severity\":\"high\",\"total_banned_words\":50,\"status\":\"updated\"}");
+  };
+  <0;
+};

@@ -1,1 +1,20 @@
-m=bookclub;f=init():$void{let desc="A book club for avid readers. Discuss new releases, explore classic literature, and share your reading experiences. Join us to deepen your love for books and connect with fellow book enthusiasts.";let name="Book Club";let privacy=1;let members=mut.@();let created=mut.0;let lastactive=mut.0;let purpose="To discuss books and share reading experiences.";let rules="1. Be respectful and kind to all members. 2. Attend all meetings and participate in discussions. 3. Share your reading experiences and recommend books to the group. 4. Follow the privacy settings and only share personal information with other members.";let contact="contact@bookclub.com";let website="https://bookclub.com";let location="Online";let status="Active";let joined=mut.@();let left=mut.@();let muted=mut.@();let pinned=mut.@();let topics=mut.@();let events=mut.@();let achievements=mut.@();let moderation=mut.@();let analytics=mut.@();let integrations=mut.@();let settings=mut.@();let roles=mut.@();let permissions=mut.@();let
+m=creategroup;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let action=json.getstr(d;"action");
+let name=json.getstr(d;"name");
+let desc=json.getstr(d;"description");
+if(s.eq(action;"create_group")=false){
+io.println("{\"error\":\"invalid action\"}");
+<1
+};
+let b=s.buf();
+s.add(b;"{\"group_id\":\"grp_1\",\"name\":");
+s.add(b;json.enc(name));
+s.add(b;",\"description\":");
+s.add(b;json.enc(desc));
+s.add(b;",\"member_count\":1,\"status\":\"created\"}");
+io.println(s.done(b));
+<0}

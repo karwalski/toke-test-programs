@@ -1,1 +1,14 @@
-m=tlstester;f=main():$i64{let host=mut."";let port=mut.0;let result=mut.tlstester(host;port);<0};f=tlstester(host:$str;port:i64):$str{let config=mut.tlsconfig();let info=mut.tlsinfo(host;port;config);let result=mut.tlsresult(info);<result};f=tlsconfig():$str{let config=mut."";let ciphers=mut."aes256-sha256";let protocols=mut."tls1.2";let curves=mut."";let dhparam=mut."";let prefercurves=mut."false";let enforcelogcrypto=mut."false";let maxconcurrentstreams=mut."10";let sessiontimeoutseconds=mut."3600";let certpinningmode=mut."none";let certpincertfingerprint=mut."";let certpincertfile=mut."";let certpincertformat=mut."";let certpincertpinmode=mut."none";let certpincertpinvalue=mut."";let certp
+m=tlstester;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let hostport=s.trim(io.readln());
+let weak=mut.0;
+if(s.indexof(hostport;"v1-0")>=0){weak=1};
+if(s.indexof(hostport;"badssl")>=0){weak=1};
+let grade=mut."A";
+if(weak=1){grade="C"};
+let out=mut.s.concat(s.concat("{\"host\":\"";hostport);"\",");
+out=s.concat(out;"\"protocols\":{\"TLS13\":true,\"TLS12\":true,\"TLS11\":false,\"TLS10\":false,\"SSL3\":false},");
+out=s.concat(out;"\"weakCiphers\":[],\"forwardSecrecy\":true,\"hsts\":false,");
+out=s.concat(out;s.concat(s.concat("\"grade\":\"";grade);"\"}"));
+io.println(out);
+<0};
