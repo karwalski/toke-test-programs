@@ -1,1 +1,28 @@
-m=chessclock;f=chessclock(startwhite:$i64;startblack:$i64;movesequence:$str;elapsedtimes:$i64):$str{let white=mut.startwhite;let black=mut.startblack;let moves=movesequence.split(" ");let times=elapsedtimes;lp(let i=0;i<moves.len;i=i+1){let m=moves.get(i);if(i=0){let w=mut.white;let b=mut.black;lp(let j=0;j<times;j=j+1){let wtmp=w-1;if(wtmp<0){let btmp=b-1;if(btmp<0){w=0;b=0;}el{b=btmp;};}el{w=wtmp;};};if(w=0){let result="White time expired. Black wins.";<result;}el{let btmp=b-1;if(btmp<0){b=0;}el{b=btmp;};};}el
+m=chessclock;
+i=io:std.io;
+i=s:std.str;
+f=toi(x:$str):$i64{ let r=mt s.toint(x){ $ok:v v; $err:e 0 }; <r };
+f=main():$i64{
+  let initline=io.readln();
+  if(s.len(initline)=0){ <0 };
+  let init=toi(s.trim(initline));
+  let white=mut.init;
+  let black=mut.init;
+  let k=mut.0;
+  let stop=mut.false;
+  lp(let i=0;i<100000;i=i+1){
+    if(stop){ br };
+    let line=io.readln();
+    if(s.len(line)=0){ br };
+    let e=toi(s.trim(line));
+    let whiteturn=mut.true;
+    let half=k-(k/2)*2;
+    if(half=1){ whiteturn=false };
+    if(whiteturn){ white=white-e } el{ black=black-e };
+    let out=mut.s.concat(s.concat(s.concat("White: ";s.fromint(white));"s Black: ");s.concat(s.fromint(black);"s"));
+    if(whiteturn){ if(white<=0){ out=s.concat(out;" - White flags!"); stop=true } } el{ if(black<=0){ out=s.concat(out;" - Black flags!"); stop=true } };
+    io.println(out);
+    k=k+1;
+  };
+  <0
+};

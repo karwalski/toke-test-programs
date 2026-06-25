@@ -1,1 +1,82 @@
-m=mergesort;f=merge(x:@$i64;y:@$i64):@$i64{let result=mut.@();let i=mut.0;let j=mut.0;lp(let k=0;k<x.len+y.len;k=k+1){if(i<x.len){if(j<y.len){if(x.get(i)<y.get(j)){result=result+@(x.get(i));i=i+1;}el{result=result+@(y.get(j));j=j+1;};}el{result=result+@(x.get(i));i=i+1;);};}el{if(j<y.len){result=result+@(y.get(j));j=j+1;);};};};<result};f=mergesort(arr:@$i64):@$i64{if(arr.len<2){<arr};let mid=arr.len/2;let left=mut.@();let right=mut.@();lp(let i=0;i<mid;i=i+1){left=left+@(arr.get(i)));};lp(let j=mid;j<arr.len;j=j+1){right=right+@(arr.get(j)));};let sortedleft=mergesort
+m=mergesort;
+i=io:std.io;
+i=s:std.str;
+
+f=joincomma(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(",";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=joinspace(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(" ";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=merge(x:@i64;y:@i64):@i64{
+  let result=mut.@();
+  let i=mut.0;
+  let j=mut.0;
+  lp(1=1){
+    if(i>=x.len){
+      if(j>=y.len){br};
+      result=result.push(y.get(j));j=j+1;
+    }el{
+      if(j>=y.len){
+        result=result.push(x.get(i));i=i+1;
+      }el{
+        if(x.get(i)<=y.get(j)){
+          result=result.push(x.get(i));i=i+1;
+        }el{
+          result=result.push(y.get(j));j=j+1;
+        };
+      };
+    };
+  };
+  <result
+};
+
+f=main():i64{
+  let line=io.readln();
+  let parts=s.split(line;" ");
+  let runs=mut.@();
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=parts.get(i);
+    if(s.len(p)>0){
+      runs=runs.push(@(s.toint(p)));
+    };
+  };
+  let n=runs.len;
+  lp(1=1){
+    if(runs.len<=1){br};
+    let next=mut.@();
+    lp(let k=0;k<runs.len;k=k+2){
+      if(k+1<runs.len){
+        let a=runs.get(k);
+        let b=runs.get(k+1);
+        let m=merge(a;b);
+        if(m.len>2){
+          io.println(s.concat("Merge [";s.concat(joincomma(a);s.concat("] + [";s.concat(joincomma(b);s.concat("] -> [";s.concat(joincomma(m);"]")))))));
+        }el{
+          if(n<=2){
+            io.println(s.concat("Merge [";s.concat(joincomma(a);s.concat("] + [";s.concat(joincomma(b);s.concat("] -> [";s.concat(joincomma(m);"]")))))));
+          };
+        };
+        next=next.push(m);
+      }el{
+        next=next.push(runs.get(k));
+      };
+    };
+    runs=next;
+  };
+  let sorted=runs.get(0);
+  io.println(s.concat("Sorted: ";joinspace(sorted)));
+  <0
+}

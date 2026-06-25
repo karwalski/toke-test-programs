@@ -1,1 +1,14 @@
-m=decompose;f=extractdigits(s:$str):$str{let n=s.len;let lhs=mut."";lp(let rhs=0;rhs<n;rhs=rhs+1){let c=s.get(rhs);if(c>47){if(c<58){lhs=lhs+c}}}};<lhs};f=countdigits(s:$str):$i64{let n=s.len;let count=mut.0;lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c>47){if(c<58){count=count+1}}}};<count};f=extractandcount(s:$str):$i64{let digits=extractdigits(s);<countdigits(digits)};f=main():$i64{<extractandcount("hello123world456")")}};
+m=decompose;i=io:std.io;i=s:std.str;
+f=countdigits(str:$str):i64{
+  let n=s.len(str);
+  let count=mut.0;
+  lp(let i=0 as u64;i<n;i=i+1 as u64){
+    let c=s.get(str;i) as i64;
+    if(c>47){if(c<58){count=count+1}}
+  };
+  <count
+};
+f=main():i64{
+  io.println(s.fromint(countdigits("hello123world456")));
+  <0
+};

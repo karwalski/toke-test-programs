@@ -1,1 +1,46 @@
-m=ctx;i=io:std.io;i=s:std.str;i=j:std.json;f=main():$i64{let input=io.readln();let data=j.parse(input);let turns=j.get(data;"turns");let maxctx=j.getint(data;"max_context");let threshold=j.getfloat(data;"compression_threshold");let total=mut.0;let idx=mut.0;lp(idx<j.len(turns)){let turn=j.at(turns;idx);let tokens=j.getint(turn;"token_count");total=total+tokens;idx=idx+1};let util=total as$f64/maxctx as$f64;let action=mut."none";let evict=mut.0;if(util>threshold){action="evict";evict=2};let result=j.object();j.set(result;"total_tokens";total);j.set(result;"utilisation";util);j.set(result;"action";action);j.set(result;"evict_count";evict);io.println(j.stringify(result));<0}
+m=budget;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let turns=json.getarr(d;"turns");
+let nt=turns.len();
+let maxc=json.getint(d;"max_context");
+let thr=json.getfloat(d;"compression_threshold");
+let total=mut.0;
+let i=mut.0;
+lp(i<nt){
+let t=turns.get(i);
+let tc=json.getint(t;"token_count");
+total=total+tc;
+i=i+1;
+};
+let util=(total as $f64)/(maxc as $f64);
+let action=mut."none";
+let evict=mut.0;
+if(util>(1 as $f64)){
+action="evict";
+let remaining=mut.total;
+let k=mut.0;
+lp(remaining>maxc){
+let t=turns.get(k);
+let tc=json.getint(t;"token_count");
+remaining=remaining-tc;
+evict=evict+1;
+k=k+1;
+};
+}el{
+if(util>=thr){action="compress"};
+};
+let b=s.buf();
+s.add(b;"{\"total_tokens\":");
+s.add(b;s.fromint(total as $i64));
+s.add(b;",\"utilisation\":");
+s.add(b;s.fromfloat(util));
+s.add(b;",\"action\":");
+s.add(b;json.enc(action));
+s.add(b;",\"evict_count\":");
+s.add(b;s.fromint(evict as $i64));
+s.add(b;"}");
+io.println(s.done(b));
+<0};

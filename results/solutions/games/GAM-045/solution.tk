@@ -1,1 +1,80 @@
-m=validate;f=validate(grid:@$str;answers:@$str):bool{let n=grid.len;let m=answers.len;let idx=mut.0;let valid=mut.true;lp(let i=0;i<m;i=i+1){let ans=answers.get(i);let len=ans.len;let start=mut.0;let found=mut.false;lp(let j=0;j<n;j=j+1){let cell=grid.get(j);let clen=cell.len;if(!(clen=len)){if(!(found)){start=j;found=true;};};};if(found){let startidx=start;let endidx=startidx+len-1;if(!(endidx<n)){valid=false;}el{lp(let k=startidx;k<endidx;k=k+1){let cell=grid.get(k);let celllen=cell.len;if(!(celllen=len)){valid=false;};};};}el{valid=false;};};};<valid};
+m=validate;
+i=io:std.io;
+i=s:std.str;
+f=addsegs(runs:@$str;line:$str):@$str{
+  let acc=mut.runs;
+  let parts=s.split(line;"#");
+  let n=parts.len as i64;
+  lp(let i=0;i<n;i=i+1){
+    let seg=parts.get(i as u64);
+    if(s.len(seg)>1){
+      acc=acc+@(seg);
+    };
+  };
+  <acc
+};
+f=hasrun(runs:@$str;w:$str):$bool{
+  let n=runs.len as i64;
+  let found=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    let r=runs.get(i as u64);
+    if(s.eq(r;w)){found=true};
+  };
+  <found
+};
+f=main():$i64{
+  let grid=mut.@();
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    grid=grid+@(line);
+  };
+  let rows=grid.len as i64;
+  let runs=mut.@();
+  lp(let r=0;r<rows;r=r+1){
+    runs=addsegs(runs;grid.get(r as u64));
+  };
+  let maxcol=mut.0;
+  lp(let r=0;r<rows;r=r+1){
+    let rl=s.len(grid.get(r as u64)) as i64;
+    if(rl>maxcol){maxcol=rl};
+  };
+  lp(let c=0;c<maxcol;c=c+1){
+    let col=mut."";
+    lp(let r=0;r<rows;r=r+1){
+      let row=grid.get(r as u64);
+      let rl=s.len(row) as i64;
+      if(c<rl){
+        let ch=mt s.slice(row; c as u64; (c+1) as u64){ $ok:v v; $err:e "#" };
+        col=s.concat(col;ch);
+      }el{
+        col=s.concat(col;"#");
+      };
+    };
+    runs=addsegs(runs;col);
+  };
+  let words=mut.@();
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    words=words+@(line);
+  };
+  let nw=words.len as i64;
+  let out=mut."";
+  let anybad=mut.false;
+  lp(let i=0;i<nw;i=i+1){
+    let w=words.get(i as u64);
+    if(!(hasrun(runs;w))){
+      anybad=true;
+      out=s.concat(out;"Invalid: ");
+      out=s.concat(out;w);
+      out=s.concat(out;"\n");
+    };
+  };
+  if(anybad){
+    io.print(out);
+  }el{
+    io.println("Valid");
+  };
+  <0
+};

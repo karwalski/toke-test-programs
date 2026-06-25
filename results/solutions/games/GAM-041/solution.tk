@@ -1,1 +1,63 @@
-m=minesweeper;f=solve(p0:$i64;p1:$i64;p2:$i64;p3:$i64):$str{let rows=p0;let cols=p1;let minecount=p2;let seed=p3;let board=mut.@();lp(let i=0;i<rows;i=i+1){let row=mut.@();lp(let j=0;j<cols;j=j+1){let cell=mut." ";row=row+@(cell);};board=board+@(row);};lp(let i=0;i<minecount;i=i+1){let mineplaced=mut.false;lp(let j=0;j<100;j=j+1){if(mineplaced){br};let ridx=mut.(j-j/rows*rows);let cidx=mut.(j/rows);if(ridx<rows){if(cidx<cols){let cell=board.get(ridx).get(cidx);if(cell=" "){board.get(ridx).get(cidx)="*";mineplaced=true;};};};};};lp(let i=0;i<rows;i=i+1){let row=board.get(i);lp
+m=minesweeper;i=io:std.io;i=s:std.str;
+f=isminehere(mines:@$i64;cols:$i64;r:$i64;c:$i64):$bool{
+  let pos=r*cols+c;
+  let found=mut.false;
+  lp(let k=0;k<(mines.len as i64);k=k+1){
+    if(mines.get(k)=pos){found=true};
+  };
+  <found
+};
+f=solve(rows:$i64;cols:$i64;minecount:$i64;seed:$i64):$str{
+  let total=rows*cols;
+  let mines=mut.@();
+  let state=mut.seed-seed/32768*32768;
+  if(state<0){state=0-state};
+  lp(let i=0;i<minecount;i=i+1){
+    let placed=mut.false;
+    lp(let t=0;t<10000;t=t+1){
+      if(placed){br};
+      state=(state*1103+12345)-(state*1103+12345)/32768*32768;
+      let pm=mut.state; if(pm<0){pm=0-pm};
+      let pos=pm-pm/total*total;
+      if(!(isminehere(mines;cols;pos/cols;pos-pos/cols*cols))){
+        mines=mines+@(pos);
+        placed=true;
+      };
+    };
+  };
+  let out=mut."";
+  lp(let r=0;r<rows;r=r+1){
+    if(r>0){out=s.concat(out;"\n")};
+    lp(let c=0;c<cols;c=c+1){
+      if(isminehere(mines;cols;r;c)){
+        out=s.concat(out;"M");
+      }el{
+        let cnt=mut.0;
+        lp(let dr=0-1;dr<2;dr=dr+1){
+          lp(let dc=0-1;dc<2;dc=dc+1){
+            let nr=r+dr; let nc=c+dc;
+            if(!(dr=0)){
+              if(nr<0){}el{if(nr<rows){if(nc<0){}el{if(nc<cols){if(isminehere(mines;cols;nr;nc)){cnt=cnt+1};};};};};
+            }el{
+              if(!(dc=0)){
+                if(nr<0){}el{if(nr<rows){if(nc<0){}el{if(nc<cols){if(isminehere(mines;cols;nr;nc)){cnt=cnt+1};};};};};
+              };
+            };
+          };
+        };
+        out=s.concat(out;s.fromint(cnt));
+      };
+    };
+  };
+  <out
+};
+f=main():$i64{
+  let input=io.readln();
+  let parts=s.split(input;" ");
+  let rows=mt s.toint(parts.get(0)){ $ok:v v; $err:e 0 };
+  let cols=mt s.toint(parts.get(1)){ $ok:v v; $err:e 0 };
+  let mc=mt s.toint(parts.get(2)){ $ok:v v; $err:e 0 };
+  let seed=mt s.toint(parts.get(3)){ $ok:v v; $err:e 0 };
+  io.println(solve(rows;cols;mc;seed));
+  <0
+};

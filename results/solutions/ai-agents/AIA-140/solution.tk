@@ -1,1 +1,147 @@
-m=dashboard;t=$str;f=formatmetric(val:$i64):$str{if(val<0){<"invalid"};if(val<1000){<val as$str};if(val<1000000){let k=val/1000;<k as$str+"k"};<val as$str+"m"}};f=buildpanel(title:$str;metrics:@$str):$str{let out=mut."";out=s.concat(out;title);out=s.concat(out;"\n");lp(let i=0;i<metrics.len;i=i+1){let m=metrics.get(i);out=out+m;out=s.concat(out;"\n");};<out};f=main():$i64{let titles=@("Privacy";"Security";"Compliance";"Risk"));let counts=@(15;23;5;12));let metrics=@();lp(let i=0;i<titles.len;i=i+1){let title=titles.get(i);let count=counts.get(i);let formatted=formatmetric(count);let entry=s.concat(s.concat("  ";title);": ")+formatted;metrics.push(entry);};let dashboard=buildpanel("Privacy Dashboard";metrics);<0};
+m=dashboard;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+f=numafter(hay:$str;key:$str):$i64{
+  let kpos=s.indexof(hay;key);
+  if(kpos<0){<0};
+  let start=kpos+(s.len(key) as i64);
+  let n=s.len(hay) as i64;
+  let i=mut.start;
+  let out=mut."";
+  lp(i<n){
+    let ch=s.slice(hay;i;i+1);
+    if(s.eq(ch;",")){i=n}el{
+      if(s.eq(ch;"}")){i=n}el{
+        out=s.concat(out;ch);i=i+1
+      }
+    }
+  };
+  <parseint(s.trim(out))
+};
+f=strafter(hay:$str;key:$str):$str{
+  let kpos=s.indexof(hay;key);
+  if(kpos<0){<""};
+  let start=kpos+(s.len(key) as i64);
+  let n=s.len(hay) as i64;
+  let i=mut.start;
+  let out=mut."";
+  lp(i<n){
+    let ch=s.slice(hay;i;i+1);
+    if(s.eq(ch;"\"")){i=n}el{out=s.concat(out;ch);i=i+1}
+  };
+  <out
+};
+f=fmtlat(x:$f64):$str{
+  let scaled=x*1000000.0+0.5;let asi=scaled as i64;
+  let ip=asi/1000000;let fp=asi-ip*1000000;
+  let fs=mut.s.fromint(fp);
+  lp(s.len(fs) as i64<6){fs=s.concat("0";fs)};
+  let lastnz=mut.5;
+  lp(let i=5;i>=0;i=i-1){let ch=s.slice(fs;i;i+1);if(s.eq(ch;"0")){lastnz=i-1}el{i=0-1}};
+  let out=mut.s.fromint(ip);
+  if(lastnz>=0){out=s.concat(out;".");out=s.concat(out;s.slice(fs;0;lastnz+1))}el{out=s.concat(out;".0")};
+  <out
+};
+f=fmtrate(x:$f64):$str{
+  let scaled=x*100.0+0.5;let asi=scaled as i64;
+  let ip=asi/100;let fp=asi-ip*100;
+  let out=mut.s.fromint(ip);
+  if(fp=0){<s.concat(out;".0")};
+  let fs=mut.s.fromint(fp);
+  if(fp<10){fs=s.concat("0";fs)};
+  let last=mut.1;
+  if(fp-(fp/10)*10=0){last=0};
+  if(last=0){out=s.concat(out;".");out=s.concat(out;s.slice(fs;0;1))}el{out=s.concat(out;".");out=s.concat(out;fs)};
+  <out
+};
+f=main():$i64{
+  let line=io.readln();
+  let ids=mut.@();
+  let sumlat=mut.@();
+  let cnt=mut.@();
+  let succ=mut.@();
+  let toks=mut.@();
+  let n=s.len(line) as i64;
+  let i=mut.0;
+  let totlat=mut.0;
+  let totcnt=mut.0;
+  let totsucc=mut.0;
+  let tottoks=mut.0;
+  lp(i<n){
+    let aidx=s.indexof(s.slice(line;i;n);"\"agent_id\":\"");
+    if(aidx<0){i=n}el{
+      let objstart=i+aidx;
+      let seg=s.slice(line;objstart;n);
+      let endrel=s.indexof(seg;"}");
+      let objend=mut.n;
+      if(endrel>=0){objend=objstart+endrel+1};
+      let obj=s.slice(line;objstart;objend);
+      let aid=strafter(obj;"\"agent_id\":\"");
+      let lat=numafter(obj;"\"latency_ms\":");
+      let tk=numafter(obj;"\"tokens_used\":");
+      let issucc=mut.0;
+      if(s.contains(obj;"\"success\":true")){issucc=1};
+      let found=mut.0-1;
+      lp(let k=0;k<ids.len as i64;k=k+1){
+        if(s.eq(ids.get(k);aid)){found=k}
+      };
+      if(found<0){
+        ids=ids+@(aid);
+        sumlat=sumlat+@(lat);
+        cnt=cnt+@(1);
+        succ=succ+@(issucc);
+        toks=toks+@(tk)
+      }el{
+        sumlat=sumlat.set(found;sumlat.get(found)+lat);
+        cnt=cnt.set(found;cnt.get(found)+1);
+        succ=succ.set(found;succ.get(found)+issucc);
+        toks=toks.set(found;toks.get(found)+tk)
+      };
+      totlat=totlat+lat;
+      totcnt=totcnt+1;
+      totsucc=totsucc+issucc;
+      tottoks=tottoks+tk;
+      i=objend
+    }
+  };
+  let out=mut."{\"agents\":{";
+  lp(let k=0;k<ids.len as i64;k=k+1){
+    if(k>0){out=s.concat(out;",")};
+    let avg=(sumlat.get(k) as f64)/(cnt.get(k) as f64);
+    let rate=(succ.get(k) as f64)/(cnt.get(k) as f64);
+    out=s.concat(out;"\"");
+    out=s.concat(out;ids.get(k));
+    out=s.concat(out;"\":{\"avg_latency_ms\":");
+    out=s.concat(out;fmtlat(avg));
+    out=s.concat(out;",\"success_rate\":");
+    out=s.concat(out;fmtrate(rate));
+    out=s.concat(out;",\"total_tokens\":");
+    out=s.concat(out;s.fromint(toks.get(k)));
+    out=s.concat(out;",\"request_count\":");
+    out=s.concat(out;s.fromint(cnt.get(k)));
+    out=s.concat(out;"}")
+  };
+  out=s.concat(out;"},\"totals\":{\"avg_latency_ms\":");
+  let tavg=(totlat as f64)/(totcnt as f64);
+  let trate=(totsucc as f64)/(totcnt as f64);
+  out=s.concat(out;fmtlat(tavg));
+  out=s.concat(out;",\"success_rate\":");
+  out=s.concat(out;fmtrate(trate));
+  out=s.concat(out;",\"total_tokens\":");
+  out=s.concat(out;s.fromint(tottoks));
+  out=s.concat(out;",\"request_count\":");
+  out=s.concat(out;s.fromint(totcnt));
+  out=s.concat(out;"}}");
+  io.println(out);
+  <0
+};

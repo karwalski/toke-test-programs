@@ -1,1 +1,41 @@
-m=route;i=io:std.io;i=s:std.str;i=j:std.json;f=main():$i64{let line=io.readln();let data=j.parse(line);let msg=j.get(data;"message");let msgtype=j.getstring(msg;"type");let agents=j.get(data;"agents");let agentcount=j.len(agents);let target=mut."";let idx=mut.0;lp(idx<agentcount){let agent=j.index(agents;idx);let agentid=j.getstring(agent;"id");let types=j.get(agent;"handles_types");let typecount=j.len(types);let tidx=mut.0;let handles=mut.false;lp(tidx<typecount){let htype=j.getstring(types;tidx);if(htype=msgtype){handles=true};tidx=tidx+1};if(handles){if(target=""){target=agentid}};idx=idx+1};let priority=mut."normal";if(msgtype="error"){priority="high"};let result=mut."{\"route_to\":\"";result=s.concat(result;target);result=s.concat(result;"\",\"priority\":\"");result=s.concat(result;priority);result=s.concat(result;"\"}");io.println(result);<0}
+m=route;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let msg=json.getobj(d;"message");
+let mtype=json.getstr(msg;"type");
+let want=json.enc(mtype);
+let agents=json.getarr(d;"agents");
+let n=agents.len();
+let target=mut."";
+let found=mut.false;
+let i=mut.0;
+lp(i<n){
+let a=agents.get(i);
+let id=json.getstr(a;"id");
+let types=json.getarr(a;"handles_types");
+let tn=types.len();
+let j=mut.0;
+let handles=mut.false;
+lp(j<tn){
+let t=types.get(j);
+let traw="\(t.raw)";
+if(traw=want){handles=true};
+j=j+1;
+};
+if(handles){
+if(found=false){target=id;found=true};
+};
+i=i+1;
+};
+let priority=mut."normal";
+if(mtype="error"){priority="high"};
+let b=s.buf();
+s.add(b;"{\"route_to\":");
+s.add(b;json.enc(target));
+s.add(b;",\"priority\":");
+s.add(b;json.enc(priority));
+s.add(b;"}");
+io.println(s.done(b));
+<0};

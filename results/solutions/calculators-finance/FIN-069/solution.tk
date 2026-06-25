@@ -1,1 +1,30 @@
-m=portfolio;f=dotproduct(a:@$f64;b:@$f64):$f64{let result=mut.0.0;lp(let i=0;i<a.len;i=i+1){result=result+(a.get(i)*b.get(i)))};<result};f=portfolioreturn(prices:@$f64;weights:@$f64):$f64{let n=prices.len;let dot=dotproduct(prices;weights);let ret=mut.0.0;lp(let i=0;i<n;i=i+1){let p=prices.get(i);let w=weights.get(i);let tmp=p*w;ret=ret+tmp};let total=ret;let result=total;let ou
+m=portfolio;
+i=io:std.io;
+i=s:std.str;
+f=fmt2(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let n=mut.scaled as i64;
+  let intpart=n/100;
+  let frac=n-intpart*100;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  let res=mut.s.concat(s.fromint(intpart);s.concat(".";fracstr));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+f=main():i64{
+  let line=io.readln();
+  let parts=s.split(line;",");
+  let count=parts.len as i64;
+  let initial=s.tofloat(parts.get(0));
+  let final=s.tofloat(parts.get((count-1) as i64));
+  let total=(final-initial)/initial;
+  let periods=(count-1) as$f64;
+  let annual=total*12.0/periods;
+  io.println(s.concat(fmt2(total*100.0);"%"));
+  io.println(s.concat(fmt2(annual*100.0);"%"));
+  <0
+};

@@ -1,1 +1,46 @@
-m=scrabble;f=scrabble(word:$str):$i64{let score=mut.0;let len=word.len;lp(let idx=0;idx<len;idx=idx+1){let ch=word.get(idx);let val=mut.0;if(ch="a"){val=1};if(ch="b"){val=3};if(ch="c"){val=3};if(ch="d"){val=2};if(ch="e"){val=1};if(ch="f"){val=4};if(ch="g"){val=2};if(ch="h"){val=4};if(ch="i"){val=1};if(ch="j"){val=8};if(ch="k"){val=5};if(ch="l"){val=1};if(ch="m"){val=3};if(ch="n"){val=1};if(ch="o"){val=1};if(ch="p"){val=3};if(ch="q"){val=10};if(ch="r"){val=1};if(ch="s"){val=1};if(ch="t"){val=1};if(ch="u"){val=1};if(ch="v"){val=
+m=scrabble;i=io:std.io;i=s:std.str;
+f=letterval(ch:$str):$i64{
+if(s.eq(ch;"a")){<1};if(s.eq(ch;"b")){<3};if(s.eq(ch;"c")){<3};if(s.eq(ch;"d")){<2};
+if(s.eq(ch;"e")){<1};if(s.eq(ch;"f")){<4};if(s.eq(ch;"g")){<2};if(s.eq(ch;"h")){<4};
+if(s.eq(ch;"i")){<1};if(s.eq(ch;"j")){<8};if(s.eq(ch;"k")){<5};if(s.eq(ch;"l")){<1};
+if(s.eq(ch;"m")){<3};if(s.eq(ch;"n")){<1};if(s.eq(ch;"o")){<1};if(s.eq(ch;"p")){<3};
+if(s.eq(ch;"q")){<10};if(s.eq(ch;"r")){<1};if(s.eq(ch;"s")){<1};if(s.eq(ch;"t")){<1};
+if(s.eq(ch;"u")){<1};if(s.eq(ch;"v")){<4};if(s.eq(ch;"w")){<4};if(s.eq(ch;"x")){<8};
+if(s.eq(ch;"y")){<4};if(s.eq(ch;"z")){<10};
+<0
+};
+f=main():$i64{
+let wordline=io.readln();
+let word=s.lower(s.trim(wordline));
+let n=s.len(word) as $i64;
+let lmult=mut.@();
+lp(let i=0;i<n;i=i+1){lmult=lmult+@(1)};
+let wmult=mut.1;
+let done=mut.0;
+lp(done<1){
+let line=io.readln();
+let t=s.trim(line);
+if(s.len(t)=0){done=1}el{
+let parts=s.split(t;" ");
+let pos=s.toint(s.trim(parts.get(0)));
+let typ=s.trim(parts.get(1));
+if(s.eq(typ;"DL")){if(pos>=0){if(pos<n){lmult=arrset(lmult;pos;2)}}};
+if(s.eq(typ;"TL")){if(pos>=0){if(pos<n){lmult=arrset(lmult;pos;3)}}};
+if(s.eq(typ;"DW")){wmult=wmult*2};
+if(s.eq(typ;"TW")){wmult=wmult*3};
+};
+};
+let sum=mut.0;
+lp(let i=0;i<n;i=i+1){
+let ch=s.slice(word;i as u64;(i+1) as u64);
+sum=sum+letterval(ch)*lmult.get(i);
+};
+io.println(s.fromint(sum*wmult));
+<0
+};
+f=arrset(a:@$i64;idx:$i64;v:$i64):@$i64{
+let out=mut.@();
+let n=a.len as $i64;
+lp(let i=0;i<n;i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(a.get(i))}};
+<out
+};

@@ -1,1 +1,64 @@
-m=payoff;f=buildschedule(principal:$f64;interestrate:$f64;monthlypayment:$f64):@$f64{let remaining=mut.principal;let paid=mut.0;let schedule=mut.@();lp(let i=0;i<100;i=i+1){if(remaining<0.01){br};let interest=remaining*interestrate/12;let payment=monthlypayment;let principalpart=payment-interest;remaining=remaining-principalpart;paid=paid+principalpart;schedule=schedule+@(paid)};<schedule>;};f=payoff
+m=payoff;
+i=io:std.io;
+i=s:std.str;
+
+f=main():$i64{
+  let extraline=io.readln();
+  let extra=s.tofloat(s.trim(extraline));
+  let names=mut.@();
+  let balstrs=mut.@();
+  let minstrs=mut.@();
+  lp(let g=0;g<1000;g=g+1){
+    let line=io.readln();
+    if(s.eq(s.trim(line);"")){br};
+    let parts=s.split(s.trim(line);" ");
+    names=names+@(parts.get(0));
+    balstrs=balstrs+@(parts.get(1));
+    minstrs=minstrs+@(parts.get(3))
+  };
+  let n=names.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  lp(let i=0;i<n;i=i+1){
+    let minidx=mut.i;
+    lp(let j=i+1;j<n;j=j+1){
+      let a=order.get(minidx);
+      let b=order.get(j);
+      if(s.tofloat(balstrs.get(b))<s.tofloat(balstrs.get(a))){minidx=j}
+    };
+    if(minidx>i){
+      let tmp=order.get(i);
+      let mi=order.get(minidx);
+      order=setidx(order;i;mi);
+      order=setidx(order;minidx;tmp)
+    }
+  };
+  let monthselapsed=mut.0;
+  let snowball=mut.extra;
+  lp(let k=0;k<n;k=k+1){
+    let idx=order.get(k);
+    let bal=s.tofloat(balstrs.get(idx));
+    let mn=s.tofloat(minstrs.get(idx));
+    let elapsedf=monthselapsed as$f64;
+    let rem=bal-mn*elapsedf;
+    let pay=mn+snowball;
+    let exact=rem/pay;
+    let whole=exact as i64;
+    let months=mut.whole;
+    let wholef=whole as$f64;
+    if(wholef<exact){months=whole+1};
+    monthselapsed=monthselapsed+months;
+    let outline=s.concat(names.get(idx);s.concat(": ";s.concat(s.fromint(monthselapsed);" months")));
+    io.println(outline);
+    snowball=snowball+mn
+  };
+  <0
+};
+
+f=setidx(arr:@$i64;pos:$i64;val:$i64):@$i64{
+  let res=mut.@();
+  lp(let i=0;i<(arr.len as i64);i=i+1){
+    if(i=pos){res=res+@(val)}el{res=res+@(arr.get(i))}
+  };
+  <res
+};

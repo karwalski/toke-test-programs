@@ -1,1 +1,83 @@
-m=hexfield;f=solve(p0:$str;p1:$str):$str{let hexstr=p0;let fielddef=p1;let result=mut."";let hlen=hexstr.len;let deflen=fielddef.len;let startidx=mut.0;let endidx=mut.0;let found=mut.false;lp(let i=0;i<deflen;i=i+1){let ch=fielddef.get(i);if(ch=":"){found=true};if(!(found)){startidx=startidx+1};}
+m=hexfield;
+i=io:std.io;
+i=s:std.str;
+
+f=hexval(c:$str):i64{
+  if(c="0"){<0};if(c="1"){<1};if(c="2"){<2};if(c="3"){<3};
+  if(c="4"){<4};if(c="5"){<5};if(c="6"){<6};if(c="7"){<7};
+  if(c="8"){<8};if(c="9"){<9};
+  if(c="A"){<10};if(c="B"){<11};if(c="C"){<12};if(c="D"){<13};if(c="E"){<14};if(c="F"){<15};
+  if(c="a"){<10};if(c="b"){<11};if(c="c"){<12};if(c="d"){<13};if(c="e"){<14};if(c="f"){<15};
+  <0
+};
+
+f=hextobits(h:$str):@i64{
+  let bits=mut.@();
+  let n=s.len(h);
+  lp(let i=0;i<n;i=i+1){
+    let nib=hexval(s.slice(h;i;i+1));
+    let b3=nib/8;
+    let b2=(nib/4)-(nib/8)*2;
+    let b1=(nib/2)-(nib/4)*2;
+    let b0=nib-(nib/2)*2;
+    bits=bits.push(b3);
+    bits=bits.push(b2);
+    bits=bits.push(b1);
+    bits=bits.push(b0)
+  };
+  <bits
+};
+
+f=extract(bits:@i64;offset:i64;width:i64):i64{
+  let v=mut.0;
+  lp(let i=0;i<width;i=i+1){
+    let bit=bits.get(offset+i);
+    v=v*2+bit
+  };
+  <v
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  let names=mut.@();
+  let offsets=mut.@();
+  let widths=mut.@();
+  let datalines=mut.@();
+  let indefs=mut.1;
+  lp(let i=0;i<lines.len;i=i+1){
+    let ln=lines.get(i);
+    if(s.len(ln)=0){
+      indefs=0
+    }el{
+      if(indefs=1){
+        let parts=s.split(ln;" ");
+        names=names.push(parts.get(0));
+        offsets=offsets.push(s.toint(parts.get(1)));
+        widths=widths.push(s.toint(parts.get(2)))
+      }el{
+        datalines=datalines.push(ln)
+      }
+    }
+  };
+  lp(let d=0;d<datalines.len;d=d+1){
+    let bits=hextobits(datalines.get(d));
+    let out=mut."{";
+    lp(let f=0;f<names.len;f=f+1){
+      if(f>0){out=s.concat(out;",")};
+      let val=extract(bits;offsets.get(f);widths.get(f));
+      out=s.concat(out;"\"");
+      out=s.concat(out;names.get(f));
+      out=s.concat(out;"\":");
+      out=s.concat(out;s.fromint(val))
+    };
+    out=s.concat(out;"}");
+    io.print(out);
+    io.print("\n")
+  };
+  <0
+}

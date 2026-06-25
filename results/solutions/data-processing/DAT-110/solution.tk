@@ -1,1 +1,237 @@
-m=csv;f=escape(s:$str):$str{let r=mut."";let i=mut.0;lp(let idx=0;idx<s.len;idx=idx+1){let ch=s.get(idx);if(ch=","){r=s.concat(r;"\"");let j=mut.idx;j=j+1;lp(let k=j;k<s.len;k=k+1){let c=s.get(k);if(c="\""){r=s.concat(r;"\"");k=k+1;};r=r+c;};r=s.concat(r;"\"");i=idx+1;}el{r=r+ch;};};<r};f=csvrow(vals:@$str):$str{let n=vals.len;let r=mut."";lp(let i=0;i<n;i=i+1){let v=vals.get(i);if(i>0){r=s.concat(r;",};lp(let j=1;j<n;j=j+1){let v=vals.get(j);if(j>0){r=r+"),};lp(let k=1;k<n;k=k+1){let v=vals.get(k);if(k>0){r=s.concat(r;",};lp(let m=1;m<n;m=m+1){let v=vals.get(m)
+m=csv;
+i=io:std.io;
+i=s:std.str;
+
+(* toke string '=' / '>' codegen is unreliable when comparing two strings
+   that were loaded via .get from function-returned arrays. Use length+
+   substring containment for equality, and ASCII-ordinal char compare for
+   ordering, both of which compile correctly. *)
+f=streq(a:$str;b:$str):i64{
+  if(s.len(a)!=s.len(b)){<0};
+  if(s.contains(a;b)){<1};
+  <0
+};
+
+(* ASCII-ordered table of printable chars; index = ASCII code - 32. *)
+f=charord(c:$str):i64{
+  let alpha=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  let idx=s.indexof(alpha;c);
+  if(idx<0){<200};
+  <idx
+};
+
+(* returns 1 if a < b lexicographically (ASCII), else 0 *)
+f=strless(a:$str;b:$str):i64{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let n=mut.la;
+  if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let ca=charord(s.slice(a;i;i+1));
+    let cb=charord(s.slice(b;i;i+1));
+    if(ca<cb){<1};
+    if(ca>cb){<0}
+  };
+  if(la<lb){<1};
+  <0
+};
+
+f=splittop(content:$str):@$str{
+  let res=mut.@();
+  let n=s.len(content);
+  let depth=mut.0;
+  let instr=mut.0;
+  let start=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(content;i;i+1);
+    if(instr=1){
+      if(c="\\"){
+        i=i+1
+      }el{
+        if(c="\""){instr=0}
+      }
+    }el{
+      if(c="\""){instr=1}
+      el{ if(c="{"){depth=depth+1} el{
+        if(c="["){depth=depth+1} el{
+        if(c="}"){depth=depth-1} el{
+        if(c="]"){depth=depth-1} el{
+        if(c=","){
+          if(depth=0){
+            res=res.push(s.slice(content;start;i));
+            start=i+1
+          }
+        }}}}}
+      }
+    }
+  };
+  if(n>0){res=res.push(s.slice(content;start;n))};
+  <res
+};
+
+f=inner(str:$str):$str{
+  let n=s.len(str);
+  if(n<2){<""};
+  <s.slice(str;1;n-1)
+};
+
+f=findcolon(pair:$str):i64{
+  let n=s.len(pair);
+  let instr=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(pair;i;i+1);
+    if(instr=1){
+      if(c="\\"){i=i+1}el{if(c="\""){instr=0}}
+    }el{
+      if(c="\""){instr=1}el{
+        if(c=":"){<i}
+      }
+    }
+  };
+  <0-1
+};
+
+f=unescape(lit:$str):$str{
+  let n=s.len(lit);
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(lit;i;i+1);
+    if(c="\\"){
+      let nx=s.slice(lit;i+1;i+2);
+      if(nx="n"){out=s.concat(out;"\n")}el{
+        if(nx="t"){out=s.concat(out;"\t")}el{
+          out=s.concat(out;nx)
+        }
+      };
+      i=i+1
+    }el{
+      out=s.concat(out;c)
+    }
+  };
+  <out
+};
+
+f=flattenobj(objtext:$str;prefix:$str):@(@$str){
+  let keys=mut.@();
+  let vals=mut.@();
+  let content=inner(objtext);
+  let pairs=splittop(content);
+  lp(let p=0;p<pairs.len;p=p+1){
+    let pair=pairs.get(p);
+    let ci=findcolon(pair);
+    let rawkey=s.slice(pair;0;ci);
+    let keyname=unescape(inner(rawkey));
+    let fullkey=mut.keyname;
+    if(s.len(prefix)>0){fullkey=s.concat(s.concat(prefix;".");keyname)};
+    let val=s.slice(pair;ci+1;s.len(pair));
+    let first=s.slice(val;0;1);
+    if(first="{"){
+      let sub=flattenobj(val;fullkey);
+      let sk=sub.get(0);
+      let sv=sub.get(1);
+      lp(let q=0;q<sk.len;q=q+1){
+        keys=keys.push(sk.get(q));
+        vals=vals.push(sv.get(q))
+      }
+    }el{
+      if(first="\""){
+        keys=keys.push(fullkey);
+        vals=vals.push(unescape(inner(val)))
+      }el{
+        keys=keys.push(fullkey);
+        vals=vals.push(val)
+      }
+    }
+  };
+  let r=mut.@();
+  r=r.push(keys);
+  r=r.push(vals);
+  <r
+};
+
+f=csvcell(v:$str):$str{
+  let n=s.len(v);
+  let doubled=mut."";
+  let needwrap=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(v;i;i+1);
+    if(c="\""){doubled=s.concat(doubled;"\"\"")}
+    el{
+      if(c=","){needwrap=1;doubled=s.concat(doubled;c)}
+      el{
+        if(c="\n"){needwrap=1;doubled=s.concat(doubled;c)}
+        el{doubled=s.concat(doubled;c)}
+      }
+    }
+  };
+  if(needwrap=1){<s.concat(s.concat("\"";doubled);"\"")};
+  <doubled
+};
+
+f=main():i64{
+  let raw=mut."";
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    raw=s.concat(raw;l)
+  };
+  let arrcontent=inner(raw);
+  let objs=splittop(arrcontent);
+
+  let allcols=mut.@();
+  let rowKeys=mut.@();
+  let rowVals=mut.@();
+  lp(let o=0;o<objs.len;o=o+1){
+    let flat=flattenobj(objs.get(o);"");
+    let ks=flat.get(0);
+    let vs=flat.get(1);
+    rowKeys=rowKeys.push(ks);
+    rowVals=rowVals.push(vs);
+    lp(let i=0;i<ks.len;i=i+1){
+      let k=ks.get(i);
+      let exists=mut.0;
+      lp(let j=0;j<allcols.len;j=j+1){
+        if(streq(allcols.get(j);k)=1){exists=1;br}
+      };
+      if(exists=0){allcols=allcols.push(k)}
+    }
+  };
+
+  let nc=allcols.len;
+  lp(let i=0;i<nc;i=i+1){
+    lp(let j=0;j<nc-1-i;j=j+1){
+      if(strless(allcols.get(j+1);allcols.get(j))=1){
+        let t=allcols.get(j);
+        allcols=allcols.set(j;allcols.get(j+1));
+        allcols=allcols.set(j+1;t)
+      }
+    }
+  };
+
+  let header=mut."";
+  lp(let i=0;i<nc;i=i+1){
+    if(i>0){header=s.concat(header;",")};
+    header=s.concat(header;csvcell(allcols.get(i)))
+  };
+  io.print(header);
+  io.print("\n");
+
+  lp(let o=0;o<rowKeys.len;o=o+1){
+    let ks=rowKeys.get(o);
+    let vs=rowVals.get(o);
+    let line=mut."";
+    lp(let c=0;c<nc;c=c+1){
+      if(c>0){line=s.concat(line;",")};
+      let col=allcols.get(c);
+      let cell=mut."";
+      lp(let i=0;i<ks.len;i=i+1){
+        if(streq(ks.get(i);col)=1){cell=vs.get(i);br}
+      };
+      line=s.concat(line;csvcell(cell))
+    };
+    io.print(line);
+    if(o<rowKeys.len-1){io.print("\n")}
+  };
+  io.print("\n");
+  <0
+}

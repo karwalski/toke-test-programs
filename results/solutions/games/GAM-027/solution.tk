@@ -1,1 +1,22 @@
-m=ast;f=heuristic(a:$str;b:$str):$i64{let ax=a.charat(0)as.i64-97;let ay=a.charat(1)as.i64-49;let bx=b.charat(0)as.i64-97;let by=b.charat(1)as.i64-49;let dx=bx-ax;let dy=by-ay;if(dx<0){dx=-dx};if(dy<0){dy=-dy};<dx+dy};f=astsearch(grid:$str;start:$str;goal:$str):$str{let rows=grid.split("\n");let rowcount=rows.len;let cols=rows.get(0).split(" ");let colcount=cols.len;let startpos=start.split(" ");let startX=startpos.get(0).as.i64;let startY=startpos.get(1).as.i64;let goalpos=goal.split(" ");let goalX=goalpos.get(0).as.i64;let goalY=goalpos.get(1).as.i64;let openlist=mut.@();let closedlist=mut.@
+m=ast;i=io:std.io;i=s:std.str;
+f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
+f=main():$i64{let rows=mut.@($str);let reading=mut.true;
+lp(reading){let line=io.readln();let t=s.trim(line);if(s.len(t)=0){reading=false}el{rows=rows+@(t)}};
+let sline=s.split(s.trim(io.readln());" ");let sr=s.toint(sline.get(1));let scol=s.toint(sline.get(2));
+let eline=s.split(s.trim(io.readln());" ");let er=s.toint(eline.get(1));let ecol=s.toint(eline.get(2));
+let nr=rows.len();let nc=mut.0;if(nr>0){nc=s.len(rows.get(0))};let total=nr*nc;
+let dist=mut.@($i64);let prev=mut.@($i64);lp(let i=0;i<total;i=i+1){dist=dist+@(-1);prev=prev+@(-1)};
+let queue=mut.@($i64);let head=mut.0;
+let startidx=sr*nc+scol;dist=dist.set(startidx;0);queue=queue+@(startidx);
+lp(head<queue.len()){let cur=queue.get(head);head=head+1;let cr=cur/nc;let cc=cur%nc;
+let drs=@(-1;1;0;0);let dcs=@(0;0;-1;1);
+lp(let k=0;k<4;k=k+1){let nrr=cr+drs.get(k);let ncc=cc+dcs.get(k);
+if(nrr>=0){if(nrr<nr){if(ncc>=0){if(ncc<nc){
+if(!(s.equals(ch(rows.get(nrr);ncc);"#"))){let nidx=nrr*nc+ncc;if(dist.get(nidx)<0){dist=dist.set(nidx;dist.get(cur)+1);prev=prev.set(nidx;cur);queue=queue+@(nidx)}}}}}}}};
+let endidx=er*nc+ecol;
+if(dist.get(endidx)<0){io.println("No path");<0};
+let onpath=mut.@($bool);lp(let i=0;i<total;i=i+1){onpath=onpath+@(false)};
+let p=mut.endidx;lp(p>=0){onpath=onpath.set(p;true);p=prev.get(p)};
+io.println(s.fromint(dist.get(endidx)));
+lp(let r=0;r<nr;r=r+1){let outl=mut."";lp(let c=0;c<nc;c=c+1){let idx=r*nc+c;if(onpath.get(idx)){outl=s.concat(outl;"*")}el{outl=s.concat(outl;ch(rows.get(r);c))}};io.println(outl)};
+<0}

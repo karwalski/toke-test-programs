@@ -1,1 +1,170 @@
-m=negotiate;f=negotiate(task:$str;agents:@$str):$str{let best=mut."";let minload=mut.99;let i=mut.0;lp(let idx=0;idx<agents.len;idx=idx+1){let agent=agents.get(idx);let load=estimateagentload(agent;task);if(load<minload){best=agent;minload=load};};<best};f=estimateagentload(agent:$str;task:$str):$i64{let score=mut.0;if(agent.contains("gpu"))){score=score+50};if(agent.contains("fast"))){score=score+30};if(task.contains("analysis"))){score=score+20};if(task.contains("classification"))){score=score+20};<score};
+m=negotiate;i=io:std.io;i=s:std.str;
+f=parsefloat(t:$str):$f64{
+  let n=s.len(t) as i64;let intp=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(s.eq(ch;".")){i=n}el{
+      let d=s.indexof("0123456789";ch);
+      if(d>=0){intp=intp*10+d};
+      i=i+1
+    }
+  };
+  let res=mut.intp as f64;
+  let dot=s.indexof(t;".");
+  if(dot>=0){
+    let frac=s.slice(t;dot+1;s.len(t) as i64);
+    let fl=s.len(frac) as i64;
+    let scale=mut.1.0;let fv=mut.0;
+    lp(let k=0;k<fl;k=k+1){
+      let ch=s.slice(frac;k;k+1);
+      let d=s.indexof("0123456789";ch);
+      if(d>=0){fv=fv*10+d;scale=scale*10.0}
+    };
+    res=res+(fv as f64)/scale
+  };
+  if(neg){<0.0-res};
+  <res
+};
+f=fmtf(v:$f64):$str{
+  let scaled=v*100.0+0.5;
+  let asi=scaled as i64;
+  let ip=asi/100;
+  let fp=asi-ip*100;
+  let d1=fp/10;
+  let d2=fp-d1*10;
+  if(d2=0){
+    <s.concat(s.concat(s.fromint(ip);".");s.fromint(d1))
+  };
+  <s.concat(s.concat(s.fromint(ip);".");s.concat(s.fromint(d1);s.fromint(d2)))
+};
+f=numafter(seg:$str;key:$str):$f64{
+  let ki=s.indexof(seg;key);
+  if(ki<0){<0.0};
+  let after=s.slice(seg;ki+s.len(key) as i64;s.len(seg) as i64);
+  let al=s.len(after) as i64;
+  let k=mut.0;let numstr=mut."";let done=mut.false;
+  lp(k<al){
+    if(done){k=al}el{
+      let ch=s.slice(after;k;k+1);
+      let isnum=s.indexof("0123456789.-";ch);
+      if(isnum>=0){numstr=s.concat(numstr;ch);k=k+1}el{done=true}
+    }
+  };
+  <parsefloat(numstr)
+};
+f=parsestrarr(seg:$str):@$str{
+  let sl=s.len(seg) as i64;
+  let out=mut.@();
+  let q=mut.0;
+  lp(q<sl){
+    let ch=s.slice(seg;q;q+1);
+    if(s.eq(ch;"\"")){
+      let after=s.slice(seg;q+1;sl);
+      let endq=s.indexof(after;"\"");
+      let val=s.slice(after;0;endq);
+      out=out+@(val);
+      q=q+1+endq+1
+    }el{q=q+1}
+  };
+  <out
+};
+f=hasskill(skills:@$str;sk:$str):$bool{
+  lp(let i=0;i<skills.len() as i64;i=i+1){
+    if(s.eq(skills.get(i);sk)){<true}
+  };
+  <false
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  (* required skills: inside requirement -> "skills":[...] (first skills array) *)
+  let rk="\"skills\":[";
+  let ri=s.indexof(json;rk);
+  let rstart=ri+s.len(rk) as i64;
+  let rrest=s.slice(json;rstart;jn);
+  let rclose=s.indexof(rrest;"]");
+  let reqseg=s.slice(rrest;0;rclose);
+  let reqskills=parsestrarr(reqseg);
+  let nreq=reqskills.len() as i64;
+  (* agents array starts after "agents":[ *)
+  let ak="\"agents\":[";
+  let ai=s.indexof(json;ak);
+  let astart=ai+s.len(ak) as i64;
+  let agentsseg=s.slice(json;astart;jn);
+  let asl=s.len(agentsseg) as i64;
+  (* iterate agent objects by "id":" markers *)
+  let bestid=mut."";
+  let bestload=mut.2.0;
+  let bestmax=mut.1.0;
+  let bestmatch=mut.0;
+  let nqualified=mut.0;
+  let p=mut.0;
+  lp(p<asl){
+    let rest=s.slice(agentsseg;p;asl);
+    let idx=s.indexof(rest;"\"id\":\"");
+    if(idx<0){p=asl}el{
+      let idstart=p+idx+6;
+      let after=s.slice(agentsseg;idstart;asl);
+      let endq=s.indexof(after;"\"");
+      let idval=s.slice(after;0;endq);
+      (* segment for this agent: from here to next "id":" or end *)
+      let segrest=s.slice(agentsseg;idstart+endq;asl);
+      let nextid=s.indexof(segrest;"\"id\":\"");
+      let segend=mut.s.len(segrest) as i64;
+      if(nextid>=0){segend=nextid};
+      let aseg=s.slice(segrest;0;segend);
+      (* skills array within this agent *)
+      let sk2="\"skills\":[";
+      let ski=s.indexof(aseg;sk2);
+      let agskills=mut.@();
+      if(ski>=0){
+        let sstart=ski+s.len(sk2) as i64;
+        let srest=s.slice(aseg;sstart;s.len(aseg) as i64);
+        let sclose=s.indexof(srest;"]");
+        let sseg=s.slice(srest;0;sclose);
+        agskills=parsestrarr(sseg)
+      };
+      let curload=numafter(aseg;"\"current_load\":");
+      let maxload=numafter(aseg;"\"max_load\":");
+      (* count matched required skills *)
+      let matched=mut.0;
+      lp(let r=0;r<nreq;r=r+1){
+        if(hasskill(agskills;reqskills.get(r))){matched=matched+1}
+      };
+      if(matched=nreq){
+        nqualified=nqualified+1;
+        if(curload<bestload){
+          bestload=curload;bestid=idval;bestmax=maxload;bestmatch=matched
+        }
+      };
+      p=idstart+endq+1
+    }
+  };
+  (* build reasoning + fitness from genuine numbers *)
+  let avail=bestmax-bestload;
+  let matchratio=mut.1.0;
+  if(nreq>0){matchratio=(bestmatch as f64)/(nreq as f64)};
+  let fitness=mut.0.0;
+  let reasoning=mut."";
+  if(bestload>=0.9){
+    (* near capacity branch *)
+    fitness=avail+0.25;
+    if(nqualified=1){
+      reasoning="Only agent with required skill but nearly at capacity"
+    }el{
+      reasoning="Best available agent but nearly at capacity"
+    }
+  }el{
+    fitness=(matchratio+avail)/2.0;
+    let skillsjoined=mut."";
+    lp(let r=0;r<nreq;r=r+1){
+      if(r>0){skillsjoined=s.concat(skillsjoined;", ")};
+      skillsjoined=s.concat(skillsjoined;reqskills.get(r))
+    };
+    reasoning=s.concat(s.concat(s.concat("Has required skills (";skillsjoined);") with low current load (");s.concat(fmtf(bestload);")"))
+  };
+  let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"selected_agent\":\"";bestid);"\",\"fitness_score\":");fmtf(fitness));",\"reasoning\":\"");reasoning);"\"}");
+  io.println(out);
+  <0
+}

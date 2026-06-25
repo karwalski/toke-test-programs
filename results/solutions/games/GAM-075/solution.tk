@@ -1,1 +1,170 @@
-m=crossword;f=solve(p:$str;q:$str):$str{let result=mut."";let words=mut.@();let current=mut."";lp(let i=0;i<p.len;i=i+1){let ch=p.get(i);if(ch=" "){if(!(current.len=0 as u64))){words=words+@(current);};current="";}el{current=current+ch;};}
+m=crossword;
+i=io:std.io;
+i=str:std.str;
+f=arrset(a:@$str;idx:$i64;v:$str):@$str{
+  let out=mut.@();
+  let n=a.len as i64;
+  lp(let i=0;i<n;i=i+1){
+    if(i=idx){out=out+@(v)}el{out=out+@(a.get(i as u64))}
+  };
+  <out
+};
+f=cellat(grid:@$str;r:$i64;c:$i64;cols:$i64):$str{
+  <grid.get((r*cols+c) as u64)
+};
+f=fitslot(grid:@$str;slot:$str;word:$str):$bool{
+  let cells=str.split(slot;",");
+  let n=cells.len as i64;
+  if(!(str.len(word)=(n as u64))){<false};
+  lp(let i=0;i<n;i=i+1){
+    let ci=mt str.toint(cells.get(i as u64)){ $ok:v v; $err:e 0 };
+    let cur=grid.get(ci as u64);
+    let wc=mt str.slice(word;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+    if(!(str.eq(cur;"?"))){
+      if(!(str.eq(cur;wc))){<false}
+    }
+  };
+  <true
+};
+f=applyword(grid:@$str;slot:$str;word:$str):@$str{
+  let cells=str.split(slot;",");
+  let n=cells.len as i64;
+  let g=mut.grid;
+  lp(let i=0;i<n;i=i+1){
+    let ci=mt str.toint(cells.get(i as u64)){ $ok:v v; $err:e 0 };
+    let wc=mt str.slice(word;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+    g=arrset(g;ci;wc)
+  };
+  <g
+};
+f=usedhas(used:@$str;w:$str):$bool{
+  lp(let i=0;i<(used.len as i64);i=i+1){
+    if(str.eq(used.get(i as u64);w)){<true}
+  };
+  <false
+};
+f=solve(grid:@$str;slots:@$str;si:$i64;words:@$str;used:@$str):$str{
+  if(si=(slots.len as i64)){
+    let out=mut."OK|";
+    lp(let k=0;k<(grid.len as i64);k=k+1){
+      out=str.concat(out;grid.get(k as u64))
+    };
+    <out
+  };
+  let slot=slots.get(si as u64);
+  let nw=words.len as i64;
+  lp(let wi=0;wi<nw;wi=wi+1){
+    let w=words.get(wi as u64);
+    if(!(usedhas(used;w))){
+      if(fitslot(grid;slot;w)){
+        let g2=applyword(grid;slot;w);
+        let used2=used+@(w);
+        let res=solve(g2;slots;si+1;words;used2);
+        if(str.startswith(res;"OK|")){<res}
+      }
+    }
+  };
+  <"NO"
+};
+f=main():$i64{
+  let rawlines=mut.@();
+  let blankseen=mut.false;
+  let gridlines=mut.@();
+  let words=mut.@();
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(str.len(line)=0){
+      if(blankseen){br};
+      blankseen=true
+    }el{
+      if(blankseen){words=words+@(line)}el{gridlines=gridlines+@(line)}
+    }
+  };
+  let rows=gridlines.len as i64;
+  let cols=mut.0;
+  lp(let r=0;r<rows;r=r+1){
+    let ln=gridlines.get(r as u64);
+    let l=str.len(ln) as i64;
+    if(l>cols){cols=l}
+  };
+  let grid=mut.@();
+  lp(let r=0;r<rows;r=r+1){
+    let ln=gridlines.get(r as u64);
+    let l=str.len(ln) as i64;
+    lp(let c=0;c<cols;c=c+1){
+      if(c<l){
+        let ch=mt str.slice(ln;c as u64;(c+1) as u64){ $ok:v v; $err:e " " };
+        grid=grid+@(ch)
+      }el{
+        grid=grid+@("#")
+      }
+    }
+  };
+  let slots=mut.@();
+  lp(let r=0;r<rows;r=r+1){
+    let c=mut.0;
+    lp(let z=0;z<cols;z=z+1){
+      if(c<cols){
+        let ch=grid.get((r*cols+c) as u64);
+        if(str.eq(ch;"#")){c=c+1}el{
+          let start=c;
+          let run=mut."";
+          lp(let z2=0;z2<cols;z2=z2+1){
+            if(c<cols){
+              let ch2=grid.get((r*cols+c) as u64);
+              if(!(str.eq(ch2;"#"))){
+                let idx=r*cols+c;
+                if(str.len(run)=0){run=str.fromint(idx)}el{run=str.concat(str.concat(run;",");str.fromint(idx))};
+                c=c+1
+              }el{z2=cols}
+            }
+          };
+          let cnt=str.split(run;",");
+          if((cnt.len as i64)>=2){slots=slots+@(run)}
+        }
+      }
+    }
+  };
+  let init=mut.@();
+  let res=solve(grid;slots;0;words;init);
+  if(str.startswith(res;"OK|")){
+    let body=mt str.slice(res;3 as u64;str.len(res)){ $ok:v v; $err:e "" };
+    let g2=mut.@();
+    lp(let k=0;k<(str.len(body) as i64);k=k+1){
+      let ch=mt str.slice(body;k as u64;(k+1) as u64){ $ok:v v; $err:e "" };
+      g2=g2+@(ch)
+    };
+    lp(let r=0;r<rows;r=r+1){
+      lp(let c=0;c<cols;c=c+1){
+        let idx=r*cols+c;
+        let ch=g2.get(idx as u64);
+        if(str.eq(ch;"?")){
+          let filled=mut."?";
+          if(r>0){
+            let up=g2.get(((r-1)*cols+c) as u64);
+            if(!(str.eq(up;"?"))){if(!(str.eq(up;"#"))){filled=up}}
+          };
+          if(str.eq(filled;"?")){
+            if(r<rows-1){
+              let dn=g2.get(((r+1)*cols+c) as u64);
+              if(!(str.eq(dn;"?"))){if(!(str.eq(dn;"#"))){filled=dn}}
+            }
+          };
+          g2=arrset(g2;idx;filled)
+        }
+      }
+    };
+    let outl=mut."";
+    lp(let r=0;r<rows;r=r+1){
+      let row=mut."";
+      lp(let c=0;c<cols;c=c+1){
+        row=str.concat(row;g2.get((r*cols+c) as u64))
+      };
+      if(r=0){outl=row}el{outl=str.concat(str.concat(outl;"\n");row)}
+    };
+    io.println(outl)
+  }el{
+    io.println("No solution")
+  };
+  <0
+};

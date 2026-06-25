@@ -1,1 +1,122 @@
-m=registry;f=solve(p0:$str):i64{let lines=p0.split("\n");let count=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let trimmed=line.trim();let isvalid=mut.false;if(!(trimmed.len=0))){if(!(trimmed.len=1))){isvalid=true;};};if(isvalid){let parts=trimmed.split(" ");if(parts.len>2){let tagpart=parts.get(2);if(tagpart.len>0){if(!(tagpart.len=1))){count=count+1;};};};};};<count};
+m=registry;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let plen=str.len(pat) as i64;
+  let start=idx+plen;
+  let olen=str.len(obj) as i64;
+  let rest=mt str.slice(obj;start;olen){ $ok:v v; $err:e "" };
+  let qidx=str.indexof(rest;"\"");
+  if(qidx<0){<rest};
+  <mt str.slice(rest;0;qidx){ $ok:v v; $err:e "" }
+};
+
+f=streq(a:$str;b:$str):$bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  if(!(la=lb)){<false};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let ok=mut.true;
+  lp(let i=0;i<la;i=i+1){
+    if(!((ba.get(i) as i64)=(bb.get(i) as i64))){ok=false};
+  };
+  <ok
+};
+
+f=strcmp(a:$str;b:$str):$i64{
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  let n=mut.la;
+  if(lb<la){n=lb};
+  let res=mut.0;
+  let done=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    if(!(done)){
+      let ca=ba.get(i) as i64;
+      let cb=bb.get(i) as i64;
+      if(ca<cb){res=0-1;done=true};
+      if(ca>cb){res=1;done=true};
+    };
+  };
+  if(!(done)){
+    if(la<lb){res=0-1};
+    if(la>lb){res=1};
+  };
+  <res
+};
+
+f=main():i64{
+  let filter=io.readln();
+  let input=io.readln();
+  let n=str.len(input) as i64;
+  if(n=0){<0};
+  let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
+  let parts=str.split(inner;"},{");
+  let np=parts.len as i64;
+  let repos=mut.@();
+  let tags=mut.@();
+  let digests=mut.@();
+  let pushes=mut.@();
+  lp(let i=0;i<np;i=i+1){
+    let raw=parts.get(i);
+    let obj=mut.raw;
+    if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
+    if(!(str.endswith(obj;"}"))){obj=str.concat(obj;"}")};
+    let repo=getstr(obj;"repo");
+    let tag=getstr(obj;"tag");
+    let digest=getstr(obj;"digest");
+    let pushed=getstr(obj;"pushed");
+    let keep=mut.false;
+    if(streq(filter;"all")){keep=true};
+    if(str.startswith(filter;"tag:")){
+      let want=mt str.slice(filter;4;str.len(filter) as i64){ $ok:v v; $err:e "" };
+      if(streq(tag;want)){keep=true};
+    };
+    if(str.startswith(filter;"before:")){
+      let date=mt str.slice(filter;7;str.len(filter) as i64){ $ok:v v; $err:e "" };
+      if(strcmp(pushed;date)<0){keep=true};
+    };
+    if(keep){
+      repos=repos.push(repo);
+      tags=tags.push(tag);
+      digests=digests.push(digest);
+      pushes=pushes.push(pushed);
+    };
+  };
+  let cnt=repos.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<cnt;i=i+1){order=order.push(i)};
+  lp(let i=0;i<cnt;i=i+1){
+    lp(let j=0;j<cnt-1-i;j=j+1){
+      let a=order.get(j);
+      let b=order.get(j+1);
+      if(strcmp(pushes.get(a);pushes.get(b))<0){
+        order=order.set(j;b);
+        order=order.set(j+1;a);
+      };
+    };
+  };
+  lp(let k=0;k<cnt;k=k+1){
+    let i=order.get(k);
+    let digest=digests.get(i);
+    let dlen=str.len(digest) as i64;
+    let shortend=mut.dlen;
+    if(dlen>10){shortend=10};
+    let short=mt str.slice(digest;0;shortend){ $ok:v v; $err:e "" };
+    let line=mut.str.concat(repos.get(i);":");
+    line=str.concat(line;tags.get(i));
+    line=str.concat(line;" (");
+    line=str.concat(line;short);
+    line=str.concat(line;") ");
+    line=str.concat(line;pushes.get(i));
+    io.println(line);
+  };
+  <0
+};

@@ -1,1 +1,175 @@
-m=cribbage;f=score(hand:$str;starter:$str):$i64{let total=mut.0;let pairs=mut.0;let runs=mut.0;let flushes=mut.0;let cardvals=@(0;0;2;3;4;5;6;7;8;9;10;11;12;13;14;15);let handcards=hand.split(" ");let starterval=cardvals.get(startercard as:i64-1));let handpoints=mut.0;lp(let i=0;i<handcards.len;i=i+1){let cardval=cardvals.get(handcards.get(i)as:i64-1));handpoints=handpoints+cardval;};let fifteen
+m=cribbage;
+i=io:std.io;
+i=str:std.str;
+f=pow2(n:$i64):$i64{
+  let r=mut.1;
+  lp(let i=0;i<n;i=i+1){r=r*2};
+  <r
+};
+f=arrseti(a:@$i64;idx:$i64;v:$i64):@$i64{
+  let r=mut.@();
+  let n=a.len as i64;
+  lp(let i=0;i<n;i=i+1){
+    if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))};
+  };
+  <r
+};
+f=arrsetb(a:@$bool;idx:$i64;v:$bool):@$bool{
+  let r=mut.@();
+  let n=a.len as i64;
+  lp(let i=0;i<n;i=i+1){
+    if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))};
+  };
+  <r
+};
+f=rankval(card:$str):$i64{
+  let n=str.len(card) as i64;
+  let rank=mt str.slice(card;0 as u64;(n-1) as u64){ $ok:v v; $err:e "" };
+  let r=mut.0;
+  if(str.eq(rank;"A")){r=1};
+  if(str.eq(rank;"2")){r=2};
+  if(str.eq(rank;"3")){r=3};
+  if(str.eq(rank;"4")){r=4};
+  if(str.eq(rank;"5")){r=5};
+  if(str.eq(rank;"6")){r=6};
+  if(str.eq(rank;"7")){r=7};
+  if(str.eq(rank;"8")){r=8};
+  if(str.eq(rank;"9")){r=9};
+  if(str.eq(rank;"10")){r=10};
+  if(str.eq(rank;"T")){r=10};
+  if(str.eq(rank;"J")){r=11};
+  if(str.eq(rank;"Q")){r=12};
+  if(str.eq(rank;"K")){r=13};
+  <r
+};
+f=fifteenval(card:$str):$i64{
+  let rv=rankval(card);
+  if(rv>10){<10};
+  <rv
+};
+f=isace(card:$str):$bool{
+  let n=str.len(card) as i64;
+  let rank=mt str.slice(card;0 as u64;(n-1) as u64){ $ok:v v; $err:e "" };
+  <str.eq(rank;"A")
+};
+f=isjack(card:$str):$bool{
+  if(rankval(card)=11){<true};
+  <false
+};
+f=suitof(card:$str):$str{
+  let n=str.len(card) as i64;
+  <mt str.slice(card;(n-1) as u64;n as u64){ $ok:v v; $err:e "" }
+};
+f=isrun(rv:@$i64;mask:$i64;length:$i64):$bool{
+  let vals=mut.@();
+  lp(let b=0;b<5;b=b+1){
+    let bit=mask/pow2(b)-mask/pow2(b+1)*2;
+    if(bit=1){vals=vals+@(rv.get(b))};
+  };
+  let m=vals.len as i64;
+  let sorted=mut.vals;
+  lp(let i=0;i<m;i=i+1){
+    lp(let j=0;j<m-1;j=j+1){
+      if(sorted.get(j)>sorted.get(j+1)){
+        let tmp=sorted.get(j);
+        sorted=arrseti(sorted;j;sorted.get(j+1));
+        sorted=arrseti(sorted;j+1;tmp);
+      };
+    };
+  };
+  let ok=mut.true;
+  lp(let i=0;i<m-1;i=i+1){
+    if(!(sorted.get(i+1)-sorted.get(i)=1)){ok=false};
+  };
+  <ok
+};
+f=main():i64{
+  let line=io.readln();
+  let cards=str.split(line;" ");
+  let fv=mut.@(0;0;0;0;0);
+  let rv=mut.@(0;0;0;0;0);
+  let ace=mut.@(false;false;false;false;false);
+  lp(let i=0;i<5;i=i+1){
+    let c=cards.get(i);
+    fv=arrseti(fv;i;fifteenval(c));
+    rv=arrseti(rv;i;rankval(c));
+    ace=arrsetb(ace;i;isace(c));
+  };
+  let fdisp=mut.0;
+  lp(let mask=1;mask<32;mask=mask+1){
+    let cnt=mut.0;
+    let base=mut.0;
+    let aces=mut.0;
+    lp(let b=0;b<5;b=b+1){
+      let bit=mask/pow2(b)-mask/pow2(b+1)*2;
+      if(bit=1){
+        cnt=cnt+1;
+        base=base+fv.get(b);
+        if(ace.get(b)){aces=aces+1};
+      };
+    };
+    if(cnt>1){
+      let ok=mut.false;
+      lp(let k=0;k<(aces+1);k=k+1){
+        if(base+k*10=15){ok=true};
+      };
+      if(ok){fdisp=fdisp+1};
+    };
+  };
+  let fstd=mut.0;
+  lp(let mask=1;mask<32;mask=mask+1){
+    let cnt=mut.0;
+    let base=mut.0;
+    lp(let b=0;b<5;b=b+1){
+      let bit=mask/pow2(b)-mask/pow2(b+1)*2;
+      if(bit=1){cnt=cnt+1;base=base+fv.get(b)};
+    };
+    if(cnt>1){ if(base=15){fstd=fstd+1} };
+  };
+  let pairs=mut.0;
+  lp(let i=0;i<5;i=i+1){
+    lp(let j=i+1;j<5;j=j+1){
+      if(rv.get(i)=rv.get(j)){pairs=pairs+1};
+    };
+  };
+  let runpts=mut.0;
+  let runlen=mut.0;
+  lp(let length=5;length>2;length=length-1){
+    if(runlen=0){
+      let cnt=mut.0;
+      lp(let mask=1;mask<32;mask=mask+1){
+        let sz=mut.0;
+        lp(let b=0;b<5;b=b+1){
+          let bit=mask/pow2(b)-mask/pow2(b+1)*2;
+          if(bit=1){sz=sz+1};
+        };
+        if(sz=length){
+          if(isrun(rv;mask;length)){cnt=cnt+1};
+        };
+      };
+      if(cnt>0){runpts=length*cnt;runlen=length};
+    };
+  };
+  let flush=mut.0;
+  let s0=suitof(cards.get(0));
+  let allsame=mut.true;
+  lp(let i=1;i<4;i=i+1){
+    if(!(str.eq(suitof(cards.get(i));s0))){allsame=false};
+  };
+  if(allsame){
+    flush=4;
+    if(str.eq(suitof(cards.get(4));s0)){flush=5};
+  };
+  let nobs=mut.0;
+  lp(let i=0;i<4;i=i+1){
+    if(isjack(cards.get(i))){nobs=nobs+1};
+  };
+  let total=fstd*2+pairs*2+runpts+flush+nobs;
+  io.println(str.concat("Fifteens: ";str.fromint(fdisp)));
+  io.println(str.concat("Pairs: ";str.fromint(pairs)));
+  io.println(str.concat("Runs: ";str.fromint(runpts)));
+  io.println(str.concat("Flush: ";str.fromint(flush)));
+  io.println(str.concat("Nobs: ";str.fromint(nobs)));
+  io.println(str.concat("Total: ";str.fromint(total)));
+  <0
+};

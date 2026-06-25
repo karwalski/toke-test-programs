@@ -1,1 +1,114 @@
-m=password;f=passwordstrength(len:$i64;hasupper:$bool;hasdigit:$bool;hasspecial:$bool):$str{if(len<8){<"weak"};let count=mut.0;if(hasupper){count=count+1};if(hasdigit){count=count+1};if(hasspecial){count=count+1};if(!(len<12))el{if(!(count<2))el{<"weak"}el{<"medium"}};if(!(len<12)){if(count>3){<"strong"}el{<"medium"}}};
+m=password;
+i=io:std.io;
+i=s:std.str;
+
+f=myln(x:$f64):$f64{
+  let y=(x-1.0)/(x+1.0);
+  let y2=y*y;
+  let term=mut.y;
+  let sum=mut.0.0;
+  lp(let k=1;k<100;k=k+2){
+    sum=sum+term/(k as f64);
+    term=term*y2
+  };
+  <2.0*sum
+};
+
+f=mylog2(x:$f64):$f64{
+  let ln2=0.6931471805599453;
+  <myln(x)/ln2
+};
+
+f=iscommon(p:$str):$bool{
+  if(s.eq(p;"password")){<true};
+  if(s.eq(p;"123456")){<true};
+  if(s.eq(p;"123456789")){<true};
+  if(s.eq(p;"qwerty")){<true};
+  if(s.eq(p;"abc123")){<true};
+  if(s.eq(p;"password123")){<true};
+  if(s.eq(p;"admin")){<true};
+  if(s.eq(p;"letmein")){<true};
+  if(s.eq(p;"welcome")){<true};
+  if(s.eq(p;"monkey")){<true};
+  if(s.eq(p;"iloveyou")){<true};
+  if(s.eq(p;"football")){<true};
+  <false
+};
+
+f=main():i64{
+  let line=io.readln();
+  let b=s.bytes(line);
+  let n=(b.len as i64);
+
+  if(n=0){
+    io.println("0");
+    io.println("WEAK");
+    <0
+  };
+
+  let score=mut.n*5;
+  if(score>25){score=25};
+
+  let haslower=mut.false;
+  let hasupper=mut.false;
+  let hasdigit=mut.false;
+  let hasspecial=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    let c=b.get(i);
+    if(c>96){if(c<123){haslower=true}};
+    if(c>64){if(c<91){hasupper=true}};
+    if(c>47){if(c<58){hasdigit=true}};
+    let islower=mut.false;
+    if(c>96){if(c<123){islower=true}};
+    let isupper=mut.false;
+    if(c>64){if(c<91){isupper=true}};
+    let isdigit=mut.false;
+    if(c>47){if(c<58){isdigit=true}};
+    if(!(islower)){if(!(isupper)){if(!(isdigit)){hasspecial=true}}}
+  };
+
+  let classes=mut.0;
+  if(haslower){classes=classes+1};
+  if(hasupper){classes=classes+1};
+  if(hasdigit){classes=classes+1};
+  if(hasspecial){classes=classes+1};
+
+  if(!(n<4)){
+    score=score+classes*10;
+    if(classes=4){score=score+1}
+  };
+
+  let nf=(n as f64);
+  let entropy=mut.0.0;
+  lp(let v=0;v<256;v=v+1){
+    let cnt=mut.0;
+    lp(let i=0;i<n;i=i+1){
+      if(b.get(i)=v){cnt=cnt+1}
+    };
+    if(cnt>0){
+      let pr=(cnt as f64)/nf;
+      entropy=entropy-pr*mylog2(pr)
+    }
+  };
+  let entbonus=(entropy*2.0) as i64;
+  score=score+entbonus;
+
+  let lowerline=s.lower(line);
+  if(iscommon(lowerline)){score=score-30};
+
+  if(score<0){score=0};
+  if(score>100){score=100};
+
+  io.println(s.fromint(score));
+
+  let label=mut."WEAK";
+  if(!(score<90)){label="VERY_STRONG"}el{
+    if(!(score<70)){label="STRONG"}el{
+      if(!(score<50)){label="GOOD"}el{
+        if(!(score<25)){label="FAIR"}el{label="WEAK"}
+      }
+    }
+  };
+  io.println(label);
+  <0
+};

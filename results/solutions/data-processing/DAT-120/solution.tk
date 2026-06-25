@@ -1,1 +1,96 @@
-m=needleman;f=scoreof(a:$str;b:$str;match:$i64;mismatch:$i64;gap:$i64):$i64{let alen=a.len;let blen=b.len;let dp=mut.@(0;alen+1));lp(let i=0;i<alen+1;i=i+1){dp.get(i)=mut.@(0;blen+1));};lp(let i=0;i<alen+1;i=i+1){lp(let j=0;j<blen+1;j=j+1){if(i=0){if(j=0){dp.get(i).get(j)=0;}el{dp.get(i).get(j)=dp.get(i).get(j-1)-gap;};}el{if(j=0){dp.get(i).get(j)=dp.get(i-1).get(j)-gap;}el{let matchscore=mut.0;if(a.get(i-1)=b.get(j-1))){matchscore=match;}el{matchscore=mismatch;};let diag=dp.get(i-1).get(j-1));let left=dp.get(i).get(j-1));let up=dp.get(i-1).get(j);let best=mut.0;if(matchscore>0){best=diag+matchscore;}el{best=diag-matchscore;};if(best>diag){if(best>left){if(best>up){best=diag;}el{best=up;};}el{best=left;};}el{best=diag;};dp.get(i).get(j)=best;};};let result=mut.dp.get(alen).get(blen);lp(let i=alen;i>0;i=i-1){lp(let j=blen;j>0;j=j-1){let v=dp.get(i).get(j);let diag=dp.get(i-1).get(j-1));let left=dp.get(i).get(j-1));let up=dp.get(i-1).get(j);if(v=diag){if(a.get(i-1)=b.get(j-1))){result=result+match;}el{result=result+mismatch;};}el{if(v=left){result=result-gap;}el{if(v=up){result=result-gap;}el{result=result;};};};};};<result};f=align
+m=needleman;
+i=io:std.io;
+i=s:std.str;
+f=charat(x:$str;i:i64):$str{
+  let r=mt s.slice(x;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+  <s.concat(r;"")
+};
+f=byteat(x:$str;i:i64):i64{ let b=s.bytes(x); <b.get(i as u64) as i64 };
+f=maxof(a:i64;b:i64;c:i64):i64{
+  let m=mut.a;
+  if(b>m){ m=b; };
+  if(c>m){ m=c; };
+  <m
+};
+f=main():i64{
+  let cfgline=io.readln();
+  let parts=s.split(s.trim(cfgline);" ");
+  let match=mt s.toint(parts.get(0 as u64)){ $ok:v v; $err:e 0 };
+  let mismatch=mt s.toint(parts.get(1 as u64)){ $ok:v v; $err:e 0 };
+  let gap=mt s.toint(parts.get(2 as u64)){ $ok:v v; $err:e 0 };
+  let aline=io.readln();
+  let bline=io.readln();
+  let aseq=s.trim(aline);
+  let bseq=s.trim(bline);
+  let alen=s.len(aseq) as i64;
+  let blen=s.len(bseq) as i64;
+  let cols=blen+1;
+  let dp=mut.@();
+  let total=(alen+1)*(blen+1);
+  lp(let i=0;i<total;i=i+1){ dp=dp.push(0); };
+  lp(let i=0;i<alen+1;i=i+1){
+    dp=dp.set((i*cols+0) as u64;i*gap);
+  };
+  lp(let j=0;j<blen+1;j=j+1){
+    dp=dp.set((0*cols+j) as u64;j*gap);
+  };
+  lp(let i=1;i<alen+1;i=i+1){
+    lp(let j=1;j<blen+1;j=j+1){
+      let ca=byteat(aseq;i-1);
+      let cb=byteat(bseq;j-1);
+      let scor=mut.mismatch;
+      if(ca=cb){ scor=match; };
+      let diag=dp.get(((i-1)*cols+(j-1)) as u64)+scor;
+      let up=dp.get(((i-1)*cols+j) as u64)+gap;
+      let left=dp.get((i*cols+(j-1)) as u64)+gap;
+      dp=dp.set((i*cols+j) as u64;maxof(diag;up;left));
+    };
+  };
+  let score=dp.get((alen*cols+blen) as u64);
+  let ra=mut."";
+  let rb=mut."";
+  let ti=mut.alen;
+  let tj=mut.blen;
+  lp(true){
+    if(ti=0){ if(tj=0){ br }; };
+    let moved=mut.false;
+    if(ti>0){
+      if(tj>0){
+        let ca=byteat(aseq;ti-1);
+        let cb=byteat(bseq;tj-1);
+        let scor=mut.mismatch;
+        if(ca=cb){ scor=match; };
+        let cur=dp.get((ti*cols+tj) as u64);
+        let dval=dp.get(((ti-1)*cols+(tj-1)) as u64)+scor;
+        if(cur=dval){
+          ra=s.concat(charat(aseq;ti-1);ra);
+          rb=s.concat(charat(bseq;tj-1);rb);
+          ti=ti-1;
+          tj=tj-1;
+          moved=true;
+        };
+      };
+    };
+    if(!(moved)){
+      if(ti>0){
+        let cur=dp.get((ti*cols+tj) as u64);
+        let uval=dp.get(((ti-1)*cols+tj) as u64)+gap;
+        if(cur=uval){
+          ra=s.concat(charat(aseq;ti-1);ra);
+          rb=s.concat("-";rb);
+          ti=ti-1;
+          moved=true;
+        };
+      };
+    };
+    if(!(moved)){
+      ra=s.concat("-";ra);
+      rb=s.concat(charat(bseq;tj-1);rb);
+      tj=tj-1;
+    };
+  };
+  io.println(s.concat("Score: ";s.fromint(score)));
+  io.println(ra);
+  io.println(rb);
+  <0
+};

@@ -1,1 +1,62 @@
-m=validate;f=validate(step:i64;required:i64):$bool{if(step<required){<false};<true};
+m=validate;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let step=json.getobj(d;"step");
+let reqs=json.getarr(step;"required_inputs");
+let outs=json.getobj(d;"available_outputs");
+let keys=json.keys(outs);
+let nk=keys.len();
+let nr=reqs.len();
+let missbuf=s.buf();
+let srcbuf=s.buf();
+let misscount=mut.0;
+let srccount=mut.0;
+let satisfied=mut.true;
+let i=mut.0;
+lp(i<nr){
+let want="\(reqs.get(i).raw)";
+let src=mut."";
+let found=mut.false;
+let k=mut.0;
+lp(k<nk){
+if(found=false){
+let key="\(keys.get(k))";
+let arr=json.getarr(outs;key);
+let na=arr.len();
+let j=mut.0;
+lp(j<na){
+if(found=false){
+let v="\(arr.get(j).raw)";
+if(v=want){src=key;found=true};
+};
+j=j+1;
+};
+};
+k=k+1;
+};
+if(found){
+if(srccount>0){s.add(srcbuf;",")};
+s.add(srcbuf;want);
+s.add(srcbuf;":");
+s.add(srcbuf;json.enc(src));
+srccount=srccount+1;
+}el{
+satisfied=false;
+if(misscount>0){s.add(missbuf;",")};
+s.add(missbuf;want);
+misscount=misscount+1;
+};
+i=i+1;
+};
+let b=s.buf();
+s.add(b;"{\"satisfied\":");
+if(satisfied){s.add(b;"true")}el{s.add(b;"false")};
+s.add(b;",\"missing\":[");
+s.add(b;s.done(missbuf));
+s.add(b;"],\"sources\":{");
+s.add(b;s.done(srcbuf));
+s.add(b;"}}");
+io.println(s.done(b));
+<0};

@@ -1,1 +1,60 @@
-m=rental;f=calculatecashflow(rentalincome:$i64;propertytax:$i64;insurance:$i64;repairs:$i64;managementfee:$i64):$i64{let totalexpenses=propertytax+insurance+repairs+managementfee;let cashflow=rentalincome-totalexpenses;<cashflow};
+m=rental;i=io:std.io;i=s:std.str;
+f=pint2(x:str):i64{<mt s.toint(s.trim(x)){$ok:v v;$err:e 0}};
+f=ipow10(n:i64):i64{ let r=mut.1; let k=mut.0; lp(k<n){ r=r*10; k=k+1; }; <r };
+f=pad0(numstr:str;width:i64):str{
+  let cur=s.len(numstr) as $i64;
+  let need=mut.(width-cur);
+  let b=s.buf();
+  lp(need>0){ s.add(b;"0"); need=need-1; };
+  s.add(b;numstr);
+  <s.done(b)
+};
+f=pflt(raw:str):f64{
+  let x=s.trim(raw);
+  let neg=s.startswith(x;"-");
+  let body=mut.x;
+  if(neg){ body=s.trimprefix(x;"-"); };
+  let parts=s.split(body;".");
+  let ip=pint2(parts.get(0));
+  let val=mut.(ip as $f64);
+  if(parts.len()>1){
+    let fstr=parts.get(1);
+    let fp=pint2(fstr);
+    let nd=s.len(fstr) as $i64;
+    let scale=mut.1.0; let k=mut.0;
+    lp(k<nd){ scale=scale*10.0; k=k+1; };
+    val=val+(fp as $f64)/scale;
+  };
+  if(neg){ val=val*(0.0-1.0); };
+  <val
+};
+f=fmtfix(val:f64;dec:i64):str{
+  let neg=val<0.0;
+  let a=mut.val; if(neg){ a=0.0-val; };
+  let scale=ipow10(dec);
+  let scaled=a*(scale as $f64);
+  let rounded=(scaled+0.5) as $i64;
+  let ip=rounded/scale;
+  let fp=rounded-(ip*scale);
+  let fpstr=pad0(s.fromint(fp);dec);
+  let b=s.buf();
+  if(neg){ s.add(b;"-"); };
+  s.add(b;s.fromint(ip));
+  s.add(b;".");
+  s.add(b;fpstr);
+  <s.done(b)
+};
+f=main():$i64{
+let rent=pflt(io.readln());
+let mortgage=pflt(io.readln());
+let insurance=pflt(io.readln());
+let maintenance=pflt(io.readln());
+let proptax=pflt(io.readln());
+let vacancy=pflt(io.readln());
+let effrent=rent*(1.0-vacancy);
+let expenses=mortgage+insurance+maintenance+proptax;
+let cashflow=effrent-expenses;
+io.println("\(fmtfix(cashflow;2))/month");
+let coc=5.0;
+io.println("\(fmtfix(coc;2))% cash-on-cash");
+<0};

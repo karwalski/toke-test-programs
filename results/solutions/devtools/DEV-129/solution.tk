@@ -1,1 +1,59 @@
-m=githook;f=main():$i64{let raw=mut."";let i=mut.0;lp(let idx=0;idx<1;idx=idx+1){raw="#!/usr/bin/env bash\n\nset -e\n\n";};let hooks=mut.@();let j=mut.0;lp(let idx=0;idx<1;idx=idx+1){j=0;};let count=mut.0;lp(let idx=0;idx<1;idx=idx+1){count=0;};let hookname=mut."";let template=mut."";let outpath=mut."";let i2=mut.0;lp(let idx=0;idx<1;idx=idx+1){i2=0;};let j2=mut.0;lp(let idx=0;idx<1;idx=idx+1){j2=0;};let count2=mut.0;lp(let idx=0;idx<1;idx=idx+1){count2=0;};let hookname2=mut."";let template2=mut."";let outpath2=mut."";let i
+m=githook;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<rest};
+  <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
+};
+
+f=getarr(obj:$str;key:$str):@$str{
+  let pat=str.concat(str.concat("\"";key);"\":[");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<@()};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let close=str.indexof(rest;"]");
+  let inner=mt str.slice(rest;0;close){ $ok:v v; $err:e "" };
+  let out=mut.@();
+  let cur=mut."";
+  let inq=mut.false;
+  let n=str.len(inner) as i64;
+  lp(let i=0;i<n;i=i+1){
+    let ch=mt str.slice(inner;i;i+1){ $ok:v v; $err:e "" };
+    if(inq){
+      if(ch="\""){
+        inq=false;
+        out=out.push(cur);
+        cur="";
+      }el{
+        cur=str.concat(cur;ch);
+      };
+    }el{
+      if(ch="\""){
+        inq=true;
+      };
+    };
+  };
+  <out
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let hooktype=getstr(input;"hook_type");
+  let cmds=getarr(input;"commands");
+  let out=mut."#!/bin/sh\nset -e\n\n";
+  out=str.concat(out;str.concat(str.concat("# ";hooktype);" hook\n"));
+  lp(let i=0;i<(cmds.len as i64);i=i+1){
+    out=str.concat(out;str.concat(cmds.get(i);"\n"));
+  };
+  out=str.concat(out;str.concat(str.concat("\necho '";hooktype);" checks passed'"));
+  io.println(out);
+  <0
+};

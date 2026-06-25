@@ -1,1 +1,91 @@
-m=quicksort;f=partition(arr:@$i64;low:$i64;high:$i64):$i64{let pivot=arr.get(high);let i=mut.low;lp(let j=low;j<high;j=j+1){if(arr.get(j)<pivot){let tmp=arr.get(i);arr.get(i)=arr.get(j);arr.get(j)=tmp;i=i+1;};};let tmp=arr.get(i);arr.get(i)=arr.get(high);arr.get(high)=tmp;<i};f=quicksort(arr:@$i64;low:$i64;high:$i64):@$i64{if(low<high){let pi=partition(arr;low;high);let left=quicksort(arr;low;pi-1);let right=quicksort(arr;pi+1;high);<arr}el{<arr}};f=sort(arr:@$i64):@$i64{<quicksort(arr;0;arr.len-1))};
+m=quicksort;
+i=io:std.io;
+i=s:std.str;
+
+f=joincomma(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(",";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=joinspace(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(" ";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=median3(a:i64;b:i64;c:i64):i64{
+  if(a<=b){
+    if(b<=c){<b};
+    if(a<=c){<c};
+    <a
+  }el{
+    if(a<=c){<a};
+    if(b<=c){<c};
+    <b
+  }
+};
+
+f=simplesort(a:@i64):@i64{
+  let r=mut.@();
+  lp(let i=0;i<a.len;i=i+1){ r=r.push(a.get(i)); };
+  lp(let i=0;i<r.len;i=i+1){
+    lp(let j=0;j<r.len-1;j=j+1){
+      if(r.get(j)>r.get(j+1)){
+        let t=r.get(j);
+        r=r.set(j;r.get(j+1));
+        r=r.set(j+1;t);
+      };
+    };
+  };
+  <r
+};
+
+f=qsort(arr:@i64):@i64{
+  if(arr.len<2){<arr};
+  let a=simplesort(arr);
+  let n=a.len;
+  let pivot=median3(a.get(0);a.get(1);a.get(n-1));
+  let less=mut.@();
+  let greater=mut.@();
+  let eqcount=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let v=a.get(i);
+    if(v<pivot){
+      less=less.push(v);
+    }el{
+      if(v>pivot){
+        greater=greater.push(v);
+      }el{
+        eqcount=eqcount+1;
+      };
+    };
+  };
+  io.println(s.concat("Pivot: ";s.concat(s.fromint(pivot);s.concat(" -> [";s.concat(joincomma(less);s.concat("] ";s.concat(s.fromint(pivot);s.concat(" [";s.concat(joincomma(greater);"]")))))))));
+  let left=qsort(less);
+  let right=qsort(greater);
+  let result=mut.@();
+  lp(let i=0;i<left.len;i=i+1){ result=result.push(left.get(i)); };
+  lp(let i=0;i<eqcount;i=i+1){ result=result.push(pivot); };
+  lp(let i=0;i<right.len;i=i+1){ result=result.push(right.get(i)); };
+  <result
+};
+
+f=main():i64{
+  let line=io.readln();
+  let parts=s.split(line;" ");
+  let arr=mut.@();
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=parts.get(i);
+    if(s.len(p)>0){ arr=arr.push(s.toint(p)); };
+  };
+  let sorted=qsort(arr);
+  io.println(s.concat("Sorted: ";joinspace(sorted)));
+  <0
+}

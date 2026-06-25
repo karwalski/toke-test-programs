@@ -1,86 +1,114 @@
 m=lightsout;
 i=io:std.io;
 i=s:std.str;
-i=mut:std.mut;
+i=vec:std.vec;
 
-f=solve(grid:$[i64];size:$i64):$[i64]{
-    let pressed=mut.array(size*size;0);
-    let current=mut.array(size*size;0);
-    lp(let i=0;i<size*size;i=i+1){
-        current.set(i;grid.get(i));
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)=0){done=1;br};
+    lines=lines.push(line)
+  };
+  let rows=(lines.len as i64)-1;
+  if(rows<1){io.println("Unsolvable");<0};
+  let cols=s.len(lines.get(1)) as i64;
+
+  (* original grid flat, 1=on/0=off *)
+  let orig=mut.vec.new();
+  lp(let r=1;r<=rows;r=r+1){
+    let b=s.bytes(lines.get(r));
+    lp(let c=0;c<cols;c=c+1){
+      orig=vec.push(orig;(b.get(c) as i64)-48)
+    }
+  };
+
+  (* brute force first-row press masks; pick min presses *)
+  let bestcount=mut.-1;
+  let bestpress=mut.vec.new();   (* flat press grid of best solution *)
+  lp(let i=0;i<rows*cols;i=i+1){bestpress=vec.push(bestpress;0)};
+
+  let masks=1;
+  let limit=mut.1;
+  lp(let i=0;i<cols;i=i+1){limit=limit*2};
+
+  lp(let mask=0;mask<limit;mask=mask+1){
+    (* working grid copy *)
+    let g=mut.vec.new();
+    lp(let i=0;i<rows*cols;i=i+1){g=vec.push(g;vec.get(orig;i))};
+    let press=mut.vec.new();
+    lp(let i=0;i<rows*cols;i=i+1){press=vec.push(press;0)};
+
+    (* apply first-row presses from mask *)
+    lp(let c=0;c<cols;c=c+1){
+      let bit=(mask/pw2(c))%2;
+      if(bit=1){
+        press=vec.set(press;c;1);
+        g=toggle(g;rows;cols;0;c)
+      }
     };
-    
-    lp(let row=0;row<size;row=row+1){
-        lp(let col=0;col<size;col=col+1){
-            let idx=row*size+col;
-            if(current.get(idx)=1){
-                pressed.set(idx;1);
-                current.set(idx;1-current.get(idx));
-                if(row>0){
-                    let up=(row-1)*size+col;
-                    current.set(up;1-current.get(up));
-                };
-                if(row<size-1){
-                    let down=(row+1)*size+col;
-                    current.set(down;1-current.get(down));
-                };
-                if(col>0){
-                    let left=row*size+(col-1);
-                    current.set(left;1-current.get(left));
-                };
-                if(col<size-1){
-                    let right=row*size+(col+1);
-                    current.set(right;1-current.get(right));
-                };
-            };
-        };
+
+    (* chase down *)
+    lp(let r=1;r<rows;r=r+1){
+      lp(let c=0;c<cols;c=c+1){
+        if(vec.get(g;(r-1)*cols+c)=1){
+          press=vec.set(press;r*cols+c;1);
+          g=toggle(g;rows;cols;r;c)
+        }
+      }
     };
-    
-    lp(let i=0;i<size*size;i=i+1){
-        if(current.get(i)=1){
-            <mut.array(0;0);
-        };
+
+    (* check bottom row all off *)
+    let ok=mut.1;
+    lp(let c=0;c<cols;c=c+1){
+      if(vec.get(g;(rows-1)*cols+c)=1){ok=0}
     };
-    <pressed;
+
+    if(ok=1){
+      let cnt=mut.0;
+      lp(let i=0;i<rows*cols;i=i+1){cnt=cnt+vec.get(press;i)};
+      if(bestcount<0){
+        bestcount=cnt;
+        lp(let i=0;i<rows*cols;i=i+1){bestpress=vec.set(bestpress;i;vec.get(press;i))}
+      }el{
+        if(cnt<bestcount){
+          bestcount=cnt;
+          lp(let i=0;i<rows*cols;i=i+1){bestpress=vec.set(bestpress;i;vec.get(press;i))}
+        }
+      }
+    }
+  };
+
+  if(bestcount<0){
+    io.println("Unsolvable")
+  }el{
+    lp(let r=0;r<rows;r=r+1){
+      lp(let c=0;c<cols;c=c+1){
+        if(vec.get(bestpress;r*cols+c)=1){
+          io.println(s.concat(s.concat(s.fromint(r);" ");s.fromint(c)))
+        }
+      }
+    }
+  };
+  <0
 };
 
-f=main():$i64{
-    let lines=mut.array(0;"");
-    let size=mut.0;
-    lp(let running=true;running){
-        let line=io.readln();
-        if(s.length(line)=0){
-            running=false;
-        }else{
-            if(size=0){
-                size=s.length(line);
-            };
-            lines.append(line);
-        };
-    };
-    
-    let grid=mut.array(size*size;0);
-    lp(let i=0;i<size;i=i+1){
-        let line=lines.get(i);
-        lp(let j=0;j<size;j=j+1){
-            let char=s.char(line;j);
-            let val=s.toint(char);
-            grid.set(i*size+j;val);
-        };
-    };
-    
-    let result=solve(grid;size);
-    if(result.length()=0){
-        io.println("Unsolvable");
-    }else{
-        lp(let i=0;i<size;i=i+1){
-            lp(let j=0;j<size;j=j+1){
-                let idx=i*size+j;
-                if(result.get(idx)=1){
-                    io.println(s.concat(s.concat(s.fromint(i);" ");s.fromint(j)));
-                };
-            };
-        };
-    };
-    <0;
+(* 2^n *)
+f=pw2(n:$i64):$i64{
+  let r=mut.1;
+  lp(let i=0;i<n;i=i+1){r=r*2};
+  <r
 };
+
+(* toggle cell (r,c) and its 4 orthogonal neighbours *)
+f=toggle(g:$vec;rows:$i64;cols:$i64;r:$i64;c:$i64):$vec{
+  let res=mut.g;
+  res=vec.set(res;r*cols+c;1-vec.get(res;r*cols+c));
+  if(r>0){ let i=(r-1)*cols+c; res=vec.set(res;i;1-vec.get(res;i)) };
+  if(r<rows-1){ let i=(r+1)*cols+c; res=vec.set(res;i;1-vec.get(res;i)) };
+  if(c>0){ let i=r*cols+(c-1); res=vec.set(res;i;1-vec.get(res;i)) };
+  if(c<cols-1){ let i=r*cols+(c+1); res=vec.set(res;i;1-vec.get(res;i)) };
+  <res
+}

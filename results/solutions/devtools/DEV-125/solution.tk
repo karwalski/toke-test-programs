@@ -1,1 +1,108 @@
-m=debt;f=simplecodecomplexity(lines:$i64):$i64{if(lines<10){<1};if(lines<20){<2};if(lines<50){<3};<4};f=estimatehours(codecomplexity:$i64;lines:$i64):$f64{let base=codecomplexity as$f64;let size=lines as$f64;let ratio=size/base;let hours=ratio/4.0;<hours};f=totaltechnicaldebt(codebases:$str;linesperbase:@$i64):$f64{let total=mut.0.0;let i=mut.0;lp(let idx=0;idx<linesperbase.len;idx=idx+1){let lines=linesperbase.get(idx);let complexity=simplecodecomplexity(lines);let hours=estimatehours(complexity;lines);total=total+hours;i=i+1;};<total};f=main():$i64{let bases=@("base1";"base2";"base3"));let lines=@(100;200;500));let debt
+m=debt;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<rest};
+  <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
+};
+
+f=getint(obj:$str;key:$str):$i64{
+  let pat=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<0};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let n=str.len(rest) as i64;
+  let num=mut."";
+  let done=mut.false;
+  let zero=str.bytes("0").get(0);
+  let nine=str.bytes("9").get(0);
+  lp(let i=0;i<n;i=i+1){
+    if(!(done)){
+      let b=str.bytes(rest).get(i);
+      let ok=mut.false;
+      if(!(b<zero)){ if(!(b>nine)){ ok=true } };
+      if(ok){
+        num=str.concat(num;mt str.slice(rest;i;i+1){ $ok:v v; $err:e "" });
+      }el{
+        if(str.len(num)>0){ done=true };
+      };
+    };
+  };
+  <mt str.toint(num){ $ok:v v; $err:e 0 }
+};
+
+f=fmt1(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*10.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/10;
+  let frac=asint-whole*10;
+  let sign=mut."";
+  if(neg){sign="-"};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");str.fromint(frac))
+};
+
+f=debtof(complexity:$i64;dup:$i64;cov:$i64;age:$i64):$f64{
+  let comp=(complexity as f64)/10.0;
+  let dpart=(dup as f64)/20.0;
+  let covterm=(100-cov)/20;
+  let base=comp+dpart+(covterm as f64);
+  let agefactor=1.0+((age/1000) as f64);
+  <base*agefactor
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let n=str.len(input) as i64;
+  let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
+  let parts=str.split(inner;"},{");
+  let files=mut.@();
+  let debts=mut.@();
+  let total=mut.0.0;
+  lp(let i=0;i<(parts.len as i64);i=i+1){
+    let raw=parts.get(i);
+    let obj=mut.raw;
+    if(!(str.startswith(obj;"{"))){ obj=str.concat("{";obj) };
+    if(!(str.endswith(obj;"}"))){ obj=str.concat(obj;"}") };
+    let fname=getstr(obj;"file");
+    let complexity=getint(obj;"complexity");
+    let dup=getint(obj;"duplication_pct");
+    let cov=getint(obj;"coverage_pct");
+    let age=getint(obj;"age_days");
+    let d=debtof(complexity;dup;cov;age);
+    files=files.push(fname);
+    debts=debts.push(d);
+    total=total+d;
+  };
+  let cnt=files.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<cnt;i=i+1){ order=order.push(i) };
+  lp(let a=0;a<cnt;a=a+1){
+    lp(let b=0;b<cnt-1;b=b+1){
+      let i1=order.get(b);
+      let i2=order.get(b+1);
+      if(debts.get(i1)<debts.get(i2)){
+        order=order.set(b;i2);
+        order=order.set(b+1;i1);
+      };
+    };
+  };
+  let out=mut."";
+  lp(let i=0;i<cnt;i=i+1){
+    let oi=order.get(i);
+    out=str.concat(out;str.concat(str.concat(files.get(oi);": ");str.concat(fmt1(debts.get(oi));"h\n")));
+  };
+  out=str.concat(out;str.concat("Total: ";str.concat(fmt1(total);"h")));
+  io.println(out);
+  <0
+};

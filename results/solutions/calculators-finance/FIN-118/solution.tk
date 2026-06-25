@@ -1,1 +1,48 @@
-m=retirement;f=required_corpus(age:$i64;expected_life:$i64;annual_income:$i64):$i64{let inflation_rate=mut.3;let years_until_retirement=mut.65-age;let projected_income=mut.annual_income*(1+inflation_rate/100));let corpus=mut.0;lp(let idx=0;idx<years_until_retirement;idx=idx+1){corpus=corpus+projected_income*(1+inflation_rate/100));};<corpus};f=monthly_savings_needed(corpus:$i64;years_until_retirement:$i64):$i64{let monthly_savings=mut.0;let total_months=years_until_retirement*12;lp(let idx=0;idx<total_months;idx=idx+1){monthly_savings=monthly_savings+corpus/total_months;};<monthly_savings};f=main():$i64{let age=30;let expected_life=100;let annual_income=50000;let corpus=required_corpus(age;expected_life;annual_income));let
+m=retirement;
+i=io:std.io;
+i=s:std.str;
+i=mth:std.math;
+
+f=fmt2(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let n=mut.scaled as i64;
+  let intpart=n/100;
+  let frac=n-intpart*100;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  let res=mut.s.concat(s.fromint(intpart);s.concat(".";fracstr));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+
+f=main():$i64{
+  let line=io.readln();
+  let parts=s.split(s.trim(line);" ");
+  let currentage=s.tofloat(parts.get(0));
+  let retireage=s.tofloat(parts.get(1));
+  let monthlyexpense=s.tofloat(parts.get(2));
+  let inflation=s.tofloat(parts.get(3));
+  let returnrate=s.tofloat(parts.get(4));
+
+  let years=retireage-currentage;
+  let inflatedmonthly=monthlyexpense*mth.pow(1.0+inflation;years);
+  let annualexpense=inflatedmonthly*12.0;
+
+  let retireyears=25.0;
+  let ratio=(1.0+inflation)/(1.0+returnrate);
+  let corpus=annualexpense*(1.0-mth.pow(ratio;retireyears))/(returnrate-inflation);
+
+  let months=years*12.0;
+  let monthlyrate=returnrate/12.0;
+  let growth=mth.pow(1.0+monthlyrate;months)-1.0;
+  let monthlysavings=corpus*monthlyrate/growth;
+  let totalinvested=monthlysavings*months;
+
+  io.println(fmt2(corpus));
+  io.println(fmt2(monthlysavings));
+  io.println(fmt2(totalinvested));
+  <0
+};

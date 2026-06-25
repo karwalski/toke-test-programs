@@ -1,1 +1,113 @@
-m=gae;f=mutate(s:$str):$str{let n=s.len;let m=mut.n;lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c>64){if(c<91){let r=mut.c+32;if(r>122){r=r-26};<r}}}};let r=mut.m;if(r>n){r=r-n};<s};f=cross(a:$str;b:$str):$str{let n=a.len;let m=mut.n;lp(let i=0;i<n;i=i+1){let ca=a.get(i);let cb=b.get(i);if(ca=cb){let r=mut.ca;if(r>64){if(r<91){let rr=r+32;if(rr>122){rr=rr-26};<rr}}}}
+m=gaphrase;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+(* LCG PRNG: returns new state; helper to get next *)
+f=nextrand(state:$i64):$i64{
+  let r=(state*1103515245+12345)%2147483648;
+  let rr=mut.r;
+  if(rr<0){rr=rr+2147483648};
+  <rr
+};
+
+(* map a random 0..25 to an uppercase letter byte (65..90) *)
+f=letterbyte(r:$i64):$i64{
+  let m=r%26;
+  let mm=mut.m;
+  if(mm<0){mm=mm+26};
+  <(mm+65)
+};
+
+f=bytestostr(bs:@$i64;n:$i64):$str{
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    out=s.concat(out;s.frombytes(@(bs.get(i))))
+  };
+  <out
+};
+
+f=fitness(cand:@$i64;target:@$i64;n:$i64):$i64{
+  let f=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    if(cand.get(i)=target.get(i)){f=f+1}
+  };
+  <f
+};
+
+f=main():i64{
+  let target=io.readln();
+  let cfg=io.readln();
+  let parts=s.split(cfg;" ");
+  let popsize=s.toint(parts.get(0));
+  (* mutation rate as float ignored for integer prng; we derive an int threshold *)
+  let ratestr=parts.get(1);
+  let seed0=s.toint(parts.get(2));
+
+  let tb=s.bytes(target);
+  let n=s.len(target) as i64;
+
+  (* mutation rate -> permille threshold out of 1000 *)
+  let ratef=s.tofloat(ratestr);
+  let thresh=(ratef*1000.0) as i64;
+
+  let state=mut.seed0;
+
+  (* initialise population as flat vec of bytes: pop[p*n + i] *)
+  let pop=mut.vec.new();
+  lp(let p=0;p<popsize;p=p+1){
+    lp(let i=0;i<n;i=i+1){
+      state=nextrand(state);
+      pop=vec.push(pop;letterbyte(state))
+    }
+  };
+
+  let gen=mut.0;
+  let solved=mut.0;
+  let bestidx=mut.0;
+  lp(gen<100000){
+    (* evaluate fitness, find best *)
+    let bestfit=mut.-1;
+    bestidx=0;
+    lp(let p=0;p<popsize;p=p+1){
+      let f=mut.0;
+      lp(let i=0;i<n;i=i+1){
+        if(vec.get(pop;p*n+i)=(tb.get(i) as i64)){f=f+1}
+      };
+      if(f>bestfit){bestfit=f;bestidx=p}
+    };
+    if(bestfit=n){solved=1;br};
+
+    (* build next generation: keep best (elitism), others = mutated copies of best *)
+    let newpop=mut.vec.new();
+    (* elite copy *)
+    lp(let i=0;i<n;i=i+1){
+      newpop=vec.push(newpop;vec.get(pop;bestidx*n+i))
+    };
+    lp(let p=1;p<popsize;p=p+1){
+      lp(let i=0;i<n;i=i+1){
+        let base=vec.get(pop;bestidx*n+i);
+        state=nextrand(state);
+        let roll=state%1000;
+        let nb=mut.base;
+        if(roll<thresh){
+          state=nextrand(state);
+          nb=letterbyte(state)
+        };
+        newpop=vec.push(newpop;nb)
+      }
+    };
+    pop=newpop;
+    gen=gen+1
+  };
+
+  (* reconstruct best phrase *)
+  let phrase=mut."";
+  lp(let i=0;i<n;i=i+1){
+    phrase=s.concat(phrase;s.frombytes(@(vec.get(pop;bestidx*n+i) as u8)))
+  };
+
+  let out=s.concat(s.concat(s.concat("Converged in ";s.fromint(gen));" generations: ");phrase);
+  io.println(out);
+  <0
+}

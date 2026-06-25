@@ -1,1 +1,63 @@
-m=cumulativegpa;f=lettergrade(pct:$i64):$str{if(!(pct<97))){<"A+";}el{if(!(pct<93))){<"A";}el{if(!(pct<87))){<"B+";}el{if(!(pct<83))){<"B";}el{if(!(pct<77))){<"C+";}el{if(!(pct<73))){<"C";}el{if(!(pct<67))){<"D+";}el{if(!(pct<63))){<"D";}el{<"F";}}}}}}}};f=creditpoints(grade:$str):$i64{if(grade="A+"){<4.0};if(grade="A"){<4.0};if(grade="B+"){<3.0};if(grade="B"){<3.0};if(grade="C+"){<2.0};if(grade="C"){<2.0};if(grade="D+"){<1.0};if(grade="D"){<1.0};<0.0};
+m=cumulativegpa;
+i=io:std.io;
+i=str:std.str;
+
+f=gradeval(g:$str):$f64{
+  if(g="A"){<4.0};
+  if(g="B"){<3.0};
+  if(g="C"){<3.0};
+  if(g="D"){<1.0};
+  <0.0
+};
+
+f=fmt1(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*10.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/10;
+  let frac=asint-whole*10;
+  let sign=mut."";
+  if(neg){sign="-"};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");str.fromint(frac))
+};
+
+f=fmt2(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*100.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/100;
+  let frac=asint-whole*100;
+  let sign=mut."";
+  if(neg){sign="-"};
+  let fracstr=mut.str.fromint(frac);
+  if(frac<10){fracstr=str.concat("0";str.fromint(frac))};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");fracstr)
+};
+
+f=main():i64{
+  let totalqp=mut.0.0;
+  let totalcred=mut.0.0;
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(str.len(line)=0){br};
+    let parts=str.split(line;" ");
+    let course=parts.get(0);
+    let creditstr=parts.get(1);
+    let grade=parts.get(2);
+    let credits=mt str.toint(creditstr){ $ok:v v; $err:e 0 };
+    let cf=credits as f64;
+    let gv=gradeval(grade);
+    let qp=cf*gv;
+    totalqp=totalqp+qp;
+    totalcred=totalcred+cf;
+    io.println(str.concat(str.concat(str.concat(course;": ");fmt1(qp));" quality points"));
+  };
+  let gpa=mut.0.0;
+  if(!(totalcred=0.0)){gpa=totalqp/totalcred};
+  io.println(str.concat("GPA: ";fmt2(gpa)));
+  <0
+};

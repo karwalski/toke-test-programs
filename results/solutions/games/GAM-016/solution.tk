@@ -1,1 +1,16 @@
-m=guesser;f=extractletters(s:$str):$str{let n=s.len;let m=mut."";lp(let i=0;i<n;i=i+1){let c=s.get(i);let islower=mut.false;if(c>96){if(c<123){islower=true}};if(islower){m=m+c}};let result=mut."";let ml=m.len;lp(let i=0;i<ml;i=i+1){let c=m.get(i);let found=mut.false;let rl=result.len;lp(let j=0;j<rl;j=j+1){let cc=result.get(j);if(cc=c){found=true}};if(!(found)){result=result+c}}};f=sortbylen
+m=guesser;i=io:std.io;i=s:std.str;
+f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
+f=fb(target:$str;guess:$str):$str{let n=s.len(target);let res=mut.@($str);let avail=mut.@($str);
+lp(let i=0;i<n;i=i+1){res=res+@("B");avail=avail+@(ch(target;i))};
+lp(let i=0;i<n;i=i+1){if(s.equals(ch(target;i);ch(guess;i))){res=res.set(i;"G");avail=avail.set(i;"")}};
+lp(let i=0;i<n;i=i+1){if(s.equals(res.get(i);"B")){let gc=ch(guess;i);let done=mut.false;lp(let j=0;j<n;j=j+1){if(!(done)){if(s.equals(avail.get(j);gc)){res=res.set(i;"Y");avail=avail.set(j;"");done=true}}}}};
+let out=mut."";lp(let i=0;i<n;i=i+1){out=s.concat(out;res.get(i))};<out};
+f=main():$i64{let words=mut.@($str);let reading=mut.true;
+lp(reading){let line=s.trim(io.readln());if(s.len(line)=0){reading=false}el{words=words+@(line)}};
+let gw=mut.@($str);let gf=mut.@($str);let reading2=mut.true;
+lp(reading2){let line=s.trim(io.readln());if(s.len(line)=0){reading2=false}el{let p=s.split(line;":");if(p.len()>=2){gw=gw+@(s.trim(p.get(0)));gf=gf+@(s.trim(p.get(1)))}}};
+let best=mut."";let found=mut.false;
+lp(let i=0;i<words.len();i=i+1){if(!(found)){let w=words.get(i);let ok=mut.true;lp(let j=0;j<gw.len();j=j+1){if(!(s.equals(fb(w;gw.get(j));gf.get(j)))){ok=false}};if(ok){best=w;found=true}}};
+if(!(found)){if(words.len()>0){best=words.get(0)}};
+io.println(best);
+<0}

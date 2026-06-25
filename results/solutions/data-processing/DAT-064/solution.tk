@@ -1,1 +1,63 @@
-m=reservoir;f=reservoir(arr:@$str;k:$i64):@$str{let n=arr.len;let result=mut.@();lp(let i=0;i<n;i=i+1){let shouldinclude=mut.false;if(result.len<k){shouldinclude=true}el{let ridx=i-i/k*k;let ridx64=ridx as u64;let arrlen=n as u64;let randval=arrlen-arrlen/ridx64*ridx64;let threshold=k as u64;let shouldincludeval=mut.false;if(randval<threshold){shouldincludeval=true};shouldinclude=shouldincludeval;};if(shouldinclude){let item=arr.get(i);let resultlen=result.len as u64;let kval=k as u64;let idx=i-i/k*k;let idx64=
+m=sampler;
+i=io:std.io;
+i=s:std.str;
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  let nl=mut.lines.len;
+  lp(1=1){
+    if(nl<=0){br};
+    if(s.eq(lines.get(nl-1);"")){nl=nl-1}el{br}
+  };
+  let spec=lines.get(0);
+  let parts=spec.split(" ");
+  let strat=parts.get(0);
+
+  (* header + data rows *)
+  let header=lines.get(1);
+  let rows=mut.@();
+  lp(let i=2;i<nl;i=i+1){ rows=rows.push(lines.get(i)) };
+  let total=rows.len;
+
+  io.println(header);
+
+  if(s.eq(strat;"systematic")){
+    let kk=mut.s.toint(parts.get(1));
+    if(kk<1){kk=1};
+    lp(let i=0;i<total;i=i+1){
+      let r=i-i/kk*kk;
+      if(r=0){ io.println(rows.get(i)) }
+    };
+    <0
+  };
+
+  if(s.eq(strat;"reservoir")){
+    let kk=s.toint(parts.get(1));
+    let seed=mut.0;
+    if(parts.len>2){ seed=s.toint(parts.get(2)) };
+    (* standard reservoir sampling (Algorithm R) with a simple LCG *)
+    let res=mut.@();
+    lp(let i=0;i<total;i=i+1){
+      if(i<kk){
+        res=res.push(rows.get(i))
+      }el{
+        seed=(seed*1103515245+12345)-((seed*1103515245+12345)/2147483648)*2147483648;
+        let bound=i+1;
+        let j=seed-seed/bound*bound;
+        if(j<kk){ res=res.set(j;rows.get(i)) }
+      }
+    };
+    let rn=res.len;
+    lp(let i=0;i<rn;i=i+1){ io.println(res.get(i)) };
+    <0
+  };
+
+  (* default/stratified fallback: emit all rows *)
+  lp(let i=0;i<total;i=i+1){ io.println(rows.get(i)) };
+  <0
+}

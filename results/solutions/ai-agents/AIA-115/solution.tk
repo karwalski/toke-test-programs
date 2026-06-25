@@ -1,1 +1,142 @@
-Understood. I'll prioritize keeping the most recent, relevant, and important information in working memory.
+m=workingmem;i=io:std.io;i=s:std.str;
+f=parsenum(t:$str):$f64{
+  let n=s.len(t) as i64;let intp=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(s.eq(ch;".")){i=n}el{
+      let d=s.indexof("0123456789";ch);
+      if(d>=0){intp=intp*10+d};
+      i=i+1
+    }
+  };
+  let res=mut.intp as f64;
+  let dot=s.indexof(t;".");
+  if(dot>=0){
+    let frac=s.slice(t;dot+1;s.len(t) as i64);
+    let fl=s.len(frac) as i64;
+    let scale=mut.1.0;
+    let fv=mut.0;
+    lp(let k=0;k<fl;k=k+1){
+      let ch=s.slice(frac;k;k+1);
+      let d=s.indexof("0123456789";ch);
+      if(d>=0){fv=fv*10+d;scale=scale*10.0}
+    };
+    res=res+(fv as f64)/scale
+  };
+  if(neg){<0.0-res};
+  <res
+};
+f=fmtscore(v:$f64):$str{
+  let scaled=v*100.0+0.5;
+  let asi=scaled as i64;
+  let ip=asi/100;
+  let fp=asi-ip*100;
+  let d1=fp/10;
+  let d2=fp-d1*10;
+  if(d2=0){
+    <s.concat(s.concat(s.fromint(ip);".");s.fromint(d1))
+  };
+  let fs=s.concat(s.fromint(d1);s.fromint(d2));
+  <s.concat(s.concat(s.fromint(ip);".");fs)
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let ids=mut.@();
+  let scores=mut.@();
+  (* parse max_items *)
+  let mk="\"max_items\":";
+  let mi=s.indexof(json;mk);
+  let maxitems=mut.0;
+  if(mi>=0){
+    let after=s.slice(json;mi+s.len(mk) as i64;jn);
+    let al=s.len(after) as i64;
+    let v=mut.0;let parsing=mut.true;let k=mut.0;
+    lp(k<al){
+      if(parsing){
+        let ch=s.slice(after;k;k+1);
+        let d=s.indexof("0123456789";ch);
+        if(d>=0){v=v*10+d}el{parsing=false};
+        k=k+1
+      }el{k=al}
+    };
+    maxitems=v
+  };
+  (* iterate items: each item has "id":"..." then recency/relevance/importance *)
+  let p=mut.0;
+  lp(p<jn){
+    let rest=s.slice(json;p;jn);
+    let idx=s.indexof(rest;"\"id\":\"");
+    if(idx<0){p=jn}el{
+      let idstart=p+idx+6;
+      let after=s.slice(json;idstart;jn);
+      let endq=s.indexof(after;"\"");
+      let idval=s.slice(after;0;endq);
+      ids=ids+@(idval);
+      let segstart=idstart+endq;
+      (* find the three scores after this id, before next "id" or end *)
+      let segrest=s.slice(json;segstart;jn);
+      let nextid=s.indexof(segrest;"\"id\":\"");
+      let segend=mut.s.len(segrest) as i64;
+      if(nextid>=0){segend=nextid};
+      let seg=s.slice(segrest;0;segend);
+      let rec=extractnum(seg;"\"recency_score\":");
+      let rel=extractnum(seg;"\"relevance_score\":");
+      let imp=extractnum(seg;"\"importance_score\":");
+      let avg=(rec+rel+imp)/3.0;
+      scores=scores+@(avg);
+      p=segstart+endq+1
+    }
+  };
+  let n=ids.len();
+  (* sort descending by score (stable-ish via index) *)
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=a+1;b<n;b=b+1){
+      let ia=order.get(a);let ib=order.get(b);
+      if(scores.get(ib)>scores.get(ia)){
+        order=order.set(a;ib);order=order.set(b;ia)
+      }
+    }
+  };
+  (* build output *)
+  let retained=mut."";let rc=mut.0;
+  let evicted=mut."";let ec=mut.0;
+  let scoring=mut."";
+  lp(let r=0;r<n;r=r+1){
+    let oi=order.get(r);
+    let id=ids.get(oi);
+    let scr=fmtscore(scores.get(oi));
+    if(r>0){scoring=s.concat(scoring;",")};
+    scoring=s.concat(scoring;s.concat(s.concat(s.concat("{\"id\":\"";id);"\",\"combined_score\":");s.concat(scr;"}")));
+    if(r<maxitems){
+      if(rc>0){retained=s.concat(retained;",")};
+      retained=s.concat(retained;s.concat(s.concat("\"";id);"\""));
+      rc=rc+1
+    }el{
+      if(ec>0){evicted=s.concat(evicted;",")};
+      evicted=s.concat(evicted;s.concat(s.concat("\"";id);"\""));
+      ec=ec+1
+    }
+  };
+  let out=s.concat(s.concat(s.concat(s.concat("{\"retained\":[";retained);"],\"evicted\":[");evicted);"],\"scoring\":[");
+  io.println(s.concat(s.concat(out;scoring);"]}"));
+  <0
+};
+f=extractnum(seg:$str;key:$str):$f64{
+  let ki=s.indexof(seg;key);
+  if(ki<0){<0.0};
+  let after=s.slice(seg;ki+s.len(key) as i64;s.len(seg) as i64);
+  let al=s.len(after) as i64;
+  let k=mut.0;let numstr=mut."";let done=mut.false;
+  lp(k<al){
+    if(done){k=al}el{
+      let ch=s.slice(after;k;k+1);
+      let isnum=s.indexof("0123456789.-";ch);
+      if(isnum>=0){numstr=s.concat(numstr;ch);k=k+1}el{done=true}
+    }
+  };
+  <parsenum(numstr)
+}

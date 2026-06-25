@@ -1,1 +1,93 @@
-m=timestamp;f=solve(p0:$i64;p1:$str;p2:$str):$i64{let tz1=p1;let tz2=p2;let ts=p0;let result=mut.ts;let tzdiff=mut.0;if(tz1="utc"){if(tz2="utc"){<ts};if(tz2="local"){<ts};};if(tz1="local"){if(tz2="utc"){<ts};if(tz2="local"){<ts};};<result};
+m=tzconvert;i=io:std.io;i=s:std.str;
+f=p2(n:$i64):$str{
+  let v=s.fromint(n);
+  if(n<10){<s.concat("0";v)};
+  <v
+};
+f=isleap(y:$i64):$i64{
+  if((y-(y/4)*4)!=0){<0};
+  if((y-(y/100)*100)!=0){<1};
+  if((y-(y/400)*400)!=0){<0};
+  <1
+};
+f=dim(y:$i64;m:$i64):$i64{
+  if(m=1){<31};
+  if(m=2){if(isleap(y)=1){<29};<28};
+  if(m=3){<31};
+  if(m=4){<30};
+  if(m=5){<31};
+  if(m=6){<30};
+  if(m=7){<31};
+  if(m=8){<31};
+  if(m=9){<30};
+  if(m=10){<31};
+  if(m=11){<30};
+  <31
+};
+f=zoneoff(tz:$str;month:$i64):$i64{
+  if(tz="UTC"){<0};
+  let daylight=mut.0;
+  if(month>=4){if(month<=10){daylight=1}};
+  if(tz="America/New_York"){
+    if(daylight=1){<(0-4)*60};
+    <(0-5)*60
+  };
+  if(tz="America/Los_Angeles"){
+    if(daylight=1){<(0-7)*60};
+    <(0-8)*60
+  };
+  <0
+};
+f=offstr(mins:$i64):$str{
+  let sign=mut."+";
+  let a=mut.mins;
+  if(mins<0){sign="-";a=0-mins};
+  let h=a/60;
+  let mm=a-h*60;
+  <s.concat(s.concat(s.concat(sign;p2(h));":");p2(mm))
+};
+f=main():$i64{
+  let header=io.readln();
+  let zones=s.split(header;" ");
+  let src=zones.get(0);
+  let tgt=zones.get(1);
+  let line=mut.io.readln();
+  lp(io.eof()!=1){
+    let yr=s.toint(s.slice(line;0;4));
+    let mo=s.toint(s.slice(line;5;7));
+    let dy=mut.s.toint(s.slice(line;8;10));
+    let hh=mut.s.toint(s.slice(line;11;13));
+    let mi=s.toint(s.slice(line;14;16));
+    let ss=s.slice(line;17;19);
+    let rest=s.slice(line;19;s.len(line));
+    let srcoff=mut.0;
+    if(rest!="Z"){
+      let osign=s.slice(rest;0;1);
+      let oh=s.toint(s.slice(rest;1;3));
+      let om=s.toint(s.slice(rest;4;6));
+      let total=oh*60+om;
+      if(osign="-"){srcoff=0-total}el{srcoff=total}
+    };
+    let totalmin=mut.hh*60+mi;
+    totalmin=totalmin-srcoff;
+    let tgtoff=zoneoff(tgt;mo);
+    totalmin=totalmin+tgtoff;
+    lp(totalmin<0){
+      totalmin=totalmin+1440;
+      dy=dy-1;
+      if(dy<1){dy=dim(yr;mo-1)}
+    };
+    lp(totalmin>=1440){
+      totalmin=totalmin-1440;
+      dy=dy+1
+    };
+    hh=totalmin/60;
+    let outmi=totalmin-hh*60;
+    let datepart=s.concat(s.concat(s.concat(s.concat(s.concat(s.fromint(yr);"-");p2(mo));"-");p2(dy));"T");
+    let timepart=s.concat(s.concat(s.concat(s.concat(p2(hh);":");p2(outmi));":");ss);
+    let out=s.concat(s.concat(datepart;timepart);offstr(tgtoff));
+    io.println(out);
+    line=io.readln()
+  };
+  <0
+};

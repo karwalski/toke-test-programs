@@ -1,1 +1,64 @@
-m=shuffle;f=shuffle(n:$i64;m:$i64):$i64{let r=mut.0;let s=mut.0;lp(let i=0;i<m;i=i+1){let j=i+i/2;let tmp=n.get(i);n.get(i)=n.get(j);n.get(j)=tmp;};<n};f=deal(hands:$i64;cardsperhand:$i64;totalcards:$i64):$i64{let result=mut.@();lp(let i=0;i<hands;i=i+1){let hand=mut.@();lp(let j=0;j<cardsperhand;j=j+1){if((i*cardsperhand+j)<totalcards)){hand=hand+@((i*cardsperhand+j)<totalcards));};};result=result+@(hand);};<result};f=main(args:@$str):i64{let seed=args.get(0);let hands=args.get(1);let cardsperhand=args.get(2);let totalcards=args.get(3);let shuffled=shuffle(seed;totalcards);let dealt=deal(shuffled;hands;cardsperhand;totalcards);lp(let i=0;i<dealt.len;i=i+1){let hand=dealt.get(i);let output=mut."";lp(let j=0;j<hand.len;j=j+1){let card=hand.get(j);output=output+card;if(!(j=hand.len-1))){output=s.concat(output;" ");};};<output;};
+m=carddeal;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=nextrand(state:$i64):$i64{
+  let r=(state*1103515245+12345)%2147483648;
+  let rr=mut.r;
+  if(rr<0){rr=rr+2147483648};
+  <rr
+};
+
+f=cardname(idx:$i64):$str{
+  (* idx 0..51 ; rank=idx%13 ; suit=idx/13 *)
+  let rank=idx%13;
+  let suit=idx/13;
+  let ranks=mut.@("A");
+  ranks=ranks.push("2");ranks=ranks.push("3");ranks=ranks.push("4");
+  ranks=ranks.push("5");ranks=ranks.push("6");ranks=ranks.push("7");
+  ranks=ranks.push("8");ranks=ranks.push("9");ranks=ranks.push("T");
+  ranks=ranks.push("J");ranks=ranks.push("Q");ranks=ranks.push("K");
+  let suits=mut.@("H");
+  suits=suits.push("S");suits=suits.push("D");suits=suits.push("C");
+  <s.concat(ranks.get(rank);suits.get(suit))
+};
+
+f=main():i64{
+  let line=io.readln();
+  let parts=s.split(line;" ");
+  let seed=s.toint(parts.get(0));
+  let hands=s.toint(parts.get(1));
+  let perhand=s.toint(parts.get(2));
+
+  (* deck of indices 0..51 *)
+  let deck=mut.vec.new();
+  lp(let i=0;i<52;i=i+1){deck=vec.push(deck;i)};
+
+  let state=mut.seed;
+  (* Fisher-Yates: for i from 51 down to 1, j=rand%(i+1), swap *)
+  lp(let i=51;i>0;i=i-1){
+    state=nextrand(state);
+    let j=state%(i+1);
+    let a=vec.get(deck;i);
+    let b=vec.get(deck;j);
+    deck=vec.set(deck;i;b);
+    deck=vec.set(deck;j;a)
+  };
+
+  (* deal: hand h gets cards at positions; deal round-robin or sequential?
+     We deal sequentially: hand h, card k = deck[h*perhand + k] *)
+  lp(let h=0;h<hands;h=h+1){
+    let out=mut."";
+    out=s.concat(out;"Hand ");
+    out=s.concat(out;s.fromint(h+1));
+    out=s.concat(out;": ");
+    lp(let k=0;k<perhand;k=k+1){
+      let pos=h*perhand+k;
+      out=s.concat(out;cardname(vec.get(deck;pos)));
+      if(k<perhand-1){out=s.concat(out;" ")}
+    };
+    io.println(out)
+  };
+  <0
+}

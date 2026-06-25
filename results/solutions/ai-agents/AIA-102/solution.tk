@@ -1,1 +1,54 @@
-m=validator;i=io:std.io;i=s:std.str;i=j:std.json;f=main():$i64{let input=io.readln();let data=j.parse(input);let raw=data.get("raw_message");let protocol=data.get("protocol");let reqfields=protocol.get("required_fields");let types=protocol.get("types");let sender=mut.raw.get("sender");if(sender=0){sender=raw.get("from")};let receiver=mut.raw.get("receiver");if(receiver=0){receiver=raw.get("to")};let msgtype=mut.raw.get("type");if(msgtype=0){msgtype="notification"};let payload=mut.raw.get("payload");if(payload=0){payload=raw.get("msg")};let timestamp=raw.get("timestamp");let formatted=j.object();j.set(formatted;"sender";sender);j.set(formatted;"receiver";receiver);j.set(formatted;"type";msgtype);j.set(formatted;"payload";payload);j.set(formatted;"timestamp";timestamp);let valid=mut.true;let idx=mut.0;lp(idx<reqfields.len){let field=reqfields.get(idx);let value=formatted.get(field);if(value=0){valid=false};idx=idx+1};let typefound=mut.false;let tidx=mut.0;lp(tidx<types.len){if(msgtype=types.get(tidx)){typefound=true};tidx=tidx+1};if(!typefound){valid=false};let result=j.object();j.set(result;"formatted_message";formatted);j.set(result;"valid";valid);io.println(j.stringify(result));<0}
+m=protocol;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=unq(q:$str):$str{ let n=s.len(q); <s.slice(q;1;n-1) };
+f=aliasof(rf:$str):$str{
+if(rf="sender"){<"from"};
+if(rf="receiver"){<"to"};
+if(rf="payload"){<"msg"};
+<""};
+f=inferred(raw:Json;rf:$str):$str{
+if(rf="type"){
+if(json.has(raw;"msg")){<"\"notification\""};
+if(json.has(raw;"payload")){<"\"notification\""};
+};
+<"null"};
+f=main():$i64{
+let line=io.readln();
+let d=pdoc(line);
+let raw=json.getobj(d;"raw_message");
+let proto=json.getobj(d;"protocol");
+let reqs=json.getarr(proto;"required_fields");
+let nr=reqs.len();
+let valid=mut.true;
+let b=s.buf();
+s.add(b;"{\"formatted_message\":{");
+let i=mut.0;
+lp(i<nr){
+let quoted="\(reqs.get(i).raw)";
+let rf=unq(quoted);
+if(i>0){s.add(b;",")};
+s.add(b;quoted);
+s.add(b;":");
+if(json.has(raw;rf)){
+s.add(b;json.getobj(raw;rf).raw);
+}el{
+valid=false;
+let al=aliasof(rf);
+let done=mut.false;
+if(al!=""){
+if(json.has(raw;al)){
+s.add(b;json.getobj(raw;al).raw);
+done=true;
+};
+};
+if(done=false){
+s.add(b;inferred(raw;rf));
+};
+};
+i=i+1;
+};
+s.add(b;"},\"valid\":");
+if(valid){s.add(b;"true")}el{s.add(b;"false")};
+s.add(b;"}");
+io.println(s.done(b));
+<0};

@@ -1,1 +1,88 @@
-m=validpairs;f=solve(p0:@$str):@$str{let result=mut.@();let n=p0.len;lp(let i=0;i<n-1;i=i+1){let p=p0.get(i);let q=p0.get(i+1);let edge1=p.substr(p.len-1;1);let edge2=q.substr(0;1);let valid=mut.false;if(edge1="|"){if(edge2="|"){valid=true}};if(valid){let pair=p+"/"+q;result=result+@(pair)}};<result};
+m=validpairs;
+i=io:std.io;
+i=s:std.str;
+
+(* edges complement when tab(+) meets blank(-). flat(0) is a border edge
+   and never forms an interior adjacency. *)
+f=comp(x:$str;y:$str):$bool{
+  if(s.eq(x;"+")){ if(s.eq(y;"-")){<true} };
+  if(s.eq(x;"-")){ if(s.eq(y;"+")){<true} };
+  <false
+};
+
+f=strgt(a:$str;b:$str):$bool{
+  let la=s.len(a) as i64;
+  let lb=s.len(b) as i64;
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  let n=mut.la;
+  if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let ca=ba.get(i) as i64;
+    let cb=bb.get(i) as i64;
+    if(ca>cb){<true};
+    if(ca<cb){<false}
+  };
+  <(la>lb)
+};
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)>0){lines=lines.push(line)}
+  };
+  let n=(lines.len as i64)-1;
+
+  (* parse: id top right bottom left *)
+  let ids=mut.@("");
+  let tops=mut.@("");
+  let rights=mut.@("");
+  let bottoms=mut.@("");
+  let lefts=mut.@("");
+  lp(let i=1;i<=n;i=i+1){
+    let p=s.split(lines.get(i);" ");
+    ids=ids.push(p.get(0));
+    tops=tops.push(p.get(1));
+    rights=rights.push(p.get(2));
+    bottoms=bottoms.push(p.get(3));
+    lefts=lefts.push(p.get(4))
+  };
+
+  (* collect results: "X right of Y" when Y.right comp X.left
+     "X below Y" when Y.bottom comp X.top *)
+  let results=mut.@("");
+  lp(let xi=1;xi<=n;xi=xi+1){
+    lp(let yi=1;yi<=n;yi=yi+1){
+      if(xi=yi){}el{
+        if(comp(rights.get(yi);lefts.get(xi))){
+          let r=s.concat(s.concat(ids.get(xi);" right of ");ids.get(yi));
+          results=results.push(r)
+        };
+        if(comp(bottoms.get(yi);tops.get(xi))){
+          let r=s.concat(s.concat(ids.get(xi);" below ");ids.get(yi));
+          results=results.push(r)
+        }
+      }
+    }
+  };
+  let rc=(results.len as i64)-1;
+
+  (* sort lexicographically *)
+  lp(let a=1;a<=rc;a=a+1){
+    lp(let b=a+1;b<=rc;b=b+1){
+      if(strgt(results.get(a);results.get(b))){
+        let tmp=results.get(a);
+        results=results.set(a;results.get(b));
+        results=results.set(b;tmp)
+      }
+    }
+  };
+
+  lp(let i=1;i<=rc;i=i+1){
+    io.println(results.get(i))
+  };
+  <0
+}

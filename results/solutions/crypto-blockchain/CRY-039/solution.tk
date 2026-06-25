@@ -1,1 +1,41 @@
-m=entropy;f=bitlen(n:$i64):$i64{let m=mut.n;let c=mut.0;if(m=0){<0};lp(let i=0;i<64;i=i+1){let rem=m-m/2*2;if(rem=1){c=c+1};m=m/2;if(m=0){br};};<c};f=clamp(x:$i64;lo:$i64;hi:$i64):$i64{if(x<lo){<lo};if(x>hi){<hi};<x};f=bitget(n:$i64;idx:$i64):$i64{let shift=idx;let val=mut.n;let mask=mut.1;lp(let i=0;i<shift;i=i+1){mask=mask*2};let result=val-val/2*2;<result>;let masked=val-val/2*2;if(masked=mask){<1};<0};f=bitcount(n:$i64):$i64{let count=mut.0;let val=mut.n;lp(let i=0;i<
+m=entropy;
+i=io:std.io;
+i=s:std.str;
+i=cr:std.crypto;
+f=getbit(b:@byte;idx:$i64):$i64{
+  let byteidx=idx/8;
+  let bitidx=7-(idx-byteidx*8);
+  let v=b.get(byteidx as u64) as i64;
+  let shifted=v>>bitidx;
+  <shifted&1
+};
+f=wordfor(idx:$i64):$str{
+  <s.concat("w";s.fromint(idx))
+};
+f=main():$i64{
+  let bits=s.toint(s.trim(io.readln()));
+  let entbytes=bits/8;
+  let ent=cr.randombytes(entbytes as u64);
+  let hash=cr.sha256(ent);
+  let csbits=bits/32;
+  let totalbits=bits+csbits;
+  let nwords=totalbits/11;
+  let out=mut.s.buf();
+  lp(let w=0;w<nwords;w=w+1){
+    let val=mut.0;
+    lp(let k=0;k<11;k=k+1){
+      let globalbit=w*11+k;
+      let bit=mut.0;
+      if(globalbit<bits){
+        bit=getbit(ent;globalbit)
+      }el{
+        bit=getbit(hash;globalbit-bits)
+      };
+      val=val*2+bit
+    };
+    if(w>0){s.add(out;" ")};
+    s.add(out;wordfor(val))
+  };
+  io.println(s.done(out));
+  <0
+};

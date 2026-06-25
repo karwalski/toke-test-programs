@@ -1,1 +1,70 @@
-m=we;f=iswe(data:@$i64):$bool{let len=data.len;if(len<20){<false};let avg=mut.0;lp(let i=0;i<len;i=i+1){avg=avg+data.get(i)};avg=avg/(len as$i64));let std=mut.0;lp(let i=0;i<len;i=i+1){let diff=data.get(i)-avg;std=std+diff*diff};std=std/(len as$i64)-1 as$i64);let lo=avg-3*std;let hi=avg+3*std;let count=mut.0;lp(let i=0;i<len;i=i+1){let v=data.get(i);if(v<lo){count=count+1};if(v>hi){count=count+1}};if(count>0){<true};<false};
+m=we;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=median(vals:@f64):f64{
+let n=(vals.len as i64);
+let arr=mut.@();
+lp(let i=0;i<n;i=i+1){arr=arr+@(vals.get(i))};
+lp(let i=0;i<n;i=i+1){
+lp(let j=0;j<n-1-i;j=j+1){
+if(arr.get(j)>arr.get(j+1)){
+let tmp=arr.get(j);
+arr=arr.set(j;arr.get(j+1));
+arr=arr.set(j+1;tmp);
+}
+}
+};
+let mid=n/2;
+let res=mut.0.0;
+if(n-mid*2=0){
+res=(arr.get(mid-1)+arr.get(mid))/2.0
+}el{
+res=arr.get(mid)
+};
+<res+0.0
+};
+f=main():i64{
+let vals=mut.@();
+let go=mut.1;
+lp(go>0){
+let line=s.trim(io.readln());
+if(s.len(line)=0){go=0}el{
+vals=vals+@(s.tofloat(line))
+}
+};
+let n=(vals.len as i64);
+let center=median(vals);
+let mrsum=mut.0.0;
+lp(let i=1;i<n;i=i+1){
+let cur=mut.0.0;
+let prev=mut.0.0;
+cur=vals.get(i);
+prev=vals.get(i-1);
+let mr=mut.0.0;
+mr=math.abs(cur-prev);
+mrsum=mrsum+mr;
+};
+let mrbar=mrsum/s.tofloat(s.fromint(n-1));
+let sigma=mrbar/1.128;
+let out=mut."{\"violations\":[";
+let cnt=mut.0;
+lp(let i=0;i<n;i=i+1){
+let vi=mut.0.0;
+vi=vals.get(i);
+let dev=mut.0.0;
+dev=math.abs(vi-center);
+let limit=mut.0.0;
+limit=3.0*sigma;
+if(dev>limit){
+if(cnt>0){out=s.concat(out;",")};
+out=s.concat(out;"{\"rule\":\"1_beyond_3sigma\",\"index\":");
+out=s.concat(out;s.fromint(i));
+out=s.concat(out;"}");
+cnt=cnt+1;
+}
+};
+out=s.concat(out;"]}");
+io.println(out);
+<0
+}

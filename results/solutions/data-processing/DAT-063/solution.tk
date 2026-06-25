@@ -1,1 +1,94 @@
-m=outlier;f=quartile(arr:@$f64;n:$i64;idx:$i64):$f64{let sorted=mut.arr;lp(let i=0;i<n-1;i=i+1){let minidx=mut.i;lp(let j=i+1;j<n;j=j+1){let val=sorted.get(j);let other=sorted.get(minidx);if(val<other){minidx=j};};let tmp=sorted.get(i);sorted.get(i)=sorted.get(minidx);sorted.get(minidx)=tmp;};let len=n as$f64;let idxf=idx as$f64;let result=sorted.get((idxf*(len-1 as$f64))))};f=zscore(arr:@$f64;n:$i64;idx:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<n;i=i+1){sum=sum+arr.get(i);};let mean=sum/n as$f64;let varsum=mut.0.0;lp(let i=0;i<n;i=i+1){let diff=arr.get(i)-mean;varsum=var
+m=outlier;
+i=io:std.io;
+i=s:std.str;
+i=mth:std.math;
+
+f=fabs(x:f64):f64{ if(x<0.0){<0.0-x}; <x };
+
+f=sortcopy(arr:@f64):@f64{
+  let a=mut.arr;
+  let n=a.len as i64;
+  lp(let i=0;i<n-1;i=i+1){
+    lp(let j=0;j<n-1-i;j=j+1){
+      let x=a.get(j as u64);
+      let y=a.get((j+1) as u64);
+      if(x>y){ a=a.set(j as u64;y); a=a.set((j+1) as u64;x) }
+    }
+  };
+  <a
+};
+
+f=percentile(sorted:@f64;p:f64):f64{
+  let n=sorted.len as i64;
+  if(n=1){<sorted.get(0)};
+  let pos=p*((n-1) as f64);
+  let lo=pos as i64;
+  let frac=pos-(lo as f64);
+  let vlo=sorted.get(lo as u64);
+  if(lo+1>=n){<vlo};
+  let vhi=sorted.get((lo+1) as u64);
+  <vlo+frac*(vhi-vlo)
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  if(lines.len<3){<0};
+  let method=s.trim(lines.get(0));
+  let k=s.tofloat(s.trim(lines.get(1)));
+
+  (* gather all value tokens from remaining lines (space-separated, possibly one line) *)
+  let toks=mut.@("seed");
+  lp(let r=2;r<lines.len;r=r+1){
+    let line=s.trim(lines.get(r as u64));
+    if(s.len(line)>0){
+      let parts=s.split(line;" ");
+      lp(let j=0;j<parts.len;j=j+1){
+        let t=s.trim(parts.get(j as u64));
+        if(s.len(t)>0){ toks=toks.push(t) }
+      }
+    }
+  };
+  let nvals=(toks.len as i64)-1;
+  if(nvals<=0){<0};
+
+  (* numeric values seeded with first to fix f64 type *)
+  let vals=mut.@(s.tofloat(toks.get(1)));
+  lp(let i=2;i<=nvals;i=i+1){ vals=vals.push(s.tofloat(toks.get(i as u64))) };
+
+  if(s.eq(method;"iqr")){
+    let sorted=sortcopy(vals);
+    let q1=percentile(sorted;0.25);
+    let q3=percentile(sorted;0.75);
+    let lower=q1-k;
+    let upper=q3+k;
+    lp(let i=0;i<nvals;i=i+1){
+      let v=vals.get(i as u64);
+      if(v<lower){
+        io.println(s.concat("Index ";s.concat(s.fromint(i);s.concat(": ";s.concat(toks.get((i+1) as u64);" (outlier)")))))
+      }el{ if(v>upper){
+        io.println(s.concat("Index ";s.concat(s.fromint(i);s.concat(": ";s.concat(toks.get((i+1) as u64);" (outlier)")))))
+      } }
+    }
+  }el{
+    (* zscore: population stddev *)
+    let sum=mut.0.0;
+    lp(let i=0;i<nvals;i=i+1){ sum=sum+vals.get(i as u64) };
+    let mean=sum/(nvals as f64);
+    let varsum=mut.0.0;
+    lp(let i=0;i<nvals;i=i+1){ let d=vals.get(i as u64)-mean; varsum=varsum+d*d };
+    let std=mth.sqrt(varsum/(nvals as f64));
+    lp(let i=0;i<nvals;i=i+1){
+      let v=vals.get(i as u64);
+      let z=fabs(v-mean)/std;
+      if(z>k){
+        io.println(s.concat("Index ";s.concat(s.fromint(i);s.concat(": ";s.concat(toks.get((i+1) as u64);" (outlier)")))))
+      }
+    }
+  };
+  <0
+}

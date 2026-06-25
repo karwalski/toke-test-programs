@@ -1,1 +1,124 @@
-m=extmergesort;f=sortarray(arr:@$i64):@$i64{let n=arr.len;let sorted=mut.@();lp(let i=0;i<n;i=i+1){sorted=sorted+@(arr.get(i));};lp(let pass=0;pass<n;pass=pass+1){lp(let j=0;j<n-pass-1;j=j+1){if(sorted.get(j)>sorted.get(j+1))){let tmp=sorted.get(j);sorted.get(j)=sorted.get(j+1);sorted.get(j+1)=tmp;};};};<sorted};f=merge(a:@$i64;b:@$i64):@$i64{let result=mut.@();let i=mut.0;let j=mut.0;lp(let k=0;k<a.len+b.len;k=k+1){if(i<a.len){if(j<b.len){if(a.get(i)<b.get(j)){result=result+@(a.get(i));i=i+1;}el{result=result+@(b.get(j));j=j+1;};}el{result=result+@(a.get(i));i=i+1;};};};<result};
+m=extmergesort;
+i=io:std.io;
+i=s:std.str;
+
+f=joincomma(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(",";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=joinspace(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(" ";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=ssort(arr:@i64):@i64{
+  let r=mut.@();
+  lp(let i=0;i<arr.len;i=i+1){ r=r.push(arr.get(i)); };
+  lp(let i=0;i<r.len;i=i+1){
+    lp(let j=0;j<r.len-1;j=j+1){
+      if(r.get(j)>r.get(j+1)){
+        let t=r.get(j);
+        r=r.set(j;r.get(j+1));
+        r=r.set(j+1;t);
+      };
+    };
+  };
+  <r
+};
+
+f=merge(x:@i64;y:@i64):@i64{
+  let result=mut.@();
+  let i=mut.0;
+  let j=mut.0;
+  lp(1=1){
+    if(i>=x.len){
+      if(j>=y.len){br};
+      result=result.push(y.get(j));j=j+1;
+    }el{
+      if(j>=y.len){
+        result=result.push(x.get(i));i=i+1;
+      }el{
+        if(x.get(i)<=y.get(j)){
+          result=result.push(x.get(i));i=i+1;
+        }el{
+          result=result.push(y.get(j));j=j+1;
+        };
+      };
+    };
+  };
+  <result
+};
+
+f=joinruns(runs:@(@i64)):$str{
+  if(runs.len=0){<""};
+  let out=mut.s.concat("[";s.concat(joincomma(runs.get(0));"]"));
+  lp(let i=1;i<runs.len;i=i+1){
+    out=s.concat(out;s.concat(" [";s.concat(joincomma(runs.get(i));"]")));
+  };
+  <out
+};
+
+f=main():i64{
+  let line=io.readln();
+  let kline=io.readln();
+  let k=s.toint(s.trim(kline));
+  let parts=s.split(line;" ");
+  let nums=mut.@();
+  lp(let i=0;i<parts.len;i=i+1){
+    let p=parts.get(i);
+    if(s.len(p)>0){ nums=nums.push(s.toint(p)); };
+  };
+  let n=nums.len;
+  (* build runs of size k *)
+  let runs=mut.@();
+  let idx=mut.0;
+  let rnum=mut.1;
+  lp(1=1){
+    if(idx>=n){br};
+    let chunk=mut.@();
+    let c=mut.0;
+    lp(1=1){
+      if(c>=k){br};
+      if(idx>=n){br};
+      chunk=chunk.push(nums.get(idx));
+      idx=idx+1;
+      c=c+1;
+    };
+    let sorted=ssort(chunk);
+    runs=runs.push(sorted);
+    io.println(s.concat("Run ";s.concat(s.fromint(rnum);s.concat(": [";s.concat(joincomma(sorted);"]")))));
+    rnum=rnum+1;
+  };
+  (* merge passes: pairwise adjacent *)
+  let passnum=mut.1;
+  lp(1=1){
+    if(runs.len<=1){br};
+    let next=mut.@();
+    let pp=mut.0;
+    lp(1=1){
+      if(pp>=runs.len){br};
+      if(pp+1<runs.len){
+        next=next.push(merge(runs.get(pp);runs.get(pp+1)));
+      }el{
+        next=next.push(runs.get(pp));
+      };
+      pp=pp+2;
+    };
+    runs=next;
+    io.println(s.concat("Merge pass ";s.concat(s.fromint(passnum);s.concat(": ";joinruns(runs)))));
+    passnum=passnum+1;
+  };
+  io.println(s.concat("I/O ops: ";s.fromint(2*n)));
+  let final=runs.get(0);
+  io.println(s.concat("Sorted: ";joinspace(final)));
+  <0
+}

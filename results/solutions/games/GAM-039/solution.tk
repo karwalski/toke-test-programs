@@ -1,1 +1,36 @@
-m=stockgame;f=playgame(prices:@$i64;cmds:@$str):$i64{let n=prices.len;let m=cmds.len;let bal=mut.1000;let pos=mut.0;lp(let i=0;i<m;i=i+1){let cmd=cmds.get(i);if(cmd="b"){let canbuy=mut.true;if(pos>0){canbuy=false};if(canbuy){let p=prices.get(i);if(p<bal){bal=bal-p;pos=pos+1;}el{bal=bal;pos=pos;};};};if(cmd="s"){let cansell=mut.true;if(pos=0){cansell=false};if(cansell){let p=prices.get(i);bal=bal+p;pos=pos-1;};};};};<bal>};
+m=stockgame;
+i=io:std.io;
+i=s:std.str;
+f=toi(x:$str):$i64{ let r=mt s.toint(x){ $ok:v v; $err:e 0 }; <r };
+f=main():$i64{
+  let priceline=io.readln();
+  if(s.len(priceline)=0){ <0 };
+  let parts=s.split(s.trim(priceline);" ");
+  let cashline=io.readln();
+  let cash=mut.toi(s.trim(cashline));
+  let shares=mut.0;
+  let day=mut.0;
+  lp(let i=0;i<100000;i=i+1){
+    if((day as i64)>=(parts.len as i64)){ br };
+    let cmd=io.readln();
+    if(s.len(cmd)=0){ br };
+    let p=toi(s.trim(parts.get(day as u64)));
+    let tc=s.trim(cmd);
+    let toks=s.split(tc;" ");
+    let op=s.trim(toks.get(0));
+    if(s.eq(op;"buy")){
+      let n=toi(s.trim(toks.get(1)));
+      let cost=n*p;
+      if(cost<=cash){ cash=cash-cost; shares=shares+n };
+    };
+    if(s.eq(op;"sell")){
+      let n=toi(s.trim(toks.get(1)));
+      if(n<=shares){ cash=cash+n*p; shares=shares-n };
+    };
+    let val=cash+shares*p;
+    let dn=s.fromint((day as i64)+1);
+    io.println(s.concat(s.concat(s.concat("Day ";dn);": $");s.concat(s.fromint(val);".00")));
+    day=day+1;
+  };
+  <0
+};

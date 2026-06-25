@@ -1,130 +1,84 @@
-m=agentdispatcher;
-i=io:std.io;
-i=s:std.str;
-i=j:std.json;
+m=dispatch;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=setint(a:@($i64);idx:$i64;v:$i64):@($i64){
+let r=mut.@(); let n=a.len(); let i=mut.0;
+lp(i<n){ if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
+<r};
+f=setstr(a:@($str);idx:$i64;v:$str):@($str){
+let r=mut.@(); let n=a.len(); let i=mut.0;
+lp(i<n){ if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
+<r};
 f=main():$i64{
-  let input=io.readln();
-  let data=j.parse(input);
-  let workitems=j.get(data;"work_items");
-  let agents=j.get(data;"agents");
-  
-  let assigns=mut.@();
-  let agentloads=mut.@();
-  
-  let nagents=j.len(agents);
-  lp(let idx=0;idx<nagents;idx=idx+1){
-    let agent=j.get(agents;idx);
-    let agentid=j.getstr(agent;"id");
-    let capacity=j.getint(agent;"capacity");
-    assigns=assigns+@(@(agentid;@()));
-    agentloads=agentloads+@(@(agentid;0));
-  };
-  
-  let nwork=j.len(workitems);
-  lp(let widx=0;widx<nwork;widx=widx+1){
-    let work=j.get(workitems;widx);
-    let workid=j.getstr(work;"id");
-    let worktype=j.getstr(work;"type");
-    let complexity=j.getint(work;"complexity");
-    
-    let bestagent=mut."";
-    let bestload=mut.1000000;
-    
-    lp(let aidx=0;aidx<nagents;aidx=aidx+1){
-      let agent=j.get(agents;aidx);
-      let agentid=j.getstr(agent;"id");
-      let capacity=j.getint(agent;"capacity");
-      let specialties=j.get(agent;"specialties");
-      
-      let canhandle=mut.false;
-      let nspec=j.len(specialties);
-      lp(let sidx=0;sidx<nspec;sidx=sidx+1){
-        let spec=j.getstr(specialties;sidx);
-        if(spec=worktype){canhandle=true;br;};
-      };
-      
-      if(canhandle){
-        let currentload=getload(agentloads;agentid);
-        if((currentload+complexity)<=capacity){
-          if(currentload<bestload){
-            bestagent=agentid;
-            bestload=currentload;
-          };
-        };
-      };
-    };
-    
-    if(bestagent!=""){
-      assigns=addwork(assigns;bestagent;workid);
-      agentloads=updateload(agentloads;bestagent;bestload+complexity);
-    };
-  };
-  
-  let output=buildoutput(assigns);
-  io.println(output);
-  <0
+let line=io.readln();
+let d=pdoc(line);
+let items=json.getarr(d;"work_items");
+let agents=json.getarr(d;"agents");
+let na=agents.len();
+let ni=items.len();
+let loads=mut.@();
+let caps=mut.@();
+let listbufs=mut.@();
+let ai=mut.0;
+lp(ai<na){
+loads=loads+@(0);
+let ag=agents.get(ai);
+caps=caps+@(json.getint(ag;"capacity"));
+listbufs=listbufs+@("");
+ai=ai+1;
 };
-f=getload(loads:@(@($str));agentid:$str):$i64{
-  let len=loads.len;
-  lp(let idx=0;idx<len;idx=idx+1){
-    let pair=loads.get(idx);
-    if(pair.get(0)=agentid){<pair.get(1) as $i64};
-  };
-  <0
+let wi=mut.0;
+lp(wi<ni){
+let it=items.get(wi);
+let itid=json.getstr(it;"id");
+let itype="\(json.getstr(it;"type"))";
+let cx=json.getint(it;"complexity");
+let best=mut.0-1;
+let bestload=mut.0;
+let k=mut.0;
+lp(k<na){
+let ag=agents.get(k);
+let specs=json.getarr(ag;"specialties");
+let ns=specs.len();
+let hit=mut.false;
+let si=mut.0;
+lp(si<ns){
+let sp="\(specs.get(si).raw)";
+if(sp=json.enc(itype)){hit=true};
+si=si+1;
 };
-f=updateload(loads:@(@($str));agentid:$str;newload:$i64):@(@($str)){
-  let newarr=mut.@();
-  let len=loads.len;
-  lp(let idx=0;idx<len;idx=idx+1){
-    let pair=loads.get(idx);
-    if(pair.get(0)=agentid){
-      newarr=newarr+@(@(agentid;newload));
-    }el{
-      newarr=newarr+@(pair);
-    };
-  };
-  <newarr
+let curload=loads.get(k);
+let cap=caps.get(k);
+if(hit){
+if((curload+cx)<=cap){
+if(best<0){best=k;bestload=curload}el{if(curload<bestload){best=k;bestload=curload}};
 };
-f=addwork(assigns:@(@($str));agentid:$str;workid:$str):@(@($str)){
-  let newarr=mut.@();
-  let len=assigns.len;
-  lp(let idx=0;idx<len;idx=idx+1){
-    let pair=assigns.get(idx);
-    if(pair.get(0)=agentid){
-      let works=pair.get(1);
-      let newworks=works+@(workid);
-      newarr=newarr+@(@(agentid;newworks));
-    }el{
-      newarr=newarr+@(pair);
-    };
-  };
-  <newarr
 };
-f=buildoutput(assigns:@(@($str))):$str{
-  let b=s.builder();
-  s.add(b;"{");
-  let len=assigns.len;
-  let first=mut.true;
-  lp(let idx=0;idx<len;idx=idx+1){
-    let pair=assigns.get(idx);
-    let agentid=pair.get(0);
-    let works=pair.get(1);
-    if(works.len>0){
-      if(!first){s.add(b;",")};
-      first=false;
-      s.add(b;"\"");
-      s.add(b;agentid);
-      s.add(b;"\":[");
-      let wlen=works.len;
-      lp(let widx=0;widx<wlen;widx=widx+1){
-        if(widx>0){s.add(b;",")};
-        s.add(b;"\"");
-        s.add(b;works.get(widx));
-        s.add(b;"\"");
-      };
-      s.add(b;"]");
-    };
-  };
-  s.add(b;"}");
-  <s.build(b)
+k=k+1;
 };
+if(best>=0){
+loads=setint(loads;best;loads.get(best)+cx);
+let cur=listbufs.get(best);
+let nv=mut."";
+if(cur=""){nv=json.enc(itid)}el{nv="\(cur),\(json.enc(itid))"};
+listbufs=setstr(listbufs;best;nv);
+};
+wi=wi+1;
+};
+let b=s.buf();
+s.add(b;"{");
+let first=mut.true;
+let oi=mut.0;
+lp(oi<na){
+let ag=agents.get(oi);
+let id=json.getstr(ag;"id");
+if(first=false){s.add(b;",")};
+first=false;
+s.add(b;json.enc(id));
+s.add(b;":[");
+s.add(b;listbufs.get(oi));
+s.add(b;"]");
+oi=oi+1;
+};
+s.add(b;"}");
+io.println(s.done(b));
+<0};

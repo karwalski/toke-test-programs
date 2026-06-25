@@ -1,1 +1,45 @@
-m=duration;f=macaulay_duration(n:$i64;y:$i64):$i64{let sum=mut.0;lp(let i=1;!(i>n);i=i+1){let cashflow=y;let time=i;let weighted_cashflow=cashflow*time;sum=sum+weighted_cashflow};let total_cashflow=n*sum;let duration=total_cashflow/sum;<duration};f=modified_duration(n:$i64;y:$i64):$f64{let macaulay=macaulay_duration(n;y);let coupon_rate=y as$f64/n as$f64;let modified=macaulay/coupon_rate;<modified};
+m=duration;
+i=io:std.io;
+i=s:std.str;
+i=mth:std.math;
+
+f=fmt4(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let scaled=v*10000.0+0.5;
+  let n=mut.scaled as i64;
+  let intpart=n/10000;
+  let frac=n-intpart*10000;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<1000){fracstr=s.concat("0";fracstr)};
+  if(frac<100){fracstr=s.concat("0";fracstr)};
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  let res=mut.s.concat(s.fromint(intpart);s.concat(".";fracstr));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+
+f=main():$i64{
+  let line=io.readln();
+  let parts=s.split(line;" ");
+  let face=s.tofloat(parts.get(0));
+  let couponrate=s.tofloat(parts.get(1));
+  let yield=s.tofloat(parts.get(2));
+  let periods=s.toint(parts.get(3));
+  let coupon=face*couponrate;
+  let price=mut.0.0;
+  let macnum=mut.0.0;
+  lp(let t=1;!(t>periods);t=t+1){
+    let cf=mut.coupon;
+    if(t=periods){cf=cf+face};
+    let pv=cf/mth.pow(1.0+yield;t as$f64);
+    price=price+pv;
+    macnum=macnum+(t as$f64)*pv
+  };
+  let mac=macnum/price;
+  let mod=mac/(1.0+yield);
+  io.println(fmt4(mac));
+  io.println(fmt4(mod));
+  <0
+};

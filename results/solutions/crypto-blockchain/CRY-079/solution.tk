@@ -1,1 +1,25 @@
-m=commitreveal;f=hash(val:$str;nonce:$i64):$str{let s=s.concat(val;nonce) as$str;let h=mut."";lp(let i=0;i<s.len;i=i+1){let c=s.get(i);let x=h.len;let y=c as i64;let z=mut.0;if(x>0){z=h.get(x-1))};let next=mut."";if(z>0){next=z as$str};next=next+c;h=next};<h};f=commit(val:$str;nonce:$i64):$str{let h=hash(val;nonce);<h};f=verify(commitment:$str;val:$str;nonce:$i64):$bool{let h=hash(val;nonce);let c=commitment;let v=mut.false;if(h=c){v=true};<v};
+m=commitreveal;
+i=io:std.io;
+i=s:std.str;
+i=cr:std.crypto;
+f=commitment(val:$str;nonce:$str):$str{
+  let msg=s.concat(val;s.concat("||";nonce));
+  let h=cr.sha256(s.bytes(msg));
+  <cr.tohex(h)
+};
+f=main():$void{
+  let line=io.readln();
+  let parts=s.split(s.trim(line);" ");
+  let op=parts.get(0);
+  if(s.eq(op;"COMMIT")){
+    let val=parts.get(1);
+    let nonce=parts.get(2);
+    io.println(commitment(val;nonce));
+  }el{
+    let val=parts.get(1);
+    let nonce=parts.get(2);
+    let given=parts.get(3);
+    let computed=commitment(val;nonce);
+    if(s.eq(computed;given)){io.println("VALID")}el{io.println("INVALID")};
+  };
+};

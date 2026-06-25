@@ -1,1 +1,99 @@
-m=pareto;f=countvals(arr:@$str):@($str;$i64){let counts=mut.@();let vals=mut.@();lp(let i=0;i<arr.len;i=i+1){let val=arr.get(i);let found=mut.false;let idx=mut.0;lp(let j=0;j<vals.len;j=j+1){if(vals.get(j)=val)){found=true;idx=j;};};if(found){counts.get(idx)=counts.get(idx)+1;}el{vals=vals+@(val);counts=counts+@(1);};};<vals;counts};f=sortbycount(vals:@$str;counts:@$i64):@$str{let n=vals.len;let sorted=mut.@();lp(let i=0;i<n;i=i+1){sorted=sorted+@(vals.get(i))));};lp(let i=0;i<n;i=i+1){lp(let j=0;j<n-i-1;j=j+1){if(counts.get(j)<counts.get(j+1))){let tmp=sorted.get(j);sorted.get(j)=sorted.get(j+1);sorted.get(j+1)=tmp;let tmp2=
+m=pareto;
+i=io:std.io;
+i=s:std.str;
+
+f=ljust(x:$str;w:i64):$str{
+  let r=mut.x;
+  let n=s.len(x) as i64;
+  lp(let i=n;i<w;i=i+1){ r=s.concat(r;" ") };
+  <r
+};
+
+f=rjust(x:$str;w:i64):$str{
+  let r=mut.x;
+  let n=s.len(x) as i64;
+  lp(let i=n;i<w;i=i+1){ r=s.concat(" ";r) };
+  <r
+};
+
+f=fmtcum(numerator:i64;total:i64):$str{
+  let scaled=(numerator as f64)*1000.0/(total as f64);
+  let r=(scaled+0.5) as i64;
+  let ip=r/10;
+  let fp=r-(ip*10);
+  let ips=s.fromint(ip);
+  let fps=s.fromint(fp);
+  <s.concat(s.concat(s.concat(ips;".");fps);"%")
+};
+
+f=main():i64{
+  let cats=mut.@();
+  let vals=mut.@();
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){
+      let dummy=0
+    }el{
+      let parts=s.split(t;" ");
+      let c=parts.get(0 as u64);
+      let vstr=parts.get(1 as u64);
+      let v=mt s.toint(vstr){ $ok:vv vv; $err:e 0 };
+      cats=cats.push(c);
+      vals=vals.push(v)
+    }
+  };
+  let n=cats.len as i64;
+  let total=mut.0;
+  lp(let i=0;i<n;i=i+1){ total=total+vals.get(i as u64) };
+
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){ order=order.push(i) };
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-i-1;j=j+1){
+      let a=order.get(j as u64);
+      let b=order.get((j+1) as u64);
+      let va=vals.get(a as u64);
+      let vb=vals.get(b as u64);
+      if(va<vb){
+        order=order.set(j as u64;b);
+        order=order.set((j+1) as u64;a)
+      }
+    }
+  };
+
+  io.println("Category  Value  Cum%");
+  let cum=mut.0;
+  let crossed=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    let idx=order.get(i as u64);
+    let c=cats.get(idx as u64);
+    let v=vals.get(idx as u64);
+    cum=cum+v;
+    let line=s.concat(s.concat(ljust(c;10);rjust(s.fromint(v);5));rjust(fmtcum(cum;total);7));
+    let crossnow=mut.false;
+    if(crossed){
+      let d2=0
+    }el{
+      let tenx=cum*10;
+      let thresh=total*8;
+      if(tenx<thresh){
+        let d3=0
+      }el{
+        crossnow=true;
+        crossed=true
+      }
+    };
+    if(crossnow){
+      io.println(s.concat(line;" ← 80% threshold crossed"))
+    }el{
+      if(i=0){
+        io.println(s.concat(line;" ← 80% threshold not yet reached"))
+      }el{
+        io.println(line)
+      }
+    }
+  };
+  <0
+};

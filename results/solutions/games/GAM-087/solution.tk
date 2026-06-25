@@ -1,1 +1,144 @@
-m=spellcheck;t=$str;f=ispalindrome(s:$str):$bool{let n=s.len;let lhs=mut.0;let rhs=mut.n-1;let result=mut.true;lp(let i=0;i<n;i=i+1){let cond1=lhs<rhs;let cond2=result=true;if(cond1){let c1=s.get(lhs);let c2=s.get(rhs);if(!(c1=c2))result=false;lhs=lhs+1;rhs=rhs-1;}el{result=false;};};<result};f=tolower(c:$str):$str{let code=c.get(0);if(code>64){if(code<91){let lowercode=code+32;let result=mut."";result=s.concat(result;lowercode) as$str;<result};};};<c};f=checkword(word:$str;letters:@$str):$bool{let wordlen=word.len;let lettercount=letters.len;let minletters=mut.0;if(wordlen<lettercount){minletters=wordlen;}el{minletters=lettercount;};let found=mut.0;lp(let i=0;i<lettercount;i
+m=spellbee;
+i=io:std.io;
+i=s:std.str;
+
+(* 1 if every byte of w is in allowed set string, else 0 *)
+f=onlyallowed(w:$str;allowed:$str):$i64{
+  let wb=s.bytes(w);
+  let ab=s.bytes(allowed);
+  let n=wb.len as i64;
+  let m=ab.len as i64;
+  let ok=mut.1;
+  lp(let i=0;i<n;i=i+1){
+    let c=wb.get(i);
+    let found=mut.0;
+    lp(let j=0;j<m;j=j+1){
+      if(ab.get(j)=c){found=1}
+    };
+    if(found=0){ok=0}
+  };
+  <ok
+};
+
+(* 1 if w contains byte ch *)
+f=hasbyte(w:$str;ch:$i64):$i64{
+  let wb=s.bytes(w);
+  let n=wb.len as i64;
+  let r=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    if((wb.get(i) as i64)=ch){r=1}
+  };
+  <r
+};
+
+(* 1 if a<b lexicographically by bytes *)
+f=strlt(a:$str;b:$str):$i64{
+  let ab=s.bytes(a);
+  let bb=s.bytes(b);
+  let la=ab.len as i64;
+  let lb=bb.len as i64;
+  let n=mut.la;
+  if(lb<la){n=lb};
+  let res=mut.0;
+  let decided=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    if(decided=0){
+      let ca=ab.get(i) as i64;
+      let cb=bb.get(i) as i64;
+      if(ca<cb){res=1;decided=1}el{
+        if(cb<ca){res=0;decided=1}
+      }
+    }
+  };
+  if(decided=0){
+    if(la<lb){res=1}
+  };
+  <res
+};
+
+(* count distinct bytes of w *)
+f=distinct(w:$str):$i64{
+  let wb=s.bytes(w);
+  let n=wb.len as i64;
+  let cnt=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=wb.get(i);
+    let seen=mut.0;
+    lp(let j=0;j<i;j=j+1){
+      if(wb.get(j)=c){seen=1}
+    };
+    if(seen=0){cnt=cnt+1}
+  };
+  <cnt
+};
+
+f=main():i64{
+  let centre=io.readln();
+  let others=io.readln();
+  let allowed=s.concat(centre;others);
+  let cb=s.bytes(centre);
+  let cch=cb.get(0) as i64;
+
+  let words=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)=0){}el{words=words.push(line)}
+  };
+  let wc=(words.len as i64)-1;
+
+  let valid=mut.@("");
+  let scores=mut.@(0);
+  lp(let i=1;i<wc+1;i=i+1){
+    let w=words.get(i);
+    let ln=s.len(w) as i64;
+    let oa=onlyallowed(w;allowed);
+    let hasc=hasbyte(w;cch);
+    if(ln>3){
+      if(hasc=1){
+        if(oa=1){
+          let dist=distinct(w);
+          let bonus=mut.0;
+          if(ln=7){if(dist=7){bonus=7}};
+          let theval=ln+bonus;
+          valid=valid.push(w);
+          scores=scores.push(theval)
+        }
+      }
+    }
+  };
+  let vc=(valid.len as i64)-1;
+
+  let idx=mut.@(0);
+  lp(let i=1;i<vc+1;i=i+1){ idx=idx.push(i) };
+
+  lp(let a=1;a<vc;a=a+1){
+    lp(let b=a+1;b<vc+1;b=b+1){
+      let ia=idx.get(a);
+      let ib=idx.get(b);
+      let wa=valid.get(ia);
+      let wb=valid.get(ib);
+      let la=s.len(wa) as i64;
+      let lb=s.len(wb) as i64;
+      let swap=mut.0;
+      if(lb>la){swap=1}el{
+        if(lb=la){
+          if(strlt(wb;wa)=1){swap=1}
+        }
+      };
+      if(swap=1){
+        idx=idx.set(a;ib);
+        idx=idx.set(b;ia)
+      }
+    }
+  };
+
+  lp(let i=1;i<vc+1;i=i+1){
+    let id=idx.get(i);
+    let w=valid.get(id);
+    let theval=scores.get(id);
+    io.println(s.concat(s.concat(s.concat(w;" (");s.fromint(theval));")"))
+  };
+  <0
+}

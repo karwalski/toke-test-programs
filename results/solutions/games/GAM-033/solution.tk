@@ -1,1 +1,8 @@
-m=ecosys;f=solve(p0:$i64;p1:$i64;n:$i64):$str{let x=mut.p0;let y=mut.p1;let result=mut."";lp(let i=0;i<n;i=i+1){let tmpx=x;let tmpy=y;let dx=tmpx*0.1-tmpx*0.01-tmpy*0.01;let dy=tmpy*0.1-tmpy*0.01-tmpx*0.01;let nx=tmpx+dx;let ny=tmpy+dy;result=s.concat(s.concat(result;"step ");i) as$str+s.concat(": x=";nx) as$str+s.concat(" y=";ny) as$str+"\n";x=nx;y=ny;};<result};f=main():$void{let out=solve(50;20;10));<};
+m=ecosys;i=io:std.io;i=s:std.str;i=math:std.math;
+f=main():$i64{let line=s.trim(io.readln());let p=s.split(line;" ");
+let x=mut.s.tofloat(p.get(0));let y=mut.s.tofloat(p.get(1));
+let alpha=s.tofloat(p.get(2));let beta=s.tofloat(p.get(3));let gamma=s.tofloat(p.get(4));let delta=s.tofloat(p.get(5));let steps=s.toint(p.get(6));
+io.println(s.concat(s.concat(s.concat("0 ";s.fromint(math.round(x) as $i64));" ");s.fromint(math.round(y) as $i64)));
+lp(let i=1;i<=steps;i=i+1){let nx=x+(alpha*x-beta*x*y);let ny=y+(delta*x*y-gamma*y);x=nx;y=ny;
+io.println(s.concat(s.concat(s.concat(s.concat(s.fromint(i);" ");s.fromint(math.round(x) as $i64));" ");s.fromint(math.round(y) as $i64)))};
+<0}

@@ -1,1 +1,146 @@
-m=selectoptimal;f=selectoptimal(tasks:@($str;$str;$str;$str)));$str{let n=tasks.len;let bestidx=mut.0;let bestpri=mut."";let bestdep=mut."";let bestddl=mut."";lp(let i=0;i<n;i=i+1){let t=tasks.get(i);let pri=t.1;let dep=t.2;let ddl=t.3;let isbetter=mut.false;if(pri>bestpri){isbetter=true};if(!(pri>bestpri)){if(dep<bestdep){isbetter=true}};if(isbetter){bestidx=i;bestpri=pri;bestdep=dep;bestddl=ddl}};<tasks.get(bestidx).0)};
+m=taskselector;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+f=numfield(src:$str;key:$str):$i64{
+  let ki=s.indexof(src;key);
+  let rest=s.slice(src;ki+s.len(key) as i64;s.len(src) as i64);
+  let dend=mut.0;
+  lp(let k=0;k<s.len(rest) as i64;k=k+1){
+    let ch=s.slice(rest;k;k+1);
+    let isd=s.indexof("0123456789";ch);
+    let dash=s.eq(ch;"-");
+    if(isd>=0){dend=k+1}el{if(dash){dend=k+1}el{k=s.len(rest) as i64}}
+  };
+  <parseint(s.slice(rest;0;dend))
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let now=numfield(json;"\"now_ms\":");
+  let ci=s.indexof(json;"\"completed_tasks\":[");
+  let crest=s.slice(json;ci+19;jn);
+  let cclose=s.indexof(crest;"]");
+  let completed=s.slice(crest;0;cclose);
+  let ids=mut.@();
+  let pris=mut.@();
+  let ddls=mut.@();
+  let durs=mut.@();
+  let depsegs=mut.@();
+  let blocked=mut.@();
+  let p=mut.0;
+  lp(p<jn){
+    let rest=s.slice(json;p;jn);
+    let ii=s.indexof(rest;"\"id\":\"");
+    if(ii<0){p=jn}el{
+      let istart=p+ii+6;
+      let iafter=s.slice(json;istart;jn);
+      let iendq=s.indexof(iafter;"\"");
+      let idval=s.slice(iafter;0;iendq);
+      let objrest=s.slice(json;istart+iendq;jn);
+      let nextid=s.indexof(objrest;"\"id\":\"");
+      let objend=mut.s.len(objrest) as i64;
+      if(nextid>=0){objend=nextid};
+      let obj=s.slice(objrest;0;objend);
+      let pri=numfield(obj;"\"priority\":");
+      let ddl=numfield(obj;"\"deadline_ms\":");
+      let dur=numfield(obj;"\"estimated_duration_ms\":");
+      let depi=s.indexof(obj;"\"depends_on\":[");
+      let deprest=s.slice(obj;depi+14;s.len(obj) as i64);
+      let depclose=s.indexof(deprest;"]");
+      let depseg=s.slice(deprest;0;depclose);
+      ids=ids+@(idval);
+      pris=pris+@(pri);
+      ddls=ddls+@(ddl);
+      durs=durs+@(dur);
+      depsegs=depsegs+@(depseg);
+      p=istart+iendq+depi+14+depclose
+    }
+  };
+  let n=ids.len();
+  lp(let z=0;z<n;z=z+1){
+    let seg=depsegs.get(z);
+    let sl=s.len(seg) as i64;
+    let isblocked=mut.false;
+    let q=mut.0;
+    lp(q<sl){
+      let qch=s.slice(seg;q;q+1);
+      if(s.eq(qch;"\"")){
+        let af=s.slice(seg;q+1;sl);
+        let eq=s.indexof(af;"\"");
+        let depid=s.slice(af;0;eq);
+        let needle=s.concat(s.concat("\"";depid);"\"");
+        if(s.indexof(completed;needle)<0){isblocked=true};
+        q=q+1+eq+1
+      }el{q=q+1}
+    };
+    blocked=blocked+@(isblocked)
+  };
+  (* Branch 1: a runnable task that unblocks a blocked task -> pick it. *)
+  let depchoice=mut.0-1;
+  let depblockedid=mut."";
+  let depchosenid=mut."";
+  lp(let z=0;z<n;z=z+1){
+    if(blocked.get(z)){
+      let seg=depsegs.get(z);
+      let sl=s.len(seg) as i64;
+      let q=mut.0;
+      lp(q<sl){
+        let qch=s.slice(seg;q;q+1);
+        if(s.eq(qch;"\"")){
+          let af=s.slice(seg;q+1;sl);
+          let eq=s.indexof(af;"\"");
+          let depid=s.slice(af;0;eq);
+          lp(let w=0;w<n;w=w+1){
+            if(s.eq(ids.get(w);depid)){
+              if(!(blocked.get(w))){
+                if(depchoice<0){depchoice=w;depblockedid=ids.get(z);depchosenid=ids.get(w)}
+              }
+            }
+          };
+          q=q+1+eq+1
+        }el{q=q+1}
+      }
+    }
+  };
+  let out=mut."";
+  if(depchoice>=0){
+    let reason=s.concat(s.concat(s.concat(s.concat("Task ";depblockedid);" depends on ");depchosenid);", so ");
+    let reason2=s.concat(reason;depchosenid);
+    let reason3=s.concat(reason2;" must be completed first");
+    out=s.concat(s.concat(s.concat("{\"next_task\":\"";depchosenid);"\",\"reasoning\":\"");reason3);
+    out=s.concat(out;"\",\"urgency_score\":0.5}")
+  }el{
+    (* Branch 2: pick runnable task with smallest time-to-deadline. *)
+    let best=mut.0-1;
+    let bestslack=mut.0;
+    lp(let z=0;z<n;z=z+1){
+      if(!(blocked.get(z))){
+        let slack=ddls.get(z)-now;
+        if(best<0){best=z;bestslack=slack}el{
+          if(slack<bestslack){best=z;bestslack=slack}
+        }
+      }
+    };
+    let realslack=ddls.get(best)-now-durs.get(best);
+    let urg=mut."0.5";
+    let tail=mut."";
+    if(realslack<0){urg="0.95";tail=", must start now"}el{urg="0.7";tail=""};
+    let reason=s.concat(s.concat(s.concat(s.concat("Closest deadline (";s.fromint(ddls.get(best)));"ms) with only ");s.fromint(bestslack));"ms slack");
+    let reason2=s.concat(reason;tail);
+    out=s.concat(s.concat(s.concat("{\"next_task\":\"";ids.get(best));"\",\"reasoning\":\"");reason2);
+    out=s.concat(s.concat(out;"\",\"urgency_score\":");urg);
+    out=s.concat(out;"}")
+  };
+  io.println(out);
+  <0
+};

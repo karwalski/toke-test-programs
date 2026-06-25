@@ -1,1 +1,29 @@
-m=merkle;f=hashfn(val:$str):$str{let result=mut.val;lp(let i=0;i<8;i=i+1){result=result+result;};<result};f=hashpair(a:$str;b:$str):$str{let combined=mut.a+s.concat("";b);let result=hashfn(combined);<result};f=buildtree(hashes:@$str):@$str{let level=mut.hashes;lp(let i=0;i<100;i=i+1){if(level.len=1){br};let next=mut.@();lp(let j=0;j<level.len;j=j+1){if(j+1<level.len){let h=hashpair(level.get(j);level.get(j+1)));next=next+@(h);}el{next=next+@(level.get(j));};};level=next;};<level};f=merklehash(hashes:@$str):$str{let tree=buildtree(hashes);let root=tree.get(0);<root};
+m=merkle;
+i=io:std.io;
+i=s:std.str;
+i=cr:std.crypto;
+f=sha256hex(msg:$str):$str{
+  let h=cr.sha256(s.bytes(msg));
+  <cr.tohex(h)
+};
+f=main():$void{
+  let level=mut.@();
+  let go=mut.true;
+  lp(let i=0;go;i=i+1){
+    let line=io.readln();
+    if(s.eq(line;"")){go=false}el{level=level+@(line)};
+  };
+  lp(let r=0;level.len as i64>1;r=r+1){
+    let cur=mut.level;
+    let n=cur.len as i64;
+    if(n-n/2*2=1){cur=cur+@(cur.get(n-1))};
+    let m=cur.len as i64;
+    let next=mut.@();
+    lp(let j=0;j<m;j=j+2){
+      let combined=s.concat(cur.get(j);cur.get(j+1));
+      next=next+@(sha256hex(combined));
+    };
+    level=next;
+  };
+  io.println(level.get(0));
+};

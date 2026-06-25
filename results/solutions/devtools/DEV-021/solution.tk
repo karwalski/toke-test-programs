@@ -1,1 +1,53 @@
-m=fileext;f=solve(p0:$str):$str{let lines=p0.split("\n");let result=mut."";let idx=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let isfile=mut.false;if(!(line.len=0))as u64{let firstchar=line.get(0);if(!(firstchar="d"))as u64{isfile=true};};if(isfile){let parts=line.split(" ");let sizepart=parts.get(parts.len-1);let size=mut.0;if(!(sizepart.len=0))as u64{let numstr=sizepart;let num=mut.0;lp(let j=0;j<numstr.len;j=j+1){let ch=numstr.get(j);let digit=ch as u64-48 as u64;num=num*10+digit;};size=num;};if(!(result.len=0))as u64{result=s.concat(result;"\n")};result=result+sizepart;};};<result};
+m=filesize;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+
+f=fmtsize(n:i64):$str{
+  if(n<1024){<s.concat(s.fromint(n);" B")};
+  let kb=n/1024;
+  if(kb<1024){<s.concat(s.fromint(kb);" KB")};
+  let mb=kb/1024;
+  if(mb<1024){<s.concat(s.fromint(mb);" MB")};
+  let gb=mb/1024;
+  <s.concat(s.fromint(gb);" GB")
+};
+
+f=main():i64{
+  let paths=mut.@();
+  let sizes=mut.@();
+  let total=mut.0;
+
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    let p=s.trim(line);
+    if(s.len(p)>0){
+      let sz=file.stat(p);
+      paths=paths.push(p);
+      sizes=sizes.push(sz);
+      total=total+sz
+    }
+  };
+
+  let n=paths.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){ order=order.push(i) };
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-i-1;j=j+1){
+      let a=order.get(j);
+      let b=order.get(j+1);
+      if(sizes.get(a as u64)<sizes.get(b as u64)){
+        order=order.set(j as u64;b);
+        order=order.set((j+1) as u64;a)
+      }
+    }
+  };
+
+  lp(let k=0;k<n;k=k+1){
+    let i=order.get(k) as u64;
+    io.println(s.concat(s.concat(paths.get(i);": ");fmtsize(sizes.get(i))))
+  };
+  io.println(s.concat("Total: ";fmtsize(total)));
+  <0
+}

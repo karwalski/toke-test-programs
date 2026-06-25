@@ -1,1 +1,84 @@
-m=maze;i=io:std.io;i=s:std.str;f=solve(width:$i64;height:$i64;seed:$i64):$str{let result=mut."";let w=width;let h=height;let s=seed;let idx=mut.0;lp(let i=0;i<w;i=i+1){result=s.concat(result;"#");};lp(let i=0;i<h;i=i+1){result=s.concat(result;"\n");lp(let j=0;j<w;j=j+1){if(j=0){result=s.concat(result;"#");}el{if(j=w-1){result=s.concat(result;"#");}el{result=s.concat(result;" ");};};};};<result};f=main():$i64{let input=io.readln();let parts=s.split(input;" ");let width=s.toint(parts[0]);let height=s.toint(parts[1]);let seed=s.toint(parts[2]);let result=solve(width;height;seed);io.println(result);<0};
+m=maze;i=io:std.io;i=s:std.str;
+f=arrset(a:@$i64;idx:$i64;v:$i64):@$i64{
+  let out=mut.@();
+  lp(let i=0;i<(a.len as i64);i=i+1){
+    if(i=idx){out=out+@(v)}el{out=out+@(a.get(i))};
+  };
+  <out
+};
+f=arrpop(a:@$i64):@$i64{
+  let out=mut.@();
+  lp(let i=0;i<(a.len as i64)-1;i=i+1){ out=out+@(a.get(i)); };
+  <out
+};
+f=carve(width:$i64;height:$i64;seed:$i64):$str{
+  let wd=2*width+1;
+  let ht=2*height+1;
+  let grid=mut.@();
+  lp(let i=0;i<wd*ht;i=i+1){ grid=grid+@(1); };
+  let visited=mut.@();
+  lp(let i=0;i<width*height;i=i+1){ visited=visited+@(0); };
+  let stackr=mut.@(0);
+  let stackc=mut.@(0);
+  let sp=mut.1;
+  visited=arrset(visited;0;1);
+  grid=arrset(grid;1*wd+1;0);
+  let state=mut.seed-seed/1048576*1048576;
+  if(state<0){state=0-state};
+  lp(let guard=0;guard<1000000;guard=guard+1){
+    if(sp=0){br};
+    let cr=stackr.get(sp-1);
+    let cc=stackc.get(sp-1);
+    let nr=mut.0-1; let nc=mut.0-1;
+    let found=mut.false;
+    let tries=mut.0;
+    lp(let t=0;t<64;t=t+1){
+      if(found){br};
+      if(tries>40){br};
+      state=(state*1103515245+12345)-(state*1103515245+12345)/1048576*1048576;
+      let dir=(state/256)-(state/256)/4*4;
+      let tr=mut.cr; let tc=mut.cc;
+      if(dir=0){tr=cr-1};
+      if(dir=1){tr=cr+1};
+      if(dir=2){tc=cc+1};
+      if(dir=3){tc=cc-1};
+      if(tr<0){}el{if(tr<height){if(tc<0){}el{if(tc<width){
+        if(visited.get(tr*width+tc)=0){
+          nr=tr; nc=tc; found=true;
+        };
+      };};};};
+      tries=tries+1;
+    };
+    if(found){
+      visited=arrset(visited;nr*width+nc;1);
+      grid=arrset(grid;(2*nr+1)*wd+(2*nc+1);0);
+      let wr=cr+nr+1;
+      let wc=cc+nc+1;
+      grid=arrset(grid;wr*wd+wc;0);
+      stackr=stackr+@(nr);
+      stackc=stackc+@(nc);
+      sp=sp+1;
+    }el{
+      stackr=arrpop(stackr);
+      stackc=arrpop(stackc);
+      sp=sp-1;
+    };
+  };
+  let out=mut."";
+  lp(let r=0;r<ht;r=r+1){
+    if(r>0){out=s.concat(out;"\n")};
+    lp(let c=0;c<wd;c=c+1){
+      if(grid.get(r*wd+c)=1){out=s.concat(out;"#")}el{out=s.concat(out;" ")};
+    };
+  };
+  <out
+};
+f=main():$i64{
+  let input=io.readln();
+  let parts=s.split(input;" ");
+  let width=mt s.toint(parts.get(0)){ $ok:v v; $err:e 0 };
+  let height=mt s.toint(parts.get(1)){ $ok:v v; $err:e 0 };
+  let seed=mt s.toint(parts.get(2)){ $ok:v v; $err:e 0 };
+  io.println(carve(width;height;seed));
+  <0
+};

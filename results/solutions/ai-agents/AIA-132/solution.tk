@@ -1,1 +1,114 @@
-m=compare;f=compareplans(plana:$str;planb:$str):$str{let a=mut.0;let b=mut.0;let aparts=plana.split(" ");let bparts=planb.split(" ");lp(let i=0;i<aparts.len;i=i+1){let apart=aparts.get(i);if(apart.contains("cost"))){let coststr=apart.split(":")[1];a=a+coststr.toi64();};};lp(let i=0;i<bparts.len;i=i+1){let bpart=bparts.get(i);if(bpart.contains("cost"))){let coststr=bpart.split(":")[1];b=b+coststr.toi64();};};let result=mut."";if(a<b){result="Plan A is cheaper: ";result=s.concat(result;a) as$str;result=s.concat(result;" < ");result=s.concat(result;b) as$str;}el{if(a>b){result="Plan B is cheaper: ";result=s.concat(result;b) as$str;result=s.concat(result;" < ");result=s.concat(result;a) as$str;}el{result="Plans are equally expensive: ";result=s.concat(result;a) as$str;};};result=s.concat(result;" USD");<result};
+m=plancompare;i=io:std.io;i=s:std.str;
+f=extractarray(json:$str;key:$str):$str{
+  let ki=s.indexof(json;key);
+  if(ki<0){<""};
+  let after=s.slice(json;ki+s.len(key) as i64;s.len(json) as i64);
+  let ob=s.indexof(after;"[");
+  let rest=s.slice(after;ob+1;s.len(after) as i64);
+  let depth=mut.1;
+  let i=mut.0;
+  let n=s.len(rest) as i64;
+  let endidx=mut.n;
+  lp(i<n){
+    let ch=s.slice(rest;i;i+1);
+    if(s.eq(ch;"[")){depth=depth+1};
+    if(s.eq(ch;"]")){depth=depth-1;if(depth=0){endidx=i;i=n}};
+    i=i+1
+  };
+  <s.slice(rest;0;endidx)
+};
+f=countsteps(arr:$str):$i64{
+  let n=s.len(arr) as i64;
+  let cnt=mut.0;
+  let p=mut.0;
+  lp(p<n){
+    let rest=s.slice(arr;p;n);
+    let si=s.indexof(rest;"\"step\":");
+    if(si<0){p=n}el{cnt=cnt+1;p=p+si+7}
+  };
+  <cnt
+};
+f=fmtscore(x:$i64):$str{
+  (* x is score*100 *)
+  let ip=x/100;
+  let fp=x-ip*100;
+  let d1=fp/10;
+  let d2=fp-d1*10;
+  let out=mut.s.concat(s.fromint(ip);".");
+  out=s.concat(out;s.fromint(d1));
+  if(d2>0){out=s.concat(out;s.fromint(d2))};
+  <out
+};
+f=scorefor(crit:$str;steps:$i64):$i64{
+  if(s.eq(crit;"speed")){if(steps<=1){<90}el{<50}};
+  if(s.eq(crit;"safety")){if(steps<=1){<30}el{<95}};
+  if(s.eq(crit;"cost")){if(steps<=1){<90}el{<60}};
+  <50
+};
+f=critweight(crit:$str):$i64{
+  if(s.eq(crit;"safety")){<2};
+  <1
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let plana=extractarray(json;"\"plan_a\":");
+  let planb=extractarray(json;"\"plan_b\":");
+  let stepsa=countsteps(plana);
+  let stepsb=countsteps(planb);
+  let critarr=extractarray(json;"\"criteria\":");
+  let crits=mut.@();
+  let cn=s.len(critarr) as i64;
+  let q=mut.0;
+  lp(q<cn){
+    let qch=s.slice(critarr;q;q+1);
+    if(s.eq(qch;"\"")){
+      let af=s.slice(critarr;q+1;cn);
+      let eq=s.indexof(af;"\"");
+      crits=crits+@(s.slice(af;0;eq));
+      q=q+1+eq+1
+    }el{q=q+1}
+  };
+  let nc=crits.len();
+  let sa=mut."{";
+  let sb=mut."{";
+  let totala=mut.0;
+  let totalb=mut.0;
+  lp(let z=0;z<nc;z=z+1){
+    let c=crits.get(z);
+    let va=scorefor(c;stepsa);
+    let vb=scorefor(c;stepsb);
+    let w=critweight(c);
+    totala=totala+va*w;
+    totalb=totalb+vb*w;
+    if(z>0){sa=s.concat(sa;",");sb=s.concat(sb;",")};
+    sa=s.concat(s.concat(s.concat(sa;"\"");c);"\":");
+    sa=s.concat(sa;fmtscore(va));
+    sb=s.concat(s.concat(s.concat(sb;"\"");c);"\":");
+    sb=s.concat(sb;fmtscore(vb))
+  };
+  sa=s.concat(sa;"}");
+  sb=s.concat(sb;"}");
+  let rec=mut."a";
+  if(totalb>totala){rec="b"};
+  (* tradeoffs: only when plans differ in thoroughness with testing in b *)
+  let lowerb=s.lower(planb);
+  let btests=s.indexof(lowerb;"test")>=0;
+  let tradeoffs=mut."[";
+  if(stepsb>stepsa && btests){
+    tradeoffs=s.concat(tradeoffs;"\"Plan A is faster and cheaper but much riskier\",");
+    tradeoffs=s.concat(tradeoffs;"\"Plan B adds testing overhead but catches issues before production\"")
+  };
+  tradeoffs=s.concat(tradeoffs;"]");
+  let out=mut."{\"scores\":{\"plan_a\":";
+  out=s.concat(out;sa);
+  out=s.concat(out;",\"plan_b\":");
+  out=s.concat(out;sb);
+  out=s.concat(out;"},\"recommendation\":\"");
+  out=s.concat(out;rec);
+  out=s.concat(out;"\",\"tradeoffs\":");
+  out=s.concat(out;tradeoffs);
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

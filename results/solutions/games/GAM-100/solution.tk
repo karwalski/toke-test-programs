@@ -1,1 +1,76 @@
-m=seedtostr;f=seedtostr(seed:$i64):$str{let num1=seed;let num2=seed;let str1=num1 as$str;let str2=num2 as$str;let result=str1+"_"+str2;<result};f=placebship(grid:$str;size:$i64;pos:$i64;dir:$i64):$str{let result=mut.grid;let size=size;let pos=pos;let dir=dir;let idx=mut.0;let row=mut.0;let col=mut.0;let size1=size;let size2=size;let pos1=pos;let pos2=pos;let dir1=dir;let dir2=dir;let idx1=mut.0;let row1=mut.0;let col1=mut.0;if(dir=0){row=pos;col=idx;lp(let i=0;i<size;i=i+1){let cell=result.get(row);let newcell=cell+"s";let newresult=result.set(row;newcell);result=newresult;row=row+1;};}el{if(dir=1){col=pos;row=idx
+m=battleship;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=nextrand(state:$i64):$i64{
+  let r=(state*1103515245+12345)%2147483648;
+  let rr=mut.r;
+  if(rr<0){rr=rr+2147483648};
+  <rr
+};
+
+f=main():i64{
+  let line=io.readln();
+  let seed=s.toint(s.trim(line));
+
+  (* 10x10 grid of bytes, '.'=46 *)
+  let grid=mut.vec.new();
+  lp(let i=0;i<100;i=i+1){grid=vec.push(grid;46)};
+
+  (* fleet: fleetltr and lengths *)
+  let fleetltr=mut.@("C");
+  fleetltr=fleetltr.push("B");fleetltr=fleetltr.push("D");
+  fleetltr=fleetltr.push("S");fleetltr=fleetltr.push("P");
+  let shiplens=mut.vec.new();
+  shiplens=vec.push(shiplens;5);shiplens=vec.push(shiplens;4);shiplens=vec.push(shiplens;3);
+  shiplens=vec.push(shiplens;3);shiplens=vec.push(shiplens;2);
+
+  let state=mut.seed;
+
+  lp(let f=0;f<5;f=f+1){
+    let slen=vec.get(shiplens;f);
+    let lb=s.bytes(fleetltr.get(f));
+    let shipbyte=lb.get(0) as i64;
+    let placed=mut.0;
+    let guard=mut.0;
+    lp(placed<1){
+      guard=guard+1;
+      if(guard>100000){br};
+      state=nextrand(state);
+      let dir=state%2; (* 0=horizontal 1=vertical *)
+      state=nextrand(state);
+      let row=state%10;
+      state=nextrand(state);
+      let col=state%10;
+      (* check fits *)
+      let fits=mut.1;
+      if(dir=0){ if((col+slen)>10){fits=0} }el{ if((row+slen)>10){fits=0} };
+      if(fits=1){
+        let ok=mut.1;
+        lp(let k=0;k<slen;k=k+1){
+          let rr=mut.row;let cc=mut.col;
+          if(dir=0){cc=col+k}el{rr=row+k};
+          if(vec.get(grid;rr*10+cc)=46){}el{ok=0}
+        };
+        if(ok=1){
+          lp(let k=0;k<slen;k=k+1){
+            let rr=mut.row;let cc=mut.col;
+            if(dir=0){cc=col+k}el{rr=row+k};
+            grid=vec.set(grid;rr*10+cc;shipbyte)
+          };
+          placed=1
+        }
+      }
+    }
+  };
+
+  lp(let r=0;r<10;r=r+1){
+    let out=mut."";
+    lp(let c=0;c<10;c=c+1){
+      out=s.concat(out;s.frombytes(@(vec.get(grid;r*10+c) as u8)))
+    };
+    io.println(out)
+  };
+  <0
+}

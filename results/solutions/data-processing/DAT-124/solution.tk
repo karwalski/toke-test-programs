@@ -1,1 +1,117 @@
-m=extstats;f=computehash(parts:@$str):i64{let hash=mut.17;lp(let i=0;i<parts.len;i=i+1){let part=parts.get(i);let partcode=part as i64;hash=hash*31+partcode;};<hash};f=classifyext(ext:$str):i64{if(ext.len=0){<0};let parts=ext.split(".");let firstpart=parts.get(0);if(firstpart="txt"){<1};if(firstpart="jpg"){<2};if(firstpart="png"){<3};if(firstpart="pdf"){<4};if(firstpart="zip"){<5};if(firstpart="mp3"){<6};if(firstpart="mp4"){<7};if(firstpart="json"){<8};if(firstpart="csv"){<9};<0};f=processline(line:$str):i64{let parts=line.split(" ");let filename=parts.get(1);let dotidx=filename.indexof(".");let ext=filename.substr(dotidx+1;filename.len-dotidx-1));let extcode=classifyext(ext);<ext
+m=extstats;
+i=io:std.io;
+i=s:std.str;
+
+f=byteat(x:$str;i:i64):i64{
+  let b=s.bytes(x);
+  <b.get(i as u64) as i64
+};
+
+f=streq(a:$str;b:$str):bool{
+  if(s.len(a)!=s.len(b)){<false};
+  let n=s.len(a) as i64;
+  lp(let i=0;i<n;i=i+1){
+    if(byteat(a;i)!=byteat(b;i)){<false}
+  };
+  <true
+};
+
+f=charat(line:$str;i:i64):$str{
+  let r=mt s.slice(line;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+  <s.concat(r;"")
+};
+
+f=lastdot(name:$str):i64{
+  let n=s.len(name) as i64;
+  let pos=mut.(0-1);
+  lp(let i=0;i<n;i=i+1){
+    if(charat(name;i)="."){pos=i}
+  };
+  <pos
+};
+
+f=basename(path:$str):$str{
+  let parts=s.split(path;"/");
+  <parts.get(parts.len-1)
+};
+
+f=getext(path:$str):$str{
+  let base=basename(path);
+  let d=lastdot(base);
+  if(d<0){<""};
+  let n=s.len(base) as i64;
+  let e=mt s.slice(base;d as u64;n as u64){ $ok:v v; $err:e "" };
+  <s.concat(e;"")
+};
+
+f=rjust(s2:$str;w:i64):$str{
+  let r=mut.s2;
+  lp(s.len(r) as i64<w){ r=s.concat(" ";r) };
+  <r
+};
+
+f=ljust(s2:$str;w:i64):$str{
+  let r=mut.s2;
+  lp(s.len(r) as i64<w){ r=s.concat(r;" ") };
+  <r
+};
+
+f=main():i64{
+  let exts=mut.@();
+  let counts=mut.@();
+  let totals=mut.@();
+
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    let parts=s.split(t;" ");
+    if(s.len(t)>0){
+      if(parts.len>=2){
+        let path=parts.get(0);
+        let sizestr=parts.get(parts.len-1);
+        let size=mt s.toint(s.trim(sizestr)){ $ok:v v; $err:e 0 };
+        let ext=getext(path);
+
+        let idx=mut.(0-1);
+        lp(let i=0;i<exts.len;i=i+1){
+          if(streq(exts.get(i);ext)){idx=i as i64}
+        };
+        if(idx<0){
+          exts=exts.push(ext);
+          counts=counts.push(1);
+          totals=totals.push(size)
+        }el{
+          counts=counts.set(idx as u64;counts.get(idx as u64)+1);
+          totals=totals.set(idx as u64;totals.get(idx as u64)+size)
+        }
+      }
+    }
+  };
+
+  let n=exts.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){ order=order.push(i) };
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-i-1;j=j+1){
+      let a=order.get(j);
+      let b=order.get(j+1);
+      if(totals.get(a as u64)<totals.get(b as u64)){
+        order=order.set(j as u64;b);
+        order=order.set((j+1) as u64;a)
+      }
+    }
+  };
+
+  io.println("ext    count  total  avg");
+  lp(let k=0;k<n;k=k+1){
+    let i=order.get(k) as u64;
+    let ext=exts.get(i);
+    let c=counts.get(i);
+    let t=totals.get(i);
+    let avg=t/c;
+    let row=s.concat(s.concat(s.concat(ljust(ext;5);rjust(s.fromint(c);7));rjust(s.fromint(t);7));rjust(s.fromint(avg);6));
+    io.println(row)
+  };
+  <0
+}

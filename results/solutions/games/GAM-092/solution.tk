@@ -1,1 +1,91 @@
-m=valid;f=valid(t:$str):$bool{let n=t.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=t.get(i);if(c=" "){m=m+1}};let res=mut.false;if(m=0){res=true}el{if(m=1){res=true}el{res=false}}};<res};
+m=tromino;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=main():i64{
+  (* read grid rows *)
+  let rows=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)=0){}el{rows=rows.push(line)}
+  };
+  let rcount=(rows.len as i64)-1;
+
+  (* parse into flat vec of ids, track ncols (assume rectangular) and maxid *)
+  let ncols=mut.0;
+  let maxid=mut.0;
+  (* parallel per-id stats; use vecs sized maxid+1, fill lazily via 2 passes *)
+  (* first pass: find maxid and ncols *)
+  lp(let r=1;r<rcount+1;r=r+1){
+    let parts=s.split(rows.get(r);" ");
+    let pc=parts.len as i64;
+    if(pc>ncols){ncols=pc};
+    lp(let c=0;c<pc;c=c+1){
+      let tok=parts.get(c);
+      if(s.len(tok)=0){}el{
+        let v=s.toint(tok);
+        if(v>maxid){maxid=v}
+      }
+    }
+  };
+
+  (* stats vecs: count, minr, maxr, minc, maxc indexed by id (0..maxid) *)
+  let cnt=mut.vec.new();
+  let minr=mut.vec.new();
+  let maxr=mut.vec.new();
+  let minc=mut.vec.new();
+  let maxc=mut.vec.new();
+  lp(let i=0;i<maxid+1;i=i+1){
+    cnt=vec.push(cnt;0);
+    minr=vec.push(minr;9999);
+    maxr=vec.push(maxr;-1);
+    minc=vec.push(minc;9999);
+    maxc=vec.push(maxc;-1)
+  };
+
+  (* second pass: accumulate *)
+  lp(let r=1;r<rcount+1;r=r+1){
+    let parts=s.split(rows.get(r);" ");
+    let pc=parts.len as i64;
+    lp(let c=0;c<pc;c=c+1){
+      let tok=parts.get(c);
+      if(s.len(tok)=0){}el{
+        let v=s.toint(tok);
+        if(v=0){}el{
+          let rr=r-1;
+          cnt=vec.set(cnt;v;vec.get(cnt;v)+1);
+          if(rr<vec.get(minr;v)){minr=vec.set(minr;v;rr)};
+          if(rr>vec.get(maxr;v)){maxr=vec.set(maxr;v;rr)};
+          if(c<vec.get(minc;v)){minc=vec.set(minc;v;c)};
+          if(c>vec.get(maxc;v)){maxc=vec.set(maxc;v;c)}
+        }
+      }
+    }
+  };
+
+  (* check each id in ascending order: L-tromino = exactly 3 cells, bbox 2x2 *)
+  let bad=mut.0;
+  let badid=mut.0;
+  lp(let tid=1;tid<maxid+1;tid=tid+1){
+    let n=vec.get(cnt;tid);
+    if(n=0){}el{
+      if(bad=0){
+        let hgt=vec.get(maxr;tid)-vec.get(minr;tid);
+        let wid=vec.get(maxc;tid)-vec.get(minc;tid);
+        let isL=mut.0;
+        if(n=3){if(hgt=1){if(wid=1){isL=1}}};
+        if(isL=0){bad=1;badid=tid}
+      }
+    }
+  };
+
+  if(bad=1){
+    io.println(s.concat(s.concat("Invalid: tromino ";s.fromint(badid));" not L-shaped"))
+  }el{
+    io.println("Valid")
+  };
+  <0
+}

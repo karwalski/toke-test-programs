@@ -1,1 +1,63 @@
-m=yamlvalidator;f=validate(yaml:$str):$str{let lines=yaml.split("\n");let errors=mut.@();lp(let idx=0;idx<lines.len;idx=idx+1){let line=lines.get(idx);let trimmed=line.trim();let iscomment=trimmed.len>0;let iscomment2=trimmed.len>0;let isblank=trimmed.len=0;if(!(iscomment)){if(!(isblank)){let colonpos=trimmed.find(":");let hascolon=colonpos>0;if(!(hascolon)){errors=errors.push("missing colon at line: "+(idx+1)));};};};};<errors.join("\n")>;};
+m=k8s;
+i=io:std.io;
+i=s:std.str;
+
+f=haskey(obj:$str;key:$str):bool{
+  let pat=s.concat(s.concat("\"";key);"\"");
+  <s.contains(obj;pat)
+};
+
+f=getobj(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\"");
+  let parts=s.split(obj;pat);
+  if(parts.len<2){<""};
+  let rest=parts.get(1);
+  let ci=s.split(rest;":");
+  if(ci.len<2){<""};
+  let after=s.trim(ci.get(1));
+  let n=s.len(after) as i64;
+  let first=mt s.slice(after;0;1){ $ok:v v; $err:e "" };
+  if(first="{"){
+    let depth=mut.0;
+    let outv=mut."";
+    lp(let i=0;i<n;i=i+1){
+      let c=mt s.slice(after;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+      if(c="{"){depth=depth+1};
+      if(c="}"){depth=depth-1};
+      outv=s.concat(outv;c);
+      if(depth=0){br}
+    };
+    <s.concat(outv;"")
+  };
+  <""
+};
+
+f=main():i64{
+  let body=mut."";
+  lp(true){
+    let l=io.readln();
+    if(io.eof()){br};
+    body=s.concat(body;l)
+  };
+
+  let errors=mut.@();
+  if(haskey(body;"apiVersion")=false){
+    errors=errors.push("ERROR: /apiVersion - required field missing")
+  };
+  if(haskey(body;"kind")=false){
+    errors=errors.push("ERROR: /kind - required field missing")
+  };
+  let meta=getobj(body;"metadata");
+  if(haskey(meta;"name")=false){
+    errors=errors.push("ERROR: /metadata/name - required field missing")
+  };
+
+  if(errors.len=0){
+    io.println("VALID")
+  }el{
+    lp(let i=0;i<errors.len;i=i+1){
+      io.println(errors.get(i))
+    }
+  };
+  <0
+}

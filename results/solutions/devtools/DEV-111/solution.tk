@@ -1,1 +1,77 @@
-m=runlen;f=encode(input:$str):$str{let n=input.len;if(n=0){<""};let result=mut."";let i=mut.0;lp(let idx=0;idx<n;idx=idx+1){let currentchar=input.get(idx);let count=mut.1;let j=mut.idx+1;lp(let k=0;k<n;k=k+1){if(j<n){let nextchar=input.get(j);if(nextchar=currentchar){count=count+1;j=j+1;}el{br};}el{br};};result=result+currentchar;result=s.concat(result;count) as$str;};<result};
+m=runlen;
+i=io:std.io;
+i=str:std.str;
+
+f=streq(a:$str;b:$str):bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  if(!(la=lb)){<false};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let ok=mut.true;
+  lp(let i=0;i<la;i=i+1){
+    if(!(ba.get(i)=bb.get(i))){ok=false};
+  };
+  <ok
+};
+
+f=stripts(line:$str):$str{
+  let sp=str.bytes(" ").get(0);
+  let n=str.len(line) as i64;
+  let idx=mut.-1;
+  let found=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    if(!(found)){
+      if(str.bytes(line).get(i)=sp){
+        idx=i;
+        found=true;
+      };
+    };
+  };
+  if(!(found)){
+    <line
+  };
+  <mt str.slice(line;(idx+1) as u64;n as u64){ $ok:v v; $err:e line }
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(str.len(line)=0){br};
+    lines=lines.push(line);
+  };
+  let n=lines.len as i64;
+  let i=mut.0;
+  lp(let g=0;g<n;g=g+1){
+    if(i<n){
+      let first=lines.get(i);
+      let key=stripts(first);
+      let count=mut.1;
+      let j=mut.i+1;
+      let cont=mut.true;
+      lp(let k=0;k<n;k=k+1){
+        if(cont){
+          if(j<n){
+            let nk=stripts(lines.get(j));
+            if(streq(nk;key)){
+              count=count+1;
+              j=j+1;
+            }el{
+              cont=false;
+            };
+          }el{
+            cont=false;
+          };
+        };
+      };
+      if(count>1){
+        io.println(str.concat(str.concat(str.concat(first;" (repeated ");str.fromint(count));" times)"));
+      }el{
+        io.println(first);
+      };
+      i=j;
+    };
+  };
+  <0
+};

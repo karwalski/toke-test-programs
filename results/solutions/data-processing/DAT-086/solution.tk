@@ -1,1 +1,71 @@
-m=sparse;f=issparse(mat:$i64;n:$i64):$bool{let count=mut.0;lp(let i=0;i<n;i=i+1){if(mat.get(i)>0)){count=count+1;};};if(count<(n as i64)/2)){<true}el{<false}};f=compress(mat:$i64;n:$i64):$i64{let sparse=issparse(mat;n);if(sparse){<mat}el{let nn=n;let vals=mut.@();let rows=mut.@();let cols=mut.@();lp(let i=0;i<nn;i=i+1){let val=mat.get(i);if(val>0){vals=vals+@(val);rows=rows+@(i);cols=cols+@(0);};};let result=mut.@();lp(let i=0;i<vals.len;i=i+1){result=result+@(vals.get(i)));};lp(let i=0;i<rows.len;i=i+1){result=result+@(rows.get(i)));};lp(let i=0;i<cols.len;i=i+1){result=result+@(cols.get(i)));};
+m=sparse;
+i=io:std.io;
+i=s:std.str;
+
+f=joinlist(a:@i64):$str{
+  if(a.len=0){<""};
+  let out=mut.s.fromint(a.get(0));
+  lp(let i=1;i<a.len;i=i+1){
+    out=s.concat(out;s.concat(", ";s.fromint(a.get(i))));
+  };
+  <out
+};
+
+f=fixed1(x:f64):$str{
+  let neg=mut.0;
+  let v=mut.x;
+  if(v<0.0){neg=1;v=0.0-v};
+  let scaled=v*10.0+0.5;
+  let iscaled=scaled as i64;
+  let whole=iscaled/10;
+  let frac=iscaled-whole*10;
+  let out=mut.s.concat(s.concat(s.fromint(whole);".");s.fromint(frac));
+  if(neg=1){out=s.concat("-";out)};
+  <out
+};
+
+f=main():i64{
+  let rows=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){
+      let t=s.trim(l);
+      if(s.len(t)>0){ rows=rows.push(t); };
+      br
+    };
+    let t=s.trim(l);
+    if(s.len(t)>0){ rows=rows.push(t); };
+  };
+  let nrows=rows.len;
+  let vals=mut.@();
+  let cols=mut.@();
+  let rowptr=mut.@();
+  rowptr=rowptr.push(0);
+  let nnz=mut.0;
+  let ncols=mut.0;
+  lp(let r=0;r<nrows;r=r+1){
+    let parts=s.split(rows.get(r);" ");
+    let cc=mut.0;
+    lp(let c=0;c<parts.len;c=c+1){
+      let p=parts.get(c);
+      if(s.len(p)>0){
+        let v=s.toint(p);
+        if(v!=0){
+          vals=vals.push(v);
+          cols=cols.push(cc);
+          nnz=nnz+1;
+        };
+        cc=cc+1;
+      };
+    };
+    if(cc>ncols){ ncols=cc; };
+    rowptr=rowptr.push(nnz);
+  };
+  let total=nrows*ncols;
+  let comp=(1.0-(nnz as f64)/(total as f64))*100.0;
+  io.println(s.concat("Values: [";s.concat(joinlist(vals);"]")));
+  io.println(s.concat("Col indices: [";s.concat(joinlist(cols);"]")));
+  io.println(s.concat("Row pointers: [";s.concat(joinlist(rowptr);"]")));
+  io.println(s.concat("Compression: ";s.concat(fixed1(comp);"%")));
+  <0
+}

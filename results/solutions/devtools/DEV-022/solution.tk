@@ -1,1 +1,55 @@
-m=binarysize;f=usage():$str{<b"Usage: binarysize <path-to-binary>";}};f=parseargs(args:@$str):$str{let x=args.get(0);let y=args.get(1);if(x="-h"){<usage()};<y};f=extractsection(data:$str;section:$str):$str{let start=mut.0;let end=mut.0;let found=mut.false;lp(let idx=0;idx<data.len;idx=idx+1){let ch=data.get(idx);if(ch=section){found=true;start=idx+1;lp(let j=start;j<data.len;j=j+1){let c=data.get(j);if(c=section){end=j;found=false;lp(let k=end;k<data.len;k=k+1){let cc=data.get(k);if(cc=section){found=true;start=k+1;};};<data.sub(start;end)};};};};};};};};};};};};};};};};};};};};};};};};}
+m=binarysize;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+
+f=detecttype(head:$str):$str{
+  let b=s.bytes(head);
+  if(s.len(head) as i64>=4){
+    let b0=b.get(0) as i64;
+    let b1=b.get(1) as i64;
+    let b2=b.get(2) as i64;
+    let b3=b.get(3) as i64;
+    if(b0=127){
+      if(b1=69){ if(b2=76){ if(b3=70){ <"ELF" } } }
+    };
+    if(b0=77){ if(b1=90){ <"PE" } };
+    if(b0=207){ if(b1=250){ <"Mach-O" } };
+    if(b0=202){ if(b1=254){ <"Mach-O" } };
+    if(b0=254){ if(b1=237){ <"Mach-O" } }
+  };
+  <"unknown"
+};
+
+f=kbformat(n:i64):$str{
+  let whole=n/1024;
+  let rem=n-whole*1024;
+  let frac=rem*100/1024;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  <s.concat(s.concat(s.concat(s.fromint(whole);".");fracstr);" KB")
+};
+
+f=main():i64{
+  let path=s.trim(io.readln());
+  let head=mt file.read(path){ $ok:v v; $err:e "" };
+  let ftype=detecttype(head);
+  let size=file.stat(path);
+
+  let strcount=mut.0;
+  let run=mut.0;
+  let hb=s.bytes(head);
+  lp(let i=0;i<s.len(head) as i64;i=i+1){
+    let c=hb.get(i as u64) as i64;
+    if(c>=32){
+      if(c<127){ run=run+1 }
+      el{ if(run>=4){strcount=strcount+1}; run=0 }
+    }el{ if(run>=4){strcount=strcount+1}; run=0 }
+  };
+  if(run>=4){strcount=strcount+1};
+
+  io.println(s.concat("file: ";path));
+  io.println(s.concat("size: ";kbformat(size)));
+  io.println(s.concat("strings: ";s.fromint(strcount)));
+  <0
+}

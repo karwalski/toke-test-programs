@@ -1,1 +1,73 @@
-m=nelson;f=solve(p0:$str):$str{let lhs=mut."";let rhs=mut."";let n=p0.len;lp(let i=0;i<n;i=i+1){let c=p0.get(i);if(c=";"){lhs=rhs;rhs="";}el{rhs=rhs+c;};};let result=mut."";if(lhs.len>0){result=s.concat(s.concat(s.concat(result;"\"");lhs);"\"");};if(rhs.len>0){if(result.len>0){result=s.concat(result;" ");};result=s.concat(s.concat(s.concat(result;"\"");rhs);"\"");};<result};
+m=nelson;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=median(vals:@f64):f64{
+let n=(vals.len as i64);
+let arr=mut.@();
+lp(let i=0;i<n;i=i+1){arr=arr+@(vals.get(i))};
+lp(let i=0;i<n;i=i+1){
+lp(let j=0;j<n-1-i;j=j+1){
+if(arr.get(j)>arr.get(j+1)){
+let tmp=arr.get(j);
+arr=arr.set(j;arr.get(j+1));
+arr=arr.set(j+1;tmp);
+}
+}
+};
+let mid=n/2;
+let res=mut.0.0;
+if(n-mid*2=0){
+let lo=mut.0.0;
+let hi=mut.0.0;
+lo=arr.get(mid-1);
+hi=arr.get(mid);
+res=(lo+hi)/2.0
+}el{
+res=arr.get(mid)
+};
+<res+0.0
+};
+f=main():i64{
+let line=s.trim(io.readln());
+let parts=s.split(line;",");
+let vals=mut.@();
+lp(let i=0;i<(parts.len as i64);i=i+1){
+let p=s.trim(parts.get(i));
+if(s.len(p)>0){vals=vals+@(s.tofloat(p))}
+};
+let n=(vals.len as i64);
+let center=median(vals);
+let mrsum=mut.0.0;
+lp(let i=1;i<n;i=i+1){
+let cur=mut.0.0;
+let prev=mut.0.0;
+cur=vals.get(i);
+prev=vals.get(i-1);
+let mr=mut.0.0;
+mr=math.abs(cur-prev);
+mrsum=mrsum+mr;
+};
+let mrbar=mrsum/s.tofloat(s.fromint(n-1));
+let sigma=mrbar/1.128;
+let out=mut."{\"violations\":[";
+let cnt=mut.0;
+lp(let i=0;i<n;i=i+1){
+let vi=mut.0.0;
+vi=vals.get(i);
+let dev=mut.0.0;
+dev=math.abs(vi-center);
+let limit=mut.0.0;
+limit=3.0*sigma;
+if(dev>limit){
+if(cnt>0){out=s.concat(out;",")};
+out=s.concat(out;"{\"rule\":1,\"index\":");
+out=s.concat(out;s.fromint(i));
+out=s.concat(out;",\"description\":\"point beyond 3 sigma\"}");
+cnt=cnt+1;
+}
+};
+out=s.concat(out;"]}");
+io.println(out);
+<0
+}

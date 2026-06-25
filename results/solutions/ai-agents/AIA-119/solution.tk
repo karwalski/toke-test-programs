@@ -1,1 +1,195 @@
-m=cond;f=cond(cond:$bool;then:$i64;otherwise:$i64):$i64{if(cond){<then};<otherwise}};
+m=router;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+f=isnum(t:$str):$bool{
+  let n=s.len(t) as i64;
+  if(n=0){<false};
+  let i=mut.0;
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789-";ch);
+    if(d<0){<false};
+    i=i+1
+  };
+  <true
+};
+(* lookup a raw value in the context object: returns the value as it appears (without quotes for strings) *)
+f=ctxget(ctx:$str;field:$str):$str{
+  let k=s.concat(s.concat("\"";field);"\":");
+  let idx=s.indexof(ctx;k);
+  if(idx<0){<""};
+  let start=idx+s.len(k) as i64;
+  let rest=s.slice(ctx;start;s.len(ctx) as i64);
+  let first=s.slice(rest;0;1);
+  if(s.eq(first;"\"")){
+    let after=s.slice(rest;1;s.len(rest) as i64);
+    let endq=s.indexof(after;"\"");
+    <s.slice(after;0;endq)
+  };
+  (* numeric: read until , or } *)
+  let rl=s.len(rest) as i64;
+  let j=mut.0;let buf=mut."";
+  lp(j<rl){
+    let ch=s.slice(rest;j;j+1);
+    if(s.eq(ch;",")){j=rl}el{if(s.eq(ch;"}")){j=rl}el{buf=s.concat(buf;ch);j=j+1}}
+  };
+  <s.trim(buf)
+};
+(* evaluate a single comparison "field op value" *)
+f=evalsingle(ctx:$str;expr:$str):$bool{
+  let e=s.trim(expr);
+  (* find operator; check two-char ops first *)
+  let opidx=mut.0-1;
+  let op=mut."";
+  let oi=s.indexof(e;">=");
+  if(oi>=0){opidx=oi;op=">="}el{
+    let oi2=s.indexof(e;"<=");
+    if(oi2>=0){opidx=oi2;op="<="}el{
+      let oi3=s.indexof(e;"==");
+      if(oi3>=0){opidx=oi3;op="=="}el{
+        let oi4=s.indexof(e;"!=");
+        if(oi4>=0){opidx=oi4;op="!="}el{
+          let oi5=s.indexof(e;">");
+          if(oi5>=0){opidx=oi5;op=">"}el{
+            let oi6=s.indexof(e;"<");
+            if(oi6>=0){opidx=oi6;op="<"}
+          }
+        }
+      }
+    }
+  };
+  if(opidx<0){<false};
+  let field=s.trim(s.slice(e;0;opidx));
+  let oplen=s.len(op) as i64;
+  let value=s.trim(s.slice(e;opidx+oplen;s.len(e) as i64));
+  let actual=ctxget(ctx;field);
+  if(isnum(value)){
+    let av=parseint(actual);
+    let bv=parseint(value);
+    if(s.eq(op;"==")){<av=bv};
+    if(s.eq(op;"!=")){<!(av=bv)};
+    if(s.eq(op;">=")){<av>=bv};
+    if(s.eq(op;"<=")){<av<=bv};
+    if(s.eq(op;">")){<av>bv};
+    if(s.eq(op;"<")){<av<bv};
+    <false
+  };
+  if(s.eq(op;"==")){<s.eq(actual;value)};
+  if(s.eq(op;"!=")){<!(s.eq(actual;value))};
+  <false
+};
+(* evaluate full condition, supporting AND *)
+f=evalcond(ctx:$str;cond:$str):$bool{
+  let andi=s.indexof(cond;" AND ");
+  if(andi<0){<evalsingle(ctx;cond)};
+  let left=s.slice(cond;0;andi);
+  let right=s.slice(cond;andi+5;s.len(cond) as i64);
+  let lv=evalsingle(ctx;left);
+  if(!(lv)){<false};
+  <evalcond(ctx;right)
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  (* extract context object *)
+  let ck="\"context\":";
+  let ci=s.indexof(json;ck);
+  let cstart=ci+s.len(ck) as i64;
+  let crest=s.slice(json;cstart;jn);
+  let cclose=s.indexof(crest;"}");
+  let ctx=s.slice(crest;0;cclose+1);
+  (* extract branches array *)
+  let bk="\"branches\":[";
+  let bi=s.indexof(json;bk);
+  let bstart=bi+s.len(bk) as i64;
+  let brest=s.slice(json;bstart;jn);
+  (* find last ] of branches : the array end. branches objects have no nested arrays here *)
+  let bclose=s.indexof(brest;"]");
+  let bseg=s.slice(brest;0;bclose);
+  let bsl=s.len(bseg) as i64;
+  (* collect conditions, targets, priorities *)
+  let conds=mut.@();
+  let targets=mut.@();
+  let prios=mut.@();
+  let p=mut.0;
+  lp(p<bsl){
+    let oc=s.slice(bseg;p;p+1);
+    if(s.eq(oc;"{")){
+      let after=s.slice(bseg;p+1;bsl);
+      let endb=s.indexof(after;"}");
+      let objs=s.slice(after;0;endb);
+      (* condition string *)
+      let condk="\"condition\":\"";
+      let cIdx=s.indexof(objs;condk);
+      let cAfter=s.slice(objs;cIdx+s.len(condk) as i64;s.len(objs) as i64);
+      let cEnd=s.indexof(cAfter;"\"");
+      let condv=s.slice(cAfter;0;cEnd);
+      (* target *)
+      let tk="\"target\":\"";
+      let tIdx=s.indexof(objs;tk);
+      let tAfter=s.slice(objs;tIdx+s.len(tk) as i64;s.len(objs) as i64);
+      let tEnd=s.indexof(tAfter;"\"");
+      let targv=s.slice(tAfter;0;tEnd);
+      (* priority *)
+      let pk="\"priority\":";
+      let pIdx=s.indexof(objs;pk);
+      let pAfter=s.slice(objs;pIdx+s.len(pk) as i64;s.len(objs) as i64);
+      let pal=s.len(pAfter) as i64;
+      let pj=mut.0;let pbuf=mut."";
+      lp(pj<pal){
+        let ch=s.slice(pAfter;pj;pj+1);
+        let dd=s.indexof("0123456789";ch);
+        if(dd>=0){pbuf=s.concat(pbuf;ch);pj=pj+1}el{pj=pal}
+      };
+      conds=conds+@(condv);
+      targets=targets+@(targv);
+      prios=prios+@(parseint(pbuf));
+      p=p+1+endb+1
+    }el{p=p+1}
+  };
+  (* build index order sorted by priority ascending (stable) *)
+  let nb=conds.len();
+  let order=mut.@();
+  lp(let i=0;i<nb;i=i+1){order=order+@(i)};
+  lp(let a=0;a<nb;a=a+1){
+    lp(let b=a+1;b<nb;b=b+1){
+      let ia=order.get(a);let ib=order.get(b);
+      if(prios.get(ib)<prios.get(ia)){
+        order=order.set(a;ib);
+        order=order.set(b;ia)
+      }
+    }
+  };
+  let selected=mut."";
+  let matched=mut."";
+  let found=mut.false;
+  lp(let i=0;i<nb;i=i+1){
+    if(!(found)){
+      let oi=order.get(i);
+      let condv=conds.get(oi);
+      if(evalcond(ctx;condv)){
+        selected=targets.get(oi);
+        matched=condv;
+        found=true
+      }
+    }
+  };
+  let out=mut."";
+  if(found){
+    out=s.concat(s.concat(s.concat(s.concat("{\"selected_branch\":\"";selected);"\",\"condition_met\":\"");matched);"\",\"fallback\":false}")
+  }el{
+    out="{\"selected_branch\":null,\"condition_met\":null,\"fallback\":true}"
+  };
+  io.println(out);
+  <0
+}

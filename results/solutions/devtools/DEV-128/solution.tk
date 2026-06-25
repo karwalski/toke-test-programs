@@ -1,1 +1,87 @@
-m=costest;f=buildcostmap():$str{let m=mut."";m=s.concat(m;"ec2.large=0.045\n");m=s.concat(m;"ec2.xlarge=0.09\n");m=s.concat(m;"ec2.2xlarge=0.18\n");m=s.concat(m;"r5.large=0.035\n");m=s.concat(m;"r5.xlarge=0.07\n");m=s.concat(m;"r5.2xlarge=0.14\n");m=s.concat(m;"p3.2xlarge=3.12\n");m=s.concat(m;"p3.8xlarge=12.48\n");m=s.concat(m;"p3.16xlarge=24.96\n");m=s.concat(m;"c5.large=0.025\n");m=s.concat(m;"c5.xlarge=0.05\n");m=s.concat(m;"c5.2xlarge=0.10\n");m=s.concat(m;"c5.4xlarge=0.20\n");m=s.concat(m;"c5.9xlarge=0.45\n");m=s.concat(m;"m5.large=0.025\n");m=s.concat(m;"m5.xlarge)
+m=costest;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<rest};
+  <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
+};
+
+f=getint(obj:$str;key:$str):$i64{
+  let pat=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<0};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let n=str.len(rest) as i64;
+  let num=mut."";
+  let done=mut.false;
+  let zero=str.bytes("0").get(0);
+  let nine=str.bytes("9").get(0);
+  lp(let i=0;i<n;i=i+1){
+    if(!(done)){
+      let b=str.bytes(rest).get(i);
+      let ok=mut.false;
+      if(!(b<zero)){ if(!(b>nine)){ ok=true } };
+      if(ok){
+        num=str.concat(num;mt str.slice(rest;i;i+1){ $ok:v v; $err:e "" });
+      }el{
+        if(str.len(num)>0){ done=true };
+      };
+    };
+  };
+  <mt str.toint(num){ $ok:v v; $err:e 0 }
+};
+
+f=ratefor(restype:$str):$f64{
+  if(restype="ec2_t3_medium"){<0.0463};
+  if(restype="rds_t3_small"){<0.040};
+  <0.0
+};
+
+f=fmt2(x:$f64):$str{
+  let scaled=x*100.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/100;
+  let frac=asint-whole*100;
+  let fs=mut.str.fromint(frac);
+  if(frac<10){ fs=str.concat("0";str.fromint(frac)) };
+  <str.concat(str.concat(str.fromint(whole);".");fs)
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let n=str.len(input) as i64;
+  let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
+  let parts=str.split(inner;"},{");
+  let total=mut.0.0;
+  let lines=mut."";
+  let cnt=mut.0;
+  lp(let i=0;i<(parts.len as i64);i=i+1){
+    let raw=parts.get(i);
+    let obj=mut.raw;
+    if(!(str.startswith(obj;"{"))){ obj=str.concat("{";obj) };
+    if(!(str.endswith(obj;"}"))){ obj=str.concat(obj;"}") };
+    let rtype=getstr(obj;"resource_type");
+    let count=getint(obj;"size_or_count");
+    let rate=ratefor(rtype);
+    if(rate>0.0){
+      let monthly=rate*730.0*(count as f64);
+      let line=str.concat(str.concat(str.concat(str.concat(rtype;" x");str.fromint(count));": $");fmt2(monthly));
+      lines=str.concat(lines;str.concat(line;"/mo\n"));
+      total=total+monthly;
+      cnt=cnt+1;
+    };
+  };
+  if(cnt>0){
+    lines=str.concat(lines;str.concat(str.concat("Total: $";fmt2(total));"/mo"));
+    io.println(lines);
+  };
+  <0
+};

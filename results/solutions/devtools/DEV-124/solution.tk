@@ -1,1 +1,75 @@
-m=synth;f=synthchecks(ep:$str;name:$str):$str{let out=mut."";let checks=mut.@("health";"metrics";"pii";"config"));lp(let i=0;i<checks.len;i=i+1){let ch=checks.get(i);let line=s.concat(s.concat("  - name: ";name);"_")+ch+"\n";line=s.concat(s.concat(s.concat(line;"    endpoint: ");ep);"\n");line=s.concat(line;"    method: GET\n");line=s.concat(line;"    path: /")+ch+"\n";line=s.concat(line;"    timeout_ms: 5000\n");line=s.concat(line;"    assert_status: 200\n");line=s.concat(line;"    assert_response_contains: []\n");out=s.concat(out;line);};<out};
+m=synth;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<rest};
+  <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
+};
+
+f=getint(obj:$str;key:$str):$i64{
+  let pat=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<0};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let n=str.len(rest) as i64;
+  let num=mut."";
+  let done=mut.false;
+  let zero=str.bytes("0").get(0);
+  let nine=str.bytes("9").get(0);
+  lp(let i=0;i<n;i=i+1){
+    if(!(done)){
+      let b=str.bytes(rest).get(i);
+      let ok=mut.false;
+      if(!(b<zero)){ if(!(b>nine)){ ok=true } };
+      if(ok){
+        num=str.concat(num;mt str.slice(rest;i;i+1){ $ok:v v; $err:e "" });
+      }el{
+        if(str.len(num)>0){ done=true };
+      };
+    };
+  };
+  <mt str.toint(num){ $ok:v v; $err:e 0 }
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let n=str.len(input) as i64;
+  let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
+  let parts=str.split(inner;"},{");
+  let body=mut."";
+  lp(let i=0;i<(parts.len as i64);i=i+1){
+    let raw=parts.get(i);
+    let obj=mut.raw;
+    if(!(str.startswith(obj;"{"))){ obj=str.concat("{";obj) };
+    if(!(str.endswith(obj;"}"))){ obj=str.concat(obj;"}") };
+    let name=getstr(obj;"name");
+    let url=getstr(obj;"url");
+    let method=getstr(obj;"method");
+    let estatus=getint(obj;"expected_status");
+    let interval=getint(obj;"check_interval_sec");
+    let mon=mut."{\"check_interval_sec\":";
+    mon=str.concat(mon;str.fromint(interval));
+    mon=str.concat(mon;",\"expected_status\":");
+    mon=str.concat(mon;str.fromint(estatus));
+    mon=str.concat(mon;",\"method\":\"");
+    mon=str.concat(mon;method);
+    mon=str.concat(mon;"\",\"name\":\"");
+    mon=str.concat(mon;name);
+    mon=str.concat(mon;"\",\"url\":\"");
+    mon=str.concat(mon;url);
+    mon=str.concat(mon;"\"}");
+    if(i>0){ body=str.concat(body;",") };
+    body=str.concat(body;mon);
+  };
+  let out=str.concat(str.concat("{\"monitors\":[";body);"]}");
+  io.println(out);
+  <0
+};

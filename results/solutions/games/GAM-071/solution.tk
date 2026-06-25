@@ -1,1 +1,138 @@
-m=klondike;f=validate(k:$str):$bool{let len=k.len;let spaces=mut.0;let cards=mut.0;let idx=mut.0;lp(let i=0;i<len;i=i+1){let ch=k.get(i);if(ch=" "){spaces=spaces+1}el{cards=cards+1}};let total=spaces+cards;let valid=mut.false;if(total=len){if(cards>0){if(spaces>0){valid=true}}}};<valid};f=main():$i64{let k="K 10 9 8 7 6 5 4 3 2 A K 10 9 8 7 6 5 4 3 2 A K 10 9 8 7 6 5 4 3 2 A K 10 9 8 7 6 5 4 3 2 A";let res=validate(k);if(res){<0}el{<1}};
+m=klondike;
+i=io:std.io;
+i=str:std.str;
+f=rankof(card:$str):$i64{
+  let n=str.len(card) as i64;
+  let r=mt str.slice(card; 0 as u64; (n-1) as u64){ $ok:v v; $err:e "" };
+  let rv=mut.0;
+  if(str.eq(r;"A")){rv=1};
+  if(str.eq(r;"2")){rv=2};
+  if(str.eq(r;"3")){rv=3};
+  if(str.eq(r;"4")){rv=4};
+  if(str.eq(r;"5")){rv=5};
+  if(str.eq(r;"6")){rv=6};
+  if(str.eq(r;"7")){rv=7};
+  if(str.eq(r;"8")){rv=8};
+  if(str.eq(r;"9")){rv=9};
+  if(str.eq(r;"10")){rv=10};
+  if(str.eq(r;"T")){rv=10};
+  if(str.eq(r;"J")){rv=11};
+  if(str.eq(r;"Q")){rv=12};
+  if(str.eq(r;"K")){rv=13};
+  <rv
+};
+f=isred(card:$str):$bool{
+  let n=str.len(card) as i64;
+  let s=mt str.slice(card; (n-1) as u64; n as u64){ $ok:v v; $err:e "" };
+  if(str.eq(s;"H")){<true};
+  if(str.eq(s;"D")){<true};
+  <false
+};
+f=lasttok(s:$str):$str{
+  if(str.len(s)=0){<""};
+  let parts=str.split(s;" ");
+  let n=parts.len as i64;
+  if(n=0){<""};
+  <parts.get((n-1) as u64)
+};
+f=poptok(s:$str):$str{
+  let parts=str.split(s;" ");
+  let n=parts.len as i64;
+  if(n<=1){<""};
+  let out=mut."";
+  lp(let i=0;i<n-1;i=i+1){
+    if(i=0){out=parts.get(0 as u64)}el{out=str.concat(str.concat(out;" ");parts.get(i as u64))}
+  };
+  <out
+};
+f=arrset(a:@$str;idx:$i64;v:$str):@$str{
+  let out=mut.@();
+  let n=a.len as i64;
+  lp(let i=0;i<n;i=i+1){
+    if(i=idx){out=out+@(v)}el{out=out+@(a.get(i as u64))}
+  };
+  <out
+};
+f=colidx(tok:$str):$i64{
+  let n=str.len(tok) as i64;
+  let num=mt str.slice(tok; 3 as u64; n as u64){ $ok:v v; $err:e "0" };
+  let r=mt str.toint(num){ $ok:v v; $err:e 0 };
+  <r-1
+};
+f=main():$i64{
+  let board=io.readln();
+  let st=str.indexof(board;"[[");
+  let inner=mt str.slice(board; st as u64; str.len(board)){ $ok:v v; $err:e "" };
+  let quote="\"";
+  let s0=str.replace(inner;"}";"");
+  let s1=str.replace(s0;"[[";"");
+  let s2=str.replace(s1;"]]";"");
+  let s3=str.replace(s2;quote;"");
+  let stripped=str.replace(s3;" ";"");
+  let groups=str.split(stripped;"],[");
+  let cols=mut.@();
+  lp(let g=0;g<(groups.len as i64);g=g+1){
+    let raw=groups.get(g as u64);
+    let cl1=str.replace(raw;"[";"");
+    let cleaned=str.replace(cl1;"]";"");
+    let cards=str.split(cleaned;",");
+    let colstr=mut."";
+    lp(let c=0;c<(cards.len as i64);c=c+1){
+      let cd=cards.get(c as u64);
+      if(str.len(cd)>0){
+        if(str.len(colstr)=0){colstr=cd}el{colstr=str.concat(str.concat(colstr;" ");cd)}
+      }
+    };
+    cols=cols+@(colstr)
+  };
+  let blank=io.readln();
+  let cur=mut.cols;
+  let stop=mut.false;
+  lp(let mv=0;mv<100000;mv=mv+1){
+    if(stop){br};
+    let line=io.readln();
+    if(str.len(line)=0){br};
+    let p=str.split(line;" ");
+    let src=colidx(p.get(0 as u64));
+    let dst=colidx(p.get(2 as u64));
+    let srccol=cur.get(src as u64);
+    let dstcol=cur.get(dst as u64);
+    if(str.len(srccol)=0){
+      io.println("Invalid: source column is empty");
+      stop=true
+    }el{
+      let card=lasttok(srccol);
+      if(str.len(dstcol)=0){
+        let nsrc=poptok(srccol);
+        let c1=arrset(cur;src;nsrc);
+        let c2=arrset(c1;dst;card);
+        cur=c2;
+        io.println("Valid")
+      }el{
+        let top=lasttok(dstcol);
+        let cr=rankof(card);
+        let tr=rankof(top);
+        let okmove=mut.false;
+        if(cr=tr-1){
+          if(!(isred(card)=isred(top))){okmove=true}
+        };
+        if(okmove){
+          let nsrc=poptok(srccol);
+          let newdst=str.concat(str.concat(dstcol;" ");card);
+          let c1=arrset(cur;src;nsrc);
+          let c2=arrset(c1;dst;newdst);
+          cur=c2;
+          io.println("Valid")
+        }el{
+          if(tr=13){
+            io.println("Invalid: K can only go on empty column")
+          }el{
+            io.println("Invalid: cards must be descending and alternating colors")
+          };
+          stop=true
+        }
+      }
+    }
+  };
+  <0
+};

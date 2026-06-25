@@ -1,5 +1,142 @@
 m=extract;
 i=io:std.io;
-i=s:std.str;
-f=extractfromtext(text:$str):$str{let result=mut."";let len=text.len;lp(let idx=0;idx<len;idx=idx+1){let ch=text.charat(idx);if(ch=" "){result=s.concat(result;"\n")}el{result=s.concat(result;ch)};};<result};
-f=main():$i64{let input=io.readln();let results=mut."[";let len=input.len;let idx=mut.0;lp(idx<len){let start=idx;lp(idx<len&input.charat(idx)!=" "&input.charat(idx)!="\t"&input.charat(idx)!="\n"){idx=idx+1;};if(idx>start){let token=input.substr(start;idx-start);if(token.startswith("http")|token.startswith("www")){if(results!="["){results=s.concat(results;",");};results=s.concat(s.concat(s.concat(results;"{\"type\":\"url\",\"value\":\"");token);s.concat(s.concat("\",\"context\":\"";input.substr(start-10<0?0:start-10;30));"\"}"));};if(token.contains("@")&token.contains(".")){if(results!="["){results=s.concat(results;",");};results=s.concat(s.concat(s.concat(results;"{\"type\":\"email\",\"value\":\"");token);s.concat(s.concat("\",\"context\":\"";input.substr(start-10<0?0:start-10;30));"\"}"));};if(token.startswith("+")|token.startswith("(")){if(results!="["){results=s.concat(results;",");};results=s.concat(s.concat(s.concat(results;"{\"type\":\"phone\",\"value\":\"");token);s.concat(s.concat("\",\"context\":\"";input.substr(start-10<0?0:start-10;30));"\"}"));};};lp(idx<len&(input.charat(idx)=" "|input.charat(idx)=="\t"|input.charat(idx)=="\n")){idx=idx+1;};};results=s.concat(results;"]");io.println(results);<0};
+i=str:std.str;
+
+f=strippunct(tok:$str):$str{
+  let n=mut.(str.len(tok) as i64);
+  let bytes=str.bytes(tok);
+  lp(let z=0;z<100000;z=z+1){
+    if(n<=0){br};
+    let c=(bytes.get((n-1) as u64) as i64);
+    let punct=mut.false;
+    if(c=46){punct=true};
+    if(c=44){punct=true};
+    if(c=59){punct=true};
+    if(c=58){punct=true};
+    if(c=33){punct=true};
+    if(c=63){punct=true};
+    if(punct){n=n-1}el{br};
+  };
+  <mt str.slice(tok;0;n as u64){ $ok:v v; $err:e "" }
+};
+
+f=endswithdot(tok:$str):$bool{
+  let n=(str.len(tok) as i64);
+  if(n<=0){<false};
+  let bytes=str.bytes(tok);
+  let c=(bytes.get((n-1) as u64) as i64);
+  if(c=46){<true};
+  <false
+};
+
+f=isconj(word:$str):$bool{
+  let w=str.lower(strippunct(word));
+  if(w="or"){<true};
+  if(w="and"){<true};
+  if(w="but"){<true};
+  if(w="however"){<true};
+  <false
+};
+
+f=classify(tok:$str):$i64{
+  let v=strippunct(tok);
+  if(str.startswith(v;"http")){<1};
+  if(str.contains(v;"@")){if(str.contains(v;".")){<2}};
+  if(str.startswith(v;"+")){<3};
+  if(str.startswith(v;"(")){<3};
+  <0
+};
+
+f=jsonesc(s:$str):$str{
+  let bytes=str.bytes(s);
+  let out=mut."";
+  let n=str.len(s);
+  lp(let i=0;i<(n as i64);i=i+1){
+    let c=(bytes.get(i as u64) as i64);
+    if(c=34){out=str.concat(out;"\\\"")}el{
+      if(c=92){out=str.concat(out;"\\\\")}el{
+        let ch=mt str.slice(s;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+        out=str.concat(out;ch)
+      }
+    };
+  };
+  <out
+};
+
+f=main():i64{
+  let input=mut."";
+  lp(let z=0;z<100000;z=z+1){
+    let ln=io.readln();
+    if(str.len(ln)=0){br};
+    if(str.len(input)=0){input=ln}el{input=str.concat(str.concat(input;" ");ln)};
+  };
+
+  let raw=str.split(input;" ");
+  let nr=(raw.len as i64);
+  let toks=mut.@();
+  lp(let i=0;i<nr;i=i+1){
+    let t=raw.get(i as u64);
+    if(str.len(t)>0){toks=toks+@(t)};
+  };
+  let nt=(toks.len as i64);
+
+  let out=mut."[";
+  let first=mut.true;
+  lp(let i=0;i<nt;i=i+1){
+    let tk=toks.get(i as u64);
+    let ty=classify(tk);
+    if(ty>0){
+      let lo=mut.0;
+      lo=i;
+      lp(let z=0;z<100000;z=z+1){
+        if(lo<=0){br};
+        let prev=toks.get((lo-1) as u64);
+        if(isconj(prev)){br};
+        if(endswithdot(prev)){br};
+        if(classify(prev)>0){br};
+        lo=lo-1;
+      };
+      let hi=mut.0;
+      hi=i;
+      lp(let z=0;z<100000;z=z+1){
+        if(hi>=(nt-1)){br};
+        let curtok=toks.get(hi as u64);
+        if(endswithdot(curtok)){br};
+        let nxt=toks.get((hi+1) as u64);
+        if(isconj(nxt)){
+          if((hi+2)<nt){
+            if(classify(toks.get((hi+2) as u64))>0){hi=hi+1};
+          };
+          br;
+        };
+        if(classify(nxt)>0){br};
+        hi=hi+1;
+      };
+
+      let ctx=mut."";
+      lp(let k=lo;k<=hi;k=k+1){
+        if(k>lo){ctx=str.concat(ctx;" ")};
+        ctx=str.concat(ctx;toks.get(k as u64));
+      };
+      ctx=strippunct(ctx);
+
+      let value=strippunct(tk);
+      let typ=mut."url";
+      if(ty=2){typ="email"};
+      if(ty=3){typ="phone"};
+
+      if(!(first)){out=str.concat(out;",")};
+      first=false;
+      out=str.concat(out;"{\"type\":\"");
+      out=str.concat(out;typ);
+      out=str.concat(out;"\",\"value\":\"");
+      out=str.concat(out;jsonesc(value));
+      out=str.concat(out;"\",\"context\":\"");
+      out=str.concat(out;jsonesc(ctx));
+      out=str.concat(out;"\"}");
+    };
+  };
+  out=str.concat(out;"]");
+  io.println(out);
+  <0
+};

@@ -1,1 +1,209 @@
-m=huffman;f=buildfreqmap(text:$str):$str{let freq=mut."";lp(let i=0;i<text.len;i=i+1){let ch=text.get(i);let found=mut.false;lp(let j=0;j<freq.len;j=j+1){let pair=freq.get(j);let pch=pair.get(0);if(pch=ch){found=true};};if(!(found)){let newpair=mut."";newpair=newpair+ch;newpair=s.concat(newpair;":0");freq=s.concat(freq;newpair);freq=s.concat(freq;"\n");};};<freq};f=buildhuffmantree(freqmap:$str):$str{let pairs=mut."";lp(let i=0;i<freqmap.len;i=i+1){let line=freqmap.get(i);let pair=mut."";lp(let j=0;j<line.len;j=j+1){let ch=line.get(j);if(!(ch="\n")){pair=pair+ch};};pairs=s.concat(pairs;pair);};let n=pairs.len;lp(let i=0;i<n;i=i+1){let p1=pairs.get(i);let p1ch=p1.get(
+m=huffman;
+i=io:std.io;
+i=s:std.str;
+
+f=fixed2(x:f64):$str{
+  let neg=mut.0; let v=mut.x;
+  if(v<0.0){neg=1;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let iscaled=scaled as i64;
+  let whole=iscaled/100; let frac=iscaled-whole*100;
+  let fs=mut.s.fromint(frac);
+  if(frac<10){fs=s.concat("0";fs)};
+  let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
+  if(neg=1){out=s.concat("-";out)};
+  <out
+};
+
+f=main():i64{
+  (* read entire stdin (single line expected) *)
+  let text=mut."";
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    text=s.concat(text;l)
+  };
+  let tlen=s.len(text);
+
+  (* count distinct chars preserving first-appearance order *)
+  let chars=mut.@();
+  let freqs=mut.@();
+  lp(let i=0;i<tlen;i=i+1){
+    let ch=s.slice(text;i;i+1);
+    let found=mut.0;
+    lp(let j=0;j<chars.len;j=j+1){
+      if(chars.get(j)=ch){
+        freqs=freqs.set(j;freqs.get(j)+1);
+        found=1;
+        br
+      }
+    };
+    if(found=0){
+      chars=chars.push(ch);
+      freqs=freqs.push(1)
+    }
+  };
+
+  let m=chars.len;
+
+  (* node arrays: nfreq, nchar (""=internal), nleft, nright, nalive *)
+  let nfreq=mut.@();
+  let nchar=mut.@();
+  let nleft=mut.@();
+  let nright=mut.@();
+  let nalive=mut.@();
+  let norder=mut.@();
+  lp(let i=0;i<m;i=i+1){
+    nfreq=nfreq.push(freqs.get(i));
+    nchar=nchar.push(chars.get(i));
+    nleft=nleft.push(0-1);
+    nright=nright.push(0-1);
+    nalive=nalive.push(1);
+    norder=norder.push(i)
+  };
+  let nextorder=mut.m;
+
+  (* repeatedly pick two min-freq alive nodes.
+     tie-break: smaller freq first; on equal freq smaller order (insertion/creation) first.
+     left child = first popped, gets bit 0. *)
+  let aliveCount=mut.m;
+  lp(aliveCount>1){
+    (* find min *)
+    let a=mut.(0-1);
+    lp(let i=0;i<nfreq.len;i=i+1){
+      if(nalive.get(i)=1){
+        if(a<0){
+          a=i
+        }el{
+          if(nfreq.get(i)<nfreq.get(a)){
+            a=i
+          }el{
+            if(nfreq.get(i)=nfreq.get(a)){
+              if(norder.get(i)<norder.get(a)){a=i}
+            }
+          }
+        }
+      }
+    };
+    nalive=nalive.set(a;0);
+    (* find second min *)
+    let b=mut.(0-1);
+    lp(let i=0;i<nfreq.len;i=i+1){
+      if(nalive.get(i)=1){
+        if(b<0){
+          b=i
+        }el{
+          if(nfreq.get(i)<nfreq.get(b)){
+            b=i
+          }el{
+            if(nfreq.get(i)=nfreq.get(b)){
+              if(norder.get(i)<norder.get(b)){b=i}
+            }
+          }
+        }
+      }
+    };
+    nalive=nalive.set(b;0);
+    (* create internal node: left=a, right=b *)
+    nfreq=nfreq.push(nfreq.get(a)+nfreq.get(b));
+    nchar=nchar.push("");
+    nleft=nleft.push(a);
+    nright=nright.push(b);
+    nalive=nalive.push(1);
+    norder=norder.push(nextorder);
+    nextorder=nextorder+1;
+    aliveCount=aliveCount-1
+  };
+
+  (* root is the last pushed alive node *)
+  let root=mut.0;
+  lp(let i=0;i<nalive.len;i=i+1){
+    if(nalive.get(i)=1){root=i}
+  };
+
+  (* assign codes by DFS using an explicit stack (parallel arrays) *)
+  let codeChars=mut.@();
+  let codeStrs=mut.@();
+
+  (* stack of (nodeidx, prefix) *)
+  let stkNode=mut.@();
+  let stkPre=mut.@();
+  stkNode=stkNode.push(root);
+  stkPre=stkPre.push("");
+  lp(stkNode.len>0){
+    let top=stkNode.len-1;
+    let node=stkNode.get(top);
+    let pre=stkPre.get(top);
+    stkNode=stkNode.set(top;0-1);
+    (* pop by rebuilding without last *)
+    let nn=mut.@();
+    let pp=mut.@();
+    lp(let i=0;i<top;i=i+1){nn=nn.push(stkNode.get(i));pp=pp.push(stkPre.get(i))};
+    stkNode=nn;
+    stkPre=pp;
+    if(s.len(nchar.get(node))>0){
+      (* leaf *)
+      let code=mut.pre;
+      if(s.len(code)=0){code="0"};
+      codeChars=codeChars.push(nchar.get(node));
+      codeStrs=codeStrs.push(code)
+    }el{
+      (* push right then left so left processed first (order not critical) *)
+      stkNode=stkNode.push(nright.get(node));
+      stkPre=stkPre.push(s.concat(pre;"1"));
+      stkNode=stkNode.push(nleft.get(node));
+      stkPre=stkPre.push(s.concat(pre;"0"))
+    }
+  };
+
+  (* sort code table by (code length, then char) *)
+  let nc=codeChars.len;
+  lp(let i=0;i<nc;i=i+1){
+    lp(let j=0;j<nc-1-i;j=j+1){
+      let la=s.len(codeStrs.get(j));
+      let lb=s.len(codeStrs.get(j+1));
+      let swap=mut.0;
+      if(la>lb){swap=1}el{
+        if(la=lb){
+          if(codeChars.get(j)>codeChars.get(j+1)){swap=1}
+        }
+      };
+      if(swap=1){
+        let tc=codeChars.get(j); codeChars=codeChars.set(j;codeChars.get(j+1)); codeChars=codeChars.set(j+1;tc);
+        let ts=codeStrs.get(j); codeStrs=codeStrs.set(j;codeStrs.get(j+1)); codeStrs=codeStrs.set(j+1;ts)
+      }
+    }
+  };
+
+  (* print code table *)
+  lp(let i=0;i<nc;i=i+1){
+    io.print(codeChars.get(i));
+    io.print(": ");
+    io.print(codeStrs.get(i));
+    io.print("\n")
+  };
+
+  (* encode text *)
+  let encoded=mut."";
+  lp(let i=0;i<tlen;i=i+1){
+    let ch=s.slice(text;i;i+1);
+    lp(let j=0;j<nc;j=j+1){
+      if(codeChars.get(j)=ch){
+        encoded=s.concat(encoded;codeStrs.get(j));
+        br
+      }
+    }
+  };
+  io.print("Encoded: ");
+  io.print(encoded);
+  io.print("\n");
+
+  (* ratio = bits / (chars*8) *)
+  let bits=s.len(encoded);
+  let denom=tlen*8;
+  let ratio=bits as f64 / denom as f64;
+  io.print("Ratio: ");
+  io.print(fixed2(ratio));
+  io.print("\n");
+  <0
+}

@@ -1,1 +1,167 @@
-m=docfreq;f=countwords(s:$str):$i64{let n=s.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=s.get(i);if(c=32){m=m+1}};m=m+1;<m};f=countinarr(arr:@$str;val:$str):$i64{let n=arr.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let c=arr.get(i);if(c=val){m=m+1}};<m};f=buildfreqmap(arr:@$str):$str{let n=arr.len;let m=mut."";lp(let i=0;i<n;i=i+1){let c=arr.get(i);let found=mut.false;let j=mut.0;lp(let k=0;k<m.len;k=k+1){let ch=m.get(k);if(ch=58){j=k+1}};lp(let idx=j;idx<m.len;idx=idx+1){let c=m.get(idx);if(c=35){found=true}};if(!(found=true))){let freq=count
+m=docfreq;
+i=io:std.io;
+i=s:std.str;
+i=mth:std.math;
+
+f=idf64(x:f64):f64{ <x+0.0 };
+
+f=fixed4(x:f64):$str{
+  let neg=mut.0; let v=mut.x;
+  if(v<0.0){neg=1;v=0.0-v};
+  let scaled=v*10000.0+0.5;
+  let iscaled=scaled as i64;
+  let whole=iscaled/10000; let frac=iscaled-whole*10000;
+  let fs=mut.s.fromint(frac);
+  if(frac<1000){fs=s.concat("0";fs)};
+  if(frac<100){fs=s.concat("0";fs)};
+  if(frac<10){fs=s.concat("0";fs)};
+  let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
+  if(neg=1){out=s.concat("-";out)};
+  <out
+};
+
+(* index of word in string array via s.eq, -1 if absent *)
+f=findidx(arr:@$str;w:$str):i64{
+  let n=arr.len as i64;
+  let res=mut.0-1;
+  lp(let i=0;i<n;i=i+1){
+    if(s.eq(arr.get(i as u64);w)){ if(res<0){res=i} }
+  };
+  <res
+};
+
+(* lexicographic: is a < b ? returns 1 if a<b else 0 *)
+f=strless(a:$str;b:$str):i64{
+  let la=s.len(a) as i64;
+  let lb=s.len(b) as i64;
+  let n=mut.la; if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let ca=s.slice(a;i;i+1);
+    let cb=s.slice(b;i;i+1);
+    if(s.eq(ca;cb)=0){
+      (* compare char codes via ordering: find which is smaller by scanning ascii *)
+      <charless(ca;cb)
+    }
+  };
+  if(la<lb){<1};
+  <0
+};
+
+(* compare two single chars: 1 if a<b *)
+f=charless(a:$str;b:$str):i64{
+  let alpha="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let ia=mut.0-1; let ib=mut.0-1;
+  let n=s.len(alpha) as i64;
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(alpha;i;i+1);
+    if(s.eq(c;a)){ if(ia<0){ia=i} };
+    if(s.eq(c;b)){ if(ib<0){ib=i} }
+  };
+  if(ia<ib){<1};
+  <0
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(l);
+    if(s.len(t)>0){ lines=lines.push(t) }
+  };
+  let ndocs=lines.len as i64;
+  if(ndocs=0){<0};
+
+  (* parse each doc: id string and word list *)
+  (* docIds: @$str ; docWords stored as array-of-arrays *)
+  let docIds=mut.@("");
+  let docTexts=mut.@("");
+  lp(let d=0;d<ndocs;d=d+1){
+    let line=lines.get(d as u64);
+    let colon=s.indexof(line;":") as i64;
+    (* id between "DOC " (4) and colon *)
+    let idpart=s.trim(s.slice(line;4;colon));
+    let textpart=s.trim(s.slice(line;colon+1;s.len(line) as i64));
+    docIds=docIds.push(idpart);
+    docTexts=docTexts.push(textpart)
+  };
+
+  (* build global df: vocab array + df counts *)
+  let vocab=mut.@("");
+  let dfcount=mut.@(0);
+  lp(let d=1;d<=ndocs;d=d+1){
+    let words=s.split(docTexts.get(d as u64);" ");
+    (* unique words in this doc *)
+    let seen=mut.@("");
+    lp(let wi=0;wi<words.len;wi=wi+1){
+      let w=s.trim(words.get(wi as u64));
+      if(s.len(w)>0){
+        if(findidx(seen;w)<0){
+          seen=seen.push(w);
+          let vi=findidx(vocab;w);
+          if(vi<0){ vocab=vocab.push(w); dfcount=dfcount.push(1) }
+          el{ dfcount=dfcount.set(vi as u64;dfcount.get(vi as u64)+1) }
+        }
+      }
+    }
+  };
+
+  let ndf=ndocs as f64;
+
+  (* for each doc, compute and print *)
+  lp(let d=1;d<=ndocs;d=d+1){
+    let words=s.split(docTexts.get(d as u64);" ");
+    (* per-doc unique words + counts *)
+    let dwords=mut.@("");
+    let dcounts=mut.@(0);
+    let total=mut.0;
+    lp(let wi=0;wi<words.len;wi=wi+1){
+      let w=s.trim(words.get(wi as u64));
+      if(s.len(w)>0){
+        total=total+1;
+        let di=findidx(dwords;w);
+        if(di<0){ dwords=dwords.push(w); dcounts=dcounts.push(1) }
+        el{ dcounts=dcounts.set(di as u64;dcounts.get(di as u64)+1) }
+      }
+    };
+
+    (* collect words with IDF>0, build output words array + scores *)
+    let outw=mut.@("");
+    let outs=mut.@(0.0);
+    lp(let i=1;i<dwords.len;i=i+1){
+      let w=dwords.get(i as u64);
+      let cnt=dcounts.get(i as u64);
+      let vi=findidx(vocab;w);
+      let df=dfcount.get(vi as u64);
+      let idf=idf64(mth.ln(ndf/(df as f64)));
+      if(idf>0.0){
+        let tf=(cnt as f64)/(total as f64);
+        outw=outw.push(w);
+        outs=outs.push(tf*idf)
+      }
+    };
+
+    (* sort outw alphabetically (skip seed index 0) carrying outs *)
+    let m=outw.len as i64;
+    lp(let a=1;a<m-1;a=a+1){
+      lp(let b=1;b<m-1;b=b+1){
+        let x=outw.get(b as u64);
+        let y=outw.get((b+1) as u64);
+        if(strless(y;x)=1){
+          let sx=outs.get(b as u64);
+          let sy=outs.get((b+1) as u64);
+          outw=outw.set(b as u64;y); outw=outw.set((b+1) as u64;x);
+          outs=outs.set(b as u64;sy); outs=outs.set((b+1) as u64;sx)
+        }
+      }
+    };
+
+    (* build output line *)
+    let oline=mut.s.concat("Doc ";s.concat(docIds.get(d as u64);":"));
+    lp(let i=1;i<outw.len;i=i+1){
+      oline=s.concat(oline;s.concat(" ";s.concat(outw.get(i as u64);s.concat(" ";fixed4(outs.get(i as u64))))))
+    };
+    io.println(oline)
+  };
+  <0
+}

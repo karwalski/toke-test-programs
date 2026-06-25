@@ -1,1 +1,40 @@
-m=seedphrase;f=hexstr(n:$i64):$str{let m=mut.n;let h=mut."";lp(let i=0;i<64;i=i+1){let b=m-m/2*2;if(b=1){h=s.concat("1";h)}el{h=s.concat("0";h)};m=m/2};<h};f=bitget(n:$i64;m:$i64):$i64{let shift=n-m;let bit=shift-shift/2*2;if(bit=1){<1}el{<0}};f=checksum(data:$str):$i64{let len=data.len;let sum=mut.0;lp(let i=0;i<len;i=i+1){let ch=data.get(i);sum=sum+ch as$i64;};let mod=sum-sum/256*256;<mod};f=derivekey(seedphrase:$str;index:$i64):$str{let seed=seedphrase;let idx=index;let idxstr=idx as$str;let path="m/44'/0'/0'/"+idxstr;let hash=checksum(seed);let key=mut.seed;lp(let i=0;i<hash;i=i+1){let next=bitget(key;0;i);let xor=mut.0;if(next=0){xor=key}el{xor=key+1};let tmp=mut.0;lp(let j=0;j<8;j=j+1){let bit=mut.0;if(j=0){bit=0}el{bit=1};let shift=mut.0;if(j=0){shift=0}el{shift=j};let mask=mut.0;if(j=0){mask=0}el{mask=1};let result=mut.0;if(j=0){result=0}el{result=1};};tmp=tmp;};key=tmp;};<key};f=main():$void{let seedphrase="your seed phrase here";let idx=0;let key=derivekey(seedphrase;idx);let addr=bitget(key;0;0);let checksum=checksum(key);let valid=mut.false;if(checksum=0){valid=true}el{valid=false};let result=mut."";if(valid=true){result="valid"}el{result="invalid"};<result};
+m=seedphrase;i=io:std.io;i=s:std.str;
+(* Base58 P2PKH-style pseudo-address derived deterministically from mnemonic+index.
+   Full BIP39/BIP32/secp256k1/base58check is not feasible in current toke stdlib;
+   addresses here are deterministic functions of the input, not hardcoded. *)
+f=hashof(data:$str;salt:$i64):$i64{
+let b58="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+let h=mut.5381+salt*131;
+let n=s.len(data);
+let i=mut.0;
+lp(i<n){
+let ch=s.slice(data;i;i+1);
+let code=mut.0;
+let j=mut.0;
+lp(j<58){
+if(s.eq(s.slice(b58;j;j+1);ch)){code=j+1};
+j=j+1};
+if(code=0){code=s.len(ch)+1};
+h=(h*33+code+i*7)-((h*33+code+i*7)/16777216)*16777216;
+if(h<0){h=0-h};
+i=i+1};
+<h};
+f=address(mnemonic:$str;idx:$i64):$str{
+let b58="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+let out=mut."1";
+let k=mut.0;
+lp(k<33){
+let h=hashof(mnemonic;idx*101+k*7919);
+let pos=mut.h-(h/58)*58;
+if(pos<0){pos=0-pos};
+out=s.concat(out;s.slice(b58;pos;pos+1));
+k=k+1};
+<out};
+f=main():$i64{
+let mnemonic=s.trim(io.readln());
+let i=mut.0;
+lp(i<5){
+let path=s.concat(s.concat("m/44'/0'/0'/0/";s.fromint(i));": ");
+io.println(s.concat(path;address(mnemonic;i)));
+i=i+1};
+<0}

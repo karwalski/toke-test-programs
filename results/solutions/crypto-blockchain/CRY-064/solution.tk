@@ -1,1 +1,41 @@
-m=prefixfinder;f=importkeypair():$str{let priv="5d22b375b585b65b75b85b95b95b95b95b95b95b95b95b95b95b95b95b95b95b95b95b9
+m=prefixfinder;
+i=io:std.io;
+i=s:std.str;
+i=cr:std.crypto;
+f=b58char(v:$i64):$str{
+  let alpha="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  let ab=s.bytes(alpha);
+  let buf=s.buf();
+  s.addbyte(buf;ab.get(v as u64));
+  <s.done(buf)
+};
+f=addressfor(pk:@byte):$str{
+  let h=cr.sha256(pk);
+  let h2=cr.sha256(h);
+  let out=mut.s.buf();
+  s.add(out;"1");
+  lp(let i=0;i<25;i=i+1){
+    let b=h2.get(i as u64) as i64;
+    s.add(out;b58char(b-b/58*58))
+  };
+  <s.done(out)
+};
+f=main():$i64{
+  let prefix=s.trim(io.readln());
+  let foundaddr=mut."";
+  let foundpk=mut."";
+  let done=mut.false;
+  lp(let iter=0;iter<200000;iter=iter+1){
+    if(done){br};
+    let pk=cr.randombytes(32 as u64);
+    let addr=addressfor(pk);
+    if(s.startswith(addr;prefix)){
+      foundaddr=addr;
+      foundpk=cr.tohex(pk);
+      done=true
+    }
+  };
+  io.println(foundaddr);
+  io.println(foundpk);
+  <0
+};

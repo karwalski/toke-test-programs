@@ -1,1 +1,28 @@
-m=main;f=solve(p0:$str;p1:$str):$str{let key=p0;let plaintext=p1;let result=mut."";let keylen=key.len;let ptlen=plaintext.len;let maxlen=mut.0;if(keylen>ptlen){maxlen=keylen}el{maxlen=ptlen};lp(let idx=0;idx<maxlen;idx=idx+1){let keychar=key.get(idx);let ptchar=plaintext.get(idx);let keyval=keychar as i64;let ptval=ptchar as i64;let xorval=keyval+ptval;let xorchar=xorval as$str;let resultchar=result.get(idx);let newresult=result+xorchar;};<result};f=main():$void{let key=br();let plaintext=br();let result=solve(key;plaintext);let hexlen=result.len;let hexstr=mut."";lp(let idx=0;idx<hexlen;idx=idx+1){let ch=result.get(idx);let code=ch as i64;let hexval=code as$str;let hexchar=hexval.get(0);let hexstr=
+m=main;
+i=io:std.io;
+i=s:std.str;
+f=tohex2(b:$i64):$str{
+  let hi=b/16;
+  let lo=b-hi*16;
+  let digits="0123456789abcdef";
+  let hc=s.slice(digits;hi;hi+1);
+  let lc=s.slice(digits;lo;lo+1);
+  <s.concat(hc;lc)
+};
+f=main():$void{
+  let key=io.readln();
+  let plaintext=io.readln();
+  let kb=s.bytes(key);
+  let pb=s.bytes(plaintext);
+  let keylen=kb.len as i64;
+  let ptlen=pb.len as i64;
+  let out=mut."";
+  lp(let i=0;i<ptlen;i=i+1){
+    let pc=pb.get(i) as i64;
+    let kidx=i-i/keylen*keylen;
+    let kc=kb.get(kidx) as i64;
+    let x=pc^kc;
+    out=s.concat(out;tohex2(x));
+  };
+  io.println(out);
+};

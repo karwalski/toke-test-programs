@@ -1,1 +1,126 @@
-m=degradation;f=calculatesuccessrate(taskscompleted:$i64;totaltasks:$i64):$f64{let successrate=mut.0.0;if(totaltasks=0){<successrate};let successcount=taskscompleted as$f64;let totalcount=totaltasks as$f64;successrate=successcount/totalcount;<successrate};f=detectdegradation(successrates:@$f64):$str{let n=successrates.len;if(n<2){<"no degradation detected"};let msg=mut."";lp(let i=0;i<n-1;i=i+1){let s1=successrates.get(i);let s2=successrates.get(i+1));if(s2<s1){let diff=s1-s2;let pct=diff/s1*100.0;msg=s.concat(msg;"degradation detected at index ")+i+" -- success rate dropped by "+pct.tostring()+"% from "+s1.tostring()+" to "+s2.tostring()+"\n"};};<msg};f=main():$i64{let successrates=@(0.95;0.92;0.88;
+m=successtracker;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+f=fmtrate(num:$i64;den:$i64):$str{
+  if(den=0){<"0.0"};
+  let scaled=num*1000/den;
+  let rem=num*1000-scaled*den;
+  let r2=mut.scaled;
+  if(rem*2>=den){r2=scaled+1};
+  let ip=r2/1000;
+  let fp=r2-ip*1000;
+  let d1=fp/100;
+  let d2=(fp-d1*100)/10;
+  let d3=fp-d1*100-d2*10;
+  let out=mut.s.concat(s.fromint(ip);".");
+  out=s.concat(out;s.fromint(d1));
+  if(d3>0){out=s.concat(out;s.fromint(d2));out=s.concat(out;s.fromint(d3))}el{
+    if(d2>0){out=s.concat(out;s.fromint(d2))}
+  };
+  <out
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let wsi=s.indexof(json;"\"window_size\":");
+  let wrest=s.slice(json;wsi+14;jn);
+  let wend=mut.0;
+  lp(let k=0;k<s.len(wrest) as i64;k=k+1){
+    let ch=s.slice(wrest;k;k+1);
+    let isd=s.indexof("0123456789";ch);
+    if(isd>=0){wend=k+1}
+  };
+  let windowsize=parseint(s.slice(wrest;0;wend));
+  let types=mut.@();
+  let tsucc=mut.@();
+  let ttot=mut.@();
+  let allsucc=mut.@();
+  let totalsucc=mut.0;
+  let totaln=mut.0;
+  let p=mut.0;
+  lp(p<jn){
+    let rest=s.slice(json;p;jn);
+    let ti=s.indexof(rest;"\"task_type\":\"");
+    if(ti<0){p=jn}el{
+      let tstart=p+ti+13;
+      let tafter=s.slice(json;tstart;jn);
+      let tendq=s.indexof(tafter;"\"");
+      let ttype=s.slice(tafter;0;tendq);
+      let srest=s.slice(json;tstart+tendq;jn);
+      let si=s.indexof(srest;"\"success\":");
+      let safter=s.slice(srest;si+10;s.len(srest) as i64);
+      let strue=mut.0;
+      let tch=s.slice(safter;0;4);
+      if(s.eq(tch;"true")){strue=1};
+      let ai=mut.0-1;
+      lp(let z=0;z<types.len();z=z+1){if(s.eq(types.get(z);ttype)){ai=z}};
+      if(ai<0){
+        types=types+@(ttype);
+        tsucc=tsucc+@(strue);
+        ttot=ttot+@(1)
+      }el{
+        tsucc=tsucc.set(ai;tsucc.get(ai)+strue);
+        ttot=ttot.set(ai;ttot.get(ai)+1)
+      };
+      allsucc=allsucc+@(strue);
+      totalsucc=totalsucc+strue;
+      totaln=totaln+1;
+      p=tstart+tendq+si+10
+    }
+  };
+  let overall=fmtrate(totalsucc;totaln);
+  let bytype=mut."{";
+  lp(let z=0;z<types.len();z=z+1){
+    if(z>0){bytype=s.concat(bytype;",")};
+    bytype=s.concat(bytype;"\"");
+    bytype=s.concat(bytype;types.get(z));
+    bytype=s.concat(bytype;"\":");
+    bytype=s.concat(bytype;fmtrate(tsucc.get(z);ttot.get(z)))
+  };
+  bytype=s.concat(bytype;"}");
+  let alert=mut.false;
+  lp(let z=0;z<types.len();z=z+1){
+    let num=tsucc.get(z)*10;
+    if(num<ttot.get(z)*7){alert=true}
+  };
+  let nwin=mut.totaln;
+  if(windowsize<totaln){nwin=windowsize};
+  let startidx=totaln-nwin;
+  let half=nwin/2;
+  let firstsucc=mut.0;let firstn=mut.0;
+  let secondsucc=mut.0;let secondn=mut.0;
+  lp(let z=0;z<nwin;z=z+1){
+    let v=allsucc.get(startidx+z);
+    if(z<half){firstsucc=firstsucc+v;firstn=firstn+1}el{secondsucc=secondsucc+v;secondn=secondn+1}
+  };
+  let trend=mut."stable";
+  if(firstn>0 && secondn>0){
+    let lhs=secondsucc*firstn;
+    let rhs=firstsucc*secondn;
+    if(lhs>rhs){trend="improving"};
+    if(lhs<rhs){trend="degrading"}
+  };
+  let alertstr=mut."false";
+  if(alert){alertstr="true"};
+  let out=mut."{\"overall_rate\":";
+  out=s.concat(out;overall);
+  out=s.concat(out;",\"by_type\":");
+  out=s.concat(out;bytype);
+  out=s.concat(out;",\"trend\":\"");
+  out=s.concat(out;trend);
+  out=s.concat(out;"\",\"alert\":");
+  out=s.concat(out;alertstr);
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

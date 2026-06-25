@@ -1,1 +1,45 @@
-m=prompt;f=score(prompt:$str):$i64{let len=prompt.len;let hasopen=len>0;if(hasopen){let first=prompt.get(0);let isopen=first=40;if(isopen){let last=prompt.get(len-1);let isclose=last=41;if(isclose){let balanced=mut.true;let depth=mut.0;lp(let i=0;i<len;i=i+1){let ch=prompt.get(i);if(ch=40){depth=depth+1;if(depth>100){balanced=false}}};if(ch=41){depth=depth-1;if(depth<0){balanced=false}}};if(!(balanced)){<0};let haspipe=len>1;if(haspipe){let second=prompt.get(1);let ispipe=second=124;if(ispipe){let hascontent=len>2;if(hascontent){<1}}}};<0};f=analyse(prompt:$str):$str
+m=promptinj;i=io:std.io;i=s:std.str;
+f=main():$i64{
+  let raw=io.readln();
+  let lower=s.lower(raw);
+  let patterns=mut.@();
+  let hasignore=mut.false;
+  if(s.contains(lower;"ignore all previous instructions")){hasignore=true};
+  if(s.contains(lower;"ignore previous instructions")){hasignore=true};
+  if(hasignore){patterns=patterns+@("ignore previous instructions")};
+  let hasrole=mut.false;
+  if(s.contains(lower;"you are now a")){hasrole=true};
+  if(hasrole){patterns=patterns+@("role reassignment")};
+  let istranslate=mut.false;
+  if(s.contains(lower;"translate")){
+    if(s.contains(raw;":")){istranslate=true}
+  };
+  let risk=mut."none";
+  let safe=mut.true;
+  let count=patterns.len as i64;
+  if(count>0){
+    if(istranslate){
+      risk="medium";
+      safe=false
+    }el{
+      risk="high";
+      safe=false
+    }
+  };
+  let parr=mut."";
+  lp(let i=0;i<patterns.len as i64;i=i+1){
+    if(i>0){parr=s.concat(parr;",")};
+    parr=s.concat(s.concat(parr;"\"");s.concat(patterns.get(i);"\""))
+  };
+  let safestr=mut."false";
+  if(safe){safestr="true"};
+  let out=mut."{\"risk_level\":\"";
+  out=s.concat(out;risk);
+  out=s.concat(out;"\",\"suspicious_patterns\":[");
+  out=s.concat(out;parr);
+  out=s.concat(out;"],\"safe_to_process\":");
+  out=s.concat(out;safestr);
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

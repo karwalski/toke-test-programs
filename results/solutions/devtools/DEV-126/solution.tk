@@ -1,1 +1,150 @@
-m=manifest;f=solve(p0:$str;p1:$str;p2:$str):$str{let appname=p0;let version=p1;let deps=p2;let result=mut."";result=s.concat(result;"app_name: ")+appname+"\n";result=s.concat(result;"version: ")+version+"\n";result=s.concat(result;"dependencies:\n");let lines=deps.split("\n");lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);result=s.concat(result;"  - ")+line+"\n";};<result};
+m=manifest;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<rest};
+  <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
+};
+
+f=getint(obj:$str;key:$str):$i64{
+  let pat=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<0};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start;str.len(obj) as i64){ $ok:v v; $err:e "" };
+  let n=str.len(rest) as i64;
+  let num=mut."";
+  let done=mut.false;
+  let zero=str.bytes("0").get(0);
+  let nine=str.bytes("9").get(0);
+  lp(let i=0;i<n;i=i+1){
+    if(!(done)){
+      let b=str.bytes(rest).get(i);
+      let ok=mut.false;
+      if(!(b<zero)){ if(!(b>nine)){ ok=true } };
+      if(ok){
+        num=str.concat(num;mt str.slice(rest;i;i+1){ $ok:v v; $err:e "" });
+      }el{
+        if(str.len(num)>0){ done=true };
+      };
+    };
+  };
+  <mt str.toint(num){ $ok:v v; $err:e 0 }
+};
+
+f=tokens(s:$str):@$str{
+  let out=mut.@();
+  let cur=mut."";
+  let inq=mut.false;
+  let n=str.len(s) as i64;
+  lp(let i=0;i<n;i=i+1){
+    let ch=mt str.slice(s;i;i+1){ $ok:v v; $err:e "" };
+    if(inq){
+      if(ch="\""){
+        inq=false;
+        out=out.push(cur);
+        cur="";
+      }el{
+        cur=str.concat(cur;ch);
+      };
+    }el{
+      if(ch="\""){ inq=true };
+    };
+  };
+  <out
+};
+
+f=main():$i64{
+  let input=io.readln();
+  let appname=getstr(input;"app_name");
+  let version=getstr(input;"version");
+  let image=getstr(input;"image");
+  let replicas=getint(input;"replicas");
+  let port=getint(input;"port");
+
+  let evpat="\"env_vars\":{";
+  let eidx=str.indexof(input;evpat);
+  let envarr=mut."[]";
+  if(eidx<0){ envarr="[]" }el{
+    let estart=eidx+(str.len(evpat) as i64);
+    let erest=mt str.slice(input;estart;str.len(input) as i64){ $ok:v v; $err:e "" };
+    let eclose=str.indexof(erest;"}");
+    let einner=mt str.slice(erest;0;eclose){ $ok:v v; $err:e "" };
+    let toks=tokens(einner);
+    let tcount=toks.len as i64;
+    if(tcount=0){ envarr="[]" }el{
+      let pairs=tcount/2;
+      let keys=mut.@();
+      let vals=mut.@();
+      lp(let p=0;p<pairs;p=p+1){
+        keys=keys.push(toks.get(p*2));
+        vals=vals.push(toks.get(p*2+1));
+      };
+      let order=mut.@();
+      lp(let p=0;p<pairs;p=p+1){ order=order.push(p) };
+      lp(let a=0;a<pairs;a=a+1){
+        lp(let b=0;b<pairs-1;b=b+1){
+          let i1=order.get(b);
+          let i2=order.get(b+1);
+          if(greater(keys.get(i1);keys.get(i2))){
+            order=order.set(b;i2);
+            order=order.set(b+1;i1);
+          };
+        };
+      };
+      let eb=mut."[";
+      lp(let p=0;p<pairs;p=p+1){
+        let oi=order.get(p);
+        if(p>0){ eb=str.concat(eb;",") };
+        eb=str.concat(eb;"{\"name\":\"");
+        eb=str.concat(eb;keys.get(oi));
+        eb=str.concat(eb;"\",\"value\":\"");
+        eb=str.concat(eb;vals.get(oi));
+        eb=str.concat(eb;"\"}");
+      };
+      eb=str.concat(eb;"]");
+      envarr=eb;
+    };
+  };
+
+  let out=mut."{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"";
+  out=str.concat(out;appname);
+  out=str.concat(out;"\",\"labels\":{\"app\":\"");
+  out=str.concat(out;appname);
+  out=str.concat(out;"\",\"version\":\"");
+  out=str.concat(out;version);
+  out=str.concat(out;"\"}},\"spec\":{\"replicas\":");
+  out=str.concat(out;str.fromint(replicas));
+  out=str.concat(out;",\"template\":{\"spec\":{\"containers\":[{\"env\":");
+  out=str.concat(out;envarr);
+  out=str.concat(out;",\"image\":\"");
+  out=str.concat(out;image);
+  out=str.concat(out;"\",\"name\":\"");
+  out=str.concat(out;appname);
+  out=str.concat(out;"\",\"ports\":[{\"containerPort\":");
+  out=str.concat(out;str.fromint(port));
+  out=str.concat(out;"}]}]}}}}");
+  io.println(out);
+  <0
+};
+
+f=greater(a:$str;b:$str):$bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  let m=mut.la;
+  if(lb<la){ m=lb };
+  lp(let i=0;i<m;i=i+1){
+    let ca=str.bytes(a).get(i);
+    let cb=str.bytes(b).get(i);
+    if(ca<cb){ <false };
+    if(cb<ca){ <true };
+  };
+  <lb<la
+};

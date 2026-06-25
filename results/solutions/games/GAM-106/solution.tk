@@ -1,1 +1,87 @@
-m=evaluate;f=evaluate(dice:@$i64;kept:@$i64):$i64{let n=dice.len;let m=kept.len;let total=mut.0;lp(let i=0;i<m;i=i+1){total=total+kept.get(i);};let remaining=n-m;let bestroll=mut.0;lp(let i=0;i<remaining;i=i+1){bestroll=bestroll+6;};let finalscore=total+bestroll;let validkeeps=mut.@();lp(let i=0;i<m;i=i+1){let k=kept.get(i);let valid=mut.true;lp(let j=0;j<m;j=j+1){if(i=j){}el{let other=kept.get(j);if(k=other){valid=false;};};};if(valid){validkeeps=validkeeps+@(k);};};let bestkeep=mut.0;lp(let i=0;i<validkeeps.len;i=i+1){let k=validkeeps.get(i);if(k>bestkeep){bestkeep=k;};};let result=mut.0;if(bestkeep>0){result=
+m=pickomino;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+(* faces: index 0..5 where 5 represents W (worm). value of face f =
+   (f+1) for f in 0..4 (i.e. faces 1..5), worm value = 5. count of each. *)
+f=main():i64{
+  (* read first line: current dice *)
+  let first=io.readln();
+  (* counts for faces 1..5 and W. Use vec size 6: idx0=face1..idx4=face5, idx5=W *)
+  let cnt=mut.vec.new();
+  lp(let i=0;i<6;i=i+1){ cnt=vec.push(cnt;0) };
+  let toks=s.split(first;" ");
+  let nt=(toks.len as i64);
+  lp(let i=0;i<nt;i=i+1){
+    let t=toks.get(i);
+    if(s.len(t)>0){
+      let bb=s.bytes(t);
+      let ch=bb.get(0) as i64;
+      if(ch=87){ cnt=vec.set(cnt;5;vec.get(cnt;5)+1) }el{
+        if(ch>48){ if(ch<54){
+          let face=ch-48;        (* 1..5 *)
+          cnt=vec.set(cnt;face-1;vec.get(cnt;face-1)+1)
+        }}
+      }
+    }
+  };
+  (* read already-kept sets (remaining lines): each token's face becomes unavailable *)
+  let used=mut.vec.new();
+  lp(let i=0;i<6;i=i+1){ used=vec.push(used;0) };
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)>0){
+      let kt=s.split(line;" ");
+      let kn=(kt.len as i64);
+      lp(let j=0;j<kn;j=j+1){
+        let t=kt.get(j);
+        if(s.len(t)>0){
+          let ch=s.bytes(t).get(0) as i64;
+          if(ch=87){ used=vec.set(used;5;1) }el{
+            if(ch>48){ if(ch<54){ used=vec.set(used;ch-48-1;1) }}}
+        }
+      }
+    }
+  };
+
+  (* build keep options: face idx, value. value = count * points.
+     points: face idx f (0..4) -> f+1; worm(5) -> 5 *)
+  (* collect into parallel vecs *)
+  let optidx=mut.vec.new();
+  let optval=mut.vec.new();
+  lp(let f=0;f<6;f=f+1){
+    let c=vec.get(cnt;f);
+    if(c>0){ if(vec.get(used;f)=0){
+      let pts=mut.0;
+      if(f=5){ pts=5 }el{ pts=f+1 };
+      let val=c*pts;
+      optidx=vec.push(optidx;f);
+      optval=vec.push(optval;val)
+    }}
+  };
+  let m=(vec.len(optidx) as i64);
+  (* sort by value descending (selection sort) *)
+  lp(let a=0;a<m;a=a+1){
+    let best=mut.a;
+    lp(let q=a+1;q<m;q=q+1){
+      if(vec.get(optval;q)>vec.get(optval;best)){ best=q }
+    };
+    if(best>a){
+      let ti=vec.get(optidx;a); let tv=vec.get(optval;a);
+      optidx=vec.set(optidx;a;vec.get(optidx;best));
+      optval=vec.set(optval;a;vec.get(optval;best));
+      optidx=vec.set(optidx;best;ti);
+      optval=vec.set(optval;best;tv)
+    }
+  };
+  lp(let a=0;a<m;a=a+1){
+    let f=vec.get(optidx;a);
+    let label=mut."W";
+    if(f<5){ label=s.fromint(f+1) };
+    io.println(s.concat(s.concat(s.concat("Keep ";label);": value ");s.fromint(vec.get(optval;a))))
+  };
+  <0
+}

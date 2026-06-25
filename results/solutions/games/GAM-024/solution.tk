@@ -1,1 +1,17 @@
-m=mastermind;f=solve(p:$str;q:$str):$str{let code=p;let guess=q;let result=mut."";let codearr=mut.@();let guessarr=mut.@();let i=mut.0;lp(let idx=0;idx<code.len;idx=idx+1){let ch=code.get(idx);codearr=codearr+@(ch);};lp(let idx=0;idx<guess.len;idx=idx+1){let ch=guess.get(idx);guessarr=guessarr+@(ch);};let black=mut.0;let white=mut.0;lp(let idx=0;idx<codearr.len;idx=idx+1){let c=codearr.get(idx);let g=guessarr.get(idx);if(c=g){black=black+1;};}
+m=mastermind;i=io:std.io;i=s:std.str;
+f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
+f=codeof(idx:$i64):$str{let a=idx/216;let b=(idx/36)%6;let c=(idx/6)%6;let d=idx%6;<s.concat(s.concat(s.concat(s.fromint(a+1);s.fromint(b+1));s.fromint(c+1));s.fromint(d+1))};
+f=blacks(x:$str;y:$str):$i64{let b=mut.0;lp(let i=0;i<4;i=i+1){if(s.equals(ch(x;i);ch(y;i))){b=b+1}};<b};
+f=matches(x:$str;y:$str):$i64{let total=mut.0;lp(let dd=1;dd<=6;dd=dd+1){let ds=s.fromint(dd);let cx=mut.0;let cy=mut.0;lp(let i=0;i<4;i=i+1){if(s.equals(ch(x;i);ds)){cx=cx+1};if(s.equals(ch(y;i);ds)){cy=cy+1}};if(cx<cy){total=total+cx}el{total=total+cy}};<total};
+f=resp(x:$str;y:$str):$i64{let b=blacks(x;y);let w=matches(x;y)-b;<b*10+w};
+f=consistent(cand:$str;hist:@$str;hr:@$i64):$bool{lp(let i=0;i<hist.len();i=i+1){if(resp(cand;hist.get(i))!=hr.get(i)){<false}};<true};
+f=main():$i64{let secret=s.trim(io.readln());
+let hist=mut.@($str);let hr=mut.@($i64);
+let count=mut.0;let solved=mut.false;let guess=mut."1122";
+lp(!(solved)){let r=resp(secret;guess);let b=r/10;let w=r%10;count=count+1;
+io.println(s.concat(s.concat(s.concat(s.concat(s.concat(guess;" ");s.fromint(b));"B");s.fromint(w));"W"));
+hist=hist+@(guess);hr=hr+@(r);
+if(b=4){solved=true}el{
+let found=mut.false;lp(let i=0;i<1296;i=i+1){if(!(found)){let cand=codeof(i);if(consistent(cand;hist;hr)){guess=cand;found=true}}}}};
+io.println(s.concat(s.concat("Solved in ";s.fromint(count));" guesses"));
+<0}

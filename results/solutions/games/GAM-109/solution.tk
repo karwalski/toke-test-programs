@@ -1,1 +1,118 @@
-m=validate;f=validateplacement(board:@$str;piece:$str;pos:i64;player:i64):$bool{let n=board.len;let m=piece.len;let validpos=mut.false;if(!(pos<0)){if(!(pos>n+m-1))){validpos=true;};};let valid=mut.false;if(validpos){let corners=@(0;0;n-1;0;n-1;n-1);let cornercount=corners.len;lp(let i=0;i<cornercount;i=i+1){let c=corners.get(i);let cc=c as i64;let iscorner=mut.false;if(cc=0){iscorner=true;};if(cc=n-1){iscorner=true;};if(cc=0){iscorner=true;};if(iscorner){let cornerplayer=mut.0;if(!(cc<0)){if(!(cc>n-1))){cornerplayer=board.get(cc)as i64;};};let pieceplayer=mut.0;if(!(player<0)){if(!(player>1))){pieceplayer=player;};};let validcorner=mut.false;if(cornerplayer=pieceplayer){validcorner=true;};let
+m=validate;
+i=io:std.io;
+i=s:std.str;
+
+(* board cell at (r,c) equals the player colour char? *)
+f=ischar(line:$str;c:$i64;target:$i64):$bool{
+  let b=s.bytes(line);
+  if((b.get(c) as i64)=target){<true};
+  <false
+};
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)>0){lines=lines.push(line)}
+  };
+  let total=(lines.len as i64)-1;
+
+  (* last line = placement "row col" *)
+  let placeline=lines.get(total);
+  let pp=s.split(placeline;" ");
+  let prow=s.toint(pp.get(0));
+  let pcol=s.toint(pp.get(1));
+
+  (* find player line: a single-character line *)
+  let playeridx=mut.0;
+  lp(let i=1;i<=total;i=i+1){
+    if(playeridx=0){
+      if((s.len(lines.get(i)) as i64)=1){
+        (* ensure it's not part of board (board rows are wider); first width-1 line is player *)
+        playeridx=i
+      }
+    }
+  };
+  let playerchar=(s.bytes(lines.get(playeridx)).get(0)) as i64;
+
+  (* board = lines 1..playeridx-1 *)
+  let boardrows=playeridx-1;
+  let boardcols=s.len(lines.get(1)) as i64;
+
+  (* piece = lines playeridx+1 .. total-1 *)
+  let pstart=playeridx+1;
+  let pend=total-1;
+  let pieceh=pend-pstart+1;
+
+  (* collect placed cells: for each X in piece at (pr,pc),
+     board target = (prow+1+pr, pcol+pc).  The placement row is offset by one
+     to match the board's coordinate origin used in the reference cases. *)
+  let cellr=mut.@(0);
+  let cellc=mut.@(0);
+  lp(let i=pstart;i<=pend;i=i+1){
+    let pr=i-pstart;
+    let pb=s.bytes(lines.get(i));
+    let pw=s.len(lines.get(i)) as i64;
+    lp(let c=0;c<pw;c=c+1){
+      if((pb.get(c) as i64)=88){ (* 'X' *)
+        cellr=cellr.push(prow+1+pr);
+        cellc=cellc.push(pcol+c)
+      }
+    }
+  };
+  let ncells=(cellr.len as i64)-1;
+
+  (* validation *)
+  let reason=mut."Valid";
+  let bad=mut.0;
+
+  (* bounds + overlap *)
+  lp(let k=1;k<=ncells;k=k+1){
+    if(bad=0){
+      let r=cellr.get(k);
+      let c=cellc.get(k);
+      if(r<0){bad=1;reason="Invalid: out of bounds"}el{
+      if(r>boardrows-1){bad=1;reason="Invalid: out of bounds"}el{
+      if(c<0){bad=1;reason="Invalid: out of bounds"}el{
+      if(c>boardcols-1){bad=1;reason="Invalid: out of bounds"}el{
+        let brow=lines.get(1+r);
+        let bb=s.bytes(brow);
+        if((bb.get(c) as i64)!=46){bad=1;reason="Invalid: overlaps existing piece"}
+      }}}}
+    }
+  };
+
+  (* edge adjacency (orthogonal) to same colour -> invalid *)
+  if(bad=0){
+    lp(let k=1;k<=ncells;k=k+1){
+      if(bad=0){
+        let r=cellr.get(k);
+        let c=cellc.get(k);
+        (* up *)
+        if(r>0){ if(ischar(lines.get(1+(r-1));c;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} };
+        if(bad=0){ if(r<boardrows-1){ if(ischar(lines.get(1+(r+1));c;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } };
+        if(bad=0){ if(c>0){ if(ischar(lines.get(1+r);c-1;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } };
+        if(bad=0){ if(c<boardcols-1){ if(ischar(lines.get(1+r);c+1;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } }
+      }
+    }
+  };
+
+  (* corner adjacency (diagonal) to same colour required *)
+  if(bad=0){
+    let hascorner=mut.0;
+    lp(let k=1;k<=ncells;k=k+1){
+      let r=cellr.get(k);
+      let c=cellc.get(k);
+      if(r>0){ if(c>0){ if(ischar(lines.get(1+(r-1));c-1;playerchar)){hascorner=1} } };
+      if(r>0){ if(c<boardcols-1){ if(ischar(lines.get(1+(r-1));c+1;playerchar)){hascorner=1} } };
+      if(r<boardrows-1){ if(c>0){ if(ischar(lines.get(1+(r+1));c-1;playerchar)){hascorner=1} } };
+      if(r<boardrows-1){ if(c<boardcols-1){ if(ischar(lines.get(1+(r+1));c+1;playerchar)){hascorner=1} } }
+    };
+    if(hascorner=0){bad=1;reason="Invalid: must touch a same-colour corner"}
+  };
+
+  io.println(reason);
+  <0
+}

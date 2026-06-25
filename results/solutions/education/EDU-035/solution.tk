@@ -1,1 +1,53 @@
-m=subset;f=buildsubset(qb:$str;n:$i64):$str{let result=mut."";let count=mut.0;let idx=mut.0;lp(let i=0;i<qb.len;i=i+1){let ch=qb.get(i);if(ch=","){let qlen=count-idx;let q=mut."";lp(let j=idx;j<count;j=j+1){q=s.concat(q;qb.get(count+j));};if(!(result.len=0))){result=s.concat(result;"\n");};result=s.concat(result;q);idx=count;};count=count+1;};if(!(result.len=0))){result=s.concat(result;"\n");}
+m=subset;
+i=io:std.io;
+i=str:std.str;
+
+f=main():i64{
+  let header=io.readln();
+  let hp=str.split(str.trim(header);" ");
+  let seed=mt str.toint(hp.get(0)){ $ok:v v; $err:e 0 };
+  let num=mt str.toint(hp.get(1)){ $ok:v v; $err:e 0 };
+
+  let json=io.readln();
+
+  let questions=mut.@();
+  let search="\"q\":\"";
+  let rest=mut.json;
+  lp(let i=0;i<100000;i=i+1){
+    let pos=str.indexof(rest;search);
+    if(pos<0){br};
+    let after=mt str.slice(rest;(pos as u64)+5;str.len(rest)){ $ok:v v; $err:e "" };
+    let endq=str.indexof(after;"\"");
+    let qval=mt str.slice(after;0;endq as u64){ $ok:v v; $err:e "" };
+    questions=questions+@(qval);
+    rest=mt str.slice(after;(endq as u64)+1;str.len(after)){ $ok:v v; $err:e "" };
+  };
+  let total=questions.len as i64;
+
+  let a=1103515245;
+  let c=2531011;
+  let m=2147483647;
+  let state=mut.seed;
+
+  let order=mut.@();
+  lp(let i=0;i<total;i=i+1){order=order+@(i)};
+
+  lp(let i=0;i<num;i=i+1){
+    state=(a*state+c)%m;
+    let span=total-i;
+    let r=state%span;
+    let j=i+r;
+    let vi=order.get(i);
+    let vj=order.get(j);
+    order=order.set(i;vj);
+    order=order.set(j;vi);
+  };
+
+  lp(let i=0;i<num;i=i+1){
+    let idx=order.get(i);
+    let q=questions.get(idx);
+    let numstr=str.fromint(i+1);
+    io.println(str.concat(str.concat(numstr;". ");q));
+  };
+  <0
+};

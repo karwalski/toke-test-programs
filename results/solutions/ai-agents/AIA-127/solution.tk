@@ -1,1 +1,259 @@
-m=scheduler;f=schedule(task:$str;duration:i64;deadline:i64;resources:$str):$str{let result=mut."";result=s.concat(s.concat(s.concat(result;"Task: ");task);"\n");result=s.concat(s.concat(result;"Duration: ");duration) as$str+"\n";result=s.concat(s.concat(result;"Deadline: ");deadline) as$str+"\n";result=s.concat(s.concat(s.concat(result;"Resources: ");resources);"\n");<result};f=main():$str{let task1=schedule("report";120;720;"memory");let task2=schedule("analysis";90;600;"compute");let task3=schedule("backup";60;480;"memory");let schedule=mut."";schedule=schedule+task1;schedule=schedule+task2;schedule=schedule+task3;<schedule};
+m=scheduler;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+(* given text right after '[', index of matching ']' *)
+f=arrclose(t:$str):$i64{
+  let n=s.len(t) as i64;let depth=mut.0;let i=mut.0;let instr=mut.false;
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(instr){if(s.eq(ch;"\"")){instr=false}}el{
+      if(s.eq(ch;"\"")){instr=true}el{
+        if(s.eq(ch;"[")){depth=depth+1}el{
+          if(s.eq(ch;"]")){if(depth=0){<i};depth=depth-1}
+        }
+      }
+    };
+    i=i+1
+  };
+  <n
+};
+(* given text right after '{', index of matching '}' *)
+f=objclose(t:$str):$i64{
+  let n=s.len(t) as i64;let depth=mut.0;let i=mut.0;let instr=mut.false;
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(instr){if(s.eq(ch;"\"")){instr=false}}el{
+      if(s.eq(ch;"\"")){instr=true}el{
+        if(s.eq(ch;"{")){depth=depth+1}el{
+          if(s.eq(ch;"}")){if(depth=0){<i};depth=depth-1}
+        }
+      }
+    };
+    i=i+1
+  };
+  <n
+};
+f=findnum(obj:$str;key:$str):$i64{
+  let k=s.concat(s.concat("\"";key);"\":");
+  let idx=s.indexof(obj;k);
+  if(idx<0){<0};
+  let start=idx+s.len(k) as i64;
+  let rest=s.slice(obj;start;s.len(obj) as i64);
+  let rl=s.len(rest) as i64;let j=mut.0;let buf=mut."";
+  lp(j<rl){
+    let ch=s.slice(rest;j;j+1);
+    let isdig=s.indexof("0123456789-";ch);
+    if(isdig>=0){buf=s.concat(buf;ch);j=j+1}el{j=rl}
+  };
+  <parseint(buf)
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  (* --- parse resources object --- *)
+  let rk="\"resources\":{";
+  let rki=s.indexof(json;rk);
+  let rstart=rki+s.len(rk) as i64;
+  let rrest=s.slice(json;rstart;jn);
+  let rclose=objclose(rrest);
+  let robj=s.slice(rrest;0;rclose);
+  let rnames=mut.@();
+  let rcaps=mut.@();
+  (* parse key:value pairs in robj *)
+  let rl=s.len(robj) as i64;
+  let rp=mut.0;
+  lp(rp<rl){
+    let ch=s.slice(robj;rp;rp+1);
+    if(s.eq(ch;"\"")){
+      let after=s.slice(robj;rp+1;rl);
+      let endq=s.indexof(after;"\"");
+      let name=s.slice(after;0;endq);
+      (* value after "name": *)
+      let valpart=s.slice(after;endq+2;s.len(after) as i64);
+      let vl=s.len(valpart) as i64;let vj=mut.0;let vbuf=mut."";
+      lp(vj<vl){
+        let vc=s.slice(valpart;vj;vj+1);
+        let dd=s.indexof("0123456789";vc);
+        if(dd>=0){vbuf=s.concat(vbuf;vc);vj=vj+1}el{vj=vl}
+      };
+      rnames=rnames+@(name);
+      rcaps=rcaps+@(parseint(vbuf));
+      rp=rp+1+endq+1
+    }el{rp=rp+1}
+  };
+  let numres=rnames.len();
+  (* --- parse tasks array --- *)
+  let tkk="\"tasks\":[";
+  let tki=s.indexof(json;tkk);
+  let tstart=tki+s.len(tkk) as i64;
+  let trest=s.slice(json;tstart;jn);
+  let tclose=arrclose(trest);
+  let tseg=s.slice(trest;0;tclose);
+  let tsl=s.len(tseg) as i64;
+  let ids=mut.@();
+  let durs=mut.@();
+  (* needs flattened: needsflat[t*numres + r] *)
+  let needsflat=mut.@();
+  let p=mut.0;
+  lp(p<tsl){
+    let oc=s.slice(tseg;p;p+1);
+    if(s.eq(oc;"{")){
+      let after=s.slice(tseg;p+1;tsl);
+      let endb=objclose(after);
+      let objs=s.slice(after;0;endb);
+      (* id *)
+      let idk="\"id\":\"";
+      let idi=s.indexof(objs;idk);
+      let idrest=s.slice(objs;idi+s.len(idk) as i64;s.len(objs) as i64);
+      let idend=s.indexof(idrest;"\"");
+      let id=s.slice(idrest;0;idend);
+      let dur=findnum(objs;"duration_ms");
+      (* resource_needs object *)
+      let rnk="\"resource_needs\":{";
+      let rni=s.indexof(objs;rnk);
+      let rnrest=s.slice(objs;rni+s.len(rnk) as i64;s.len(objs) as i64);
+      let rnclose=objclose(rnrest);
+      let rnobj=s.slice(rnrest;0;rnclose);
+      ids=ids+@(id);
+      durs=durs+@(dur);
+      lp(let ri=0;ri<numres;ri=ri+1){
+        let nm=rnames.get(ri);
+        let need=findnum(rnobj;nm);
+        needsflat=needsflat+@(need)
+      };
+      p=p+1+endb+1
+    }el{p=p+1}
+  };
+  let numtasks=ids.len();
+  (* --- greedy list scheduling: process in duration desc order (orig idx tiebreak) --- *)
+  let order=mut.@();
+  lp(let i=0;i<numtasks;i=i+1){order=order+@(i)};
+  lp(let a=0;a<numtasks;a=a+1){
+    lp(let b=a+1;b<numtasks;b=b+1){
+      let ia=order.get(a);let ib=order.get(b);
+      let swap=mut.false;
+      if(durs.get(ib)>durs.get(ia)){swap=true};
+      if(durs.get(ib)=durs.get(ia)){if(ib<ia){swap=true}};
+      if(swap){order=order.set(a;ib);order=order.set(b;ia)}
+    }
+  };
+  let starts=mut.@();
+  let ends=mut.@();
+  lp(let i=0;i<numtasks;i=i+1){starts=starts+@(0);ends=ends+@(0)};
+  let placedcount=mut.0;
+  let placedidx=mut.@();
+  lp(let oi=0;oi<numtasks;oi=oi+1){
+    let ti=order.get(oi);
+    let dur=durs.get(ti);
+    (* candidate start times: 0 and end of each placed task *)
+    let cands=mut.@();
+    cands=cands+@(0);
+    lp(let pc=0;pc<placedcount;pc=pc+1){
+      let pi=placedidx.get(pc);
+      cands=cands+@(ends.get(pi))
+    };
+    (* sort cands asc *)
+    lp(let a=0;a<cands.len();a=a+1){
+      lp(let b=a+1;b<cands.len();b=b+1){
+        if(cands.get(b)<cands.get(a)){
+          let tmp=cands.get(a);cands=cands.set(a;cands.get(b));cands=cands.set(b;tmp)
+        }
+      }
+    };
+    let chosen=mut.0-1;
+    lp(let ci=0;ci<cands.len();ci=ci+1){
+      if(chosen<0){
+        let st=cands.get(ci);
+        let en=st+dur;
+        (* sample points: st and each placed start/end within [st,en) *)
+        let samples=mut.@();
+        samples=samples+@(st);
+        lp(let pc=0;pc<placedcount;pc=pc+1){
+          let pi=placedidx.get(pc);
+          let ps=starts.get(pi);let pe=ends.get(pi);
+          if(ps>=st){if(ps<en){samples=samples+@(ps)}};
+          if(pe>=st){if(pe<en){samples=samples+@(pe)}}
+        };
+        let feasible=mut.true;
+        lp(let smp=0;smp<samples.len();smp=smp+1){
+          let tp=samples.get(smp);
+          (* for each resource, used at tp by placed tasks active at tp *)
+          lp(let ri=0;ri<numres;ri=ri+1){
+            let used=mut.0;
+            lp(let pc=0;pc<placedcount;pc=pc+1){
+              let pi=placedidx.get(pc);
+              let ps=starts.get(pi);let pe=ends.get(pi);
+              if(ps<=tp){if(tp<pe){used=used+needsflat.get(pi*numres+ri)}}
+            };
+            let mine=needsflat.get(ti*numres+ri);
+            if(used+mine>rcaps.get(ri)){feasible=false}
+          }
+        };
+        if(feasible){chosen=st}
+      }
+    };
+    starts=starts.set(ti;chosen);
+    ends=ends.set(ti;chosen+dur);
+    placedidx=placedidx+@(ti);
+    placedcount=placedcount+1
+  };
+  (* --- makespan --- *)
+  let makespan=mut.0;
+  lp(let i=0;i<numtasks;i=i+1){if(ends.get(i)>makespan){makespan=ends.get(i)}};
+  (* --- output order: by start asc, orig idx asc --- *)
+  let oorder=mut.@();
+  lp(let i=0;i<numtasks;i=i+1){oorder=oorder+@(i)};
+  lp(let a=0;a<numtasks;a=a+1){
+    lp(let b=a+1;b<numtasks;b=b+1){
+      let ia=oorder.get(a);let ib=oorder.get(b);
+      let swap=mut.false;
+      if(starts.get(ib)<starts.get(ia)){swap=true};
+      if(starts.get(ib)=starts.get(ia)){if(ib<ia){swap=true}};
+      if(swap){oorder=oorder.set(a;ib);oorder=oorder.set(b;ia)}
+    }
+  };
+  (* --- utilisation: avg over resources of used/(cap*makespan), in myriad --- *)
+  let summyriad=mut.0;
+  lp(let ri=0;ri<numres;ri=ri+1){
+    let used=mut.0;
+    lp(let i=0;i<numtasks;i=i+1){
+      used=used+needsflat.get(i*numres+ri)*durs.get(i)
+    };
+    let denom=rcaps.get(ri)*makespan;
+    if(denom>0){summyriad=summyriad+used*10000/denom}
+  };
+  let avgmyriad=summyriad/numres;
+  let hund=(avgmyriad+50)/100;
+  let ip=hund/100;let fp=hund-ip*100;
+  let utilstr=mut."";
+  if(fp=0){utilstr=s.concat(s.fromint(ip);".0")}el{
+    if(fp-(fp/10)*10=0){utilstr=s.concat(s.concat(s.fromint(ip);".");s.fromint(fp/10))}el{
+      let fs=mut.s.fromint(fp);if(fp<10){fs=s.concat("0";fs)};
+      utilstr=s.concat(s.concat(s.fromint(ip);".");fs)
+    }
+  };
+  (* --- build output --- *)
+  let out=mut."{\"schedule\": [";
+  lp(let i=0;i<numtasks;i=i+1){
+    if(i>0){out=s.concat(out;", ")};
+    let ti=oorder.get(i);
+    out=s.concat(out;s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"task_id\": \"";ids.get(ti));"\", \"start_ms\": ");s.fromint(starts.get(ti)));", \"end_ms\": ");s.fromint(ends.get(ti)));"}"))
+  };
+  out=s.concat(out;"], \"total_duration_ms\": ");
+  out=s.concat(out;s.fromint(makespan));
+  out=s.concat(out;", \"resource_utilisation\": ");
+  out=s.concat(out;utilstr);
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+}

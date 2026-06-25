@@ -1,1 +1,170 @@
-m=latency;f=buildheatmap(data:@($str;$str)):@$str):$str{let result=mut."";lp(let i=0;i<data.len;i=i+1){let entry=data.get(i);result=result+entry+"\n";};<result};f=classifylatency(latencyms:$i64):$str{if(latencyms<500){<"instant"};if(latencyms<1000){<"fast"};if(latencyms<3000){<"considered"};<"background"};f=extracthour(timestamp:$str):$i64{let idx=mut.0;let len=timestamp.len;lp(let i=0;i<len;i=i+1){let ch=timestamp.get(i);if(ch=" "){idx=i+1};};let hourstr=timestamp.slice(idx;idx+2);<hourstr.parsei64()};f=main():$i64{let data=@("10:00";"fast");("14:00";"instant");("18:00";"fast"));let heatmap=buildheatmap(data);let classifications=@("fast";"instant";"
+m=latency;
+i=io:std.io;
+i=str:std.str;
+
+f=isdigit(b:byte):bool{
+  let z=str.bytes("0").get(0);
+  let n=str.bytes("9").get(0);
+  if(b<z){<false};
+  if(b>n){<false};
+  <true
+};
+
+f=twodigit(bytes:@byte;pos:$i64):$i64{
+  let a=bytes.get(pos);
+  let b=bytes.get(pos+1);
+  <((a as i64)-48)*10+((b as i64)-48)
+};
+
+f=dow(y:$i64;m:$i64;d:$i64):$i64{
+  let yy=mut.y;
+  if(m<3){yy=yy-1};
+  let t=mut.@();
+  t=t.push(0);t=t.push(3);t=t.push(2);t=t.push(5);t=t.push(0);t=t.push(3);
+  t=t.push(5);t=t.push(1);t=t.push(4);t=t.push(6);t=t.push(2);t=t.push(4);
+  let s=(yy + yy/4 - yy/100 + yy/400 + t.get(m-1) + d) % 7;
+  <(s+6) % 7
+};
+
+f=getlat(obj:$str):$i64{
+  let needle="\"latency_ms\":";
+  let idx=str.indexof(obj;needle);
+  if(idx<0){<0};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let val=mut.0;
+  let i=mut.start;
+  let go=mut.true;
+  lp(let g=0;g<n;g=g+1){
+    if(go){
+      if(i<n){
+        let c=bytes.get(i);
+        if(isdigit(c)){val=val*10+((c as i64)-48);i=i+1}el{go=false};
+      }el{go=false};
+    };
+  };
+  <val
+};
+
+f=getts(obj:$str):$str{
+  let needle="\"timestamp\":\"";
+  let idx=str.indexof(obj;needle);
+  if(idx<0){<""};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let q=str.bytes("\"").get(0);
+  let j=mut.start;
+  let endpos=mut.start;
+  let done=mut.false;
+  lp(let h=0;h<n;h=h+1){
+    if(!(done)){
+      if(j<n){ if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1} }el{done=true};
+    };
+  };
+  <mt str.slice(obj;start as u64;endpos as u64){ $ok:v v; $err:e "" }
+};
+
+f=classify(avg:$i64):$str{
+  if(avg<50){<"LOW"};
+  if(avg<201){<"MED"};
+  <"HIGH"
+};
+
+f=padhour(h:$i64):$str{
+  let s=str.fromint(h);
+  let result=mut.s;
+  let need=5-(str.len(s) as i64);
+  lp(let i=0;i<need;i=i+1){ result=str.concat(result;" ") };
+  <result
+};
+
+f=main():i64{
+  let input=io.readln();
+  let bytes=str.bytes(input);
+  let n=str.len(input) as i64;
+
+  let sums=mut.@();
+  let counts=mut.@();
+  lp(let i=0;i<168;i=i+1){ sums=sums.push(0); counts=counts.push(0); };
+
+  let obrace=str.bytes("{").get(0);
+  let cbrace=str.bytes("}").get(0);
+  let i=mut.0;
+  lp(let g=0;g<n;g=g+1){
+    if(i<n){
+      if(bytes.get(i)=obrace){
+        let estart=i;
+        let j=mut.i+1;
+        let eend=mut.i+1;
+        let done=mut.false;
+        lp(let h=0;h<n;h=h+1){
+          if(!(done)){
+            if(j<n){ if(bytes.get(j)=cbrace){eend=j;done=true}el{j=j+1} }el{done=true};
+          };
+        };
+        let entry=mt str.slice(input;estart as u64;(eend+1) as u64){ $ok:v v; $err:e "" };
+        let ts=getts(entry);
+        let lat=getlat(entry);
+        let tb=str.bytes(ts);
+        let year=twodigit(tb;0)*100+twodigit(tb;2);
+        let month=twodigit(tb;5);
+        let day=twodigit(tb;8);
+        let hour=twodigit(tb;11);
+        let d=dow(year;month;day);
+        let cell=d*24+hour;
+        sums=sums.set(cell;sums.get(cell)+lat);
+        counts=counts.set(cell;counts.get(cell)+1);
+        i=eend+1;
+      }el{
+        i=i+1;
+      };
+    };
+  };
+
+  let dnames=mut.@();
+  dnames=dnames.push("Mon");dnames=dnames.push("Tue");dnames=dnames.push("Wed");
+  dnames=dnames.push("Thu");dnames=dnames.push("Fri");dnames=dnames.push("Sat");dnames=dnames.push("Sun");
+
+  let daypresent=mut.@();
+  lp(let dd=0;dd<7;dd=dd+1){
+    let any=mut.false;
+    lp(let hh=0;hh<24;hh=hh+1){ if(counts.get(dd*24+hh)>0){any=true} };
+    if(any){daypresent=daypresent.push(dd)};
+  };
+
+  let hourpresent=mut.@();
+  lp(let hh=0;hh<24;hh=hh+1){
+    let any=mut.false;
+    lp(let dd=0;dd<7;dd=dd+1){ if(counts.get(dd*24+hh)>0){any=true} };
+    if(any){hourpresent=hourpresent.push(hh)};
+  };
+
+  io.println("Latency Heatmap (Mon=0, Sun=6)");
+
+  let header=mut."Hour |";
+  lp(let k=0;k<(daypresent.len as i64);k=k+1){
+    let dv=daypresent.get(k);
+    header=str.concat(str.concat(header;" ");dnames.get(dv));
+  };
+  io.println(header);
+
+  lp(let hk=0;hk<(hourpresent.len as i64);hk=hk+1){
+    let hv=hourpresent.get(hk);
+    let row=mut.str.concat(padhour(hv);"|");
+    lp(let dk=0;dk<(daypresent.len as i64);dk=dk+1){
+      let dv=daypresent.get(dk);
+      let cell=dv*24+hv;
+      let c=counts.get(cell);
+      if(c>0){
+        let avg=sums.get(cell)/c;
+        row=str.concat(str.concat(str.concat(row;" [");classify(avg));"]");
+      }el{
+        row=str.concat(row;" [ . ]");
+      };
+    };
+    io.println(row);
+  };
+  <0
+};

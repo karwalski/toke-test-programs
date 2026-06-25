@@ -1,1 +1,97 @@
-m=check;f=checknewfact(newfact:$str;storedfacts:@$str):@$str{let result=mut.storedfacts;let newfacts=mut.@();let i=mut.0;lp(let idx=0;idx<newfact.len;idx=idx+1){let ch=newfact.get(idx);if(ch=";"){let fact=newfact.substr(i;idx);newfacts=newfacts+@(fact);i=idx+1;};};let fact=newfact.substr(i;newfact.len);newfacts=newfacts+@(fact);let checked=mut.@();lp(let idx=0;idx<newfacts.len;idx=idx+1){let fact=newfacts.get(idx);let iscontradiction=mut.false;lp(let j=0;j<storedfacts.len;j=j+1){let stored=storedfacts.get(j);if(stored=fact){iscontradiction=true;};};if(!(iscontradiction=true))){checked=checked+@(fact);};};result=checked;<result};
+m=factcheck;i=io:std.io;i=s:std.str;
+f=wordcount(t:$str):$i64{
+  if(s.eq(t;"")){<0};
+  let parts=s.split(t;" ");
+  <parts.len() as i64
+};
+f=commonprefix(a:$str;b:$str):$i64{
+  let pa=s.split(a;" ");
+  let pb=s.split(b;" ");
+  let na=pa.len() as i64;
+  let nb=pb.len() as i64;
+  let n=mut.na;if(nb<na){n=nb};
+  let c=mut.0;let stop=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    if(!(stop)){
+      if(s.eq(pa.get(i);pb.get(i))){c=c+1}el{stop=true}
+    }
+  };
+  <c
+};
+f=joinfrom(t:$str;start:$i64):$str{
+  let parts=s.split(t;" ");
+  let n=parts.len() as i64;
+  let out=mut."";
+  lp(let i=start;i<n;i=i+1){
+    if(i>start){out=s.concat(out;" ")};
+    out=s.concat(out;parts.get(i))
+  };
+  <out
+};
+f=jsonstr(v:$str):$str{
+  <s.concat(s.concat("\"";v);"\"")
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  (* extract new_fact string *)
+  let nk="\"new_fact\":";
+  let ni=s.indexof(json;nk);
+  let nafter=s.slice(json;ni+s.len(nk) as i64;jn);
+  let nq1=s.indexof(nafter;"\"");
+  let nrest=s.slice(nafter;nq1+1;s.len(nafter) as i64);
+  let nq2=s.indexof(nrest;"\"");
+  let newfact=s.slice(nrest;0;nq2);
+  (* extract stored_facts array *)
+  let sk="\"stored_facts\":[";
+  let si=s.indexof(json;sk);
+  let sstart=si+s.len(sk) as i64;
+  let sarr=s.slice(json;sstart;jn);
+  let close=s.indexof(sarr;"]");
+  let seg=s.slice(sarr;0;close);
+  let sl=s.len(seg) as i64;
+  let stored=mut.@();
+  let q=mut.0;
+  lp(q<sl){
+    let ch=s.slice(seg;q;q+1);
+    if(s.eq(ch;"\"")){
+      let after=s.slice(seg;q+1;sl);
+      let endq=s.indexof(after;"\"");
+      let val=s.slice(after;0;endq);
+      stored=stored+@(val);
+      q=q+1+endq+1
+    }el{q=q+1}
+  };
+  (* detect contradiction *)
+  let conflict=mut."";
+  let oldobj=mut."";
+  let found=mut.false;
+  let ns=stored.len() as i64;
+  lp(let i=0;i<ns;i=i+1){
+    if(!(found)){
+      let sf=stored.get(i);
+      let cp=commonprefix(newfact;sf);
+      let wn=wordcount(newfact);
+      let wsf=wordcount(sf);
+      if(cp>=3){
+        if(cp<wn){
+          if(cp<wsf){
+            if(!(s.eq(joinfrom(newfact;cp);joinfrom(sf;cp)))){
+              conflict=sf;
+              oldobj=joinfrom(sf;cp);
+              found=true
+            }
+          }
+        }
+      }
+    }
+  };
+  if(found){
+    let resolution=s.concat(s.concat(s.concat("Update: ";newfact);" (replaces ");s.concat(oldobj;")"));
+    let out=s.concat(s.concat("{\"contradicts\":true,\"conflicting_facts\":[";jsonstr(conflict));s.concat("],\"resolution\":";s.concat(jsonstr(resolution);"}")));
+    io.println(out);
+    <0
+  };
+  io.println("{\"contradicts\":false,\"conflicting_facts\":[],\"resolution\":\"\"}");
+  <0
+}

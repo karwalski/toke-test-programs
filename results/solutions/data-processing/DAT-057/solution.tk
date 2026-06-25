@@ -1,1 +1,198 @@
-m=descstats;f=parsefloat(s:$str):$f64{<s as$f64}};f=count(vals:@$f64):$i64{<vals.len as$i64}};f=sum(vals:@$f64):$f64{let acc=mut.0.0;lp(let i=0;i<vals.len;i=i+1){acc=acc+vals.get(i);};<acc}};f=mean(vals:@$f64):$f64{if(vals.len=0 as u64)){<0.0};<sum(vals)/count(vals)}};f=median(vals:@$f64):$f64{let sorted=mut.vals;lp(let i=0;i<sorted.len;i=i+1){lp(let j=i+1;j<sorted.len;j=j+1){if(sorted.get(i)>sorted.get(j)){let tmp=sorted.get(i);sorted.get(i)=sorted.get(j);sorted.get(j)=tmp;};};};let len=sorted.len;let half=len/2;if(len=0){<0.0};if(len=1){<sorted.get(0)}};f=
+m=descstats;
+i=io:std.io;
+i=s:std.str;
+i=mth:std.math;
+
+f=isdigitchar(c:$str):i64{
+  if(s.eq(c;"0")){<1};
+  if(s.eq(c;"1")){<1};
+  if(s.eq(c;"2")){<1};
+  if(s.eq(c;"3")){<1};
+  if(s.eq(c;"4")){<1};
+  if(s.eq(c;"5")){<1};
+  if(s.eq(c;"6")){<1};
+  if(s.eq(c;"7")){<1};
+  if(s.eq(c;"8")){<1};
+  if(s.eq(c;"9")){<1};
+  <0
+};
+
+f=isnum(x:$str):i64{
+  let t=s.trim(x);
+  let n=s.len(t);
+  if(n=0){<0};
+  let ok=mut.1;
+  let digits=mut.0;
+  let dots=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(t;i;i+1);
+    if(isdigitchar(c)=1){digits=digits+1}
+    el{
+      if(s.eq(c;".")){dots=dots+1}
+      el{
+        if(s.eq(c;"-")){ if(i!=0){ok=0} }
+        el{ if(s.eq(c;"+")){ if(i!=0){ok=0} } el{ok=0} }
+      }
+    }
+  };
+  if(dots>1){ok=0};
+  if(digits=0){ok=0};
+  <ok
+};
+
+f=fixed2(x:f64):$str{
+  let neg=mut.0; let v=mut.x;
+  if(v<0.0){neg=1;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let iscaled=scaled as i64;
+  let whole=iscaled/100; let frac=iscaled-whole*100;
+  let fs=mut.s.fromint(frac);
+  if(frac<10){fs=s.concat("0";fs)};
+  let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
+  if(neg=1){out=s.concat("-";out)};
+  <out
+};
+
+f=rjust(x:$str;w:i64):$str{
+  let out=mut.x;
+  lp(let i=s.len(x);i<w;i=i+1){ out=s.concat(" ";out) };
+  <out
+};
+
+f=ljust(x:$str;w:i64):$str{
+  let out=mut.x;
+  lp(let i=s.len(x);i<w;i=i+1){ out=s.concat(out;" ") };
+  <out
+};
+
+f=sortcopy(arr:@f64):@f64{
+  let a=mut.arr;
+  let n=a.len as i64;
+  lp(let i=0;i<n-1;i=i+1){
+    lp(let j=0;j<n-1-i;j=j+1){
+      let x=a.get(j as u64);
+      let y=a.get((j+1) as u64);
+      if(x>y){ a=a.set(j as u64;y); a=a.set((j+1) as u64;x) }
+    }
+  };
+  <a
+};
+
+f=percentile(sorted:@f64;p:f64):f64{
+  let n=sorted.len as i64;
+  if(n=1){<sorted.get(0)};
+  let pos=p*((n-1) as f64);
+  let lo=pos as i64;
+  let frac=pos-(lo as f64);
+  let vlo=sorted.get(lo as u64);
+  if(lo+1>=n){<vlo};
+  let vhi=sorted.get((lo+1) as u64);
+  <vlo+frac*(vhi-vlo)
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  if(lines.len=0){<0};
+  let header=lines.get(0);
+  let hcols=s.split(header;",");
+  let ncols=hcols.len as i64;
+  let nrows=(lines.len as i64)-1;
+
+  let numericFlags=mut.@();
+  lp(let c=0;c<ncols;c=c+1){
+    let isnumcol=mut.1;
+    lp(let r=1;r<=nrows;r=r+1){
+      let row=lines.get(r as u64);
+      let cells=s.split(row;",");
+      if((c as u64)<cells.len){
+        let cell=cells.get(c as u64);
+        if(isnum(cell)=0){isnumcol=0}
+      }el{ isnumcol=0 }
+    };
+    numericFlags=numericFlags.push(isnumcol)
+  };
+
+  let colIdx=mut.@();
+  let colHead=mut.@();
+  lp(let c=0;c<ncols;c=c+1){
+    if(numericFlags.get(c as u64)=1){
+      colIdx=colIdx.push(c);
+      colHead=colHead.push(hcols.get(c as u64))
+    }
+  };
+  let nnum=colIdx.len as i64;
+
+  let labels=@("count";"mean";"median";"stddev";"min";"max";"Q1";"Q3");
+
+  let allcells=mut.@();
+  lp(let k=0;k<nnum;k=k+1){
+    let c=colIdx.get(k as u64);
+    (* seed with first data row's value to fix element type to f64 *)
+    let firstrow=lines.get(1);
+    let firstcells=s.split(firstrow;",");
+    let vals=mut.@(s.tofloat(s.trim(firstcells.get(c as u64))));
+    lp(let r=2;r<=nrows;r=r+1){
+      let row=lines.get(r as u64);
+      let cells=s.split(row;",");
+      let cell=cells.get(c as u64);
+      vals=vals.push(s.tofloat(s.trim(cell)))
+    };
+    let cnt=vals.len as i64;
+    let sum=mut.0.0;
+    lp(let i=0;i<cnt;i=i+1){ sum=sum+vals.get(i as u64) };
+    let mean=sum/(cnt as f64);
+    let varsum=mut.0.0;
+    lp(let i=0;i<cnt;i=i+1){ let d=vals.get(i as u64)-mean; varsum=varsum+d*d };
+    let stddev=mth.sqrt(varsum/(cnt as f64));
+    let sorted=sortcopy(vals);
+    let med=percentile(sorted;0.5);
+    let q1=percentile(sorted;0.25);
+    let q3=percentile(sorted;0.75);
+    let mn=sorted.get(0);
+    let mx=sorted.get((cnt-1) as u64);
+    let colcells=mut.@();
+    colcells=colcells.push(s.fromint(cnt));
+    colcells=colcells.push(fixed2(mean));
+    colcells=colcells.push(fixed2(med));
+    colcells=colcells.push(fixed2(stddev));
+    colcells=colcells.push(fixed2(mn));
+    colcells=colcells.push(fixed2(mx));
+    colcells=colcells.push(fixed2(q1));
+    colcells=colcells.push(fixed2(q3));
+    allcells=allcells.push(colcells)
+  };
+
+  let statw=mut.s.len("stat") as i64;
+  lp(let i=0;i<8;i=i+1){ let ll=s.len(labels.get(i as u64)) as i64; if(ll>statw){statw=ll} };
+
+  let colw=mut.@();
+  lp(let k=0;k<nnum;k=k+1){
+    let cc=allcells.get(k as u64);
+    let w=mut.0;
+    lp(let i=1;i<8;i=i+1){ let ll=s.len(cc.get(i as u64)) as i64; if(ll>w){w=ll} };
+    let hl=s.len(colHead.get(k as u64)) as i64;
+    if(hl>w){w=hl};
+    colw=colw.push(w)
+  };
+
+  let hr=mut.ljust("stat";statw);
+  lp(let k=0;k<nnum;k=k+1){
+    hr=s.concat(hr;s.concat("  ";rjust(colHead.get(k as u64);colw.get(k as u64) as i64)))
+  };
+  io.println(hr);
+
+  lp(let i=0;i<8;i=i+1){
+    let r=mut.ljust(labels.get(i as u64);statw);
+    lp(let k=0;k<nnum;k=k+1){
+      let cc=allcells.get(k as u64);
+      r=s.concat(r;s.concat("  ";rjust(cc.get(i as u64);colw.get(k as u64) as i64)))
+    };
+    io.println(r)
+  };
+  <0
+}

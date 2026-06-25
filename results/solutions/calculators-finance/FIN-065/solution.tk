@@ -1,1 +1,35 @@
-m=dca;f=invest(initial:$i64;periodic:$i64;prices:@$i64):$i64{let total=mut.initial;lp(let i=0;i<prices.len;i=i+1){let p=prices.get(i);total=total+p;};let final=total;let result=final;<result};f=main():$i64{let initial=100;let periodic=50;let prices=@(100;150;200;250;300));let final=invest(initial;periodic;prices);<0};
+m=dca;
+i=io:std.io;
+i=s:std.str;
+f=fmt2(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let n=mut.scaled as i64;
+  let intpart=n/100;
+  let frac=n-intpart*100;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  let res=mut.s.concat(s.fromint(intpart);s.concat(".";fracstr));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+f=main():$i64{
+  let invline=io.readln();
+  let priceline=io.readln();
+  let inv=s.toint(s.trim(invline)) as$f64;
+  let parts=s.split(priceline;",");
+  let units=mut.0.0;
+  let n=parts.len;
+  lp(let i=0;i<n;i=i+1){
+    let p=s.toint(s.trim(parts.get(i))) as$f64;
+    units=units+inv/p
+  };
+  let totalinvested=inv*(n as$f64);
+  let avgcost=totalinvested/units;
+  io.println(fmt2(totalinvested));
+  io.println(fmt2(units));
+  io.println(fmt2(avgcost));
+  <0
+};

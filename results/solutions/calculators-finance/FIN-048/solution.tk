@@ -1,1 +1,55 @@
-m=main;i=math:std.math;f=main():$i64{let a=@(1.0;2.0;3.0;4.0));let b=@(2.5;3.5;4.5;5.5));let av=math.mean(a);let bv=math.mean(b);let asd=math.stddev(a);let bsd=math.stddev(b);let df=a.len as i64-1;let tstat=(av-bv)/math.sqrt(asd*asd/av.len as f64+b*bsd*bsd/b.len as f64));<0};
+m=ttest;i=io:std.io;i=s:std.str;i=math:std.math;
+f=parseflt(t:$str):$f64{
+  let n=s.len(t) as i64;let i=mut.0;let neg=mut.false;
+  let intp=mut.0;let frac=mut.0.0;let scale=mut.1.0;let infrac=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(s.eq(ch;".")){infrac=true}el{
+      let d=s.indexof("0123456789";ch);
+      if(d>=0){
+        if(infrac){scale=scale*0.1;frac=frac+(d as f64)*scale}el{intp=intp*10+d}
+      }
+    };
+    i=i+1
+  };
+  let v=mut.(intp as f64)+frac;
+  if(neg){v=0.0-v};
+  <v
+};
+f=fmt4(x:$f64):$str{
+  let neg=x<0.0;let v=mut.x;if(neg){v=0.0-x};
+  let scaled=v*10000.0+0.5;let asi=scaled as i64;
+  let ip=asi/10000;let fp=asi-ip*10000;
+  let fs=mut.s.fromint(fp);
+  lp(s.len(fs) as i64<4){fs=s.concat("0";fs)};
+  let out=mut.s.fromint(ip);
+  out=s.concat(out;".");
+  out=s.concat(out;fs);
+  if(neg){<s.concat("-";out)};
+  <out
+};
+f=main():$i64{
+  let l1=io.readln();
+  let l2=io.readln();
+  let p1=s.split(l1;",");
+  let p2=s.split(l2;",");
+  let n1=p1.len as i64;
+  let n2=p2.len as i64;
+  let sum1=mut.0.0;
+  lp(let i=0;i<n1;i=i+1){sum1=sum1+parseflt(s.trim(p1.get(i)))};
+  let sum2=mut.0.0;
+  lp(let i=0;i<n2;i=i+1){sum2=sum2+parseflt(s.trim(p2.get(i)))};
+  let m1=sum1/(n1 as f64);
+  let m2=sum2/(n2 as f64);
+  let ss1=mut.0.0;
+  lp(let i=0;i<n1;i=i+1){let d=parseflt(s.trim(p1.get(i)))-m1;ss1=ss1+d*d};
+  let ss2=mut.0.0;
+  lp(let i=0;i<n2;i=i+1){let d=parseflt(s.trim(p2.get(i)))-m2;ss2=ss2+d*d};
+  let sp2=(ss1+ss2)/((n1+n2-2) as f64);
+  let se=math.sqrt(sp2*(1.0/(n1 as f64)+1.0/(n2 as f64)));
+  let tstat=mut.0.0;
+  if(se>0.0){tstat=(m1-m2)/se};
+  io.println(fmt4(tstat));
+  <0
+};

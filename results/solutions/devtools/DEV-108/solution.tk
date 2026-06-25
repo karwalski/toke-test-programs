@@ -1,1 +1,171 @@
-m=uptime;f=parsepercent(s:$str):$f64{let trimmed=s.trim();let len=trimmed.len;let lastchar=trimmed.get(len-1));let pctval=mut.0.0;if(!(lastchar=".")){let asint=trimmed.parsei64();pctval=asint as$f64;}el{let base=trimmed.slice(0;len-1));let asint=base.parsei64();pctval=asint as$f64;};<pctval};f=parseuptime(s:$str):$i64{let trimmed=s.trim();let len=trimmed.len;let colonidx=mut.-1;lp(let i=0;i<len;i=i+1){if(trimmed.get(i)as$str=":"){colonidx=i};};if(colonidx<0){<0}el{let hourpart=trimmed.slice(0;colonidx));let hourval=hourpart.parsei64();<hourval};};f=computebudget(uptimehours:$i64):$f64{let totalhours=uptimehours as$f64;let pct=parsepercent("99.9%")
+m=uptime;
+i=io:std.io;
+i=str:std.str;
+
+f=isdigit(b:byte):bool{
+  let z=str.bytes("0").get(0);
+  let n=str.bytes("9").get(0);
+  if(b<z){<false};
+  if(b>n){<false};
+  <true
+};
+
+f=getfloat(obj:$str;key:$str):$f64{
+  let needle=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;needle);
+  if(idx<0){<0.0};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let dot=str.bytes(".").get(0);
+  let whole=mut.0;
+  let frac=mut.0;
+  let fracdiv=mut.1;
+  let i=mut.start;
+  let seendot=mut.false;
+  let go=mut.true;
+  lp(let g=0;g<n;g=g+1){
+    if(go){
+      if(i<n){
+        let c=bytes.get(i);
+        if(c=dot){
+          seendot=true;
+          i=i+1;
+        }el{
+          if(isdigit(c)){
+            if(seendot){
+              frac=frac*10+((c as i64)-48);
+              fracdiv=fracdiv*10;
+            }el{
+              whole=whole*10+((c as i64)-48);
+            };
+            i=i+1;
+          }el{
+            go=false;
+          };
+        };
+      }el{go=false};
+    };
+  };
+  let res=(whole as f64)+((frac as f64)/(fracdiv as f64));
+  <res
+};
+
+f=getint(obj:$str;key:$str):$i64{
+  let needle=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;needle);
+  if(idx<0){<0};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let val=mut.0;
+  let i=mut.start;
+  let go=mut.true;
+  lp(let g=0;g<n;g=g+1){
+    if(go){
+      if(i<n){
+        let c=bytes.get(i);
+        if(isdigit(c)){
+          val=val*10+((c as i64)-48);
+          i=i+1;
+        }el{go=false};
+      }el{go=false};
+    };
+  };
+  <val
+};
+
+f=sumdurations(obj:$str):$f64{
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let needle="\"duration_minutes\":";
+  let nlen=str.len(needle) as i64;
+  let total=mut.0.0;
+  let i=mut.0;
+  lp(let g=0;g<n;g=g+1){
+    if(i<n){
+      let rest=mt str.slice(obj;i as u64;n as u64){ $ok:v v; $err:e "" };
+      let found=str.indexof(rest;needle);
+      if(found<0){
+        i=n;
+      }el{
+        let valstart=i+(found as i64)+nlen;
+        let whole=mut.0;
+        let frac=mut.0;
+        let fracdiv=mut.1;
+        let seendot=mut.false;
+        let j=mut.valstart;
+        let go=mut.true;
+        let dot=str.bytes(".").get(0);
+        lp(let h=0;h<n;h=h+1){
+          if(go){
+            if(j<n){
+              let c=bytes.get(j);
+              if(c=dot){seendot=true;j=j+1}el{
+                if(isdigit(c)){
+                  if(seendot){frac=frac*10+((c as i64)-48);fracdiv=fracdiv*10}el{whole=whole*10+((c as i64)-48)};
+                  j=j+1;
+                }el{go=false};
+              };
+            }el{go=false};
+          };
+        };
+        total=total+(whole as f64)+((frac as f64)/(fracdiv as f64));
+        i=valstart;
+      };
+    };
+  };
+  <total
+};
+
+f=fmt1(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*10.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/10;
+  let frac=asint-whole*10;
+  let sign=mut."";
+  if(neg){sign="-"};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");str.fromint(frac))
+};
+
+f=fmt2(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*100.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/100;
+  let frac=asint-whole*100;
+  let sign=mut."";
+  if(neg){sign="-"};
+  let fracstr=mut.str.fromint(frac);
+  if(frac<10){fracstr=str.concat("0";str.fromint(frac))};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");fracstr)
+};
+
+f=main():i64{
+  let input=io.readln();
+  let slo=getfloat(input;"slo_target_pct");
+  let days=getint(input;"measurement_period_days");
+  let consumed=sumdurations(input);
+  let periodminutes=(days as f64)*1440.0;
+  let budget=periodminutes*(1.0-slo/100.0);
+  let consumedpct=mut.0.0;
+  if(budget>0.0){consumedpct=consumed/budget*100.0};
+  let remaining=budget-consumed;
+  let remainingpct=mut.0.0;
+  if(budget>0.0){remainingpct=remaining/budget*100.0};
+  let burn=mut.0.0;
+  if(days>0){burn=consumedpct/(days as f64)};
+
+  io.println(str.concat(str.concat("SLO: ";fmt1(slo));"%"));
+  io.println(str.concat(str.concat("Measurement period: ";str.fromint(days));" days"));
+  io.println(str.concat(str.concat("Total error budget: ";fmt1(budget));" minutes"));
+  io.println(str.concat(str.concat(str.concat(str.concat("Consumed: ";fmt1(consumed));" minutes (");fmt1(consumedpct));"%)"));
+  io.println(str.concat(str.concat(str.concat(str.concat("Remaining: ";fmt1(remaining));" minutes (");fmt1(remainingpct));"%)"));
+  io.println(str.concat(str.concat("Burn rate: ";fmt2(burn));"x"));
+  <0
+};

@@ -1,1 +1,13 @@
-m=slotmachine;f=solve(p0:$i64;p1:i64;p2:i64):$i64{let bet=p0;let seed=p1;let n=p2;let total=mut.0;let current=mut.seed;lp(let i=0;i<n;i=i+1){let symbol=current-current/3*3;let pay=mut.0;if(symbol=0){pay=10}el{if(symbol=1){pay=5}el{if(symbol=2){pay=2}el{pay=0}}}};total=total+pay;current=current+1;if(current>8){current=current-9}};<total};
+m=slotmachine;i=io:std.io;i=s:std.str;
+f=main():$i64{let line=s.trim(io.readln());let p=s.split(line;" ");
+let n=s.toint(p.get(0));let bet=s.toint(p.get(1));let seed=s.toint(p.get(2));
+let state=mut.seed;let total=mut.0;
+lp(let i=0;i<n;i=i+1){
+state=(state*1103515245+12345)%2147483648;let r1=state%7;
+state=(state*1103515245+12345)%2147483648;let r2=state%7;
+state=(state*1103515245+12345)%2147483648;let r3=state%7;
+if(r1=r2){if(r2=r3){total=total+10*bet}}};
+let net=total-n*bet;
+io.println(s.concat("Total payout: ";s.fromint(total)));
+io.println(s.concat("Net: ";s.fromint(net)));
+<0}

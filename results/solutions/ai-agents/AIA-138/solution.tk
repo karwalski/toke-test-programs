@@ -1,1 +1,105 @@
-m=costanomaly;f=isoutlier(arr:@$f64;val:$f64):$bool{let len=arr.len;let isin=mut.false;lp(let i=0;i<len;i=i+1){if(arr.get(i)=val)){isin=true;};};<isin};f=median(arr:@$f64):$f64{let len=arr.len;let sorted=mut.@();lp(let i=0;i<len;i=i+1){sorted=sorted+@(arr.get(i));};};let mid=len/2;let iseven=!(len-mid*2=0));let result=mut.0.0;if(iseven){let idx=mid-1;result=sorted.get(idx);};if(!(iseven)){let idx=mid;result=sorted.get(idx);};<result};f=absf(x:$f64):$f64{if(x<0.0){<0.0-x};<x};f=relui(x:$f64):$f64{if(x>0.0){<x};<0.0};f=variance(arr:@$f64):$f
+m=costanomaly;i=io:std.io;i=s:std.str;
+f=parseflt(t:$str):$f64{
+  let n=s.len(t) as i64;let i=mut.0;let neg=mut.false;
+  let intp=mut.0;let frac=mut.0.0;let scale=mut.1.0;let infrac=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(s.eq(ch;".")){infrac=true}el{
+      let d=s.indexof("0123456789";ch);
+      if(d>=0){
+        if(infrac){scale=scale*0.1;frac=frac+(d as f64)*scale}el{intp=intp*10+d}
+      }
+    };
+    i=i+1
+  };
+  let v=mut.(intp as f64)+frac;
+  if(neg){v=0.0-v};
+  <v
+};
+f=fmtflt(x:$f64):$str{
+  let neg=x<0.0;let v=mut.x;if(neg){v=0.0-x};
+  let scaled=v*1000000.0+0.5;let asi=scaled as i64;
+  let ip=asi/1000000;let fp=asi-ip*1000000;
+  let fs=mut.s.fromint(fp);
+  lp(s.len(fs) as i64<6){fs=s.concat("0";fs)};
+  let lastnz=mut.5;
+  lp(let i=5;i>=0;i=i-1){let ch=s.slice(fs;i;i+1);if(s.eq(ch;"0")){lastnz=i-1}el{i=0-1}};
+  let out=mut.s.fromint(ip);
+  if(lastnz>=0){out=s.concat(out;".");out=s.concat(out;s.slice(fs;0;lastnz+1))}el{out=s.concat(out;".0")};
+  if(neg){<s.concat("-";out)};
+  <out
+};
+f=main():$i64{
+  let line=io.readln();
+  let sum=mut.0.0;
+  let cnt=mut.0;
+  let n=s.len(line) as i64;
+  let hpos=s.indexof(line;"\"history\"");
+  let cpos=s.indexof(line;"\"current\"");
+  let hseg=s.slice(line;hpos;cpos);
+  let i=mut.0;
+  let hn=s.len(hseg) as i64;
+  lp(i<hn){
+    let seg=s.slice(hseg;i;hn);
+    let crel=s.indexof(seg;"\"cost\":");
+    if(crel<0){i=hn}el{
+      let cstart=i+crel+(s.len("\"cost\":") as i64);
+      let j=mut.cstart;
+      let numstr=mut."";
+      lp(j<hn){
+        let ch=s.slice(hseg;j;j+1);
+        if(s.eq(ch;",")){j=hn}el{
+          if(s.eq(ch;"}")){j=hn}el{numstr=s.concat(numstr;ch);j=j+1}
+        }
+      };
+      sum=sum+parseflt(s.trim(numstr));
+      cnt=cnt+1;
+      i=cstart+(s.len(numstr) as i64)+1
+    }
+  };
+  let curseg=s.slice(line;cpos;n);
+  let ccrel=s.indexof(curseg;"\"cost\":");
+  let ccstart=ccrel+(s.len("\"cost\":") as i64);
+  let cn=s.len(curseg) as i64;
+  let k=mut.ccstart;let curstr=mut."";
+  lp(k<cn){
+    let ch=s.slice(curseg;k;k+1);
+    if(s.eq(ch;",")){k=cn}el{
+      if(s.eq(ch;"}")){k=cn}el{curstr=s.concat(curstr;ch);k=k+1}
+    }
+  };
+  let current=parseflt(s.trim(curstr));
+  let tmrel=s.indexof(line;"\"threshold_multiplier\":");
+  let tmstart=tmrel+(s.len("\"threshold_multiplier\":") as i64);
+  let tm=mut.tmstart;let tmstr=mut."";
+  lp(tm<n){
+    let ch=s.slice(line;tm;tm+1);
+    if(s.eq(ch;",")){tm=n}el{
+      if(s.eq(ch;"}")){tm=n}el{tmstr=s.concat(tmstr;ch);tm=tm+1}
+    }
+  };
+  let mult=parseflt(s.trim(tmstr));
+  let mean=sum/(cnt as f64);
+  let lo=mean/mult;
+  let hi=mean*mult;
+  let isanom=mut.false;
+  if(current<lo){isanom=true};
+  if(current>hi){isanom=true};
+  let devraw=(current-mean)/mean*100.0;
+  let devneg=devraw<0.0;let dv=mut.devraw;if(devneg){dv=0.0-devraw};
+  let devr=mut.((dv+0.5) as i64) as f64;
+  if(devneg){devr=0.0-devr};
+  let anomstr=mut."false";if(isanom){anomstr="true"};
+  let out=mut."{\"is_anomaly\":";
+  out=s.concat(out;anomstr);
+  out=s.concat(out;",\"expected_range\":{\"min\":");
+  out=s.concat(out;fmtflt(lo));
+  out=s.concat(out;",\"max\":");
+  out=s.concat(out;fmtflt(hi));
+  out=s.concat(out;"},\"deviation_pct\":");
+  out=s.concat(out;fmtflt(devr));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

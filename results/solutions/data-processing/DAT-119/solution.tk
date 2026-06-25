@@ -1,1 +1,125 @@
-m=bucketing;f=bucketcount(arr:@$f64):$i64{let n=arr.len;if(n=0){<0};let m=mut.0;lp(let i=1;i<n;i=i+1){let val=arr.get(i);let other=arr.get(m);if(val<other){m=i};};<m+1};f=bucketsort(arr:@$f64):@$f64{let n=arr.len;if(n=0){<@};let m=bucketcount(arr);let buckets=mut.@();lp(let i=0;i<m;i=i+1){buckets=buckets+@(0.0));};lp(let i=0;i<n;i=i+1){let val=arr.get(i);let idx=mut.0;lp(let j=0;j<m;j=j+1){let lo=j as$f64;let hi=(j+1)as$f64;let lof=lo;if(val<lof){idx=j;br};};if(idx=m-1){let hi=(idx+1)as$f64;let hif=hi;let valf=val;if(!(valf<hif)){idx=
+m=bucketing;
+i=io:std.io;
+i=s:std.str;
+
+f=streqlit(a:$str;b:$str):bool{
+  if(s.len(a)!=s.len(b)){<false};
+  let n=s.len(a) as i64;
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  lp(let i=0;i<n;i=i+1){
+    if((ba.get(i as u64) as i64)!=(bb.get(i as u64) as i64)){<false}
+  };
+  <true
+};
+
+f=findcol(header:@($str);name:$str):i64{
+  let n=header.len as i64;
+  let res=mut.(0-1);
+  lp(let i=0;i<n;i=i+1){
+    if(streqlit(header.get(i as u64);name)){
+      if(res<0){ res=i }
+    }
+  };
+  <res
+};
+
+f=main():i64{
+  let modeline=io.readln();
+  let ml=s.trim(modeline);
+  let mparts=s.split(ml;" ");
+  let mode=mparts.get(0 as u64);
+  let nbins=mt s.toint(mparts.get(1 as u64)){ $ok:vv vv; $err:e 0 };
+  let colline=io.readln();
+  let colname=s.trim(colline);
+
+  let headerline=io.readln();
+  let header=s.split(s.trim(headerline);",");
+  let colidx=findcol(header;colname);
+
+  let rowtexts=mut.@();
+  let rowvals=mut.@();
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    let t=s.trim(line);
+    if(s.len(t)=0){
+      let dummy=0
+    }el{
+      let fields=s.split(t;",");
+      let cell=fields.get(colidx as u64);
+      let v=mt s.toint(cell){ $ok:vv vv; $err:e 0 };
+      rowtexts=rowtexts.push(t);
+      rowvals=rowvals.push(v)
+    }
+  };
+
+  let n=rowvals.len as i64;
+
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){ order=order.push(i) };
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-i-1;j=j+1){
+      let a=order.get(j as u64);
+      let b=order.get((j+1) as u64);
+      let va=rowvals.get(a as u64);
+      let vb=rowvals.get(b as u64);
+      if(vb<va){
+        order=order.set(j as u64;b);
+        order=order.set((j+1) as u64;a)
+      }
+    }
+  };
+
+  let binof=mut.@();
+  lp(let i=0;i<n;i=i+1){ binof=binof.push(0) };
+
+  let isquant=streqlit(mode;"quantile");
+
+  if(isquant){
+    lp(let i=0;i<n;i=i+1){
+      let rowindex=order.get(i as u64);
+      let prod=i*nbins;
+      let b=(prod*2+n)/(n*2)+1;
+      let bb=mut.b;
+      if(bb<1){ bb=1 };
+      if(bb>nbins){ bb=nbins };
+      binof=binof.set(rowindex as u64;bb)
+    }
+  }el{
+    let minv=mut.0;
+    let maxv=mut.0;
+    if(n>0){
+      minv=rowvals.get(0 as u64);
+      maxv=rowvals.get(0 as u64)
+    };
+    lp(let i=0;i<n;i=i+1){
+      let v=rowvals.get(i as u64);
+      if(v<minv){ minv=v };
+      if(maxv<v){ maxv=v }
+    };
+    let range=(maxv-minv) as f64;
+    lp(let i=0;i<n;i=i+1){
+      let v=rowvals.get(i as u64);
+      let bb=mut.1;
+      if(range>0.0){
+        let frac=((v-minv) as f64)/range;
+        let raw=(frac*(nbins as f64)) as i64;
+        bb=raw+1
+      };
+      if(bb<1){ bb=1 };
+      if(bb>nbins){ bb=nbins };
+      binof=binof.set(i as u64;bb)
+    }
+  };
+
+  let prefix=mut.s.fromint(1);
+  if(isquant){ prefix="Q" }el{ prefix="B" };
+
+  io.println(s.concat(s.trim(headerline);s.concat(",";s.concat(colname;"_bin"))));
+  lp(let i=0;i<n;i=i+1){
+    let label=s.concat(prefix;s.fromint(binof.get(i as u64)));
+    io.println(s.concat(rowtexts.get(i as u64);s.concat(",";label)))
+  };
+  <0
+};

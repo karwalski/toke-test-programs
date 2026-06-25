@@ -1,1 +1,55 @@
-m=floodfill;f=floodfill(grid:@($i64);n:$i64;m:$i64;startrow:$i64;startcol:$i64):$i64{let result=mut.grid;let fillval=mut.2;let n=grid.len;let m=grid.get(0).len;let startval=grid.get(startrow).get(startcol);let q=mut.@($i64);$i64);let front=mut.@($i64);$i64);front.push(startrow);front.push(startcol);q.push(front);lp(let qi=0;qi<q.len;qi=qi+1){let current=q.get(qi);let crow=current.get(0);let ccol=current.get(1);let dirs=@(@($i64);$i64);@($i64);-1);@($i64);1);@($i64);0);let ndirs=dirs.len;lp(let didx=0;didx<ndirs;didx=didx+1){let d=dirs.get(didx);let nr=crow+d.get(0);let nc=
+m=floodfill;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  let coord=mut."";
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)=0){
+      coord=io.readln();
+      done=1;br
+    };
+    lines=lines.push(line)
+  };
+  let nrows=(lines.len as i64)-1;
+  if(nrows<1){io.println("0");<0};
+  let ncols=s.len(lines.get(1)) as i64;
+  let parts=s.split(coord;" ");
+  let srow=s.toint(parts.get(0));
+  let scol=s.toint(parts.get(1));
+  (* visited flat grid via vec *)
+  let visited=mut.vec.new();
+  lp(let i=0;i<nrows*ncols;i=i+1){visited=vec.push(visited;0)};
+  (* gather byte rows *)
+  let target=s.bytes(lines.get(srow+1)).get(scol);
+  let stackr=mut.vec.new();
+  let stackc=mut.vec.new();
+  stackr=vec.push(stackr;srow);
+  stackc=vec.push(stackc;scol);
+  let count=mut.0;
+  lp(vec.len(stackr)>0){
+    let r=vec.pop(stackr);
+    let c=vec.pop(stackc);
+    if(r<0){}el{if(r>nrows-1){}el{if(c<0){}el{if(c>ncols-1){}el{
+      let idx=r*ncols+c;
+      if(vec.get(visited;idx)=1){}el{
+        let ch=s.bytes(lines.get(r+1)).get(c);
+        if(ch=target){
+          visited=vec.set(visited;idx;1);
+          count=count+1;
+          stackr=vec.push(stackr;r-1);stackc=vec.push(stackc;c);
+          stackr=vec.push(stackr;r+1);stackc=vec.push(stackc;c);
+          stackr=vec.push(stackr;r);stackc=vec.push(stackc;c-1);
+          stackr=vec.push(stackr;r);stackc=vec.push(stackc;c+1)
+        }
+      }
+    }}}}
+  };
+  io.println(s.fromint(count));
+  <0
+}

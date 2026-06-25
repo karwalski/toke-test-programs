@@ -1,1 +1,31 @@
-m=cardgame;f=flip(card:$str):$str{if(card="*"){<card};<card};f=checkmatch(f1:$str;f2:$str):$bool{if(f1=f2){<true};<false};f=scoreboard(matches:$i64):$str{let s=mut."";lp(let i=0;i<matches;i=i+1){s=s.concat(s;"*");};<s};f=main():$void{let cards=@("a";"b";"a";"c";"b";"c"));let flips=@(("a";"b");("a";"b");("c";"c")));let matches=mut.0;lp(let i=0;i<flips.len;i=i+1){let f1=flip(cards.get(i*2)));let f2=flip(cards.get(i*2+1)));let m=checkmatch(f1;f2);if(m){matches=matches+1};};let board=scoreboard(matches);let finalmsg=mut."";if(matches=flips.len){finalmsg="congratulations"}el{finalmsg="better luck next time"};let out=board
+m=cardgame;
+i=io:std.io;
+i=s:std.str;
+f=main():$i64{
+  let sizeline=io.readln();
+  let cardline=io.readln();
+  let cards=s.split(cardline;" ");
+  let score=mut.0;
+  let nomatch=mut.0;
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(s.len(line)=0){br};
+    let parts=s.split(line;" ");
+    let a=mt s.toint(parts.get(0)){ $ok:v v; $err:e 0 };
+    let b=mt s.toint(parts.get(1)){ $ok:v v; $err:e 0 };
+    let ca=cards.get(a as u64);
+    let cb=cards.get(b as u64);
+    if(s.eq(ca;cb)){
+      score=score+1;
+    }el{
+      nomatch=nomatch+1;
+    };
+  };
+  let out=mut."Score: ";
+  out=s.concat(out;s.fromint(score));
+  out=s.concat(out;"\nRemaining: ");
+  out=s.concat(out;s.fromint(nomatch));
+  out=s.concat(out;"\n");
+  io.print(out);
+  <0
+};

@@ -1,1 +1,97 @@
-m=pegsol;f=solve(n:$i64):$str{if(n<1){<""};let size=n*2-1;let board=mut.@();lp(let i=0;i<size*size;i=i+1){board=board+@(false)}};lp(let r=0;r<1;r=r+1){let center=size/2;let centeridx=center*size+center;board.get(centeridx)=true}};lp(let r=0;r<1;r=r+1){let found=mut.false;lp(let i=0;i<board.len;i=i+1){if(!board.get(i)){found=true}}}};lp(let r=0;r<1;r=r+1){if(!found){<""};let path=mut."";let x=mut.center;let y=mut.center;lp(let r=0;r<1;r=r+1){let moved=mut.false;lp(let dir=0;dir<4;dir=dir+1){let dx=mut.0;if(dir=0){dx=1}el{if(dir=1){dx=-1}}};let dy=mut.0;if(dir=0){dy=0}el
+m=pegsol;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=copyb(v:$vec):$vec{
+  let n=vec.len(v);
+  let r=mut.vec.new();
+  lp(let i=0;i<(n as i64);i=i+1){ r=vec.push(r;vec.get(v;i)) };
+  <r
+};
+
+f=pegcount(b:$vec;total:$i64):i64{
+  let c=mut.0;
+  lp(let i=0;i<total;i=i+1){ if(vec.get(b;i)=1){ c=c+1 } };
+  <c
+};
+
+(* returns move-list string or "FAIL" *)
+f=solve(b:$vec;rows:$i64;cols:$i64;cr:$i64;cc:$i64):$str{
+  let total=rows*cols;
+  let pc=pegcount(b;total);
+  if(pc=1){
+    if(vec.get(b;cr*cols+cc)=1){ <"" }el{ <"FAIL" }
+  };
+  (* try all jumps *)
+  let res=mut."FAIL";
+  let found=mut.0;
+  lp(let r=0;r<rows;r=r+1){
+    if(found<1){
+    lp(let c=0;c<cols;c=c+1){
+      if(found<1){
+      if(vec.get(b;r*cols+c)=1){
+        (* 4 dirs *)
+        lp(let d=0;d<4;d=d+1){
+          if(found<1){
+          let dr=mut.0; let dc=mut.0;
+          if(d=0){ dr=0-1; dc=0 }el{
+            if(d=1){ dr=1; dc=0 }el{
+              if(d=2){ dr=0; dc=0-1 }el{ dr=0; dc=1 }}};
+          let mr=r+dr; let mc=c+dc;
+          let tr=r+dr+dr; let tc=c+dc+dc;
+          if(mr>0-1){ if(mr<rows){ if(mc>0-1){ if(mc<cols){
+          if(tr>0-1){ if(tr<rows){ if(tc>0-1){ if(tc<cols){
+            let midok=vec.get(b;mr*cols+mc)=1;
+            let dstok=vec.get(b;tr*cols+tc)=2;
+            if(midok){ if(dstok){
+              let nb=mut.copyb(b);
+              nb=vec.set(nb;r*cols+c;2);
+              nb=vec.set(nb;mr*cols+mc;2);
+              nb=vec.set(nb;tr*cols+tc;1);
+              let child=solve(nb;rows;cols;cr;cc);
+              if(!(s.eq(child;"FAIL"))){
+                let line=s.concat(s.concat(s.concat(s.concat(s.fromint(r);",");s.fromint(c));" to ");s.concat(s.concat(s.fromint(tr);",");s.fromint(tc)));
+                if(s.eq(child;"")){ res=line }el{ res=s.concat(s.concat(line;"\n");child) };
+                found=1
+              }
+            }}
+          }}}}}}}}
+          }
+        }
+      }
+      }
+    }
+    }
+  };
+  <res
+};
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    lines=lines.push(line)
+  };
+  let rows=(lines.len as i64)-1;
+  if(rows<1){ io.println("No solution"); <0 };
+  let cols=(s.bytes(lines.get(1)).len as i64);
+  let b=mut.vec.new();
+  lp(let r=0;r<rows;r=r+1){
+    let rb=s.bytes(lines.get(r+1));
+    lp(let c=0;c<cols;c=c+1){
+      let ch=mut.0-1;
+      if(c<(rb.len as i64)){ ch=rb.get(c) as i64 };
+      let v=mut.0;
+      if(ch=79){ v=1 }el{ if(ch=46){ v=2 }el{ v=0 }};
+      b=vec.push(b;v)
+    }
+  };
+  let cr=rows/2;
+  let cc=cols/2;
+  let out=solve(b;rows;cols;cr;cc);
+  if(s.eq(out;"FAIL")){ io.println("No solution") }el{ io.println(out) };
+  <0
+}

@@ -1,1 +1,22 @@
-m=classroomrules;f=main():$str{let rules=@("be kind to everyone";"raise your hand before speaking";"listen carefully when others are speaking";"keep your hands and feet inside the classroom at all times";"no eating or drinking during class time";"complete all homework assignments on time";"participate actively in class discussions and activities";"respect the privacy and confidentiality of others";"follow all classroom rules and procedures at all times"));let poster=mut."Classroom Rules\n=================\n";lp(let i=0;i<rules.len;i=i+1){let idx=i+1;let line=idx as$str+": "+rules.get(i);poster=poster+line+"\n"};<poster};
+m=classroomrules;
+i=io:std.io;
+i=str:std.str;
+
+f=main():i64{
+  let border="========================";
+  let name=io.readln();
+  let title=str.concat(str.concat("   RULES FOR ";str.upper(name));"   ");
+  io.println(border);
+  io.println(title);
+  io.println(border);
+  let n=mut.0;
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(str.len(line)=0){br};
+    n=n+1;
+    let num=str.concat(str.fromint(n);". ");
+    io.println(str.concat(num;line));
+  };
+  io.println(border);
+  <0
+};

@@ -1,1 +1,187 @@
-m=csvprofile;f=profilecol(rows:@($str);$str);colidx:$i64;colname:$str):$str{let total=rows.len;let nullcount=mut.0;lp(let ri=0;ri<total;ri=ri+1){let cell=rows.get(ri);if(cell.len=0){nullcount=nullcount+1}};let nullpct=nullcount as$f64*100.0/total as$f64;let notnullcount=total-nullcount;let values=mut.@($str)
+m=csvprofile;
+i=io:std.io;
+i=s:std.str;
+
+f=streqlit(a:$str;b:$str):bool{
+  if(s.len(a)!=s.len(b)){<false};
+  let n=s.len(a) as i64;
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  lp(let i=0;i<n;i=i+1){
+    if((ba.get(i as u64) as i64)!=(bb.get(i as u64) as i64)){<false}
+  };
+  <true
+};
+
+f=isint(x:$str):bool{
+  let n=s.len(x) as i64;
+  if(n=0){<false};
+  let b=s.bytes(x);
+  let start=mut.0;
+  let first=b.get(0 as u64) as i64;
+  if(first=45){ start=1 };
+  if(start>=n){<false};
+  lp(let i=start;i<n;i=i+1){
+    let c=b.get(i as u64) as i64;
+    if(c<48){<false};
+    if(c>57){<false}
+  };
+  <true
+};
+
+f=fmtfrac(num:i64;den:i64):$str{
+  if(den=0){<"0.0"};
+  let rem0=num-((num/den)*den);
+  let ipart=num/den;
+  if(rem0=0){
+    <s.concat(s.fromint(ipart);".0")
+  };
+  let r=mut.rem0;
+  let frac=mut.s.fromint(0);
+  frac="";
+  lp(let i=0;i<16;i=i+1){
+    r=r*10;
+    let d=r/den;
+    frac=s.concat(frac;s.fromint(d));
+    r=r-(d*den)
+  };
+  let fb=s.bytes(frac);
+  let flen=s.len(frac) as i64;
+  let lastnz=mut.(0-1);
+  lp(let i=0;i<flen;i=i+1){
+    if((fb.get(i as u64) as i64)!=48){ lastnz=i }
+  };
+  let outfrac=mut.s.fromint(0);
+  outfrac="0";
+  if(lastnz>=0){
+    let r2=mt s.slice(frac;0 as u64;(lastnz+1) as u64){ $ok:vv vv; $err:e "" };
+    outfrac=s.concat(r2;"")
+  };
+  <s.concat(s.concat(s.fromint(ipart);".");outfrac)
+};
+
+f=jsonstr(x:$str):$str{
+  <s.concat(s.concat("\"";x);"\"")
+};
+
+f=main():i64{
+  let headerline=io.readln();
+  let header=s.split(s.trim(headerline);",");
+  let ncols=header.len as i64;
+
+  let allrows=mut.@();
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    allrows=allrows.push(line)
+  };
+  let nrows=allrows.len as i64;
+
+  let out=mut.s.fromint(0);
+  out="{";
+
+  lp(let c=0;c<ncols;c=c+1){
+    let colname=header.get(c as u64);
+
+    let cells=mut.@();
+    lp(let r=0;r<nrows;r=r+1){
+      let raw=allrows.get(r as u64);
+      let t=s.trim(raw);
+      let fields=s.split(t;",");
+      let cell=mut.s.fromint(0);
+      cell="";
+      if(c<(fields.len as i64)){
+        let cv=fields.get(c as u64);
+        cell=s.trim(cv)
+      };
+      cells=cells.push(cell)
+    };
+
+    let total=cells.len as i64;
+    let nonnull=mut.0;
+    let allintsofar=mut.true;
+    lp(let r=0;r<total;r=r+1){
+      let cell=cells.get(r as u64);
+      if(s.len(cell)=0){
+        let dd=0
+      }el{
+        nonnull=nonnull+1;
+        if(!(isint(cell))){ allintsofar=false }
+      }
+    };
+
+    let isinttype=mut.allintsofar;
+    if(nonnull=0){ isinttype=false };
+
+    let distinct=mut.@();
+    let counts=mut.@();
+    lp(let r=0;r<total;r=r+1){
+      let cell=cells.get(r as u64);
+      if(s.len(cell)=0){
+        let dd=0
+      }el{
+        let found=mut.(0-1);
+        let dn=distinct.len as i64;
+        lp(let k=0;k<dn;k=k+1){
+          if(streqlit(distinct.get(k as u64);cell)){
+            if(found<0){ found=k }
+          }
+        };
+        if(found<0){
+          distinct=distinct.push(cell);
+          counts=counts.push(1)
+        }el{
+          counts=counts.set(found as u64;counts.get(found as u64)+1)
+        }
+      }
+    };
+
+    let cardinality=distinct.len as i64;
+
+    let order=mut.@();
+    lp(let k=0;k<cardinality;k=k+1){ order=order.push(k) };
+    lp(let a=0;a<cardinality;a=a+1){
+      lp(let bI=0;bI<cardinality-a-1;bI=bI+1){
+        let p=order.get(bI as u64);
+        let q=order.get((bI+1) as u64);
+        if(counts.get(q as u64)>counts.get(p as u64)){
+          order=order.set(bI as u64;q);
+          order=order.set((bI+1) as u64;p)
+        }
+      }
+    };
+
+    let topn=mut.cardinality;
+    if(topn>5){ topn=5 };
+    let topstr=mut.s.fromint(0);
+    topstr="[";
+    lp(let k=0;k<topn;k=k+1){
+      let di=order.get(k as u64);
+      let dv=distinct.get(di as u64);
+      let piece=mut.s.fromint(0);
+      if(isinttype){ piece=dv }el{ piece=jsonstr(dv) };
+      if(k>0){ topstr=s.concat(topstr;",") };
+      topstr=s.concat(topstr;piece)
+    };
+    topstr=s.concat(topstr;"]");
+
+    let typestr=mut.s.fromint(0);
+    if(isinttype){ typestr="integer" }el{ typestr="string" };
+
+    let comp=fmtfrac(nonnull;total);
+
+    let entry=mut.s.fromint(0);
+    entry=s.concat(jsonstr(colname);":{");
+    entry=s.concat(entry;s.concat("\"type\":";jsonstr(typestr)));
+    entry=s.concat(entry;s.concat(",\"completeness\":";comp));
+    entry=s.concat(entry;s.concat(",\"cardinality\":";s.fromint(cardinality)));
+    entry=s.concat(entry;s.concat(",\"top_values\":";topstr));
+    entry=s.concat(entry;"}");
+
+    if(c>0){ out=s.concat(out;",") };
+    out=s.concat(out;entry)
+  };
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

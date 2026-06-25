@@ -1,1 +1,84 @@
-m=tb;f=solve(p0:$i64;p1:$i64;p2:$i64):$str{let tokens=mut.p0;let capacity=mut.p1;let refill=mut.p2;let result=mut."";let allowed=mut.false;if(!(tokens<0)){if(!(tokens>capacity)){allowed=true}}};if(allowed){result="allowed"}el{result="throttled"};<result};
+m=tb;
+i=io:std.io;
+i=str:std.str;
+
+f=toint(s:$str):i64{
+  let r=mt str.toint(str.trim(s)){ $ok:v v; $err:e 0 };
+  <r
+};
+
+f=extractfield(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\"");
+  let parts=str.split(obj;pat);
+  if(parts.len<2){<""};
+  let rest=parts.get(1);
+  let afterc=str.split(rest;":");
+  if(afterc.len<2){<""};
+  let valpart=afterc.get(1);
+  let v=mut.str.trim(valpart);
+  let cut=str.split(v;",");
+  v=str.trim(cut.get(0));
+  let cut2=str.split(v;"}");
+  v=str.trim(cut2.get(0));
+  v=str.trim(v);
+  let n=str.len(v) as i64;
+  if(n>=2){
+    let first=mt str.slice(v;0;1){ $ok:a a; $err:e "" };
+    if(first="\""){
+      let inner=mt str.slice(v;1;(n-1) as u64){ $ok:a a; $err:e "" };
+      <inner
+    }
+  };
+  <v
+};
+
+f=main():i64{
+  let header=io.readln();
+  let hp=str.split(str.trim(header);" ");
+  let rate=toint(hp.get(0));
+  let burst=toint(hp.get(1));
+
+  let jsonline=mut."";
+  lp(true){
+    let l=io.readln();
+    if(io.eof()){br};
+    jsonline=str.concat(jsonline;l)
+  };
+
+  let body=str.trim(jsonline);
+  let inner=mut.body;
+  let bl=str.len(body) as i64;
+  if(bl>=2){
+    inner=mt str.slice(body;1;(bl-1) as u64){ $ok:a a; $err:e body }
+  };
+
+  let objs=str.split(inner;"}");
+  let tokens=mut.(rate as f64);
+  if(tokens>(burst as f64)){tokens=(burst as f64)};
+  let last=mut.0;
+  let started=mut.false;
+
+  lp(let i=0;i<objs.len;i=i+1){
+    let raw=objs.get(i);
+    if(str.contains(raw;"time_ms")){
+      let obj=str.concat(raw;"}");
+      let tms=toint(extractfield(obj;"time_ms"));
+      let ep=extractfield(obj;"endpoint");
+      if(started=false){
+        last=tms;
+        started=true
+      };
+      let elapsed=(tms-last) as f64;
+      tokens=tokens+elapsed*(rate as f64)/1000.0;
+      if(tokens>(burst as f64)){tokens=(burst as f64)};
+      last=tms;
+      let verdict=mut."THROTTLED";
+      if(tokens>=1.0){
+        tokens=tokens-1.0;
+        verdict="ALLOWED"
+      };
+      io.println(str.concat(str.concat(str.concat(str.concat(str.fromint(tms);" ");ep);": ");verdict))
+    }
+  };
+  <0
+}

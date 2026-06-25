@@ -1,1 +1,10 @@
-m=hangman;f=playhangman(word:$str;guesses:@$str):$str{let lives=mut.6;let masked=mut.word;let i=mut.0;lp(let idx=0;idx<guesses.len;idx=idx+1){let guess=guesses.get(idx);let found=mut.false;let j=mut.0;lp(let k=0;k<word.len;k=k+1){let ch=word.get(k);if(ch=guess){if(!(found)){masked=masked.sub(0;k)+guess+masked.sub(k+1;word.len);found=true;};};};if(found){lives=lives;}el{if(!(lives=0))){lives=lives-1;};};};<masked+s.concat(" lives: ";lives) as$str;};
+m=hangman;i=io:std.io;i=s:std.str;
+f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
+f=main():$i64{let word=s.trim(io.readln());let gline=s.trim(io.readln());
+let gparts=s.split(gline;" ");
+let n=s.len(word);
+let revealed=mut.@($bool);lp(let i=0;i<n;i=i+1){revealed=revealed+@(false)};
+let lives=mut.6;
+lp(let g=0;g<gparts.len();g=g+1){let letter=s.trim(gparts.get(g));if(s.len(letter)>0){let hit=mut.false;lp(let i=0;i<n;i=i+1){if(s.equals(ch(word;i);letter)){revealed=revealed.set(i;true);hit=true}};if(!(hit)){lives=lives-1}}};
+let masked=mut."";lp(let i=0;i<n;i=i+1){if(revealed.get(i)){masked=s.concat(masked;ch(word;i))}el{masked=s.concat(masked;"_")}};
+io.println(masked);io.println(s.fromint(lives));<0}

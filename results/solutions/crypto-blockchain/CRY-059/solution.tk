@@ -1,1 +1,43 @@
-m=amm;f=solve(x:$i64;y:$i64;swap:$str):$str{let k=x*y;let result=mut."";let idx=mut.0;lp(let i=0;i<swap.len;i=i+1){let c=swap.get(i);if(c="x"){let xval=x;if(!(xval<0)){}el{let msg="negative x";result=msg;br=1;};let yval=y;if(!(yval<0)){}el{let msg="negative y";result=msg;br=1;};let kval=k;if(!(kval<0)){}el{let msg="negative k";result=msg;br=1;};let xother=xval;if(!(xother<0)){}el{let msg="negative xother";result=msg;br=1;};let yother=yval;if(!(yother<0)){}el{let msg="negative yother";result=msg;br=1;};let kother=kval;if(!(kother<0)){}el{let msg="negative kother";result=msg;br=1;};let xfinal=xother;if(!(xfinal<0)){}el{let msg="negative
+m=amm;
+i=io:std.io;
+i=s:std.str;
+
+f=ceildiv(a:$i64;b:$i64):$i64{
+  <(a+b-1)/b
+};
+
+f=main():i64{
+  let first=s.trim(io.readln());
+  let parts=s.split(first;" ");
+  let x=mut.s.toint(parts.get(0));
+  let y=mut.s.toint(parts.get(1));
+  let k=x*y;
+
+  lp(let guard=0;guard<1000000;guard=guard+1){
+    let line=s.trim(io.readln());
+    if(s.eq(line;"")){
+      br
+    };
+    let p=s.split(line;" ");
+    let cmd=p.get(0);
+    let amt=s.toint(p.get(1));
+    let out=mut.0;
+    if(s.eq(cmd;"SWAP_X")){
+      let nx=x+amt;
+      let ny=ceildiv(k;nx);
+      out=y-ny;
+      x=nx;
+      y=ny
+    }el{
+      let ny=y+amt;
+      let nx=ceildiv(k;ny);
+      out=x-nx;
+      x=nx;
+      y=ny
+    };
+    io.println(s.fromint(out))
+  };
+
+  io.println(s.concat("RESERVES ";s.concat(s.fromint(x);s.concat(" ";s.fromint(y)))));
+  <0
+};

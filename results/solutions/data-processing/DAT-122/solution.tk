@@ -1,1 +1,231 @@
-m=cdcpipeline;f=extractkey(event:$str):$str{let idx=mut.0;let len=event.len;lp(let i=0;i<len;i=i+1){let ch=event.get(i);if(ch=":"){idx=i};};let keylen=idx-1;let key=mut."";lp(let i=0;i<keylen;i=i+1){key=s.concat(key;event.get(i+1)));};<key};f=extractvalue(event:$str):$str{let len=event.len;let idx=mu
+m=cdc;i=io:std.io;i=s:std.str;
+
+f=byteat(x:$str;idx:i64):i64{ let b=s.bytes(x); <b.get(idx as u64) as i64 };
+f=charat(x:$str;idx:i64):$str{ let r=mt s.slice(x;idx as u64;(idx+1) as u64){ $ok:v v; $err:e "" }; <s.concat(r;"") };
+f=slc(x:$str;a:i64;b:i64):$str{ let r=mt s.slice(x;a as u64;b as u64){ $ok:v v; $err:e "" }; <s.concat(r;"") };
+
+f=streq(a:$str;b:$str):bool{
+  if(s.len(a)!=s.len(b)){<false};
+  let n=s.len(a) as i64;
+  lp(let i=0;i<n;i=i+1){ if(byteat(a;i)!=byteat(b;i)){<false} };
+  <true
+};
+
+# Find index of substring `needle` in `hay` starting at position from; -1 if not found.
+f=findfrom(hay:$str;needle:$str;from:i64):i64{
+  let hl=s.len(hay) as i64;
+  let nl=s.len(needle) as i64;
+  if(nl=0){ <from };
+  let res=mut.(0-1);
+  let stop=hl-nl;
+  lp(let i=from;i<=stop;i=i+1){
+    if(res<0){
+      let m=mut.true;
+      lp(let j=0;j<nl;j=j+1){ if(m){ if(byteat(hay;i+j)!=byteat(needle;j)){ m=false } } };
+      if(m){ res=i }
+    }
+  };
+  <res
+};
+
+# Extract the string value of a top-level "field": from a flat region.
+# Given content and the position right after the colon, read a JSON scalar value
+# (string in quotes -> inner text; number/true/false -> raw text up to , or } ).
+# Returns the raw text WITHOUT surrounding quotes for strings.
+# Also sets nothing else; caller computes positions.
+
+f=main():i64{
+  # table: parallel arrays
+  let tkeys=mut.@();    # canonical key text (as appears, e.g. "1" or "a")
+  let trows=mut.@();    # CSV value string for the row (comma-joined data values)
+  let header=mut."";
+  let haveHeader=mut.0;
+
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){ br };
+    if(s.len(line) as i64=0){
+      # skip blank
+    }el{
+      # find "op":" then char
+      let opPos=findfrom(line;"\"op\":\"";0);
+      let op=charat(line;opPos+6);   # after the opening quote of op value
+
+      # find "key": value (could be number or quoted string)
+      let keyPos=findfrom(line;"\"key\":";0);
+      let kstart=keyPos+6;           # position right after colon
+      let keyText=mut."";
+      if(byteat(line;kstart)=34){
+        # quoted string key
+        let qe=findfrom(line;"\"";kstart+1);
+        keyText=slc(line;kstart+1;qe)
+      }el{
+        # numeric/other key: read until , or }
+        let ne=mut.kstart;
+        lp(true){
+          let cc=byteat(line;ne);
+          if(cc=44){ br };
+          if(cc=125){ br };
+          ne=ne+1
+        };
+        keyText=slc(line;kstart;ne)
+      };
+
+      if(streq(op;"D")){
+        # remove key
+        let newK=mut.@();
+        let newR=mut.@();
+        lp(let i=0;i<tkeys.len as i64;i=i+1){
+          if(!(streq(tkeys.get(i as u64);keyText))){
+            newK=newK.push(tkeys.get(i as u64));
+            newR=newR.push(trows.get(i as u64))
+          }
+        };
+        tkeys=newK;
+        trows=newR
+      }el{
+        # I or U: parse data object
+        let dataPos=findfrom(line;"\"data\":{";0);
+        let dstart=dataPos+8;     # first char inside data object
+        # parse key/value pairs until matching '}'
+        let cols=mut.@();    # column names in order
+        let vlist=mut.@();   # values in order (as text)
+        let p=mut.dstart;
+        let dlen=s.len(line) as i64;
+        lp(true){
+          # skip until we hit a '"' (start of key) or '}' (end)
+          lp(true){
+            if(p>=dlen){ br };
+            let cc=byteat(line;p);
+            if(cc=34){ br };
+            if(cc=125){ br };
+            p=p+1
+          };
+          if(p>=dlen){ br };
+          if(byteat(line;p)=125){ br };
+          # at opening quote of key
+          let ke=findfrom(line;"\"";p+1);
+          let colname=slc(line;p+1;ke);
+          # after closing quote, find ':'
+          let colon=findfrom(line;":";ke+1);
+          let vp=mut.(colon+1);
+          # skip spaces
+          lp(true){ if(byteat(line;vp)=32){ vp=vp+1 }el{ br } };
+          let vtext=mut."";
+          if(byteat(line;vp)=34){
+            let vqe=findfrom(line;"\"";vp+1);
+            vtext=slc(line;vp+1;vqe);
+            p=vqe+1
+          }el{
+            let vne=mut.vp;
+            lp(true){
+              if(vne>=dlen){ br };
+              let cc=byteat(line;vne);
+              if(cc=44){ br };
+              if(cc=125){ br };
+              vne=vne+1
+            };
+            vtext=slc(line;vp;vne);
+            p=vne
+          };
+          cols=cols.push(colname);
+          vlist=vlist.push(vtext)
+        };
+
+        # build header from cols (first time)
+        if(haveHeader=0){
+          let h=mut."";
+          lp(let i=0;i<cols.len as i64;i=i+1){
+            if(i>0){ h=s.concat(h;",") };
+            h=s.concat(h;cols.get(i as u64))
+          };
+          header=h;
+          haveHeader=1
+        };
+        # build row csv
+        let row=mut."";
+        lp(let i=0;i<vlist.len as i64;i=i+1){
+          if(i>0){ row=s.concat(row;",") };
+          row=s.concat(row;vlist.get(i as u64))
+        };
+        # upsert: if key exists, replace row; else append
+        let found=mut.0;
+        lp(let i=0;i<tkeys.len as i64;i=i+1){
+          if(streq(tkeys.get(i as u64);keyText)){
+            trows=trows.set(i as u64;row);
+            found=1
+          }
+        };
+        if(found=0){
+          tkeys=tkeys.push(keyText);
+          trows=trows.push(row)
+        }
+      }
+    }
+  };
+
+  # output: if no surviving rows, print nothing
+  if(tkeys.len as i64=0){
+    <0
+  };
+
+  # sort surviving keys. Determine if keys are numeric.
+  # Build an index array and sort by key (numeric if all numeric, else lexical).
+  let n=tkeys.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){ order=order.push(i) };
+
+  # detect numeric: all chars digits (allow leading '-')
+  let allNum=mut.1;
+  lp(let i=0;i<n;i=i+1){
+    let kt=tkeys.get(i as u64);
+    let kl=s.len(kt) as i64;
+    if(kl=0){ allNum=0 };
+    lp(let j=0;j<kl;j=j+1){
+      let cc=byteat(kt;j);
+      if(cc<48){ allNum=0 }el{ if(cc>57){ allNum=0 } }
+    }
+  };
+
+  # simple bubble sort on order[]
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=0;b<n-1;b=b+1){
+      let i1=order.get(b as u64);
+      let i2=order.get((b+1) as u64);
+      let k1=tkeys.get(i1 as u64);
+      let k2=tkeys.get(i2 as u64);
+      let swap=mut.0;
+      if(allNum=1){
+        let v1=mt s.toint(k1){ $ok:v v; $err:e 0 };
+        let v2=mt s.toint(k2){ $ok:v v; $err:e 0 };
+        if(v1>v2){ swap=1 }
+      }el{
+        # lexical compare
+        let l1=s.len(k1) as i64;
+        let l2=s.len(k2) as i64;
+        let mn=mut.l1;
+        if(l2<l1){ mn=l2 };
+        let cmp=mut.0;
+        lp(let c=0;c<mn;c=c+1){
+          if(cmp=0){
+            let d=byteat(k1;c)-byteat(k2;c);
+            if(d>0){ cmp=1 }el{ if(d<0){ cmp=0-1 } }
+          }
+        };
+        if(cmp=0){ if(l1>l2){ cmp=1 } };
+        if(cmp>0){ swap=1 }
+      };
+      if(swap=1){
+        order=order.set(b as u64;i2);
+        order=order.set((b+1) as u64;i1)
+      }
+    }
+  };
+
+  io.println(header);
+  lp(let i=0;i<n;i=i+1){
+    let idx=order.get(i as u64);
+    io.println(trows.get(idx as u64))
+  };
+  <0
+};

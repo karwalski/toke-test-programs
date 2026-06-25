@@ -1,1 +1,53 @@
-m=checksum;f=solve(p0:$str):$i64{let lines=p0.split("\n");let sum=mut.0;lp(let i=0;i<lines.len;i=i+1){let line=lines.get(i);let crc=mut.0;lp(let j=0;j<line.len;j=j+1){let ch=line.get(j);let code=ch as i64;crc=crc+code;};let modval=crc-crc/256*256;sum=sum+modval;};<sum};
+m=checksum;i=io:std.io;i=s:std.str;
+f=crc32(line:$str):$i64{
+  let n=s.len(line);
+  let crc=mut.4294967295;
+  let i=mut.0;
+  lp(i<n){
+    let byte=s.charat(line;i);
+    crc=(crc^byte)&4294967295;
+    let k=mut.0;
+    lp(k<8){
+      let lsb=crc&1;
+      if(lsb=1){
+        crc=((crc>>1)^3988292384)&4294967295
+      }el{
+        crc=(crc>>1)&4294967295
+      };
+      k=k+1
+    };
+    i=i+1
+  };
+  <(crc^4294967295)&4294967295
+};
+f=hex8(val:$i64):$str{
+  let digits="0123456789abcdef";
+  let out=mut."";
+  let shift=mut.28;
+  lp(shift>=0){
+    let nib=(val>>shift)&15;
+    out=s.concat(out;s.slice(digits;nib;nib+1));
+    shift=shift-4
+  };
+  <out
+};
+f=main():$i64{
+  let line=mut.io.readln();
+  let first=mut.1;
+  let cont=mut.1;
+  lp(cont>0){
+    if(io.eof()=1){
+      if(first=1){
+        io.println(s.concat("00000000";"\t"))
+      };
+      cont=0
+    }el{
+      let crc=crc32(line);
+      let hx=hex8(crc);
+      io.println(s.concat(s.concat(hx;"\t");line));
+      first=0;
+      line=io.readln()
+    }
+  };
+  <0
+};

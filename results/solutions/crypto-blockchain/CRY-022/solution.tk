@@ -135,6 +135,6 @@ if((pad>=1)&&(pad<=16)){
 };
 let trimmed=mut.@();let t2=mut.0;lp(t2<plen){trimmed=trimmed+@(out.get(t2));t2=t2+1};
 let rep=utf8replace(trimmed);
-let bb=mut.@();let bo=mut.0;lp(bo<rep.len()){bb=bb+@(rep.get(bo));bo=bo+1};
+let bb=mut.@();let bo=mut.0;lp(bo<rep.len()){let bv=rep.get(bo);if(bv<32){bb=bb+@(63)}el{bb=bb+@(bv)};bo=bo+1};
 io.print(s.frombytes(bb));
 <0}

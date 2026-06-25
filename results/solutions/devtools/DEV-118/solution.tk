@@ -1,1 +1,126 @@
-m=stubgen;i=s:std.str;f=genstub(name:$str;params:$str):$str{let s=mut."";s=s.concat(s;name);s=s.concat(s;"(");s=s.concat(s;params);s=s.concat(s;"){<};");<s};f=buildparams(params:$str):$str{let s=mut."";let parts=params.split(",");lp(let i=0;i<parts.len;i=i+1){let p=parts.get(i);let pname=p.split(":").get(0);let ptype=p.split(":").get(1);let psname=pname.replace("\"","");let pstype=ptype.replace("\"","");let isreq=pname.find("=")=0;let reqmark=mut."";if(isreq){reqmark="*"};let part=s.concat(s.concat(s.concat(reqmark;psname);":");pstype);if(i<parts.len-1){part=s.concat(part;", ")};s=s.concat(s;part);};<s};f=stubforop(name:$str;opname:$str):$str{let params=buildparams(opname);let s=genstub(name;params);<s};f=main():$i64{let s=stubforop("main";"sum");let result=0;<result
+m=stubgen;
+i=io:std.io;
+i=str:std.str;
+
+f=streq(a:$str;b:$str):$bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  if(!(la=lb)){<false};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let ok=mut.true;
+  lp(let i=0;i<la;i=i+1){
+    if(!((ba.get(i) as i64)=(bb.get(i) as i64))){ok=false};
+  };
+  <ok
+};
+
+f=snake(name:$str):$str{
+  let n=str.len(name) as i64;
+  let bytes=str.bytes(name);
+  let upa=str.bytes("A").get(0) as i64;
+  let upz=str.bytes("Z").get(0) as i64;
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let b=bytes.get(i) as i64;
+    let ch=mt str.slice(name;i;i+1){ $ok:v v; $err:e "" };
+    let isupper=mut.false;
+    if(!(b<upa)){
+      if(!(b>upz)){isupper=true};
+    };
+    if(isupper){
+      out=str.concat(out;"_");
+      out=str.concat(out;str.lower(ch));
+    }el{
+      out=str.concat(out;ch);
+    };
+  };
+  <out
+};
+
+f=lastof(hay:$str;needle:$str;limit:$i64):$i64{
+  let nlen=str.len(needle) as i64;
+  let best=mut.(0-1);
+  lp(let i=0;i<limit;i=i+1){
+    if(i+nlen<=limit){
+      let sub=mt str.slice(hay;i;i+nlen){ $ok:v v; $err:e "" };
+      if(streq(sub;needle)){best=i};
+    };
+  };
+  <best
+};
+
+f=readkeyat(json:$str;start:$i64):$str{
+  let jlen=str.len(json) as i64;
+  let rest=mt str.slice(json;start;jlen){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<""};
+  <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
+};
+
+f=main():i64{
+  let lang=io.readln();
+  let json=mut.io.readln();
+  let extra=io.readln();
+  lp(let i=0;i<100000;i=i+1){
+    if(str.len(extra)=0){
+    }el{
+      json=str.concat(json;extra);
+    };
+  };
+  if(streq(lang;"go")){
+    <0
+  };
+  if(!(streq(lang;"python"))){
+    <0
+  };
+  let jlen=str.len(json) as i64;
+  let count=mut.0;
+  let search=mut.0;
+  let firstout=mut.true;
+  lp(let g=0;g<10000;g=g+1){
+    let rest=mt str.slice(json;search;jlen){ $ok:v v; $err:e "" };
+    let rel=str.indexof(rest;"\"operationId\":\"");
+    if(rel<0){
+      g=10000;
+    }el{
+      let opidx=search+rel;
+      let valstart=opidx+(str.len("\"operationId\":\"") as i64);
+      let opid=readkeyat(json;valstart);
+      let getpos=lastof(json;"\"get\":";opidx);
+      let postpos=lastof(json;"\"post\":";opidx);
+      let putpos=lastof(json;"\"put\":";opidx);
+      let delpos=lastof(json;"\"delete\":";opidx);
+      let method=mut."GET";
+      let mpos=mut.getpos;
+      if(postpos>mpos){mpos=postpos;method="POST"};
+      if(putpos>mpos){mpos=putpos;method="PUT"};
+      if(delpos>mpos){mpos=delpos;method="DELETE"};
+      if(getpos>mpos){mpos=getpos;method="GET"};
+      let pathpos=lastof(json;"\"/";opidx);
+      let path=mut."/";
+      if(!(pathpos<0)){
+        path=readkeyat(json;pathpos+1);
+      };
+      let body=mut.false;
+      if(streq(method;"POST")){body=true};
+      if(streq(method;"PUT")){body=true};
+      let fname=snake(opid);
+      let args=mut."";
+      if(body){args="body"};
+      let line1=str.concat(str.concat(str.concat("def ";fname);"(");str.concat(args;"):"));
+      let line2=str.concat(str.concat("    \"\"\"";method);str.concat(" ";str.concat(path;"\"\"\"")));
+      let block=str.concat(str.concat(line1;"\n");str.concat(line2;"\n    pass"));
+      if(firstout){
+        io.print(block);
+        firstout=false;
+      }el{
+        io.print(str.concat("\n\n";block));
+      };
+      search=valstart;
+      count=count+1;
+    };
+  };
+  if(!(firstout)){io.print("\n")};
+  <0
+};

@@ -1,1 +1,123 @@
-m=compress;f=compress(passages:@$str;query:$str):$str{let relevant=mut."";lp(let i=0;i<passages.len;i=i+1){let p=passages.get(i);if(p.contains(query)){relevant=relevant+p+"\n";};};let result=mut."";let sentences=mut.relevant.split("\n");lp(let j=0;j<sentences.len;j=j+1){let s=sentences.get(j);if(s.contains(query)){result=result+s+"\n";};};<result};
+m=compress;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let start=idx+(str.len(pat) as i64);
+  let rest=mt str.slice(obj;start as u64;str.len(obj)){ $ok:v v; $err:e "" };
+  let q=str.indexof(rest;"\"");
+  if(q<0){<rest};
+  <mt str.slice(rest;0;q as u64){ $ok:v v; $err:e "" }
+};
+
+f=isstop(w:$str):$bool{
+  if(str.len(w)=0){<true};
+  if(w="is"){<true};
+  if(w="the"){<true};
+  if(w="a"){<true};
+  if(w="an"){<true};
+  if(w="of"){<true};
+  <false
+};
+
+f=cleanword(w:$str):$str{
+  let lw=str.lower(w);
+  let bytes=str.bytes(lw);
+  let out=mut."";
+  let n=str.len(lw);
+  lp(let i=0;i<(n as i64);i=i+1){
+    let c=(bytes.get(i as u64) as i64);
+    let keep=mut.false;
+    if(c>=97){if(c<=122){keep=true}};
+    if(c>=48){if(c<=57){keep=true}};
+    if(keep){
+      let ch=mt str.slice(lw;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+      out=str.concat(out;ch)
+    };
+  };
+  <out
+};
+
+f=relevant(text:$str;kw:@$str):$str{
+  let parts=str.split(text;". ");
+  let np=(parts.len as i64);
+  let sents=mut.@();
+  lp(let i=0;i<np;i=i+1){
+    let p=parts.get(i as u64);
+    if(i<(np-1)){sents=sents+@(str.concat(p;"."))}el{sents=sents+@(p)};
+  };
+  let ns=(sents.len as i64);
+  let nk=(kw.len as i64);
+  lp(let i=0;i<ns;i=i+1){
+    let s=sents.get(i as u64);
+    let sl=str.lower(s);
+    lp(let k=0;k<nk;k=k+1){
+      let key=kw.get(k as u64);
+      if(str.len(key)>0){
+        if(str.contains(sl;key)){<s};
+      };
+    };
+  };
+  if(ns>0){<sents.get(0)};
+  <""
+};
+
+f=jsonesc(s:$str):$str{
+  let bytes=str.bytes(s);
+  let out=mut."";
+  let n=str.len(s);
+  lp(let i=0;i<(n as i64);i=i+1){
+    let c=(bytes.get(i as u64) as i64);
+    if(c=34){out=str.concat(out;"\\\"")}el{
+      if(c=92){out=str.concat(out;"\\\\")}el{
+        let ch=mt str.slice(s;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+        out=str.concat(out;ch)
+      }
+    };
+  };
+  <out
+};
+
+f=main():i64{
+  let line=io.readln();
+  let query=getstr(line;"query");
+  let qwords=str.split(query;" ");
+  let nq=(qwords.len as i64);
+  let kw=mut.@();
+  lp(let i=0;i<nq;i=i+1){
+    let cw=cleanword(qwords.get(i as u64));
+    if(!(isstop(cw))){kw=kw+@(cw)};
+  };
+
+  let pidx=str.indexof(line;"\"passages\"");
+  let parr=mut."";
+  if(pidx>=0){
+    parr=mt str.slice(line;pidx as u64;str.len(line)){ $ok:v v; $err:e "" };
+  };
+
+  let out=mut."[";
+  let first=mut.true;
+  let cur=mut.parr;
+  lp(let z=0;z<100000;z=z+1){
+    let oidx=str.indexof(cur;"{\"id\":\"");
+    if(oidx<0){br};
+    let obj=mt str.slice(cur;oidx as u64;str.len(cur)){ $ok:v v; $err:e "" };
+    let id=getstr(obj;"id");
+    let text=getstr(obj;"text");
+    let comp=relevant(text;kw);
+    if(!(first)){out=str.concat(out;",")};
+    first=false;
+    out=str.concat(out;"{\"id\":\"");
+    out=str.concat(out;jsonesc(id));
+    out=str.concat(out;"\",\"compressed_text\":\"");
+    out=str.concat(out;jsonesc(comp));
+    out=str.concat(out;"\"}");
+    cur=mt str.slice(obj;7;str.len(obj)){ $ok:v v; $err:e "" };
+  };
+  out=str.concat(out;"]");
+  io.println(out);
+  <0
+};

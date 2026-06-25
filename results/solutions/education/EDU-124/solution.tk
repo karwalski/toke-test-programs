@@ -1,1 +1,28 @@
-m=gradebook;f=calcaverage(scores:@$i64):$f64{let total=mut.0;lp(let i=0;i<(<scores.len as$f64));i=i+1){total=total+scores.get(i as u64));};<total as$f64/<scores.len as$f64};f=calclettergrade(average:$f64):$str{if(!(average<97.0)){<"A+"};if(!(average<93.0)){<"A"};if(!(average<90.0)){<"A-"};if(!(average<87.0)){<"B+"};if(!(average<83.0)){<"B"};if(!(average<80.0)){<"B-"};if(!(average<77.0)){<"C+"};if(!(average<73.0)){<"C"};if(!(average<70.0)){<"C-"};if(!(average<67.0)){<"D+"};if(!(average<63.0)){<"D"};if(!(average<60.0)){<"D-"};<"F"};f=
+m=gradebook;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":\"");let parts=s.split(json;pat);if(parts.len()<2){<""};let rest=parts.get(1);let endp=s.split(rest;"\"");<endp.get(0)};
+f=pad(v:$str;w:$i64):$str{let l=s.len(v);if(l>=w){<v};<s.concat(v;s.repeat(" ";w-l))};
+f=gradeval(gblock:$str;aname:$str):$str{let pat=s.concat(s.concat("\"";aname);"\":");let pp=s.split(gblock;pat);if(pp.len()<2){<""};let rest=pp.get(1);let cm=s.split(rest;",");<s.trim(cm.get(0))};
+f=main():$i64{let input=io.readln();
+let cname=getstr(input;"class_name");
+io.println(s.concat("Grade Book: ";cname));
+let sp=s.split(input;"\"students\":[");let spart=mut."";if(sp.len()>=2){let r=sp.get(1);spart=r};
+let studs=s.split(spart;"{\"name\":\"");
+let names=mut.@($str);let gradeblocks=mut.@($str);
+lp(let i=1;i<studs.len();i=i+1){let chunk=studs.get(i);let nq=s.split(chunk;"\"");let nm=nq.get(0);
+let gb=s.split(chunk;"\"grades\":{");let gblock=mut."";if(gb.len()>=2){let r=gb.get(1);let e=s.split(r;"}");gblock=e.get(0)};
+names=names+@(nm);gradeblocks=gradeblocks+@(gblock)};
+let cols=mut.@($str);
+lp(let i=0;i<gradeblocks.len();i=i+1){let gblock=gradeblocks.get(i);let pairs=s.split(gblock;",");
+lp(let j=0;j<pairs.len();j=j+1){let pr=pairs.get(j);let kv=s.split(pr;":");if(kv.len()>=2){let kq=s.split(kv.get(0);"\"");let aname=mut."";if(kq.len()>=2){aname=kq.get(1)};if(s.len(aname)>0){let seen=mut.false;lp(let k=0;k<cols.len();k=k+1){if(s.equals(cols.get(k);aname)){seen=true}};if(!(seen)){cols=cols+@(aname)}}}}};
+lp(let a=0;a<cols.len();a=a+1){lp(let b=0;b<cols.len()-1-a;b=b+1){if(s.compare(cols.get(b);cols.get(b+1))<0){let tmp=cols.get(b);cols=cols.set(b;cols.get(b+1));cols=cols.set(b+1;tmp)}}};
+let namew=mut.4;lp(let i=0;i<names.len();i=i+1){let l=s.len(names.get(i));if(l>namew){namew=l}};
+let colw=mut.@($i64);lp(let a=0;a<cols.len();a=a+1){colw=colw+@(s.len(cols.get(a)))};
+lp(let i=0;i<names.len();i=i+1){let gblock=gradeblocks.get(i);lp(let a=0;a<cols.len();a=a+1){let vstr=gradeval(gblock;cols.get(a));let vl=s.len(vstr);let cur=colw.get(a);if(vl>cur){colw=colw.set(a;vl)}}};
+let header=mut.pad("Name";namew);lp(let a=0;a<cols.len();a=a+1){header=s.concat(header;s.concat(" | ";pad(cols.get(a);colw.get(a))))};header=s.concat(header;" | Avg");
+io.println(header);
+lp(let i=0;i<names.len();i=i+1){let gblock=gradeblocks.get(i);let row=mut.pad(names.get(i);namew);let total=mut.0;let cnt=mut.0;
+lp(let a=0;a<cols.len();a=a+1){let vstr=gradeval(gblock;cols.get(a));let v=s.toint(vstr);total=total+v;cnt=cnt+1;row=s.concat(row;s.concat(" | ";pad(vstr;colw.get(a))))};
+let avg=mut.0.0;if(cnt>0){avg=total as $f64/(cnt as $f64)};
+row=s.concat(row;s.concat(" | ";s.format(avg;"%.1f")));
+io.println(row)};
+<0}

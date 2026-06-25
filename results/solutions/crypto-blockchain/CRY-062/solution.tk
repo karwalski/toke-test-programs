@@ -1,1 +1,34 @@
-m=secretsharing;f=sharergen(secret:$i64;threshold:$i64;total:$i64):@$i64{let shares=mut.@();let val=secret as$f64;let other=1.0 as$f64;let v=mut.val;lp(let i=0;i<total;i=i+1){let r=v*other;let s=r as$i64;let delta=s as$f64-v*other;if(!(i<total-1)){let adj=mut.0;if(delta<0.0){adj=1}el{if(delta>0.0){adj=-1}};let news=s+adj;shares=shares+@(news)}el{shares=shares+@(s)}};<shares};f=verify(shares:@$i64;threshold:$i64;total:$i64):$bool{let sum=mut.0;lp(let i=0;i<total;i=i+1){sum=sum+shares.get(i as$u64));};let val=sum as$f64;let other=1.0 as$f64;let v=val*other;let s=v as$i
+m=secretsharing;
+i=io:std.io;
+i=s:std.str;
+i=cr:std.crypto;
+f=randint(modp:$i64):$i64{
+  let b=cr.randombytes(4 as u64);
+  let v=mut.0;
+  lp(let i=0;i<4;i=i+1){
+    v=v*256+(b.get(i as u64) as i64)
+  };
+  if(v<0){v=0-v};
+  <v-v/modp*modp
+};
+f=main():$i64{
+  let secret=s.toint(s.trim(io.readln()));
+  let t=s.toint(s.trim(io.readln()));
+  let n=s.toint(s.trim(io.readln()));
+  let prime=2147483647;
+  let coeffs=mut.@(secret);
+  lp(let i=1;i<t;i=i+1){
+    coeffs=coeffs+@(randint(prime))
+  };
+  lp(let x=1;x<n+1;x=x+1){
+    let y=mut.0;
+    let xpow=mut.1;
+    lp(let j=0;j<t;j=j+1){
+      let term=coeffs.get(j as u64)*xpow-coeffs.get(j as u64)*xpow/prime*prime;
+      y=(y+term)-(y+term)/prime*prime;
+      xpow=(xpow*x)-(xpow*x)/prime*prime
+    };
+    io.println(s.concat(s.fromint(x);s.concat(",";s.fromint(y))))
+  };
+  <0
+};

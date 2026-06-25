@@ -1,1 +1,84 @@
-m=roulette;f=spin(seed:$i64):$i64{let result=seed-(seed/37)*37;if(result=0){<37};<result};f=playround(seed:$i64;bets:$i64):$i64{let spinresult=spin(seed);let pay=mut.0;if(spinresult=bets){pay=36*bets};if(!(pay>0))){if(spinresult=1){pay=100};if(spinresult=2){pay=50};if(spinresult=3){pay=25};if(spinresult=4){pay=10};if(spinresult=5){pay=5};if(spinresult=6){pay=2};if(spinresult=7){pay=1};};<pay};f=main():$i64{let seed=1;let bets=18;let balance=mut.1000;let spins=mut.0;lp(let idx=0;idx<10;idx=idx+1){let pay=playround(seed+spins;bets);balance=balance+pay;sp
+m=roulette;
+i=io:std.io;
+i=str:std.str;
+f=isred(n:$i64):$bool{
+  if(n=1){<true}; if(n=3){<true}; if(n=5){<true}; if(n=7){<true};
+  if(n=9){<true}; if(n=12){<true}; if(n=14){<true}; if(n=16){<true};
+  if(n=18){<true}; if(n=19){<true}; if(n=21){<true}; if(n=23){<true};
+  if(n=25){<true}; if(n=27){<true}; if(n=30){<true}; if(n=32){<true};
+  if(n=34){<true}; if(n=36){<true};
+  <false
+};
+f=colorof(n:$i64;bettype:$str):$str{
+  if(str.startswith(bettype;"number")){<"Green"};
+  if(n=0){<"Green"};
+  if(isred(n)){<"Red"};
+  <"Black"
+};
+f=nextstate(s:$i64):$i64{
+  let m=2147483648;
+  let v=1103515245*s+12345;
+  let r=v-v/m*m;
+  if(r<0){<r+m};
+  <r
+};
+f=wins(bettype:$str;num:$i64):$bool{
+  if(str.eq(bettype;"red")){<isred(num)};
+  if(str.eq(bettype;"black")){
+    if(num=0){<false};
+    <!(isred(num))
+  };
+  if(str.eq(bettype;"even")){
+    if(num=0){<false};
+    <(num-num/2*2)=0
+  };
+  if(str.eq(bettype;"odd")){
+    <(num-num/2*2)=1
+  };
+  if(str.startswith(bettype;"number")){
+    let nstr=mt str.slice(bettype;6 as u64;str.len(bettype)){ $ok:v v; $err:e "-1" };
+    let target=mt str.toint(nstr){ $ok:v v; $err:e (0-1) };
+    <num=target
+  };
+  <false
+};
+f=payoutmult(bettype:$str):$i64{
+  if(str.startswith(bettype;"number")){<35};
+  <1
+};
+f=main():$i64{
+  let balstr=io.readln();
+  let balance=mut.(mt str.toint(balstr){ $ok:v v; $err:e 0 });
+  let seedstr=io.readln();
+  let seed=mt str.toint(seedstr){ $ok:v v; $err:e 0 };
+  let state=mut.seed;
+  let spin=mut.0;
+  lp(let i=0;i<100000;i=i+1){
+    let line=io.readln();
+    if(str.len(line)=0){br};
+    let parts=str.split(line;" ");
+    let bettype=parts.get(0 as u64);
+    let amtstr=parts.get(1 as u64);
+    let amount=mt str.toint(amtstr){ $ok:v v; $err:e 0 };
+    state=nextstate(state);
+    let num=state-state/37*37;
+    spin=spin+1;
+    let color=colorof(num;bettype);
+    let won=wins(bettype;num);
+    let outcome=mut."";
+    if(won){
+      let win=amount*payoutmult(bettype);
+      balance=balance+win;
+      outcome=str.concat("Win $";str.fromint(win))
+    }el{
+      balance=balance-amount;
+      outcome=str.concat("Lose $";str.fromint(amount))
+    };
+    let head=str.concat(str.concat(str.concat("Spin ";str.fromint(spin));": ");str.fromint(num));
+    let mid=str.concat(str.concat(head;" ");color);
+    let m2=str.concat(str.concat(mid;" - ");outcome);
+    let m3=str.concat(str.concat(m2;" - Balance: $");str.fromint(balance));
+    io.println(m3)
+  };
+  <0
+};

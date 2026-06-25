@@ -1,1 +1,82 @@
-m=rrt;f=plays(r:$str;p:$str):$str{if(r=p){<r};if(r="rock"){if(p="scissors"){<r};<p};if(r="paper"){if(p="rock"){<r};<p};if(r="scissors"){if(p="paper"){<r};<p}};f=score(r:$str;p:$str):$i64{let res=plays(r;p);if(res=r){<1};if(res=p){<1};<0};f=roundrobin(players:@$str):$i64{let n=players.len;let total=mut.0;lp(let i=0;i<n;i=i+1){lp(let j=i+1;j<n;j=j+1){let s=score(players.get(i));players.get(j));total=total+s;};};<total};f=main():$i64{let players=@("alice";"bob";"charlie";"dave"));<roundrobin(players)};
+m=rrt;i=io:std.io;i=s:std.str;
+f=beats(a:$str;b:$str):$i64{
+if(s.eq(a;b)){<0};
+if(s.eq(a;"R")){if(s.eq(b;"S")){<1}el{<0-1}};
+if(s.eq(a;"P")){if(s.eq(b;"R")){<1}el{<0-1}};
+if(s.eq(a;"S")){if(s.eq(b;"P")){<1}el{<0-1}};
+<0
+};
+f=charat(str:$str;i:$i64):$str{<s.slice(str;i as u64;(i+1) as u64)};
+f=main():$i64{
+let names=mut.@();
+let strats=mut.@();
+let rounds=mut.0;
+let done=mut.0;
+lp(done<1){
+let line=io.readln();
+let t=s.trim(line);
+if(s.len(t)=0){done=1}el{
+if(s.contains(t;" ")){
+let parts=s.split(t;" ");
+names=names+@(s.trim(parts.get(0)));
+strats=strats+@(s.trim(parts.get(1)));
+}el{
+rounds=s.toint(t);
+};
+};
+};
+let np=names.len as $i64;
+let wins=mut.@();
+let draws=mut.@();
+let losses=mut.@();
+lp(let i=0;i<np;i=i+1){wins=wins+@(0);draws=draws+@(0);losses=losses+@(0)};
+lp(let i=0;i<np;i=i+1){
+lp(let j=i+1;j<np;j=j+1){
+let s1=strats.get(i);
+let s2=strats.get(j);
+let l1=s.len(s1) as $i64;
+let l2=s.len(s2) as $i64;
+let w1=mut.0;
+let w2=mut.0;
+lp(let r=0;r<rounds;r=r+1){
+let a=charat(s1;r-r/l1*l1);
+let b=charat(s2;r-r/l2*l2);
+let res=beats(a;b);
+if(res=1){w1=w1+1};
+if(res=0-1){w2=w2+1};
+};
+if(w1>w2){wins=arrinc(wins;i);losses=arrinc(losses;j)}el{
+if(w2>w1){wins=arrinc(wins;j);losses=arrinc(losses;i)}el{
+draws=arrinc(draws;i);draws=arrinc(draws;j)};};
+};
+};
+let order=mut.@();
+lp(let i=0;i<np;i=i+1){order=order+@(i)};
+lp(let pass=0;pass<np;pass=pass+1){
+lp(let k=0;k<np-1;k=k+1){
+let p=order.get(k);
+let q=order.get(k+1);
+if(wins.get(q)>wins.get(p)){
+order=arrset(order;k;q);
+order=arrset(order;k+1;p);
+};
+};
+};
+lp(let i=0;i<np;i=i+1){
+let idx=order.get(i);
+let line=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(
+s.fromint(i+1);". ");names.get(idx));": ");s.fromint(wins.get(idx)));"W ");s.fromint(draws.get(idx)));"D ");s.fromint(losses.get(idx)));
+io.println(s.concat(line;"L"));
+};
+<0
+};
+f=arrinc(a:@$i64;idx:$i64):@$i64{
+let out=mut.@();let n=a.len as $i64;
+lp(let i=0;i<n;i=i+1){if(i=idx){out=out+@(a.get(i)+1)}el{out=out+@(a.get(i))}};
+<out
+};
+f=arrset(a:@$i64;idx:$i64;v:$i64):@$i64{
+let out=mut.@();let n=a.len as $i64;
+lp(let i=0;i<n;i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(a.get(i))}};
+<out
+};

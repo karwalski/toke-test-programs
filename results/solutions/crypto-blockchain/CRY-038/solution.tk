@@ -1,1 +1,26 @@
-m=password;f=password(n:$i64):$str{let len=n;let chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}|:<>?";let result=mut."";lp(let i=0;i<len;i=i+1){let idx=(i as u64)*31;let ch=chars.get(idx);result=result+ch};<result};f=main():$i64{let len=mut.0;let pass=mut."";lp(let i=0;i<1;i=i+1){len=12;pass=password(len);};<0};
+m=password;i=io:std.io;i=s:std.str;i=cr:std.crypto;
+f=pick(set:$str;b:$i64):$str{let n=s.len(set);let idx=b-b/n*n;<s.slice(set;idx;idx+1)};
+f=main():$i64{
+  let line=s.trim(io.readln());
+  let n=mut.s.toint(line);
+  if(n<8){n=8};
+  let upper="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let lower="abcdefghijklmnopqrstuvwxyz";
+  let digit="0123456789";
+  let sym="!@#$%^&*()_+-=";
+  let all="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
+  let rb=cr.randombytes(n as$u64);
+  let chars=mut.@($str);
+  let i=mut.0;
+  lp(i<n){chars=chars+@("");i=i+1};
+  chars=chars.set(0;pick(upper;rb.get(0)));
+  chars=chars.set(1;pick(lower;rb.get(1)));
+  chars=chars.set(2;pick(digit;rb.get(2)));
+  chars=chars.set(3;pick(sym;rb.get(3)));
+  let j=mut.4;
+  lp(j<n){chars=chars.set(j;pick(all;rb.get(j)));j=j+1};
+  let out=mut."";
+  let k=mut.0;
+  lp(k<n){out=s.concat(out;chars.get(k));k=k+1};
+  io.println(out);
+  <0}

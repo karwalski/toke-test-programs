@@ -1,1 +1,14 @@
-m=board;f=boardrows(n:$i64):$i64{<n};f=boardcols(n:$i64):$i64{<n};f=validrow(row:$i64;rows:$i64):$bool{if(row<0){<false};if(row>rows){<false};<true};f=lowestvalidrow(board:$str;col:$i64;rows:$i64):$i64{let i=mut.rows;lp(let j=0;j<1;j=j+1){if(validrow(i-1;rows;rows))){<i-1};i=i-1;if(!(i>0)){<0};};f=solve(p0:$str;p1:$i64;p2:$str):$i64{let board=p0;let col=p1;let rows=boardrows(board);let lowest=lowestvalidrow(board;col;rows);<lowest};
+m=board;i=io:std.io;i=s:std.str;
+f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
+f=pwidth(piece:$str):$i64{if(s.equals(piece;"I")){<4};if(s.equals(piece;"O")){<2};<3};
+f=main():$i64{let rows=mut.@($str);let reading=mut.true;
+lp(reading){let line=s.trim(io.readln());if(s.len(line)=0){reading=false}el{rows=rows+@(line)}};
+let pieceline=s.trim(io.readln());let pp=s.split(pieceline;" ");let piece=pp.get(0);let col=s.toint(pp.get(1));
+let nrows=rows.len();let w=pwidth(piece);
+let ncols=mut.0;if(nrows>0){ncols=s.len(rows.get(0))};
+if(col+w>ncols){io.println("Invalid");<0};
+let landing=mut.-1;
+lp(let r=0;r<nrows;r=r+1){let blocked=mut.false;lp(let c=col;c<col+w;c=c+1){if(s.equals(ch(rows.get(r);c);"X")){blocked=true}};if(!(blocked)){landing=r}el{r=nrows}};
+if(landing<0){io.println("Invalid");<0};
+io.println(s.fromint(landing));
+<0}

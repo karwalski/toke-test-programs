@@ -1,51 +1,190 @@
 m=build;
 i=io:std.io;
-i=s:std.str;
-i=j:std.json;
+i=str:std.str;
 
-f=build(target:$str;inputs:@$str):$str{let output=mut."";let found=mut.false;lp(let i=0;i<inputs.len;i=i+1){let inp=inputs.get(i);if(inp=target){found=true};};if(found){output="build";}el{output="skip";};<output};
+f=streq(a:$str;b:$str):$bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  if(!(la=lb)){<false};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let ok=mut.true;
+  lp(let i=0;i<la;i=i+1){
+    if(!((ba.get(i) as i64)=(bb.get(i) as i64))){ok=false};
+  };
+  <ok
+};
 
-f=main():$i64{
-let input=io.readln();
-let data=j.parse(input);
-let targets=data.get("targets");
-let changed=data.get("changed_files");
-let rebuild=mut.@$str[];
-let needsrebuild=mut.@$str[];
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let plen=str.len(pat) as i64;
+  let start=idx+plen;
+  let olen=str.len(obj) as i64;
+  let rest=mt str.slice(obj;start;olen){ $ok:v v; $err:e "" };
+  let qidx=str.indexof(rest;"\"");
+  if(qidx<0){<rest};
+  <mt str.slice(rest;0;qidx){ $ok:v v; $err:e "" }
+};
 
-lp(let i=0;i<changed.len;i=i+1){
-    let changedfile=changed.get(i);
-    lp(let t=0;t<targets.len;t=t+1){
-        let target=targets.get(t);
-        let name=target.get("name");
-        let inputs=target.get("inputs");
-        lp(let inp=0;inp<inputs.len;inp=inp+1){
-            if(inputs.get(inp)=changedfile){
-                rebuild.add(name);
-            };
-        };
+f=getarr(obj:$str;key:$str):@$str{
+  let pat=str.concat(str.concat("\"";key);"\":[");
+  let idx=str.indexof(obj;pat);
+  let out=mut.@();
+  if(idx<0){<out};
+  let plen=str.len(pat) as i64;
+  let start=idx+plen;
+  let olen=str.len(obj) as i64;
+  let rest=mt str.slice(obj;start;olen){ $ok:v v; $err:e "" };
+  let close=str.indexof(rest;"]");
+  if(close<0){<out};
+  if(close=0){<out};
+  let body=mt str.slice(rest;0;close){ $ok:v v; $err:e "" };
+  let items=str.split(body;",");
+  lp(let i=0;i<(items.len as i64);i=i+1){
+    let it=items.get(i);
+    let t=str.trim(it);
+    let v=str.replace(t;"\"";"");
+    out=out.push(v);
+  };
+  <out
+};
+
+f=contains(arr:@$str;val:$str):$bool{
+  lp(let i=0;i<(arr.len as i64);i=i+1){
+    if(streq(arr.get(i);val)){<true};
+  };
+  <false
+};
+
+f=main():i64{
+  let input=io.readln();
+  let tidx=str.indexof(input;"\"targets\":[");
+  if(tidx<0){<0};
+  let tstart=tidx+(str.len("\"targets\":[") as i64);
+  let ilen=str.len(input) as i64;
+  let afterT=mt str.slice(input;tstart;ilen){ $ok:v v; $err:e "" };
+  let tclose=mut.str.indexof(afterT;"],\"changed_files\"");
+  if(tclose<0){tclose=str.indexof(afterT;"]")};
+  let tbody=mt str.slice(afterT;0;tclose){ $ok:v v; $err:e "" };
+  let parts=str.split(tbody;"},{");
+  let np=parts.len as i64;
+
+  let cidx=str.indexof(input;"\"changed_files\":[");
+  let changed=mut.@();
+  if(!(cidx<0)){
+    let cstart=cidx+(str.len("\"changed_files\":[") as i64);
+    let afterC=mt str.slice(input;cstart;ilen){ $ok:v v; $err:e "" };
+    let cclose=str.indexof(afterC;"]");
+    if(cclose>0){
+      let cbody=mt str.slice(afterC;0;cclose){ $ok:v v; $err:e "" };
+      let citems=str.split(cbody;",");
+      lp(let i=0;i<(citems.len as i64);i=i+1){
+        let t=str.trim(citems.get(i));
+        let v=str.replace(t;"\"";"");
+        changed=changed.push(v);
+      };
     };
-};
+  };
 
-lp(let r=0;r<rebuild.len;r=r+1){
-    let rebuilding=rebuild.get(r);
-    lp(let t=0;t<targets.len;t=t+1){
-        let target=targets.get(t);
-        let name=target.get("name");
-        let depends=target.get("depends_on");
-        lp(let d=0;d<depends.len;d=d+1){
-            if(depends.get(d)=rebuilding){
-                rebuild.add(name);
-            };
-        };
+  let names=mut.@();
+  let rebuild=mut.@();
+  let reason=mut.@();
+  let depnames=mut.@();
+  lp(let i=0;i<np;i=i+1){
+    let raw=parts.get(i);
+    let obj=mut.raw;
+    if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
+    if(!(str.endswith(obj;"}"))){obj=str.concat(obj;"}")};
+    let name=getstr(obj;"name");
+    let inputs=getarr(obj;"inputs");
+    names=names.push(name);
+    let need=mut.false;
+    lp(let k=0;k<(inputs.len as i64);k=k+1){
+      if(contains(changed;inputs.get(k))){need=true};
     };
-};
+    if(need){
+      rebuild=rebuild.push(1);
+      reason=reason.push("input changed");
+    }el{
+      rebuild=rebuild.push(0);
+      reason=reason.push("");
+    };
+  };
+  let cnt=names.len as i64;
 
-io.println("Needs rebuild:");
-lp(let i=0;i<rebuild.len;i=i+1){
-    let name=rebuild.get(i);
-    io.println(s.concat(s.fromint(i+1);". ")+name);
-};
+  let changedflag=mut.true;
+  lp(let pass=0;pass<cnt+1;pass=pass+1){
+    lp(let i=0;i<np;i=i+1){
+      if(rebuild.get(i)=0){
+        let raw=parts.get(i);
+        let obj=mut.raw;
+        if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
+        if(!(str.endswith(obj;"}"))){obj=str.concat(obj;"}")};
+        let deps=getarr(obj;"depends_on");
+        lp(let d=0;d<(deps.len as i64);d=d+1){
+          let dn=deps.get(d);
+          lp(let tt=0;tt<cnt;tt=tt+1){
+            if(streq(names.get(tt);dn)){
+              if(rebuild.get(tt)=1){
+                if(rebuild.get(i)=0){
+                  rebuild=rebuild.set(i;1);
+                  reason=reason.set(i;str.concat(str.concat("dependency ";dn);" changed"));
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+  };
 
-<0
-}
+  let totalrebuild=mut.0;
+  lp(let i=0;i<cnt;i=i+1){
+    if(rebuild.get(i)=1){totalrebuild=totalrebuild+1};
+  };
+  if(totalrebuild=0){<0};
+
+  let emitted=mut.@();
+  lp(let i=0;i<cnt;i=i+1){emitted=emitted.push(0)};
+  let order=mut.@();
+  lp(let pass=0;pass<cnt;pass=pass+1){
+    lp(let i=0;i<cnt;i=i+1){
+      if(emitted.get(i)=0){
+        if(rebuild.get(i)=1){
+          let raw=parts.get(i);
+          let obj=mut.raw;
+          if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
+          if(!(str.endswith(obj;"}"))){obj=str.concat(obj;"}")};
+          let deps=getarr(obj;"depends_on");
+          let ready=mut.true;
+          lp(let d=0;d<(deps.len as i64);d=d+1){
+            let dn=deps.get(d);
+            lp(let tt=0;tt<cnt;tt=tt+1){
+              if(streq(names.get(tt);dn)){
+                if(rebuild.get(tt)=1){
+                  if(emitted.get(tt)=0){ready=false};
+                };
+              };
+            };
+          };
+          if(ready){
+            order=order.push(i);
+            emitted=emitted.set(i;1);
+          };
+        };
+      };
+    };
+  };
+
+  io.println("Needs rebuild:");
+  lp(let k=0;k<(order.len as i64);k=k+1){
+    let i=order.get(k);
+    let num=str.fromint(k+1);
+    let line=str.concat(str.concat(num;". ");str.concat(names.get(i);" ("));
+    let full=str.concat(str.concat(line;reason.get(i));")");
+    io.println(full);
+  };
+  <0
+};

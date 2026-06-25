@@ -1,1 +1,97 @@
-m=summary;f=average(scores:@$i64):$f64{let total=mut.0;lp(let i=0;i<scores.len;i=i+1){total=total+scores.get(i)});let count=scores.len as$f64;<total as$f64/count};f=median(scores:@$i64):$i64{let n=scores.len;let sorted=mut.scores;lp(let i=0;i<n;i=i+1){lp(let j=0;j<n-1-i;j=j+1){if(sorted.get(j)>sorted.get(j+1))){let tmp=sorted.get(j);sorted.get(j)=sorted.get(j+1);sorted.get(j+1)=tmp;};};};let mid=n/2;if(n-n/2*2=0){<sorted.get(mid-1)+sorted.get(mid))/2};<sorted.get(mid)};f=mode(scores:@$i64):$i64{let n=scores.len;let freq=mut.@();lp(let i=0;i<n;i=i+1){let found=mut.false;lp(let j=0;j<freq.len;j=j+1){if(freq
+m=summary;
+i=io:std.io;
+i=str:std.str;
+i=math:std.math;
+
+f=fmt1(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*10.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/10;
+  let frac=asint-whole*10;
+  let sign=mut."";
+  if(neg){sign="-"};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");str.fromint(frac))
+};
+
+f=main():i64{
+  let line=io.readln();
+  let parts=str.split(str.trim(line);" ");
+  let n=parts.len as i64;
+  let vals=mut.@();
+  lp(let i=0;i<n;i=i+1){
+    let p=parts.get(i);
+    if(!(str.len(p)=0)){
+      let v=mt str.toint(p){ $ok:x x; $err:e 0 };
+      vals=vals+@(v);
+    };
+  };
+  let cnt=vals.len as i64;
+  let total=mut.0;
+  let mn=mut.vals.get(0);
+  let mx=mut.vals.get(0);
+  let passcnt=mut.0;
+  lp(let i=0;i<cnt;i=i+1){
+    let v=vals.get(i);
+    total=total+v;
+    if(v<mn){mn=v};
+    if(v>mx){mx=v};
+    if(!(v<50)){passcnt=passcnt+1};
+  };
+  let mean=(total as f64)/(cnt as f64);
+
+  let sorted=mut.@();
+  lp(let i=0;i<cnt;i=i+1){sorted=sorted+@(vals.get(i))};
+  lp(let i=0;i<cnt;i=i+1){
+    lp(let j=0;j<cnt-1-i;j=j+1){
+      if(sorted.get(j)>sorted.get(j+1)){
+        let a=sorted.get(j);
+        let b=sorted.get(j+1);
+        sorted=sorted.set(j;b);
+        sorted=sorted.set(j+1;a);
+      };
+    };
+  };
+  let med=mut.0.0;
+  let mid=cnt/2;
+  if(cnt-cnt/2*2=0){
+    med=((sorted.get(mid-1)+sorted.get(mid)) as f64)/2.0;
+  }el{
+    med=sorted.get(mid) as f64;
+  };
+
+  let modeval=mut.sorted.get(0);
+  let modecount=mut.0;
+  lp(let i=0;i<cnt;i=i+1){
+    let cand=sorted.get(i);
+    let c=mut.0;
+    lp(let j=0;j<cnt;j=j+1){
+      if(sorted.get(j)=cand){c=c+1};
+    };
+    if(c>modecount){
+      modecount=c;
+      modeval=cand;
+    };
+  };
+
+  let sumsq=mut.0.0;
+  lp(let i=0;i<cnt;i=i+1){
+    let diff=(vals.get(i) as f64)-mean;
+    sumsq=sumsq+diff*diff;
+  };
+  let variance=sumsq/(cnt as f64);
+  let sd=math.sqrt(variance);
+
+  let passrate=(passcnt*100+cnt/2)/cnt;
+
+  io.println(str.concat("mean: ";fmt1(mean)));
+  io.println(str.concat("median: ";fmt1(med)));
+  io.println(str.concat("mode: ";str.fromint(modeval)));
+  io.println(str.concat("min: ";str.fromint(mn)));
+  io.println(str.concat("max: ";str.fromint(mx)));
+  io.println(str.concat("stddev: ";fmt1(sd)));
+  io.println(str.concat(str.concat("pass_rate: ";str.fromint(passrate));"%"));
+  <0
+};

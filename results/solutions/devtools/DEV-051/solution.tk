@@ -1,1 +1,94 @@
-m=duprate;f=extractlines(code:$str):@$str{let lines=mut.@();let current=mut."";let i=mut.0;lp(let idx=0;idx<code.len;idx=idx+1){let ch=code.get(idx);if(ch="\n"){lines=lines+@(current);current="";}el{current=current+ch;};};if(!(current="")){lines=lines+@(current);};<lines};f=countunique(lines:@$str):$i64{let seen=mut.@();let i=mut.0;lp(let idx=0;idx<lines.len;idx=idx+1){let current=lines.get(idx);let found=mut.false;let j=mut.0;lp(let k=0;k<seen.len;k=k+1){if(seen.get(k)=current){found=true;};};if(!(found=true)){seen=seen+@(current);};};<seen.len as i64};f=main():$i64{let code="fn foo(){let x=42;let y=x;}fn bar(){let a=42;let b=a;}}";let lines=extract
+m=duprate;
+i=io:std.io;
+i=s:std.str;
+i=file:std.file;
+
+f=streq(a:$str;b:$str):bool{
+  if(s.len(a)!=s.len(b)){<false};
+  let n=s.len(a) as i64;
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  lp(let i=0;i<n;i=i+1){
+    if(ba.get(i as u64)!=bb.get(i as u64)){<false}
+  };
+  <true
+};
+
+f=iscomment(line:$str):bool{
+  let t=s.trim(line);
+  if(s.len(t)=0){<true};
+  let first=mt s.slice(t;0;1){ $ok:v v; $err:e "" };
+  if(first="#"){<true};
+  if(s.len(t) as i64>=2){
+    let two=mt s.slice(t;0;2){ $ok:v v; $err:e "" };
+    if(two="//"){<true}
+  };
+  <false
+};
+
+f=main():i64{
+  let files=mut.@();
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    let p=s.trim(line);
+    if(s.len(p)>0){ files=files.push(p) }
+  };
+
+  let nf=files.len as i64;
+
+  let allsets=mut.@();
+  let counts=mut.@();
+
+  lp(let f=0;f<nf;f=f+1){
+    let path=files.get(f as u64);
+    let content=mt file.read(path){ $ok:v v; $err:e "" };
+    let rawlines=s.split(content;"\n");
+    let uniq=mut.@();
+    lp(let i=0;i<rawlines.len;i=i+1){
+      let ln=rawlines.get(i);
+      if(iscomment(ln)=false){
+        let key=s.trim(ln);
+        let seen=mut.false;
+        lp(let j=0;j<uniq.len;j=j+1){
+          if(streq(uniq.get(j);key)){seen=true}
+        };
+        if(seen=false){ uniq=uniq.push(key) }
+      }
+    };
+    allsets=allsets.push(uniq.len as i64);
+    counts=counts.push(uniq)
+  };
+
+  let totallines=mut.0;
+  let totaldup=mut.0;
+
+  lp(let f=0;f<nf;f=f+1){
+    let mineset=counts.get(f as u64);
+    let nlines=mineset.len as i64;
+    let dup=mut.0;
+    lp(let i=0;i<mineset.len;i=i+1){
+      let lk=mineset.get(i);
+      let inother=mut.false;
+      lp(let g=0;g<nf;g=g+1){
+        if(g!=f as i64){
+          let oset=counts.get(g as u64);
+          lp(let j=0;j<oset.len;j=j+1){
+            if(streq(oset.get(j);lk)){inother=true}
+          }
+        }
+      };
+      if(inother){dup=dup+1}
+    };
+    let pct=mut.0;
+    if(nlines>0){pct=dup*100/nlines};
+    io.println(s.concat(s.concat(s.concat(s.concat(files.get(f as u64);": ");s.fromint(nlines));" lines (");s.concat(s.concat(s.fromint(pct);"% duplicated)");"")));
+    totallines=totallines+nlines;
+    totaldup=totaldup+dup
+  };
+
+  let overall=mut.0;
+  if(totallines>0){overall=totaldup*100/totallines};
+  io.println(s.concat(s.concat("Overall: ";s.fromint(overall));"% duplication"));
+  <0
+}

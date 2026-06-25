@@ -1,1 +1,16 @@
-m=awards;f=calculateawards(scores:@$i64):@$str{let result=mut.@();lp(let i=0;i<scores.len;i=i+1){let score=scores.get(i);let award=mut."";if(score>90){award="gold"}el{if(score>80){award="silver"}el{if(score>70){award="bronze"}el{award="none"}}}};result=result+@(award)};};<result};f=main():$void{let scores=@(95;85;75;65;55));let awards=calculateawards(scores);lp(let i=0;i<awards.len;i=i+1){let award=awards.get(i);let output=mut."";if(award="gold"){output="Gold Award"}el{if(award="silver"){output="Silver Award"}el{if(award="bronze"){output="Bronze Award"}el{output="No Award"}}}};let idx=i as$str;let msg=output+@" for student #";let fullmsg=msg+idx;let finalmsg=fullmsg+@".";let finalfinalmsg=finalmsg
+m=awards;i=io:std.io;i=s:std.str;
+f=getstr(json:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":\"");let parts=s.split(json;pat);if(parts.len()<2){<""};let rest=parts.get(1);let endp=s.split(rest;"\"");<endp.get(0)};
+f=getnum(json:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":");let parts=s.split(json;pat);if(parts.len()<2){<"0"};let rest=parts.get(1);let b=s.split(rest;"}");let cm=s.split(b.get(0);",");<s.trim(cm.get(0))};
+f=main():$i64{let input=io.readln();
+let objs=s.split(input;"{");
+lp(let i=0;i<objs.len();i=i+1){let o=objs.get(i);if(s.contains(o;"student")){
+let name=getstr(o;"student");
+let gpa=s.tofloat(getnum(o;"gpa"));
+let att=s.tofloat(getnum(o;"attendance_pct"));
+let part=s.tofloat(getnum(o;"participation_score"));
+let awards=mut.@($str);
+if(gpa>=3.5){awards=awards+@("Academic Excellence")};
+if(att>=95.0){awards=awards+@("Perfect Attendance")};
+if(part>=8.0){awards=awards+@("Most Engaged")};
+if(awards.len()>0){let line=mut.s.concat(name;": ");lp(let j=0;j<awards.len();j=j+1){if(j>0){line=s.concat(line;", ")};line=s.concat(line;awards.get(j))};io.println(line)}}};
+<0}

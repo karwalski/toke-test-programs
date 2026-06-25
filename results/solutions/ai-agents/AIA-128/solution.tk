@@ -1,58 +1,198 @@
-{
-  "m": "replan";
-  "f": "replan(plan:i64;completed:i64;failed:i64;goal:$str):$str{
-    let steps=plan.steps;
-    let remaining=mut.@();
-    lp(let i=0;i<steps.len;i=i+1){
-      let step=steps.get(i);
-      let should_add=mut.false;
-      if(step.id<0){should_add=true}el{
-        let is_completed=mut.false;
-        lp(let j=0;j<completed.len;j=j+1){
-          if(completed.get(j)=step.id){is_completed=true}
-        };
-        if(!is_completed){should_add=true}
-      };
-      if(should_add){remaining=remaining.push(step)}
+m=replanner;i=io:std.io;i=s:std.str;
+f=arrclose(t:$str):$i64{
+  let n=s.len(t) as i64;let depth=mut.0;let i=mut.0;let instr=mut.false;
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(instr){if(s.eq(ch;"\"")){instr=false}}el{
+      if(s.eq(ch;"\"")){instr=true}el{
+        if(s.eq(ch;"[")){depth=depth+1}el{
+          if(s.eq(ch;"]")){if(depth=0){<i};depth=depth-1}
+        }
+      }
     };
-    let revised=mut.@();
-    lp(let i=0;i<remaining.len;i=i+1){
-      let step=remaining.get(i);
-      let new_step=mut.step;
-      if(step.id<0){
-        new_step=step.copywith(id=step.id*-1))
-      };
-      revised=revised.push(new_step)
+    i=i+1
+  };
+  <n
+};
+f=objclose(t:$str):$i64{
+  let n=s.len(t) as i64;let depth=mut.0;let i=mut.0;let instr=mut.false;
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(instr){if(s.eq(ch;"\"")){instr=false}}el{
+      if(s.eq(ch;"\"")){instr=true}el{
+        if(s.eq(ch;"{")){depth=depth+1}el{
+          if(s.eq(ch;"}")){if(depth=0){<i};depth=depth-1}
+        }
+      }
     };
-    let output=mut."";
-    lp(let i=0;i<revised.len;i=i+1){
-      let step=revised.get(i);
-      let line=mut."";
-      line=line+step.id;
-      line=line+": ";
-      line=line+step.action;
-      if(step.status="pending"){
-        line=line+" [pending]"
-      }el{
-        if(step.status="in_progress"){
-          line=line+" [in_progress]"
-        }el{
-          if(step.status="completed"){
-            line=line+" [completed]"
+    i=i+1
+  };
+  <n
+};
+f=getstr(obj:$str;key:$str):$str{
+  let k=s.concat(s.concat("\"";key);"\":\"");
+  let idx=s.indexof(obj;k);
+  if(idx<0){<""};
+  let rest=s.slice(obj;idx+s.len(k) as i64;s.len(obj) as i64);
+  let endq=s.indexof(rest;"\"");
+  <s.slice(rest;0;endq)
+};
+(* derive a readable resource name from an action like fetch_api_b -> "API B" *)
+f=resname(action:$str):$str{
+  let parts=s.split(action;"_");
+  let out=mut."";
+  let started=mut.false;
+  lp(let i=0;i<parts.len();i=i+1){
+    let w=parts.get(i);
+    if(started){
+      if(s.len(out) as i64>0){out=s.concat(out;" ")};
+      out=s.concat(out;s.upper(w))
+    };
+    if(s.eq(w;"fetch")){started=true}
+  };
+  <out
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  (* original_plan *)
+  let pk="\"original_plan\":[";
+  let pki=s.indexof(json;pk);
+  let prest=s.slice(json;pki+s.len(pk) as i64;jn);
+  let pclose=arrclose(prest);
+  let pseg=s.slice(prest;0;pclose);
+  let psl=s.len(pseg) as i64;
+  let pids=mut.@();
+  let pacts=mut.@();
+  let pp=mut.0;
+  lp(pp<psl){
+    let oc=s.slice(pseg;pp;pp+1);
+    if(s.eq(oc;"{")){
+      let after=s.slice(pseg;pp+1;psl);
+      let endb=objclose(after);
+      let objs=s.slice(after;0;endb);
+      pids=pids+@(getstr(objs;"id"));
+      pacts=pacts+@(getstr(objs;"action"));
+      pp=pp+1+endb+1
+    }el{pp=pp+1}
+  };
+  (* completed: array of strings *)
+  let ck="\"completed\":[";
+  let cki=s.indexof(json;ck);
+  let crest=s.slice(json;cki+s.len(ck) as i64;jn);
+  let cclose=arrclose(crest);
+  let cseg=s.slice(crest;0;cclose);
+  let completed=mut.@();
+  let csl=s.len(cseg) as i64;
+  let cp=mut.0;
+  lp(cp<csl){
+    let ch=s.slice(cseg;cp;cp+1);
+    if(s.eq(ch;"\"")){
+      let after=s.slice(cseg;cp+1;csl);
+      let endq=s.indexof(after;"\"");
+      completed=completed+@(s.slice(after;0;endq));
+      cp=cp+1+endq+1
+    }el{cp=cp+1}
+  };
+  (* failed: array of {step_id,error} *)
+  let fk="\"failed\":[";
+  let fki=s.indexof(json;fk);
+  let frest=s.slice(json;fki+s.len(fk) as i64;jn);
+  let fclose=arrclose(frest);
+  let fseg=s.slice(frest;0;fclose);
+  let fsl=s.len(fseg) as i64;
+  let failedids=mut.@();
+  let fp=mut.0;
+  lp(fp<fsl){
+    let oc=s.slice(fseg;fp;fp+1);
+    if(s.eq(oc;"{")){
+      let after=s.slice(fseg;fp+1;fsl);
+      let endb=objclose(after);
+      let objs=s.slice(after;0;endb);
+      failedids=failedids+@(getstr(objs;"step_id"));
+      fp=fp+1+endb+1
+    }el{fp=fp+1}
+  };
+  (* --- determine recoverability: every failed step must be a fetch (cacheable) --- *)
+  let allrecover=mut.true;
+  lp(let i=0;i<failedids.len();i=i+1){
+    let fid=failedids.get(i);
+    (* find action for this id *)
+    let act=mut."";
+    lp(let j=0;j<pids.len();j=j+1){
+      if(s.eq(pids.get(j);fid)){act=pacts.get(j)}
+    };
+    if(!(s.contains(act;"fetch"))){allrecover=false}
+  };
+  let revised=mut.@();
+  let adaptations=mut.@();
+  let hasreport=mut.false;
+  let stalename=mut."";
+  if(allrecover){
+    if(failedids.len()>0){
+      (* iterate plan in order; build revised steps for uncompleted work *)
+      lp(let i=0;i<pids.len();i=i+1){
+        let id=pids.get(i);
+        let act=pacts.get(i);
+        (* skip completed *)
+        let iscompleted=mut.false;
+        lp(let c=0;c<completed.len();c=c+1){if(s.eq(completed.get(c);id)){iscompleted=true}};
+        (* is failed? *)
+        let isfailed=mut.false;
+        lp(let f=0;f<failedids.len();f=f+1){if(s.eq(failedids.get(f);id)){isfailed=true}};
+        if(!(iscompleted)){
+          if(isfailed){
+            let rn=resname(act);
+            stalename=rn;
+            let alt=mut."{\"id\":\"";
+            alt=s.concat(alt;id);
+            alt=s.concat(alt;"_alt\",\"action\":\"");
+            alt=s.concat(alt;act);
+            alt=s.concat(alt;"_cache\",\"description\":\"Use cached data from ");
+            alt=s.concat(alt;rn);
+            alt=s.concat(alt;"\"}");
+            revised=revised+@(alt);
+            let adp=mut."Replaced live ";
+            adp=s.concat(adp;rn);
+            adp=s.concat(adp;" fetch with cached data due to API being down");
+            adaptations=adaptations+@(adp)
           }el{
-            if(step.status="failed"){
-              line=line+" [failed: "+step.error+"]"
+            if(s.contains(act;"report")){
+              hasreport=true;
+              let rs=mut."{\"id\":\"";
+              rs=s.concat(rs;id);
+              rs=s.concat(rs;"\",\"action\":\"");
+              rs=s.concat(rs;act);
+              rs=s.concat(rs;"\",\"note\":\"Mark ");
+              rs=s.concat(rs;stalename);
+              rs=s.concat(rs;" data as potentially stale\"}");
+              revised=revised+@(rs)
             }el{
-              line=line+" [unknown status]"
+              let ns=mut."{\"id\":\"";
+              ns=s.concat(ns;id);
+              ns=s.concat(ns;"\",\"action\":\"");
+              ns=s.concat(ns;act);
+              ns=s.concat(ns;"\"}");
+              revised=revised+@(ns)
             }
           }
         }
       };
-      output=output+line;
-      if(!(i=(revised.len-1)))){output=output+"\n"}
-    };
-    <output
-  }";
-  "i": "std.llm:llm_call";
-  "t": "step:{id:$str;action:$str;status:$str;error:$str}"
+      if(hasreport){adaptations=adaptations+@("Added staleness warning to report")}
+    }
+  };
+  (* build output *)
+  let out=mut."{\"revised_plan\":[";
+  lp(let i=0;i<revised.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(out;revised.get(i))
+  };
+  out=s.concat(out;"],\"adaptations\":[");
+  lp(let i=0;i<adaptations.len();i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    out=s.concat(s.concat(s.concat(out;"\"");adaptations.get(i));"\"")
+  };
+  out=s.concat(out;"]}");
+  io.println(out);
+  <0
 }

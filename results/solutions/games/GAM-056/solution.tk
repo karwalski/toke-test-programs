@@ -1,1 +1,28 @@
-m=mastermind;f=checkguess(secret:$str;guess:$str):$str{let result=mut."";let i=mut.0;lp(let idx=0;idx<guess.len;idx=idx+1){let g=guess.get(idx);let s=secret.get(idx);if(g=s){result=s.concat(result;"B");}el{let found=mut.false;lp(let jdx=0;jdx<secret.len;jdx=jdx+1){if(!(jdx=idx))){if(secret.get(jdx)=g)){found=true;};};};if(found){result=s.concat(result;"C");}el{result=s.concat(result;"-");};};};<result};f=playround(secret:$str):$str{let guess=mut."";let valid=mut.false;lp(let idx=0;idx<10;idx=idx+1){let c=guess.get(idx);if(!(c=0 as$str))){valid=true;};};if(!(valid)){<guess};let result=checkguess(secret;guess);<result};f=mastermind():$str{let secret=mut."";let i=mut.0;lp(let idx=0;idx<4;idx=idx
+m=mastermind;i=io:std.io;i=s:std.str;
+f=charat(str:$str;i:$i64):$str{<s.slice(str;i as u64;(i+1) as u64)};
+f=contains(secret:$str;ch:$str):$bool{
+let n=s.len(secret) as $i64;
+lp(let i=0;i<n;i=i+1){if(s.eq(charat(secret;i);ch)){<true}};
+<false
+};
+f=main():$i64{
+let secretline=io.readln();
+let secret=s.trim(secretline);
+let n=s.len(secret) as $i64;
+let done=mut.0;
+lp(done<1){
+let line=io.readln();
+let g=s.trim(line);
+if(s.len(g)=0){done=1}el{
+let bulls=mut.0;
+let cows=mut.0;
+lp(let i=0;i<n;i=i+1){
+let gch=charat(g;i);
+let sch=charat(secret;i);
+if(s.eq(gch;sch)){bulls=bulls+1}el{if(contains(secret;gch)){cows=cows+1}};
+};
+io.println(s.concat(s.concat(s.concat(s.fromint(bulls);"A");s.fromint(cows));"B"));
+};
+};
+<0
+};

@@ -1,1 +1,229 @@
-m=versioncheck;f=solve(p0:@$str;p1:@$str):bool{let result=mut.true;lp(let i=0;i<p0.len;i=i+1){let pkgname=p0.get(i);let requiredversion=p1.get(i);let found=mut.false;let installedversion=mut."";lp(let j=0;j<p0.len;j=j+1){if(p0.get(j)=pkgname)){found=true;installedversion=p1.get(j);};};if(found){let reqmaj=mut.0;let reqmin=mut.0;let instmaj=mut.0;let instmin=mut.0;let idx=mut.0;lp(let k=0;k<requiredversion.len;k=k+1){let ch=requiredversion.get(k);if(ch="." as u8){idx=k+1;reqmaj=mut.0;reqmin=mut.0;lp(let m=0;m<idx;m=m+1){let digit=requiredversion.get(m);if(!(digit<"0"as u8)){if(!(digit>"9"as u8)){let val=digit as u8-"0"as u8;reqmaj=reqmaj
+m=versioncheck;
+i=io:std.io;
+i=str:std.str;
+
+f=streq(a:$str;b:$str):bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  if(!(la=lb)){<false};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let ok=mut.true;
+  lp(let i=0;i<la;i=i+1){
+    if(!(ba.get(i)=bb.get(i))){ok=false};
+  };
+  <ok
+};
+
+f=isdigit(b:byte):bool{
+  let z=str.bytes("0").get(0);
+  let n=str.bytes("9").get(0);
+  if(b<z){<false};
+  if(b>n){<false};
+  <true
+};
+
+f=parsekeys(obj:$str):@$str{
+  let keys=mut.@();
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let q=str.bytes("\"").get(0);
+  let colon=str.bytes(":").get(0);
+  let i=mut.0;
+  lp(let g=0;g<n;g=g+1){
+    if(i<n){
+      let c=bytes.get(i);
+      if(c=q){
+        let start=i+1;
+        let j=mut.start;
+        let endpos=mut.start;
+        let done=mut.false;
+        lp(let h=0;h<n;h=h+1){
+          if(!(done)){
+            if(j<n){
+              if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1};
+            }el{done=true};
+          };
+        };
+        let tok=mt str.slice(obj;start as u64;endpos as u64){ $ok:v v; $err:e "" };
+        let after=endpos+1;
+        let iscolon=mut.false;
+        if(after<n){ if(bytes.get(after)=colon){iscolon=true} };
+        if(iscolon){
+          keys=keys.push(tok);
+        };
+        i=endpos+1;
+      }el{
+        i=i+1;
+      };
+    };
+  };
+  <keys
+};
+
+f=getval(obj:$str;key:$str):$str{
+  let needle=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;needle);
+  if(idx<0){<""};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(obj);
+  let n=str.len(obj) as i64;
+  let q=str.bytes("\"").get(0);
+  let j=mut.start;
+  let endpos=mut.start;
+  let done=mut.false;
+  lp(let h=0;h<n;h=h+1){
+    if(!(done)){
+      if(j<n){
+        if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1};
+      }el{done=true};
+    };
+  };
+  <mt str.slice(obj;start as u64;endpos as u64){ $ok:v v; $err:e "" }
+};
+
+f=verpart(ver:$str;which:$i64):$i64{
+  let bytes=str.bytes(ver);
+  let n=str.len(ver) as i64;
+  let part=mut.0;
+  let cur=mut.0;
+  let dot=str.bytes(".").get(0);
+  let i=mut.0;
+  let started=mut.false;
+  lp(let g=0;g<n;g=g+1){
+    if(i<n){
+      let c=bytes.get(i);
+      if(c=dot){
+        part=part+1;
+      }el{
+        if(isdigit(c)){
+          if(part=which){
+            cur=cur*10+((c as i64)-48);
+            started=true;
+          };
+        };
+      };
+      i=i+1;
+    };
+  };
+  <cur
+};
+
+f=cmpver(a:$str;b:$str):$i64{
+  let am=verpart(a;0);
+  let bm=verpart(b;0);
+  if(am<bm){<-1};
+  if(am>bm){<1};
+  let an=verpart(a;1);
+  let bn=verpart(b;1);
+  if(an<bn){<-1};
+  if(an>bn){<1};
+  let ap=verpart(a;2);
+  let bp=verpart(b;2);
+  if(ap<bp){<-1};
+  if(ap>bp){<1};
+  <0
+};
+
+f=satisfies(ver:$str;con:$str):bool{
+  let cn=str.len(con) as i64;
+  let bytes=str.bytes(con);
+  let c0=bytes.get(0);
+  let ge=str.bytes(">").get(0);
+  let le=str.bytes("<").get(0);
+  let eqs=str.bytes("=").get(0);
+  let caret=str.bytes("^").get(0);
+  let tilde=str.bytes("~").get(0);
+  let op=mut."=";
+  let vstart=mut.0;
+  if(c0=ge){
+    if(cn>1){ if(bytes.get(1)=eqs){op=">=";vstart=2}el{op=">";vstart=1} }el{op=">";vstart=1};
+  }el{ if(c0=le){
+    if(cn>1){ if(bytes.get(1)=eqs){op="<=";vstart=2}el{op="<";vstart=1} }el{op="<";vstart=1};
+  }el{ if(c0=eqs){
+    op="=";vstart=1;
+  }el{ if(c0=caret){
+    op="^";vstart=1;
+  }el{ if(c0=tilde){
+    op="~";vstart=1;
+  }el{
+    op="=";vstart=0;
+  }}}}};
+  let target=mt str.slice(con;vstart as u64;cn as u64){ $ok:v v; $err:e con };
+  let cmp=cmpver(ver;target);
+  if(streq(op;">=")){ if(!(cmp<0)){<true}el{<false} };
+  if(streq(op;"<=")){ if(!(cmp>0)){<true}el{<false} };
+  if(streq(op;">")){ if(cmp>0){<true}el{<false} };
+  if(streq(op;"<")){ if(cmp<0){<true}el{<false} };
+  if(streq(op;"=")){ if(cmp=0){<true}el{<false} };
+  if(streq(op;"^")){
+    let vmaj=verpart(ver;0);
+    let tmaj=verpart(target;0);
+    if(!(vmaj=tmaj)){<false};
+    if(!(cmp<0)){<true}el{<false}
+  };
+  if(streq(op;"~")){
+    let vmaj=verpart(ver;0);
+    let tmaj=verpart(target;0);
+    let vmin=verpart(ver;1);
+    let tmin=verpart(target;1);
+    if(!(vmaj=tmaj)){<false};
+    if(!(vmin=tmin)){<false};
+    if(!(cmp<0)){<true}el{<false}
+  };
+  <false
+};
+
+f=strlt(a:$str;b:$str):bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  let m=mut.la;
+  if(lb<la){m=lb};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let i=mut.0;
+  let res=mut.0;
+  let decided=mut.false;
+  lp(let g=0;g<m;g=g+1){
+    if(!(decided)){
+      let ca=ba.get(i);
+      let cb=bb.get(i);
+      if(ca<cb){res=-1;decided=true}el{ if(cb<ca){res=1;decided=true} };
+      i=i+1;
+    };
+  };
+  if(decided){ if(res<0){<true}el{<false} };
+  if(la<lb){<true};
+  <false
+};
+
+f=main():i64{
+  let installed=io.readln();
+  let constraints=io.readln();
+  let keys=parsekeys(installed);
+  let nk=keys.len as i64;
+  let sorted=mut.@();
+  lp(let i=0;i<nk;i=i+1){ sorted=sorted.push(keys.get(i)); };
+  lp(let i=0;i<nk;i=i+1){
+    lp(let j=0;j<nk-1;j=j+1){
+      let a=sorted.get(j);
+      let b=sorted.get(j+1);
+      if(strlt(b;a)){
+        let tmp=a;
+        sorted=sorted.set(j;b);
+        sorted=sorted.set(j+1;tmp);
+      };
+    };
+  };
+  lp(let i=0;i<nk;i=i+1){
+    let pkg=sorted.get(i);
+    let ver=getval(installed;pkg);
+    let con=getval(constraints;pkg);
+    if(satisfies(ver;con)){
+      io.println(str.concat(str.concat(str.concat(pkg;": SATISFIED (");ver);")"));
+    }el{
+      io.println(str.concat(str.concat(str.concat(str.concat(str.concat(pkg;": VIOLATED (");ver);", requires ");con);")"));
+    };
+  };
+  <0
+};

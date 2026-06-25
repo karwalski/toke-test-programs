@@ -1,1 +1,41 @@
-m=chipstack;f=optimalbreakdown(val:$i64;denoms:@$i64):@$i64{let result=mut.@();let remaining=mut.val;lp(let i=0;i<denoms.len;i=i+1){let denom=denoms.get(i);let count=mut.0;lp(let j=0;j<1000;j=j+1){if(remaining<denom){br};remaining=remaining-denom;count=count+1};result=result+@(count)};<result};f=main():$i64{let denoms=@(100;50;20;10;5;1));let val=mut.47;let result=optimalbreakdown(val;denoms);lp(let i=0;i<result.len;i=i+1){let count=result.get(i);<count;};<0};
+m=chipstack;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let first=io.readln();
+let toks=s.split(s.trim(first);" ");
+let nt=toks.len as $i64;
+let denoms=mut.@();
+let counts=mut.@();
+lp(let i=0;i<nt;i=i+1){
+let tk=s.trim(toks.get(i));
+if(s.len(tk)>0){
+let dc=s.split(tk;":");
+denoms=denoms+@(s.toint(dc.get(0)));
+counts=counts+@(s.toint(dc.get(1)));
+};
+};
+let nd=denoms.len as $i64;
+let total=mut.0;
+lp(let i=0;i<nd;i=i+1){total=total+denoms.get(i)*counts.get(i)};
+let done=mut.0;
+lp(done<1){
+let line=io.readln();
+let t=s.trim(line);
+if(s.len(t)=0){done=1}el{
+let amt=s.toint(t);
+if(amt>total){io.println("Cannot make amount")}el{
+let rem=mut.amt;
+let out=mut.s.concat(s.fromint(amt);":");
+lp(let i=0;i<nd;i=i+1){
+let d=denoms.get(i);
+let use=rem/d;
+if(use>0){
+out=s.concat(out;s.concat(s.concat(s.concat(" ";s.fromint(use));"x");s.fromint(d)));
+rem=rem-use*d;
+};
+};
+if(rem!=0){io.println("Cannot make amount")}el{io.println(out)};
+};
+};
+};
+<0
+};

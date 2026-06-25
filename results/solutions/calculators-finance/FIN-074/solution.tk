@@ -1,40 +1,49 @@
 m=invoice;
 i=io:std.io;
 i=s:std.str;
-f=calcprice(qty:$i64;price:$f64):$f64{let total=qty*price;let discount=total*0.1;if(discount>0.0){let final=total-discount;<final}el{<total}};
-f=invoice(items:@$str;qty:@$i64;price:@$f64):$f64{let total=mut.0.0;lp(let idx=0;idx<items.len;idx=idx+1){let item=items.get(idx);let q=qty.get(idx);let p=price.get(idx);let itemtotal=calcprice(q;p);total=total+itemtotal};<total};
-f=main():$i64{
-let items=mut@$str{};
-let qtys=mut@$i64{};
-let prices=mut@$f64{};
-let subtotal=mut.0.0;
-let discounttotal=mut.0.0;
-let taxrate=mut.0.0;
-lp(let continue=mut.true;continue){
-let line=io.readln();
-let parts=s.split(line;" ");
-if(s.equals(parts.get(0);"TAX")){
-taxrate=s.tofloat(parts.get(1));
-continue=false
-}el{
-items.add(parts.get(0));
-qtys.add(s.toint(parts.get(1)));
-prices.add(s.tofloat(parts.get(2)));
-let qty=s.toint(parts.get(1));
-let price=s.tofloat(parts.get(2));
-let discount=s.tofloat(parts.get(3));
-let itemsub=qty as$f64*price;
-let itemdiscount=itemsub*discount/100.0;
-subtotal=subtotal+itemsub;
-discounttotal=discounttotal+itemdiscount
-}
+f=fmt2(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let n=mut.scaled as i64;
+  let intpart=n/100;
+  let frac=n-intpart*100;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  let res=mut.s.concat(s.fromint(intpart);s.concat(".";fracstr));
+  if(neg){res=s.concat("-";res)};
+  <res
 };
-let taxableamount=subtotal-discounttotal;
-let taxamount=taxableamount*taxrate;
-let grandtotal=taxableamount+taxamount;
-io.println(s.fromfloat(subtotal));
-io.println(s.fromfloat(discounttotal));
-io.println(s.fromfloat(taxamount));
-io.println(s.fromfloat(grandtotal));
-<0
-}
+f=main():i64{
+  let rawsubtotal=mut.0.0;
+  let discounttotal=mut.0.0;
+  let taxrate=mut.0.0;
+  lp(1=1){
+    let line=io.readln();
+    if(io.eof()){br};
+    if(s.len(line)=0){}el{
+      let parts=s.split(line;" ");
+      if(s.eq(parts.get(0);"TAX")){
+        taxrate=s.tofloat(parts.get(1));
+        br
+      }el{
+        let qty=s.tofloat(parts.get(1));
+        let price=s.tofloat(parts.get(2));
+        let disc=s.tofloat(parts.get(3));
+        let itemsub=qty*price;
+        let itemdiscount=itemsub*disc/100.0;
+        rawsubtotal=rawsubtotal+itemsub;
+        discounttotal=discounttotal+itemdiscount
+      }
+    }
+  };
+  let discounted=rawsubtotal-discounttotal;
+  let taxamount=discounted*taxrate;
+  let grandtotal=discounted+taxamount;
+  io.println(fmt2(discounted));
+  io.println(fmt2(discounttotal));
+  io.println(fmt2(taxamount));
+  io.println(fmt2(grandtotal));
+  <0
+};

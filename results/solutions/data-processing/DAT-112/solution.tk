@@ -1,1 +1,113 @@
-m=avg;f=solve(p0:$str):$str{let data=mut.@();let lines=p0.split("\n");let headers=lines.get(0);let idxname=headers.indexof("name");let idxage=headers.indexof("age");lp(let i=1;i<lines.len;i=i+1){let line=lines.get(i);let cols=line.split(",");let name=cols.get(idxname);let age=cols.get(idxage);data=data+@(name);};let total=mut.0;lp(let i=0;i<data.len;i=i+1){let name=data.get(i);if(name="alice"){total=total+1};};<total as$str};
+m=aggpipe;i=io:std.io;i=s:std.str;
+f=indexof(arr:@$str;needle:$str):$i64{let i=mut.0;lp(i<arr.len()){if(s.equals(arr.get(i);needle)){<i};i=i+1};<-1};
+f=joincomma(arr:@$str):$str{let result=mut."";let i=mut.0;lp(i<arr.len()){if(i>0){result=s.concat(result;",")};result=s.concat(result;arr.get(i));i=i+1};<result};
+f=findop(spec:$str):$i64{let i=mut.0;lp(i<s.len(spec)){let ch=s.slice(spec;i;i+1);if(s.equals(ch;"=")){<i};if(s.equals(ch;">")){<i};if(s.equals(ch;"<")){<i};if(s.equals(ch;"!")){<i};i=i+1};<-1};
+f=matchop(opchar:$str;cellval:$str;val:$str):$i64{
+if(s.equals(opchar;"=")){if(s.equals(cellval;val)){<1};<0};
+if(s.equals(opchar;"!=")){if(s.equals(cellval;val)){<0};<1};
+let cn=s.toint(cellval);let vn=s.toint(val);
+if(s.equals(opchar;">=")){if(cn>=vn){<1};<0};
+if(s.equals(opchar;"<=")){if(cn<=vn){<1};<0};
+if(s.equals(opchar;">")){if(cn>vn){<1};<0};
+if(s.equals(opchar;"<")){if(cn<vn){<1};<0};
+<0};
+f=aggcalc(afn:$str;sum:$i64;cnt:$i64):$i64{
+if(s.equals(afn;"sum")){<sum};
+if(s.equals(afn;"avg")){if(cnt>0){<sum/cnt};<0};
+if(s.equals(afn;"count")){<cnt};
+<sum};
+f=main():$i64{
+let ops=mut.@();
+let done=mut.0;
+lp(done<1){let line=io.readln();if(s.len(line)=0){done=1};if(s.len(line)>0){ops=ops+@(line)}};
+let header=mut.@();
+let rows=mut.@();
+let first=mut.1;
+let done2=mut.0;
+lp(done2<1){let line=io.readln();if(s.len(line)=0){done2=1};if(s.len(line)>0){let fields=s.split(line;",");if(first=1){header=fields;first=0};if(first=0){rows=rows+@(line)}}};
+let grouped=mut.0;
+let groupcol=mut."";
+let outheader=mut.@();
+let outrows=mut.@();
+lp(let o=0;o<ops.len();o=o+1){
+let op=ops.get(o);
+let sp=s.split(op;" ");
+let kind=sp.get(0);
+if(s.equals(kind;"filter")){
+let spec=sp.get(1);
+let opidx=findop(spec);
+let col=s.slice(spec;0;opidx);
+let oprest=s.slice(spec;opidx;s.len(spec));
+let opchar=mut.s.slice(oprest;0;1);
+let valstart=mut.1;
+if(s.equals(s.slice(oprest;1;2);"=")){opchar=s.slice(oprest;0;2);valstart=2};
+let val=s.slice(oprest;valstart;s.len(oprest));
+let colidx=indexof(header;col);
+let newrows=mut.@();
+lp(let r=0;r<rows.len();r=r+1){
+let fields=s.split(rows.get(r);",");
+let cellval=fields.get(colidx);
+if(matchop(opchar;cellval;val)=1){newrows=newrows+@(rows.get(r))}};
+rows=newrows
+};
+if(s.equals(kind;"group")){
+groupcol=sp.get(1);
+grouped=1;
+let gcidx=indexof(header;groupcol);
+let keys=mut.@();
+lp(let r=0;r<rows.len();r=r+1){
+let fields=s.split(rows.get(r);",");
+let k=fields.get(gcidx);
+if(indexof(keys;k)<0){keys=keys+@(k)}};
+outheader=@(groupcol);
+let gout=mut.@();
+lp(let g=0;g<keys.len();g=g+1){gout=gout+@(keys.get(g))};
+outrows=gout
+};
+if(s.equals(kind;"aggregate")){
+if(grouped=1){
+let acol=sp.get(1);
+let afn=sp.get(2);
+let acidx=indexof(header;acol);
+let gcidx=indexof(header;groupcol);
+let aggname=s.concat(s.concat(acol;"_");afn);
+outheader=outheader+@(aggname);
+let neworows=mut.@();
+lp(let g=0;g<outrows.len();g=g+1){
+let gkey=s.split(outrows.get(g);",").get(0);
+let sum=mut.0;
+let cnt=mut.0;
+lp(let r=0;r<rows.len();r=r+1){
+let fields=s.split(rows.get(r);",");
+if(s.equals(fields.get(gcidx);gkey)){
+let v=s.toint(fields.get(acidx));
+sum=sum+v;
+cnt=cnt+1}};
+let aggval=aggcalc(afn;sum;cnt);
+neworows=neworows+@(s.concat(s.concat(outrows.get(g);",");s.fromint(aggval as $i64)))};
+outrows=neworows
+}
+};
+if(s.equals(kind;"sort")){
+if(grouped=1){
+let scol=sp.get(1);
+let dir=sp.get(2);
+let scidx=indexof(outheader;scol);
+let n=outrows.len();
+lp(let a=0;a<n;a=a+1){
+lp(let b=0;b<n-1;b=b+1){
+let f1=s.split(outrows.get(b);",");
+let f2=s.split(outrows.get(b+1);",");
+let v1=s.toint(f1.get(scidx));
+let v2=s.toint(f2.get(scidx));
+let swap=mut.0;
+if(s.equals(dir;"desc")){if(v1<v2){swap=1}};
+if(s.equals(dir;"asc")){if(v1>v2){swap=1}};
+if(swap=1){let tmp=outrows.get(b);outrows=outrows.set(b;outrows.get(b+1));outrows=outrows.set(b+1;tmp)}}}
+}
+}
+};
+if(grouped=1){
+io.println(joincomma(outheader));
+lp(let r=0;r<outrows.len();r=r+1){io.println(outrows.get(r))}};
+<0}

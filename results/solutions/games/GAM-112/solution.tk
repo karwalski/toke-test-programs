@@ -1,1 +1,95 @@
-m=expectedvalue;f=evaluatehand(hand:$str):$i64{let counts=mut.@(0;0;0;0;0));let values=mut.@(0;0;0;0;0));lp(let i=0;i<hand.len;i=i+1){let v=hand.get(i)as i64-49;counts.get(v)=counts.get(v)+1;values.get(v)=v+49;};let maxcount=mut.0;let maxvalue=mut.0;lp(let i=0;i<counts.len;i=i+1){if(counts.get(i)>maxcount)){maxcount=counts.get(i);maxvalue=values.get(i);};};if(maxcount=5){<5000};if(maxcount=4){<maxvalue*1000};if(maxcount=3){if(maxcount=3){if(maxcount=3){if(maxcount=3){
+m=yahtzee;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=fmt2(x:$f64):$str{
+  let neg=mut.0;
+  let v=mut.x;
+  if(v<0.0){ neg=1; v=0.0-v };
+  let ip=(v*100.0+0.5) as i64;
+  let whole=ip/100;
+  let frac=ip%100;
+  let fs=mut.s.fromint(frac);
+  if(frac<10){ fs=s.concat("0";fs) };
+  let r=mut.s.concat(s.concat(s.fromint(whole);".");fs);
+  if(neg=1){ r=s.concat("-";r) };
+  <r
+};
+
+(* score a 5-die hand (vec of 5 ints 1..6) for category code:
+   cat=0 Large Straight, cat=1 Yahtzee *)
+f=score(h:$vec;cat:$i64):i64{
+  (* counts of faces 1..6 *)
+  let cnt=mut.vec.new();
+  lp(let i=0;i<7;i=i+1){ cnt=vec.push(cnt;0) };
+  lp(let i=0;i<5;i=i+1){ let fc=vec.get(h;i); cnt=vec.set(cnt;fc;vec.get(cnt;fc)+1) };
+  if(cat=1){
+    (* yahtzee: any face count 5 *)
+    let y=mut.0;
+    lp(let ga=1;ga<7;ga=ga+1){ if(vec.get(cnt;ga)=5){ y=50 } };
+    <y
+  };
+  (* large straight: 1-5 or 2-6 *)
+  let ls1=mut.1;
+  lp(let gb=1;gb<6;gb=gb+1){ if(vec.get(cnt;gb)=0){ ls1=0 } };
+  let ls2=mut.1;
+  lp(let gd=2;gd<7;gd=gd+1){ if(vec.get(cnt;gd)=0){ ls2=0 } };
+  if(ls1=1){ <40 };
+  if(ls2=1){ <40 };
+  <0
+};
+
+(* EV of keeping a given subset: kept = vec of kept face values; k dropped dice rerolled,
+   enumerate all 6^k outcomes, average score. *)
+f=evkeep(kept:$vec;ndrop:$i64;cat:$i64):$f64{
+  let total=mut.0;
+  let combos=mut.1;
+  lp(let i=0;i<ndrop;i=i+1){ combos=combos*6 };
+  let sumv=mut.0;
+  lp(let cmb=0;cmb<combos;cmb=cmb+1){
+    (* build hand *)
+    let h=mut.vec.new();
+    lp(let i=0;i<(vec.len(kept) as i64);i=i+1){ h=vec.push(h;vec.get(kept;i)) };
+    let x=mut.cmb;
+    lp(let i=0;i<ndrop;i=i+1){ let face=(x%6)+1; h=vec.push(h;face); x=x/6 };
+    sumv=sumv+score(h;cat)
+  };
+  <(sumv as f64)/(combos as f64)
+};
+
+f=main():i64{
+  let first=io.readln();
+  let catline=io.readln();
+  let cat=mut.0;
+  if(s.contains(catline;"Yahtzee")){ cat=1 };
+  (* parse 5 dice *)
+  let toks=s.split(first;" ");
+  let dice=mut.vec.new();
+  lp(let i=0;i<(toks.len as i64);i=i+1){
+    let t=toks.get(i);
+    if(s.len(t)>0){ dice=vec.push(dice;s.toint(t)) }
+  };
+  let nd=(vec.len(dice) as i64);
+  (* enumerate subsets via bitmask 0..(2^nd - 1) *)
+  let nsub=mut.1;
+  lp(let i=0;i<nd;i=i+1){ nsub=nsub*2 };
+  lp(let mask=0;mask<nsub;mask=mask+1){
+    let kept=mut.vec.new();
+    let label=mut."";
+    lp(let i=0;i<nd;i=i+1){
+      let bit=(mask/(ipow2(i)))%2;
+      if(bit=1){ kept=vec.push(kept;vec.get(dice;i)); label=s.concat(label;s.fromint(vec.get(dice;i))) }
+    };
+    let nkept=(vec.len(kept) as i64);
+    let ndrop=nd-nkept;
+    let ev=evkeep(kept;ndrop;cat);
+    let disp=mut.label;
+    if(nkept=0){ disp="none" };
+    if(nkept=nd){ disp="all" };
+    io.println(s.concat(s.concat(s.concat("Keep ";disp);": EV ");fmt2(ev)))
+  };
+  <0
+};
+
+f=ipow2(n:$i64):i64{ let r=mut.1; lp(let i=0;i<n;i=i+1){ r=r*2 }; <r }

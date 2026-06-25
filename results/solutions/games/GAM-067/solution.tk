@@ -1,1 +1,21 @@
-m=sg;f=sg(n:$i64):$i64{if(n<0){<0};if(n=0){<0};let m=mut.0;lp(let i=0;i<n;i=i+1){let tmp=sg(n-1-i);if(!(tmp=0)){<n-1-i};m=tmp};if(m=0){<n};<0};f=optimalmove(piles:@$i64):$str{let n=piles.len;let m=mut.0;lp(let i=0;i<n;i=i+1){let s=sg(piles.get(i)));if(!(s=0)){<""};m=s};if(m=0){<""};<""};
+m=sg;i=io:std.io;i=s:std.str;
+f=main():$i64{
+let line=io.readln();
+let t=s.trim(line);
+let parts=s.split(t;" ");
+let n=parts.len as $i64;
+let piles=mut.@();
+lp(let i=0;i<n;i=i+1){
+let tok=s.trim(parts.get(i));
+if(s.len(tok)>0){piles=piles+@(s.toint(tok))};
+};
+let np=piles.len as $i64;
+let x=mut.0;
+lp(let i=0;i<np;i=i+1){x=x^piles.get(i)};
+if(x=0){io.println("Losing position");<0};
+let bi=mut.0;
+lp(let i=1;i<np;i=i+1){if(piles.get(i)>piles.get(bi)){bi=i}};
+let out=s.concat(s.concat(s.concat("Take ";s.fromint(x));" from pile ");s.fromint(bi+1));
+io.println(out);
+<0
+};

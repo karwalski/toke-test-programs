@@ -1,1 +1,59 @@
-m=huffman;f=buildtree(freqs:@$i64):$str{let n=freqs.len;let nodes=mut.@();lp(let i=0;i<n;i=i+1){let node=$str{symbol:freqs.get(i);freq:freqs.get(i)};nodes=nodes+@(node)};lp(let m=n;m>1;m=m-1){let merged=mut.@();lp(let i=0;i<m/2;i=i+1){let a=nodes.get(i*2);let b=nodes.get(i*2+1);let mergednode=$str{symbol:a.symbol+b.symbol;freq:a.freq+b.freq};merged=merged+@(mergednode)};nodes=merged;};<nodes.get(0)};f=decodebitstring(tree:$str;bitstring:$str):$str{let n=bitstring.len;let current=mut.tree;lp(let i=0;i<n;i=i+1){let bit=bitstring.get(i);if(bit="0"){current=current.symbol+"0"}el{current=current.symbol+"1"};};<current.symbol};f=huffmandecode(freqs:@$i64;bitstring:$str
+m=huffman;
+i=io:std.io;
+i=s:std.str;
+
+f=streq(a:$str;b:$str):i64{
+  if(s.len(a)!=s.len(b)){<0};
+  if(a=b){<1};
+  <0
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  (* parse code table until blank line; remaining (single) line is bitstring *)
+  let codes=mut.@();
+  let chars=mut.@();
+  let intable=mut.1;
+  let bitstring=mut."";
+  lp(let i=0;i<lines.len;i=i+1){
+    let ln=lines.get(i);
+    if(s.len(ln)=0){
+      intable=0
+    }el{
+      if(intable=1){
+        (* format: 'C: code'  -> char is ln[0..colon], code after ': ' *)
+        let cidx=s.indexof(ln;":");
+        let ch=s.slice(ln;0;cidx);
+        (* code starts after ': ' = cidx+2 *)
+        let code=s.slice(ln;cidx+2;s.len(ln));
+        chars=chars.push(ch);
+        codes=codes.push(code)
+      }el{
+        bitstring=s.concat(bitstring;ln)
+      }
+    }
+  };
+  (* greedy prefix decode *)
+  let out=mut."";
+  let acc=mut."";
+  let n=s.len(bitstring);
+  lp(let i=0;i<n;i=i+1){
+    acc=s.concat(acc;s.slice(bitstring;i;i+1));
+    (* check if acc matches any code *)
+    lp(let c=0;c<codes.len;c=c+1){
+      if(streq(acc;codes.get(c))=1){
+        out=s.concat(out;chars.get(c));
+        acc="";
+        br
+      }
+    }
+  };
+  io.print(out);
+  io.print("\n");
+  <0
+}

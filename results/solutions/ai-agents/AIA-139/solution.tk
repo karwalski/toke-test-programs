@@ -1,1 +1,96 @@
-m=abtest;f=varianta(n:$i64):$i64{<n};f=variantb(n:$i64):$i64{<n};f=runa(b:$i64):$i64{<b};f=runb(a:$i64):$i64{<a};f=compare(a:$i64;b:$i64):$bool{if(a>b){<true};<false};f=declarewinner(a:$i64;b:$i64):$str{if(compare(a;b))){<"varianta"}el{<"variantb"}};f=main():$i64{let a=runa(15);let b=runb(10);let winner=declarewinner(a;b);<0};
+m=abtest;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+f=numafter(hay:$str;key:$str):$str{
+  let kpos=s.indexof(hay;key);
+  if(kpos<0){<""};
+  let start=kpos+(s.len(key) as i64);
+  let n=s.len(hay) as i64;
+  let i=mut.start;
+  let out=mut."";
+  lp(i<n){
+    let ch=s.slice(hay;i;i+1);
+    if(s.eq(ch;",")){i=n}el{
+      if(s.eq(ch;"}")){i=n}el{
+        out=s.concat(out;ch);i=i+1
+      }
+    }
+  };
+  <s.trim(out)
+};
+f=fmtnum(x:$f64):$str{
+  let neg=x<0.0;let v=mut.x;if(neg){v=0.0-x};
+  let scaled=v*1000000.0+0.5;let asi=scaled as i64;
+  let ip=asi/1000000;let fp=asi-ip*1000000;
+  let fs=mut.s.fromint(fp);
+  lp(s.len(fs) as i64<6){fs=s.concat("0";fs)};
+  let lastnz=mut.5;
+  lp(let i=5;i>=0;i=i-1){let ch=s.slice(fs;i;i+1);if(s.eq(ch;"0")){lastnz=i-1}el{i=0-1}};
+  let out=mut.s.fromint(ip);
+  if(lastnz>=0){out=s.concat(out;".");out=s.concat(out;s.slice(fs;0;lastnz+1))}el{out=s.concat(out;".0")};
+  if(neg){<s.concat("-";out)};
+  <out
+};
+f=sqrtf(x:$f64):$f64{
+  if(x<=0.0){<0.0};
+  let g=mut.x;
+  lp(let i=0;i<60;i=i+1){g=(g+x/g)*0.5};
+  <g
+};
+f=main():$i64{
+  let line=io.readln();
+  let apos=s.indexof(line;"\"variant_a\"");
+  let bpos=s.indexof(line;"\"variant_b\"");
+  let cpos=s.indexof(line;"\"confidence_level\"");
+  let aseg=s.slice(line;apos;bpos);
+  let bseg=s.slice(line;bpos;cpos);
+  let sa=parseint(numafter(aseg;"\"successes\":"));
+  let na=parseint(numafter(aseg;"\"total\":"));
+  let sb=parseint(numafter(bseg;"\"successes\":"));
+  let nb=parseint(numafter(bseg;"\"total\":"));
+  let cl=numafter(line;"\"confidence_level\":");
+  let ratea=(sa as f64)/(na as f64);
+  let rateb=(sb as f64)/(nb as f64);
+  let pa=ratea;let pb=rateb;
+  let ppool=((sa+sb) as f64)/((na+nb) as f64);
+  let denom=sqrtf(ppool*(1.0-ppool)*(1.0/(na as f64)+1.0/(nb as f64)));
+  let z=mut.0.0;
+  if(denom>0.0){z=(pb-pa)/denom};
+  let absz=mut.z;if(z<0.0){absz=0.0-z};
+  let crit=mut.1.96;
+  if(s.contains(cl;"0.9")){crit=1.645};
+  if(s.contains(cl;"0.95")){crit=1.96};
+  if(s.contains(cl;"0.99")){crit=2.576};
+  let significant=mut.false;
+  if(absz>crit){significant=true};
+  let winner=mut."inconclusive";
+  if(significant){
+    if(pb>pa){winner="b"}el{winner="a"}
+  };
+  let lift=mut.0.0;
+  if(ratea>0.0){lift=(rateb-ratea)/ratea*100.0};
+  let sigstr=mut."false";if(significant){sigstr="true"};
+  let out=mut."{\"winner\":\"";
+  out=s.concat(out;winner);
+  out=s.concat(out;"\",\"rate_a\":");
+  out=s.concat(out;fmtnum(ratea));
+  out=s.concat(out;",\"rate_b\":");
+  out=s.concat(out;fmtnum(rateb));
+  out=s.concat(out;",\"significant\":");
+  out=s.concat(out;sigstr);
+  out=s.concat(out;",\"lift_pct\":");
+  out=s.concat(out;fmtnum(lift));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

@@ -1,1 +1,92 @@
-m=hyperloglog;f=hash(s:$str):$i64{let h=mut.0;lp(let i=0;i<s.len;i=i+1){let c=s.get(i);let sum=h+c;let mod=sum-sum/2*2;h=mod;};<h};f=countbits(n:$i64):$i64{let count=mut.0;let num=mut.n;lp(let i=0;i<64;i=i+1){let bit=num-num/2*2;if(bit=1){count=count+1};num=num/2;if(num=0){br};};<count};f=hyperloglog(n:$i64;m:$i64):$i64{let hashes=mut.@();lp(let i=0;i<n;i=i+1){let s=s.concat("val";i) as$str;let h=hash(s);hashes=hashes+@(h);};let maxbits=mut.0;lp(let i=0;i<hashes.len;i=i+1){let h=hashes.get(i);let bits=countbits(h);if(bits>maxbits){maxbits=bits};};<maxbits
+m=hyperloglog;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=byteat(x:$str;i:i64):i64{ let b=s.bytes(x); <b.get(i as u64) as i64 };
+f=streq(a:$str;b:$str):bool{
+  if(s.len(a)!=s.len(b)){<false};
+  let n=s.len(a) as i64;
+  lp(let i=0;i<n;i=i+1){ if(byteat(a;i)!=byteat(b;i)){<false} };
+  <true
+};
+f=hashval(x:$str):i64{
+  let n=s.len(x) as i64;
+  let h=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let c=byteat(x;i);
+    let nh=h*131+c;
+    h=nh-nh/1000000007*1000000007;
+  };
+  <h
+};
+f=ipow2(b:i64):i64{
+  let r=mut.1;
+  lp(let i=0;i<b;i=i+1){ r=r*2; };
+  <r
+};
+f=lnval(r:f64):f64{
+  let y=(r-1.0)/(r+1.0);
+  let y2=y*y;
+  let term=mut.y;
+  let acc=mut.0.0;
+  let k=mut.1;
+  lp(let i=0;i<50;i=i+1){
+    acc=acc+term/(k as f64);
+    term=term*y2;
+    k=k+2;
+  };
+  <2.0*acc
+};
+f=roundint(x:f64):i64{
+  <math.floor(x+0.5)
+};
+f=main():i64{
+  let bline=io.readln();
+  let b=mt s.toint(s.trim(bline)){ $ok:v v; $err:e 8 };
+  let m=ipow2(b);
+  let regs=mut.@();
+  lp(let i=0;i<m;i=i+1){ regs=regs.push(0); };
+  let uniq=mut.@();
+  lp(true){
+    let line=io.readln();
+    if(io.eof()){br};
+    let w=s.trim(line);
+    if(s.len(w)>0 as u64){
+      let found=mut.false;
+      lp(let j=0;j<uniq.len as i64;j=j+1){
+        if(streq(uniq.get(j as u64);w)){ found=true; };
+      };
+      if(!(found)){
+        uniq=uniq.push(w);
+        let h=hashval(w);
+        let idx=h-h/m*m;
+        regs=regs.set(idx as u64;1);
+      };
+    };
+  };
+  let empty=mut.0;
+  lp(let i=0;i<m;i=i+1){
+    if(regs.get(i as u64)=0){ empty=empty+1; };
+  };
+  let mv=m as f64;
+  let vv=empty as f64;
+  let est=mut.0;
+  if(empty=0){
+    est=m;
+  }el{
+    let lc=mv*lnval(mv/vv);
+    est=roundint(lc);
+  };
+  let actual=uniq.len as i64;
+  let diff=mut.est-actual;
+  if(diff<0){ diff=0-diff; };
+  let errpct=(diff as f64)/(actual as f64)*100.0;
+  let erot=roundint(errpct*10.0);
+  let whole=erot/10;
+  let fracpart=erot-whole*10;
+  io.println(s.concat("HyperLogLog estimate: ";s.fromint(est)));
+  io.println(s.concat("Actual distinct: ";s.fromint(actual)));
+  let errstr=s.concat(s.concat(s.fromint(whole);".");s.fromint(fracpart));
+  io.println(s.concat(s.concat("Error: ";errstr);"%"));
+  <0
+};

@@ -1,1 +1,91 @@
-m=validtile;f=validtile(grid:$str):$str{let lines=grid.split("\n");let nrows=lines.len;let ncols=lines.get(0).len;let seen=mut.@($str);lp(let r=0;r<nrows;r=r+1){lp(let c=0;c<ncols;c=c+1){let ch=lines.get(r).get(c);if(ch=" "){<""};let id=ch as$str;if(!(id="A")){if(!(id="B"))){if(!(id="C"))){if(!(id="D")){let msg="Invalid: piece "+id+" is not a valid tetromino";<msg}}}};let pos
+m=validtile;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    if(s.len(line)>0){lines=lines.push(line)}
+  };
+  let nrows=(lines.len as i64)-1;
+  if(nrows<1){io.println("Valid tiling");<0};
+  let ncols=s.len(lines.get(1)) as i64;
+
+  (* flat grid of ids; each char is a single-digit id, '0'=empty *)
+  let grid=mut.vec.new();
+  lp(let r=1;r<=nrows;r=r+1){
+    let bytes=s.bytes(lines.get(r));
+    lp(let c=0;c<ncols;c=c+1){
+      let v=(bytes.get(c) as i64)-48;
+      grid=vec.push(grid;v)
+    }
+  };
+
+  let foundbad=mut.0;
+  let badid=mut.0;
+  lp(let id=1;id<10;id=id+1){
+    if(foundbad=0){
+      let count=mut.0;
+      let fr=mut.0;
+      let fc=mut.0;
+      let have=mut.0;
+      lp(let r=0;r<nrows;r=r+1){
+        lp(let c=0;c<ncols;c=c+1){
+          if(vec.get(grid;r*ncols+c)=id){
+            count=count+1;
+            if(have=0){fr=r;fc=c;have=1}
+          }
+        }
+      };
+      if(have>0){
+        (* BFS connectivity from (fr,fc) *)
+        let visited=mut.vec.new();
+        lp(let i=0;i<nrows*ncols;i=i+1){visited=vec.push(visited;0)};
+        let stack=mut.vec.new();
+        stack=vec.push(stack;fr*ncols+fc);
+        visited=vec.set(visited;fr*ncols+fc;1);
+        let reached=mut.0;
+        lp(vec.len(stack)>0){
+          let idx=vec.pop(stack);
+          reached=reached+1;
+          let cr=idx/ncols;
+          let cc=idx-cr*ncols;
+          (* four neighbours *)
+          if(cr>0){
+            let ni=(cr-1)*ncols+cc;
+            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+          };
+          if(cr<nrows-1){
+            let ni=(cr+1)*ncols+cc;
+            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+          };
+          if(cc>0){
+            let ni=cr*ncols+(cc-1);
+            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+          };
+          if(cc<ncols-1){
+            let ni=cr*ncols+(cc+1);
+            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+          }
+        };
+        (* valid tetromino: exactly 4 cells, all connected *)
+        if(count=4){
+          if(reached=4){}el{foundbad=1;badid=id}
+        }el{
+          foundbad=1;badid=id
+        }
+      }
+    }
+  };
+
+  if(foundbad>0){
+    io.println(s.concat(s.concat("Invalid: piece ";s.fromint(badid));" is not a valid tetromino"))
+  }el{
+    io.println("Valid tiling")
+  };
+  <0
+}

@@ -1,1 +1,69 @@
-m=portfolio;f=dotprod(n:$i64;m:$i64):$i64{let res=mut.0;lp(let i=0;i<n;i=i+1){res=res+m;};<res};f=portfoliovar(n:$i64;m:$i64;c:$i64):$i64{let a=dotprod(n;m);let b=dotprod(n;c);let d=dotprod(m;c);let res=mut.0;lp(let i=0;i<n;i=i+1){res=res+a;};lp(let i=0;i<m;i=i+1){res=res+b;};lp(let i=0;i<c;i=i+1){res=res+d;};<res};
+m=portfolio;i=io:std.io;i=s:std.str;i=mh:std.math;
+f=ipow10(n:i64):i64{ let r=mut.1; let k=mut.0; lp(k<n){ r=r*10; k=k+1; }; <r };
+f=pad0(numstr:str;width:i64):str{
+  let cur=s.len(numstr) as $i64;
+  let need=mut.(width-cur);
+  let b=s.buf();
+  lp(need>0){ s.add(b;"0"); need=need-1; };
+  s.add(b;numstr);
+  <s.done(b)
+};
+f=pflt(raw:str):f64{
+  let x=s.trim(raw);
+  let neg=s.startswith(x;"-");
+  let body=mut.x; if(neg){ body=s.trimprefix(x;"-"); };
+  let parts=s.split(body;".");
+  let ip=mt s.toint(parts.get(0)){$ok:v v;$err:e 0};
+  let val=mut.(ip as $f64);
+  if(parts.len()>1){
+    let fstr=parts.get(1);
+    let fp=mt s.toint(fstr){$ok:v v;$err:e 0};
+    let nd=s.len(fstr) as $i64;
+    let scale=mut.1.0; let k=mut.0; lp(k<nd){ scale=scale*10.0; k=k+1; };
+    val=val+(fp as $f64)/scale;
+  };
+  if(neg){ val=val*(0.0-1.0); };
+  <val
+};
+f=fmtfix(val:f64;dec:i64):str{
+  let neg=val<0.0;
+  let a=mut.val; if(neg){ a=0.0-val; };
+  let scale=ipow10(dec);
+  let scaled=a*(scale as $f64);
+  let rounded=(scaled+0.5) as $i64;
+  let ip=rounded/scale;
+  let fp=rounded-(ip*scale);
+  let fpstr=pad0(s.fromint(fp);dec);
+  let b=s.buf();
+  if(neg){ s.add(b;"-"); };
+  s.add(b;s.fromint(ip));
+  s.add(b;".");
+  s.add(b;fpstr);
+  <s.done(b)
+};
+f=main():$i64{
+let warr=s.split(s.trim(io.readln());",");
+let varr=s.split(s.trim(io.readln());",");
+let n=warr.len() as $i64;
+let total=mut.0.0;
+let irow=mut.0;
+lp(irow<n){
+  let rowline=s.trim(io.readln());
+  let cells=s.split(rowline;" ");
+  let wi=pflt(warr.get(irow));
+  let sigi=mh.sqrt(pflt(varr.get(irow)));
+  let jcol=mut.0;
+  lp(jcol<n){
+    let wj=pflt(warr.get(jcol));
+    let sigj=mh.sqrt(pflt(varr.get(jcol)));
+    let corr=pflt(cells.get(jcol));
+    let term=wi*wj*sigi*sigj*corr;
+    total=total+term;
+    jcol=jcol+1;
+  };
+  irow=irow+1;
+};
+let stddev=mh.sqrt(total);
+io.println(fmtfix(total;6));
+io.println(fmtfix(stddev;6));
+<0};

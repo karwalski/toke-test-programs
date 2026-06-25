@@ -1,1 +1,169 @@
-m=dirwalk;f=walkdir(path:$str):$str{let result=mut."";let idx=mut.0;lp(let i=0;i<1;i=i+1){result=s.concat(result;path);idx=idx+1;lp(let j=0;j<1;j=j+1){idx=idx+1;lp(let k=0;k<1;k=k+1){idx=idx+1;};};};<result};f=main():$void{let out=walkdir("/src");<out};
+m=dirwalk;
+i=io:std.io;
+i=str:std.str;
+i=file:std.file;
+
+f=listdir(p:$str):@$str{
+  <mt file.list(p){ $ok:v v; $err:e @() }
+};
+
+f=readfile(p:$str):$str{
+  <mt file.read(p){ $ok:v v; $err:e "" }
+};
+
+f=jsonname(content:$str):$str{
+  let needle="\"name\":\"";
+  let idx=str.indexof(content;needle);
+  if(idx<0){<""};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(content);
+  let n=str.len(content) as i64;
+  let q=str.bytes("\"").get(0);
+  let j=mut.start;
+  let endpos=mut.start;
+  let done=mut.false;
+  lp(let h=0;h<n;h=h+1){
+    if(!(done)){
+      if(j<n){ if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1} }el{done=true};
+    };
+  };
+  <mt str.slice(content;start as u64;endpos as u64){ $ok:v v; $err:e "" }
+};
+
+f=lastpathseg(s:$str):$str{
+  let bytes=str.bytes(s);
+  let n=str.len(s) as i64;
+  let slash=str.bytes("/").get(0);
+  let start=mut.0;
+  lp(let i=0;i<n;i=i+1){ if(bytes.get(i)=slash){start=i+1} };
+  <mt str.slice(s;start as u64;n as u64){ $ok:v v; $err:e s }
+};
+
+f=gomodname(content:$str):$str{
+  let needle="module ";
+  let idx=str.indexof(content;needle);
+  if(idx<0){<""};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(content);
+  let n=str.len(content) as i64;
+  let nl=str.bytes("\n").get(0);
+  let cr=str.bytes("\r").get(0);
+  let sp=str.bytes(" ").get(0);
+  let j=mut.start;
+  let endpos=mut.start;
+  let done=mut.false;
+  lp(let h=0;h<n;h=h+1){
+    if(!(done)){
+      if(j<n){
+        let c=bytes.get(j);
+        if(c=nl){endpos=j;done=true}el{ if(c=cr){endpos=j;done=true}el{ if(c=sp){endpos=j;done=true}el{j=j+1} } };
+      }el{endpos=j;done=true};
+    };
+  };
+  let modpath=mt str.slice(content;start as u64;endpos as u64){ $ok:v v; $err:e "" };
+  <lastpathseg(modpath)
+};
+
+f=pyname(content:$str):$str{
+  let needle="name=\"";
+  let idx=str.indexof(content;needle);
+  if(idx<0){<""};
+  let start=(idx as i64)+(str.len(needle) as i64);
+  let bytes=str.bytes(content);
+  let n=str.len(content) as i64;
+  let q=str.bytes("\"").get(0);
+  let j=mut.start;
+  let endpos=mut.start;
+  let done=mut.false;
+  lp(let h=0;h<n;h=h+1){
+    if(!(done)){ if(j<n){ if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1} }el{done=true} };
+  };
+  <mt str.slice(content;start as u64;endpos as u64){ $ok:v v; $err:e "" }
+};
+
+f=detect(dir:$str;rel:$str):$str{
+  let pj=str.concat(dir;"/package.json");
+  if(file.exists(pj)){
+    let nm=jsonname(readfile(pj));
+    <str.concat(str.concat(str.concat(str.concat(nm;": node (");rel);")");"\n")
+  };
+  let gm=str.concat(dir;"/go.mod");
+  if(file.exists(gm)){
+    let nm=gomodname(readfile(gm));
+    <str.concat(str.concat(str.concat(str.concat(nm;": go (");rel);")");"\n")
+  };
+  let sp=str.concat(dir;"/setup.py");
+  if(file.exists(sp)){
+    let nm=pyname(readfile(sp));
+    <str.concat(str.concat(str.concat(str.concat(nm;": python (");rel);")");"\n")
+  };
+  <""
+};
+
+f=walk(dir:$str;rel:$str;depth:$i64):$str{
+  let out=mut.detect(dir;rel);
+  if(depth>0){
+    let entries=listdir(dir);
+    lp(let i=0;i<(entries.len as i64);i=i+1){
+      let e=entries.get(i);
+      let child=str.concat(str.concat(dir;"/");e);
+      if(file.isdir(child)){
+        let childrel=mut.e;
+        if(str.len(rel)>0){ childrel=str.concat(str.concat(rel;"/");e) };
+        out=str.concat(out;walk(child;childrel;depth-1));
+      };
+    };
+  };
+  <out
+};
+
+f=strlt(a:$str;b:$str):bool{
+  let la=str.len(a) as i64;
+  let lb=str.len(b) as i64;
+  let m=mut.la;
+  if(lb<la){m=lb};
+  let ba=str.bytes(a);
+  let bb=str.bytes(b);
+  let i=mut.0;
+  let res=mut.0;
+  let decided=mut.false;
+  lp(let g=0;g<m;g=g+1){
+    if(!(decided)){
+      let ca=ba.get(i);
+      let cb=bb.get(i);
+      if(ca<cb){res=-1;decided=true}el{ if(cb<ca){res=1;decided=true} };
+      i=i+1;
+    };
+  };
+  if(decided){ if(res<0){<true}el{<false} };
+  if(la<lb){<true};
+  <false
+};
+
+f=main():i64{
+  let root=io.readln();
+  let raw=walk(root;"";2);
+  let lines=str.split(raw;"\n");
+  let collected=mut.@();
+  lp(let i=0;i<(lines.len as i64);i=i+1){
+    let ln=lines.get(i);
+    if(str.len(ln)>0){ collected=collected.push(ln) };
+  };
+  let n=collected.len as i64;
+  if(n=0){
+    io.println("No packages detected");
+    <0
+  };
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n-1;j=j+1){
+      let a=collected.get(j);
+      let b=collected.get(j+1);
+      if(strlt(b;a)){
+        collected=collected.set(j;b);
+        collected=collected.set(j+1;a);
+      };
+    };
+  };
+  lp(let i=0;i<n;i=i+1){ io.println(collected.get(i)) };
+  <0
+};

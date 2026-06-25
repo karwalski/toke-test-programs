@@ -1,1 +1,39 @@
-m=workflow;f=calculateeta(completed:$i64;remaining:$i64;elapsed:$i64):$i64{if(remaining=0){<0};let avg=elapsed/completed;let eta=avg*remaining;<eta};f=main():$i64{let completed=3;let remaining=2;let elapsed=10;let eta=calculateeta(completed;remaining;elapsed);<0};
+m=workflow;i=io:std.io;i=s:std.str;i=j:std.json;
+f=fmtpct(x:$f64):$str{
+  let r=mut.s.format(x;"%.1f");
+  <r};
+f=main():$i64{
+  let input=mt j.dec(io.readln()){$ok:v v;$err:e j.obj("{}")};
+  let steps=j.getarr(input;"steps");
+  let n=j.arrlen(steps);
+  let doneweight=mut.0;
+  let totalweight=mut.0;
+  let doneduration=mut.0;
+  let current=mut."null";
+  let foundcurrent=mut.false;
+  let i=mut.0;
+  lp(i<n){
+    let st=j.arrget(steps;i);
+    let w=j.geti64(st;"weight");
+    let status=j.getstr(st;"status");
+    totalweight=totalweight+w;
+    if(s.eq(status;"done")){
+      doneweight=doneweight+w;
+      let d=j.geti64(st;"duration_ms");
+      doneduration=doneduration+d;
+    }el{
+      if(foundcurrent=false){
+        current=s.concat("\"";s.concat(j.getstr(st;"id");"\""));
+        foundcurrent=true;
+      };
+    };
+    i=i+1};
+  let pct=(doneweight as$f64)/(totalweight as$f64)*100.0;
+  let remweight=totalweight-doneweight;
+  let eta=mut.0;
+  if(doneweight>0){
+    let avg=doneduration/doneweight;
+    eta=avg*remweight;
+  };
+  io.println(s.concat("{\"completion_pct\":";s.concat(fmtpct(pct);s.concat(",\"eta_ms\":";s.concat(s.fromint(eta);s.concat(",\"current_step\":";s.concat(current;"}")))))));
+  <0}

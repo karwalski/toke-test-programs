@@ -1,1 +1,139 @@
-m=dedupreport;f=countunique(arr:@$str):i64{let seen=mut.@();let n=arr.len;lp(let i=0;i<n;i=i+1){let current=arr.get(i);let isnew=mut.true;let m=seen.len;lp(let j=0;j<m;j=j+1){if(seen.get(j)=current)){isnew=false;};};if(isnew){seen=seen+@(current);};};<seen.len as i64};f=buildreport(original:@$str):$str{let unique=countunique(original);let total=original.len;let ratio=mut.0.0;if(total>0){ratio=unique as f64/total as f64;};let report=mut."Deduplication Report\n";report=s.concat(report;"-----------------------------\n");report=s.concat(report;"Original count: ");report=s.concat(report;total) as$str;report=s.concat(report;"\n");report=s.concat(report;"Unique count: ");report=s.concat(report;unique) as$str;report=s.concat(report;"\n");report=s.concat(report;"Deduplication ratio: ");report=s.concat(report;ratio) as$str;report=s.concat(report;"%\n");report=s.concat(report;")
+m=dedupreport;
+i=io:std.io;
+i=s:std.str;
+
+(* one decimal formatter, round-half-up, non-negative inputs *)
+f=fixed1(x:f64):$str{
+  let scaled=x*10.0+0.5;
+  let iscaled=scaled as i64;
+  let whole=iscaled/10; let frac=iscaled-whole*10;
+  let out=s.concat(s.concat(s.fromint(whole);".");s.fromint(frac));
+  <out
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  (* drop trailing blank lines *)
+  let nl=mut.lines.len;
+  lp(1=1){
+    if(nl<=0){br};
+    let last=lines.get(nl-1);
+    if(s.eq(last;"")){nl=nl-1}el{br}
+  };
+  let header=lines.get(0);
+  let hcols=header.split(",");
+  let ncol=hcols.len;
+  (* data rows = lines[1..nl) *)
+  let rows=mut.@();
+  lp(let i=1;i<nl;i=i+1){
+    rows=rows.push(lines.get(i))
+  };
+  let total=rows.len;
+
+  (* dedup: find unique rows in first-appearance order with counts *)
+  let urows=mut.@();
+  let ucounts=mut.@();
+  lp(let i=0;i<total;i=i+1){
+    let r=rows.get(i);
+    let found=mut.0;
+    let un=urows.len;
+    lp(let j=0;j<un;j=j+1){
+      if(s.eq(urows.get(j);r)){
+        ucounts=ucounts.set(j;ucounts.get(j)+1);
+        found=1;
+        br
+      }
+    };
+    if(found=0){
+      urows=urows.push(r);
+      ucounts=ucounts.push(1)
+    }
+  };
+  let uniquecount=urows.len;
+  let dupextra=total-uniquecount;
+
+  io.println(s.concat("Total rows: ";s.fromint(total)));
+  io.println(s.concat("Exact duplicates: ";s.fromint(dupextra)));
+
+  if(dupextra>0){
+    io.println("Duplicate rows:");
+    (* gather indices of rows with count>1 *)
+    let didx=mut.@();
+    lp(let j=0;j<uniquecount;j=j+1){
+      if(ucounts.get(j)>1){ didx=didx.push(j) }
+    };
+    let dn=didx.len;
+    (* sort didx by count desc, tie = first appearance (smaller index) *)
+    lp(let a=1;a<dn;a=a+1){
+      let key=didx.get(a);
+      let kc=ucounts.get(key);
+      let b=mut.a-1;
+      lp(1=1){
+        if(b<0){br};
+        let cur=didx.get(b);
+        let cc=ucounts.get(cur);
+        let swap=mut.0;
+        if(cc<kc){swap=1};
+        if(swap=1){
+          didx=didx.set(b+1;cur);
+          b=b-1
+        }el{br}
+      };
+      didx=didx.set(b+1;key)
+    };
+    lp(let k=0;k<dn;k=k+1){
+      let idx=didx.get(k);
+      let r=urows.get(idx);
+      let cnt=ucounts.get(idx);
+      let line=s.concat(s.concat("  (";r);s.concat(") x";s.fromint(cnt)));
+      io.println(line)
+    };
+
+    (* column duplication: distinct/total*100, columns ordered non-id first then id *)
+    (* build cell matrix: for each column, count distinct across rows *)
+    let parts=mut.@();
+    (* compute distinct per column index *)
+    let order=mut.@();
+    (* first non-id columns in header order *)
+    lp(let c=0;c<ncol;c=c+1){
+      let cn=hcols.get(c);
+      if(s.eq(cn;"id")){}el{ order=order.push(c) }
+    };
+    lp(let c=0;c<ncol;c=c+1){
+      let cn=hcols.get(c);
+      if(s.eq(cn;"id")){ order=order.push(c) }
+    };
+    let on=order.len;
+    let colout=mut."";
+    lp(let oi=0;oi<on;oi=oi+1){
+      let c=order.get(oi);
+      let cn=hcols.get(c);
+      (* distinct count of values in column c over all rows *)
+      let seen=mut.@();
+      lp(let ri=0;ri<total;ri=ri+1){
+        let cells=rows.get(ri).split(",");
+        let v=cells.get(c);
+        let f=mut.0;
+        let sn=seen.len;
+        lp(let sj=0;sj<sn;sj=sj+1){
+          if(s.eq(seen.get(sj);v)){f=1;br}
+        };
+        if(f=0){seen=seen.push(v)}
+      };
+      let distinct=seen.len;
+      let pct=distinct as f64/total as f64*100.0;
+      let seg=s.concat(s.concat(cn;" ");s.concat(fixed1(pct);"%"));
+      if(oi>0){colout=s.concat(colout;", ")};
+      colout=s.concat(colout;seg)
+    };
+    io.println(s.concat("Column duplication: ";colout))
+  }el{
+    io.println("No duplicates found")
+  };
+  <0
+}

@@ -1,1 +1,177 @@
-m=episode;f=getepisode(id:$str):$str{if(id="1"){<"episode 1: the beginning"};if(id="2"){<"episode 2: the journey"};if(id="3"){<"episode 3: the end"});f=main():$void{let episode=getepisode("1");<};
+m=episodic;i=io:std.io;i=s:std.str;
+(* check if word is a stopword *)
+f=isstop(w:$str):$bool{
+  let stops=" how do i to the a an of we that was what is are about and or with for in on at it discuss discussed discussing talk talked help helped ";
+  let probe=s.concat(s.concat(" ";w);" ");
+  <s.contains(stops;probe)
+};
+(* count distinct query keywords that appear as substrings in text *)
+f=matchcount(qwords:@$str;text:$str):$i64{
+  let c=mut.0;
+  lp(let i=0;i<qwords.len();i=i+1){
+    let w=qwords.get(i);
+    (* use stem: drop trailing s/ing/ment by simple prefix containment *)
+    let stem=mut.w;
+    if(s.len(w) as i64>4){stem=s.slice(w;0;4)};
+    if(s.contains(text;stem)){c=c+1}
+  };
+  <c
+};
+(* given text starting right after an opening '[', return index of matching ']' *)
+f=arrclose(t:$str):$i64{
+  let n=s.len(t) as i64;
+  let depth=mut.0;
+  let i=mut.0;
+  let instr=mut.false;
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    if(instr){
+      if(s.eq(ch;"\"")){instr=false}
+    }el{
+      if(s.eq(ch;"\"")){instr=true}el{
+        if(s.eq(ch;"[")){depth=depth+1}el{
+          if(s.eq(ch;"]")){
+            if(depth=0){<i};
+            depth=depth-1
+          }
+        }
+      }
+    };
+    i=i+1
+  };
+  <n
+};
+f=fmtscore(x:$i64):$str{
+  (* x is hundredths *)
+  let ip=x/100;let fp=x-ip*100;
+  if(fp=0){<s.concat(s.fromint(ip);".0")};
+  let fs=mut.s.fromint(fp);
+  if(fp<10){fs=s.concat("0";fs)}el{ if(fp-(fp/10)*10=0){fs=s.fromint(fp/10)} };
+  <s.concat(s.concat(s.fromint(ip);".");fs)
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  (* query *)
+  let qk="\"query\":\"";
+  let qi=s.indexof(json;qk);
+  let qrest=s.slice(json;qi+s.len(qk) as i64;jn);
+  let qend=s.indexof(qrest;"\"");
+  let query=s.slice(qrest;0;qend);
+  let qlow=s.lower(query);
+  (* tokenize query, strip punctuation by replacing *)
+  let qclean=s.replace(s.replace(s.replace(qlow;"?";" ");".";" ");",";" ");
+  let qparts=s.split(qclean;" ");
+  let qwords=mut.@();
+  lp(let i=0;i<qparts.len();i=i+1){
+    let w=s.trim(qparts.get(i));
+    if(s.len(w) as i64>0){
+      if(!(isstop(w))){qwords=qwords+@(w)}
+    }
+  };
+  (* top_k *)
+  let topk=mut.1;
+  let tkk="\"top_k\":";
+  let tki=s.indexof(json;tkk);
+  if(tki>=0){
+    let trest=s.slice(json;tki+s.len(tkk) as i64;jn);
+    let trl=s.len(trest) as i64;let tj=mut.0;let tbuf=mut."";
+    lp(tj<trl){
+      let ch=s.slice(trest;tj;tj+1);
+      let dd=s.indexof("0123456789";ch);
+      if(dd>=0){tbuf=s.concat(tbuf;ch);tj=tj+1}el{tj=trl}
+    };
+    let tv=mut.0;
+    lp(let z=0;z<s.len(tbuf) as i64;z=z+1){
+      let ch=s.slice(tbuf;z;z+1);tv=tv*10+s.indexof("0123456789";ch)
+    };
+    topk=tv
+  };
+  (* episodes array *)
+  let ek="\"episodes\":[";
+  let ei=s.indexof(json;ek);
+  let estart=ei+s.len(ek) as i64;
+  let erest=s.slice(json;estart;jn);
+  let close=arrclose(erest);
+  let eseg=mut.s.slice(erest;0;close);
+  let esl=s.len(eseg) as i64;
+  let ids=mut.@();
+  let scores=mut.@();
+  let reasons=mut.@();
+  let p=mut.0;
+  lp(p<esl){
+    let oc=s.slice(eseg;p;p+1);
+    if(s.eq(oc;"{")){
+      let after=s.slice(eseg;p+1;esl);
+      let endb=s.indexof(after;"}");
+      let objs=s.slice(after;0;endb);
+      (* id *)
+      let idk="\"id\":\"";
+      let idi=s.indexof(objs;idk);
+      let idrest=s.slice(objs;idi+s.len(idk) as i64;s.len(objs) as i64);
+      let idend=s.indexof(idrest;"\"");
+      let id=s.slice(idrest;0;idend);
+      (* summary *)
+      let smk="\"summary\":\"";
+      let smi=s.indexof(objs;smk);
+      let smrest=s.slice(objs;smi+s.len(smk) as i64;s.len(objs) as i64);
+      let smend=s.indexof(smrest;"\"");
+      let summary=s.slice(smrest;0;smend);
+      let sumlow=s.lower(summary);
+      (* tags region (rest of objs) *)
+      let tagslow=s.lower(objs);
+      let summatch=matchcount(qwords;sumlow);
+      let tagmatch=matchcount(qwords;tagslow);
+      let qn=qwords.len();
+      (* scoring (hundredths) *)
+      let scv=mut.0;
+      let reason=mut."";
+      if(qn>0){
+        if(summatch=qn){
+          if(qn>=2){scv=95}el{scv=90};
+          reason=s.concat("Directly relevant to ";summary)
+        }el{
+          if(summatch>0){
+            scv=90;
+            reason=s.concat("Specifically about ";summary)
+          }el{
+            if(tagmatch>0){
+              scv=50;
+              reason="Related by topic but not a direct match"
+            }el{
+              scv=10;
+              reason="Not relevant to the query"
+            }
+          }
+        }
+      };
+      ids=ids+@(id);
+      scores=scores+@(scv);
+      reasons=reasons+@(reason);
+      p=p+1+endb+1
+    }el{p=p+1}
+  };
+  (* sort descending by score (stable) *)
+  let n=ids.len();
+  let order=mut.@();
+  lp(let i=0;i<n;i=i+1){order=order+@(i)};
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=a+1;b<n;b=b+1){
+      let ia=order.get(a);let ib=order.get(b);
+      if(scores.get(ib)>scores.get(ia)){
+        order=order.set(a;ib);order=order.set(b;ia)
+      }
+    }
+  };
+  let limit=mut.topk;
+  if(topk>n){limit=n};
+  let out=mut."[";
+  lp(let i=0;i<limit;i=i+1){
+    if(i>0){out=s.concat(out;",")};
+    let oi=order.get(i);
+    out=s.concat(out;s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"id\":\"";ids.get(oi));"\",\"relevance_score\":");fmtscore(scores.get(oi)));",\"reason\":\"");reasons.get(oi));"\"}"))
+  };
+  out=s.concat(out;"]");
+  io.println(out);
+  <0
+}

@@ -1,1 +1,99 @@
-m=planchecker;t=$str;f=checkfeasibility(tasks:@$str;resources:@$str;dependencies:@$str;deadline:$str):$str{let result=mut."feasible";let n=tasks.len;lp(let i=0;i<n;i=i+1){let task=tasks.get(i);let hasresource=mut.false;let m=resources.len;lp(let j=0;j<m;j=j+1){let res=resources.get(j);if(res=task){hasresource=true};};if(!(hasresource)){result="infeasible";};};if(result="infeasible"){<result};let deadlinetask=mut.false;lp(let i=0;i<n;i=i+1){let task=tasks.get(i);if(task=deadline){deadlinetask=true};};if(!(deadlinetask)){result="infeasible";};<result};
+m=feasibilitychecker;i=io:std.io;i=s:std.str;
+f=parseint(t:$str):$i64{
+  let n=s.len(t) as i64;let r=mut.0;let i=mut.0;let neg=mut.false;
+  if(n>0){let c0=s.slice(t;0;1);if(s.eq(c0;"-")){neg=true;i=1}};
+  lp(i<n){
+    let ch=s.slice(t;i;i+1);
+    let d=s.indexof("0123456789";ch);
+    if(d>=0){r=r*10+d};
+    i=i+1
+  };
+  if(neg){<0-r};
+  <r
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let ids=mut.@();
+  let durs=mut.@();
+  let deps=mut.@();
+  let p=mut.0;
+  lp(p<jn){
+    let rest=s.slice(json;p;jn);
+    let ii=s.indexof(rest;"\"id\":\"");
+    if(ii<0){p=jn}el{
+      let istart=p+ii+6;
+      let iafter=s.slice(json;istart;jn);
+      let iendq=s.indexof(iafter;"\"");
+      let idval=s.slice(iafter;0;iendq);
+      let after=s.slice(json;istart+iendq;jn);
+      let di=s.indexof(after;"\"duration_ms\":");
+      let drest=s.slice(after;di+14;s.len(after) as i64);
+      let dend=mut.0;
+      lp(let k=0;k<s.len(drest) as i64;k=k+1){
+        let ch=s.slice(drest;k;k+1);
+        let isd=s.indexof("0123456789";ch);
+        if(isd>=0){dend=k+1}el{k=s.len(drest) as i64}
+      };
+      let durval=parseint(s.slice(drest;0;dend));
+      let depi=s.indexof(after;"\"depends_on\":[");
+      let deprest=s.slice(after;depi+14;s.len(after) as i64);
+      let depclose=s.indexof(deprest;"]");
+      let depseg=s.slice(deprest;0;depclose);
+      ids=ids+@(idval);
+      durs=durs+@(durval);
+      deps=deps+@(depseg);
+      p=istart+iendq+depi+14+depclose
+    }
+  };
+  let n=ids.len();
+  let longest=mut.@();
+  lp(let z=0;z<n;z=z+1){longest=longest+@(0)};
+  lp(let pass=0;pass<n;pass=pass+1){
+    lp(let z=0;z<n;z=z+1){
+      let seg=deps.get(z);
+      let sl=s.len(seg) as i64;
+      let maxdep=mut.0;
+      let q=mut.0;
+      lp(q<sl){
+        let qch=s.slice(seg;q;q+1);
+        if(s.eq(qch;"\"")){
+          let af=s.slice(seg;q+1;sl);
+          let eq=s.indexof(af;"\"");
+          let depid=s.slice(af;0;eq);
+          lp(let w=0;w<n;w=w+1){
+            if(s.eq(ids.get(w);depid)){
+              if(longest.get(w)>maxdep){maxdep=longest.get(w)}
+            }
+          };
+          q=q+1+eq+1
+        }el{q=q+1}
+      };
+      let cand=maxdep+durs.get(z);
+      if(cand>longest.get(z)){longest=longest.set(z;cand)}
+    }
+  };
+  let critical=mut.0;
+  lp(let z=0;z<n;z=z+1){if(longest.get(z)>critical){critical=longest.get(z)}};
+  let di2=s.indexof(json;"\"deadline_ms\":");
+  let drest2=s.slice(json;di2+14;jn);
+  let dend2=mut.0;
+  lp(let k=0;k<s.len(drest2) as i64;k=k+1){
+    let ch=s.slice(drest2;k;k+1);
+    let isd=s.indexof("0123456789";ch);
+    if(isd>=0){dend2=k+1}el{k=s.len(drest2) as i64}
+  };
+  let deadline=parseint(s.slice(drest2;0;dend2));
+  let slack=deadline-critical;
+  let feasstr=mut."false";
+  if(slack>=0){feasstr="true"};
+  let out=mut."{\"feasible\":";
+  out=s.concat(out;feasstr);
+  out=s.concat(out;",\"critical_path_ms\":");
+  out=s.concat(out;s.fromint(critical));
+  out=s.concat(out;",\"bottlenecks\":[],\"slack_ms\":");
+  out=s.concat(out;s.fromint(slack));
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

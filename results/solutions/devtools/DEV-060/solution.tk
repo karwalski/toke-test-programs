@@ -1,1 +1,27 @@
-m=portscan;f=scanrange(start:$i64;end:$i64):$str{let result=mut."";lp(let i=start;i<end;i=i+1){let out=scanport(i);if(out="open"){result=s.concat(result;i) as$str+" "}};<result};f=scanport(port:$i64):$str{let sock=mut.0;let ok=mut.false;lp(let attempt=0;attempt<5;attempt=attempt+1){sock=0;ok=false;let portstr=port as$str;let msg="CONNECTING: localhost:";let fullmsg=msg+portstr;let connsucc=mut.false;lp(let innerattempt=0;innerattempt<3;innerattempt=innerattempt+1){let connresult=connectlocalhost(port);if(connresult="connected"){connsucc=true;br};};if(connsucc){ok=true;sock=1;};};if(ok){let out="open";<out}el{let out="closed";<out}};f=connectlocalhost(port:$i64):$str{
+m=portscan;
+i=io:std.io;
+i=s:std.str;
+i=net:std.net;
+
+f=toint(x:$str):i64{
+  let r=mt s.toint(s.trim(x)){ $ok:v v; $err:e 0 };
+  <r
+};
+
+f=main():i64{
+  let header=io.readln();
+  let parts=s.split(s.trim(header);" ");
+  let startp=toint(parts.get(0));
+  let endp=toint(parts.get(1));
+
+  let opencount=mut.0;
+  lp(let p=startp;p<=endp;p=p+1){
+    let avail=net.portavailable(p as u64);
+    if(avail=0){
+      opencount=opencount+1;
+      io.println(s.concat(s.concat("port ";s.fromint(p));": OPEN"))
+    }
+  };
+  io.println(s.concat(s.concat(s.fromint(opencount);" port(s) open");""));
+  <0
+}

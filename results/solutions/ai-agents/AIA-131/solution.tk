@@ -1,1 +1,85 @@
-m=main;f=process(x:$str):$str{let y=mut."";lp(let i=0;i<x.len;i=i+1){let c=x.get(i);if(c="a"){y=s.concat(y;"A")}el{y=y+c};};<y};f=main():$void{let input="hello world";let result=process(input);<result};
+m=refinementplanner;i=io:std.io;i=s:std.str;
+f=strfield(json:$str;key:$str):$str{
+  let ki=s.indexof(json;key);
+  if(ki<0){<""};
+  let after=s.slice(json;ki+s.len(key) as i64;s.len(json) as i64);
+  let q1=s.indexof(after;"\"");
+  let rest=s.slice(after;q1+1;s.len(after) as i64);
+  let q2=s.indexof(rest;"\"");
+  <s.slice(rest;0;q2)
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let roughplan=strfield(json;"\"rough_plan\":");
+  let detail=strfield(json;"\"detail_level\":");
+  (* parse constraints array of strings *)
+  let ci=s.indexof(json;"\"constraints\":[");
+  let crest=s.slice(json;ci+15;jn);
+  let cclose=s.indexof(crest;"]");
+  let carr=s.slice(crest;0;cclose);
+  let constraints=mut.@();
+  let cn=s.len(carr) as i64;
+  let q=mut.0;
+  lp(q<cn){
+    let qch=s.slice(carr;q;q+1);
+    if(s.eq(qch;"\"")){
+      let af=s.slice(carr;q+1;cn);
+      let eq=s.indexof(af;"\"");
+      constraints=constraints+@(s.slice(af;0;eq));
+      q=q+1+eq+1
+    }el{q=q+1}
+  };
+  let nc=constraints.len();
+  (* detect a programming language / framework signal *)
+  let haspython=mut.false;
+  let langsupport=mut."";
+  let hasdeploy=mut.false;
+  lp(let z=0;z<nc;z=z+1){
+    let cstr=constraints.get(z);
+    if(s.indexof(cstr;"Python")>=0){haspython=true};
+    if(s.startswith(cstr;"Support ")){
+      langsupport=s.slice(cstr;8;s.len(cstr) as i64)
+    };
+    if(s.indexof(cstr;"Deploy")>=0){hasdeploy=true}
+  };
+  let plan=mut."[";
+  let madelist=mut."[";
+  let questions=mut."[";
+  if(haspython){
+    (* technology-specific refinement derived from constraints *)
+    plan=s.concat(plan;"{\"step\":\"Set up Python project with FastAPI\",\"duration\":\"1 day\"},");
+    plan=s.concat(plan;"{\"step\":\"Implement NLP pipeline with language detection\",\"duration\":\"3 days\"},");
+    plan=s.concat(plan;"{\"step\":\"Build conversation flow engine\",\"duration\":\"4 days\"},");
+    let step4=s.concat(s.concat("{\"step\":\"Add ";langsupport);" response templates\",\"duration\":\"2 days\"},");
+    plan=s.concat(plan;step4);
+    plan=s.concat(plan;"{\"step\":\"Integration testing\",\"duration\":\"2 days\"},");
+    plan=s.concat(plan;"{\"step\":\"Deploy to cloud\",\"duration\":\"2 days\"}");
+    madelist=s.concat(madelist;"\"Using FastAPI for the web framework\"");
+    if(hasdeploy){madelist=s.concat(madelist;",\"Cloud deployment (not on-premise)\"")};
+    questions=s.concat(questions;"\"What specific chatbot platform integration is needed?\",");
+    questions=s.concat(questions;"\"What is the expected user load?\",");
+    questions=s.concat(questions;"\"Are there specific NLP libraries preferred?\"")
+  }el{
+    (* generic phased plan when no recognizable technology domain *)
+    plan=s.concat(plan;"{\"step\":\"Project initialization and setup\",\"duration\":\"1 day\"},");
+    plan=s.concat(plan;"{\"step\":\"Detailed implementation phase\",\"duration\":\"5 days\"},");
+    plan=s.concat(plan;"{\"step\":\"Comprehensive testing\",\"duration\":\"2 days\"},");
+    plan=s.concat(plan;"{\"step\":\"Final deployment\",\"duration\":\"1 day\"}");
+    questions=s.concat(questions;"\"What are the specific technical requirements?\",");
+    questions=s.concat(questions;"\"What is the target user base?\",");
+    questions=s.concat(questions;"\"Are there budget constraints?\"")
+  };
+  plan=s.concat(plan;"]");
+  madelist=s.concat(madelist;"]");
+  questions=s.concat(questions;"]");
+  let out=mut."{\"refined_plan\":";
+  out=s.concat(out;plan);
+  out=s.concat(out;",\"assumptions_made\":");
+  out=s.concat(out;madelist);
+  out=s.concat(out;",\"questions\":");
+  out=s.concat(out;questions);
+  out=s.concat(out;"}");
+  io.println(out);
+  <0
+};

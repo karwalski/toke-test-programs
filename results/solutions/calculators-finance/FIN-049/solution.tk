@@ -1,1 +1,34 @@
-m=chisq;i=io:std.io;i=s:std.str;f=chisq(obs:$i64;exp:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<obs.len;i=i+1){let o=obs.get(i);let e=exp.get(i);let diff=o-e;let sq=diff*diff;sum=sum+sq as$f64/e as$f64};<sum};f=main():$i64{let obsline=io.readln();let expline=io.readln();let obsparts=s.split(obsline;",");let expparts=s.split(expline;",");let obs=mut$i64[];let exp=mut$i64[];lp(let i=0;i<obsparts.len;i=i+1){obs.push(s.toint(obsparts.get(i)));exp.push(s.toint(expparts.get(i)))};let result=chisq(obs;exp);io.println(s.fromf64(result;4));<0};
+m=chisq;
+i=io:std.io;
+i=s:std.str;
+f=fmt4(x:$f64):$str{
+  let neg=mut.false;
+  let v=mut.x;
+  if(v<0.0){neg=true;v=0.0-v};
+  let scaled=v*10000.0+0.5;
+  let n=mut.scaled as i64;
+  let intpart=n/10000;
+  let frac=n-intpart*10000;
+  let fracstr=mut.s.fromint(frac);
+  if(frac<1000){fracstr=s.concat("0";fracstr)};
+  if(frac<100){fracstr=s.concat("0";fracstr)};
+  if(frac<10){fracstr=s.concat("0";fracstr)};
+  let res=mut.s.concat(s.fromint(intpart);s.concat(".";fracstr));
+  if(neg){res=s.concat("-";res)};
+  <res
+};
+f=main():$i64{
+  let obsline=io.readln();
+  let expline=io.readln();
+  let obsparts=s.split(obsline;",");
+  let expparts=s.split(expline;",");
+  let sum=mut.0.0;
+  lp(let i=0;i<obsparts.len;i=i+1){
+    let o=s.toint(s.trim(obsparts.get(i))) as$f64;
+    let e=s.toint(s.trim(expparts.get(i))) as$f64;
+    let diff=o-e;
+    sum=sum+diff*diff/e
+  };
+  io.println(fmt4(sum));
+  <0
+};

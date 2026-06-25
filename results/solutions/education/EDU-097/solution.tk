@@ -1,1 +1,11 @@
-m=debate;f=solve(p0:$str;p1:$str;p2:i64):$str{let students=std.json.parse(p0);let motion=p1;let seed=p2;let n=students.len;let teama=mut.@();let teamb=mut.@();lp(let i=0;i<n;i=i+1){let s=students.get(i);let hash=mut.0;let name=s.str;lp(let j=0;j<name.len;j=j+1){let c=name.get(j);hash=hash+c as i64;};let idx=hash as i64;let mod=idx-(idx/2)*2;if(mod=0){teama=teama+@(s)}el{teamb=teamb+@(s)}};let result=mut."";let aidx=mut.0;lp(let i=0;i<teama.len;i=i+1){let s=teama.get(i);let name=s.str;let idx=aidx;let line=mut."";line=s.concat(line;"A");line=s.concat(line;".");line=line+name;result=s.concat(result;line);aidx=aidx+1;};let bidx=mut.0;lp(let i=0;i<teamb.len;i=i+1){let s=teamb.get(i);let name=s.str;let idx=bidx;let line=mut."";line=s.concat(line;"B)
+m=debate;i=io:std.io;i=s:std.str;
+f=main():$i64{let input=io.readln();
+let mq=s.split(input;"\"motion\":\"");let motion=mut."";if(mq.len()>=2){let r=mq.get(1);let e=s.split(r;"\"");motion=e.get(0)};
+let sp=s.split(input;"\"students\":[");let sinner=mut."";if(sp.len()>=2){let r=sp.get(1);let e=s.split(r;"]");sinner=e.get(0)};
+let raw=s.split(sinner;",");let students=mut.@($str);
+lp(let i=0;i<raw.len();i=i+1){let q=s.split(raw.get(i);"\"");if(q.len()>=2){students=students+@(q.get(1))}};
+let n=students.len();let forcount=(n+1)/2;
+io.println(s.concat("Motion: ";motion));
+let fline=mut."FOR: ";lp(let i=0;i<forcount;i=i+1){if(i>0){fline=s.concat(fline;", ")};fline=s.concat(fline;students.get(i))};io.println(fline);
+let aline=mut."AGAINST: ";lp(let i=forcount;i<n;i=i+1){if(i>forcount){aline=s.concat(aline;", ")};aline=s.concat(aline;students.get(i))};io.println(aline);
+<0}

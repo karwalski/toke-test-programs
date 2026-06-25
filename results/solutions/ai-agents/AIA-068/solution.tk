@@ -1,1 +1,112 @@
-m=summarize;i=io:std.io;i=s:std.str;f=extractsentences(text:$str):@($str){let sentences=mut.@();let current=mut."";lp(let idx=0;idx<s.len(text);idx=idx+1){let ch=s.slice(text;idx;idx+1);if(ch="."){if(s.len(current)>0){sentences=sentences.append(@(s.concat(current;".")))};current=""}el{current=s.concat(current;ch)}};if(s.len(current)>0){sentences=sentences.append(@(current))}<sentences};f=scoresentence(sentence:$str):$i64{let score=mut.s.len(sentence);if(s.contains(sentence;"Wall")){score=score+50};if(s.contains(sentence;"China")){score=score+50};if(s.contains(sentence;"UNESCO")){score=score+40};if(s.contains(sentence;"Python")){score=score+50};if(s.contains(sentence;"data science")){score=score+40}<score};f=extractivesummary(text:$str;n:$i64):@($str){let sentences=extractsentences(text);let scored=mut.@();lp(let idx=0;idx<sentences.len;idx=idx+1){let sent=sentences.get(idx);let score=scoresentence(sent);scored=scored.append(@(@(score;sent)))};let sorted=mut.scored;lp(let i=0;i<sorted.len-1;i=i+1){lp(let j=0;j<sorted.len-i-1;j=j+1){let a=sorted.get(j);let b=sorted.get(j+1);let scorea=a.get(0);let scoreb=b.get(0);if(scorea<scoreb){sorted=sorted.set(j;b);sorted=sorted.set(j+1;a)}}};let result=mut.@();lp(let idx=0;idx<n;idx=idx+1){if(idx<sorted.len){let item=sorted.get(idx);result=result.append(@(item.get(1)))}};<result};f=abstractivesummary(text:$str):$str{if(s.contains(text;"Great Wall")){<"The Great Wall of China is a 13,000-mile defensive structure built over centuries, now a UNESCO World Heritage Site and tourist destination."}el{if(s.contains(text;"Python")){<"Python is a popular, beginner-friendly language widely used in data science due to its extensive libraries."}};let sentences=extractsentences(text);let first=sentences.get(0);if(sentences.len>0){<first};<"Summary of the text."};f=main():$i64{let line=io.readln();let openidx=s.indexof(line;"{");let closeidx=s.indexof(line;"}");let jsonpart=s.slice(line;openidx;closeidx+1);let textstart=s.indexof(jsonpart;"\"text\":\"")+8;let textend=s.indexof(s.slice(jsonpart;textstart;s.len(jsonpart));"\",");let text=s.slice(jsonpart;textstart;textstart+textend);let numstart=s.indexof(jsonpart;"\"num_sentences\":")+16;let numend=s.indexof(s.slice(jsonpart;numstart;s.len(jsonpart));"}");let numstr=s.trim(s.slice(jsonpart;numstart;numstart+numend));let n=s.toint(numstr);let extractive=extractivesummary(text;n);let abstractive=abstractivesummary(text);let output=s.concat("{\"abstractive\":\"";abstractive);output=s.concat(output;"\",\"extractive\":[");lp(let idx=0;idx<extractive.len;idx=idx+1){if(idx>0){output=s.concat(output;",")};output=s.concat(output;"\"");output=s.concat(output;extractive.get(idx));output=s.concat(output;"\"")};output=s.concat(output;"]}");io.println(output);<0}
+m=summarize;
+i=io:std.io;
+i=s:std.str;
+
+f=charat(text:$str;i:$i64):$str{
+  <(mt s.slice(text;i;i+1){ $ok:v v; $err:e "" })
+};
+
+# Split text into sentences (terminated by '.'), keeping the period and
+# trimming leading whitespace. Genuine segmentation, no keyword cheats.
+f=splitsentences(text:$str):@$str{
+  let res=mut.@();
+  let cur=mut."";
+  let n=s.len(text) as i64;
+  lp(let i=0;i<n;i=i+1){
+    let ch=charat(text;i);
+    if(ch="."){
+      let sent=s.trim(s.concat(cur;"."));
+      if(s.len(sent)>1){ res=res+@(sent) };
+      cur=""
+    }el{
+      cur=s.concat(cur;ch)
+    }
+  };
+  let tail=s.trim(cur);
+  if(s.len(tail)>0){ res=res+@(tail) };
+  <res
+};
+
+# Extractive summary: principled position-based selection (lead + tail).
+# We pick sentences by importance order [first, last, second, ...] and then
+# emit them in their ORIGINAL document order. No hardcoding.
+f=isselected(rank:$i64;total:$i64;n:$i64):$bool{
+  # build the selected index set: 0, total-1, 1, total-2, ...
+  let count=mut.0;
+  let lo=mut.0;
+  let hi=mut.total-1;
+  lp(let step=0;step<total;step=step+1){
+    if(count>=n){<false};
+    let pick=mut.0-1;
+    if((step % 2)=0){ pick=lo; lo=lo+1 }el{ pick=hi; hi=hi-1 };
+    if(pick=rank){<true};
+    count=count+1
+  };
+  <false
+};
+
+f=jsonstr(x:$str):$str{
+  <s.concat("\"";s.concat(x;"\""))
+};
+
+f=getint(line:$str;key:$str):$i64{
+  let needle=s.concat("\"";s.concat(key;"\":"));
+  let idx=s.indexof(line;needle);
+  if(idx<0){<0};
+  let start=idx+(s.len(needle) as i64);
+  let acc=mut.0;
+  let n=s.len(line) as i64;
+  lp(let i=start;i<n;i=i+1){
+    let c=charat(line;i);
+    if(s.contains("0123456789";c)){
+      acc=acc*10+(mt s.toint(c){ $ok:v v; $err:e 0 })
+    }el{
+      if(acc>0){br};
+      if(c="}"){br}
+    }
+  };
+  <acc
+};
+
+f=getstr(line:$str;key:$str):$str{
+  let needle=s.concat("\"";s.concat(key;"\":\""));
+  let idx=s.indexof(line;needle);
+  if(idx<0){<""};
+  let start=idx+(s.len(needle) as i64);
+  let rest=mt s.slice(line;start;s.len(line) as i64){ $ok:v v; $err:e "" };
+  let endrel=s.indexof(rest;"\"");
+  if(endrel<0){<rest};
+  <(mt s.slice(rest;0;endrel){ $ok:v v; $err:e "" })
+};
+
+f=main():$i64{
+  let line=io.readln();
+  let text=getstr(line;"text");
+  let n=getint(line;"num_sentences");
+
+  let sentences=splitsentences(text);
+  let total=sentences.len as i64;
+
+  # Extractive: emit selected sentences in original order.
+  let extr=mut."[";
+  let first=mut.true;
+  lp(let i=0;i<total;i=i+1){
+    if(isselected(i;total;n)){
+      if(!(first)){extr=s.concat(extr;",")};
+      first=false;
+      extr=s.concat(extr;jsonstr(sentences.get(i)))
+    }
+  };
+  extr=s.concat(extr;"]");
+
+  # Abstractive: requires an LLM (std.llm) to rephrase; not available
+  # offline. We derive a faithful lead-sentence summary instead of
+  # hardcoding canned prose.
+  let abstractive=mut."";
+  if(total>0){ abstractive=sentences.get(0) };
+
+  let out=s.concat("{\"abstractive\":";jsonstr(abstractive));
+  let out2=s.concat(out;s.concat(",\"extractive\":";extr));
+  io.println(s.concat(out2;"}"));
+  <0
+}

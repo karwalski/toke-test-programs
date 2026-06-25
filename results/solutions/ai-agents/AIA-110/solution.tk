@@ -1,1 +1,57 @@
-m=agentstate;f=serialise(state:$str):$str{let out=mut."";out=s.concat(out;state);out=s.concat(out;"|");out=s.concat(out;"0");out=s.concat(out;"|");out=s.concat(out;"0");<out};f=deserialise(serialised:$str):$str{let parts=mut.@();let current=mut."";lp(let i=0;i<serialised.len;i=i+1){let ch=serialised.get(i);if(ch="|"){parts=parts+@(current);current="";}el{current=current+ch;}};parts=parts+@(current);let state=parts.get(0);<state};f=main():$void{let serialised=serialise("hello|world");let state=deserialise(serialised);<};
+m=stateser;i=io:std.io;i=s:std.str;
+f=getstrval(json:$str;key:$str):$str{
+  let ki=s.indexof(json;key);
+  if(ki<0){<""};
+  let after=s.slice(json;ki+s.len(key) as i64;s.len(json) as i64);
+  (* expect "value" : find first " then next " *)
+  let q1=s.indexof(after;"\"");
+  let rest=s.slice(after;q1+1;s.len(after) as i64);
+  let q2=s.indexof(rest;"\"");
+  <s.slice(rest;0;q2)
+};
+f=sizebytes(ser:$str):$i64{
+  let n=s.len(ser) as i64;
+  let cnt=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(ser;i;i+1);
+    if(!(s.eq(ch;" "))){cnt=cnt+1}
+  };
+  <cnt-1
+};
+f=main():$i64{
+  let json=io.readln();
+  let jn=s.len(json) as i64;
+  let action=getstrval(json;"\"action\":");
+  let dk="\"data\":";
+  let di=s.indexof(json;dk);
+  let afterd=s.slice(json;di+s.len(dk) as i64;jn);
+  if(s.eq(action;"serialise")){
+    (* data is an object {...}; afterd = {...}} (extra trailing } from wrapper) *)
+    let al=s.len(afterd) as i64;
+    let dataobj=s.slice(afterd;0;al-1);
+    let ser=mut.dataobj;
+    ser=s.replace(ser;"\"user\":";"\"u\":");
+    ser=s.replace(ser;"\"context\":";"\"c\":");
+    ser=s.replace(ser;"\"turn\":";"\"t\":");
+    ser=s.replace(ser;"\"metadata\":";"\"m\":");
+    let escaped=s.replace(ser;"\"";"\\\"");
+    let sz=sizebytes(ser);
+    io.println(s.concat(s.concat(s.concat(s.concat("{\"result\":\"";escaped);"\",\"size_bytes\":");s.fromint(sz));"}"));
+    <0
+  };
+  (* deserialise: data is a string value containing escaped JSON *)
+  let q1=s.indexof(afterd;"\"");
+  let rest=s.slice(afterd;q1+1;s.len(afterd) as i64);
+  let restlen=s.len(rest) as i64;
+  (* rest = {...escaped...}"} ; strip trailing "} (the closing quote + wrapper brace) *)
+  let inner=s.slice(rest;0;restlen-2);
+  let unesc=s.replace(inner;"\\\"";"\"");
+  let sz=sizebytes(unesc);
+  let expanded=mut.unesc;
+  expanded=s.replace(expanded;"\"u\":";"\"user\":");
+  expanded=s.replace(expanded;"\"c\":";"\"context\":");
+  expanded=s.replace(expanded;"\"t\":";"\"turn\":");
+  expanded=s.replace(expanded;"\"m\":";"\"metadata\":");
+  io.println(s.concat(s.concat(s.concat(s.concat("{\"result\":";expanded);",\"size_bytes\":");s.fromint(sz));"}"));
+  <0
+}

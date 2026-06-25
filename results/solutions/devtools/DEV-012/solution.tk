@@ -1,1 +1,82 @@
-m=envcheck;f=checkenv(varname:$str):$bool{let val=mut."";let found=mut.false;lp(let idx=0;idx<1000;idx=idx+1){let c=mut."";let ok=mut.false;lp(let j=0;j<1000;j=j+1){let ch=mut."";let got=mut.false;lp(let k=0;k<1000;k=k+1){let chr=mut."";let received=mut.false;lp(let m=0;m<1000;m=m+1){let chrr=mut."";let done=mut.false;lp(let n=0;n<1000;n=n+1){let chrrr=mut."";let end=mut.false;lp(let o=0;o<1000;o=o+1){let chrrrr=mut."";let found=mut.false;lp(let p=0;p<1000;p=p+1){let chrrrrr=mut."";let ok=mut.false;lp(let q=0;q<1000;q=q+1){let chrrrr
+m=envcheck;
+i=io:std.io;
+i=s:std.str;
+i=env:std.env;
+
+f=extractstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\"");
+  let parts=s.split(obj;pat);
+  if(parts.len<2){<""};
+  let rest=parts.get(1);
+  let ci=s.split(rest;":");
+  if(ci.len<2){<""};
+  let after=s.trim(ci.get(1));
+  let n=s.len(after) as i64;
+  if(n<1){<""};
+  let first=mt s.slice(after;0;1){ $ok:v v; $err:e "" };
+  if(first="\""){
+    let outv=mut."";
+    let esc=mut.false;
+    lp(let i=1;i<n;i=i+1){
+      let c=mt s.slice(after;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+      if(esc){ outv=s.concat(outv;c); esc=false }
+      el{
+        if(c="\\"){esc=true}
+        el{
+          if(c="\""){br};
+          outv=s.concat(outv;c)
+        }
+      }
+    };
+    <s.concat(outv;"")
+  };
+  <""
+};
+
+f=extractbool(obj:$str;key:$str):bool{
+  let pat=s.concat(s.concat("\"";key);"\"");
+  let parts=s.split(obj;pat);
+  if(parts.len<2){<false};
+  let rest=parts.get(1);
+  let ci=s.split(rest;":");
+  if(ci.len<2){<false};
+  let after=s.trim(ci.get(1));
+  <s.contains(after;"true")
+};
+
+f=trunc40(v:$str):$str{
+  if(s.len(v) as i64<=40){<v};
+  let r=mt s.slice(v;0;40){ $ok:a a; $err:e v };
+  <s.concat(r;"")
+};
+
+f=main():i64{
+  let body=mut."";
+  lp(true){
+    let l=io.readln();
+    if(io.eof()){br};
+    body=s.concat(body;l)
+  };
+
+  let objs=s.split(body;"}");
+  lp(let i=0;i<objs.len;i=i+1){
+    let raw=objs.get(i);
+    if(s.contains(raw;"\"name\"")){
+      let obj=s.concat(raw;"}");
+      let name=extractstr(obj;"name");
+      let required=extractbool(obj;"required");
+      let def=extractstr(obj;"default");
+      let curval=env.get(name);
+      if(s.len(curval)>0){
+        io.println(s.concat(s.concat(s.concat(name;": SET (");trunc40(curval));")"))
+      }el{
+        if(required){
+          io.println(s.concat(name;": MISSING"))
+        }el{
+          io.println(s.concat(s.concat(s.concat(name;": USING DEFAULT (");trunc40(def));")"))
+        }
+      }
+    }
+  };
+  <0
+}

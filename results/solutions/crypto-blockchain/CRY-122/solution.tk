@@ -1,1 +1,49 @@
-m=gasprice;f=median(arr:@($i64))):$i64{let n=arr.len;let sorted=mut.@($i64);lp(let i=0;i<n;i=i+1){sorted=sorted+@(arr.get(i))};lp(let i=0;i<n;i=i+1){let minidx=mut.i;lp(let j=i+1;j<n;j=j+1){if(sorted.get(j)<sorted.get(minidx)){minidx=j}};let tmp=sorted.get(i);sorted.get(i)=sorted.get(minidx);sorted.get(minidx)=tmp};let m=n/2;if(n-n/2*2=0){<sorted.get(m)}el{<sorted.get(m)+sorted.get(m+1)}el/2}};f=recommend(gasprice:$i64):$str{let thresholds=@(50;100;200));let labels=@("slow";"average";"fast"));let idx=mut.0;lp(let i=0;i<thresholds.len;i=i+1){if(gasprice<thresholds.get(i)){idx=i;br}};if(idx=0){<labels.get(0)}
+m=gasprice;i=io:std.io;i=s:std.str;
+f=wrap(x:$f64):$f64{<x+0.0};
+f=pct(sorted:@$i64;p:$i64):$i64{
+let n=sorted.len();
+let idx=wrap((p as $f64)/100.0*(n as $f64)-1.0);
+let lo=mut.idx as $i64;
+if(lo<0){lo=0};
+let frac=mut.wrap(idx-(lo as $f64));
+if(frac<0.0){frac=0.0};
+let result=mut.0;
+if(lo+1<n){
+let a=sorted.get(lo);
+let b=sorted.get(lo+1);
+let fv=wrap((a as $f64)+frac*((b as $f64)-(a as $f64)));
+result=fv as $i64
+}el{
+result=sorted.get(lo)
+};
+<result};
+f=main():$i64{
+let line=s.trim(io.readln());
+let clean=mut."";
+let i=mut.0;
+lp(i<s.len(line)){
+let ch=s.slice(line;i;i+1);
+if(s.eq(ch;"[")){clean=clean}el{
+if(s.eq(ch;"]")){clean=clean}el{
+if(s.eq(ch;" ")){clean=clean}el{
+clean=s.concat(clean;ch)}}};
+i=i+1};
+let parts=s.split(clean;",");
+let np=parts.len();
+let nums=mut.@();
+let k=mut.0;
+lp(k<np){nums=nums+@(s.toint(parts.get(k)));k=k+1};
+let n=nums.len();
+lp(let a=0;a<n;a=a+1){
+let minidx=mut.a;
+lp(let b=a+1;b<n;b=b+1){
+if(nums.get(b)<nums.get(minidx)){minidx=b}};
+let tmp=nums.get(a);
+nums=nums.set(a;nums.get(minidx));
+nums=nums.set(minidx;tmp)};
+let p25=pct(nums;25);
+let p50=pct(nums;50);
+let p75=pct(nums;75);
+let out=s.concat(s.concat(s.concat("slow:";s.fromint(p25));s.concat(" average:";s.fromint(p50)));s.concat(" fast:";s.fromint(p75)));
+io.println(out);
+<0}

@@ -1,1 +1,24 @@
-m=plan;f=makeplan(n:$i64;m:$i64):$str{let s=mut."";lp(let i=0;i<n;i=i+1){let j=mut.0;lp(let k=0;k<m;k=k+1){let zor=mut.false;if(k=j){zor=true};if(!(zor)){s=s.concat(s;"plan day=");s=s+i;s=s.concat(s;" avoid=");s=s+j;s=s.concat(s;"\n");j=j+1}};s=s.concat(s;"all plans\n");<s};f=checkavoid(day:$i64;avoid:$i64):$bool{let r=mut.false;if(day=avoid){r=true};<r};f=main():$i64{let s=makeplan(5;3);<0};
+m=plan;i=io:std.io;i=s:std.str;
+f=isleap(y:$i64):$bool{if(y%4!=0){<false};if(y%100!=0){<true};if(y%400!=0){<false};<true};
+f=mdays(y:$i64;m:$i64):$i64{if(m=1){<31};if(m=2){if(isleap(y)){<29};<28};if(m=3){<31};if(m=4){<30};if(m=5){<31};if(m=6){<30};if(m=7){<31};if(m=8){<31};if(m=9){<30};if(m=10){<31};if(m=11){<30};<31};
+f=todays(date:$str):$i64{let p=s.split(date;"-");let y=s.toint(p.get(0));let m=s.toint(p.get(1));let d=s.toint(p.get(2));let total=mut.d;let yy=mut.0;lp(yy<y){let dy=mut.365;if(isleap(yy)){dy=366};total=total+dy;yy=yy+1};let mm=mut.1;lp(mm<m){total=total+mdays(y;mm);mm=mm+1};<total};
+f=pad2(n:$i64):$str{if(n<10){<s.concat("0";s.fromint(n))};<s.fromint(n)};
+f=fromdays(days:$i64):$str{let y=mut.0;let rem=mut.days;lp(true){let dy=mut.365;if(isleap(y)){dy=366};if(rem>dy){rem=rem-dy;y=y+1}el{y=y;rem=rem;let done=mut.true;if(done){<concatdate(y;rem)}}};<""};
+f=concatdate(y:$i64;rem:$i64):$str{let m=mut.1;let r=mut.rem;lp(true){let dm=mdays(y;m);if(r>dm){r=r-dm;m=m+1}el{<s.concat(s.concat(s.concat(s.concat(s.fromint(y);"-");pad2(m));"-");pad2(r))}};<""};
+f=isexcluded(excl:@$str;date:$str):$bool{lp(let i=0;i<excl.len();i=i+1){if(s.equals(excl.get(i);date)){<true}};<false};
+f=main():$i64{let input=io.readln();
+let sp=s.split(input;"\"start_date\":\"");let start=mut."";if(sp.len()>=2){let r=sp.get(1);let e=s.split(r;"\"");start=e.get(0)};
+let ex=s.split(input;"\"excluded_dates\":[");let exinner=mut."";if(ex.len()>=2){let r=ex.get(1);let e=s.split(r;"]");exinner=e.get(0)};
+let exraw=s.split(exinner;",");let excl=mut.@($str);lp(let i=0;i<exraw.len();i=i+1){let q=s.split(exraw.get(i);"\"");if(q.len()>=2){excl=excl+@(q.get(1))}};
+let aspl=s.split(input;"\"assessments\":[");let ainner=mut."";if(aspl.len()>=2){let r=aspl.get(1);ainner=r};
+let objs=s.split(ainner;"{");
+let startday=todays(start);
+let prev=mut.-1;
+lp(let i=0;i<objs.len();i=i+1){let o=objs.get(i);if(s.contains(o;"title")){
+let tq=s.split(o;"\"title\":\"");let title=mut."";if(tq.len()>=2){let r=tq.get(1);let e=s.split(r;"\"");title=e.get(0)};
+let gq=s.split(o;"\"min_days_gap\":");let gap=mut.0;if(gq.len()>=2){let r=gq.get(1);let b=s.split(r;"}");let cm=s.split(b.get(0);",");gap=s.toint(s.trim(cm.get(0)))};
+let cand=mut.startday;if(prev>=0){cand=prev+gap};
+lp(isexcluded(excl;fromdays(cand))){cand=cand+1};
+io.println(s.concat(s.concat(title;": ");fromdays(cand)));
+prev=cand}};
+<0}

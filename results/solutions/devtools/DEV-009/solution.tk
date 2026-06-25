@@ -1,1 +1,144 @@
-m=lint;f=lint(code:$str;rules:@($str)):i64{let violations=mut.0;lp(let i=0;i<rules.len;i=i+1){let rule=rules.get(i);if(rule="max-line-length"){let max=80;let lines=code.split("\n");lp(let j=0;j<lines.len;j=j+1){let line=lines.get(j);if(line.len>max){violations=violations+1}}}}el{if(rule="no-magic-numbers"){let hasmagic=mut.false;let nums=@(0;1;2;3;4;5;6;7;8;9));let words=code.split(" ");lp(let k=0;k<words.len;k=k+1){let word=words.get(k);let isnum=mut.false;lp(let m=0;m<nums.len;m=m+1){if(word=nums.get(m)){isnum=true}};if(!(isnum)){hasmagic=true}}};if(hasmagic){violations=violations+1}}}};if(violations>0){<1}el{<0}};f=main():$void{let
+m=lint;
+i=io:std.io;
+i=s:std.str;
+
+f=extractstr(obj:$str;key:$str):$str{
+  let pat=s.concat(s.concat("\"";key);"\"");
+  let parts=s.split(obj;pat);
+  if(parts.len<2){<""};
+  let rest=parts.get(1);
+  let ci=s.split(rest;":");
+  if(ci.len<2){<""};
+  let after=s.trim(ci.get(1));
+  let n=s.len(after) as i64;
+  if(n<1){<""};
+  let first=mt s.slice(after;0;1){ $ok:v v; $err:e "" };
+  if(first="\""){
+    let outv=mut."";
+    let esc=mut.false;
+    lp(let i=1;i<n;i=i+1){
+      let c=mt s.slice(after;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+      if(esc){
+        outv=s.concat(outv;c);
+        esc=false
+      }el{
+        if(c="\\"){esc=true}
+        el{
+          if(c="\""){br};
+          outv=s.concat(outv;c)
+        }
+      }
+    };
+    <s.concat(outv;"")
+  };
+  <""
+};
+
+f=unescaperegex(p:$str):$str{
+  let n=s.len(p) as i64;
+  let outv=mut."";
+  let i=mut.0;
+  lp(i<n){
+    let c=mt s.slice(p;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
+    if(c="\\"){
+      if(i+1<n){
+        let nextc=mt s.slice(p;(i+1) as u64;(i+2) as u64){ $ok:v v; $err:e "" };
+        outv=s.concat(outv;nextc);
+        i=i+2
+      }el{
+        i=i+1
+      }
+    }el{
+      outv=s.concat(outv;c);
+      i=i+1
+    }
+  };
+  <s.concat(outv;"")
+};
+
+f=main():i64{
+  let rulesline=io.readln();
+
+  let codelines=mut.@();
+  lp(true){
+    let l=io.readln();
+    if(io.eof()){br};
+    codelines=codelines.push(l)
+  };
+
+  let rids=mut.@();
+  let rpats=mut.@();
+  let rmsgs=mut.@();
+  let rsevs=mut.@();
+
+  let objs=s.split(rulesline;"}");
+  lp(let i=0;i<objs.len;i=i+1){
+    let raw=objs.get(i);
+    if(s.contains(raw;"\"id\"")){
+      let obj=s.concat(raw;"}");
+      rids=rids.push(extractstr(obj;"id"));
+      rpats=rpats.push(unescaperegex(extractstr(obj;"pattern")));
+      rmsgs=rmsgs.push(extractstr(obj;"message"));
+      rsevs=rsevs.push(extractstr(obj;"severity"))
+    }
+  };
+
+  let vlines=mut.@();
+  let vrids=mut.@();
+  let vouts=mut.@();
+
+  lp(let ln=0;ln<codelines.len;ln=ln+1){
+    let line=codelines.get(ln);
+    lp(let r=0;r<rids.len;r=r+1){
+      if(s.contains(line;rpats.get(r))){
+        let lineno=(ln as i64)+1;
+        let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("line ";s.fromint(lineno));": [");rsevs.get(r));"] ");rids.get(r));" - ");rmsgs.get(r));
+        vlines=vlines.push(lineno);
+        vrids=vrids.push(rids.get(r));
+        vouts=vouts.push(out)
+      }
+    }
+  };
+
+  let m=vouts.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<m;i=i+1){ order=order.push(i) };
+  lp(let i=0;i<m;i=i+1){
+    lp(let j=0;j<m-i-1;j=j+1){
+      let a=order.get(j);
+      let b=order.get(j+1);
+      let swap=mut.false;
+      if(vlines.get(a as u64)>vlines.get(b as u64)){swap=true}
+      el{
+        if(vlines.get(a as u64)=vlines.get(b as u64)){
+          if(strgt(vrids.get(a as u64);vrids.get(b as u64))){swap=true}
+        }
+      };
+      if(swap){
+        order=order.set(j as u64;b);
+        order=order.set((j+1) as u64;a)
+      }
+    }
+  };
+
+  lp(let k=0;k<m;k=k+1){
+    io.println(vouts.get(order.get(k) as u64))
+  };
+  <0
+};
+
+f=strgt(a:$str;b:$str):bool{
+  let na=s.len(a) as i64;
+  let nb=s.len(b) as i64;
+  let m=mut.na;
+  if(nb<m){m=nb};
+  let ba=s.bytes(a);
+  let bb=s.bytes(b);
+  lp(let i=0;i<m;i=i+1){
+    let ca=ba.get(i as u64) as i64;
+    let cb=bb.get(i as u64) as i64;
+    if(ca>cb){<true};
+    if(ca<cb){<false}
+  };
+  <na>nb
+}

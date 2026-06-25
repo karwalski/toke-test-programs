@@ -1,1 +1,126 @@
-m=traffic;f=extractmethod(line:$str):$str{let idx=mut.0;let n=line.len;lp(let i=0;i<n;i=i+1){let c=line.get(i);if(c=" "){idx=i;br};};let start=idx+1;let end=mut.n;lp(let i=start;i<n;i=i+1){let c=line.get(i);if(c=" "){end=i;br};};let result=mut."";lp(let i=start;i<end;i=i+1){let c=line.get(i);result=result+c;};<result};f=extractpath
+m=traffic;
+i=io:std.io;
+i=str:std.str;
+
+f=getstr(obj:$str;key:$str):$str{
+  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<""};
+  let plen=str.len(pat) as i64;
+  let start=idx+plen;
+  let olen=str.len(obj) as i64;
+  let rest=mt str.slice(obj;start;olen){ $ok:v v; $err:e "" };
+  let qidx=str.indexof(rest;"\"");
+  if(qidx<0){<rest};
+  <mt str.slice(rest;0;qidx){ $ok:v v; $err:e "" }
+};
+
+f=getint(obj:$str;key:$str):$i64{
+  let pat=str.concat(str.concat("\"";key);"\":");
+  let idx=str.indexof(obj;pat);
+  if(idx<0){<0};
+  let plen=str.len(pat) as i64;
+  let start=idx+plen;
+  let olen=str.len(obj) as i64;
+  let zero=str.bytes("0").get(0);
+  let nine=str.bytes("9").get(0);
+  let bytes=str.bytes(obj);
+  let val=mut.0;
+  let going=mut.true;
+  lp(let i=start;i<olen;i=i+1){
+    if(going){
+      let b=bytes.get(i);
+      let isdigit=mut.false;
+      if(!(b<zero)){
+        if(!(b>nine)){
+          isdigit=true;
+        };
+      };
+      if(isdigit){
+        val=val*10+((b as i64)-48);
+      }el{
+        going=false;
+      };
+    };
+  };
+  <val
+};
+
+f=fmt1(x:$f64):$str{
+  let neg=x<0.0;
+  let ax=mut.x;
+  if(neg){ax=0.0-x};
+  let scaled=ax*10.0+0.5;
+  let asint=scaled as i64;
+  let whole=asint/10;
+  let frac=asint-whole*10;
+  let sign=mut."";
+  if(neg){sign="-"};
+  <str.concat(str.concat(str.concat(sign;str.fromint(whole));".");str.fromint(frac))
+};
+
+f=main():i64{
+  let input=io.readln();
+  let n=str.len(input) as i64;
+  if(n=0){<0};
+  let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
+  let parts=str.split(inner;"},{");
+  let np=parts.len as i64;
+  let froms=mut.@();
+  let tos=mut.@();
+  let reqs=mut.@();
+  let errs=mut.@();
+  let lats=mut.@();
+  lp(let i=0;i<np;i=i+1){
+    let raw=parts.get(i);
+    let obj=mut.raw;
+    if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
+    if(!(str.endswith(obj;"}"))){obj=str.concat(obj;"}")};
+    froms=froms.push(getstr(obj;"from_service"));
+    tos=tos.push(getstr(obj;"to_service"));
+    reqs=reqs.push(getint(obj;"request_count"));
+    errs=errs.push(getint(obj;"error_count"));
+    lats=lats.push(getint(obj;"avg_latency_ms"));
+  };
+  let cnt=froms.len as i64;
+  let order=mut.@();
+  lp(let i=0;i<cnt;i=i+1){order=order.push(i)};
+  lp(let i=0;i<cnt;i=i+1){
+    lp(let j=0;j<cnt-1-i;j=j+1){
+      let a=order.get(j);
+      let b=order.get(j+1);
+      if(reqs.get(a)<reqs.get(b)){
+        order=order.set(j;b);
+        order=order.set(j+1;a);
+      };
+    };
+  };
+  io.println("Traffic Summary");
+  let totalreq=mut.0;
+  let totalerr=mut.0;
+  lp(let k=0;k<cnt;k=k+1){
+    let i=order.get(k);
+    let rc=reqs.get(i);
+    let ec=errs.get(i);
+    let lat=lats.get(i);
+    totalreq=totalreq+rc;
+    totalerr=totalerr+ec;
+    let rate=mut.0.0;
+    if(!(rc=0)){rate=(ec as f64)/(rc as f64)*100.0};
+    let line=mut.str.concat(froms.get(i);" -> ");
+    line=str.concat(line;tos.get(i));
+    line=str.concat(line;": ");
+    line=str.concat(line;str.fromint(rc));
+    line=str.concat(line;" req/s, ");
+    line=str.concat(line;fmt1(rate));
+    line=str.concat(line;"% errors, ");
+    line=str.concat(line;str.fromint(lat));
+    line=str.concat(line;"ms avg");
+    io.println(line);
+  };
+  io.println(str.concat("Total requests: ";str.fromint(totalreq)));
+  let orate=mut.0.0;
+  if(!(totalreq=0)){orate=(totalerr as f64)/(totalreq as f64)*100.0};
+  io.println(str.concat(str.concat("Overall error rate: ";fmt1(orate));"%"));
+  <0
+};

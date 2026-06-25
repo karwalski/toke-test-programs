@@ -1,1 +1,97 @@
-m=trie;f=insert(root:$str;word:$str):$str{let node=root;let i=mut.0;lp(let idx=0;idx<word.len;idx=idx+1){let ch=word.get(idx);let found=mut.false;let next=mut.node;lp(let jdx=0;jdx<node.len;jdx=jdx+1){let entry=node.get(jdx);if(entry.ch=ch){found=true;next=entry.next;};};if(!(found)){let newentry=$str{ch:ch;next:$str{}}};node=node+newentry;next=newentry.next;};node=next;};<root};f=autocomplete(root:$str;prefix:$str):@$str{let node=root;let i=mut.0;lp(let idx=0;idx<prefix.len;idx=idx+1){let ch=prefix
+m=trie;
+i=io:std.io;
+i=s:std.str;
+
+f=charat(w:$str;i:i64):$str{ <s.slice(w;i;i+1) };
+
+(* rank a single-char string; lowercase letters then digits then other *)
+f=charrank(c:$str):i64{
+  if(s.eq(c;"a")){<0}; if(s.eq(c;"b")){<1}; if(s.eq(c;"c")){<2};
+  if(s.eq(c;"d")){<3}; if(s.eq(c;"e")){<4}; if(s.eq(c;"f")){<5};
+  if(s.eq(c;"g")){<6}; if(s.eq(c;"h")){<7}; if(s.eq(c;"i")){<8};
+  if(s.eq(c;"j")){<9}; if(s.eq(c;"k")){<10}; if(s.eq(c;"l")){<11};
+  if(s.eq(c;"m")){<12}; if(s.eq(c;"n")){<13}; if(s.eq(c;"o")){<14};
+  if(s.eq(c;"p")){<15}; if(s.eq(c;"q")){<16}; if(s.eq(c;"r")){<17};
+  if(s.eq(c;"s")){<18}; if(s.eq(c;"t")){<19}; if(s.eq(c;"u")){<20};
+  if(s.eq(c;"v")){<21}; if(s.eq(c;"w")){<22}; if(s.eq(c;"x")){<23};
+  if(s.eq(c;"y")){<24}; if(s.eq(c;"z")){<25};
+  if(s.eq(c;"0")){<26}; if(s.eq(c;"1")){<27}; if(s.eq(c;"2")){<28};
+  if(s.eq(c;"3")){<29}; if(s.eq(c;"4")){<30}; if(s.eq(c;"5")){<31};
+  if(s.eq(c;"6")){<32}; if(s.eq(c;"7")){<33}; if(s.eq(c;"8")){<34};
+  if(s.eq(c;"9")){<35};
+  <99
+};
+
+(* returns 1 if a<b lexicographically (lowercased), else 0 *)
+f=strless(a:$str;b:$str):i64{
+  let la=s.len(a); let lb=s.len(b);
+  let n=mut.la; if(lb<la){n=lb};
+  lp(let i=0;i<n;i=i+1){
+    let x=charrank(charat(a;i)); let y=charrank(charat(b;i));
+    if(x<y){<1};
+    if(y<x){<0};
+  };
+  if(la<lb){<1};
+  <0
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  let total=lines.len;
+  let words=mut.@();
+  let queries=mut.@();
+  let inq=mut.0;
+  lp(let i=0;i<total;i=i+1){
+    let l=lines.get(i);
+    if(s.eq(l;"")){
+      inq=1
+    }el{
+      if(inq=0){words=words.push(l)}el{queries=queries.push(l)}
+    }
+  };
+  let nq=queries.len;
+  lp(let qi=0;qi<nq;qi=qi+1){
+    let prefix=queries.get(qi);
+    let lpf=s.lower(prefix);
+    let matches=mut.@();
+    let nw=words.len;
+    lp(let wi=0;wi<nw;wi=wi+1){
+      let w=words.get(wi);
+      let lw=s.lower(w);
+      if(s.startswith(lw;lpf)){
+        matches=matches.push(w)
+      }
+    };
+    let m=matches.len;
+    lp(let a=1;a<m;a=a+1){
+      let key=matches.get(a);
+      let lkey=s.lower(key);
+      let b=mut.a-1;
+      lp(1=1){
+        if(b<0){br};
+        let cur=matches.get(b);
+        let lcur=s.lower(cur);
+        if(strless(lkey;lcur)=1){
+          matches=matches.set(b+1;cur);
+          b=b-1
+        }el{br}
+      };
+      matches=matches.set(b+1;key)
+    };
+    let out=mut.s.concat(prefix;": ");
+    let cnt=mut.0;
+    let lim=mut.m; if(m>5){lim=5};
+    lp(let k=0;k<lim;k=k+1){
+      if(cnt>0){out=s.concat(out;", ")};
+      out=s.concat(out;matches.get(k));
+      cnt=cnt+1
+    };
+    io.println(out)
+  };
+  <0
+}

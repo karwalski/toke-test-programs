@@ -1,1 +1,149 @@
-m=kakuro;f=solve(grid:$i64;rows:i64;cols:i64):$i64{let result=mut.grid;let row=mut.0;lp(let r=0;r<rows;r=r+1){let col=mut.0;lp(let c=0;c<cols;c=c+1){let cell=result.get(row*cols+col));if(cell=0){let sum=mut.0;let i=mut.col-1;lp(let j=0;j<1;j=j+1){if(!(i<0)){}el{br};let left=result.get(row*cols+i));if(left=0){sum=sum+left}el{sum=sum+left};i=i-1;};let j=mut.col+1;lp(let k=0;k<1;k=k+1){if(!(j<cols)){}el{br};let right=result.get(row*cols+j));if(right=0){sum=sum+right}el{sum=sum+right};j=j+1;};let clue=mut.0;let idx=mut.col-1;lp(let z=0;z<1;z=z+1){if(!(idx
+m=kakuro;
+i=io:std.io;
+i=s:std.str;
+f=okcell(vals:@i64;segstarts:@i64;segcounts:@i64;segtargets:@i64;segcells:@i64;cell:i64):i64{
+let nseg=(segstarts.len as i64);
+lp(let si=0;si<nseg;si=si+1){
+let start=segstarts.get(si);
+let count=segcounts.get(si);
+let target=segtargets.get(si);
+let contains=mut.0;
+lp(let j=0;j<count;j=j+1){
+if(segcells.get(start+j)=cell){contains=1}
+};
+if(contains>0){
+let total=mut.0;
+let allset=mut.1;
+lp(let j=0;j<count;j=j+1){
+let idx=segcells.get(start+j);
+let v=vals.get(idx);
+if(v=0){allset=0}el{total=total+v}
+};
+if(allset>0){
+if(total=target){}el{<0}
+}el{
+if(total>=target){<0}
+}
+}
+};
+<1
+};
+f=bt(vals:@i64;cells:@i64;ci:i64;segstarts:@i64;segcounts:@i64;segtargets:@i64;segcells:@i64):@i64{
+if(ci=(cells.len as i64)){<vals};
+let cell=cells.get(ci);
+lp(let v=1;v<10;v=v+1){
+let trial=mut.vals.set(cell;v);
+if(okcell(trial;segstarts;segcounts;segtargets;segcells;cell)>0){
+let res=bt(trial;cells;ci+1;segstarts;segcounts;segtargets;segcells);
+if((res.len as i64)>0){<res}
+}
+};
+<@()
+};
+f=main():i64{
+let rows=mut.@();
+let go=mut.1;
+lp(go>0){
+let line=io.readln();
+let trimmed=s.trim(line);
+if(s.len(trimmed)=0){go=0}el{
+rows=rows+@(trimmed)
+}
+};
+let nr=(rows.len as i64);
+let grid=mut.@();
+let nc=mut.0;
+lp(let r=0;r<nr;r=r+1){
+let toks=s.split(rows.get(r);" ");
+let cnt=mut.0;
+lp(let t=0;t<(toks.len as i64);t=t+1){
+let tk=s.trim(toks.get(t));
+if(s.len(tk)>0){
+grid=grid+@(tk);
+cnt=cnt+1;
+}
+};
+if(cnt>nc){nc=cnt}
+};
+let cells=mut.@();
+let vals=mut.@();
+lp(let i=0;i<nr*nc;i=i+1){
+let tk=grid.get(i);
+if(s.equals(tk;"?")){cells=cells+@(i)};
+vals=vals+@(0);
+};
+let segstarts=mut.@();
+let segcounts=mut.@();
+let segtargets=mut.@();
+let segcells=mut.@();
+lp(let r=0;r<nr;r=r+1){
+let c=mut.0;
+lp(c<nc){
+let tk=grid.get(r*nc+c);
+if(s.startswith(tk;"V")){
+let target=s.toint(s.slice(tk;1;s.len(tk)));
+let start=(segcells.len as i64);
+let count=mut.0;
+let cc=mut.c+1;
+lp(cc<nc){
+if(s.equals(grid.get(r*nc+cc);"?")){
+segcells=segcells+@(r*nc+cc);
+count=count+1;
+cc=cc+1;
+}el{cc=nc}
+};
+if(count>0){
+segstarts=segstarts+@(start);
+segcounts=segcounts+@(count);
+segtargets=segtargets+@(target);
+};
+c=cc;
+}el{c=c+1}
+}
+};
+lp(let c=0;c<nc;c=c+1){
+let r=mut.0;
+lp(r<nr){
+let tk=grid.get(r*nc+c);
+if(s.startswith(tk;"H")){
+let target=s.toint(s.slice(tk;1;s.len(tk)));
+let start=(segcells.len as i64);
+let count=mut.0;
+let rr=mut.r+1;
+lp(rr<nr){
+if(s.equals(grid.get(rr*nc+c);"?")){
+segcells=segcells+@(rr*nc+c);
+count=count+1;
+rr=rr+1;
+}el{rr=nr}
+};
+if(count>0){
+segstarts=segstarts+@(start);
+segcounts=segcounts+@(count);
+segtargets=segtargets+@(target);
+};
+r=rr;
+}el{r=r+1}
+}
+};
+let result=bt(vals;cells;0;segstarts;segcounts;segtargets;segcells);
+if((result.len as i64)=0){
+io.println("No solution");
+<0
+};
+lp(let r=0;r<nr;r=r+1){
+let outln=mut."";
+lp(let c=0;c<nc;c=c+1){
+let tk=grid.get(r*nc+c);
+let cellstr=mut."";
+if(s.equals(tk;"X")){cellstr="X"}el{
+if(s.equals(tk;"?")){cellstr=s.fromint(result.get(r*nc+c))}el{
+cellstr=s.slice(tk;1;s.len(tk))
+}
+};
+if(c=0){outln=cellstr}el{outln=s.concat(s.concat(outln;" ");cellstr)}
+};
+io.println(outln);
+};
+<0
+}

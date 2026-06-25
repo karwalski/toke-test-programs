@@ -1,1 +1,128 @@
-m=wordsearch;f=solve(p0:$str;p1:i64;p2:i64;p3:i64):$str{let words=p0.split(",");let rows=p1;let cols=p2;let seed=p3;let grid=mut."";lp(let i=0;i<rows;i=i+1){let row=mut."";lp(let j=0;j<cols;j=j+1){let idx=i*cols+j;let char=mut." ";if(!(idx<seed)){char=words.get(idx-seed));};row=s.concat(row;char);};grid=s.concat(s.concat(grid;row);"\n");};let result=mut."";lp(let i=0;i<rows;i=i+1){let line=grid.split("\n").get(i);let spaces=mut."";lp(let j=0;j<cols;j=j+1){spaces=s.concat(spaces;" ");};let combined=line+spaces;result=result+combined+"\n";};<result};
+m=wordsearch;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=nextrand(state:$i64):$i64{
+  let r=(state*1103515245+12345)%2147483648;
+  let rr=mut.r;
+  if(rr<0){rr=rr+2147483648};
+  <rr
+};
+
+f=main():i64{
+  let first=io.readln();
+  let parts=s.split(first;" ");
+  let rows=s.toint(parts.get(0));
+  let cols=s.toint(parts.get(1));
+  let seed=s.toint(parts.get(2));
+
+  (* read words *)
+  let words=mut.@("");  (* index 0 dummy *)
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){
+      if(s.len(line)>0){words=words.push(line)};
+      done=1;br
+    };
+    if(s.len(line)>0){words=words.push(line)}
+  };
+  let wcount=(words.len as i64)-1;
+
+  (* grid as flat vec of bytes, 0 = empty *)
+  let grid=mut.vec.new();
+  lp(let i=0;i<rows*cols;i=i+1){grid=vec.push(grid;0)};
+
+  (* placement records: store as parallel vecs *)
+  let prrow=mut.vec.new();
+  let prcol=mut.vec.new();
+  let prdir=mut.vec.new(); (* 0=right 1=down *)
+  let prwidx=mut.vec.new();
+
+  let state=mut.seed;
+
+  (* place each word: try directions/positions, first non-conflicting *)
+  lp(let w=1;w<=wcount;w=w+1){
+    let word=words.get(w);
+    let wb=s.bytes(word);
+    let wl=s.len(word) as i64;
+    let placed=mut.0;
+    (* try horizontal then vertical, scanning rows/cols *)
+    lp(let dir=0;dir<2;dir=dir+1){
+      if(placed<1){
+        lp(let r=0;r<rows;r=r+1){
+          if(placed<1){
+            lp(let c=0;c<cols;c=c+1){
+              if(placed<1){
+                (* check fits *)
+                let fits=mut.1;
+                if(dir=0){ if((c+wl)>cols){fits=0} }el{ if((r+wl)>rows){fits=0} };
+                if(fits=1){
+                  (* check no conflict *)
+                  let ok=mut.1;
+                  lp(let k=0;k<wl;k=k+1){
+                    let rr=mut.r;let cc=mut.c;
+                    if(dir=0){cc=c+k}el{rr=r+k};
+                    let cur=vec.get(grid;rr*cols+cc);
+                    let wch=wb.get(k) as i64;
+                    if(cur=0){}el{ if(cur=wch){}el{ok=0} }
+                  };
+                  if(ok=1){
+                    (* place *)
+                    lp(let k=0;k<wl;k=k+1){
+                      let rr=mut.r;let cc=mut.c;
+                      if(dir=0){cc=c+k}el{rr=r+k};
+                      grid=vec.set(grid;rr*cols+cc;wb.get(k) as i64)
+                    };
+                    prrow=vec.push(prrow;r);
+                    prcol=vec.push(prcol;c);
+                    prdir=vec.push(prdir;dir);
+                    prwidx=vec.push(prwidx;w);
+                    placed=1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
+  (* fill empty cells with deterministic pseudo-random uppercase letters *)
+  lp(let i=0;i<rows*cols;i=i+1){
+    if(vec.get(grid;i)=0){
+      state=nextrand(state);
+      let m=state%26;
+      grid=vec.set(grid;i;(m+65))
+    }
+  };
+
+  (* print grid *)
+  lp(let r=0;r<rows;r=r+1){
+    let out=mut."";
+    lp(let c=0;c<cols;c=c+1){
+      out=s.concat(out;s.frombytes(@(vec.get(grid;r*cols+c) as u8)))
+    };
+    io.println(out)
+  };
+
+  (* print placement list *)
+  let pn=vec.len(prwidx) as i64;
+  lp(let i=0;i<pn;i=i+1){
+    let w=vec.get(prwidx;i);
+    let dirstr=mut."right";
+    if(vec.get(prdir;i)=1){dirstr="down"};
+    let out=mut."";
+    out=s.concat(out;words.get(w));
+    out=s.concat(out;": row ");
+    out=s.concat(out;s.fromint(vec.get(prrow;i)));
+    out=s.concat(out;" col ");
+    out=s.concat(out;s.fromint(vec.get(prcol;i)));
+    out=s.concat(out;" ");
+    out=s.concat(out;dirstr);
+    io.println(out)
+  };
+  <0
+}

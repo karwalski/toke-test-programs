@@ -1,1 +1,61 @@
-m=oe;f=calcavail(total:i64;down:i64):f64{if(total=0){<1.0};let a=total-down;<a as f64/total as f64};f=calcperf(total:i64;unavailable:i64;response:i64;avgresponse:i64):f64{let a=total-unavailable;if(a=0){<1.0};let b=response as f64/avgresponse as f64;<b*a as f64/total as f64};f=calcquality
+m=oee;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+f=rnd2(x:f64):f64{
+let scaled=x*100.0+0.5;
+let fl=math.floor(scaled);
+<fl/100.0
+};
+f=fmtnum(x:f64):str{
+let r=mut.s.format(x;"%.2f");
+let go=mut.1;
+lp(go>0){
+if(s.endswith(r;"0")){
+let cut=s.slice(r;0;s.len(r)-1);
+if(s.endswith(cut;".")){r=s.concat(cut;"0");go=0}el{r=cut}
+}el{go=0}
+};
+<r
+};
+f=main():i64{
+let out=mut.s.concat("{";"\"machines\":[");
+let first=mut.1;
+let header=mut.1;
+let go=mut.1;
+let cnt=mut.0;
+lp(go>0){
+let line=s.trim(io.readln());
+if(s.len(line)=0){go=0}el{
+if(header>0){header=0}el{
+let p=s.split(line;",");
+let machine=s.trim(p.get(0));
+let planned=s.tofloat(s.trim(p.get(1)));
+let runt=s.tofloat(s.trim(p.get(2)));
+let ideal=s.tofloat(s.trim(p.get(3)));
+let total=s.tofloat(s.trim(p.get(4)));
+let good=s.tofloat(s.trim(p.get(5)));
+let avail=rnd2(runt/planned);
+let perf=rnd2(ideal*total/runt);
+let qual=rnd2(good/total);
+let oee=rnd2(avail*perf*qual);
+if(cnt>0){out=s.concat(out;",")};
+out=s.concat(out;"{\"machine\":\"");
+out=s.concat(out;machine);
+out=s.concat(out;"\",\"availability\":");
+out=s.concat(out;fmtnum(avail));
+out=s.concat(out;",\"performance\":");
+out=s.concat(out;fmtnum(perf));
+out=s.concat(out;",\"quality\":");
+out=s.concat(out;fmtnum(qual));
+out=s.concat(out;",\"oee\":");
+out=s.concat(out;fmtnum(oee));
+out=s.concat(out;"}");
+cnt=cnt+1;
+}
+}
+};
+out=s.concat(out;"]}");
+io.println(out);
+<0
+}

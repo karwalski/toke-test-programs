@@ -1,1 +1,52 @@
-m=dealer;f=play(dealer:$i64):$i64{if(dealer<17){<play(dealer+1):$i64};<dealer};
+m=dealer;
+i=io:std.io;
+i=s:std.str;
+
+(* card value: K/Q/J=10, A=11, numbers as given *)
+f=cardval(c:$str):$i64{
+  if(s.eq(c;"K")){<10};
+  if(s.eq(c;"Q")){<10};
+  if(s.eq(c;"J")){<10};
+  if(s.eq(c;"A")){<11};
+  <s.toint(c)
+};
+
+f=main():i64{
+  let handline=io.readln();
+  let deckline=io.readln();
+
+  let hand=s.split(handline;" ");
+  let total=mut.0;
+  lp(let i=0;i<hand.len as i64;i=i+1){
+    let c=hand.get(i);
+    if(s.len(c)=0){}el{total=total+cardval(c)}
+  };
+
+  io.println(s.concat("Stand: ";s.fromint(total)));
+
+  let deck=s.split(deckline;" ");
+  let dn=deck.len as i64;
+  let di=mut.0;
+  let stop=mut.0;
+  lp(stop<1){
+    if(total>16){stop=1;br};
+    if(di>=dn){stop=1;br};
+    let c=deck.get(di);
+    di=di+1;
+    if(s.len(c)=0){}el{
+      total=total+cardval(c);
+      if(total>21){
+        io.println(s.concat(s.concat(s.concat("Hit: ";c);" -> Bust: ");s.fromint(total)));
+        stop=1
+      }el{
+        if(total>16){
+          io.println(s.concat(s.concat(s.concat("Hit: ";c);" -> Stand: ");s.fromint(total)));
+          stop=1
+        }el{
+          io.println(s.concat(s.concat(s.concat("Hit: ";c);" -> Hit: ");s.fromint(total)))
+        }
+      }
+    }
+  };
+  <0
+}

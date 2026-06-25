@@ -1,1 +1,106 @@
-m=arrowmaze;f=solve(arr:@$str;n:$i64;m:$i64):$str{let dirs=arr;let startx=n;let starty=m;let x=mut.startx;let y=mut.starty;let result=mut."";let found=mut.false;lp(let i=0;i<1000;i=i+1){let dir=dirs.get(y);let ch=dir.get(x);if(ch="N"){y=y-1}el{if(ch="S"){y=y+1}el{if(ch="E"){x=x+1}el{if(ch="W"){x=x-1}el{}}}}};if(!(x<0)){if(!(y<0)){if(!(x>n)){if(!(y>m)){result="Found";found=true}}}}};if(found){<result}el{<""}};
+m=arrowmaze;
+i=io:std.io;
+i=s:std.str;
+i=vec:std.vec;
+
+f=gridget(lines:@$str;r:$i64;c:$i64;nrows:$i64):i64{
+  if(r<0){ <0-1 };
+  if(r>nrows-1){ <0-1 };
+  let row=lines.get(r+1);
+  let rb=s.bytes(row);
+  let rl=(rb.len as i64);
+  if(c<0){ <0-1 };
+  if(c>rl-1){ <0-1 };
+  <(rb.get(c) as i64)
+};
+
+f=isarrow(ch:$i64):$bool{
+  if(ch=94){ <true };
+  if(ch=118){ <true };
+  if(ch=60){ <true };
+  if(ch=62){ <true };
+  <false
+};
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    lines=lines.push(line)
+  };
+  let nrows=(lines.len as i64)-1;
+  if(nrows<1){ io.println("Out of bounds"); <0 };
+
+  let srow=mut.0-1;
+  let scol=mut.0-1;
+  lp(let r=0;r<nrows;r=r+1){
+    let row=lines.get(r+1);
+    let rb=s.bytes(row);
+    let rl=(rb.len as i64);
+    lp(let c=0;c<rl;c=c+1){
+      let ch=rb.get(c) as i64;
+      if(ch=83){ srow=r; scol=c }
+    }
+  };
+  if(srow<0){ io.println("Out of bounds"); <0 };
+
+  let dr=mut.0;
+  let dc=mut.0;
+  let haveh=mut.0;
+  if(haveh<1){
+    let nch=gridget(lines;srow-1;scol;nrows);
+    if(nch>0-1){ if(isarrow(nch)){ dr=0-1; dc=0; haveh=1 } }
+  };
+  if(haveh<1){
+    let nch=gridget(lines;srow+1;scol;nrows);
+    if(nch>0-1){ if(isarrow(nch)){ dr=1; dc=0; haveh=1 } }
+  };
+  if(haveh<1){
+    let nch=gridget(lines;srow;scol-1;nrows);
+    if(nch>0-1){ if(isarrow(nch)){ dr=0; dc=0-1; haveh=1 } }
+  };
+  if(haveh<1){
+    let nch=gridget(lines;srow;scol+1;nrows);
+    if(nch>0-1){ if(isarrow(nch)){ dr=0; dc=1; haveh=1 } }
+  };
+  if(haveh<1){ io.println("Out of bounds"); <0 };
+
+  let maxc=mut.0;
+  lp(let r=0;r<nrows;r=r+1){
+    let row=lines.get(r+1);
+    let rl=(s.bytes(row).len as i64);
+    if(rl>maxc){ maxc=rl }
+  };
+  let total=nrows*maxc;
+  let vis=mut.vec.new();
+  lp(let i=0;i<total;i=i+1){ vis=vec.push(vis;0) };
+
+  let cr=mut.srow;
+  let cc=mut.scol;
+  let count=mut.1;
+  vis=vec.set(vis;cr*maxc+cc;1);
+
+  let result=mut."";
+  let finished=mut.0;
+  lp(finished<1){
+    let nr=cr+dr;
+    let nc=cc+dc;
+    let ch=gridget(lines;nr;nc;nrows);
+    if(ch<0){ result="Out of bounds"; finished=1; br };
+    let idx=nr*maxc+nc;
+    if(vec.get(vis;idx)=1){ result="Loop detected"; finished=1; br };
+    cr=nr; cc=nc;
+    count=count+1;
+    vis=vec.set(vis;idx;1);
+    if(ch=69){ result=s.fromint(count); finished=1; br };
+    if(ch=94){ dr=0-1; dc=0 }el{
+      if(ch=118){ dr=1; dc=0 }el{
+        if(ch=60){ dr=0; dc=0-1 }el{
+          if(ch=62){ dr=0; dc=1 }el{
+          }}}}
+  };
+  io.println(result);
+  <0
+}

@@ -1,1 +1,71 @@
-m=ma;f=simplemovingavg(vals:@$f64;n:$i64):$f64{let sum=mut.0.0;lp(let i=0;i<n;i=i+1){sum=sum+vals.get(i as u64));};<sum/(n as$f64))};f=exponentialmovingavg(vals:@$f64;n:$i64):$f64{let alpha=1.0/(n as$f64));let result=mut.0.0;lp(let i=0;i<vals.len;i=i+1){let currentval=vals.get(i);let oldresult=result;if(i=0){result=currentval}el{result=oldresult+(currentval-oldresult)*alpha);};};<result};f=weightedmovingavg(vals:@$f64;weights:@$f64):$f64{let n=vals.len;if(n=0){<0.0};let sum=mut.0.0;let weightedsum=mut.0.0;lp(let i=0;i<n;i=i+1){let val=vals.get(i);let weight=weights.get(i);sum=sum+val
+m=ma;
+i=io:std.io;
+i=s:std.str;
+i=mth:std.math;
+
+f=fixed2(x:f64):$str{
+  let neg=mut.0; let v=mut.x;
+  if(v<0.0){neg=1;v=0.0-v};
+  let scaled=v*100.0+0.5;
+  let iscaled=scaled as i64;
+  let whole=iscaled/100; let frac=iscaled-whole*100;
+  let fs=mut.s.fromint(frac);
+  if(frac<10){fs=s.concat("0";fs)};
+  let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
+  if(neg=1){out=s.concat("-";out)};
+  <out
+};
+
+f=main():i64{
+  let lines=mut.@();
+  lp(1=1){
+    let l=io.readln();
+    if(io.eof()){br};
+    lines=lines.push(l)
+  };
+  if(lines.len=0){<0};
+  let first=lines.get(0);
+  let parts=s.split(s.trim(first);" ");
+  let nwin=s.toint(s.trim(parts.get(0)));
+  let alpha=s.tofloat(s.trim(parts.get(1)));
+
+  let nvals=(lines.len as i64)-1;
+  if(nvals<=0){<0};
+  (* seed values array with first value to fix f64 type *)
+  let vals=mut.@(s.tofloat(s.trim(lines.get(1))));
+  lp(let r=2;r<=nvals;r=r+1){
+    vals=vals.push(s.tofloat(s.trim(lines.get(r as u64))))
+  };
+
+  (* precompute running EMA: ema[0]=vals[0], ema[i]=alpha*vals[i]+(1-alpha)*ema[i-1] *)
+  let ema=mut.@(vals.get(0));
+  lp(let i=1;i<nvals;i=i+1){
+    let prev=ema.get((i-1) as u64);
+    let cur=vals.get(i as u64);
+    ema=ema.push(alpha*cur+(1.0-alpha)*prev)
+  };
+
+  lp(let p=0;p<nvals;p=p+1){
+    if(p<nwin-1){
+      io.println("null\tnull\tnull")
+    }el{
+      (* SMA: average of last nwin values *)
+      let smasum=mut.0.0;
+      lp(let j=p-nwin+1;j<=p;j=j+1){ smasum=smasum+vals.get(j as u64) };
+      let sma=smasum/(nwin as f64);
+      (* WMA: weights 1..nwin, newest weight nwin *)
+      let wnum=mut.0.0;
+      let wden=mut.0.0;
+      lp(let j=0;j<nwin;j=j+1){
+        let idx=p-nwin+1+j;
+        let w=(j+1) as f64;
+        wnum=wnum+vals.get(idx as u64)*w;
+        wden=wden+w
+      };
+      let wma=wnum/wden;
+      let emav=ema.get(p as u64);
+      io.println(s.concat(fixed2(sma);s.concat("\t";s.concat(fixed2(emav);s.concat("\t";fixed2(wma))))))
+    }
+  };
+  <0
+}

@@ -1,1 +1,91 @@
-m=elo;f=parsefloat(s:$str):$f64{let result=mut.0.0;let len=s.len;let idx=mut.0;let num=mut.0.0;let sign=mut.1.0;lp(let i=0;i<len;i=i+1){let c=s.get(i);if(c=45){sign=-1.0};if(c=46){idx=i};if(c>47){if(c<58){let d=c-48;num=num*10.0+d}}}};if(idx>0){let frac=s.slice(idx+1;len);let f=parseint(s:$str):$i64{let result=mut.0;let len=s.len;lp(let i=0;i<len;i=i+1){let c=s.get(i);let d=c-48;result=result*10+d;};<result};f=parsebool(s:$str):$bool{let result=mut.false
+m=elo;
+i=io:std.io;
+i=s:std.str;
+i=math:std.math;
+
+f=parseresult(t:$str):$f64{
+  if(s.contains(t;".")){<0.5};
+  let v=s.toint(t);
+  <(v as f64)
+};
+
+f=expected(ra:$f64;rb:$f64):$f64{
+  <(1.0/(1.0+math.pow(10.0;(rb-ra)/400.0)))
+};
+
+f=main():i64{
+  let lines=mut.@("");
+  let done=mut.0;
+  lp(done<1){
+    let line=io.readln();
+    if(io.eof()){done=1;br};
+    lines=lines.push(line)
+  };
+  let total=(lines.len as i64)-1;
+
+  let names=mut.@("");
+  let ratings=mut.@(0.0);
+  let i=mut.1;
+  let parsing=mut.1;
+  lp(parsing>0){
+    if(i>total){parsing=0;br};
+    let ln=lines.get(i);
+    if(s.len(ln)=0){i=i+1;parsing=0;br};
+    let p=s.split(ln;" ");
+    names=names.push(p.get(0));
+    ratings=ratings.push((s.toint(p.get(1)) as f64));
+    i=i+1
+  };
+  let np=(names.len as i64)-1;
+
+  lp(i<=total){
+    let ln=lines.get(i);
+    if(s.len(ln)>0){
+      let p=s.split(ln;" ");
+      let n1=p.get(0);
+      let n2=p.get(1);
+      let res=parseresult(p.get(2));
+      let idx1=mut.0;
+      let idx2=mut.0;
+      lp(let k=1;k<=np;k=k+1){
+        if(s.eq(names.get(k);n1)){idx1=k};
+        if(s.eq(names.get(k);n2)){idx2=k}
+      };
+      let ra=ratings.get(idx1);
+      let rb=ratings.get(idx2);
+      let ea=expected(ra;rb);
+      let na=ra+32.0*(res-ea);
+      let nb=rb+32.0*((1.0-res)-(1.0-ea));
+      ratings=ratings.set(idx1;na);
+      ratings=ratings.set(idx2;nb)
+    };
+    i=i+1
+  };
+
+  let finalr=mut.@(0);
+  lp(let k=1;k<=np;k=k+1){
+    let r=ratings.get(k);
+    let ri=(r+0.5) as i64;
+    finalr=finalr.push(ri)
+  };
+
+  let order=mut.@(0);
+  lp(let k=1;k<=np;k=k+1){order=order.push(k)};
+  lp(let a=1;a<=np;a=a+1){
+    lp(let b=a+1;b<=np;b=b+1){
+      let ia=order.get(a);
+      let ib=order.get(b);
+      if(finalr.get(ib)>finalr.get(ia)){
+        order=order.set(a;ib);
+        order=order.set(b;ia)
+      }
+    }
+  };
+
+  lp(let k=1;k<=np;k=k+1){
+    let pi=order.get(k);
+    let line=s.concat(s.concat(names.get(pi);": ");s.fromint(finalr.get(pi)));
+    io.println(line)
+  };
+  <0
+}
