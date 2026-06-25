@@ -119,7 +119,7 @@
   output_format: "Single line 'fog: N.N'"
   test_cases:
     - input: "The cat sat on the mat. It was a nice day."
-      expected_output: "fog: 1.6"
+      expected_output: "fog: 2.2"
     - input: "The obfuscation of parliamentary procedures represents a significant challenge."
       expected_output: "fog: 17.0"
   constraints: ["Fog = 0.4 * ((words/sentences) + 100*(complex_words/words))", "Complex words have 3+ syllables"]
@@ -679,7 +679,7 @@
   output_format: "Key: value pairs for chars, words, sentences, paragraphs, avg_word_length"
   test_cases:
     - input: "Hello world.\n\nFoo bar."
-      expected_output: "chars: 21\nwords: 4\nsentences: 2\nparagraphs: 2\navg_word_length: 4.0"
+      expected_output: "chars: 22\nwords: 4\nsentences: 2\nparagraphs: 2\navg_word_length: 4.0"
     - input: "One."
       expected_output: "chars: 4\nwords: 1\nsentences: 1\nparagraphs: 1\navg_word_length: 3.0"
   constraints: ["Paragraph = block separated by blank line", "avg_word_length rounded to 1 decimal"]
@@ -1159,7 +1159,7 @@
   output_format: "Lines of 'Sentence N (W words): <sentence>' for flagged sentences"
   test_cases:
     - input: "5\nShort sentence. This one is much much longer than allowed by the threshold."
-      expected_output: "Sentence 2 (14 words): This one is much much longer than allowed by the threshold."
+      expected_output: "Sentence 2 (11 words): This one is much much longer than allowed by the threshold."
     - input: "3\nHi. Bye."
       expected_output: ""
   constraints: ["Sentences split by . ? !", "Count by whitespace-delimited words"]
@@ -1271,7 +1271,7 @@
   output_format: "Lines of 'sentence N: score M' where M = comma_count + conjunction_count"
   test_cases:
     - input: "The cat sat.\nAlthough tired, and hungry, she ran."
-      expected_output: "sentence 1: score 0\nsentence 2: score 3"
+      expected_output: "sentence 1: score 0\nsentence 2: score 4"
     - input: "He ran and jumped."
       expected_output: "sentence 1: score 1"
   constraints: ["Conjunctions: and, but, or, nor, for, yet, so, although, because, if, when", "Case-insensitive"]

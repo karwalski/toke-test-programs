@@ -613,7 +613,7 @@
   output_format: "Decoded text"
   test_cases:
     - input: "A: 0\nR: 10\nB: 110\nC: 1110\nD: 1111\n\n01101001110011111101100"
-      expected_output: "ABRACADABRA"
+      expected_output: "ABRACADBBA"
     - input: "X: 0\nY: 1\n\n010101"
       expected_output: "XYXYXY"
   constraints: ["Must read from stdin", "Greedy prefix-free decoding", "Error on invalid bit string"]
@@ -627,7 +627,7 @@
   output_format: "CRC32 hex checksum and line, tab-separated"
   test_cases:
     - input: "hello world\nfoo bar"
-      expected_output: "0d4a1185\thello world\nad9bbd55\tfoo bar"
+      expected_output: "0d4a1185\thello world\nbe460134\tfoo bar"
     - input: ""
       expected_output: "00000000\t"
   constraints: ["Must read from stdin", "Lowercase hex", "CRC32 polynomial 0xEDB88320"]
@@ -1033,7 +1033,7 @@
   output_format: "JSON object per data line with extracted field values"
   test_cases:
     - input: "version 0 4\ntype 4 4\nlength 8 16\n\nFF01004E"
-      expected_output: "{\"version\":15,\"type\":15,\"length\":78}"
+      expected_output: "{\"version\":15,\"type\":15,\"length\":256}"
     - input: "flag 0 1\nid 1 7\n\n82"
       expected_output: "{\"flag\":1,\"id\":2}"
   constraints: ["Must read from stdin", "Big-endian bit ordering", "Output as unsigned integers"]

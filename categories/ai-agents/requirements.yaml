@@ -236,7 +236,7 @@
   output_format: "JSON array of objects with 'chunk_id', 'text', 'start_offset', 'end_offset'"
   test_cases:
     - input: '{"text":"The quick brown fox jumps over the lazy dog near the river bank","chunk_size":20,"overlap":5}'
-      expected_output: '[{"chunk_id":0,"text":"The quick brown fox ","start_offset":0,"end_offset":20},{"chunk_id":1,"text":"fox jumps over the l","start_offset":15,"end_offset":35},{"chunk_id":2,"text":"he lazy dog near the","start_offset":30,"end_offset":50},{"chunk_id":3,"text":"r the river bank","start_offset":49,"end_offset":65}]'
+      expected_output: "[{\"chunk_id\":0,\"text\":\"The quick brown fox \",\"start_offset\":0,\"end_offset\":20},{\"chunk_id\":1,\"text\":\" fox jumps over the \",\"start_offset\":15,\"end_offset\":35},{\"chunk_id\":2,\"text\":\" the lazy dog near t\",\"start_offset\":30,\"end_offset\":50},{\"chunk_id\":3,\"text\":\"ear the river bank\",\"start_offset\":45,\"end_offset\":63}]"
     - input: '{"text":"Hello world","chunk_size":50,"overlap":10}'
       expected_output: '[{"chunk_id":0,"text":"Hello world","start_offset":0,"end_offset":11}]'
   constraints: ["Last chunk may be shorter than chunk_size", "Overlap must not exceed chunk_size"]

@@ -608,7 +608,7 @@
   output_format: "stdout: JSON with t_statistic, p_value, significant, means"
   test_cases:
     - input: "10.0,10.1,10.2,9.9,10.0\n10.5,10.4,10.6,10.3,10.5"
-      expected_output: '{"mean_a":10.04,"mean_b":10.46,"t_statistic":-5.69,"p_value":0.0,"significant":true}'
+      expected_output: "{\"mean_a\":10.04,\"mean_b\":10.46,\"t_statistic\":-5.82,\"p_value\":0.0,\"significant\":true}"
   constraints: ["two-tailed test at alpha=0.05", "Welch t-test"]
 
 - id: "MFG-051"
@@ -812,7 +812,7 @@
   output_format: "stdout: JSON with silhouette_score and per_point_scores"
   test_cases:
     - input: "x,y,cluster\n1.0,1.0,0\n1.1,1.1,0\n5.0,5.0,1\n5.1,5.1,1"
-      expected_output: '{"silhouette_score":0.99,"per_point_scores":[0.99,0.99,0.99,0.99]}'
+      expected_output: "{\"silhouette_score\":0.97,\"per_point_scores\":[0.98,0.97,0.97,0.98]}"
   constraints: ["score range -1 to 1", "round to 2 decimal places"]
 
 - id: "MFG-068"
@@ -1476,7 +1476,7 @@
   output_format: "stdout: JSON with similarities and best_match"
   test_cases:
     - input: "batch,f1,f2,f3\nH1,1,0,1\nH2,0,1,0\nH3,1,1,0\n---\n1,0,1"
-      expected_output: '{"similarities":[{"batch":"H1","similarity":0.71},{"batch":"H2","similarity":0.0},{"batch":"H3","similarity":0.71}],"best_match":"H1"}'
+      expected_output: "{\"similarities\":[{\"batch\":\"H1\",\"similarity\":1.0},{\"batch\":\"H2\",\"similarity\":0.0},{\"batch\":\"H3\",\"similarity\":0.5}],\"best_match\":\"H1\"}"
   constraints: ["cosine similarity", "round to 2 decimal places", "break ties by first match"]
 
 - id: "MFG-123"

@@ -199,7 +199,7 @@
   output_format: "Masked word (underscores for unguessed) then remaining lives (start 6, lose 1 per wrong guess)"
   test_cases:
     - input: "PYTHON\nP Y O"
-      expected_output: "P_T_ON\n5"
+      expected_output: "PY__O_\n6"
     - input: "HELLO\nA B C D"
       expected_output: "_____\n2"
   constraints: ["Must read from stdin", "Uppercase letters only", "6 starting lives"]
@@ -213,11 +213,11 @@
   output_format: "5-character feedback string using G Y B"
   test_cases:
     - input: "CRANE\nSLATE"
-      expected_output: "BBGBB"
+      expected_output: "BBGBG"
     - input: "CRANE\nCRANE"
       expected_output: "GGGGG"
     - input: "CRANE\nCAREL"
-      expected_output: "GYBGB"
+      expected_output: "GYYYB"
   constraints: ["Must read from stdin", "Yellow means letter in word but wrong position", "Handle duplicate letters correctly"]
 
 - id: "GAM-016"
@@ -355,7 +355,7 @@
   output_format: "Each guess on its own line followed by response, then 'Solved in N guesses'"
   test_cases:
     - input: "1234"
-      expected_output: "1122 1B0W\n1344 1B1W\n1234 4B0W\nSolved in 3 guesses"
+      expected_output: "1122 1B1W\n1233 3B0W\n1234 4B0W\nSolved in 3 guesses"
     - input: "6666"
       expected_output: "1122 0B0W\n3344 0B0W\n5566 0B2W\n5665 0B2W\n6556 0B2W\n6666 4B0W\nSolved in 6 guesses"
   constraints: ["Must read from stdin", "Knuth algorithm guarantees <=5 guesses", "Output each guess + response"]
@@ -569,9 +569,9 @@
   output_format: "Portfolio value at end of each day"
   test_cases:
     - input: "10 12 8 15 11\n100\nbuy 5\nhold\nsell 5\nbuy 3\nhold"
-      expected_output: "Day 1: $100.00\nDay 2: $110.00\nDay 3: $90.00\nDay 4: $125.00\nDay 5: $92.00"
+      expected_output: "Day 1: $100.00\nDay 2: $110.00\nDay 3: $90.00\nDay 4: $90.00\nDay 5: $78.00"
     - input: "5 10\n50\nbuy 10\nsell 10"
-      expected_output: "Day 1: $0.00\nDay 2: $100.00"
+      expected_output: "Day 1: $50.00\nDay 2: $100.00"
   constraints: ["Must read from stdin", "Cannot go negative cash", "Report 2 decimal places"]
 
 - id: "GAM-040"
@@ -625,7 +625,7 @@
   output_format: "Found words sorted by length descending then alphabetically, one per line"
   test_cases:
     - input: "SERS\nPATI\nNEAT\nEWIS\n\nSEAT\nNEAT\nSET\nPAN\nPAT\nTIN\nEAT"
-      expected_output: "SEAT\nNEAT\nEAT\nPAN\nPAT\nSET\nTIN"
+      expected_output: "NEAT\nSEAT\nEAT\nPAN\nPAT\nSET"
     - input: "ABCD\nEFGH\nIJKL\nMNOP\n\nABCG\nAB"
       expected_output: "ABCG"
   constraints: ["Must read from stdin", "Adjacent includes diagonals", "No cell reuse in single word"]
@@ -639,7 +639,7 @@
   output_format: "Total score"
   test_cases:
     - input: "QUIZ\n0 DL\n1 TW"
-      expected_output: "62"
+      expected_output: "96"
     - input: "CAT\n"
       expected_output: "5"
   constraints: ["Must read from stdin", "Standard Scrabble values", "Apply letter then word multipliers"]
@@ -809,7 +809,7 @@
   output_format: "'Na Nb' format per guess where a=bulls b=cows"
   test_cases:
     - input: "1807\n7810\n3451"
-      expected_output: "1A3B\n0A0B"
+      expected_output: "1A3B\n0A1B"
     - input: "4271\n4271"
       expected_output: "4A0B"
   constraints: ["Must read from stdin", "No repeated digits in secret", "Bulls=right position, Cows=wrong position"]
@@ -907,7 +907,7 @@
   output_format: "After each move: both players' remaining time, flag if someone's time expires"
   test_cases:
     - input: "300\n10\n15\n12\n280\n5"
-      expected_output: "White: 290s Black: 300s\nWhite: 290s Black: 285s\nWhite: 278s Black: 285s\nWhite: -2s Black: 285s - White flags!"
+      expected_output: "White: 290s Black: 300s\nWhite: 290s Black: 285s\nWhite: 278s Black: 285s\nWhite: 278s Black: 5s\nWhite: 273s Black: 5s"
     - input: "60\n30\n30"
       expected_output: "White: 30s Black: 60s\nWhite: 30s Black: 30s"
   constraints: ["Must read from stdin", "White moves first", "Flag = time reaches 0"]
@@ -1225,7 +1225,7 @@
   output_format: "Grid with move numbers showing knight's path, or 'No tour found'"
   test_cases:
     - input: "5 0 0"
-      expected_output: " 1 12 21 18 13\n20 17 14  7 22\n11  2 19  4 25\n16  5  8 23  6\n 9 10  3 24 15"
+      expected_output: "1 20  9 14  3\n10 15  2 19 24\n21  8 23  4 13\n16 11  6 25 18\n 7 22 17 12  5"
     - input: "8 0 0"
       expected_output: " 1 60 39 34 31 18  9 64\n38 35 32 61 10 63 30 17\n59  2 37 40 33 28 19  8\n36 49 42 27 62 11 16 29\n43 58  3 50 41 24  7 20\n48 51 44 55 26 21 12 15\n57 46 53  4 23 14 25  6\n52 47 56 45 54  5 22 13"
   constraints: ["Must read from stdin", "Warnsdorff heuristic", "Visit every square exactly once"]
@@ -1283,7 +1283,7 @@
   output_format: "Size of connected region"
   test_cases:
     - input: "....X\n.XXX.\n.....\nXXXXX\n\n0 0"
-      expected_output: "8"
+      expected_output: "11"
     - input: "XXXXX\nX...X\nXXXXX\n\n1 1"
       expected_output: "3"
   constraints: ["Must read from stdin", "4-connected flood fill", "Fill region of same character as start"]
@@ -1381,7 +1381,7 @@
   output_format: "Sequence of jumps 'from row,col to row,col' or 'No solution'"
   test_cases:
     - input: "XX.XX\nXO.OX\n.O.O.\nXO.OX\nXX.XX"
-      expected_output: "0,2 to 2,2\n..."
+      expected_output: "No solution"
     - input: "X.X\n...\nX.X"
       expected_output: "No solution"
   constraints: ["Must read from stdin", "Jump must land on empty", "Jumped peg removed"]
@@ -1555,7 +1555,7 @@
   output_format: "Final ratings for all players sorted by rating descending"
   test_cases:
     - input: "Alice 1200\nBob 1000\n\nAlice Bob 1\nBob Alice 1"
-      expected_output: "Alice: 1206\nBob: 994"
+      expected_output: "Alice: 1183\nBob: 1017"
     - input: "A 1000\nB 1000\n\nA B 0.5"
       expected_output: "A: 1000\nB: 1000"
   constraints: ["Must read from stdin", "K-factor = 32", "Round to nearest integer"]
@@ -1659,7 +1659,7 @@
   output_format: "'Valid tiling' or 'Invalid: piece N is not a valid tetromino'"
   test_cases:
     - input: "1122\n1133\n4433\n4443"
-      expected_output: "Valid tiling"
+      expected_output: "Invalid: piece 2 is not a valid tetromino"
     - input: "1112\n1112\n3322\n3322"
       expected_output: "Invalid: piece 1 is not a valid tetromino"
   constraints: ["Must read from stdin", "Each ID must appear exactly 4 times in connected L/S/T/I/O shape", "0 = empty cell"]

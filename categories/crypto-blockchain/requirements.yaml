@@ -55,7 +55,7 @@
   output_format: "64-character lowercase hex HMAC-SHA256"
   test_cases:
     - input: "secret\nhello world"
-      expected_output: "734cc62f32841568f45f6c1a8eb8307a1ee74a56d72e2bd4652b032514b15c09"
+      expected_output: "734cc62f32841568f45715aeb9f4d7891324e6d948e4c6c60c0621cdac48623a"
     - input: "key\nmessage"
       expected_output: "6e9ef29b75fffc5b7abae527d58fdadb2fe42e7219011976917343065f58ed4a"
   constraints: ["Must use std.crypto.hmac with sha256"]
@@ -125,7 +125,7 @@
   output_format: "Base58 encoded string using Bitcoin alphabet (123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz)"
   test_cases:
     - input: "0062e907b15cbf27d5425399ebf6f0fb50ebb88f18"
-      expected_output: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+      expected_output: "12NvYg7CXwVYtMDYia7n9viekJ6d5"
     - input: "68656c6c6f"
       expected_output: "Cn8eVZg"
   constraints: ["Must implement Bitcoin Base58 alphabet", "Preserve leading zero bytes as '1' characters"]
@@ -387,9 +387,9 @@
   output_format: "Hex encoded XOR result"
   test_cases:
     - input: "key\nhello"
-      expected_output: "030a09090a"
+      expected_output: "030015070a"
     - input: "abc\nxyz"
-      expected_output: "191a19"
+      expected_output: "191b19"
   constraints: ["Key repeats cyclically over plaintext", "Byte-wise XOR"]
 
 - id: "CRY-027"
@@ -705,9 +705,9 @@
   output_format: "Line 1: nonce (integer). Line 2: resulting hash"
   test_cases:
     - input: "hello\n2"
-      expected_output: "<nonce>\n00<remaining hash>"
+      expected_output: "227\n001b92541ed0a22b0cb89018b561d895503206c0082c0ecf2d0b7e5182191eed"
     - input: "block data\n3"
-      expected_output: "<nonce>\n000<remaining hash>"
+      expected_output: "2893\n00033494d6564e05527ab59c272d5f98561d5688d0360632d2d2ff74218e7767"
   constraints: ["SHA-256(data + nonce_string) must have N leading hex zeros", "Start nonce at 0, increment"]
 
 - id: "CRY-047"
@@ -719,9 +719,9 @@
   output_format: "64-character hex Merkle root"
   test_cases:
     - input: "abc123\ndef456"
-      expected_output: "<sha256(abc123 + def456)>"
+      expected_output: "e861b2eab679927cfa36fe256e9deb1969b0468ad0744d61064f9d188333aec6"
     - input: "aaa\nbbb\nccc\nddd"
-      expected_output: "<merkle root of 4 leaves>"
+      expected_output: "a70145e430c9ffc0527e6679bd3d14c3819921c7bdcee060e3e848c1e60fe771"
   constraints: ["Double-SHA256 for combining pairs", "Duplicate last hash if odd number of leaves", "Bitcoin-style Merkle tree"]
 
 - id: "CRY-048"
@@ -1239,9 +1239,9 @@
   output_format: "Commitment value (integer)"
   test_cases:
     - input: "23\n5\n7\n3\n4"
-      expected_output: "16"
+      expected_output: "21"
     - input: "97\n5\n7\n10\n20"
-      expected_output: "68"
+      expected_output: "89"
   constraints: ["C = (g^v * h^r) mod p", "Generators g and h must have unknown discrete log relation for security"]
 
 - id: "CRY-083"
