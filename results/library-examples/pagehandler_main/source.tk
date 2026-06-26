@@ -1,0 +1,38 @@
+m=pagehandler;
+i=http:std.http;
+i=tpl:std.template;
+i=str:std.str;
+i=io:std.io;
+
+
+
+f=handler(req:i64):i64{
+  let title="My Page";
+  let content="Dynamic content from handler";
+
+  
+  let b=str.buf();
+  str.add(b;"<!DOCTYPE html>
+<html>
+<head><title>");
+  str.add(b;title);
+  str.add(b;"</title></head>
+<body>
+<h1>");
+  str.add(b;title);
+  str.add(b;"</h1>
+<p>");
+  str.add(b;content);
+  str.add(b;"</p>
+</body>
+</html>");
+  let html=str.done(b);
+  <http.resok(html)
+};
+
+f=main():i64{
+  http.get("/";&handler);
+  io.println("pagehandler listening on http://localhost:8080");
+  http.serve(8080);
+  <0
+};

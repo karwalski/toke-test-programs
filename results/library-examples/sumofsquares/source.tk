@@ -1,0 +1,29 @@
+m=sumofsquares;
+i=io:std.io;
+
+f=square(x:i64):i64{
+  <x*x;
+};
+
+f=sumofsquares(a:i64;b:i64):i64{
+  <square(a)+square(b);
+};
+
+f=main():i64{
+  if(sumofsquares(3;4)=25){
+    io.println("sumofsquares(3,4) = 25: PASS");
+  }el{
+    io.println("sumofsquares(3,4) = 25: FAIL");
+  };
+  if(sumofsquares(0;5)=25){
+    io.println("sumofsquares(0,5) = 25: PASS");
+  }el{
+    io.println("sumofsquares(0,5) = 25: FAIL");
+  };
+  if(sumofsquares(1;1)=2){
+    io.println("sumofsquares(1,1) = 2: PASS");
+  }el{
+    io.println("sumofsquares(1,1) = 2: FAIL");
+  };
+  <0;
+};

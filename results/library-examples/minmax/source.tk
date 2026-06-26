@@ -1,0 +1,29 @@
+m=interpolation;
+i=io:std.io;
+
+f=max(a:i64;b:i64):i64{
+  if(a>b){<a;}el{<b;};
+};
+
+f=min(a:i64;b:i64):i64{
+  if(a<b){<a;}el{<b;};
+};
+
+f=main():i64{
+  if(max(10;20)=20){
+    io.println("max(10,20) = 20: PASS");
+  }el{
+    io.println("max(10,20) = 20: FAIL");
+  };
+  if(min(10;20)=10){
+    io.println("min(10,20) = 10: PASS");
+  }el{
+    io.println("min(10,20) = 10: FAIL");
+  };
+  if(max(0-3;0-7)=0-3){
+    io.println("max(-3,-7) = -3: PASS");
+  }el{
+    io.println("max(-3,-7) = -3: FAIL");
+  };
+  <0;
+};

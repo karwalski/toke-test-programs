@@ -1,0 +1,12 @@
+m=example;
+i=auth:std.auth;
+i=str:std.str;
+
+f=main():i64{
+  let key = str.bytes("mysecret");
+  let apikey = auth.apikeygenerate("app");
+  let header = "Bearer sometoken";
+  let tok = mt auth.bearerextract(header) {$ok:t t;$err:e ""};
+  <0;
+};
+

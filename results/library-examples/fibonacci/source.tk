@@ -1,0 +1,31 @@
+m=fibonacci;
+i=io:std.io;
+
+f=fib(n:i64):i64{
+  if(n<2){<n;};
+  <fib(n-1)+fib(n-2);
+};
+
+f=main():i64{
+  if(fib(0)=0){
+    io.println("fib(0) = 0: PASS");
+  }el{
+    io.println("fib(0) = 0: FAIL");
+  };
+  if(fib(1)=1){
+    io.println("fib(1) = 1: PASS");
+  }el{
+    io.println("fib(1) = 1: FAIL");
+  };
+  if(fib(10)=55){
+    io.println("fib(10) = 55: PASS");
+  }el{
+    io.println("fib(10) = 55: FAIL");
+  };
+  if(fib(20)=6765){
+    io.println("fib(20) = 6765: PASS");
+  }el{
+    io.println("fib(20) = 6765: FAIL");
+  };
+  <0;
+};

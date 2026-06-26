@@ -1,0 +1,63 @@
+m=docpipeline;
+
+i=file:std.file;
+i=str:std.str;
+i=log:std.log;
+
+t=$err{code:i64};
+
+f=countlines(content:$str):i64{
+  let lines=str.split(content; "\n");
+  < lines.len as i64
+};
+
+f=countwords(content:$str):i64{
+  let words=str.split(content; " ");
+  < words.len as i64
+};
+
+f=summarise(name:$str;lines:i64;words:i64):$str{
+  let lstr=str.fromint(lines);
+  let wstr=str.fromint(words);
+  < str.concat(name;
+       str.concat(" lines=";
+         str.concat(lstr;
+           str.concat(" words="; wstr))))
+};
+
+f=processfile(name:$str;content:$str):i64{
+  let lines=countlines(content);
+  let words=countwords(content);
+  let summary=summarise(name; lines; words);
+  log.info(summary);
+  < 1
+};
+
+f=skipfile(name:$str):i64{
+  log.warn(str.concat("skipped: "; name));
+  < 0
+};
+
+f=processdir(dir:$str):i64!$err{
+  let entries=file.list(dir)!$err;
+  let total=mut.0;
+  lp(let i=0;i<entries.len as i64;i=i+1){
+    let name=entries.get(i);
+    let fullpath=str.concat(dir; str.concat("/"; name));
+    let counted=mt file.read(fullpath) {
+      $ok:content processfile(name; content);
+      $err:e skipfile(name)
+    };
+    total=total+counted
+  };
+  log.info(str.concat("processed "; str.fromint(total)));
+  < 0
+};
+
+f=main():i64!$err{
+  let dir="docs";
+  log.info(str.concat("scanning: "; dir));
+  processdir(dir)!$err;
+  < 0
+};
+
