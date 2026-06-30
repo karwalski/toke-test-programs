@@ -495,22 +495,36 @@
   constraints: ["Use AES-256-GCM", "Random nonce for each message", "Include associated data in authentication", "Message key used exactly once then deleted"]
 
 - id: "MSG-034"
-  disabled: true
-  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
-  disabled_at: "2026-06-02"
-  disabled_by: "epic-112-cheat-audit"
   title: "Contact fingerprint generation"
-  description: "Generate a human-readable safety number for verifying end-to-end encryption between two contacts."
+  description: "Generate a human-readable safety number for verifying end-to-end encryption between two contacts, using Signal's numeric-fingerprint algorithm."
   difficulty: 3
-  stdlib_modules: [std.crypto, std.str]
+  stdlib_modules: [std.crypto, std.str, std.encoding]
   input_format: "Line 1: user A identity key (hex). Line 2: user A identifier. Line 3: user B identity key (hex). Line 4: user B identifier."
-  output_format: "60-digit safety number displayed in groups of 5."
+  output_format: "60-digit safety number displayed in 12 space-separated groups of 5."
+  algorithm: >
+    Signal NumericFingerprintGenerator (114.27, re-enabled 2026-06-30; fixtures
+    generated and verified by results/python-refs/messaging/MSG-034/genref.py,
+    whose hash+encode pipeline reproduces libsignal's published test-vector
+    fingerprint). Per party P with raw key bytes K (the hex decoded; no DJB
+    0x05 type-prefix) and identifier bytes I:
+      h = (0x00 0x00) || K || I            # FINGERPRINT_VERSION = 0, big-endian short
+      repeat 5200 times: h = SHA-512(h || K)
+      fp = first 30 bytes of h
+      digits(P) = concat over the 6 chunks fp[0:5],fp[5:10],...,fp[25:30] of
+                  printf("%05d", bigEndian5(chunk) %% 100000)   # 30 digits/party
+    combined = (digits(A) <= digits(B)) ? digits(A)+digits(B) : digits(B)+digits(A)
+    output  = combined split into 12 groups of 5, joined by single spaces.
+    The lexicographic ordering of the two 30-digit strings makes the result
+    independent of which contact is A vs B.
   test_cases:
     - input: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nalice@example.com\nfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\nbob@example.com"
-      expected_output: "12345 67890 12345 67890 12345 67890 12345 67890 12345 67890 12345 67890"
-    - input: "aaaa...key_hex\nuser1\nbbbb...key_hex\nuser2"
-      expected_output: "xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx"
-  constraints: ["Deterministic for same inputs regardless of order", "Use iterated SHA-512 hashing", "Combine both fingerprints into single number"]
+      expected_output: "06890 45338 99982 37733 41547 67439 98182 11592 78005 48183 60856 89352"
+    - input: "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\ncarol@example.com\nffeeddccbbaa99887766554433221100ffeeddccbbaa99887766554433221100\ndave@example.com"
+      expected_output: "50375 44206 67995 86569 79593 68237 58336 23247 76169 18050 32561 53981"
+    # order-swap of case 1 (B,A instead of A,B) must yield the identical number — guards the order-independence constraint and defeats any input->output hardcoding.
+    - input: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\nbob@example.com\n0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nalice@example.com"
+      expected_output: "06890 45338 99982 37733 41547 67439 98182 11592 78005 48183 60856 89352"
+  constraints: ["Deterministic for same inputs regardless of order", "Use iterated SHA-512 hashing (5200 rounds, FINGERPRINT_VERSION 0)", "Combine both 30-digit fingerprints smaller-first into a single 60-digit number"]
 
 - id: "MSG-035"
   title: "Message priority queue"

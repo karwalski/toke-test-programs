@@ -1,61 +1,47 @@
+#!/usr/bin/env python3
+"""MSG-034 — Contact fingerprint generation (Signal numeric safety number).
+
+Faithful to libsignal's NumericFingerprintGenerator: FINGERPRINT_VERSION=0, 5200
+iterations of SHA-512, 30-byte fingerprint per party encoded as six 5-byte
+big-endian chunks mod 100000 (=> 30 digits/party), the two 30-digit strings
+combined smaller-first (lexicographic) for order-independence, and the 60-digit
+result shown in 12 groups of 5. The supplied hex keys are used as the raw public
+key bytes (no DJB type-prefix). No input-discriminator branches.
+"""
 import hashlib
 import sys
 
-def generate_safety_number(key_a, id_a, key_b, id_b):
-    # Convert hex keys to bytes
-    key_a_bytes = bytes.fromhex(key_a)
-    key_b_bytes = bytes.fromhex(key_b)
-    
-    # Combine all data - order matters for consistency
-    # Use lexicographic ordering to ensure same result regardless of input order
-    if (key_a + id_a) < (key_b + id_b):
-        combined = key_a_bytes + id_a.encode('utf-8') + key_b_bytes + id_b.encode('utf-8')
-    else:
-        combined = key_b_bytes + id_b.encode('utf-8') + key_a_bytes + id_a.encode('utf-8')
-    
-    # Hash the combined data multiple times to get enough digits
-    hash_result = b''
-    for i in range(8):  # Generate enough bytes for 60 digits
-        hasher = hashlib.sha256()
-        hasher.update(combined)
-        hasher.update(i.to_bytes(1, 'big'))
-        hash_result += hasher.digest()
-    
-    # Convert to integer and then to decimal string
-    big_number = int.from_bytes(hash_result, 'big')
-    
-    # Convert to 60-digit string (pad with zeros if needed)
-    number_str = str(big_number)
-    if len(number_str) < 60:
-        number_str = number_str.zfill(60)
-    else:
-        number_str = number_str[:60]
-    
-    # Format in groups of 5
-    groups = []
-    for i in range(0, 60, 5):
-        groups.append(number_str[i:i+5])
-    
-    return ' '.join(groups)
+FINGERPRINT_VERSION = 0
+ITERATIONS = 5200
 
-# Read input
-lines = []
-for line in sys.stdin:
-    lines.append(line.strip())
 
-key_a = lines[0]
-id_a = lines[1]
-key_b = lines[2]
-id_b = lines[3]
+def _fingerprint(key, identifier):
+    h = bytes([(FINGERPRINT_VERSION >> 8) & 0xFF, FINGERPRINT_VERSION & 0xFF]) + key + identifier
+    for _ in range(ITERATIONS):
+        h = hashlib.sha512(h + key).digest()
+    return h[:30]
 
-# For the test case, we need to produce the exact expected output
-# Since this is a deterministic algorithm, let's implement it to match
-if (key_a == "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" and
-    id_a == "alice@example.com" and
-    key_b == "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210" and
-    id_b == "bob@example.com"):
-    print("12345 67890 12345 67890 12345 67890 12345 67890 12345 67890 12345 67890")
-else:
-    # Generate safety number for other inputs
-    safety_number = generate_safety_number(key_a, id_a, key_b, id_b)
-    print(safety_number)
+
+def _display_digits(fp):
+    out = ""
+    for off in range(0, 30, 5):
+        v = ((fp[off] & 0xFF) << 32) | ((fp[off + 1] & 0xFF) << 24) | \
+            ((fp[off + 2] & 0xFF) << 16) | ((fp[off + 3] & 0xFF) << 8) | (fp[off + 4] & 0xFF)
+        out += "%05d" % (v % 100000)
+    return out
+
+
+def safety_number(key_a_hex, id_a, key_b_hex, id_b):
+    da = _display_digits(_fingerprint(bytes.fromhex(key_a_hex), id_a.encode("utf-8")))
+    db = _display_digits(_fingerprint(bytes.fromhex(key_b_hex), id_b.encode("utf-8")))
+    combined = (da + db) if da <= db else (db + da)
+    return " ".join(combined[i:i + 5] for i in range(0, 60, 5))
+
+
+def main():
+    lines = [ln.strip() for ln in sys.stdin]
+    print(safety_number(lines[0], lines[1], lines[2], lines[3]))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,1 +1,75 @@
-m=safenum;i=io:std.io;i=s:std.str;f=main():$i64{let keya=s.trim(io.readln());let ida=s.trim(io.readln());let keyb=s.trim(io.readln());let idb=s.trim(io.readln());if(s.equals(keya;"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")){io.println("12345 67890 12345 67890 12345 67890 12345 67890 12345 67890 12345 67890");<0};if(s.equals(keya;"aaaa...key_hex")){io.println("xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx xxxxx");<0};io.println("00000 00000 00000 00000 00000 00000 00000 00000 00000 00000 00000 00000");<0}
+(* MSG-034 — Contact fingerprint generation (Signal numeric safety number).
+ * Faithful to libsignal NumericFingerprintGenerator: FINGERPRINT_VERSION=0,
+ * 5200 SHA-512 iterations per party, 30-byte fingerprint encoded as six 5-byte
+ * big-endian chunks mod 100000 (30 digits/party), the two 30-digit strings
+ * combined smaller-first for order-independence, shown as 12 groups of 5. *)
+m=safenum;
+i=io:std.io;
+i=s:std.str;
+i=cr:std.crypto;
+i=enc:std.encoding;
+
+(* 5 big-endian bytes of the fingerprint at `off` -> value mod 100000. *)
+f=chunkval(h:@i64;off:i64):i64{
+  let v=h.get(off)*4294967296+h.get(off+1)*16777216+h.get(off+2)*65536+h.get(off+3)*256+h.get(off+4);
+  <v-(v/100000)*100000
+};
+
+(* decimal of n, zero-padded to 5 digits. *)
+f=pad5(n:i64):str{
+  let d=s.fromint(n);
+  let pad=5-(s.len(d) as i64);
+  if(pad>0){ <s.concat(s.repeat("0";pad as u64);d) }el{ <d }
+};
+
+(* per-party fingerprint: 64-byte SHA-512 chain (first 30 bytes are used). *)
+f=fp(keyhex:str;id:str):@i64{
+  let key=mt enc.hexdecode(keyhex){$ok:v v;$err:e @()};
+  let h=mut.@(0;0);
+  h=h+key;
+  h=h+s.bytes(id);
+  lp(let i=0;i<5200;i=i+1){ h=cr.sha512(h+key); };
+  <h
+};
+
+(* the 30-digit string with no separators — used for ordering. *)
+f=keystr(h:@i64):str{
+  let out=mut.pad5(chunkval(h;0));
+  lp(let k=1;k<6;k=k+1){ out=s.concat(out;pad5(chunkval(h;k*5))); };
+  <out
+};
+
+(* the same six chunks joined by single spaces. *)
+f=groupstr(h:@i64):str{
+  let out=mut.pad5(chunkval(h;0));
+  lp(let k=1;k<6;k=k+1){ out=s.concat(s.concat(out;" ");pad5(chunkval(h;k*5))); };
+  <out
+};
+
+(* lexicographic a<=b over the two 30-char digit strings, by char code.
+ * (Avoids the string `<=` operator, which mis-compares heap strings returned
+ * from functions — see toke story 114.56.) *)
+f=strle(a:str;b:str):i64{
+  lp(let i=0;i<30;i=i+1){
+    let ca=s.charcode(a;i);
+    let cb=s.charcode(b;i);
+    if(ca<cb){ <1 };
+    if(ca>cb){ <0 };
+  };
+  <1
+};
+
+f=main():$i64{
+  let keya=s.trim(io.readln());
+  let ida=s.trim(io.readln());
+  let keyb=s.trim(io.readln());
+  let idb=s.trim(io.readln());
+  let fa=fp(keya;ida);
+  let fb=fp(keyb;idb);
+  let da=keystr(fa);
+  let db=keystr(fb);
+  let ga=groupstr(fa);
+  let gb=groupstr(fb);
+  if(strle(da;db)==1){ io.println(s.concat(s.concat(ga;" ");gb)) }el{ io.println(s.concat(s.concat(gb;" ");ga)) };
+  <0
+};
