@@ -1,9 +1,9 @@
 m=qrkey;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
 f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
-f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1=1};if(y<x){<1=0}};<la<lb};
+f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1==1};if(y<x){<1==0}};<la<lb};
 f=todec(b:@$i64):$str{let dig=mut.@(0);let n=b.len();lp(let i=0;i<n;i=i+1){let by=b.get(i);let carry=mut.by;let m=dig.len();let nd=mut.@();lp(let j=0;j<m;j=j+1){let v=dig.get(j)*256+carry;nd=nd+@(v-v/10*10);carry=v/10};lp(carry>0){nd=nd+@(carry-carry/10*10);carry=carry/10};dig=nd};
 let out=mut."";let ln=dig.len();lp(let k=0;k<ln;k=k+1){let d=dig.get(ln-1-k);out=s.concat(out;s.fromint(d))};
-if(s.len(out)=0){out="0"};<out};
+if(s.len(out)==0){out="0"};<out};
 f=main():$i64{
 let version=s.toint(s.trim(io.readln()));
 let ka=s.trim(io.readln());

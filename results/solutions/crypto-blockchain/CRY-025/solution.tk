@@ -86,7 +86,7 @@ f=poly1305(msg:@i64;okey:@i64):@i64{
   let mask=mut.0;
   if(g4<0){mask=0}el{mask=1};
   let fh0=mut.0;let fh1=mut.0;let fh2=mut.0;let fh3=mut.0;let fh4=mut.0;
-  if(mask=1){fh0=gg0;fh1=gg1;fh2=gg2;fh3=gg3;fh4=g4&67108863}el{fh0=h0;fh1=h1;fh2=h2;fh3=h3;fh4=h4};
+  if(mask==1){fh0=gg0;fh1=gg1;fh2=gg2;fh3=gg3;fh4=g4&67108863}el{fh0=h0;fh1=h1;fh2=h2;fh3=h3;fh4=h4};
   let f0=(fh0|(fh1<<26))&4294967295;
   let f1=((fh1>>6)|(fh2<<20))&4294967295;
   let f2=((fh2>>12)|(fh3<<14))&4294967295;

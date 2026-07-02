@@ -41,7 +41,7 @@ f=fmtnum(v:$f64;agf:$str):$str{
   if(s.eq(agf;"avg")){<s.format(v;"%.2f")};
   if(s.eq(agf;"count")){<s.fromint(v as $i64)};
   let iv=v as $i64;
-  if((iv as $f64)=v){<s.fromint(iv)};
+  if((iv as $f64)==v){<s.fromint(iv)};
   <s.format(v;"%.2f")
 };
 
@@ -49,11 +49,11 @@ f=main():$i64{
   let header=s.trim(io.readln());
   let headers=s.split(header;",");
   let rows=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let lt=s.trim(line);
-    if(s.len(lt)=0){br};
+    if(s.len(lt)==0){br};
     rows=rows.push(lt)
   };
   let config=s.trim(io.readln());
@@ -131,7 +131,7 @@ f=main():$i64{
           let x=s.tofloat(cells.get(cidx as $u64));
           sum=sum+x;
           cnt=cnt+1;
-          if(first=1){mn=x;mx=x;first=0}el{if(x<mn){mn=x};if(x>mx){mx=x}}
+          if(first==1){mn=x;mx=x;first=0}el{if(x<mn){mn=x};if(x>mx){mx=x}}
         };
         r=r+1
       };

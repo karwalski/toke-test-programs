@@ -6,9 +6,9 @@ f=listdir(dir:$str):@$str{
   }
 };
 f=contains(arr:@$str;needle:$str):$bool{
-  let found=mut.(1=0);
+  let found=mut.(1==0);
   lp(let i=0;i<(arr.len as $i64);i=i+1){
-    if(s.eq(arr.get(i as $u64);needle)){found=(1=1)}
+    if(s.eq(arr.get(i as $u64);needle)){found=(1==1)}
   };
   <found
 };
@@ -20,21 +20,21 @@ f=strless(a:$str;b:$str):$bool{
   let ba=s.bytes(a);
   let bb=s.bytes(b);
   let res=mut.0;
-  let done=mut.(1=0);
+  let done=mut.(1==0);
   lp(let i=0;i<n;i=i+1){
-    if(done=(1=0)){
+    if(done==(1==0)){
       let ca=(ba.get(i as $u64) as $i64);
       let cb=(bb.get(i as $u64) as $i64);
-      if(ca<cb){res=0-1;done=(1=1)}
-      el{if(ca>cb){res=1;done=(1=1)}}
+      if(ca<cb){res=0-1;done=(1==1)}
+      el{if(ca>cb){res=1;done=(1==1)}}
     }
   };
-  if(done=(1=0)){if(la<lb){res=0-1}el{if(la>lb){res=1}}};
+  if(done==(1==0)){if(la<lb){res=0-1}el{if(la>lb){res=1}}};
   <(res<0)
 };
 f=main():$i64{
   let prefix=mut."";
-  if(io.eof()=(1=0)){
+  if(io.eof()==(1==0)){
     let raw=io.readln();
     prefix=s.trim(raw)
   };
@@ -51,12 +51,12 @@ f=main():$i64{
       let names=listdir(dir);
       lp(let n=0;n<(names.len as $i64);n=n+1){
         let name=names.get(n as $u64);
-        let keep=mut.(1=1);
+        let keep=mut.(1==1);
         if(s.len(prefix)>0){
-          if(s.startswith(name;prefix)=(1=0)){keep=(1=0)}
+          if(s.startswith(name;prefix)==(1==0)){keep=(1==0)}
         };
         if(keep){
-          if(contains(seen;name)){keep=(1=0)}
+          if(contains(seen;name)){keep=(1==0)}
         };
         if(keep){
           seen=seen+@(name);
@@ -71,14 +71,14 @@ f=main():$i64{
   lp(let k=0;k<cnt;k=k+1){
     let cur=outs.get(k as $u64);
     let pos=mut.0;
-    let placed=mut.(1=0);
+    let placed=mut.(1==0);
     let slen=(sorted.len as $i64);
     lp(let j=0;j<slen;j=j+1){
-      if(placed=(1=0)){
-        if(strless(cur;sorted.get(j as $u64))){pos=j;placed=(1=1)}
+      if(placed==(1==0)){
+        if(strless(cur;sorted.get(j as $u64))){pos=j;placed=(1==1)}
       }
     };
-    if(placed=(1=0)){pos=slen};
+    if(placed==(1==0)){pos=slen};
     let rebuilt=mut.@();
     lp(let j=0;j<pos;j=j+1){rebuilt=rebuilt+@(sorted.get(j as $u64))};
     rebuilt=rebuilt+@(cur);

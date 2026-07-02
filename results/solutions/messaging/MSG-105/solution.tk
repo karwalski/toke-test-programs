@@ -61,7 +61,7 @@ let addpart=s.slice(new;bj;j);
 changes=changes+@(s.concat(s.concat("added '";addpart);"'"))
 }};
 ai=i+size;bj=j+size};
-if(changes.len=0){<""};
+if(changes.len==0){<""};
 let joined=mut."";lp(let c=0;c<(changes.len as $i64);c=c+1){if(c>0){joined=s.concat(joined;", ")};joined=s.concat(joined;changes.get(c))};
 if(hasnoninsert){<s.concat(s.concat(" [changed: ";joined);"]")};
 <s.concat(s.concat(" [";joined);"]")};
@@ -82,7 +82,7 @@ let rest=s.slice(obj;start;s.len(obj) as $i64);
 let num=mut."";lp(let i=0;i<(s.len(rest) as $i64);i=i+1){let c=charat(rest;i);if(s.contains("0123456789";c)){num=s.concat(num;c)}el{br}};
 <s.toint(num)};
 f=main():$i64{
-let input=mut."";lp(1=1){let line=io.readln();if(io.eof()){input=s.concat(input;line);br};input=s.concat(input;line)};
+let input=mut."";lp(1==1){let line=io.readln();if(io.eof()){input=s.concat(input;line);br};input=s.concat(input;line)};
 let trimmed=s.trim(input);
 let inner=s.slice(trimmed;1;(s.len(trimmed) as $i64)-1);
 let objs=s.split(inner;"},{");
@@ -96,7 +96,7 @@ vers=vers+@(getint(obj;"version"));
 texts=texts+@(getstr(obj;"text"));
 edits=edits+@(getstr(obj;"edited_at"))};
 let uniq=mut.@($str);
-lp(let i=0;i<n;i=i+1){let id=ids.get(i);let found=mut.false;lp(let j=0;j<(uniq.len as $i64);j=j+1){if(s.eq(uniq.get(j);id)){found=true}};if(found=false){uniq=uniq+@(id)}};
+lp(let i=0;i<n;i=i+1){let id=ids.get(i);let found=mut.false;lp(let j=0;j<(uniq.len as $i64);j=j+1){if(s.eq(uniq.get(j);id)){found=true}};if(found==false){uniq=uniq+@(id)}};
 lp(let p=0;p<(uniq.len as $i64);p=p+1){lp(let q=0;q<(uniq.len as $i64)-1;q=q+1){if(strgt(uniq.get(q);uniq.get(q+1))){let t=uniq.get(q);uniq=uniq.set(q;uniq.get(q+1));uniq=uniq.set(q+1;t)}}};
 let out=mut."";let first=mut.true;
 lp(let u=0;u<(uniq.len as $i64);u=u+1){
@@ -110,8 +110,8 @@ let prev=mut."";
 lp(let i=0;i<m;i=i+1){
 let text=vt.get(i);
 let line=s.concat(s.concat(s.concat(s.concat(s.concat("\n  v";s.fromint(vv.get(i)));" (");ve.get(i));"): ");text);
-if(i=0){out=s.concat(out;line)}el{let d=chardiff(prev;text);out=s.concat(out;s.concat(line;d))};
+if(i==0){out=s.concat(out;line)}el{let d=chardiff(prev;text);out=s.concat(out;s.concat(line;d))};
 prev=text}};
 io.println(out);<0};
-f=strgt(a:$str;b:$str):$bool{let la=s.len(a) as $i64;let lb=s.len(b) as $i64;let mn=mut.la;if(lb<la){mn=lb};lp(let i=0;i<mn;i=i+1){let ca=charat(a;i);let cb=charat(b;i);if(s.eq(ca;cb)=false){<gtchar(ca;cb)}};<la>lb};
+f=strgt(a:$str;b:$str):$bool{let la=s.len(a) as $i64;let lb=s.len(b) as $i64;let mn=mut.la;if(lb<la){mn=lb};lp(let i=0;i<mn;i=i+1){let ca=charat(a;i);let cb=charat(b;i);if(s.eq(ca;cb)==false){<gtchar(ca;cb)}};<la>lb};
 f=gtchar(a:$str;b:$str):$bool{<s.indexof("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";a)>s.indexof("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";b)}

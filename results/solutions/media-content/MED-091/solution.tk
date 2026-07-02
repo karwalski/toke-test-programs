@@ -37,7 +37,7 @@ f=score(line:$str):$i64{
         word="";
       };
       if(i<n){
-        if(c=44){total=total+1};
+        if(c==44){total=total+1};
       };
     };
     i=i+1;
@@ -48,7 +48,7 @@ f=main():$i64{
   let num=mut.0;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     num=num+1;
     let out=s.concat("sentence ";s.fromint(num));
     let out2=s.concat(out;": score ");

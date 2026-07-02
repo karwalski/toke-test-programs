@@ -15,10 +15,10 @@ f=gridget(lines:@$str;r:$i64;c:$i64;nrows:$i64):i64{
 };
 
 f=isarrow(ch:$i64):$bool{
-  if(ch=94){ <true };
-  if(ch=118){ <true };
-  if(ch=60){ <true };
-  if(ch=62){ <true };
+  if(ch==94){ <true };
+  if(ch==118){ <true };
+  if(ch==60){ <true };
+  if(ch==62){ <true };
   <false
 };
 
@@ -41,7 +41,7 @@ f=main():i64{
     let rl=(rb.len as i64);
     lp(let c=0;c<rl;c=c+1){
       let ch=rb.get(c) as i64;
-      if(ch=83){ srow=r; scol=c }
+      if(ch==83){ srow=r; scol=c }
     }
   };
   if(srow<0){ io.println("Out of bounds"); <0 };
@@ -90,15 +90,15 @@ f=main():i64{
     let ch=gridget(lines;nr;nc;nrows);
     if(ch<0){ result="Out of bounds"; finished=1; br };
     let idx=nr*maxc+nc;
-    if(vec.get(vis;idx)=1){ result="Loop detected"; finished=1; br };
+    if(vec.get(vis;idx)==1){ result="Loop detected"; finished=1; br };
     cr=nr; cc=nc;
     count=count+1;
     vis=vec.set(vis;idx;1);
-    if(ch=69){ result=s.fromint(count); finished=1; br };
-    if(ch=94){ dr=0-1; dc=0 }el{
-      if(ch=118){ dr=1; dc=0 }el{
-        if(ch=60){ dr=0; dc=0-1 }el{
-          if(ch=62){ dr=0; dc=1 }el{
+    if(ch==69){ result=s.fromint(count); finished=1; br };
+    if(ch==94){ dr=0-1; dc=0 }el{
+      if(ch==118){ dr=1; dc=0 }el{
+        if(ch==60){ dr=0; dc=0-1 }el{
+          if(ch==62){ dr=0; dc=1 }el{
           }}}}
   };
   io.println(result);

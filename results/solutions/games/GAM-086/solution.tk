@@ -9,7 +9,7 @@ f=hasbyte(str:$str;b:$i64):$i64{
   let n=bs.len as i64;
   let r=mut.0;
   lp(let i=0;i<n;i=i+1){
-    if((bs.get(i) as i64)=b){r=1}
+    if((bs.get(i) as i64)==b){r=1}
   };
   <r
 };
@@ -28,7 +28,7 @@ f=main():i64{
   let known=mut."";
   lp(let i=0;i<masklen;i=i+1){
     let c=mb.get(i) as i64;
-    if(c=95){}el{ known=s.concat(known;s.substr(mask;i;i+1)) }
+    if(c==95){}el{ known=s.concat(known;s.substr(mask;i;i+1)) }
   };
 
   (* wrong letters: split on space *)
@@ -36,7 +36,7 @@ f=main():i64{
   let wrongletters=mut."";
   lp(let i=0;i<wparts.len as i64;i=i+1){
     let p=wparts.get(i);
-    if(s.len(p)=0){}el{ wrongletters=s.concat(wrongletters;p) }
+    if(s.len(p)==0){}el{ wrongletters=s.concat(wrongletters;p) }
   };
 
   (* read dictionary *)
@@ -45,7 +45,7 @@ f=main():i64{
   lp(done<1){
     let line=io.readln();
     if(io.eof()){done=1;br};
-    if(s.len(line)=0){}el{words=words.push(s.upper(line))}
+    if(s.len(line)==0){}el{words=words.push(s.upper(line))}
   };
   let wc=(words.len as i64)-1;
 
@@ -59,29 +59,29 @@ f=main():i64{
     let wl=wb.len as i64;
     (* candidate filter *)
     let ok=mut.1;
-    if(wl=masklen){}el{ok=0};
-    if(ok=1){
+    if(wl==masklen){}el{ok=0};
+    if(ok==1){
       (* known positions match *)
       lp(let i=0;i<masklen;i=i+1){
         let mc=mb.get(i) as i64;
-        if(mc=95){}el{
-          if((wb.get(i) as i64)=mc){}el{ok=0}
+        if(mc==95){}el{
+          if((wb.get(i) as i64)==mc){}el{ok=0}
         }
       }
     };
-    if(ok=1){
+    if(ok==1){
       (* contains no wrong letter *)
       lp(let i=0;i<wl;i=i+1){
         let c=wb.get(i) as i64;
-        if(hasbyte(wrongletters;c)=1){ok=0}
+        if(hasbyte(wrongletters;c)==1){ok=0}
       }
     };
-    if(ok=1){
+    if(ok==1){
       (* accumulate frequency for letters not known *)
       lp(let i=0;i<wl;i=i+1){
         let c=wb.get(i) as i64;
         if(c>64){if(c<91){
-          if(hasbyte(known;c)=1){}el{
+          if(hasbyte(known;c)==1){}el{
             let idx=c-65;
             freq=vec.set(freq;idx;vec.get(freq;idx)+1)
           }

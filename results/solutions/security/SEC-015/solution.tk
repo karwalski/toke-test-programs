@@ -5,7 +5,7 @@ i=s:std.str;
 f=main():$i64{
   let input=s.trim(io.readln());
   let inner=s.trim(s.slice(input;1;s.len(input)-1));
-  if(s.len(inner)=0){io.println("No findings");<0};
+  if(s.len(inner)==0){io.println("No findings");<0};
   let low=s.lower(input);
   if(s.contains(low;"\"severity\":\"high\"")){io.println("CRITICAL");<0};
   if(s.contains(low;"\"severity\": \"high\"")){io.println("CRITICAL");<0};

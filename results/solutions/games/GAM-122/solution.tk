@@ -23,7 +23,7 @@ f=winning(dict:@($str);ns:$str):$bool{
       if(hasidx(opp;ch)){}el{opp=opp+@(ch)};
     }};
   };
-  if((opp.len() as $i64)=0){<false};
+  if((opp.len() as $i64)==0){<false};
   let om=opp.len() as $i64;
   lp(let k=0;k<om;k=k+1){
     let ol=opp.get(k);
@@ -44,11 +44,11 @@ f=winning(dict:@($str);ns:$str):$bool{
 };
 f=main():$i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
-    if(s.len(t)=0){}el{lines=lines+@(t)};
+    if(s.len(t)==0){}el{lines=lines+@(t)};
   };
   let current=lines.get(0);
   let dict=mut.@();
@@ -83,9 +83,9 @@ f=main():$i64{
     let c=sorted.get(i);
     let ns=s.concat(current;c);
     if(winning(dict;ns)){
-      if(s.len(win)=0){win=c}el{win=s.concat(s.concat(win;" ");c)};
+      if(s.len(win)==0){win=c}el{win=s.concat(s.concat(win;" ");c)};
     }el{
-      if(s.len(lose)=0){lose=c}el{lose=s.concat(s.concat(lose;" ");c)};
+      if(s.len(lose)==0){lose=c}el{lose=s.concat(s.concat(lose;" ");c)};
     };
   };
   io.println(s.concat("Winning moves: ";win));

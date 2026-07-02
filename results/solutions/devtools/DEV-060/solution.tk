@@ -17,7 +17,7 @@ f=main():i64{
   let opencount=mut.0;
   lp(let p=startp;p<=endp;p=p+1){
     let avail=net.portavailable(p as u64);
-    if(avail=0){
+    if(avail==0){
       opencount=opencount+1;
       io.println(s.concat(s.concat("port ";s.fromint(p));": OPEN"))
     }

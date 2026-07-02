@@ -16,11 +16,11 @@ let keys=mut.@();
 let vals=mut.@();
 let count=mut.0;
 let content=mut."";
-lp(1=1){
+lp(1==1){
 let line=io.readln();
 if(io.eof()){br};
 let trimmed=s.trim(line);
-if(s.len(trimmed)=0){br};
+if(s.len(trimmed)==0){br};
 let parts=s.split(trimmed;" ");
 let cmd=parts.get(0);
 if(s.eq(cmd;"INSERT")){

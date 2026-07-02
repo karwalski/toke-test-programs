@@ -26,9 +26,9 @@ f=main():$i64{
   let codes=mut.@();
   let comments=mut.@();
   let blanks=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let path=s.trim(line);
     if(s.len(path)>0){
       if(isregular(path)){
@@ -40,7 +40,7 @@ f=main():$i64{
         let blank=mut.0;
         lp(let i=0;i<lines.len();i=i+1){
           let st=s.trim(lines.get(i));
-          if(s.len(st)=0){blank=blank+1}
+          if(s.len(st)==0){blank=blank+1}
           el{if(s.startswith(st;"#")){comment=comment+1}el{code=code+1}}
         };
         let found=mut.0-1;

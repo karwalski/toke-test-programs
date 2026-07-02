@@ -15,7 +15,7 @@ f=extractarr(text:$str;key:$str):$str{
     }el{
       if(s.eq(c;"\"")){inq=true};
       if(s.eq(c;"[")){depth=depth+1};
-      if(s.eq(c;"]")){depth=depth-1;if(depth=0){<s.slice(text;start+1;i)}}
+      if(s.eq(c;"]")){depth=depth-1;if(depth==0){<s.slice(text;start+1;i)}}
     };
     i=i+1
   };
@@ -61,8 +61,8 @@ f=splitobjects(arr:$str):@($str){
       if(s.eq(c;"\"")){inq=false}
     }el{
       if(s.eq(c;"\"")){inq=true};
-      if(s.eq(c;"{")){if(depth=0){start=i};depth=depth+1};
-      if(s.eq(c;"}")){depth=depth-1;if(depth=0){out=out+@(s.slice(arr;start;i+1))}}
+      if(s.eq(c;"{")){if(depth==0){start=i};depth=depth+1};
+      if(s.eq(c;"}")){depth=depth-1;if(depth==0){out=out+@(s.slice(arr;start;i+1))}}
     };
     i=i+1
   };

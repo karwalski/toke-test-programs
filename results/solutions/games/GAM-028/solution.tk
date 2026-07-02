@@ -3,15 +3,15 @@ f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
 f=main():$i64{let gsz=s.toint(s.trim(io.readln()));
 let foodr=mut.@($i64);let foodc=mut.@($i64);
 let reading=mut.true;
-lp(reading){let line=s.trim(io.readln());if(s.len(line)=0){reading=false}el{let p=s.split(line;" ");if(p.len()>=2){foodr=foodr+@(s.toint(p.get(0))-1);foodc=foodc+@(s.toint(p.get(1))-1)}}};
+lp(reading){let line=s.trim(io.readln());if(s.len(line)==0){reading=false}el{let p=s.split(line;" ");if(p.len()>=2){foodr=foodr+@(s.toint(p.get(0))-1);foodc=foodc+@(s.toint(p.get(1))-1)}}};
 let moves=s.trim(io.readln());
 let r=mut.0;let c=mut.0;let score=mut.0;let dead=mut.false;
 let eaten=mut.@($bool);lp(let i=0;i<foodr.len();i=i+1){eaten=eaten+@(false)};
-lp(let i=0;i<foodr.len();i=i+1){if(!(eaten.get(i))){if(foodr.get(i)=r){if(foodc.get(i)=c){score=score+1;eaten=eaten.set(i;true)}}}};
+lp(let i=0;i<foodr.len();i=i+1){if(!(eaten.get(i))){if(foodr.get(i)==r){if(foodc.get(i)==c){score=score+1;eaten=eaten.set(i;true)}}}};
 lp(let m=0;m<s.len(moves);m=m+1){let mv=ch(moves;m);
 if(s.equals(mv;"R")){c=c+1}el{if(s.equals(mv;"L")){c=c-1}el{if(s.equals(mv;"U")){r=r-1}el{if(s.equals(mv;"D")){r=r+1}}}};
 if(r<0){dead=true};if(r>=gsz){dead=true};if(c<0){dead=true};if(c>=gsz){dead=true};
-if(!(dead)){lp(let i=0;i<foodr.len();i=i+1){if(!(eaten.get(i))){if(foodr.get(i)=r){if(foodc.get(i)=c){score=score+1;eaten=eaten.set(i;true)}}}}}};
+if(!(dead)){lp(let i=0;i<foodr.len();i=i+1){if(!(eaten.get(i))){if(foodr.get(i)==r){if(foodc.get(i)==c){score=score+1;eaten=eaten.set(i;true)}}}}}};
 let status=mut."Alive";if(dead){status="Game Over"};
 io.println(s.concat(s.concat(s.fromint(score);" ");status));
 <0}

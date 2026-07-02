@@ -15,22 +15,22 @@ f=detectlang(text:$str):$str{
     lower=s.replace(lower;"?";"");
     lower=s.replace(lower;",";"");
     
-    if(lower="bonjour"){frcount=frcount+1};
-    if(lower="le"){frcount=frcount+1};
-    if(lower="monde"){frcount=frcount+1};
-    if(lower="comment"){frcount=frcount+1};
-    if(lower="allez-vous"){frcount=frcount+1};
-    if(lower="aujourd'hui"){frcount=frcount+1};
+    if(lower=="bonjour"){frcount=frcount+1};
+    if(lower=="le"){frcount=frcount+1};
+    if(lower=="monde"){frcount=frcount+1};
+    if(lower=="comment"){frcount=frcount+1};
+    if(lower=="allez-vous"){frcount=frcount+1};
+    if(lower=="aujourd'hui"){frcount=frcount+1};
     
-    if(lower="hello"){encount=encount+1};
-    if(lower="world"){encount=encount+1};
+    if(lower=="hello"){encount=encount+1};
+    if(lower=="world"){encount=encount+1};
     
-    if(lower="hola"){escount=escount+1};
-    if(lower="mundo"){escount=escount+1};
+    if(lower=="hola"){escount=escount+1};
+    if(lower=="mundo"){escount=escount+1};
   };
   
   let total=frcount+encount+escount;
-  if(total=0){<"{\"primary\":\"unknown\",\"confidence\":0.0,\"secondary\":[]}"};
+  if(total==0){<"{\"primary\":\"unknown\",\"confidence\":0.0,\"secondary\":[]}"};
   
   let primary=mut."en";
   let conf=mut.0.5;

@@ -60,7 +60,7 @@ f=getts(obj:$str):$str{
   let done=mut.false;
   lp(let h=0;h<n;h=h+1){
     if(!(done)){
-      if(j<n){ if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1} }el{done=true};
+      if(j<n){ if(bytes.get(j)==q){endpos=j;done=true}el{j=j+1} }el{done=true};
     };
   };
   <mt str.slice(obj;start as u64;endpos as u64){ $ok:v v; $err:e "" }
@@ -94,14 +94,14 @@ f=main():i64{
   let i=mut.0;
   lp(let g=0;g<n;g=g+1){
     if(i<n){
-      if(bytes.get(i)=obrace){
+      if(bytes.get(i)==obrace){
         let estart=i;
         let j=mut.i+1;
         let eend=mut.i+1;
         let done=mut.false;
         lp(let h=0;h<n;h=h+1){
           if(!(done)){
-            if(j<n){ if(bytes.get(j)=cbrace){eend=j;done=true}el{j=j+1} }el{done=true};
+            if(j<n){ if(bytes.get(j)==cbrace){eend=j;done=true}el{j=j+1} }el{done=true};
           };
         };
         let entry=mt str.slice(input;estart as u64;(eend+1) as u64){ $ok:v v; $err:e "" };

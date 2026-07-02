@@ -3,7 +3,7 @@ i=io:std.io;
 i=s:std.str;
 
 f=joincomma(a:@i64):$str{
-  if(a.len=0){<""};
+  if(a.len==0){<""};
   let out=mut.s.fromint(a.get(0));
   lp(let i=1;i<a.len;i=i+1){
     out=s.concat(out;s.concat(",";s.fromint(a.get(i))));
@@ -12,7 +12,7 @@ f=joincomma(a:@i64):$str{
 };
 
 f=joinspace(a:@i64):$str{
-  if(a.len=0){<""};
+  if(a.len==0){<""};
   let out=mut.s.fromint(a.get(0));
   lp(let i=1;i<a.len;i=i+1){
     out=s.concat(out;s.concat(" ";s.fromint(a.get(i))));
@@ -39,7 +39,7 @@ f=merge(x:@i64;y:@i64):@i64{
   let result=mut.@();
   let i=mut.0;
   let j=mut.0;
-  lp(1=1){
+  lp(1==1){
     if(i>=x.len){
       if(j>=y.len){br};
       result=result.push(y.get(j));j=j+1;
@@ -59,7 +59,7 @@ f=merge(x:@i64;y:@i64):@i64{
 };
 
 f=joinruns(runs:@(@i64)):$str{
-  if(runs.len=0){<""};
+  if(runs.len==0){<""};
   let out=mut.s.concat("[";s.concat(joincomma(runs.get(0));"]"));
   lp(let i=1;i<runs.len;i=i+1){
     out=s.concat(out;s.concat(" [";s.concat(joincomma(runs.get(i));"]")));
@@ -82,11 +82,11 @@ f=main():i64{
   let runs=mut.@();
   let idx=mut.0;
   let rnum=mut.1;
-  lp(1=1){
+  lp(1==1){
     if(idx>=n){br};
     let chunk=mut.@();
     let c=mut.0;
-    lp(1=1){
+    lp(1==1){
       if(c>=k){br};
       if(idx>=n){br};
       chunk=chunk.push(nums.get(idx));
@@ -100,11 +100,11 @@ f=main():i64{
   };
   (* merge passes: pairwise adjacent *)
   let passnum=mut.1;
-  lp(1=1){
+  lp(1==1){
     if(runs.len<=1){br};
     let next=mut.@();
     let pp=mut.0;
-    lp(1=1){
+    lp(1==1){
       if(pp>=runs.len){br};
       if(pp+1<runs.len){
         next=next.push(merge(runs.get(pp);runs.get(pp+1)));

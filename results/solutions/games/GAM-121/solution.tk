@@ -9,7 +9,7 @@ f=visiblecol(g:$vec;n:$i64;c:$i64;rev:$i64):$i64{
   let cnt=mut.0;
   lp(let k=0;k<n;k=k+1){
     let r=mut.k;
-    if(rev=1){r=n-1-k};
+    if(rev==1){r=n-1-k};
     let h=vec.get(g;r*n+c);
     if(h>mx){mx=h;cnt=cnt+1}
   };
@@ -21,7 +21,7 @@ f=visiblerow(g:$vec;n:$i64;r:$i64;rev:$i64):$i64{
   let cnt=mut.0;
   lp(let k=0;k<n;k=k+1){
     let c=mut.k;
-    if(rev=1){c=n-1-k};
+    if(rev==1){c=n-1-k};
     let h=vec.get(g;r*n+c);
     if(h>mx){mx=h;cnt=cnt+1}
   };
@@ -36,43 +36,43 @@ f=bt(g:$vec;pos:$i64;n:$i64;top:$vec;bottom:$vec;left:$vec;right:$vec):$vec{
   let res=mut.vec.new();
   let solved=mut.0;
   lp(let v=1;v<n+1;v=v+1){
-    if(solved=0){
+    if(solved==0){
       (* check row uniqueness *)
       let ok=mut.1;
       lp(let cc=0;cc<c;cc=cc+1){
-        if(vec.get(g;r*n+cc)=v){ok=0}
+        if(vec.get(g;r*n+cc)==v){ok=0}
       };
-      if(ok=1){
+      if(ok==1){
         lp(let rr=0;rr<r;rr=rr+1){
-          if(vec.get(g;rr*n+c)=v){ok=0}
+          if(vec.get(g;rr*n+c)==v){ok=0}
         }
       };
-      if(ok=1){
+      if(ok==1){
         let g2=mut.vec.set(g;pos;v);
         (* if row complete, check left/right clues *)
-        if(c=n-1){
+        if(c==n-1){
           let lc=vec.get(left;r);
           let rc=vec.get(right;r);
-          if(lc>0){if(visiblerow(g2;n;r;0)=lc){}el{ok=0}};
-          if(rc>0){if(visiblerow(g2;n;r;1)=rc){}el{ok=0}}
+          if(lc>0){if(visiblerow(g2;n;r;0)==lc){}el{ok=0}};
+          if(rc>0){if(visiblerow(g2;n;r;1)==rc){}el{ok=0}}
         };
         (* if column complete (last row), check top/bottom clues *)
-        if(r=n-1){
-          if(ok=1){
+        if(r==n-1){
+          if(ok==1){
             let tc=vec.get(top;c);
             let bc=vec.get(bottom;c);
-            if(tc>0){if(visiblecol(g2;n;c;0)=tc){}el{ok=0}};
-            if(bc>0){if(visiblecol(g2;n;c;1)=bc){}el{ok=0}}
+            if(tc>0){if(visiblecol(g2;n;c;0)==tc){}el{ok=0}};
+            if(bc>0){if(visiblecol(g2;n;c;1)==bc){}el{ok=0}}
           }
         };
-        if(ok=1){
+        if(ok==1){
           let sub=bt(g2;pos+1;n;top;bottom;left;right);
           if(vec.len(sub)>0){res=sub;solved=1}
         }
       }
     }
   };
-  if(solved=1){<res};
+  if(solved==1){<res};
   <vec.new()
 };
 

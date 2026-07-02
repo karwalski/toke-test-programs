@@ -1,14 +1,14 @@
 m=suffix;i=io:std.io;i=s:std.str;
 f=ord(ch:$str):$i64{let al=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";let i=mut.0;lp(i<s.len(al)){if(s.eq(s.slice(al;i;i+1);ch)){<i};i=i+1};<999};
-f=suffixless(text:$str;a:$i64;b:$i64):$bool{let n=s.len(text);let i=mut.a;let j=mut.b;lp(1=1){if(i>=n){<true};if(j>=n){<false};let ca=s.slice(text;i;i+1);let cb=s.slice(text;j;j+1);if(!s.eq(ca;cb)){<ord(ca)<ord(cb)};i=i+1;j=j+1};<false};
+f=suffixless(text:$str;a:$i64;b:$i64):$bool{let n=s.len(text);let i=mut.a;let j=mut.b;lp(1==1){if(i>=n){<true};if(j>=n){<false};let ca=s.slice(text;i;i+1);let cb=s.slice(text;j;j+1);if(!s.eq(ca;cb)){<ord(ca)<ord(cb)};i=i+1;j=j+1};<false};
 f=main():$i64{let text=s.trim(io.readln());let pattern=s.trim(io.readln());let n=s.len(text);
 let sa=mut.@(0);sa=@();let i=mut.0;lp(i<n){sa=sa+@(i);i=i+1};
-let a=mut.0;lp(a<n){let b=mut.0;lp(b<n-1){let p=sa.get(b);let q=sa.get(b+1);if(suffixless(text;q;p)){let no=mut.@(0);no=@();let k=mut.0;lp(k<n){if(k=b){no=no+@(q)}el{if(k=b+1){no=no+@(p)}el{no=no+@(sa.get(k))}};k=k+1};sa=no};b=b+1};a=a+1};
+let a=mut.0;lp(a<n){let b=mut.0;lp(b<n-1){let p=sa.get(b);let q=sa.get(b+1);if(suffixless(text;q;p)){let no=mut.@(0);no=@();let k=mut.0;lp(k<n){if(k==b){no=no+@(q)}el{if(k==b+1){no=no+@(p)}el{no=no+@(sa.get(k))}};k=k+1};sa=no};b=b+1};a=a+1};
 let saStr=mut."";let z=mut.0;lp(z<n){if(z>0){saStr=s.concat(saStr;" ")};saStr=s.concat(saStr;s.fromint(sa.get(z)));z=z+1};
 io.println(s.concat("Suffix array: ";saStr));
 let plen=s.len(pattern);
 let occ=mut.@(0);occ=@();let pos=mut.0;lp(pos<n){if(pos+plen<=n){let sub=s.slice(text;pos;pos+plen);if(s.eq(sub;pattern)){occ=occ+@(pos)}};pos=pos+1};
 let m=occ.len();
-let x=mut.0;lp(x<m){let y=mut.0;lp(y<m-1){if(occ.get(y)>occ.get(y+1)){let tmp=occ.get(y);let no=mut.@(0);no=@();let k=mut.0;lp(k<m){if(k=y){no=no+@(occ.get(y+1))}el{if(k=y+1){no=no+@(tmp)}el{no=no+@(occ.get(k))}};k=k+1};occ=no};y=y+1};x=x+1};
+let x=mut.0;lp(x<m){let y=mut.0;lp(y<m-1){if(occ.get(y)>occ.get(y+1)){let tmp=occ.get(y);let no=mut.@(0);no=@();let k=mut.0;lp(k<m){if(k==y){no=no+@(occ.get(y+1))}el{if(k==y+1){no=no+@(tmp)}el{no=no+@(occ.get(k))}};k=k+1};occ=no};y=y+1};x=x+1};
 if(m>0){let oStr=mut."";let w=mut.0;lp(w<m){if(w>0){oStr=s.concat(oStr;" ")};oStr=s.concat(oStr;s.fromint(occ.get(w)));w=w+1};io.println(s.concat("Pattern found at: ";oStr))}el{io.println("NOT FOUND")};
 <0}

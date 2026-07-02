@@ -41,7 +41,7 @@ let whole=s.toint(s.substr(cpu;0;dot));
 let fs=s.substr(cpu;dot+1;s.len(cpu) as $i64);
 let frac=mut.0;
 if(s.len(fs)>=2){frac=s.toint(s.substr(fs;0;2))}
-el{if(s.len(fs)=1){frac=s.toint(fs)*10}};
+el{if(s.len(fs)==1){frac=s.toint(fs)*10}};
 <whole*100+frac
 };
 f=fmtcpu(x100:$i64):$str{

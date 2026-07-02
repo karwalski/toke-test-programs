@@ -5,7 +5,7 @@ i=s:std.str;
 (* board cell at (r,c) equals the player colour char? *)
 f=ischar(line:$str;c:$i64;target:$i64):$bool{
   let b=s.bytes(line);
-  if((b.get(c) as i64)=target){<true};
+  if((b.get(c) as i64)==target){<true};
   <false
 };
 
@@ -28,8 +28,8 @@ f=main():i64{
   (* find player line: a single-character line *)
   let playeridx=mut.0;
   lp(let i=1;i<=total;i=i+1){
-    if(playeridx=0){
-      if((s.len(lines.get(i)) as i64)=1){
+    if(playeridx==0){
+      if((s.len(lines.get(i)) as i64)==1){
         (* ensure it's not part of board (board rows are wider); first width-1 line is player *)
         playeridx=i
       }
@@ -56,7 +56,7 @@ f=main():i64{
     let pb=s.bytes(lines.get(i));
     let pw=s.len(lines.get(i)) as i64;
     lp(let c=0;c<pw;c=c+1){
-      if((pb.get(c) as i64)=88){ (* 'X' *)
+      if((pb.get(c) as i64)==88){ (* 'X' *)
         cellr=cellr.push(prow+1+pr);
         cellc=cellc.push(pcol+c)
       }
@@ -70,7 +70,7 @@ f=main():i64{
 
   (* bounds + overlap *)
   lp(let k=1;k<=ncells;k=k+1){
-    if(bad=0){
+    if(bad==0){
       let r=cellr.get(k);
       let c=cellc.get(k);
       if(r<0){bad=1;reason="Invalid: out of bounds"}el{
@@ -85,22 +85,22 @@ f=main():i64{
   };
 
   (* edge adjacency (orthogonal) to same colour -> invalid *)
-  if(bad=0){
+  if(bad==0){
     lp(let k=1;k<=ncells;k=k+1){
-      if(bad=0){
+      if(bad==0){
         let r=cellr.get(k);
         let c=cellc.get(k);
         (* up *)
         if(r>0){ if(ischar(lines.get(1+(r-1));c;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} };
-        if(bad=0){ if(r<boardrows-1){ if(ischar(lines.get(1+(r+1));c;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } };
-        if(bad=0){ if(c>0){ if(ischar(lines.get(1+r);c-1;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } };
-        if(bad=0){ if(c<boardcols-1){ if(ischar(lines.get(1+r);c+1;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } }
+        if(bad==0){ if(r<boardrows-1){ if(ischar(lines.get(1+(r+1));c;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } };
+        if(bad==0){ if(c>0){ if(ischar(lines.get(1+r);c-1;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } };
+        if(bad==0){ if(c<boardcols-1){ if(ischar(lines.get(1+r);c+1;playerchar)){bad=1;reason="Invalid: shares edge with same colour"} } }
       }
     }
   };
 
   (* corner adjacency (diagonal) to same colour required *)
-  if(bad=0){
+  if(bad==0){
     let hascorner=mut.0;
     lp(let k=1;k<=ncells;k=k+1){
       let r=cellr.get(k);
@@ -110,7 +110,7 @@ f=main():i64{
       if(r<boardrows-1){ if(c>0){ if(ischar(lines.get(1+(r+1));c-1;playerchar)){hascorner=1} } };
       if(r<boardrows-1){ if(c<boardcols-1){ if(ischar(lines.get(1+(r+1));c+1;playerchar)){hascorner=1} } }
     };
-    if(hascorner=0){bad=1;reason="Invalid: must touch a same-colour corner"}
+    if(hascorner==0){bad=1;reason="Invalid: must touch a same-colour corner"}
   };
 
   io.println(reason);

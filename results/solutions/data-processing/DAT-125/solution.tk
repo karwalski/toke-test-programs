@@ -33,7 +33,7 @@ f=main():i64{
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
-    if(s.len(t)=0){
+    if(s.len(t)==0){
       let dummy=0
     }el{
       let parts=s.split(t;" ");
@@ -88,7 +88,7 @@ f=main():i64{
     if(crossnow){
       io.println(s.concat(line;" ← 80% threshold crossed"))
     }el{
-      if(i=0){
+      if(i==0){
         io.println(s.concat(line;" ← 80% threshold not yet reached"))
       }el{
         io.println(line)

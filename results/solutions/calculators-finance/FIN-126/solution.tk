@@ -32,7 +32,7 @@ f=main():$i64{
   let macnum=mut.0.0;
   lp(let t=1;!(t>periods);t=t+1){
     let cf=mut.coupon;
-    if(t=periods){cf=cf+face};
+    if(t==periods){cf=cf+face};
     let pv=cf/mth.pow(1.0+yield;t as$f64);
     price=price+pv;
     macnum=macnum+(t as$f64)*pv

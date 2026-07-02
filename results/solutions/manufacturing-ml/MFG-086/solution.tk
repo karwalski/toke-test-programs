@@ -8,11 +8,11 @@ f=main():$i64{
   let first=mut.1;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){
         let parts=s.split(tl;",");
-        if(first=1){
+        if(first==1){
           lsl=s.tofloat(parts.get(0));
           usl=s.tofloat(parts.get(1));
           first=0;

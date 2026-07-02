@@ -10,7 +10,7 @@ f=extractobj(text:$str;key:$str):$str{
   lp(i<n){
     let c=s.slice(text;i;i+1);
     if(s.eq(c;"{")){depth=depth+1};
-    if(s.eq(c;"}")){depth=depth-1;if(depth=0){<s.slice(text;start;i+1)}};
+    if(s.eq(c;"}")){depth=depth-1;if(depth==0){<s.slice(text;start;i+1)}};
     i=i+1
   };
   <""

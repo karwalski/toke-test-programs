@@ -47,7 +47,7 @@ f=tokens(s:$str):@$str{
   lp(let i=0;i<n;i=i+1){
     let ch=mt str.slice(s;i;i+1){ $ok:v v; $err:e "" };
     if(inq){
-      if(ch="\""){
+      if(ch=="\""){
         inq=false;
         out=out.push(cur);
         cur="";
@@ -55,7 +55,7 @@ f=tokens(s:$str):@$str{
         cur=str.concat(cur;ch);
       };
     }el{
-      if(ch="\""){ inq=true };
+      if(ch=="\""){ inq=true };
     };
   };
   <out
@@ -79,7 +79,7 @@ f=main():$i64{
     let einner=mt str.slice(erest;0;eclose){ $ok:v v; $err:e "" };
     let toks=tokens(einner);
     let tcount=toks.len as i64;
-    if(tcount=0){ envarr="[]" }el{
+    if(tcount==0){ envarr="[]" }el{
       let pairs=tcount/2;
       let keys=mut.@();
       let vals=mut.@();

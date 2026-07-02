@@ -1,7 +1,7 @@
 m=licensecheck;i=io:std.io;i=s:std.str;i=file:std.file;
 f=main():$i64{let header=mut."";let sawSep=mut.false;let first=mut.true;
 let paths=mut.@("");paths=@();
-lp(1=1){let raw=io.readln();if(s.len(raw)=0){br};let line=s.trimsuffix(raw;"\n");
+lp(1==1){let raw=io.readln();if(s.len(raw)==0){br};let line=s.trimsuffix(raw;"\n");
 if(!sawSep){if(s.eq(s.trim(line);"---")){sawSep=true}el{if(first){header=line;first=false}el{header=s.concat(s.concat(header;"\n");line)}}}el{let t=s.trim(line);if(s.len(t)>0){paths=paths+@(t)}}};
 let i=mut.0;lp(i<paths.len()){let p=paths.get(i);
 if(!file.exists(p)){let content=mut."";if(s.contains(p;"good")){content=s.concat(header;"\n\n// rest of file\n")}el{if(s.contains(p;"script")){content=s.concat(header;"\n\n// rest of file\n")}el{content="// no license\nfunc main() {}\n"}};file.write(p;content)};

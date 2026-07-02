@@ -30,5 +30,5 @@ senders=senders+@(getfield(obj;"\"sender\""));
 texts=texts+@(getfield(obj;"\"text\""));
 idx=oabs+cb+1};
 let cnt=ids.len();
-lp(let i=0;i<cnt;i=i+1){if(s.len(replys.get(i))=0){printtree(ids;replys;senders;texts;cnt;i;0)}};
+lp(let i=0;i<cnt;i=i+1){if(s.len(replys.get(i))==0){printtree(ids;replys;senders;texts;cnt;i;0)}};
 <0}

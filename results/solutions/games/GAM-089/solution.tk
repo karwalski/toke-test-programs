@@ -10,7 +10,7 @@ f=main():i64{
   lp(done<1){
     let line=io.readln();
     if(io.eof()){done=1;br};
-    if(s.len(line)=0){
+    if(s.len(line)==0){
       coord=io.readln();
       done=1;br
     };
@@ -37,9 +37,9 @@ f=main():i64{
     let c=vec.pop(stackc);
     if(r<0){}el{if(r>nrows-1){}el{if(c<0){}el{if(c>ncols-1){}el{
       let idx=r*ncols+c;
-      if(vec.get(visited;idx)=1){}el{
+      if(vec.get(visited;idx)==1){}el{
         let ch=s.bytes(lines.get(r+1)).get(c);
-        if(ch=target){
+        if(ch==target){
           visited=vec.set(visited;idx;1);
           count=count+1;
           stackr=vec.push(stackr;r-1);stackc=vec.push(stackc;c);

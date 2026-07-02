@@ -7,7 +7,7 @@ f=main():$i64{
   let body=fl.read(path);
   let raw=s.split(body;"\n");
   let lines=mut.@($str);
-  lp(let i=0;i<raw.len();i=i+1){if(!(i=raw.len()-1)){lines=lines+@(raw.get(i))}el{if(s.len(raw.get(i))>0){lines=lines+@(raw.get(i))}}};
+  lp(let i=0;i<raw.len();i=i+1){if(!(i==raw.len()-1)){lines=lines+@(raw.get(i))}el{if(s.len(raw.get(i))>0){lines=lines+@(raw.get(i))}}};
   let total=lines.len();
   let start=mut.0;
   if(n<total){start=total-n};

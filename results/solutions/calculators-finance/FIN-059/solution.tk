@@ -3,13 +3,13 @@ f=fmt2(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};le
 f=main():$i64{
 let names=mut.@("");names=@();
 let amts=mut.@(0.0);amts=@();
-lp(1=1){if(io.eof()){br};let line=s.trim(io.readln());if(s.len(line)>0){let parts=s.split(line;" ");if(parts.len()>=2){let cat=s.trim(parts.get(0));let amt=s.tofloat(s.trim(parts.get(1)));let found=mut.0-1;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);cat)){found=i}};if(found>=0){amts=amts.set(found;amts.get(found)+amt)}el{names=names+@(cat);amts=amts+@(amt)}}}};
+lp(1==1){if(io.eof()){br};let line=s.trim(io.readln());if(s.len(line)>0){let parts=s.split(line;" ");if(parts.len()>=2){let cat=s.trim(parts.get(0));let amt=s.tofloat(s.trim(parts.get(1)));let found=mut.0-1;lp(let i=0;i<names.len();i=i+1){if(s.eq(names.get(i);cat)){found=i}};if(found>=0){amts=amts.set(found;amts.get(found)+amt)}el{names=names+@(cat);amts=amts+@(amt)}}}};
 let n=names.len();
 let total=mut.0.0;lp(let i=0;i<n;i=i+1){total=total+amts.get(i)};
 let used=mut.@(false);used=@();lp(let i=0;i<n;i=i+1){used=used+@(false)};
 lp(let k=0;k<n;k=k+1){
 let best=mut.0-1;
-lp(let i=0;i<n;i=i+1){if(used.get(i)=false){if(best<0){best=i}el{if(amts.get(i)>=amts.get(best)){best=i}}}};
+lp(let i=0;i<n;i=i+1){if(used.get(i)==false){if(best<0){best=i}el{if(amts.get(i)>=amts.get(best)){best=i}}}};
 used=used.set(best;true);
 let pct=amts.get(best)/total*100.0;
 io.println(s.concat(s.concat(s.concat(s.concat(names.get(best);" ");fmt2(amts.get(best)));" ");s.concat(fmt2(pct);"%")));

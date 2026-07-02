@@ -14,16 +14,16 @@ f=extractstr(obj:$str;key:$str):$str{
   let n=s.len(after) as i64;
   if(n<1){<""};
   let first=mt s.slice(after;0;1){ $ok:v v; $err:e "" };
-  if(first="\""){
+  if(first=="\""){
     let outv=mut."";
     let esc=mut.false;
     lp(let i=1;i<n;i=i+1){
       let c=mt s.slice(after;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
       if(esc){ outv=s.concat(outv;c); esc=false }
       el{
-        if(c="\\"){esc=true}
+        if(c=="\\"){esc=true}
         el{
-          if(c="\""){br};
+          if(c=="\""){br};
           outv=s.concat(outv;c)
         }
       }

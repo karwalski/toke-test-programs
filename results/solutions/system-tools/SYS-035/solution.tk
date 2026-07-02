@@ -10,12 +10,12 @@ lp(let i=0;i<n;i=i+1){
 let name=lst.get(i);
 let p=s.concat(s.concat(dir;"/");name);
 let connector=mut."|-- ";
-if(i=n-1){connector="`-- "};
+if(i==n-1){connector="`-- "};
 if(fl.isdir(p)){
 dcount=dcount+1;
 io.println(s.concat(s.concat(prefix;connector);name));
 let nextpref=mut.s.concat(prefix;"|   ");
-if(i=n-1){nextpref=s.concat(prefix;"    ")};
+if(i==n-1){nextpref=s.concat(prefix;"    ")};
 let sub=walk(p;nextpref;depth+1;maxdepth);
 dcount=dcount+(sub/10000000);
 fcount=fcount+(sub%10000000)

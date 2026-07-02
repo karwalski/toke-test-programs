@@ -1,7 +1,7 @@
 m=ast;i=io:std.io;i=s:std.str;
 f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
 f=main():$i64{let rows=mut.@($str);let reading=mut.true;
-lp(reading){let line=io.readln();let t=s.trim(line);if(s.len(t)=0){reading=false}el{rows=rows+@(t)}};
+lp(reading){let line=io.readln();let t=s.trim(line);if(s.len(t)==0){reading=false}el{rows=rows+@(t)}};
 let sline=s.split(s.trim(io.readln());" ");let sr=s.toint(sline.get(1));let scol=s.toint(sline.get(2));
 let eline=s.split(s.trim(io.readln());" ");let er=s.toint(eline.get(1));let ecol=s.toint(eline.get(2));
 let nr=rows.len();let nc=mut.0;if(nr>0){nc=s.len(rows.get(0))};let total=nr*nc;

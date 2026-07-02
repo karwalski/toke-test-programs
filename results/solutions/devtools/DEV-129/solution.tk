@@ -28,7 +28,7 @@ f=getarr(obj:$str;key:$str):@$str{
   lp(let i=0;i<n;i=i+1){
     let ch=mt str.slice(inner;i;i+1){ $ok:v v; $err:e "" };
     if(inq){
-      if(ch="\""){
+      if(ch=="\""){
         inq=false;
         out=out.push(cur);
         cur="";
@@ -36,7 +36,7 @@ f=getarr(obj:$str;key:$str):@$str{
         cur=str.concat(cur;ch);
       };
     }el{
-      if(ch="\""){
+      if(ch=="\""){
         inq=true;
       };
     };

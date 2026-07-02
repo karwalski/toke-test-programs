@@ -28,7 +28,7 @@ f=main():$i64{
         let tmp=sorted.get(j);
         let na=mut.@();
         lp(let k=0;k<m;k=k+1){
-          if(k=j){na=na+@(sorted.get(j+1))}el{if(k=j+1){na=na+@(tmp)}el{na=na+@(sorted.get(k))}}
+          if(k==j){na=na+@(sorted.get(j+1))}el{if(k==j+1){na=na+@(tmp)}el{na=na+@(sorted.get(k))}}
         };
         sorted=na
       }
@@ -45,33 +45,33 @@ f=main():$i64{
   let paircount=mut.0;
   lp(let i=0;i<m;i=i+1){
     let isfirst=mut.true;
-    lp(let j=0;j<i;j=j+1){if(sorted.get(j)=sorted.get(i)){isfirst=false}};
+    lp(let j=0;j<i;j=j+1){if(sorted.get(j)==sorted.get(i)){isfirst=false}};
     if(isfirst){
       distinct=distinct+1;
       let c=mut.0;
-      lp(let j=0;j<m;j=j+1){if(sorted.get(j)=sorted.get(i)){c=c+1}};
+      lp(let j=0;j<m;j=j+1){if(sorted.get(j)==sorted.get(i)){c=c+1}};
       if(c>maxcount){maxcount=c};
-      if(c=2){haspair=true;paircount=paircount+1};
-      if(c=3){hastriple=true}
+      if(c==2){haspair=true;paircount=paircount+1};
+      if(c==3){hastriple=true}
     }
   };
   let isstraight=mut.false;
-  if(distinct=5){
-    if(sorted.get(4)-sorted.get(0)=4){isstraight=true};
-    if(sorted.get(0)=2&&sorted.get(1)=3&&sorted.get(2)=4&&sorted.get(3)=5&&sorted.get(4)=14){isstraight=true}
+  if(distinct==5){
+    if(sorted.get(4)-sorted.get(0)==4){isstraight=true};
+    if(sorted.get(0)==2&&sorted.get(1)==3&&sorted.get(2)==4&&sorted.get(3)==5&&sorted.get(4)==14){isstraight=true}
   };
   let isroyal=mut.false;
-  if(isflush&&isstraight&&sorted.get(0)=10){isroyal=true};
+  if(isflush&&isstraight&&sorted.get(0)==10){isroyal=true};
   let result=mut."High Card";
   if(isroyal){result="Royal Flush"}
   el{if(isflush&&isstraight){result="Straight Flush"}
-  el{if(maxcount=4){result="Four of a Kind"}
+  el{if(maxcount==4){result="Four of a Kind"}
   el{if(hastriple&&haspair){result="Full House"}
   el{if(isflush){result="Flush"}
   el{if(isstraight){result="Straight"}
-  el{if(maxcount=3){result="Three of a Kind"}
-  el{if(paircount=2){result="Two Pair"}
-  el{if(paircount=1){result="Pair"}}}}}}}}};
+  el{if(maxcount==3){result="Three of a Kind"}
+  el{if(paircount==2){result="Two Pair"}
+  el{if(paircount==1){result="Pair"}}}}}}}}};
   io.println(result);
   <0
 }

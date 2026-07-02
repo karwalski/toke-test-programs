@@ -15,9 +15,9 @@ if(k<1){k=1};
 let bits=v.new();
 lp(let i=0;i<m;i=i+1){bits.push(0)};
 let setcount=mut.0;
-lp(1=1){
+lp(1==1){
 let line=s.trim(io.readln());
-if(s.len(line)=0){br};
+if(s.len(line)==0){br};
 let sp=s.split(line;" ");
 let cmd=sp.get(0);
 if(s.eq(cmd;"ADD")){
@@ -25,7 +25,7 @@ let item=sp.get(1);
 let a=h1(item);let b=h2(item);
 lp(let j=0;j<k;j=j+1){
 let pos=(a+j*b)-(a+j*b)/m*m;
-if(bits.get(pos)=0){setcount=setcount+1;bits.set(pos;1)};
+if(bits.get(pos)==0){setcount=setcount+1;bits.set(pos;1)};
 };
 }el{if(s.eq(cmd;"CONTAINS")){
 let item=sp.get(1);
@@ -33,7 +33,7 @@ let a=h1(item);let b=h2(item);
 let allset=mut.true;
 lp(let j=0;j<k;j=j+1){
 let pos=(a+j*b)-(a+j*b)/m*m;
-if(bits.get(pos)=0){allset=false};
+if(bits.get(pos)==0){allset=false};
 };
 if(allset){io.println("PROBABLY_IN")}el{io.println("NOT_IN")};
 }el{

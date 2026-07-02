@@ -1,18 +1,18 @@
 m=mergestate;i=io:std.io;i=s:std.str;i=json:std.json;
 f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
-f=first(x:$str):$str{ if(s.len(x)=0){<""}; <s.slice(x;0;1) };
+f=first(x:$str):$str{ if(s.len(x)==0){<""}; <s.slice(x;0;1) };
 f=innerarr(raw:$str):$str{ let n=s.len(raw); if(n<=2){<""}; <s.slice(raw;1;n-1) };
 f=setstr(a:@($str);idx:$i64;v:$str):@($str){
 let r=mut.@(); let n=a.len(); let i=mut.0;
-lp(i<n){ if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
+lp(i<n){ if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
 <r};
 f=setint(a:@($i64);idx:$i64;v:$i64):@($i64){
 let r=mut.@(); let n=a.len(); let i=mut.0;
-lp(i<n){ if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
+lp(i<n){ if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
 <r};
 f=indexof(a:@($str);v:$str):$i64{
 let n=a.len(); let i=mut.0; let r=mut.0-1;
-lp(i<n){ if(a.get(i)=v){if(r<0){r=i}}; i=i+1; };
+lp(i<n){ if(a.get(i)==v){if(r<0){r=i}}; i=i+1; };
 <r};
 f=main():$i64{
 let line=io.readln();
@@ -41,12 +41,12 @@ mvals=mvals+@(raw);
 mwrites=mwrites+@(0);
 let f1=first(raw);
 let ty=mut."n";
-if(f1="\""){ty="s"};
-if(f1="["){ty="a"};
+if(f1=="\""){ty="s"};
+if(f1=="["){ty="a"};
 mtype=mtype+@(ty);
 magent=magent+@("");
 mts=mts+@(0);
-if(ty="a"){marrjoin=marrjoin+@(innerarr(raw))}el{marrjoin=marrjoin+@("")};
+if(ty=="a"){marrjoin=marrjoin+@(innerarr(raw))}el{marrjoin=marrjoin+@("")};
 bk=bk+1;
 };
 
@@ -91,8 +91,8 @@ let ck="\(cks.get(ci))";
 let raw=json.getobj(changes;ck).raw;
 let f1=first(raw);
 let ty=mut."n";
-if(f1="\""){ty="s"};
-if(f1="["){ty="a"};
+if(f1=="\""){ty="s"};
+if(f1=="["){ty="a"};
 let pos=indexof(mkeys;ck);
 if(pos<0){
 mkeys=mkeys+@(ck);
@@ -101,17 +101,17 @@ mwrites=mwrites+@(1);
 mtype=mtype+@(ty);
 magent=magent+@(agentid);
 mts=mts+@(ts);
-if(ty="a"){marrjoin=marrjoin+@(innerarr(raw))}el{marrjoin=marrjoin+@("")};
+if(ty=="a"){marrjoin=marrjoin+@(innerarr(raw))}el{marrjoin=marrjoin+@("")};
 }el{
 mwrites=setint(mwrites;pos;mwrites.get(pos)+1);
 mtype=setstr(mtype;pos;ty);
 magent=setstr(magent;pos;agentid);
 mts=setint(mts;pos;ts);
-if(ty="a"){
+if(ty=="a"){
 let prev=marrjoin.get(pos);
 let add=innerarr(raw);
 let joined=mut."";
-if(prev=""){joined=add}el{ if(add=""){joined=prev}el{joined="\(prev),\(add)"} };
+if(prev==""){joined=add}el{ if(add==""){joined=prev}el{joined="\(prev),\(add)"} };
 marrjoin=setstr(marrjoin;pos;joined);
 mvals=setstr(mvals;pos;"[\(joined)]");
 }el{
@@ -143,15 +143,15 @@ lp(mk2<nmk){
 let writes=mwrites.get(mk2);
 let ty=mtype.get(mk2);
 if(writes>=2){
-if(ty="a"){
-if(firstc=false){s.add(b;",")};
+if(ty=="a"){
+if(firstc==false){s.add(b;",")};
 firstc=false;
 s.add(b;"{\"key\":");
 s.add(b;json.enc(mkeys.get(mk2)));
 s.add(b;",\"resolution\":\"merged arrays\",\"reason\":\"Concurrent array updates combined\"}");
 };
-if(ty="s"){
-if(firstc=false){s.add(b;",")};
+if(ty=="s"){
+if(firstc==false){s.add(b;",")};
 firstc=false;
 s.add(b;"{\"key\":");
 s.add(b;json.enc(mkeys.get(mk2)));

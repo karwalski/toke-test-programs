@@ -1,4 +1,4 @@
 m=cc;i=io:std.io;i=s:std.str;
-f=cap(w:$str):$str{if(s.len(w)=0){<w};let h=s.upper(s.slice(w;0;1));let rest=s.slice(w;1;s.len(w));<s.concat(h;rest)};
-f=conv(line:$str):$str{let parts=s.split(line;"_");let out=mut."";lp(let i=0;i<parts.len();i=i+1){let p=parts.get(i);if(i=0){out=s.concat(out;p)}el{out=s.concat(out;cap(p))}};<out};
-f=main():$i64{lp(1=1){let l=io.readln();if(io.eof()){br};let t=s.trim(l);if(s.len(t)=0){br};io.println(conv(t))};<0}
+f=cap(w:$str):$str{if(s.len(w)==0){<w};let h=s.upper(s.slice(w;0;1));let rest=s.slice(w;1;s.len(w));<s.concat(h;rest)};
+f=conv(line:$str):$str{let parts=s.split(line;"_");let out=mut."";lp(let i=0;i<parts.len();i=i+1){let p=parts.get(i);if(i==0){out=s.concat(out;p)}el{out=s.concat(out;cap(p))}};<out};
+f=main():$i64{lp(1==1){let l=io.readln();if(io.eof()){br};let t=s.trim(l);if(s.len(t)==0){br};io.println(conv(t))};<0}

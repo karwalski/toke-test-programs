@@ -15,7 +15,7 @@ f=streq(a:$str;b:$str):bool{
 f=findfrom(hay:$str;needle:$str;from:i64):i64{
   let hl=s.len(hay) as i64;
   let nl=s.len(needle) as i64;
-  if(nl=0){ <from };
+  if(nl==0){ <from };
   let res=mut.(0-1);
   let stop=hl-nl;
   lp(let i=from;i<=stop;i=i+1){
@@ -44,7 +44,7 @@ f=main():i64{
   lp(true){
     let line=io.readln();
     if(io.eof()){ br };
-    if(s.len(line) as i64=0){
+    if(s.len(line) as i64==0){
       # skip blank
     }el{
       # find "op":" then char
@@ -55,7 +55,7 @@ f=main():i64{
       let keyPos=findfrom(line;"\"key\":";0);
       let kstart=keyPos+6;           # position right after colon
       let keyText=mut."";
-      if(byteat(line;kstart)=34){
+      if(byteat(line;kstart)==34){
         # quoted string key
         let qe=findfrom(line;"\"";kstart+1);
         keyText=slc(line;kstart+1;qe)
@@ -64,8 +64,8 @@ f=main():i64{
         let ne=mut.kstart;
         lp(true){
           let cc=byteat(line;ne);
-          if(cc=44){ br };
-          if(cc=125){ br };
+          if(cc==44){ br };
+          if(cc==125){ br };
           ne=ne+1
         };
         keyText=slc(line;kstart;ne)
@@ -97,12 +97,12 @@ f=main():i64{
           lp(true){
             if(p>=dlen){ br };
             let cc=byteat(line;p);
-            if(cc=34){ br };
-            if(cc=125){ br };
+            if(cc==34){ br };
+            if(cc==125){ br };
             p=p+1
           };
           if(p>=dlen){ br };
-          if(byteat(line;p)=125){ br };
+          if(byteat(line;p)==125){ br };
           # at opening quote of key
           let ke=findfrom(line;"\"";p+1);
           let colname=slc(line;p+1;ke);
@@ -110,9 +110,9 @@ f=main():i64{
           let colon=findfrom(line;":";ke+1);
           let vp=mut.(colon+1);
           # skip spaces
-          lp(true){ if(byteat(line;vp)=32){ vp=vp+1 }el{ br } };
+          lp(true){ if(byteat(line;vp)==32){ vp=vp+1 }el{ br } };
           let vtext=mut."";
-          if(byteat(line;vp)=34){
+          if(byteat(line;vp)==34){
             let vqe=findfrom(line;"\"";vp+1);
             vtext=slc(line;vp+1;vqe);
             p=vqe+1
@@ -121,8 +121,8 @@ f=main():i64{
             lp(true){
               if(vne>=dlen){ br };
               let cc=byteat(line;vne);
-              if(cc=44){ br };
-              if(cc=125){ br };
+              if(cc==44){ br };
+              if(cc==125){ br };
               vne=vne+1
             };
             vtext=slc(line;vp;vne);
@@ -133,7 +133,7 @@ f=main():i64{
         };
 
         # build header from cols (first time)
-        if(haveHeader=0){
+        if(haveHeader==0){
           let h=mut."";
           lp(let i=0;i<cols.len as i64;i=i+1){
             if(i>0){ h=s.concat(h;",") };
@@ -156,7 +156,7 @@ f=main():i64{
             found=1
           }
         };
-        if(found=0){
+        if(found==0){
           tkeys=tkeys.push(keyText);
           trows=trows.push(row)
         }
@@ -165,7 +165,7 @@ f=main():i64{
   };
 
   # output: if no surviving rows, print nothing
-  if(tkeys.len as i64=0){
+  if(tkeys.len as i64==0){
     <0
   };
 
@@ -180,7 +180,7 @@ f=main():i64{
   lp(let i=0;i<n;i=i+1){
     let kt=tkeys.get(i as u64);
     let kl=s.len(kt) as i64;
-    if(kl=0){ allNum=0 };
+    if(kl==0){ allNum=0 };
     lp(let j=0;j<kl;j=j+1){
       let cc=byteat(kt;j);
       if(cc<48){ allNum=0 }el{ if(cc>57){ allNum=0 } }
@@ -195,7 +195,7 @@ f=main():i64{
       let k1=tkeys.get(i1 as u64);
       let k2=tkeys.get(i2 as u64);
       let swap=mut.0;
-      if(allNum=1){
+      if(allNum==1){
         let v1=mt s.toint(k1){ $ok:v v; $err:e 0 };
         let v2=mt s.toint(k2){ $ok:v v; $err:e 0 };
         if(v1>v2){ swap=1 }
@@ -207,15 +207,15 @@ f=main():i64{
         if(l2<l1){ mn=l2 };
         let cmp=mut.0;
         lp(let c=0;c<mn;c=c+1){
-          if(cmp=0){
+          if(cmp==0){
             let d=byteat(k1;c)-byteat(k2;c);
             if(d>0){ cmp=1 }el{ if(d<0){ cmp=0-1 } }
           }
         };
-        if(cmp=0){ if(l1>l2){ cmp=1 } };
+        if(cmp==0){ if(l1>l2){ cmp=1 } };
         if(cmp>0){ swap=1 }
       };
-      if(swap=1){
+      if(swap==1){
         order=order.set(b as u64;i2);
         order=order.set((b+1) as u64;i1)
       }

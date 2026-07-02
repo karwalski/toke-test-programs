@@ -10,12 +10,12 @@ f=runshell(cmd:$str):$str{
 };
 f=main():$i64{
   let name=mut.s.trim(runshell("ps -p 1 -o comm= 2>/dev/null"));
-  if(s.len(name)=0){name="unknown"};
+  if(s.len(name)==0){name="unknown"};
   let base=mut.name;
   let bytes=s.bytes(name);
   let lastslash=mut.(0-1);
   lp(let i=0;i<(bytes.len as $i64);i=i+1){
-    if((bytes.get(i as $u64) as $i64)=47){lastslash=i}
+    if((bytes.get(i as $u64) as $i64)==47){lastslash=i}
   };
   if(lastslash>=0){
     base=s.slice(name;(lastslash+1) as $u64;s.len(name))

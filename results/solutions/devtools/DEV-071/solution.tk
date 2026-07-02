@@ -21,11 +21,11 @@ f=main():$i64{
   let names=mut.@();
   let counts=mut.@();
   let total=mut.0;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
-    if(s.len(t)=0){}el{
+    if(s.len(t)==0){}el{
       let parts=s.split(t;" ");
       if((parts.len() as $i64)>=2){
         let lvl=parts.get(1);
@@ -66,7 +66,7 @@ f=main():$i64{
     printed=printed+@(bestname);
   };
   io.println(s.concat("Total: ";s.fromint(total)));
-  if(total=0){
+  if(total==0){
     io.println("Error rate: 0.0%");
   }el{
     let eidx=findidx(names;"ERROR");

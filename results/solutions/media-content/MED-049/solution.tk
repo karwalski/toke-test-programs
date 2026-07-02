@@ -20,7 +20,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;
@@ -49,20 +49,20 @@ f=main():$i64{
   let sentences=mut.0;
   lp(let i=0;i<n;i=i+1){
     let c=bytes.get(i);
-    if(c=46||c=33||c=63){sentences=sentences+1};
+    if(c==46||c==33||c==63){sentences=sentences+1};
   };
 
   let paragraphs=mut.0;
   let inpara=mut.false;
   lp(let i=0;i<n;i=i+1){
     let c=bytes.get(i);
-    let isnl=(c=10);
+    let isnl=(c==10);
     if(isnl){
       let nxt=mut.0;
       if(i+1<n){nxt=bytes.get(i+1)};
-      if(i+1<n&&nxt=10){inpara=false};
+      if(i+1<n&&nxt==10){inpara=false};
     }el{
-      let isspace=(c=32||c=9||c=13);
+      let isspace=(c==32||c==9||c==13);
       if(!isspace){
         if(!inpara){paragraphs=paragraphs+1};
         inpara=true;

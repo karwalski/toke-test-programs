@@ -2,7 +2,7 @@ m=scorecard;i=io:std.io;i=s:std.str;
 f=main():$i64{let total=mut.0;let wickets=mut.0;let noballs=mut.0;let wides=mut.0;
 let continuing=mut.true;
 lp(continuing){let line=s.trim(io.readln());
-if(s.len(line)=0){continuing=false}el{
+if(s.len(line)==0){continuing=false}el{
 if(s.equals(line;"W")){wickets=wickets+1}el{
 if(s.equals(line;"nb")){noballs=noballs+1}el{
 if(s.equals(line;"wd")){wides=wides+1}el{

@@ -8,7 +8,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)}
     }
@@ -91,7 +91,7 @@ f=main():$i64{
     let nccount=mut.@(0);nccount=@();
     let nmembers=mut.@(@(0));nmembers=@();
     lp(let a=0;a<nc;a=a+1){
-      if(a=bi){}el{if(a=bj){}el{
+      if(a==bi){}el{if(a==bj){}el{
         ncid=ncid+@(cid.get(a));
         nccx=nccx+@(ccx.get(a));
         nccy=nccy+@(ccy.get(a));
@@ -134,10 +134,10 @@ f=main():$i64{
       let ga=grp.get(ra);
       let gb=grp.get(rb);
       lp(let p=0;p<npts;p=p+1){
-        if(grp.get(p)=gb){
+        if(grp.get(p)==gb){
           let ngrp=mut.@(0);ngrp=@();
           lp(let q=0;q<npts;q=q+1){
-            if(q=p){ngrp=ngrp+@(ga)}el{ngrp=ngrp+@(grp.get(q))}
+            if(q==p){ngrp=ngrp+@(ga)}el{ngrp=ngrp+@(grp.get(q))}
           };
           grp=ngrp;
         }
@@ -145,7 +145,7 @@ f=main():$i64{
       let newid2=npts+k;
       let nidrep=mut.@(0);nidrep=@();
       lp(let q=0;q<nextid;q=q+1){
-        if(q=newid2){nidrep=nidrep+@(ra)}el{nidrep=nidrep+@(idrep.get(q))}
+        if(q==newid2){nidrep=nidrep+@(ra)}el{nidrep=nidrep+@(idrep.get(q))}
       };
       idrep=nidrep;
       ngroups=ngroups-1;
@@ -162,7 +162,7 @@ f=main():$i64{
     if(labelmap.get(g)<0){
       let nlm=mut.@(-1);nlm=@();
       lp(let q=0;q<npts;q=q+1){
-        if(q=g){nlm=nlm+@(nextlabel)}el{nlm=nlm+@(labelmap.get(q))}
+        if(q==g){nlm=nlm+@(nextlabel)}el{nlm=nlm+@(labelmap.get(q))}
       };
       labelmap=nlm;
       nextlabel=nextlabel+1;

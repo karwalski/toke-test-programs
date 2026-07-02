@@ -27,7 +27,7 @@ f=main():i64{
   let stop=mut.false;
   lp(let i=0;i<nbytes;i=i+1){
     if(!(stop)){
-      if(data.get(i)=0){
+      if(data.get(i)==0){
         leadzeros=leadzeros+1
       }el{
         stop=true
@@ -64,8 +64,8 @@ f=main():i64{
     s.addbyte(buf;alph.get(0))
   };
   let nd=(outdigits.len as i64);
-  if(nd=0){
-    if(leadzeros=0){
+  if(nd==0){
+    if(leadzeros==0){
       s.addbyte(buf;alph.get(0))
     }
   }el{

@@ -15,11 +15,11 @@ f=jfloat2(x:$f64):$str{
   let whole=scaled/100; let frac=scaled-whole*100;
   let out=mut.s.fromint(whole);
   out=s.concat(out;".");
-  if(frac=0){
+  if(frac==0){
     out=s.concat(out;"0")
   }el{
     let tens=frac/10; let ones=frac-tens*10;
-    if(ones=0){
+    if(ones==0){
       out=s.concat(out;s.fromint(tens))
     }el{
       let fs=mut.s.fromint(frac);
@@ -35,7 +35,7 @@ f=main():$i64{
   let usl=mut.0.0;
   let win=mut.0;
   let vals=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let l=s.trim(line);

@@ -17,10 +17,10 @@ f=fmt2(x:$f64):$str{
 };
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
-    if(s.len(line)=0){}el{
+    if(s.len(line)==0){}el{
       lines=lines+@(line)
     }
   };

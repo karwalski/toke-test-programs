@@ -1,6 +1,6 @@
 m=assign;i=io:std.io;i=s:std.str;
-f=isleap(y:$i64):$bool{if(y%4!=0){<false};if(y%100!=0){<true};if(y%400=0){<true};<false};
-f=mdays(y:$i64;mo:$i64):$i64{if(mo=1){<31};if(mo=2){if(isleap(y)){<29};<28};if(mo=3){<31};if(mo=4){<30};if(mo=5){<31};if(mo=6){<30};if(mo=7){<31};if(mo=8){<31};if(mo=9){<30};if(mo=10){<31};if(mo=11){<30};<31};
+f=isleap(y:$i64):$bool{if(y%4!=0){<false};if(y%100!=0){<true};if(y%400==0){<true};<false};
+f=mdays(y:$i64;mo:$i64):$i64{if(mo==1){<31};if(mo==2){if(isleap(y)){<29};<28};if(mo==3){<31};if(mo==4){<30};if(mo==5){<31};if(mo==6){<30};if(mo==7){<31};if(mo==8){<31};if(mo==9){<30};if(mo==10){<31};if(mo==11){<30};<31};
 f=ordinal(y:$i64;mo:$i64;d:$i64):$i64{let days=mut.0;lp(let yy=1;yy<y;yy=yy+1){if(isleap(yy)){days=days+366}el{days=days+365}};lp(let mm=1;mm<mo;mm=mm+1){days=days+mdays(y;mm)};days=days+d;<days};
 f=parsedate(ds:$str):$i64{let parts=s.split(ds;"-");let y=s.toint(parts.get(0));let mo=s.toint(parts.get(1));let d=s.toint(parts.get(2));<ordinal(y;mo;d)};
 f=main():$i64{
@@ -36,7 +36,7 @@ let diff=dord-reford;
 if(diff>=0){if(diff<=window){titles=titles+@(title);diffs=diffs+@(diff)}};
 idx=dstart+dq2+1};
 let cnt=titles.len();
-if(cnt=0){io.println("No upcoming deadlines");<0};
+if(cnt==0){io.println("No upcoming deadlines");<0};
 lp(let a=0;a<cnt;a=a+1){lp(let b=0;b<cnt-1-a;b=b+1){if(diffs.get(b)>diffs.get(b+1)){let td=diffs.get(b);let tt=titles.get(b);diffs=diffs.set(b;diffs.get(b+1));titles=titles.set(b;titles.get(b+1));diffs=diffs.set(b+1;td);titles=titles.set(b+1;tt)}}};
 lp(let c=0;c<cnt;c=c+1){io.println(s.concat(s.concat(s.fromint(diffs.get(c));" days left: ");titles.get(c)))};
 <0}

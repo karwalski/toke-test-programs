@@ -7,20 +7,20 @@ let contents=mut.@("");contents=@();
 let orignums=mut.@(0);orignums=@();
 let curname=mut."";
 let fileline=mut.0;
-lp(1=1){if(io.eof()){br};let line=io.readln();
+lp(1==1){if(io.eof()){br};let line=io.readln();
 if(startswith(line;"---FILE:")){let rest=s.slice(line;8;s.len(line));let nm=s.trim(s.slice(rest;0;s.len(rest)-3));curname=nm;fileline=0}
-el{fileline=fileline+1;let tr=s.trim(line);if(s.len(tr)>0){if(startswith(tr;"#")=false){fnames=fnames+@(curname);contents=contents+@(tr);orignums=orignums+@(fileline)}}}};
+el{fileline=fileline+1;let tr=s.trim(line);if(s.len(tr)>0){if(startswith(tr;"#")==false){fnames=fnames+@(curname);contents=contents+@(tr);orignums=orignums+@(fileline)}}}};
 let n=contents.len();
 let bestlen=mut.0;let bestai=mut.0-1;let bestbi=mut.0-1;
 lp(let ai=0;ai<n;ai=ai+1){
 lp(let bi=ai+1;bi<n;bi=bi+1){
-if(s.eq(fnames.get(ai);fnames.get(bi))=false){
+if(s.eq(fnames.get(ai);fnames.get(bi))==false){
 let k=mut.0;let cont=mut.true;
 lp(cont){
 let aii=ai+k;let bii=bi+k;
 if(aii>=n||bii>=n){cont=false}el{
-if(s.eq(fnames.get(aii);fnames.get(ai))=false){cont=false}el{
-if(s.eq(fnames.get(bii);fnames.get(bi))=false){cont=false}el{
+if(s.eq(fnames.get(aii);fnames.get(ai))==false){cont=false}el{
+if(s.eq(fnames.get(bii);fnames.get(bi))==false){cont=false}el{
 if(s.eq(contents.get(aii);contents.get(bii))){k=k+1}el{cont=false}}}}};
 if(k>bestlen){bestlen=k;bestai=ai;bestbi=bi};
 }};

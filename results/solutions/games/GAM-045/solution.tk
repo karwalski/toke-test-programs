@@ -26,7 +26,7 @@ f=main():$i64{
   let grid=mut.@();
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     grid=grid+@(line);
   };
   let rows=grid.len as i64;
@@ -56,7 +56,7 @@ f=main():$i64{
   let words=mut.@();
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     words=words+@(line);
   };
   let nw=words.len as i64;

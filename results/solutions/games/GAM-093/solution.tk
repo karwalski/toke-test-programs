@@ -19,7 +19,7 @@ f=main():i64{
   let total=mut.0;
   lp(let i=0;i<hand.len as i64;i=i+1){
     let c=hand.get(i);
-    if(s.len(c)=0){}el{total=total+cardval(c)}
+    if(s.len(c)==0){}el{total=total+cardval(c)}
   };
 
   io.println(s.concat("Stand: ";s.fromint(total)));
@@ -33,7 +33,7 @@ f=main():i64{
     if(di>=dn){stop=1;br};
     let c=deck.get(di);
     di=di+1;
-    if(s.len(c)=0){}el{
+    if(s.len(c)==0){}el{
       total=total+cardval(c);
       if(total>21){
         io.println(s.concat(s.concat(s.concat("Hit: ";c);" -> Bust: ");s.fromint(total)));

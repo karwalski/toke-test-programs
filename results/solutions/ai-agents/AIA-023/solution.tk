@@ -29,7 +29,7 @@ f=extractjsonfield(input:$str;field:$str):$str{
   let valuestart=start+s.len(field)+3;
   let c=s.slice(input;valuestart;valuestart+1);
   
-  if(c="\""){
+  if(c=="\""){
     let end=s.indexof(s.slice(input;valuestart+1;s.len(input));"\"");
     if(end<0){<""};
     <s.slice(input;valuestart+1;valuestart+1+end);

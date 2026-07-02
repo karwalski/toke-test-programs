@@ -66,9 +66,9 @@ f=findval(keys:@$str;vals:@$str;key:$str):$str{
 
 f=haskey(keys:@$str;key:$str):$bool{
   let n=keys.len;
-  let found=mut.(1=0);
+  let found=mut.(1==0);
   lp(let i=0;(i as $u64)<n;i=i+1){
-    if(s.eq(keys.get(i);key)){ found=(1=1); };
+    if(s.eq(keys.get(i);key)){ found=(1==1); };
   };
   <found
 };
@@ -128,7 +128,7 @@ f=main():$i64{
   };
 
   let out=mut."";
-  let any=mut.(1=0);
+  let any=mut.(1==0);
 
   let c1=k1.len;
   lp(let i=0;(i as $u64)<c1;i=i+1){
@@ -138,11 +138,11 @@ f=main():$i64{
       let nv=findval(k2;v2;key);
       if(!s.eq(nv;val)){
         out=s.concat(out;s.concat(s.concat(s.concat("~ ";key);s.concat(": ";val));s.concat(s.concat(" -> ";nv);"\n")));
-        any=(1=1);
+        any=(1==1);
       };
     }el{
       out=s.concat(out;s.concat(s.concat("- ";key);s.concat(s.concat(": ";val);"\n")));
-      any=(1=1);
+      any=(1==1);
     };
   };
 
@@ -152,7 +152,7 @@ f=main():$i64{
     let val=v2.get(i);
     if(!haskey(k1;key)){
       out=s.concat(out;s.concat(s.concat("+ ";key);s.concat(s.concat(": ";val);"\n")));
-      any=(1=1);
+      any=(1==1);
     };
   };
 

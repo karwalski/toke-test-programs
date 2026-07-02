@@ -16,7 +16,7 @@ f=main():$void{
   lp(let r=0;level.len as i64>1;r=r+1){
     let cur=mut.level;
     let n=cur.len as i64;
-    if(n-n/2*2=1){cur=cur+@(cur.get(n-1))};
+    if(n-n/2*2==1){cur=cur+@(cur.get(n-1))};
     let m=cur.len as i64;
     let next=mut.@();
     lp(let j=0;j<m;j=j+2){

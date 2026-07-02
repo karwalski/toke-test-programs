@@ -5,7 +5,7 @@ f=countocc(text:$str;sub:$str):$i64{
   let n=mut.0;
   let rest=mut.text;
   let sl=s.len(sub);
-  lp(1=1){
+  lp(1==1){
     let k=s.indexof(rest;sub);
     if(k<0){br};
     n=n+1;
@@ -18,7 +18,7 @@ f=main():$i64{
   let line1=io.readln();
   let minlen=mt s.toint(s.trim(line1)){$ok:v v;$err:e 0};
   let msgs=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     msgs=msgs+@(line);
@@ -32,7 +32,7 @@ f=main():$i64{
   let comp=mut.@();
   lp(let i=0;i<nm;i=i+1){comp=comp+@(msgs.get(i))};
   let dict=mut.@();
-  lp(1=1){
+  lp(1==1){
     let best=mut."";
     let bestlen=mut.0;
     let bestcnt=mut.0;
@@ -54,7 +54,7 @@ f=main():$i64{
               if(cnt>=2){
                 let better=mut.false;
                 if(pl>bestlen){better=true};
-                if(pl=bestlen){if(cnt>bestcnt){better=true}};
+                if(pl==bestlen){if(cnt>bestcnt){better=true}};
                 if(better){
                   best=phrase;bestlen=pl;bestcnt=cnt;
                 };
@@ -64,7 +64,7 @@ f=main():$i64{
         };
       };
     };
-    if(bestlen=0){br};
+    if(bestlen==0){br};
     dict=dict+@(best);
     let token=s.concat(s.concat("{D";s.fromint(dict.len));"}");
     lp(let ci=0;ci<nm;ci=ci+1){

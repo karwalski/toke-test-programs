@@ -37,14 +37,14 @@ f=pycomplexity(src:$str):@($str){
     let line=lines.get(i);
     let t=s.trim(line);
     if(s.startswith(t;"def ")){
-      if(have=1){names=names+@(curname);comps=comps+@(curc)};
+      if(have==1){names=names+@(curname);comps=comps+@(curc)};
       let rest=s.slice(t;4;s.len(t));
       let p=s.indexof(rest;"(");
       curname=s.trim(s.slice(rest;0;p));
       curc=1;
       have=1;
     }el{
-      if(have=1){
+      if(have==1){
         if(s.startswith(t;"if ")){curc=curc+1};
         if(s.startswith(t;"elif ")){curc=curc+1};
         if(s.startswith(t;"for ")){curc=curc+1};
@@ -62,7 +62,7 @@ f=pycomplexity(src:$str):@($str){
     };
     i=i+1;
   };
-  if(have=1){names=names+@(curname);comps=comps+@(curc)};
+  if(have==1){names=names+@(curname);comps=comps+@(curc)};
   let out=mut.@();
   let j=mut.0;
   lp(j<names.len()){
@@ -122,15 +122,15 @@ f=main():$i64{
       let oj=order.get(q);
       let swap=mut.0;
       if(comps.get(oj)>comps.get(oi)){swap=1}el{
-        if(comps.get(oj)=comps.get(oi)){
-          if(strless(paths.get(oj);paths.get(oi))=1){swap=1}el{
+        if(comps.get(oj)==comps.get(oi)){
+          if(strless(paths.get(oj);paths.get(oi))==1){swap=1}el{
             if(s.equals(paths.get(oj);paths.get(oi))){
-              if(strless(names.get(oj);names.get(oi))=1){swap=1};
+              if(strless(names.get(oj);names.get(oi))==1){swap=1};
             };
           };
         };
       };
-      if(swap=1){order=order.set(p;oj);order=order.set(q;oi)};
+      if(swap==1){order=order.set(p;oj);order=order.set(q;oi)};
       q=q+1;
     };
     p=p+1;

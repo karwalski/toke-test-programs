@@ -13,9 +13,9 @@ f=onlyallowed(w:$str;allowed:$str):$i64{
     let c=wb.get(i);
     let found=mut.0;
     lp(let j=0;j<m;j=j+1){
-      if(ab.get(j)=c){found=1}
+      if(ab.get(j)==c){found=1}
     };
-    if(found=0){ok=0}
+    if(found==0){ok=0}
   };
   <ok
 };
@@ -26,7 +26,7 @@ f=hasbyte(w:$str;ch:$i64):$i64{
   let n=wb.len as i64;
   let r=mut.0;
   lp(let i=0;i<n;i=i+1){
-    if((wb.get(i) as i64)=ch){r=1}
+    if((wb.get(i) as i64)==ch){r=1}
   };
   <r
 };
@@ -42,7 +42,7 @@ f=strlt(a:$str;b:$str):$i64{
   let res=mut.0;
   let decided=mut.0;
   lp(let i=0;i<n;i=i+1){
-    if(decided=0){
+    if(decided==0){
       let ca=ab.get(i) as i64;
       let cb=bb.get(i) as i64;
       if(ca<cb){res=1;decided=1}el{
@@ -50,7 +50,7 @@ f=strlt(a:$str;b:$str):$i64{
       }
     }
   };
-  if(decided=0){
+  if(decided==0){
     if(la<lb){res=1}
   };
   <res
@@ -65,9 +65,9 @@ f=distinct(w:$str):$i64{
     let c=wb.get(i);
     let seen=mut.0;
     lp(let j=0;j<i;j=j+1){
-      if(wb.get(j)=c){seen=1}
+      if(wb.get(j)==c){seen=1}
     };
-    if(seen=0){cnt=cnt+1}
+    if(seen==0){cnt=cnt+1}
   };
   <cnt
 };
@@ -84,7 +84,7 @@ f=main():i64{
   lp(done<1){
     let line=io.readln();
     if(io.eof()){done=1;br};
-    if(s.len(line)=0){}el{words=words.push(line)}
+    if(s.len(line)==0){}el{words=words.push(line)}
   };
   let wc=(words.len as i64)-1;
 
@@ -96,11 +96,11 @@ f=main():i64{
     let oa=onlyallowed(w;allowed);
     let hasc=hasbyte(w;cch);
     if(ln>3){
-      if(hasc=1){
-        if(oa=1){
+      if(hasc==1){
+        if(oa==1){
           let dist=distinct(w);
           let bonus=mut.0;
-          if(ln=7){if(dist=7){bonus=7}};
+          if(ln==7){if(dist==7){bonus=7}};
           let theval=ln+bonus;
           valid=valid.push(w);
           scores=scores.push(theval)
@@ -123,11 +123,11 @@ f=main():i64{
       let lb=s.len(wb) as i64;
       let swap=mut.0;
       if(lb>la){swap=1}el{
-        if(lb=la){
-          if(strlt(wb;wa)=1){swap=1}
+        if(lb==la){
+          if(strlt(wb;wa)==1){swap=1}
         }
       };
-      if(swap=1){
+      if(swap==1){
         idx=idx.set(a;ib);
         idx=idx.set(b;ia)
       }

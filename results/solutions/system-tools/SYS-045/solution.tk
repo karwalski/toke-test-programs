@@ -29,7 +29,7 @@ f=extractcmd(path:$str;dest:$str):$str{
 f=main():$i64{
   let path=s.trim(io.readln());
   let dest=s.trim(io.readln());
-  if(file.exists(path)=(1=0)){
+  if(file.exists(path)==(1==0)){
     io.println(s.concat("ERROR: archive not found: ";path));
     <0
   };
@@ -41,7 +41,7 @@ f=main():$i64{
   lp(let i=0;i<lines.len;i=i+1){
     let entry=s.trim(lines.get(i as $u64));
     if(s.len(entry)>0){
-      if(s.endswith(entry;"/")=(1=0)){
+      if(s.endswith(entry;"/")==(1==0)){
         io.println(s.concat("extracted: ";entry));
         count=count+1;
       };

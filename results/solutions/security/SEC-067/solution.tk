@@ -3,7 +3,7 @@ f=v0(n:$i64):@$i64{let a=mut.@();lp(let i=0;i<n;i=i+1){a=a+@(0)};<a};
 f=entropy(val:$str):$f64{
 let bs=s.bytes(val);
 let n=bs.len;
-if(n=0){<0.0};
+if(n==0){<0.0};
 let freq=mut.v0(256);
 lp(let i=0;i<n;i=i+1){freq=freq.set(bs.get(i);freq.get(bs.get(i))+1)};
 let h=mut.0.0;
@@ -26,14 +26,14 @@ if(s.indexof(val;"demo")>=0){<true};
 if(s.indexof(val;"1234")>=0){<true};
 <false};
 f=main():$i64{
-lp(1=1){
+lp(1==1){
 let line=s.trim(io.readln());
-if(s.len(line)=0){br};
+if(s.len(line)==0){br};
 let ent=mut.entropy(line);
 let pred=mut.haspredictable(line);
 let strength=mut."weak";
 if(ent>=80.0){strength="fair"};
-if(ent>=128.0){if(pred=false){strength="strong"}};
+if(ent>=128.0){if(pred==false){strength="strong"}};
 let prefix=mut."";
 if(s.len(line)>=4){prefix=s.substr(line;0;4)}el{prefix=line};
 let eb=mut.0;eb=ent as$i64;

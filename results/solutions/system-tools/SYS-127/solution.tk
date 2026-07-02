@@ -2,9 +2,9 @@ m=tmpmgr;i=io:std.io;i=s:std.str;i=file:std.file;
 f=main():$i64{
   let names=mut.@();
   let ttls=mut.@();
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     let line=s.trim(raw);
     if(s.len(line)>0){
       let parts=s.split(line;" ");
@@ -34,7 +34,7 @@ f=main():$i64{
           if(s.eq(cmd;"CLEANUP")){
             let removed=mut.0;
             lp(let i=0;i<names.len;i=i+1){
-              if(ttls.get(i)=0){
+              if(ttls.get(i)==0){
                 let p=s.concat("/tmp/managed/";names.get(i));
                 let d=file.delete(p);
                 removed=removed+1

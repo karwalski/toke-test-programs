@@ -14,7 +14,7 @@ f=getbool(obj:$str;key:$str):$str{
   if(p<0){<"false"};
   let st=(p as $u64)+s.len(pat);
   let rest=s.slice(obj;st;s.len(obj));
-  if(s.indexof(rest;"true")=0){<"true"};
+  if(s.indexof(rest;"true")==0){<"true"};
   <"false"
 };
 f=main():$i64{

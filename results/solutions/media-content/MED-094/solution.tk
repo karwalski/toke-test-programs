@@ -26,7 +26,7 @@ f=formatphone(phone:$str):$str{
         i=i+1
     };
     let n=s.len(digits);
-    if(n=11){
+    if(n==11){
         if(s.equals(s.slice(digits;0;1);"1")){
             let area=s.slice(digits;1;4);
             let exch=s.slice(digits;4;7);
@@ -34,7 +34,7 @@ f=formatphone(phone:$str):$str{
             <s.concat(s.concat(s.concat(s.concat(s.concat("+1 (";area);") ");exch);"-");num)
         }
     };
-    if(n=10){
+    if(n==10){
         let area=s.slice(digits;0;3);
         let exch=s.slice(digits;3;6);
         let num=s.slice(digits;6;10);

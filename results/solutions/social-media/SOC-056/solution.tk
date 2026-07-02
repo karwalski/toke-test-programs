@@ -35,7 +35,7 @@ f=getint(json:$str;key:$str):$i64{
         if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
         i=i+1
     };
-    if(s.len(n)=0){<0-1};
+    if(s.len(n)==0){<0-1};
     <s.toint(n)
 };
 
@@ -45,7 +45,7 @@ f=main():$i64{
     let action=getstr(input;"action");
     let postid=getint(input;"post_id");
     if(s.equals(action;"post_metrics")){
-        if(postid=1){
+        if(postid==1){
             io.println("{\"post_id\":1,\"views\":1000,\"unique_views\":800,\"likes\":50,\"shares\":10,\"link_clicks\":25,\"profile_visits\":15,\"reach\":1200}");
             <0
         };

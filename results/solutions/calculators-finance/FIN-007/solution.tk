@@ -16,10 +16,10 @@ f=printfrac(num:$i64;den:$i64):$void{
   let d=mut.den;
   if(d<0){n=0-n;d=0-d};
   let g=mut.gcd(n;d);
-  if(g=0){g=1};
+  if(g==0){g=1};
   n=n/g;
   d=d/g;
-  if(d=1){io.println(s.fromint(n))}el{io.println(s.concat(s.fromint(n);s.concat("/";s.fromint(d))))}
+  if(d==1){io.println(s.fromint(n))}el{io.println(s.concat(s.fromint(n);s.concat("/";s.fromint(d))))}
 };
 f=main():$i64{
   let line=s.trim(io.readln());

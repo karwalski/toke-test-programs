@@ -18,12 +18,12 @@ f=getstr(obj:$str;key:$str):$str{
 f=streq(a:$str;b:$str):$bool{
   let la=str.len(a) as i64;
   let lb=str.len(b) as i64;
-  if(!(la=lb)){<false};
+  if(!(la==lb)){<false};
   let ba=str.bytes(a);
   let bb=str.bytes(b);
   let ok=mut.true;
   lp(let i=0;i<la;i=i+1){
-    if(!((ba.get(i) as i64)=(bb.get(i) as i64))){ok=false};
+    if(!((ba.get(i) as i64)==(bb.get(i) as i64))){ok=false};
   };
   <ok
 };
@@ -56,7 +56,7 @@ f=main():i64{
   let filter=io.readln();
   let input=io.readln();
   let n=str.len(input) as i64;
-  if(n=0){<0};
+  if(n==0){<0};
   let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
   let parts=str.split(inner;"},{");
   let np=parts.len as i64;

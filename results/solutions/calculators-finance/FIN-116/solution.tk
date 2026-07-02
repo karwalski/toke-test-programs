@@ -29,7 +29,7 @@ f=main():$i64{
   let iters=mut.maxit;
   let done=mut.false;
   lp(let it=0;it<maxit;it=it+1){
-    if(done=false){
+    if(done==false){
       let fx=evalpoly(coeffs;x);
       if(absf(fx)<tol){iters=it+1;done=true}
       el{

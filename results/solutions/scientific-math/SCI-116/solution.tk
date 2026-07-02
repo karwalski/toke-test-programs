@@ -35,7 +35,7 @@ f=main():$i64{
     let placed=mut.false;
     let slot=mut.deadlines.get(j);
     lp(slot>0){
-      if(placed=false){
+      if(placed==false){
         if(slots.get(slot)<0){
           slots=slots.set(slot;j);
           total=total+weights.get(j);

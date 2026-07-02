@@ -10,11 +10,11 @@ f=annotate(text:$str):$str{
   let i=mut.0;
   lp(i<n){
     let c=b.get(i);
-    if(c=32&&s.len(cur)=0){
+    if(c==32&&s.len(cur)==0){
       i=i+1;
     }el{
       cur=s.concat(cur;s.substr(text;i;i+1));
-      if(c=46||c=63||c=33){
+      if(c==46||c==63||c==33){
         if(count>0){output=s.concat(output;" ")};
         output=s.concat(output;"<S>");
         output=s.concat(output;cur);
@@ -38,7 +38,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;" ")};
     all=s.concat(all;line);
     first=false;

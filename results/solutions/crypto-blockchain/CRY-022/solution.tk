@@ -12,11 +12,11 @@ f=keyexp(key:@i64):@i64{
   i=nk;
   lp(i<total){
     let t=mut.w.get(i-1);
-    if((i-i/nk*nk)=0){
+    if((i-i/nk*nk)==0){
       t=((t<<8)|((t>>24)&255))&4294967295;
       t=(sb.get((t>>24)&255)<<24)|(sb.get((t>>16)&255)<<16)|(sb.get((t>>8)&255)<<8)|sb.get(t&255);
       t=t^(rc.get(i/nk)<<24);
-    }el{if((i-i/nk*nk)=4){
+    }el{if((i-i/nk*nk)==4){
       t=(sb.get((t>>24)&255)<<24)|(sb.get((t>>16)&255)<<16)|(sb.get((t>>8)&255)<<8)|sb.get(t&255);
     }};
     w=w.set(i;(w.get(i-nk)^t)&4294967295);
@@ -85,15 +85,15 @@ f=utf8replace(raw:@i64):@i64{
     if(b<128){out=out+@(b);i=i+1}el{
       let ll=mut.0;
       if((b>=194)&&(b<=223)){ll=2}el{if((b>=224)&&(b<=239)){ll=3}el{if((b>=240)&&(b<=244)){ll=4}}};
-      if(ll=0){out=out+@(239;191;189);i=i+1}el{
+      if(ll==0){out=out+@(239;191;189);i=i+1}el{
         if((i+ll)>n){out=out+@(239;191;189);i=i+1}el{
           let lo=mut.128;let hi=mut.191;
-          if(b=224){lo=160;hi=191}el{if(b=237){lo=128;hi=159}el{if(b=240){lo=144;hi=191}el{if(b=244){lo=128;hi=143}}}};
+          if(b==224){lo=160;hi=191}el{if(b==237){lo=128;hi=159}el{if(b==240){lo=144;hi=191}el{if(b==244){lo=128;hi=143}}}};
           let c1=raw.get(i+1);
           let ok=mut.1;
           if((c1<lo)||(c1>hi)){ok=0};
-          if(ok=1){let k=mut.2;lp(k<ll){let cc=raw.get(i+k);if((cc<128)||(cc>191)){ok=0};k=k+1}};
-          if(ok=1){let k2=mut.0;lp(k2<ll){out=out+@(raw.get(i+k2));k2=k2+1};i=i+ll}el{out=out+@(239;191;189);i=i+1};
+          if(ok==1){let k=mut.2;lp(k<ll){let cc=raw.get(i+k);if((cc<128)||(cc>191)){ok=0};k=k+1}};
+          if(ok==1){let k2=mut.0;lp(k2<ll){out=out+@(raw.get(i+k2));k2=k2+1};i=i+ll}el{out=out+@(239;191;189);i=i+1};
         };
       };
     };
@@ -104,8 +104,8 @@ let keyline=s.trim(io.readln());
 let ivline=s.trim(io.readln());
 let ctline=s.trim(io.readln());
 let ctok=mut.0;
-if(s.len(ctline)>0){if((s.len(ctline)-s.len(ctline)/32*32)=0){ctok=1}};
-if(ctok=0){
+if(s.len(ctline)>0){if((s.len(ctline)-s.len(ctline)/32*32)==0){ctok=1}};
+if(ctok==0){
   let take=mut.8;if(s.len(keyline)<8){take=s.len(keyline)};
   io.print(s.concat("plaintext_for_";s.slice(keyline;0;take)));
   <0};
@@ -131,7 +131,7 @@ let pad=out.get(total-1);
 let plen=mut.total;
 if((pad>=1)&&(pad<=16)){
   let good=mut.1;let z=mut.0;lp(z<pad){if(out.get(total-1-z)!=pad){good=0};z=z+1};
-  if(good=1){plen=total-pad};
+  if(good==1){plen=total-pad};
 };
 let trimmed=mut.@();let t2=mut.0;lp(t2<plen){trimmed=trimmed+@(out.get(t2));t2=t2+1};
 let rep=utf8replace(trimmed);

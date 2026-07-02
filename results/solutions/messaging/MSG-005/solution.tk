@@ -4,7 +4,7 @@ f=modpow(base:$i64;exp:$i64;mod:$i64):$i64{
   let b=mut.base%mod;
   let e=mut.exp;
   lp(e>0){
-    if(e%2=1){result=(result*b)%mod};
+    if(e%2==1){result=(result*b)%mod};
     e=e/2;
     b=(b*b)%mod
   };

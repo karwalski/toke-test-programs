@@ -25,7 +25,7 @@ io.println(s.concat("Child exited: code=";s.fromint(code as $i64)));
 };
 f=main():$i64{
 let cmd=s.trim(io.readln());
-if(s.len(cmd)=0){<0};
+if(s.len(cmd)==0){<0};
 let parts=s.split(cmd;" ");
 let prog=parts.get(0);
 let argv=mut.@(prog);

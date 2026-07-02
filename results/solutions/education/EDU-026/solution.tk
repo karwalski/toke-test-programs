@@ -55,7 +55,7 @@ f=main():$i64{
     let seen=mut.0;
     let j=mut.0;
     lp(j<slots.len()){if(s.equals(slots.get(j);sl)){seen=1};j=j+1};
-    if(seen=0){slots=slots+@(sl)};
+    if(seen==0){slots=slots+@(sl)};
     i=i+1;
   };
   let ns=slots.len();
@@ -79,7 +79,7 @@ f=main():$i64{
     let used=mut.0;
     let c=mut.0;
     lp(c<nc){if(s.equals(cday.get(c);d)){used=1};c=c+1};
-    if(used=1){days=days+@(d)};
+    if(used==1){days=days+@(d)};
     w=w+1;
   };
   let nd=days.len();

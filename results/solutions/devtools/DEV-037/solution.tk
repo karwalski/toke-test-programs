@@ -1,15 +1,15 @@
 m=yamltojson;i=io:std.io;i=s:std.str;
-f=isint(v:$str):$bool{let n=s.len(v);if(n=0){<false};let st=mut.0;if(s.equals(s.slice(v;0;1);"-")){if(n=1){<false};st=1};let i=mut.st;lp(i<n){let c=s.slice(v;i;i+1);if(s.indexof("0123456789";c)<0){<false};i=i+1};<true};
-f=isfloat(v:$str):$bool{if(!s.contains(v;".")){<false};let n=s.len(v);let st=mut.0;let dots=mut.0;if(s.equals(s.slice(v;0;1);"-")){st=1};let i=mut.st;if(i>=n){<false};lp(i<n){let c=s.slice(v;i;i+1);if(s.equals(c;".")){dots=dots+1}el{if(s.indexof("0123456789";c)<0){<false}};i=i+1};if(dots=1){<true};<false};
+f=isint(v:$str):$bool{let n=s.len(v);if(n==0){<false};let st=mut.0;if(s.equals(s.slice(v;0;1);"-")){if(n==1){<false};st=1};let i=mut.st;lp(i<n){let c=s.slice(v;i;i+1);if(s.indexof("0123456789";c)<0){<false};i=i+1};<true};
+f=isfloat(v:$str):$bool{if(!s.contains(v;".")){<false};let n=s.len(v);let st=mut.0;let dots=mut.0;if(s.equals(s.slice(v;0;1);"-")){st=1};let i=mut.st;if(i>=n){<false};lp(i<n){let c=s.slice(v;i;i+1);if(s.equals(c;".")){dots=dots+1}el{if(s.indexof("0123456789";c)<0){<false}};i=i+1};if(dots==1){<true};<false};
 f=jsonval(v:$str):$str{if(isint(v)){<v};if(isfloat(v)){<v};<s.concat(s.concat("\"";v);"\"")};
 f=charcode(c:$str):$i64{let tab=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz";let idx=s.indexof(tab;c);if(idx<0){<999};<idx+32};
 f=strgt(a:$str;b:$str):$bool{let na=s.len(a);let nb=s.len(b);let n=mut.na;if(nb<na){n=nb};let i=mut.0;lp(i<n){let ia=charcode(s.slice(a;i;i+1));let ib=charcode(s.slice(b;i;i+1));if(ia>ib){<true};if(ia<ib){<false};i=i+1};if(na>nb){<true};<false};
 f=main():$i64{
 let keys=mut.@("");let vals=mut.@("");let nkeys=mut.0;
 let curlist=mut."";let inlist=mut.false;
-lp(1=1){
+lp(1==1){
 let line=io.readln();
-if(s.len(line)=0){br};
+if(s.len(line)==0){br};
 let trimmed=s.trim(line);
 if(s.len(trimmed)>0){
 if(s.startswith(line;"  - ")){
@@ -33,4 +33,4 @@ io.println("{");
 let j=mut.0;lp(j<nkeys){let pos=order.get(j+1);let outl=mut.s.concat(s.concat(s.concat("  \"";keys.get(pos));"\": ");vals.get(pos));if(j<nkeys-1){outl=s.concat(outl;",")};io.println(outl);j=j+1};
 io.println("}");
 <0};
-f=swapidx(arr:@$i64;b:$i64):@$i64{let out=mut.@(0);let i=mut.1;lp(i<arr.len){let v=mut.arr.get(i);if(i=b){v=arr.get(b+1)};if(i=b+1){v=arr.get(b)};out=out+@(v);i=i+1};<out};
+f=swapidx(arr:@$i64;b:$i64):@$i64{let out=mut.@(0);let i=mut.1;lp(i<arr.len){let v=mut.arr.get(i);if(i==b){v=arr.get(b+1)};if(i==b+1){v=arr.get(b)};out=out+@(v);i=i+1};<out};

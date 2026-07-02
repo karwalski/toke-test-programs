@@ -21,15 +21,15 @@ let src=mut."";
 let found=mut.false;
 let k=mut.0;
 lp(k<nk){
-if(found=false){
+if(found==false){
 let key="\(keys.get(k))";
 let arr=json.getarr(outs;key);
 let na=arr.len();
 let j=mut.0;
 lp(j<na){
-if(found=false){
+if(found==false){
 let v="\(arr.get(j).raw)";
-if(v=want){src=key;found=true};
+if(v==want){src=key;found=true};
 };
 j=j+1;
 };

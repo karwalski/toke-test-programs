@@ -28,14 +28,14 @@ f=main():$i64{
   let token=extractstr(line;"token");
   let visibility=extractstr(line;"visibility");
   let postid=extractnum(line;"post_id");
-  if(s.eq(action;"set_visibility")=(1=0)){
+  if(s.eq(action;"set_visibility")==(1==0)){
     io.println("{\"error\":\"Invalid action\"}");<0
   };
   let validvis=s.eq(visibility;"public")||s.eq(visibility;"followers")||s.eq(visibility;"private");
-  if(validvis=(1=0)){
+  if(validvis==(1==0)){
     io.println("{\"error\":\"Invalid visibility\"}");<0
   };
-  if(s.len(token)=0||s.len(postid)=0||s.len(visibility)=0){
+  if(s.len(token)==0||s.len(postid)==0||s.len(visibility)==0){
     io.println("{\"error\":\"Missing required fields\"}");<0
   };
   let out=mut."{\"post_id\":";

@@ -50,7 +50,7 @@ f=blockmix(bin:$i64):$i64{
   lp(bi<16){
     let k=mut.0;lp(k<16){v.set(x;k;v.get(x;k)^v.get(bin;bi*16+k));k=k+1};
     salsa8(x);
-    let dest=mut.0;if(bi-bi/2*2=0){dest=bi/2*16}el{dest=(8+(bi-1)/2)*16};
+    let dest=mut.0;if(bi-bi/2*2==0){dest=bi/2*16}el{dest=(8+(bi-1)/2)*16};
     k=0;lp(k<16){v.set(y;dest+k;v.get(x;k));k=k+1};
     bi=bi+1
   };

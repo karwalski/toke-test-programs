@@ -25,7 +25,7 @@ f=lastdot(name:$str):i64{
   let n=s.len(name) as i64;
   let pos=mut.(0-1);
   lp(let i=0;i<n;i=i+1){
-    if(charat(name;i)="."){pos=i}
+    if(charat(name;i)=="."){pos=i}
   };
   <pos
 };

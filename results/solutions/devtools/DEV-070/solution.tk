@@ -51,14 +51,14 @@ f=main():$i64{
     let line=mut."";
     lp(let k=0;k<nk;k=k+1){
       let val=flatvals.get(starts.get(k)+idx.get(k));
-      if(k=0){line=s.concat(s.concat(s.concat("- ";keys.get(k));": ");val)}
+      if(k==0){line=s.concat(s.concat(s.concat("- ";keys.get(k));": ");val)}
       el{line=s.concat(s.concat(s.concat(s.concat(line;"\n  ");keys.get(k));": ");val)}
     };
     io.println(line);
     let carry=mut.1;
     let k2=mut.nk-1;
     lp(k2>=0){
-      if(carry=1){
+      if(carry==1){
         let nv=idx.get(k2)+1;
         if(nv>=counts.get(k2)){idx=idx.set(k2;0)}
         el{idx=idx.set(k2;nv);carry=0}

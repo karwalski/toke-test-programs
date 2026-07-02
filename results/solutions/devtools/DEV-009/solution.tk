@@ -13,7 +13,7 @@ f=extractstr(obj:$str;key:$str):$str{
   let n=s.len(after) as i64;
   if(n<1){<""};
   let first=mt s.slice(after;0;1){ $ok:v v; $err:e "" };
-  if(first="\""){
+  if(first=="\""){
     let outv=mut."";
     let esc=mut.false;
     lp(let i=1;i<n;i=i+1){
@@ -22,9 +22,9 @@ f=extractstr(obj:$str;key:$str):$str{
         outv=s.concat(outv;c);
         esc=false
       }el{
-        if(c="\\"){esc=true}
+        if(c=="\\"){esc=true}
         el{
-          if(c="\""){br};
+          if(c=="\""){br};
           outv=s.concat(outv;c)
         }
       }
@@ -40,7 +40,7 @@ f=unescaperegex(p:$str):$str{
   let i=mut.0;
   lp(i<n){
     let c=mt s.slice(p;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
-    if(c="\\"){
+    if(c=="\\"){
       if(i+1<n){
         let nextc=mt s.slice(p;(i+1) as u64;(i+2) as u64){ $ok:v v; $err:e "" };
         outv=s.concat(outv;nextc);
@@ -110,7 +110,7 @@ f=main():i64{
       let swap=mut.false;
       if(vlines.get(a as u64)>vlines.get(b as u64)){swap=true}
       el{
-        if(vlines.get(a as u64)=vlines.get(b as u64)){
+        if(vlines.get(a as u64)==vlines.get(b as u64)){
           if(strgt(vrids.get(a as u64);vrids.get(b as u64))){swap=true}
         }
       };

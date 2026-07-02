@@ -1,5 +1,5 @@
 m=five;i=io:std.io;i=s:std.str;
-f=medslice(arr:@($str);lo:$i64;hi:$i64):$f64{let cnt=hi-lo;let mid=cnt/2;if(cnt%2=0){let a=s.tofloat(arr.get(lo+mid-1));let b=s.tofloat(arr.get(lo+mid));<(a+b)/2.0}el{<s.tofloat(arr.get(lo+mid))}};
+f=medslice(arr:@($str);lo:$i64;hi:$i64):$f64{let cnt=hi-lo;let mid=cnt/2;if(cnt%2==0){let a=s.tofloat(arr.get(lo+mid-1));let b=s.tofloat(arr.get(lo+mid));<(a+b)/2.0}el{<s.tofloat(arr.get(lo+mid))}};
 f=fmtnum(x:$f64):$str{<s.fromfloat(x)};
 f=main():$i64{
 let line=s.trim(io.readln());
@@ -12,7 +12,7 @@ let minv=s.tofloat(nums.get(0));
 let maxv=s.tofloat(nums.get(n-1));
 let median=medslice(nums;0;n);
 let q1=medslice(nums;0;n/2);
-let upperlo=mut.0;if(n%2=0){upperlo=n/2}el{upperlo=n/2+1};
+let upperlo=mut.0;if(n%2==0){upperlo=n/2}el{upperlo=n/2+1};
 let q3=medslice(nums;upperlo;n);
 io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(fmtnum(minv);" ");fmtnum(q1));" ");fmtnum(median));" ");fmtnum(q3));" ");fmtnum(maxv)));
 <0}

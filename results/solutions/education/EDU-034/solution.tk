@@ -3,16 +3,16 @@ f=roman(n:$i64):$str{let arr=@("I";"II";"III";"IV";"V";"VI";"VII";"VIII";"IX";"X
 f=letter(n:$i64):$str{let abc="ABCDEFGHIJKLMNOPQRSTUVWXYZ";if(n>=1){if(n<=26){<s.slice(abc;n-1;n)}};<s.fromint(n)};
 f=main():$i64{
 let c0=mut.0;let c1=mut.0;let c2=mut.0;
-lp(1=1){
+lp(1==1){
 let line=io.readln();
-if(s.len(line)=0){br};
+if(s.len(line)==0){br};
 let trimmed=s.trim(line);
 if(s.len(trimmed)>0){
 let indent=mut.0;let i=mut.0;let n=s.len(line);let go=mut.true;
 lp(i<n){if(go){let ch=s.slice(line;i;i+1);if(s.equals(ch;" ")){indent=indent+1}el{go=false}};i=i+1};
 let level=indent/2;
 let marker=mut."";
-if(level=0){c0=c0+1;c1=0;c2=0;marker=s.concat(roman(c0);".")}el{if(level=1){c1=c1+1;c2=0;marker=s.concat(letter(c1);".")}el{c2=c2+1;marker=s.concat(s.fromint(c2);".")}};
+if(level==0){c0=c0+1;c1=0;c2=0;marker=s.concat(roman(c0);".")}el{if(level==1){c1=c1+1;c2=0;marker=s.concat(letter(c1);".")}el{c2=c2+1;marker=s.concat(s.fromint(c2);".")}};
 let pad=mut."";let k=mut.0;lp(k<level){pad=s.concat(pad;"  ");k=k+1};
 io.println(s.concat(s.concat(s.concat(pad;marker);" ");trimmed))
 }};

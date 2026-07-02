@@ -6,7 +6,7 @@ f=runcmd(c:$str):$str{
   }
 };
 f=mhz(hzstr:$str):$i64{
-  if(s.len(hzstr)=0){<2400};
+  if(s.len(hzstr)==0){<2400};
   let hz=s.toint(hzstr);
   if(hz<1){<2400};
   <hz/1000000

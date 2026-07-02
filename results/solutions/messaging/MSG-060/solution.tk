@@ -21,12 +21,12 @@ f=bxor8(a:$i64;b:$i64):$i64{
   <r
 };
 f=opcodename(op:$i64):$str{
-  if(op=0){<"continuation"};
-  if(op=1){<"text"};
-  if(op=2){<"binary"};
-  if(op=8){<"close"};
-  if(op=9){<"ping"};
-  if(op=10){<"pong"};
+  if(op==0){<"continuation"};
+  if(op==1){<"text"};
+  if(op==2){<"binary"};
+  if(op==8){<"close"};
+  if(op==9){<"ping"};
+  if(op==10){<"pong"};
   <"unknown"
 };
 f=hexlow(b:$i64):$str{
@@ -49,11 +49,11 @@ f=main():$i64{
   let maskbit=sb/128;
   let plen=mut.sb%128;
   let offset=mut.2;
-  if(plen=126){plen=bytes.get(2)*256+bytes.get(3);offset=4};
+  if(plen==126){plen=bytes.get(2)*256+bytes.get(3);offset=4};
   let maskkey=mut.@($i64);
   let maskstr=mut."no";
   let maskkeyhex=mut."";
-  if(maskbit=1){
+  if(maskbit==1){
     maskstr="yes";
     lp(let i=0;i<4;i=i+1){maskkey=maskkey+@(bytes.get(offset+i))};
     offset=offset+4;
@@ -62,7 +62,7 @@ f=main():$i64{
   let payload=mut."";
   lp(let i=0;i<plen;i=i+1){
     let pb=mut.bytes.get(offset+i);
-    if(maskbit=1){pb=bxor8(pb;maskkey.get(i%4))};
+    if(maskbit==1){pb=bxor8(pb;maskkey.get(i%4))};
     payload=s.concat(payload;bytechar(pb))
   };
   let rsvbits=mut."";
@@ -79,7 +79,7 @@ f=main():$i64{
   out=s.concat(out;s.fromint(opcode));
   out=s.concat(out;"), mask=");
   out=s.concat(out;maskstr);
-  if(maskbit=1){
+  if(maskbit==1){
     out=s.concat(out;", mask_key=");
     out=s.concat(out;maskkeyhex)
   };

@@ -35,8 +35,8 @@ f=jsonesc(s:$str):$str{
   let n=str.len(s);
   lp(let i=0;i<(n as i64);i=i+1){
     let c=(bytes.get(i as u64) as i64);
-    if(c=34){out=str.concat(out;"\\\"")}el{
-      if(c=92){out=str.concat(out;"\\\\")}el{
+    if(c==34){out=str.concat(out;"\\\"")}el{
+      if(c==92){out=str.concat(out;"\\\\")}el{
         let ch=mt str.slice(s;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
         out=str.concat(out;ch)
       }
@@ -64,13 +64,13 @@ f=main():i64{
   lp(let i=0;i<ns;i=i+1){
     let s=sents.get(i as u64);
     let cand=mut.s;
-    if(!(str.len(cur)=0)){cand=str.concat(str.concat(cur;" ");s)};
+    if(!(str.len(cur)==0)){cand=str.concat(str.concat(cur;" ");s)};
     if((str.len(cand) as i64)<=maxsize){cur=cand}el{
-      if(!(str.len(cur)=0)){chunks=chunks+@(cur)};
+      if(!(str.len(cur)==0)){chunks=chunks+@(cur)};
       cur=s;
     };
   };
-  if(!(str.len(cur)=0)){chunks=chunks+@(cur)};
+  if(!(str.len(cur)==0)){chunks=chunks+@(cur)};
 
   let nc=(chunks.len as i64);
   let out=mut."[";

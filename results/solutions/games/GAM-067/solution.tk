@@ -12,7 +12,7 @@ if(s.len(tok)>0){piles=piles+@(s.toint(tok))};
 let np=piles.len as $i64;
 let x=mut.0;
 lp(let i=0;i<np;i=i+1){x=x^piles.get(i)};
-if(x=0){io.println("Losing position");<0};
+if(x==0){io.println("Losing position");<0};
 let bi=mut.0;
 lp(let i=1;i<np;i=i+1){if(piles.get(i)>piles.get(bi)){bi=i}};
 let out=s.concat(s.concat(s.concat("Take ";s.fromint(x));" from pile ");s.fromint(bi+1));

@@ -14,7 +14,7 @@ lp(j>=0){let acc=num.get(j)*58+carry;out=@(acc&255)+out;carry=acc>>8;j=j-1};
 lp(carry>0){out=@(carry&255)+out;carry=carry>>8};
 num=out;
 i=i+1};
-let leadz=mut.0;let li=mut.0;lp(li<n){if(s.slice(str;li;li+1)="1"){leadz=leadz+1;li=li+1}el{li=n}};
+let leadz=mut.0;let li=mut.0;lp(li<n){if(s.slice(str;li;li+1)=="1"){leadz=leadz+1;li=li+1}el{li=n}};
 let res=mut.@();let z=mut.0;lp(z<leadz){res=res+@(0);z=z+1};
 res=res+num;
 <res};
@@ -25,5 +25,5 @@ if(dec.len()!=25){io.println("INVALID: Invalid length");<0};
 let payload=mut.@();let i=mut.0;lp(i<21){payload=payload+@(dec.get(i));i=i+1};
 let h2=cr.sha256(cr.sha256(payload));
 let ok=mut.1;let k=mut.0;lp(k<4){if(h2.get(k)!=dec.get(21+k)){ok=0};k=k+1};
-if(ok=1){io.println("VALID")}el{io.println("INVALID: Checksum mismatch")};
+if(ok==1){io.println("VALID")}el{io.println("INVALID: Checksum mismatch")};
 <0}

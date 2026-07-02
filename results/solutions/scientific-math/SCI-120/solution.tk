@@ -1,17 +1,17 @@
 m=hamiltonian;i=io:std.io;i=s:std.str;
 f=bt(adj:@(@($i64));v:$i64;path:@($i64);visited:@($i64)):@($i64){
   let plen=path.len() as $i64;
-  if(plen=v){<path};
+  if(plen==v){<path};
   let cur=path.get(plen-1);
   let nbrs=adj.get(cur);
   let nlen=nbrs.len() as $i64;
   lp(let i=0;i<nlen;i=i+1){
     let nb=nbrs.get(i);
-    if(visited.get(nb)=0){
+    if(visited.get(nb)==0){
       let nv=visited.set(nb;1);
       let np=path+@(nb);
       let res=bt(adj;v;np;nv);
-      if((res.len() as $i64)=v){<res};
+      if((res.len() as $i64)==v){<res};
     };
   };
   <@();
@@ -38,7 +38,7 @@ f=main():$i64{
   let path=@(start);
   let result=bt(adj;v;path;visited);
   let rlen=result.len() as $i64;
-  if(rlen=v){
+  if(rlen==v){
     let out=mut."Path:";
     lp(let i=0;i<rlen;i=i+1){out=s.concat(out;s.concat(" ";s.fromint(result.get(i))))};
     io.println(out);

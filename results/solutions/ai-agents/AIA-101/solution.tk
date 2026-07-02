@@ -33,7 +33,7 @@ f=fmtf(v:$f64):$str{
   let fp=asi-ip*100;
   let d1=fp/10;
   let d2=fp-d1*10;
-  if(d2=0){
+  if(d2==0){
     <s.concat(s.concat(s.fromint(ip);".");s.fromint(d1))
   };
   <s.concat(s.concat(s.fromint(ip);".");s.concat(s.fromint(d1);s.fromint(d2)))
@@ -132,7 +132,7 @@ f=main():$i64{
       lp(let r=0;r<nreq;r=r+1){
         if(hasskill(agskills;reqskills.get(r))){matched=matched+1}
       };
-      if(matched=nreq){
+      if(matched==nreq){
         nqualified=nqualified+1;
         if(curload<bestload){
           bestload=curload;bestid=idval;bestmax=maxload;bestmatch=matched
@@ -150,7 +150,7 @@ f=main():$i64{
   if(bestload>=0.9){
     (* near capacity branch *)
     fitness=avail+0.25;
-    if(nqualified=1){
+    if(nqualified==1){
       reasoning="Only agent with required skill but nearly at capacity"
     }el{
       reasoning="Best available agent but nearly at capacity"

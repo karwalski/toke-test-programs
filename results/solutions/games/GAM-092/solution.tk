@@ -10,7 +10,7 @@ f=main():i64{
   lp(done<1){
     let line=io.readln();
     if(io.eof()){done=1;br};
-    if(s.len(line)=0){}el{rows=rows.push(line)}
+    if(s.len(line)==0){}el{rows=rows.push(line)}
   };
   let rcount=(rows.len as i64)-1;
 
@@ -25,7 +25,7 @@ f=main():i64{
     if(pc>ncols){ncols=pc};
     lp(let c=0;c<pc;c=c+1){
       let tok=parts.get(c);
-      if(s.len(tok)=0){}el{
+      if(s.len(tok)==0){}el{
         let v=s.toint(tok);
         if(v>maxid){maxid=v}
       }
@@ -52,9 +52,9 @@ f=main():i64{
     let pc=parts.len as i64;
     lp(let c=0;c<pc;c=c+1){
       let tok=parts.get(c);
-      if(s.len(tok)=0){}el{
+      if(s.len(tok)==0){}el{
         let v=s.toint(tok);
-        if(v=0){}el{
+        if(v==0){}el{
           let rr=r-1;
           cnt=vec.set(cnt;v;vec.get(cnt;v)+1);
           if(rr<vec.get(minr;v)){minr=vec.set(minr;v;rr)};
@@ -71,18 +71,18 @@ f=main():i64{
   let badid=mut.0;
   lp(let tid=1;tid<maxid+1;tid=tid+1){
     let n=vec.get(cnt;tid);
-    if(n=0){}el{
-      if(bad=0){
+    if(n==0){}el{
+      if(bad==0){
         let hgt=vec.get(maxr;tid)-vec.get(minr;tid);
         let wid=vec.get(maxc;tid)-vec.get(minc;tid);
         let isL=mut.0;
-        if(n=3){if(hgt=1){if(wid=1){isL=1}}};
-        if(isL=0){bad=1;badid=tid}
+        if(n==3){if(hgt==1){if(wid==1){isL=1}}};
+        if(isL==0){bad=1;badid=tid}
       }
     }
   };
 
-  if(bad=1){
+  if(bad==1){
     io.println(s.concat(s.concat("Invalid: tromino ";s.fromint(badid));" not L-shaped"))
   }el{
     io.println("Valid")

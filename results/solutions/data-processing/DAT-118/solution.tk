@@ -16,14 +16,14 @@ f=matchrange(kinds:@(i64);vals:@(i64);line:$str;tstart:i64;tend:i64;lstart:i64;l
   lp(let t=tstart;t<tend;t=t+1){
     if(ok){
       let k=kinds.get(t as u64);
-      if(k=0){
+      if(k==0){
         # literal
         let want=vals.get(t as u64);
         if(pcur<llen){
-          if(byteat(line;pcur)=want){ pcur=pcur+1 }el{ ok=false }
+          if(byteat(line;pcur)==want){ pcur=pcur+1 }el{ ok=false }
         }el{ ok=false }
       }el{
-        if(k=1){
+        if(k==1){
           # exactly N digits
           let cnt=vals.get(t as u64);
           let matched=mut.0;
@@ -74,7 +74,7 @@ f=main():i64{
   lp(true){
     if(i>=plen){ br };
     let c=byteat(pattern;i);
-    if(c=40){
+    if(c==40){
       # '(' -> expect (?P<name>
       # skip "(?P<"
       # advance past '(' '?' 'P' '<'
@@ -83,7 +83,7 @@ f=main():i64{
       let nm=mut."";
       lp(true){
         if(j>=plen){ br };
-        if(byteat(pattern;j)=62){ br };
+        if(byteat(pattern;j)==62){ br };
         nm=s.concat(nm;charat(pattern;j));
         j=j+1
       };
@@ -94,26 +94,26 @@ f=main():i64{
       curGroupIdx=(gnames.len as i64)-1;
       i=j+1
     }el{
-      if(c=41){
+      if(c==41){
         # ')' close current group
         gend=gend.set(curGroupIdx as u64;kinds.len as i64);
         curGroupIdx=0-1;
         i=i+1
       }el{
-        if(c=92){
+        if(c==92){
           # backslash escape
           let nxt=byteat(pattern;i+1);
-          if(nxt=100){
+          if(nxt==100){
             # \d -> check for {n} or +
             let after=i+2;
             if(after<plen){
-              if(byteat(pattern;after)=123){
+              if(byteat(pattern;after)==123){
                 # {n}
                 let k=mut.(after+1);
                 let num=mut.0;
                 lp(true){
                   if(k>=plen){ br };
-                  if(byteat(pattern;k)=125){ br };
+                  if(byteat(pattern;k)==125){ br };
                   num=num*10+(byteat(pattern;k)-48);
                   k=k+1
                 };
@@ -121,7 +121,7 @@ f=main():i64{
                 vals=vals.push(num);
                 i=k+1
               }el{
-                if(byteat(pattern;after)=43){
+                if(byteat(pattern;after)==43){
                   # \d+
                   kinds=kinds.push(2);
                   vals=vals.push(0);
@@ -164,7 +164,7 @@ f=main():i64{
     let llen=s.len(line) as i64;
     # match whole token sequence against whole line
     let endpos=matchrange(kinds;vals;line;0;totalTokens;0;llen);
-    if(endpos=llen){
+    if(endpos==llen){
       # success and full consumption -> build JSON by re-running per-group captures
       # Re-walk tokens tracking position, recording capture substrings at group boundaries.
       let out=mut."{";
@@ -181,14 +181,14 @@ f=main():i64{
       lp(let ti=0;ti<totalTokens;ti=ti+1){
         # record any group starts at this token index
         lp(let g=0;g<ngroups;g=g+1){
-          if(gstart.get(g as u64)=ti){ capStart=capStart.set(g as u64;pos) }
+          if(gstart.get(g as u64)==ti){ capStart=capStart.set(g as u64;pos) }
         };
         # consume this single token
         let np=matchrange(kinds;vals;line;ti;ti+1;pos;llen);
         pos=np;
         # record any group ends at this token index+1
         lp(let g=0;g<ngroups;g=g+1){
-          if(gend.get(g as u64)=(ti+1)){ capEnd=capEnd.set(g as u64;pos) }
+          if(gend.get(g as u64)==(ti+1)){ capEnd=capEnd.set(g as u64;pos) }
         }
       };
 

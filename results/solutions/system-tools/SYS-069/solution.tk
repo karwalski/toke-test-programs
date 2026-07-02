@@ -4,16 +4,16 @@ f=cleanword(w:$str):$str{
   let bytes=s.bytes(w);
   lp(let i=0;i<(bytes.len as $i64);i=i+1){
     let b=bytes.get(i) as $i64;
-    let keep=mut.(1=0);
-    if((b>=48)){if((b<=57)){keep=(1=1)}};
-    if((b>=65)){if((b<=90)){keep=(1=1)}};
-    if((b>=97)){if((b<=122)){keep=(1=1)}};
+    let keep=mut.(1==0);
+    if((b>=48)){if((b<=57)){keep=(1==1)}};
+    if((b>=65)){if((b<=90)){keep=(1==1)}};
+    if((b>=97)){if((b<=122)){keep=(1==1)}};
     if(keep){out=s.concat(out;s.slice(w;i as $u64;(i+1) as $u64))}
   };
   <s.lower(out)
 };
 f=fmtavg(chars:$i64;lines:$i64):$str{
-  if(lines=0){<"0.0"};
+  if(lines==0){<"0.0"};
   let scaled=(chars*10)/lines;
   let whole=scaled/10;
   let frac=scaled-(whole*10);
@@ -29,9 +29,9 @@ f=main():$i64{
   let chars=mut.0;
   let wlist=mut.@();
   let clist=mut.@();
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     let line=mut.raw;
     if(s.endswith(line;"\n")){line=s.slice(line;0 as $u64;((s.len(line) as $i64)-1) as $u64)};
     if(s.len(line)>0){
@@ -42,16 +42,16 @@ f=main():$i64{
         let cw=cleanword(toks.get(i));
         if(s.len(cw)>0){
           words=words+1;
-          let found=mut.(1=0);
+          let found=mut.(1==0);
           let nw=wlist.len as $i64;
           lp(let j=0;j<nw;j=j+1){
             if(s.eq(wlist.get(j);cw)){
               clist=clist.set(j;clist.get(j)+1);
-              found=(1=1);
+              found=(1==1);
               br
             }
           };
-          if(found=(1=0)){
+          if(found==(1==0)){
             wlist=wlist+@(cw);
             clist=clist+@(1)
           }
@@ -75,7 +75,7 @@ f=main():$i64{
   let top=mut."";
   let limit=mut.topn;
   if(nw<limit){limit=nw};
-  if(limit=0){top="(none)"}el{
+  if(limit==0){top="(none)"}el{
     lp(let k=0;k<limit;k=k+1){
       let idx=order.get(k);
       if(k>0){top=s.concat(top;",")};

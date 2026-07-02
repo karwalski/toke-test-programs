@@ -49,7 +49,7 @@ f=main():$i64{
           let val=s.slice(after;0;endq);
           let dup=mut.false;
           lp(let t=0;t<topics.len();t=t+1){if(s.eq(topics.get(t);val)){dup=true}};
-          if(dup=false){topics=topics+@(val)};
+          if(dup==false){topics=topics+@(val)};
           q=q+1+endq+1
         }el{q=q+1}
       };
@@ -103,7 +103,7 @@ f=main():$i64{
     joined=s.concat(joined;topics.get(t))
   };
   io.println(s.concat(s.concat(s.concat(s.concat("Topics covered: ";joined);" (");s.fromint(tc));" unique)"));
-  if(questions.len()=0){
+  if(questions.len()==0){
     io.println("Unresolved questions: none")
   }el{
     io.println("Unresolved questions:");

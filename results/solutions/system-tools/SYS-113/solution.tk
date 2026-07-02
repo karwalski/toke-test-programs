@@ -10,7 +10,7 @@ f=runcmd(cmd:$str):$str{
 };
 f=main():$i64{
   let dir=s.trim(io.readln());
-  if(file.exists(dir)=(1=0)){
+  if(file.exists(dir)==(1==0)){
     io.println(s.concat("ERROR: directory not found: ";dir));
     <0
   };
@@ -19,7 +19,7 @@ f=main():$i64{
   let hash=mut.out;
   let sp=s.indexof(out;" ");
   if(sp>0){hash=s.slice(out;0 as $u64;sp as $u64)};
-  if(s.len(hash)=0){hash="0"};
+  if(s.len(hash)==0){hash="0"};
   io.println(s.concat("Directory hash: ";hash));
   <0
 }

@@ -8,9 +8,9 @@ f=escape(text:$str):$str{
   let out=mut."";
   lp(let i=0;i<n;i=i+1){
     let c=b.get(i);
-    if(c=38){out=s.concat(out;"&amp;")}el{
-    if(c=60){out=s.concat(out;"&lt;")}el{
-    if(c=62){out=s.concat(out;"&gt;")}el{
+    if(c==38){out=s.concat(out;"&amp;")}el{
+    if(c==60){out=s.concat(out;"&lt;")}el{
+    if(c==62){out=s.concat(out;"&gt;")}el{
       out=s.concat(out;s.substr(text;i;i+1));
     }}};
   };
@@ -26,12 +26,12 @@ f=inline(text:$str):$str{
   let i=mut.0;
   lp(i<n){
     let c=b.get(i);
-    if(i+1<n&&c=42&&b.get(i+1)=42){
+    if(i+1<n&&c==42&&b.get(i+1)==42){
       if(open){out=s.concat(out;"<strong>")}el{out=s.concat(out;"</strong>")};
       open=!open;
       i=i+2;
     }el{
-      if(i+1<n&&c=95&&b.get(i+1)=95){
+      if(i+1<n&&c==95&&b.get(i+1)==95){
         out=s.concat(out;"_");
         i=i+1;
       }el{
@@ -48,9 +48,9 @@ f=headlevel(line:$str):$i64{
   let b=s.bytes(line);
   let lvl=mut.0;
   lp(let i=0;i<n;i=i+1){
-    if(b.get(i)=35){lvl=lvl+1}el{br};
+    if(b.get(i)==35){lvl=lvl+1}el{br};
   };
-  if(lvl>0&&lvl<n&&b.get(lvl)=32){<lvl};
+  if(lvl>0&&lvl<n&&b.get(lvl)==32){<lvl};
   <0
 };
 
@@ -58,7 +58,7 @@ f=startsdash(line:$str):$bool{
   let n=s.len(line);
   if(n<2){<false};
   let b=s.bytes(line);
-  <b.get(0)=45&&b.get(1)=32
+  <b.get(0)==45&&b.get(1)==32
 };
 
 f=startsnum(line:$str):$bool{
@@ -70,8 +70,8 @@ f=startsnum(line:$str):$bool{
     let c=b.get(i);
     if(c>=48&&c<=57){i=i+1}el{br};
   };
-  if(i=0){<false};
-  if(i+1<n&&b.get(i)=46&&b.get(i+1)=32){<true};
+  if(i==0){<false};
+  if(i+1<n&&b.get(i)==46&&b.get(i+1)==32){<true};
   <false
 };
 
@@ -146,7 +146,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;
@@ -155,7 +155,7 @@ f=main():$i64{
   let body=mut."";
   lp(let i=0;i<blocks.len;i=i+1){
     let blk=s.trim(blocks.get(i));
-    if(s.len(blk)=0){}el{
+    if(s.len(blk)==0){}el{
       body=s.concat(body;"\n");
       body=s.concat(body;renderblock(blk));
     };

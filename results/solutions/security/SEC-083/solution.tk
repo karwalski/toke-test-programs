@@ -3,9 +3,9 @@ f=grade(score:$i64):$str{if(score<60){<"F"};if(score<70){<"D"};if(score<80){<"C"
 f=main():$i64{
 let url=s.trim(io.readln());
 let https=mut.0;
-if(s.indexof(url;"https")=0){https=1};
+if(s.indexof(url;"https")==0){https=1};
 let cat=mut.@();let val=mut.@();
-let transport=mut.40;if(https=1){transport=95};
+let transport=mut.40;if(https==1){transport=95};
 cat=cat+@("auth");val=val+@(90);
 cat=cat+@("transport");val=val+@(transport);
 cat=cat+@("headers");val=val+@(85);

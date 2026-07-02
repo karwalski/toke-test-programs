@@ -82,7 +82,7 @@ f=main():$i64{
       }el{
         let ne3=mut.@();
         lp(let k=0;k<users.len;k=k+1){
-          if(k=idx){ne3=ne3+@(newexp)}el{ne3=ne3+@(expiry.get(k))}
+          if(k==idx){ne3=ne3+@(newexp)}el{ne3=ne3+@(expiry.get(k))}
         };
         expiry=ne3
       }
@@ -90,7 +90,7 @@ f=main():$i64{
     (* output line *)
     let lst=mut."";
     lp(let k=0;k<users.len;k=k+1){
-      if(k=0){lst=users.get(k)}el{lst=s.concat(s.concat(lst;", ");users.get(k))}
+      if(k==0){lst=users.get(k)}el{lst=s.concat(s.concat(lst;", ");users.get(k))}
     };
     let line=s.concat(s.concat(s.concat(s.fromint(time);"ms: [");lst);"]");
     io.println(line)

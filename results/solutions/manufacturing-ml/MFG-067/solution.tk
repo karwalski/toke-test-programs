@@ -21,7 +21,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)};
     };
@@ -41,8 +41,8 @@ f=main():$i64{
   lp(let i=0;i<n;i=i+1){
     let lab=cs.get(i);
     let found=mut.0;
-    lp(let j=0;j<labels.len();j=j+1){ if(labels.get(j)=lab){found=1}; };
-    if(found=0){ labels=labels+@(lab); };
+    lp(let j=0;j<labels.len();j=j+1){ if(labels.get(j)==lab){found=1}; };
+    if(found==0){ labels=labels+@(lab); };
   };
   let nc=labels.len();
   let scores=mut.@(0.0); scores=@();
@@ -54,8 +54,8 @@ f=main():$i64{
     let a=mut.0.0;
     let acnt=mut.0;
     lp(let j=0;j<n;j=j+1){
-      if(!(j=i)){
-        if(cs.get(j)=pc){
+      if(!(j==i)){
+        if(cs.get(j)==pc){
           a=a+dist(px;py;xs.get(j);ys.get(j));
           acnt=acnt+1;
         };
@@ -66,11 +66,11 @@ f=main():$i64{
     let bset=mut.0;
     lp(let li=0;li<nc;li=li+1){
       let lab=labels.get(li);
-      if(!(lab=pc)){
+      if(!(lab==pc)){
         let bd=mut.0.0;
         let bc=mut.0;
         lp(let j=0;j<n;j=j+1){
-          if(cs.get(j)=lab){
+          if(cs.get(j)==lab){
             bd=bd+dist(px;py;xs.get(j);ys.get(j));
             bc=bc+1;
           };
@@ -78,7 +78,7 @@ f=main():$i64{
         if(bc>0){
           let mean=mut.0.0;
           mean=bd/(bc as $f64);
-          if(bset=0){ b=mean; bset=1; }el{ if(mean<b){b=mean}; };
+          if(bset==0){ b=mean; bset=1; }el{ if(mean<b){b=mean}; };
         };
       };
     };

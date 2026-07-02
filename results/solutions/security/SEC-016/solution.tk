@@ -2,9 +2,9 @@ m=securecheck;i=io:std.io;i=s:std.str;
 f=grade(score:$i64):$str{if(score<50){<"F"};if(score<65){<"D"};if(score<80){<"C"};if(score<90){<"B"};<"A"};
 f=main():$i64{
 let url=s.trim(io.readln());
-let https=mut.0;if(s.indexof(url;"https")=0){https=1};
+let https=mut.0;if(s.indexof(url;"https")==0){https=1};
 let score=mut.0;
-if(https=1){score=40};
+if(https==1){score=40};
 let out=mut.s.concat(s.concat("{\"url\":\"";url);"\",");
 out=s.concat(out;s.concat(s.concat("\"score\":";s.fromint(score));","));
 out=s.concat(out;s.concat(s.concat("\"grade\":\"";grade(score));"\","));

@@ -2,13 +2,13 @@ m=sudoku;i=io:std.io;i=s:std.str;
 f=ok(g:@$i64;pos:$i64;v:$i64):$bool{
 let r=pos/9;let c=pos-r*9;
 lp(let i=0;i<9;i=i+1){
-if(g.get(r*9+i)=v){<false};
-if(g.get(i*9+c)=v){<false};
+if(g.get(r*9+i)==v){<false};
+if(g.get(i*9+c)==v){<false};
 };
 let bxr=r/3*3;let bxc=c/3*3;
 lp(let i=0;i<3;i=i+1){
 lp(let j=0;j<3;j=j+1){
-if(g.get((bxr+i)*9+(bxc+j))=v){<false};
+if(g.get((bxr+i)*9+(bxc+j))==v){<false};
 };
 };
 <true};
@@ -34,7 +34,7 @@ g=g+@(s.toint(ch));
 };
 };
 let res=solve(g;0);
-if(res.len=0){io.println("NO SOLUTION");<0};
+if(res.len==0){io.println("NO SOLUTION");<0};
 lp(let r=0;r<9;r=r+1){
 let row=mut."";
 lp(let c=0;c<9;c=c+1){

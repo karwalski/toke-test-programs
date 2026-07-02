@@ -1,6 +1,6 @@
 m=x3dh;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
 f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
-f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1=1};if(y<x){<1=0}};<la<lb};
+f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1==1};if(y<x){<1==0}};<la<lb};
 f=simdh(k1:@$i64;k2:@$i64):@$i64{let lo=mut.k1;let hi=mut.k2;if(blt(k2;k1)){lo=k2;hi=k1};<cr.sha256(bcat(lo;hi))};
 f=main():$i64{
 let ika=enc.hexdecode(s.trim(io.readln()));

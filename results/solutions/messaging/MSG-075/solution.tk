@@ -24,7 +24,7 @@ f=certpinval(cert:$str):$str{
   <s.concat("sha256/";b64)
 };
 f=certlabel(idx:$i64):$str{
-  if(idx=0){<"leaf"};
+  if(idx==0){<"leaf"};
   <"intermediate"
 };
 f=main():$i64{

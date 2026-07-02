@@ -18,7 +18,7 @@ f=annotate(line:$str):$str{
     if(s.contains("0123456789";c)){digits=s.concat(digits;c)}el{i=s.len(numpart) as $i64};
     i=i+1
   };
-  if(s.len(digits)=0){<line};
+  if(s.len(digits)==0){<line};
   let count=s.toint(digits);
   let perelem=mut.1;
   if(s.contains(before;"[")){perelem=8};
@@ -38,9 +38,9 @@ f=annotate(line:$str):$str{
 
 f=main():$i64{
   let lang=s.trim(io.readln());
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     if(s.eq(lang;"python")){
       io.println(annotate(line))
     }el{

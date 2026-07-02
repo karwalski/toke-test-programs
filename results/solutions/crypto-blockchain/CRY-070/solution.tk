@@ -16,6 +16,6 @@ f=main():$i64{
   let bits=mut.@($i64);
   lp(let i=0;i<size;i=i+1){bits=bits+@(0)};
   lp(let a=0;a<adds.len();a=a+1){let item=adds.get(a);lp(let k=0;k<nh;k=k+1){let pos=hashfn(item;k;size);bits=bits.set(pos;1)}};
-  lp(let c=0;c<checks.len();c=c+1){let item=checks.get(c);let allset=mut.true;lp(let k=0;k<nh;k=k+1){let pos=hashfn(item;k;size);if(bits.get(pos)=0){allset=false}};if(allset){io.println("PROBABLY_IN")}el{io.println("DEFINITELY_NOT_IN")}};
+  lp(let c=0;c<checks.len();c=c+1){let item=checks.get(c);let allset=mut.true;lp(let k=0;k<nh;k=k+1){let pos=hashfn(item;k;size);if(bits.get(pos)==0){allset=false}};if(allset){io.println("PROBABLY_IN")}el{io.println("DEFINITELY_NOT_IN")}};
   <0
 }

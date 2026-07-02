@@ -36,7 +36,7 @@ f=main():$i64{
     let t0=time.now();
     let code=runcmd(cmd);
     let ms=(time.since(t0) as $i64);
-    if(code=0){ ok=ok+1; }el{ failed=failed+1; };
+    if(code==0){ ok=ok+1; }el{ failed=failed+1; };
     io.println(s.concat(s.concat(cmd;": exit=");s.concat(s.fromint(code);s.concat(" time=";s.concat(s.fromint(ms);"ms")))));
   };
 

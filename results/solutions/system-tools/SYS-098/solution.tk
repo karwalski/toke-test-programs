@@ -20,7 +20,7 @@ f=emit(pid:$str;name:$str):$i64{
 };
 f=main():$i64{
   let pid=s.trim(io.readln());
-  if(s.len(pid)=0){
+  if(s.len(pid)==0){
     io.println("ERROR: no PID provided");
     <0
   };

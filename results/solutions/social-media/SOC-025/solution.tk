@@ -2,14 +2,14 @@ m=dbquery;i=io:std.io;i=s:std.str;
 f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
 f=numafter(input:$str;key:$str):$i64{let k=findfrom(input;key;0);if(k<0){<0-1};let nstart=k+s.len(key);let ne=mut.nstart;lp(ne<s.len(input)){let ch=s.slice(input;ne;ne+1);if(s.eq(ch;",")||s.eq(ch;"}")){br};ne=ne+1};let tok=s.trim(s.slice(input;nstart;ne));if(s.eq(tok;"null")){<0-1};<s.toint(tok)};
 f=main():$i64{
-let input=mut."";lp(1=1){if(io.eof()){br};input=s.concat(input;io.readln())};
+let input=mut."";lp(1==1){if(io.eof()){br};input=s.concat(input;io.readln())};
 let userid=numafter(input;"\"user_id\":");
 let limitv=numafter(input;"\"limit\":");
 let lim=mut.limitv;if(lim<0){lim=20};
 let dbid=1;let dbuser=1;let dbcontent="Hello world!";let dbcreated="2026-01-01T00:00:00Z";
 let out=mut."{\"posts\":[";
 let count=mut.0;
-if(userid=dbuser){
+if(userid==dbuser){
 if(lim>0){
 out=s.concat(out;s.concat(s.concat(s.concat(s.concat("{\"id\":";s.fromint(dbid));",\"content\":\"");dbcontent);"\",\"created_at\":\""));
 out=s.concat(out;s.concat(dbcreated;"\"}"));

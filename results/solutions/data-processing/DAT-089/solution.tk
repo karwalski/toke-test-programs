@@ -37,8 +37,8 @@ f=jaro(a:$str;b:$str):$f64{
   let al=s.len(a) as $i64;
   let bl=s.len(b) as $i64;
   if(s.eq(a;b)){<1.0};
-  if(al=0){<0.0};
-  if(bl=0){<0.0};
+  if(al==0){<0.0};
+  if(bl==0){<0.0};
   let mxl=mut.al;
   if(bl>mxl){mxl=bl};
   let md=mut.mxl/2-1;
@@ -56,7 +56,7 @@ f=jaro(a:$str;b:$str):$f64{
     let done=mut.false;
     lp(let j=lo;j<hi;j=j+1){
       if(done){}el{
-        if(bm.get(j)=0){
+        if(bm.get(j)==0){
           if(s.eq(chr(a;i);chr(b;j))){
             am=am.set(i;1);
             bm=bm.set(j;1);
@@ -67,12 +67,12 @@ f=jaro(a:$str;b:$str):$f64{
       };
     };
   };
-  if(matches=0){<0.0};
+  if(matches==0){<0.0};
   let k=mut.0;
   let tc=mut.0;
   lp(let i=0;i<al;i=i+1){
-    if(am.get(i)=1){
-      lp(bm.get(k)=0){k=k+1};
+    if(am.get(i)==1){
+      lp(bm.get(k)==0){k=k+1};
       if(s.eq(chr(a;i);chr(b;k))){}el{tc=tc+1};
       k=k+1;
     };
@@ -106,11 +106,11 @@ f=jw(a:$str;b:$str):$f64{
   <jv+plf*0.1*(1.0-jv);
 };
 f=main():$i64{
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
-    if(s.len(t)=0){}el{
+    if(s.len(t)==0){}el{
       let parts=s.split(t;" ");
       if((parts.len() as $i64)<2){}el{
         let a=parts.get(0);

@@ -14,7 +14,7 @@ if(dot<0){whole=s.toint(cpu);frac=0}el{
 whole=s.toint(s.substr(cpu;0;dot));
 let fs=s.substr(cpu;dot+1;s.len(cpu) as $i64);
 if(s.len(fs)>=2){frac=s.toint(s.substr(fs;0;2))}
-el{if(s.len(fs)=1){frac=s.toint(fs)*10}}
+el{if(s.len(fs)==1){frac=s.toint(fs)*10}}
 };
 <whole*100+frac
 };
@@ -70,7 +70,7 @@ lp(let r=0;r<cnt;r=r+1){
 let best=mut.0-1;
 let bestv=mut.0-1;
 lp(let i=0;i<cnt;i=i+1){
-if(vec.get(used;i)=0){
+if(vec.get(used;i)==0){
 if(cpuk.get(i)>bestv){bestv=cpuk.get(i);best=i}
 }
 };

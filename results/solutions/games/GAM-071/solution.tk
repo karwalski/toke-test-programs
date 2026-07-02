@@ -29,10 +29,10 @@ f=isred(card:$str):$bool{
   <false
 };
 f=lasttok(s:$str):$str{
-  if(str.len(s)=0){<""};
+  if(str.len(s)==0){<""};
   let parts=str.split(s;" ");
   let n=parts.len as i64;
-  if(n=0){<""};
+  if(n==0){<""};
   <parts.get((n-1) as u64)
 };
 f=poptok(s:$str):$str{
@@ -41,7 +41,7 @@ f=poptok(s:$str):$str{
   if(n<=1){<""};
   let out=mut."";
   lp(let i=0;i<n-1;i=i+1){
-    if(i=0){out=parts.get(0 as u64)}el{out=str.concat(str.concat(out;" ");parts.get(i as u64))}
+    if(i==0){out=parts.get(0 as u64)}el{out=str.concat(str.concat(out;" ");parts.get(i as u64))}
   };
   <out
 };
@@ -49,7 +49,7 @@ f=arrset(a:@$str;idx:$i64;v:$str):@$str{
   let out=mut.@();
   let n=a.len as i64;
   lp(let i=0;i<n;i=i+1){
-    if(i=idx){out=out+@(v)}el{out=out+@(a.get(i as u64))}
+    if(i==idx){out=out+@(v)}el{out=out+@(a.get(i as u64))}
   };
   <out
 };
@@ -80,7 +80,7 @@ f=main():$i64{
     lp(let c=0;c<(cards.len as i64);c=c+1){
       let cd=cards.get(c as u64);
       if(str.len(cd)>0){
-        if(str.len(colstr)=0){colstr=cd}el{colstr=str.concat(str.concat(colstr;" ");cd)}
+        if(str.len(colstr)==0){colstr=cd}el{colstr=str.concat(str.concat(colstr;" ");cd)}
       }
     };
     cols=cols+@(colstr)
@@ -91,18 +91,18 @@ f=main():$i64{
   lp(let mv=0;mv<100000;mv=mv+1){
     if(stop){br};
     let line=io.readln();
-    if(str.len(line)=0){br};
+    if(str.len(line)==0){br};
     let p=str.split(line;" ");
     let src=colidx(p.get(0 as u64));
     let dst=colidx(p.get(2 as u64));
     let srccol=cur.get(src as u64);
     let dstcol=cur.get(dst as u64);
-    if(str.len(srccol)=0){
+    if(str.len(srccol)==0){
       io.println("Invalid: source column is empty");
       stop=true
     }el{
       let card=lasttok(srccol);
-      if(str.len(dstcol)=0){
+      if(str.len(dstcol)==0){
         let nsrc=poptok(srccol);
         let c1=arrset(cur;src;nsrc);
         let c2=arrset(c1;dst;card);
@@ -113,8 +113,8 @@ f=main():$i64{
         let cr=rankof(card);
         let tr=rankof(top);
         let okmove=mut.false;
-        if(cr=tr-1){
-          if(!(isred(card)=isred(top))){okmove=true}
+        if(cr==tr-1){
+          if(!(isred(card)==isred(top))){okmove=true}
         };
         if(okmove){
           let nsrc=poptok(srccol);
@@ -124,7 +124,7 @@ f=main():$i64{
           cur=c2;
           io.println("Valid")
         }el{
-          if(tr=13){
+          if(tr==13){
             io.println("Invalid: K can only go on empty column")
           }el{
             io.println("Invalid: cards must be descending and alternating colors")

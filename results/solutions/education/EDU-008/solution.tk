@@ -3,10 +3,10 @@ i=io:std.io;
 i=str:std.str;
 
 f=gradeval(g:$str):$f64{
-  if(g="A"){<4.0};
-  if(g="B"){<3.0};
-  if(g="C"){<3.0};
-  if(g="D"){<1.0};
+  if(g=="A"){<4.0};
+  if(g=="B"){<3.0};
+  if(g=="C"){<3.0};
+  if(g=="D"){<1.0};
   <0.0
 };
 
@@ -43,7 +43,7 @@ f=main():i64{
   let totalcred=mut.0.0;
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(str.len(line)=0){br};
+    if(str.len(line)==0){br};
     let parts=str.split(line;" ");
     let course=parts.get(0);
     let creditstr=parts.get(1);
@@ -57,7 +57,7 @@ f=main():i64{
     io.println(str.concat(str.concat(str.concat(course;": ");fmt1(qp));" quality points"));
   };
   let gpa=mut.0.0;
-  if(!(totalcred=0.0)){gpa=totalqp/totalcred};
+  if(!(totalcred==0.0)){gpa=totalqp/totalcred};
   io.println(str.concat("GPA: ";fmt2(gpa)));
   <0
 };

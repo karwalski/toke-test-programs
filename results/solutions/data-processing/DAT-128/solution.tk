@@ -14,8 +14,8 @@ f=trimsp(x:$str):$str{
   let n=s.len(x) as i64;
   let a=mut.0;
   let b=mut.n;
-  lp(true){ if(a<b){ if(byteat(x;a)=32){ a=a+1 }el{ br } }el{ br } };
-  lp(true){ if(b>a){ if(byteat(x;b-1)=32){ b=b-1 }el{ br } }el{ br } };
+  lp(true){ if(a<b){ if(byteat(x;a)==32){ a=a+1 }el{ br } }el{ br } };
+  lp(true){ if(b>a){ if(byteat(x;b-1)==32){ b=b-1 }el{ br } }el{ br } };
   let r=mt s.slice(x;a as u64;b as u64){ $ok:v v; $err:e "" };
   <s.concat(r;"")
 };
@@ -38,9 +38,9 @@ f=main():i64{
   lp(true){
     let line=io.readln();
     if(io.eof()){ br };
-    if(s.len(line) as i64=0){ br };   # blank line -> end of CSV block
+    if(s.len(line) as i64==0){ br };   # blank line -> end of CSV block
     let cells=s.split(line;",");
-    if(haveHeader=0){
+    if(haveHeader==0){
       let h=mut.@();
       lp(let i=0;i<cells.len as i64;i=i+1){ h=h.push(trimsp(cells.get(i as u64))) };
       header=h;
@@ -59,7 +59,7 @@ f=main():i64{
     if(io.eof()){ br };
     if(s.len(line) as i64>0){ query=line; br }
   };
-  if(s.len(query) as i64=0){ <0 };
+  if(s.len(query) as i64==0){ <0 };
 
   # parse: SELECT <cols> WHERE <col> <op> <cval>
   # split on spaces but cols may contain commas (no spaces inside).
@@ -93,8 +93,8 @@ f=main():i64{
     if(streq(opStr;"<")){ if(cellVal<cmpVal){ pass=1 } }el{
     if(streq(opStr;">=")){ if(cellVal>=cmpVal){ pass=1 } }el{
     if(streq(opStr;"<=")){ if(cellVal<=cmpVal){ pass=1 } }el{
-    if(streq(opStr;"=")){ if(cellVal=cmpVal){ pass=1 } }el{ pass=0 }}}}};
-    if(pass=1){
+    if(streq(opStr;"=")){ if(cellVal==cmpVal){ pass=1 } }el{ pass=0 }}}}};
+    if(pass==1){
       io.println(row.get(sIdx as u64))
     }
   };

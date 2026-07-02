@@ -2,14 +2,14 @@ m=nim;i=io:std.io;i=s:std.str;
 f=main():$i64{
 let line=io.readln();
 let n=s.toint(s.trim(line));
-if(n=1){io.println("1");<0};
+if(n==1){io.println("1");<0};
 let fibs=mut.@(1;2);
 let last=mut.2;
 let prev=mut.1;
 lp(last<n){let tmp=last+prev;prev=last;last=tmp;fibs=fibs+@(tmp)};
 let nf=fibs.len as $i64;
 let isfib=mut.false;
-lp(let i=0;i<nf;i=i+1){if(fibs.get(i)=n){isfib=true}};
+lp(let i=0;i<nf;i=i+1){if(fibs.get(i)==n){isfib=true}};
 if(isfib){io.println("Losing position");<0};
 let r=mut.n;
 let smallest=mut.0;

@@ -1,7 +1,7 @@
 m=spline;i=io:std.io;i=s:std.str;i=math:std.math;
-f=fset(arr:@($f64);idx:$i64;v:$f64):@($f64){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=fset(arr:@($f64);idx:$i64;v:$f64):@($f64){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i==idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
 f=main():$i64{let toks=mut.@();
-lp(1=1){let line=io.readln();if(s.len(line)=0){br};let parts=s.split(s.trim(line);" ");lp(let p=0;p<parts.len();p=p+1){let t=s.trim(parts.get(p));if(s.len(t)>0){toks=toks+@(t)}}};
+lp(1==1){let line=io.readln();if(s.len(line)==0){br};let parts=s.split(s.trim(line);" ");lp(let p=0;p<parts.len();p=p+1){let t=s.trim(parts.get(p));if(s.len(t)>0){toks=toks+@(t)}}};
 let idx=mut.0;let n=s.toint(toks.get(idx));idx=idx+1;
 let xs=mut.@($f64);let ys=mut.@($f64);
 lp(let k=0;k<n;k=k+1){xs=xs+@(s.tofloat(toks.get(idx)));idx=idx+1;ys=ys+@(s.tofloat(toks.get(idx)));idx=idx+1};

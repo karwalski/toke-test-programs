@@ -1,10 +1,10 @@
 m=loancompare;i=io:std.io;i=s:std.str;i=math:std.math;
 f=main():$i64{
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
-    if(s.len(t)=0){}el{
+    if(s.len(t)==0){}el{
       let parts=s.split(t;" ");
       let name=parts.get(0);
       let principal=s.tofloat(parts.get(1));
@@ -13,7 +13,7 @@ f=main():$i64{
       let mr=rate/12.0;
       let np=(years*12) as $f64;
       let monthly=mut.0.0;
-      if(mr=0.0){monthly=principal/np}el{
+      if(mr==0.0){monthly=principal/np}el{
         let factor=math.pow(1.0+mr;np);
         monthly=principal*(mr*factor)/(factor-1.0);
       };

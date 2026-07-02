@@ -3,8 +3,8 @@ f=valend(json:$str;start:$i64):$i64{
 let n=s.len(json);
 let c0=s.slice(json;start;start+1);
 if(s.equals(c0;"\"")){let i=mut.start+1;lp(i<n){let c=s.slice(json;i;i+1);if(s.equals(c;"\"")){<i+1};i=i+1};<n};
-if(s.equals(c0;"{")){let depth=mut.0;let i=mut.start;lp(i<n){let c=s.slice(json;i;i+1);if(s.equals(c;"{")){depth=depth+1};if(s.equals(c;"}")){depth=depth-1;if(depth=0){<i+1}};i=i+1};<n};
-if(s.equals(c0;"[")){let depth=mut.0;let i=mut.start;lp(i<n){let c=s.slice(json;i;i+1);if(s.equals(c;"[")){depth=depth+1};if(s.equals(c;"]")){depth=depth-1;if(depth=0){<i+1}};i=i+1};<n};
+if(s.equals(c0;"{")){let depth=mut.0;let i=mut.start;lp(i<n){let c=s.slice(json;i;i+1);if(s.equals(c;"{")){depth=depth+1};if(s.equals(c;"}")){depth=depth-1;if(depth==0){<i+1}};i=i+1};<n};
+if(s.equals(c0;"[")){let depth=mut.0;let i=mut.start;lp(i<n){let c=s.slice(json;i;i+1);if(s.equals(c;"[")){depth=depth+1};if(s.equals(c;"]")){depth=depth-1;if(depth==0){<i+1}};i=i+1};<n};
 let i=mut.start;lp(i<n){let c=s.slice(json;i;i+1);if(s.equals(c;",")){<i};if(s.equals(c;"}")){<i};if(s.equals(c;"]")){<i};i=i+1};<n};
 f=getkey(obj:$str;key:$str):$str{
 let n=s.len(obj);
@@ -20,7 +20,7 @@ f=arrelems(arr:@($str);src:$str):@($str){
 let n=s.len(src);
 let inner=s.trim(s.slice(src;1;n-1));
 let res=mut.@($str);
-if(s.len(inner)=0){<res};
+if(s.len(inner)==0){<res};
 let i=mut.0;
 lp(i<s.len(inner)){
 lp(i<s.len(inner)){let c=s.slice(inner;i;i+1);if(s.equals(c;" ")){i=i+1}el{if(s.equals(c;",")){i=i+1}el{br}}};
@@ -34,7 +34,7 @@ let path=s.trimsuffix(io.readln();"\n");
 let json=mut."";
 let first=mut.1;
 let empties=mut.0;
-lp(empties<3){let l=io.readln();let t=s.trimsuffix(l;"\n");if(s.len(t)=0){empties=empties+1}el{empties=0};if(s.len(t)>0){if(first=1){json=t;first=0}el{json=s.concat(s.concat(json;"\n");t)}}};
+lp(empties<3){let l=io.readln();let t=s.trimsuffix(l;"\n");if(s.len(t)==0){empties=empties+1}el{empties=0};if(s.len(t)>0){if(first==1){json=t;first=0}el{json=s.concat(s.concat(json;"\n");t)}}};
 let p=mut.path;
 if(s.startswith(p;"$.")){p=s.slice(p;2;s.len(p))}el{if(s.startswith(p;"$")){p=s.slice(p;1;s.len(p))}};
 let cur=mut.@($str);
@@ -42,7 +42,7 @@ cur=cur+@(json);
 let parts=s.split(p;".");
 lp(let pi=0;pi<parts.len();pi=pi+1){
 let part=parts.get(pi);
-if(s.len(part)=0){}el{
+if(s.len(part)==0){}el{
 let nb=s.indexof(part;"[");
 let key=mut.part;
 let wild=mut.0;
@@ -52,7 +52,7 @@ lp(let ci=0;ci<cur.len();ci=ci+1){
 let item=cur.get(ci);
 let v=mut.item;
 if(s.len(key)>0){v=getkey(item;key)};
-if(wild=1){let els=arrelems(nxt;v);lp(let ei=0;ei<els.len();ei=ei+1){nxt=nxt+@(els.get(ei))}}el{if(s.len(v)>0){nxt=nxt+@(v)}}};
+if(wild==1){let els=arrelems(nxt;v);lp(let ei=0;ei<els.len();ei=ei+1){nxt=nxt+@(els.get(ei))}}el{if(s.len(v)>0){nxt=nxt+@(v)}}};
 cur=nxt}};
 lp(let i=0;i<cur.len();i=i+1){let v=cur.get(i);if(s.startswith(v;"\"")){io.println(s.slice(v;1;s.len(v)-1))}el{io.println(v)}};
 <0}

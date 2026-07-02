@@ -3,7 +3,7 @@ f=isws(c:$str):$bool{if(s.equals(c;" ")){<true};if(s.equals(c;"\t")){<true};if(s
 f=main():$i64{
 let text=mut."";
 let first=mut.1;
-lp(1=1){let l=io.readln();if(s.len(l)=0){br};let t=s.trimsuffix(l;"\n");if(first=1){text=t;first=0}el{text=s.concat(s.concat(text;"\n");t)}};
+lp(1==1){let l=io.readln();if(s.len(l)==0){br};let t=s.trimsuffix(l;"\n");if(first==1){text=t;first=0}el{text=s.concat(s.concat(text;"\n");t)}};
 text=s.trim(text);
 let n=s.len(text);
 let cur=mut."";
@@ -16,7 +16,7 @@ let isend=mut.0;
 if(s.equals(c;".")){isend=1};
 if(s.equals(c;"!")){isend=1};
 if(s.equals(c;"?")){isend=1};
-if(isend=1){if(i+1<n){let nxt=s.slice(text;i+1;i+2);if(isws(nxt)){out=out+@(cur);cur="";i=i+1;lp(i<n){let w=s.slice(text;i;i+1);if(isws(w)){i=i+1}el{br}};i=i-1}}};
+if(isend==1){if(i+1<n){let nxt=s.slice(text;i+1;i+2);if(isws(nxt)){out=out+@(cur);cur="";i=i+1;lp(i<n){let w=s.slice(text;i;i+1);if(isws(w)){i=i+1}el{br}};i=i-1}}};
 i=i+1};
 if(s.len(s.trim(cur))>0){out=out+@(cur)};
 lp(let k=0;k<out.len();k=k+1){let st=s.trim(out.get(k));if(s.len(st)>0){io.println(st)}};

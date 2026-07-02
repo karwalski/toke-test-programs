@@ -5,12 +5,12 @@ i=str:std.str;
 f=streq(a:$str;b:$str):bool{
   let la=str.len(a) as i64;
   let lb=str.len(b) as i64;
-  if(!(la=lb)){<false};
+  if(!(la==lb)){<false};
   let ba=str.bytes(a);
   let bb=str.bytes(b);
   let ok=mut.true;
   lp(let i=0;i<la;i=i+1){
-    if(!(ba.get(i)=bb.get(i))){ok=false};
+    if(!(ba.get(i)==bb.get(i))){ok=false};
   };
   <ok
 };
@@ -22,7 +22,7 @@ f=stripts(line:$str):$str{
   let found=mut.false;
   lp(let i=0;i<n;i=i+1){
     if(!(found)){
-      if(str.bytes(line).get(i)=sp){
+      if(str.bytes(line).get(i)==sp){
         idx=i;
         found=true;
       };
@@ -38,7 +38,7 @@ f=main():i64{
   let lines=mut.@();
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(str.len(line)=0){br};
+    if(str.len(line)==0){br};
     lines=lines.push(line);
   };
   let n=lines.len as i64;

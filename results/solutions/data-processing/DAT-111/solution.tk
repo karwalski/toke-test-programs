@@ -13,7 +13,7 @@ f=findcol(hcols:@$str;name:$str):i64{
 (* is the whole string an integer (optional leading -) *)
 f=isint(v:$str):i64{
   let n=s.len(v);
-  if(n=0){<0};
+  if(n==0){<0};
   let start=mut.0;
   let c0=s.slice(v;0;1);
   if(s.eq(c0;"-")){start=1};
@@ -25,7 +25,7 @@ f=isint(v:$str):i64{
     if(s.eq(c;"3")){ok=1}; if(s.eq(c;"4")){ok=1}; if(s.eq(c;"5")){ok=1};
     if(s.eq(c;"6")){ok=1}; if(s.eq(c;"7")){ok=1}; if(s.eq(c;"8")){ok=1};
     if(s.eq(c;"9")){ok=1};
-    if(ok=0){<0}
+    if(ok==0){<0}
   };
   <1
 };
@@ -36,20 +36,20 @@ f=numcmp(a:i64;op:$str;b:i64):i64{
   if(s.eq(op;"<")){ if(a<b){<1}; <0 };
   if(s.eq(op;">=")){ if(a>=b){<1}; <0 };
   if(s.eq(op;"<=")){ if(a<=b){<1}; <0 };
-  if(s.eq(op;"=")){ if(a=b){<1}; <0 };
+  if(s.eq(op;"=")){ if(a==b){<1}; <0 };
   if(s.eq(op;"!=")){ if(a!=b){<1}; <0 };
   <0
 };
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)
   };
   let nl=mut.lines.len;
-  lp(1=1){
+  lp(1==1){
     if(nl<=0){br};
     if(s.eq(lines.get(nl-1);"")){nl=nl-1}el{br}
   };
@@ -81,7 +81,7 @@ f=main():i64{
   if(s.eq(utoks.get(0);"SELECT")){p=1};
   (* build select segment text (tokens between SELECT and FROM) until FROM *)
   let selseg=mut."";
-  lp(1=1){
+  lp(1==1){
     if(p>=nt){br};
     if(s.eq(utoks.get(p);"FROM")){br};
     if(s.len(selseg)>0){selseg=s.concat(selseg;" ")};
@@ -98,7 +98,7 @@ f=main():i64{
   if(p<nt){p=p+1};
   if(p<nt){p=p+1};
   (* parse remaining clauses *)
-  lp(1=1){
+  lp(1==1){
     if(p>=nt){br};
     let u=utoks.get(p);
     if(s.eq(u;"WHERE")){
@@ -162,13 +162,13 @@ f=main():i64{
   lp(let i=0;i<total;i=i+1){
     let r=rows.get(i);
     let keep=mut.1;
-    if(haswhere=1){
+    if(haswhere==1){
       let cells=r.split(",");
       let ci=findcol(hcols;wherecol);
       let cv=cells.get(ci);
-      if(isint(cv)=1){
-        if(isint(whereval)=1){
-          if(numcmp(s.toint(cv);whereop;s.toint(whereval))=1){}el{keep=0}
+      if(isint(cv)==1){
+        if(isint(whereval)==1){
+          if(numcmp(s.toint(cv);whereop;s.toint(whereval))==1){}el{keep=0}
         }el{ keep=0 }
       }el{
         (* string compare; only = and != meaningful *)
@@ -177,7 +177,7 @@ f=main():i64{
         }
       }
     };
-    if(keep=1){ filtered=filtered.push(r) }
+    if(keep==1){ filtered=filtered.push(r) }
   };
 
   (* GROUP BY branch *)
@@ -200,27 +200,27 @@ f=main():i64{
 
   (* ORDER BY *)
   let flen=filtered.len;
-  if(hasorder=1){
+  if(hasorder==1){
     let oc=findcol(hcols;ordercol);
     lp(let a=1;a<flen;a=a+1){
       let key=filtered.get(a);
       let kc=key.split(",").get(oc);
       let knum=mut.0; let kival=mut.0;
-      if(isint(kc)=1){knum=1;kival=s.toint(kc)};
+      if(isint(kc)==1){knum=1;kival=s.toint(kc)};
       let b=mut.a-1;
-      lp(1=1){
+      lp(1==1){
         if(b<0){br};
         let cur=filtered.get(b);
         let cc=cur.split(",").get(oc);
         let swap=mut.0;
-        if(knum=1){
+        if(knum==1){
           let cival=s.toint(cc);
-          if(orderdesc=1){ if(cival<kival){swap=1} }el{ if(cival>kival){swap=1} }
+          if(orderdesc==1){ if(cival<kival){swap=1} }el{ if(cival>kival){swap=1} }
         }el{
           (* string order not needed for tests; keep stable *)
           swap=0
         };
-        if(swap=1){ filtered=filtered.set(b+1;cur); b=b-1 }el{br}
+        if(swap==1){ filtered=filtered.set(b+1;cur); b=b-1 }el{br}
       };
       filtered=filtered.set(b+1;key)
     }

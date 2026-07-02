@@ -6,7 +6,7 @@ f=hasdollarnum(t:$str):$bool{let n=s.len(t);let i=mut.0;lp(i<n-1){if(s.eq(s.slic
 f=wonmoney(t:$str):$bool{let w=findfrom(t;"won";0);if(w<0){<false};let m=findfrom(t;"money";w);<m>=0};
 f=hasbangbang(t:$str):$bool{let n=s.len(t);let i=mut.0;lp(i<n-1){if(s.eq(s.slice(t;i;i+1);"!")){if(s.eq(s.slice(t;i+1;i+2);"!")){<true}};i=i+1};<false};
 f=main():$i64{
-let input=mut."";lp(1=1){if(io.eof()){br};input=s.concat(input;io.readln())};
+let input=mut."";lp(1==1){if(io.eof()){br};input=s.concat(input;io.readln())};
 let subject=strval(input;"\"subject\":\"");
 let body=strval(input;"\"body\":\"");
 let text=s.lower(s.concat(s.concat(subject;" ");body));

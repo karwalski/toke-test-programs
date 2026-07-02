@@ -16,9 +16,9 @@ f=jstr(obj:$str;key:$str):$str{
   <mt s.slice(rest;0;endi as$u64){$ok:v v;$err:e ""}
 };
 f=isleap(yr:$i64):$bool{
-  if(yr-yr/4*4=0){
-    if(yr-yr/100*100=0){
-      if(yr-yr/400*400=0){<true}el{<false}
+  if(yr-yr/4*4==0){
+    if(yr-yr/100*100==0){
+      if(yr-yr/400*400==0){<true}el{<false}
     }el{<true}
   }el{<false}
 };
@@ -36,13 +36,13 @@ f=epochsecs(ts:$str):$i64{
   let mdays=@(31;28;31;30;31;30;31;31;30;31;30;31);
   lp(let m=1;m<mo;m=m+1){
     days=days+mdays.get(m-1);
-    if(m=2){if(isleap(yr)){days=days+1}};
+    if(m==2){if(isleap(yr)){days=days+1}};
   };
   days=days+(dy-1);
   <days*86400+hh*3600+mm*60+ss
 };
 f=fmtdur(secs:$i64):$str{
-  if(secs=0){<"0s"};
+  if(secs==0){<"0s"};
   let v=mut.secs;
   let d=v/86400; v=v-d*86400;
   let h=v/3600; v=v-h*3600;
@@ -87,10 +87,10 @@ f=main():$i64{
       if(s.eq(tnames.get(j);mtype)){tcounts=tcounts.set(j;tcounts.get(j)+1);tfound=true;br};
     };
     if(!tfound){tnames=tnames+@(mtype);tcounts=tcounts+@(1)};
-    if(count=1){firstts=ts};
+    if(count==1){firstts=ts};
     lastts=ts;
   };
-  if(count=0){
+  if(count==0){
     io.println("messages: 0");
     io.println("participants: 0 ()");
     io.println("duration: 0s");

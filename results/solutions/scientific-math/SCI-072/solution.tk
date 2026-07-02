@@ -14,7 +14,7 @@ lp(let it=1;it<=maxiter;it=it+1){
 let w=mut.@(0.0);w=@();
 lp(let i=0;i<n;i=i+1){let acc=mut.0.0;lp(let j=0;j<n;j=j+1){acc=acc+mat.get(i*n+j)*v.get(j)};w=w+@(acc)};
 let wn=mut.0.0;lp(let i=0;i<n;i=i+1){wn=wn+w.get(i)*w.get(i)};wn=math.sqrt(wn);
-if(wn=0.0){br};
+if(wn==0.0){br};
 let vnew=mut.@(0.0);vnew=@();lp(let i=0;i<n;i=i+1){vnew=vnew+@(w.get(i)/wn)};
 let e=mut.0.0;lp(let i=0;i<n;i=i+1){let acc=mut.0.0;lp(let j=0;j<n;j=j+1){acc=acc+mat.get(i*n+j)*vnew.get(j)};e=e+vnew.get(i)*acc};
 eig=e;
@@ -26,7 +26,7 @@ preveig=eig;
 };
 # sign convention: first nonzero component positive
 let flip=mut.false;let determined=mut.false;
-lp(let i=0;i<n;i=i+1){if(determined=false){let a=mut.v.get(i);if(a<0.0){a=0.0-a};if(a>0.000000000001){if(v.get(i)<0.0){flip=true};determined=true}}};
+lp(let i=0;i<n;i=i+1){if(determined==false){let a=mut.v.get(i);if(a<0.0){a=0.0-a};if(a>0.000000000001){if(v.get(i)<0.0){flip=true};determined=true}}};
 if(flip){lp(let i=0;i<n;i=i+1){v=v.set(i;0.0-v.get(i))}};
 io.println(s.concat("Dominant eigenvalue: ";fmtfix6(eig)));
 let ev=mut."Eigenvector: ";

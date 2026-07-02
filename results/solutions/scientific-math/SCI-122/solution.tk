@@ -3,10 +3,10 @@ f=tryaug(u:$i64;e:$i64;eu:Vec;ev:Vec;seen:Vec;matchr:Vec):$bool{
 let res=mut.false;
 let done=mut.false;
 lp(let i=0;i<e;i=i+1){
-if(done=false){
-if(eu.get(i)=u){
+if(done==false){
+if(eu.get(i)==u){
 let r=ev.get(i);
-if(seen.get(r)=0){
+if(seen.get(r)==0){
 seen.set(r;1);
 let mr=matchr.get(r);
 if(mr<0){

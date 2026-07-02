@@ -4,7 +4,7 @@ i=s:std.str;
 f=toi(x:$str):$i64{ let r=mt s.toint(x){ $ok:v v; $err:e 0 }; <r };
 f=main():$i64{
   let priceline=io.readln();
-  if(s.len(priceline)=0){ <0 };
+  if(s.len(priceline)==0){ <0 };
   let parts=s.split(s.trim(priceline);" ");
   let cashline=io.readln();
   let cash=mut.toi(s.trim(cashline));
@@ -13,7 +13,7 @@ f=main():$i64{
   lp(let i=0;i<100000;i=i+1){
     if((day as i64)>=(parts.len as i64)){ br };
     let cmd=io.readln();
-    if(s.len(cmd)=0){ br };
+    if(s.len(cmd)==0){ br };
     let p=toi(s.trim(parts.get(day as u64)));
     let tc=s.trim(cmd);
     let toks=s.split(tc;" ");

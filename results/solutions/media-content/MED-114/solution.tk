@@ -3,7 +3,7 @@ i=io:std.io;
 i=s:std.str;
 f=encode(str:$str):$str{
   let n=s.len(str);
-  if(n=0){<""};
+  if(n==0){<""};
   let b=s.bytes(str);
   let result=mut."";
   let idx=mut.0;
@@ -13,7 +13,7 @@ f=encode(str:$str):$str{
     let j=mut.idx+1;
     lp(j<n){
       let nxt=b.get(j);
-      if(nxt=cur){count=count+1;j=j+1}el{br};
+      if(nxt==cur){count=count+1;j=j+1}el{br};
     };
     result=s.concat(result;s.fromint(count));
     result=s.concat(result;s.substr(str;idx;idx+1));

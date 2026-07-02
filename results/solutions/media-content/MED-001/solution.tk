@@ -5,14 +5,14 @@ f=stripheading(line:$str):$str{
     let c=s.slice(line;n;n+1);
     if(s.eq(c;"#")){n=n+1}el{br}
   };
-  if(n=0){<line};
+  if(n==0){<line};
   let rest=s.slice(line;n;s.len(line));
   let r=mut.rest;
   lp(s.len(r)>0){
     let c=s.slice(r;0;1);
     if(s.eq(c;" ")||s.eq(c;"\t")){r=s.slice(r;1;s.len(r))}el{br}
   };
-  if(s.len(r)=s.len(rest)){<line};
+  if(s.len(r)==s.len(rest)){<line};
   <r
 };
 f=removelinks(line:$str):$str{
@@ -61,9 +61,9 @@ f=stripline(line:$str):$str{
 f=main():$i64{
   let result=mut."";
   let first=mut.true;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let stripped=stripline(line);
     if(first){result=stripped;first=false}el{result=s.concat(result;s.concat("\n";stripped))}
   };

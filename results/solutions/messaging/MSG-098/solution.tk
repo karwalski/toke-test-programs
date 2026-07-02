@@ -24,7 +24,7 @@ f=getint(json:$str;key:$str):$i64{
         if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
         i=i+1
     };
-    if(s.len(n)=0){<0};
+    if(s.len(n)==0){<0};
     <s.toint(n)
 };
 
@@ -43,7 +43,7 @@ f=getfloat(json:$str;key:$str):$f64{
         if(s.equals(c;" ")){br}el{n=s.concat(n;c)}}};
         i=i+1
     };
-    if(s.len(n)=0){<0.0};
+    if(s.len(n)==0){<0.0};
     <s.tofloat(n)
 };
 

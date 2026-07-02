@@ -9,7 +9,7 @@ f=crc32(line:$str):$i64{
     let k=mut.0;
     lp(k<8){
       let lsb=crc&1;
-      if(lsb=1){
+      if(lsb==1){
         crc=((crc>>1)^3988292384)&4294967295
       }el{
         crc=(crc>>1)&4294967295
@@ -36,8 +36,8 @@ f=main():$i64{
   let first=mut.1;
   let cont=mut.1;
   lp(cont>0){
-    if(io.eof()=1){
-      if(first=1){
+    if(io.eof()==1){
+      if(first==1){
         io.println(s.concat("00000000";"\t"))
       };
       cont=0

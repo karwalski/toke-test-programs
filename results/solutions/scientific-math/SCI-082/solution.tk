@@ -1,7 +1,7 @@
 m=huff;i=io:std.io;i=s:std.str;
 f=ccode(ch:$str):$i64{let cs="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";let p=s.indexof(cs;ch);if(p<0){<200};<p};
 f=lessnode(fa:$i64;cha:$str;fb:$i64;chb:$str):$bool{
-  if(!(fa=fb)){<(fa<fb)};
+  if(!(fa==fb)){<(fa<fb)};
   let aleaf=mut.true;if(s.equals(cha;"")){aleaf=false};
   let bleaf=mut.true;if(s.equals(chb;"")){bleaf=false};
   if((!aleaf)&&bleaf){<false};
@@ -11,7 +11,7 @@ f=lessnode(fa:$i64;cha:$str;fb:$i64;chb:$str):$bool{
 };
 f=main():$i64{
   let lines=mut.@($str);
-  lp(1=1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trimsuffix(l;"\n"))};
+  lp(1==1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trimsuffix(l;"\n"))};
   let mode=lines.get(0);
   let chars=mut.@($str);
   let freqs=mut.@($i64);
@@ -28,16 +28,16 @@ f=main():$i64{
   let heap=mut.@($i64);
   lp(let i=0;i<nsym;i=i+1){heap=heap+@(i)};
   let root=mut.0;
-  if(nsym=1){root=0}el{
+  if(nsym==1){root=0}el{
     lp(heap.len()>1){
       let bi1=mut.0;
       lp(let h=1;h<heap.len();h=h+1){let n=heap.get(h);let cur=heap.get(bi1);if(lessnode(nodeFreq.get(n);nodeChar.get(n);nodeFreq.get(cur);nodeChar.get(cur))){bi1=h}};
       let first=heap.get(bi1);
-      let nh=mut.@($i64);lp(let h=0;h<heap.len();h=h+1){if(!(h=bi1)){nh=nh+@(heap.get(h))}};heap=nh;
+      let nh=mut.@($i64);lp(let h=0;h<heap.len();h=h+1){if(!(h==bi1)){nh=nh+@(heap.get(h))}};heap=nh;
       let bi2=mut.0;
       lp(let h=1;h<heap.len();h=h+1){let n=heap.get(h);let cur=heap.get(bi2);if(lessnode(nodeFreq.get(n);nodeChar.get(n);nodeFreq.get(cur);nodeChar.get(cur))){bi2=h}};
       let second=heap.get(bi2);
-      let nh2=mut.@($i64);lp(let h=0;h<heap.len();h=h+1){if(!(h=bi2)){nh2=nh2+@(heap.get(h))}};heap=nh2;
+      let nh2=mut.@($i64);lp(let h=0;h<heap.len();h=h+1){if(!(h==bi2)){nh2=nh2+@(heap.get(h))}};heap=nh2;
       let newid=nodeChar.len();
       nodeChar=nodeChar+@("");nodeFreq=nodeFreq+@(nodeFreq.get(first)+nodeFreq.get(second));nodeLeft=nodeLeft+@(first);nodeRight=nodeRight+@(second);
       heap=heap+@(newid);
@@ -72,7 +72,7 @@ f=main():$i64{
       let x=ord.get(b);let y=ord.get(b+1);
       let cx=codeStrs.get(x);let cy=codeStrs.get(y);
       let sw=mut.false;
-      if(s.len(cx)>s.len(cy)){sw=true}el{if(s.len(cx)=s.len(cy)){if(codegt(cx;cy)){sw=true}el{if(s.equals(cx;cy)){if(ccode(codeChars.get(x))>ccode(codeChars.get(y))){sw=true}}}}};
+      if(s.len(cx)>s.len(cy)){sw=true}el{if(s.len(cx)==s.len(cy)){if(codegt(cx;cy)){sw=true}el{if(s.equals(cx;cy)){if(ccode(codeChars.get(x))>ccode(codeChars.get(y))){sw=true}}}}};
       if(sw){ord=ord.set(b;y);ord=ord.set(b+1;x)}
     }};
     lp(let i=0;i<m;i=i+1){let k=ord.get(i);io.println(s.concat(s.concat(codeChars.get(k);" ");codeStrs.get(k)))}
@@ -88,4 +88,4 @@ f=main():$i64{
   };
   <0
 };
-f=codegt(a:$str;b:$str):$bool{let n=s.len(a);let i=mut.0;let res=mut.0;lp(i<n){if(res=0){let ca=s.slice(a;i;i+1);let cb=s.slice(b;i;i+1);if(s.equals(ca;"1")&&s.equals(cb;"0")){res=1}el{if(s.equals(ca;"0")&&s.equals(cb;"1")){res=0-1}};i=i+1}el{i=n}};<(res>0)};
+f=codegt(a:$str;b:$str):$bool{let n=s.len(a);let i=mut.0;let res=mut.0;lp(i<n){if(res==0){let ca=s.slice(a;i;i+1);let cb=s.slice(b;i;i+1);if(s.equals(ca;"1")&&s.equals(cb;"0")){res=1}el{if(s.equals(ca;"0")&&s.equals(cb;"1")){res=0-1}};i=i+1}el{i=n}};<(res>0)};

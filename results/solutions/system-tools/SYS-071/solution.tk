@@ -5,7 +5,7 @@ f=listfiles(dir:$str):@$str{
   lp(let i=0;i<(entries.len as $i64);i=i+1){
     let name=entries.get(i);
     let full=path.join(dir;name);
-    if(file.isdir(full)=(1=0)){out=out+@(full)}
+    if(file.isdir(full)==(1==0)){out=out+@(full)}
   };
   <out
 };
@@ -23,7 +23,7 @@ f=build(dir:$str;manifestpath:$str):$i64{
     body=s.concat(body;h);
     body=s.concat(body;"\n")
   };
-  let wrote=mt file.write(manifestpath;body){ $ok:v v; $err:e (1=0) };
+  let wrote=mt file.write(manifestpath;body){ $ok:v v; $err:e (1==0) };
   let out=mut."Manifest saved: ";
   out=s.concat(out;manifestpath);
   out=s.concat(out;" (");
@@ -67,7 +67,7 @@ f=check(dir:$str;manifestpath:$str):$i64{
   lp(let i=0;i<(current.len as $i64);i=i+1){
     let fp=current.get(i);
     let known=hashfor(manifest;fp);
-    if(s.len(known)=0){io.println(s.concat("NEW ";fp))}
+    if(s.len(known)==0){io.println(s.concat("NEW ";fp))}
   };
   io.println(s.concat("OK ";s.fromint(okcount)));
   <0

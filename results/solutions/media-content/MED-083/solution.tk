@@ -9,11 +9,11 @@ f=trim(str:$str):$str{
   let end=mut.n;
   lp(start<end){
     let c=b.get(start);
-    if(c=32||c=9||c=10||c=13){start=start+1}el{br};
+    if(c==32||c==9||c==10||c==13){start=start+1}el{br};
   };
   lp(end>start){
     let c=b.get(end-1);
-    if(c=32||c=9||c=10||c=13){end=end-1}el{br};
+    if(c==32||c==9||c==10||c==13){end=end-1}el{br};
   };
   <s.substr(str;start;end)
 };
@@ -25,7 +25,7 @@ f=countwords(str:$str):$i64{
   let inword=mut.false;
   lp(let i=0;i<n;i=i+1){
     let c=b.get(i);
-    let isspace=(c=32||c=9||c=10||c=13);
+    let isspace=(c==32||c==9||c==10||c==13);
     if(isspace){
       inword=false;
     }el{
@@ -44,7 +44,7 @@ f=main():$i64{
   let firstl=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!firstl){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     firstl=false;
@@ -57,7 +57,7 @@ f=main():$i64{
   let cur=mut.0;
   lp(let i=0;i<n;i=i+1){
     let c=b.get(i);
-    if(c=46||c=63||c=33){
+    if(c==46||c==63||c==33){
       let piece=s.substr(text;cur;i);
       let t=trim(piece);
       if(s.len(t)>0){
@@ -79,7 +79,7 @@ f=main():$i64{
     let nbare=s.len(bare);
     if(nbare>0){
       let lastc=s.bytes(bare).get(nbare-1);
-      if(lastc=46||lastc=63||lastc=33){bare=trim(s.substr(bare;0;nbare-1))};
+      if(lastc==46||lastc==63||lastc==33){bare=trim(s.substr(bare;0;nbare-1))};
     };
     let wc=countwords(bare);
     if(wc>threshold){

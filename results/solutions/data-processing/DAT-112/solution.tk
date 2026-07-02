@@ -19,12 +19,12 @@ if(s.equals(afn;"count")){<cnt};
 f=main():$i64{
 let ops=mut.@();
 let done=mut.0;
-lp(done<1){let line=io.readln();if(s.len(line)=0){done=1};if(s.len(line)>0){ops=ops+@(line)}};
+lp(done<1){let line=io.readln();if(s.len(line)==0){done=1};if(s.len(line)>0){ops=ops+@(line)}};
 let header=mut.@();
 let rows=mut.@();
 let first=mut.1;
 let done2=mut.0;
-lp(done2<1){let line=io.readln();if(s.len(line)=0){done2=1};if(s.len(line)>0){let fields=s.split(line;",");if(first=1){header=fields;first=0};if(first=0){rows=rows+@(line)}}};
+lp(done2<1){let line=io.readln();if(s.len(line)==0){done2=1};if(s.len(line)>0){let fields=s.split(line;",");if(first==1){header=fields;first=0};if(first==0){rows=rows+@(line)}}};
 let grouped=mut.0;
 let groupcol=mut."";
 let outheader=mut.@();
@@ -47,7 +47,7 @@ let newrows=mut.@();
 lp(let r=0;r<rows.len();r=r+1){
 let fields=s.split(rows.get(r);",");
 let cellval=fields.get(colidx);
-if(matchop(opchar;cellval;val)=1){newrows=newrows+@(rows.get(r))}};
+if(matchop(opchar;cellval;val)==1){newrows=newrows+@(rows.get(r))}};
 rows=newrows
 };
 if(s.equals(kind;"group")){
@@ -65,7 +65,7 @@ lp(let g=0;g<keys.len();g=g+1){gout=gout+@(keys.get(g))};
 outrows=gout
 };
 if(s.equals(kind;"aggregate")){
-if(grouped=1){
+if(grouped==1){
 let acol=sp.get(1);
 let afn=sp.get(2);
 let acidx=indexof(header;acol);
@@ -89,7 +89,7 @@ outrows=neworows
 }
 };
 if(s.equals(kind;"sort")){
-if(grouped=1){
+if(grouped==1){
 let scol=sp.get(1);
 let dir=sp.get(2);
 let scidx=indexof(outheader;scol);
@@ -103,11 +103,11 @@ let v2=s.toint(f2.get(scidx));
 let swap=mut.0;
 if(s.equals(dir;"desc")){if(v1<v2){swap=1}};
 if(s.equals(dir;"asc")){if(v1>v2){swap=1}};
-if(swap=1){let tmp=outrows.get(b);outrows=outrows.set(b;outrows.get(b+1));outrows=outrows.set(b+1;tmp)}}}
+if(swap==1){let tmp=outrows.get(b);outrows=outrows.set(b;outrows.get(b+1));outrows=outrows.set(b+1;tmp)}}}
 }
 }
 };
-if(grouped=1){
+if(grouped==1){
 io.println(joincomma(outheader));
 lp(let r=0;r<outrows.len();r=r+1){io.println(outrows.get(r))}};
 <0}

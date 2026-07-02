@@ -29,7 +29,7 @@ f=main():$i64{
   let used=mut.@($i64);
   let di=mut.0;
   lp(di<=target){
-    if(di=0){dp=dp+@(0)}el{dp=dp+@(big)};
+    if(di==0){dp=dp+@(0)}el{dp=dp+@(big)};
     used=used+@(0-1);
     di=di+1
   };
@@ -71,7 +71,7 @@ f=main():$i64{
     if(cc>0){
       let r=mut.0;
       lp(r<cc){
-        if(first=0){outl=s.concat(outl;" ")};
+        if(first==0){outl=s.concat(outl;" ")};
         outl=s.concat(outl;s.fromint(coins.get(oi)));
         first=0;
         r=r+1

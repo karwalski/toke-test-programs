@@ -39,7 +39,7 @@ f=main():i64{
       let ca=byteat(aseq;i-1);
       let cb=byteat(bseq;j-1);
       let scor=mut.mismatch;
-      if(ca=cb){ scor=match; };
+      if(ca==cb){ scor=match; };
       let diag=dp.get(((i-1)*cols+(j-1)) as u64)+scor;
       let up=dp.get(((i-1)*cols+j) as u64)+gap;
       let left=dp.get((i*cols+(j-1)) as u64)+gap;
@@ -52,17 +52,17 @@ f=main():i64{
   let ti=mut.alen;
   let tj=mut.blen;
   lp(true){
-    if(ti=0){ if(tj=0){ br }; };
+    if(ti==0){ if(tj==0){ br }; };
     let moved=mut.false;
     if(ti>0){
       if(tj>0){
         let ca=byteat(aseq;ti-1);
         let cb=byteat(bseq;tj-1);
         let scor=mut.mismatch;
-        if(ca=cb){ scor=match; };
+        if(ca==cb){ scor=match; };
         let cur=dp.get((ti*cols+tj) as u64);
         let dval=dp.get(((ti-1)*cols+(tj-1)) as u64)+scor;
-        if(cur=dval){
+        if(cur==dval){
           ra=s.concat(charat(aseq;ti-1);ra);
           rb=s.concat(charat(bseq;tj-1);rb);
           ti=ti-1;
@@ -75,7 +75,7 @@ f=main():i64{
       if(ti>0){
         let cur=dp.get((ti*cols+tj) as u64);
         let uval=dp.get(((ti-1)*cols+tj) as u64)+gap;
-        if(cur=uval){
+        if(cur==uval){
           ra=s.concat(charat(aseq;ti-1);ra);
           rb=s.concat("-";rb);
           ti=ti-1;

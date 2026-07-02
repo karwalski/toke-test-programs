@@ -10,7 +10,7 @@ f=wrap(e:$str;p:$i64):$str{
 f=search(vals:@$i64;exprs:@$str;precs:@$i64;target:$i64):$str{
   let n=vals.len as i64;
   lp(let i=0;i<n;i=i+1){
-    if(vals.get(i)=target){ <exprs.get(i) };
+    if(vals.get(i)==target){ <exprs.get(i) };
   };
   lp(let i=0;i<n;i=i+1){
     lp(let j=i+1;j<n;j=j+1){
@@ -23,19 +23,19 @@ f=search(vals:@$i64;exprs:@$str;precs:@$i64;target:$i64):$str{
         let nv=mut.0;
         let ne=mut."";
         let np=mut.1;
-        if(op=0){ valid=true; nv=av+bv; ne=c3(ae;" + ";be); np=1; };
-        if(op=1){ valid=true; nv=av-bv; ne=c3(ae;" - ";be); np=1; };
-        if(op=2){ valid=true; nv=bv-av; ne=c3(be;" - ";ae); np=1; };
-        if(op=3){ valid=true; nv=av*bv; ne=c3(ax;" * ";bx); np=2; };
-        if(op=4){ if(!(av=0)){ if(bv-bv/av*av=0){ valid=true; nv=bv/av; ne=c3(bx;" / ";ax); np=2; } } };
-        if(op=5){ if(!(bv=0)){ if(av-av/bv*bv=0){ valid=true; nv=av/bv; ne=c3(ax;" / ";bx); np=2; } } };
+        if(op==0){ valid=true; nv=av+bv; ne=c3(ae;" + ";be); np=1; };
+        if(op==1){ valid=true; nv=av-bv; ne=c3(ae;" - ";be); np=1; };
+        if(op==2){ valid=true; nv=bv-av; ne=c3(be;" - ";ae); np=1; };
+        if(op==3){ valid=true; nv=av*bv; ne=c3(ax;" * ";bx); np=2; };
+        if(op==4){ if(!(av==0)){ if(bv-bv/av*av==0){ valid=true; nv=bv/av; ne=c3(bx;" / ";ax); np=2; } } };
+        if(op==5){ if(!(bv==0)){ if(av-av/bv*bv==0){ valid=true; nv=av/bv; ne=c3(ax;" / ";bx); np=2; } } };
         if(valid){
-          if(nv=target){ <ne };
+          if(nv==target){ <ne };
           let rv=mut.@(nv);
           let re=mut.@(ne);
           let rp=mut.@(np);
           lp(let k=0;k<n;k=k+1){
-            if(!(k=i)){ if(!(k=j)){
+            if(!(k==i)){ if(!(k==j)){
               rv=rv+@(vals.get(k));
               re=re+@(exprs.get(k));
               rp=rp+@(precs.get(k));
@@ -60,7 +60,7 @@ f=main():i64{
   let precs=mut.@();
   lp(let i=0;i<pn;i=i+1){
     let p=parts.get(i);
-    if(!(str.len(p)=0)){
+    if(!(str.len(p)==0)){
       let v=mt str.toint(p){ $ok:x x; $err:e 0 };
       vals=vals+@(v);
       exprs=exprs+@(p);

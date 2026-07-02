@@ -40,7 +40,7 @@ f=serialize(keys:@$str;vals:@$str;prefix:$str;depth:$i64):$str{
 f=strgt(a:$str;b:$str):$bool{
   let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<na){m=nb};
   let i=mut.0;let res=mut.0;
-  lp(i<m){if(res=0){let ca=ccode(s.slice(a;i;i+1));let cb=ccode(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};
+  lp(i<m){if(res==0){let ca=ccode(s.slice(a;i;i+1));let cb=ccode(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};
   if(res>0){<true};if(res<0){<false};<(na>nb)
 };
 f=ccode(c:$str):$i64{let cs="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";let p=s.indexof(cs;c);if(p<0){<200};<p};

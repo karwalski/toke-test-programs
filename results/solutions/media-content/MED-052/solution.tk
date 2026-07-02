@@ -3,7 +3,7 @@ i=io:std.io;
 i=s:std.str;
 f=main():$i64{
     let text=mut."";
-    lp(1=1){
+    lp(1==1){
         let line=io.readln();
         if(io.eof()){br};
         if(s.len(text)>0){text=s.concat(text;"\n")};
@@ -41,12 +41,12 @@ f=main():$i64{
             let cb=counts.get(ib);
             let swap=mut.0;
             if(ca<cb){swap=1};
-            if(ca=cb){
+            if(ca==cb){
                 let ka=codes.get(ia);
                 let kb=codes.get(ib);
                 if(ka>kb){swap=1};
             };
-            if(swap=1){
+            if(swap==1){
                 order=order.set(b;ib);
                 order=order.set(b+1;ia);
             };

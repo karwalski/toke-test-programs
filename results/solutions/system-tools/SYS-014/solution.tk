@@ -7,15 +7,15 @@ ProcessErr:e ""
 };
 f=mtimeof(path:$str):$i64{
 let out=s.trim(runcmd(@("stat";"-f";"%m";path)));
-if(s.len(out)=0){<0};
+if(s.len(out)==0){<0};
 <s.toint(out)
 };
 f=main():$i64{
 let base="/tmp/managed";
 if(fl.exists(base)){}el{fl.mkdir(base)};
-lp(io.eof()=false){
+lp(io.eof()==false){
 let raw=io.readln();
-if(io.eof()){if(s.len(raw)=0){br}};
+if(io.eof()){if(s.len(raw)==0){br}};
 let line=s.trim(raw);
 if(s.len(line)>0){
 if(s.startswith(line;"CREATE ")){

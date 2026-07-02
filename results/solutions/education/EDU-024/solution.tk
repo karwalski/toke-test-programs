@@ -11,7 +11,7 @@ f=main():i64{
   let names=mut.@();
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(str.len(line)=0){br};
+    if(str.len(line)==0){br};
     names=names+@(line);
   };
   let n=names.len as i64;
@@ -37,7 +37,7 @@ f=main():i64{
       let kb=keys.get(ib);
       let swap=mut.false;
       if(ka>kb){swap=true};
-      if(ka=kb){
+      if(ka==kb){
         if(ia>ib){swap=true};
       };
       if(swap){

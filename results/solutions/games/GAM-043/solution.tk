@@ -5,7 +5,7 @@ f=arrseti(a:@$i64;idx:$i64;v:$i64):@$i64{
   let r=mut.@();
   let n=a.len as i64;
   lp(let i=0;i<n;i=i+1){
-    if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))};
+    if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))};
   };
   <r
 };
@@ -16,14 +16,14 @@ f=dfs(grid:@$str;word:$str;wlen:$i64;cell:$i64;widx:$i64;visited:@$i64):$bool{
   let row=cell/4;
   let col=cell-row*4;
   if(!(str.eq(grid.get(cell);charat(word;widx)))){ <false };
-  if(widx=wlen-1){ <true };
+  if(widx==wlen-1){ <true };
   let nv=arrseti(visited;cell;1);
   let found=mut.false;
   lp(let dr=0-1;dr<2;dr=dr+1){
     lp(let dc=0-1;dc<2;dc=dc+1){
       if(!(found)){
         let skip=mut.false;
-        if(dr=0){ if(dc=0){skip=true} };
+        if(dr==0){ if(dc==0){skip=true} };
         if(!(skip)){
           let nr=row+dr;
           let nc=col+dc;
@@ -31,7 +31,7 @@ f=dfs(grid:@$str;word:$str;wlen:$i64;cell:$i64;widx:$i64;visited:@$i64):$bool{
           if(nr>=0){ if(nr<4){ if(nc>=0){ if(nc<4){inb=true} } } };
           if(inb){
             let ncell=nr*4+nc;
-            if(nv.get(ncell)=0){
+            if(nv.get(ncell)==0){
               if(dfs(grid;word;wlen;ncell;widx+1;nv)){found=true};
             };
           };
@@ -64,7 +64,7 @@ f=main():i64{
   let words=mut.@();
   lp(let k=0;k<100000;k=k+1){
     let w=io.readln();
-    if(str.len(w)=0){br};
+    if(str.len(w)==0){br};
     let wlen=str.len(w) as i64;
     if(wlen>=3){
       if(canform(grid;w)){words=words+@(w)};
@@ -80,12 +80,12 @@ f=main():i64{
       let lb=str.len(b) as i64;
       let swap=mut.false;
       if(la<lb){swap=true}el{
-        if(la=lb){ if(gt(a;b)){swap=true} };
+        if(la==lb){ if(gt(a;b)){swap=true} };
       };
       if(swap){
         let r2=mut.@();
         lp(let x=0;x<m;x=x+1){
-          if(x=j){r2=r2+@(b)}el{ if(x=j+1){r2=r2+@(a)}el{r2=r2+@(arr.get(x))} };
+          if(x==j){r2=r2+@(b)}el{ if(x==j+1){r2=r2+@(a)}el{r2=r2+@(arr.get(x))} };
         };
         arr=r2;
       };

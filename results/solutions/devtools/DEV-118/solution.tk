@@ -5,12 +5,12 @@ i=str:std.str;
 f=streq(a:$str;b:$str):$bool{
   let la=str.len(a) as i64;
   let lb=str.len(b) as i64;
-  if(!(la=lb)){<false};
+  if(!(la==lb)){<false};
   let ba=str.bytes(a);
   let bb=str.bytes(b);
   let ok=mut.true;
   lp(let i=0;i<la;i=i+1){
-    if(!((ba.get(i) as i64)=(bb.get(i) as i64))){ok=false};
+    if(!((ba.get(i) as i64)==(bb.get(i) as i64))){ok=false};
   };
   <ok
 };
@@ -63,7 +63,7 @@ f=main():i64{
   let json=mut.io.readln();
   let extra=io.readln();
   lp(let i=0;i<100000;i=i+1){
-    if(str.len(extra)=0){
+    if(str.len(extra)==0){
     }el{
       json=str.concat(json;extra);
     };

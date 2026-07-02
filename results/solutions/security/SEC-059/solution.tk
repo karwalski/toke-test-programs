@@ -26,9 +26,9 @@ f=strength(name:$str):$str{
   <"acceptable"
 };
 f=main():$i64{
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let name=s.trim(line);
     if(s.len(name)>0){io.println(strength(name))}
   };

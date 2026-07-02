@@ -45,18 +45,18 @@ f=main():i64{
       let col=state%10;
       (* check fits *)
       let fits=mut.1;
-      if(dir=0){ if((col+slen)>10){fits=0} }el{ if((row+slen)>10){fits=0} };
-      if(fits=1){
+      if(dir==0){ if((col+slen)>10){fits=0} }el{ if((row+slen)>10){fits=0} };
+      if(fits==1){
         let ok=mut.1;
         lp(let k=0;k<slen;k=k+1){
           let rr=mut.row;let cc=mut.col;
-          if(dir=0){cc=col+k}el{rr=row+k};
-          if(vec.get(grid;rr*10+cc)=46){}el{ok=0}
+          if(dir==0){cc=col+k}el{rr=row+k};
+          if(vec.get(grid;rr*10+cc)==46){}el{ok=0}
         };
-        if(ok=1){
+        if(ok==1){
           lp(let k=0;k<slen;k=k+1){
             let rr=mut.row;let cc=mut.col;
-            if(dir=0){cc=col+k}el{rr=row+k};
+            if(dir==0){cc=col+k}el{rr=row+k};
             grid=vec.set(grid;rr*10+cc;shipbyte)
           };
           placed=1

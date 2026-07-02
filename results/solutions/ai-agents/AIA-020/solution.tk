@@ -23,13 +23,13 @@ f=jnum(seg:$str;field:$str):$str{
   let out=mut."";
   let stop=mut.0;
   lp(i<s.len(rest)){
-    if(stop=0){
+    if(stop==0){
       let c=s.slice(rest;i;i+1);
       if(s.contains("0123456789.-";c)){out=s.concat(out;c)}el{stop=1};
     };
     i=i+1;
   };
-  if(s.len(out)=0){<"0"};
+  if(s.len(out)==0){<"0"};
   <out;
 };
 
@@ -44,7 +44,7 @@ f=jaccard(t1:$str;t2:$str):$f64{
       let seen=mut.0;
       let b=mut.0;
       lp(b<u1.len()){if(s.equals(u1.get(b);w)){seen=1};b=b+1};
-      if(seen=0){u1=u1+@(w)};
+      if(seen==0){u1=u1+@(w)};
     };
     a=a+1;
   };
@@ -56,7 +56,7 @@ f=jaccard(t1:$str;t2:$str):$f64{
       let seen=mut.0;
       let b=mut.0;
       lp(b<u2.len()){if(s.equals(u2.get(b);w)){seen=1};b=b+1};
-      if(seen=0){u2=u2+@(w)};
+      if(seen==0){u2=u2+@(w)};
     };
     c=c+1;
   };
@@ -68,7 +68,7 @@ f=jaccard(t1:$str;t2:$str):$f64{
     i=i+1;
   };
   let union=u1.len()+u2.len()-inter;
-  if(union=0){<1.0};
+  if(union==0){<1.0};
   <s.tofloat(s.fromint(inter))/s.tofloat(s.fromint(union));
 };
 
@@ -130,13 +130,13 @@ f=main():$i64{
     let redundant=mut.0;
     let e=mut.0;
     lp(e<kepttexts.len()){
-      if(redundant=0){
+      if(redundant==0){
         let sim=jaccard(txt;kepttexts.get(e));
         if(sim>=maxred){redundant=1};
       };
       e=e+1;
     };
-    if(redundant=0){
+    if(redundant==0){
       keptids=keptids+@(ids.get(idx));
       kepttexts=kepttexts+@(txt);
     };

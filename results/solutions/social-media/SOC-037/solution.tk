@@ -49,7 +49,7 @@ f=feedresponse(id:$str):$str{
 f=handle(raw:$str):$str!$apperr{
   let req=j.dec(raw)!$apperr;
   let action=j.str(req;"action")!$apperr;
-  if(s.eq(action;"list_feed")=(1=0)){
+  if(s.eq(action;"list_feed")==(1==0)){
     <"{\"error\":\"Unknown action\"}"
   };
   let listid=j.str(req;"list_id")!$apperr;

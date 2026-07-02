@@ -4,9 +4,9 @@ f=matches(pat:$str;word:$str):$bool{
   let n=s.len(pat);
   lp(let i=0;i<n;i=i+1){
     let pc=s.slice(pat;i;i+1);
-    if(s.eq(pc;"?")=false){
+    if(s.eq(pc;"?")==false){
       let wc=s.slice(word;i;i+1);
-      if(s.eq(pc;wc)=false){<false}
+      if(s.eq(pc;wc)==false){<false}
     }
   };
   <true
@@ -32,9 +32,9 @@ f=strless(a:$str;b:$str):$bool{
 f=main():$i64{
   let pat=s.trim(io.readln());
   let res=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let word=s.trim(line);
     if(s.len(word)>0){
       if(matches(pat;word)){res=res+@(word)}

@@ -12,11 +12,11 @@ f=minfloat(x:$f64):$str{
   let scaled=prod as$i64;
   let whole=scaled/100; let frac=scaled-whole*100;
   let r=mut."";
-  if(frac=0){
+  if(frac==0){
     r=s.concat(s.fromint(whole);".0");
   }el{
     let last=mut.0; last=frac-(frac/10)*10;
-    if(last=0){
+    if(last==0){
       r=s.concat(s.concat(s.fromint(whole);".");s.fromint(frac/10));
     }el{
       let fs=mut.s.fromint(frac);
@@ -30,12 +30,12 @@ f=minfloat(x:$f64):$str{
 f=main():$i64{
   let ca=mut.@(); let cb=mut.@(); let cc=mut.@(); let ys=mut.@();
   let seenheader=mut.0;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
     if(s.len(t)<1){}el{
-      if(seenheader=0){seenheader=1}el{
+      if(seenheader==0){seenheader=1}el{
         let parts=s.split(t;",");
         if(parts.len>=4){
           ca=ca+@(parsef(parts.get(0)));

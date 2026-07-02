@@ -17,7 +17,7 @@ f=rawval(obj:$str;key:$str):$str{
   let out=mut."";
   let stop=mut.0;
   lp(i<s.len(rest)){
-    if(stop=0){
+    if(stop==0){
       let c=s.slice(rest;i;i+1);
       if(s.equals(c;",")){stop=1}el{if(s.equals(c;"}")){stop=1}el{if(s.equals(c;"]")){stop=1}el{out=s.concat(out;c)}}};
     };
@@ -45,7 +45,7 @@ f=fmtg(num:$str):$str{
     lp(end>0){
       if(s.equals(s.slice(frac;end-1;end);"0")){end=end-1}el{br};
     };
-    if(end=0){<intpart};
+    if(end==0){<intpart};
     <s.concat(intpart;s.concat(".";s.slice(frac;0;end)));
   };
   <num;
@@ -72,7 +72,7 @@ f=main():$i64{
   let first=mut.1;
   let line=mut.io.readln();
   lp(s.len(line)>0){
-    if(first=1){raw=line;first=0}el{raw=s.concat(raw;s.concat("\n";line))};
+    if(first==1){raw=line;first=0}el{raw=s.concat(raw;s.concat("\n";line))};
     line=io.readln();
   };
   let json=mut.s.trim(io.readln());
@@ -95,7 +95,7 @@ f=main():$i64{
       let hdr=mut."";
       let h=mut.0;
       lp(h<cols.len()){if(h>0){hdr=s.concat(hdr;"  ")};hdr=s.concat(hdr;cols.get(h));h=h+1};
-      if(firstout=1){out=hdr;firstout=0}el{out=s.concat(out;s.concat("\n";hdr))};
+      if(firstout==1){out=hdr;firstout=0}el{out=s.concat(out;s.concat("\n";hdr))};
 
       let rk="\"rows\":";
       let rp=s.indexof(json;rk);
@@ -113,7 +113,7 @@ f=main():$i64{
             lp(cc<cols.len()){
               let col=cols.get(cc);
               let v=mut.rawval(seg;col);
-              if(israwstr(seg;col)=0){v=fmtg(v)};
+              if(israwstr(seg;col)==0){v=fmtg(v)};
               if(cc>0){rowline=s.concat(rowline;"  ")};
               rowline=s.concat(rowline;v);
               cc=cc+1;
@@ -125,7 +125,7 @@ f=main():$i64{
       };
     }el{
       let subbed=subst(tl;json);
-      if(firstout=1){out=subbed;firstout=0}el{out=s.concat(out;s.concat("\n";subbed))};
+      if(firstout==1){out=subbed;firstout=0}el{out=s.concat(out;s.concat("\n";subbed))};
     };
     li=li+1;
   };

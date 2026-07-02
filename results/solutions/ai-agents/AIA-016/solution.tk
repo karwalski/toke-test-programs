@@ -15,7 +15,7 @@ f=getint(obj:$str;key:$str):$i64{
     if(i>=(str.len(obj) as i64)){br};
     let b=bytes.get(i as u64);
     let c=(b as i64);
-    if(c=45){neg=true;i=i+1}el{
+    if(c==45){neg=true;i=i+1}el{
       if(c>=48){if(c<=57){n=n*10+(c-48);i=i+1}el{br}}el{br}
     };
   };
@@ -41,8 +41,8 @@ f=jsonesc(s:$str):$str{
   lp(let i=0;i<(n as i64);i=i+1){
     let b=bytes.get(i as u64);
     let c=(b as i64);
-    if(c=34){out=str.concat(out;"\\\"")}el{
-      if(c=92){out=str.concat(out;"\\\\")}el{
+    if(c==34){out=str.concat(out;"\\\"")}el{
+      if(c==92){out=str.concat(out;"\\\\")}el{
         let ch=mt str.slice(s;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
         out=str.concat(out;ch)
       }

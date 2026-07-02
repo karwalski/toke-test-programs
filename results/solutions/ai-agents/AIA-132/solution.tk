@@ -12,7 +12,7 @@ f=extractarray(json:$str;key:$str):$str{
   lp(i<n){
     let ch=s.slice(rest;i;i+1);
     if(s.eq(ch;"[")){depth=depth+1};
-    if(s.eq(ch;"]")){depth=depth-1;if(depth=0){endidx=i;i=n}};
+    if(s.eq(ch;"]")){depth=depth-1;if(depth==0){endidx=i;i=n}};
     i=i+1
   };
   <s.slice(rest;0;endidx)

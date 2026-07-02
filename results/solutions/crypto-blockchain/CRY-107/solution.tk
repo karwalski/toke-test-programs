@@ -1,6 +1,6 @@
 m=core;i=io:std.io;i=s:std.str;i=enc:std.encoding;
-f=lshr(x:$i64;k:$i64):$i64{if(k=0){<x};let hi=(0-1)<<(64-k);<(x>>k)&(~hi)};
-f=rotl64(x:$i64;n:$i64):$i64{if(n=0){<x};<(x<<n)|lshr(x;64-n)};
+f=lshr(x:$i64;k:$i64):$i64{if(k==0){<x};let hi=(0-1)<<(64-k);<(x>>k)&(~hi)};
+f=rotl64(x:$i64;n:$i64):$i64{if(n==0){<x};<(x<<n)|lshr(x;64-n)};
 f=md5(a:$i64):$i64{let m=a-a/5*5;if(m<0){<m+5};<m};
 f=keccakf(st:@i64):@i64{
   let stt=mut.st;
@@ -71,7 +71,7 @@ f=keccak256(msg:@byte;padbyte:$i64):@byte{
   let mlen=msg.len();
   let padded=mut.msg;
   let padlen=rate-(mlen-mlen/rate*rate);
-  if(padlen=1){
+  if(padlen==1){
     padded=padded+@(padbyte|128);
   }el{
     padded=padded+@(padbyte);
@@ -125,7 +125,7 @@ f=main():$void{
     let hb=hash.get(i/2)&255;
     let nib=mut.0;
     let rem=i-i/2*2;
-    if(rem=0){nib=lshr(hb;4)&15}el{nib=hb&15};
+    if(rem==0){nib=lshr(hb;4)&15}el{nib=hb&15};
     let outc=mut.ch;
     if(nib>=8){
       if(ch>=97){

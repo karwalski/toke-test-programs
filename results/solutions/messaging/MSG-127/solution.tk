@@ -18,7 +18,7 @@ lp(let li=r;li>0;li=li-1){
 let i=r-li;
 let nm=names.get(i);
 let lbl=mut."";
-if(li=r){lbl=s.concat("layer ";s.concat(s.fromint(li);s.concat(" (outermost, for ";s.concat(nm;"):"))))}el{lbl=s.concat("layer ";s.concat(s.fromint(li);s.concat(" (for ";s.concat(nm;"):"))))};
+if(li==r){lbl=s.concat("layer ";s.concat(s.fromint(li);s.concat(" (outermost, for ";s.concat(nm;"):"))))}el{lbl=s.concat("layer ";s.concat(s.fromint(li);s.concat(" (for ";s.concat(nm;"):"))))};
 io.println(lbl);
 let nexthop=mut."";
 if(i+1<r){nexthop=names.get(i+1)}el{nexthop="recipient"};

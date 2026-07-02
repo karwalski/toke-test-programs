@@ -22,7 +22,7 @@ let n=ids.len();
 let page=mut.1;
 let oncount=mut.0;
 lp(let i=0;i<n;i=i+1){
-if(oncount=0){
+if(oncount==0){
 io.println(s.concat(s.concat("page ";s.fromint(page));":"))
 };
 if(i>0){
@@ -33,9 +33,9 @@ let missing=cur-prev-1;
 let lo=prev+1;
 let hi=cur-1;
 let rangestr=mut."";
-if(lo=hi){rangestr=s.fromint(lo)}el{rangestr=s.concat(s.concat(s.fromint(lo);"-");s.fromint(hi))};
+if(lo==hi){rangestr=s.fromint(lo)}el{rangestr=s.concat(s.concat(s.fromint(lo);"-");s.fromint(hi))};
 let msgword=mut."messages";
-if(missing=1){msgword="message"};
+if(missing==1){msgword="message"};
 io.println(s.concat(s.concat(s.concat(s.concat(s.concat("  --- gap: ";s.fromint(missing));" ");msgword);" missing (");s.concat(rangestr;") ---")))
 }
 };

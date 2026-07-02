@@ -10,7 +10,7 @@ f=lookup(froms:@$i64;tos:@$i64;pos:$i64):$i64{
   let hit=mut.false;
   lp(let i=0;i<n;i=i+1){
     let f=geti(froms;i);
-    if(f=pos){
+    if(f==pos){
       if(!(hit)){
         res=geti(tos;i);
         hit=true;
@@ -25,7 +25,7 @@ f=main():$i64{
   let tos=mut.@();
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let parts=s.split(line;":");
     let a=mt s.toint(parts.get(0)){ $ok:v v; $err:e 0 };
     let b=mt s.toint(parts.get(1)){ $ok:v v; $err:e 0 };
@@ -52,7 +52,7 @@ f=main():$i64{
             stop=true;
           }el{
             let dest=lookup(froms;tos;cand);
-            if(dest=0-1){
+            if(dest==0-1){
               cur=cand;
             }el{
               cur=dest;
@@ -64,7 +64,7 @@ f=main():$i64{
       pos=cur;
       out=s.concat(out;s.fromint(pos));
       out=s.concat(out;"\n");
-      if(pos=100){done=true};
+      if(pos==100){done=true};
     };
   };
   io.print(out);

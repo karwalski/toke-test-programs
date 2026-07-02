@@ -1,14 +1,14 @@
 m=pegjump;i=io:std.io;i=s:std.str;
 f=cellat(grid:@$str;r:$i64;c:$i64):$str{<s.slice(grid.get(r);c;c+1)};
-f=setcell(grid:@$str;r:$i64;c:$i64;v:$str):@$str{let out=mut.@("");let i=mut.0;lp(i<grid.len){let row=mut.grid.get(i);if(i=r){row=s.concat(s.concat(s.slice(row;0;c);v);s.slice(row;c+1;s.len(row)))};out=out+@(row);i=i+1};<out};
+f=setcell(grid:@$str;r:$i64;c:$i64;v:$str):@$str{let out=mut.@("");let i=mut.0;lp(i<grid.len){let row=mut.grid.get(i);if(i==r){row=s.concat(s.concat(s.slice(row;0;c);v);s.slice(row;c+1;s.len(row)))};out=out+@(row);i=i+1};<out};
 f=main():$i64{
 let grid=mut.@("");let ng=mut.0;
 let moves=mut.@("");let nm=mut.0;
 let inmoves=mut.false;
-lp(1=1){
+lp(1==1){
 let line=io.readln();
 let l=s.trim(line);
-if(s.len(l)=0){if(inmoves){br}el{inmoves=true}}el{
+if(s.len(l)==0){if(inmoves){br}el{inmoves=true}}el{
 if(inmoves){moves=moves+@(l);nm=nm+1}el{grid=grid+@(l);ng=ng+1}
 }};
 let rows=ng;let cols=mut.0;if(ng>0){cols=s.len(grid.get(1))};

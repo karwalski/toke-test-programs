@@ -5,7 +5,7 @@ i=s:std.str;
 f=cleanword(w:$str):$str{
   let t=s.trim(w);
   let n=s.len(t);
-  if(n=0){<t};
+  if(n==0){<t};
   let last=s.slice(t;n-1;n);
   if(s.equals(last;".")){<s.slice(t;0;n-1)};
   if(s.equals(last;",")){<s.slice(t;0;n-1)};
@@ -26,7 +26,7 @@ f=main():$i64{
   };
   lp(1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let textwords=s.split(line;" ");
     lp(let tidx=0;tidx<textwords.len();tidx=tidx+1){
       let tw=cleanword(textwords.get(tidx));

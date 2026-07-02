@@ -11,7 +11,7 @@ let count=mut.0;let solved=mut.false;let guess=mut."1122";
 lp(!(solved)){let r=resp(secret;guess);let b=r/10;let w=r%10;count=count+1;
 io.println(s.concat(s.concat(s.concat(s.concat(s.concat(guess;" ");s.fromint(b));"B");s.fromint(w));"W"));
 hist=hist+@(guess);hr=hr+@(r);
-if(b=4){solved=true}el{
+if(b==4){solved=true}el{
 let found=mut.false;lp(let i=0;i<1296;i=i+1){if(!(found)){let cand=codeof(i);if(consistent(cand;hist;hr)){guess=cand;found=true}}}}};
 io.println(s.concat(s.concat("Solved in ";s.fromint(count));" guesses"));
 <0}

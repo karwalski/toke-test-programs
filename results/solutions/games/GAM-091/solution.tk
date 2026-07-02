@@ -57,22 +57,22 @@ f=main():i64{
               if(placed<1){
                 (* check fits *)
                 let fits=mut.1;
-                if(dir=0){ if((c+wl)>cols){fits=0} }el{ if((r+wl)>rows){fits=0} };
-                if(fits=1){
+                if(dir==0){ if((c+wl)>cols){fits=0} }el{ if((r+wl)>rows){fits=0} };
+                if(fits==1){
                   (* check no conflict *)
                   let ok=mut.1;
                   lp(let k=0;k<wl;k=k+1){
                     let rr=mut.r;let cc=mut.c;
-                    if(dir=0){cc=c+k}el{rr=r+k};
+                    if(dir==0){cc=c+k}el{rr=r+k};
                     let cur=vec.get(grid;rr*cols+cc);
                     let wch=wb.get(k) as i64;
-                    if(cur=0){}el{ if(cur=wch){}el{ok=0} }
+                    if(cur==0){}el{ if(cur==wch){}el{ok=0} }
                   };
-                  if(ok=1){
+                  if(ok==1){
                     (* place *)
                     lp(let k=0;k<wl;k=k+1){
                       let rr=mut.r;let cc=mut.c;
-                      if(dir=0){cc=c+k}el{rr=r+k};
+                      if(dir==0){cc=c+k}el{rr=r+k};
                       grid=vec.set(grid;rr*cols+cc;wb.get(k) as i64)
                     };
                     prrow=vec.push(prrow;r);
@@ -92,7 +92,7 @@ f=main():i64{
 
   (* fill empty cells with deterministic pseudo-random uppercase letters *)
   lp(let i=0;i<rows*cols;i=i+1){
-    if(vec.get(grid;i)=0){
+    if(vec.get(grid;i)==0){
       state=nextrand(state);
       let m=state%26;
       grid=vec.set(grid;i;(m+65))
@@ -113,7 +113,7 @@ f=main():i64{
   lp(let i=0;i<pn;i=i+1){
     let w=vec.get(prwidx;i);
     let dirstr=mut."right";
-    if(vec.get(prdir;i)=1){dirstr="down"};
+    if(vec.get(prdir;i)==1){dirstr="down"};
     let out=mut."";
     out=s.concat(out;words.get(w));
     out=s.concat(out;": row ");

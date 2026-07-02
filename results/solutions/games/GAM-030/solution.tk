@@ -2,7 +2,7 @@ m=board;i=io:std.io;i=s:std.str;
 f=ch(v:$str;i:$i64):$str{<s.substr(v;i;i+1)};
 f=pwidth(piece:$str):$i64{if(s.equals(piece;"I")){<4};if(s.equals(piece;"O")){<2};<3};
 f=main():$i64{let rows=mut.@($str);let reading=mut.true;
-lp(reading){let line=s.trim(io.readln());if(s.len(line)=0){reading=false}el{rows=rows+@(line)}};
+lp(reading){let line=s.trim(io.readln());if(s.len(line)==0){reading=false}el{rows=rows+@(line)}};
 let pieceline=s.trim(io.readln());let pp=s.split(pieceline;" ");let piece=pp.get(0);let col=s.toint(pp.get(1));
 let nrows=rows.len();let w=pwidth(piece);
 let ncols=mut.0;if(nrows>0){ncols=s.len(rows.get(0))};

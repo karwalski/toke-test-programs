@@ -60,12 +60,12 @@ f=main():$i64{
       let bchg=mut.0;
       if(s.equals(aval;baseval)){}el{achg=1};
       if(s.equals(bval;baseval)){}el{bchg=1};
-      if(achg=1){
-        if(bchg=1){
+      if(achg==1){
+        if(bchg==1){
           if(s.equals(aval;bval)){cell=aval}el{cell=s.concat("CONFLICT(";s.concat(aval;s.concat("|";s.concat(bval;")"))))};
         }el{cell=aval};
       }el{
-        if(bchg=1){cell=bval}el{cell=baseval};
+        if(bchg==1){cell=bval}el{cell=baseval};
       };
       if(c>0){merged=s.concat(merged;",")};
       merged=s.concat(merged;cell);

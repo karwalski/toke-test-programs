@@ -18,7 +18,7 @@ f=main():i64{
     if(s.len(t)>0){
       let bb=s.bytes(t);
       let ch=bb.get(0) as i64;
-      if(ch=87){ cnt=vec.set(cnt;5;vec.get(cnt;5)+1) }el{
+      if(ch==87){ cnt=vec.set(cnt;5;vec.get(cnt;5)+1) }el{
         if(ch>48){ if(ch<54){
           let face=ch-48;        (* 1..5 *)
           cnt=vec.set(cnt;face-1;vec.get(cnt;face-1)+1)
@@ -40,7 +40,7 @@ f=main():i64{
         let t=kt.get(j);
         if(s.len(t)>0){
           let ch=s.bytes(t).get(0) as i64;
-          if(ch=87){ used=vec.set(used;5;1) }el{
+          if(ch==87){ used=vec.set(used;5;1) }el{
             if(ch>48){ if(ch<54){ used=vec.set(used;ch-48-1;1) }}}
         }
       }
@@ -54,9 +54,9 @@ f=main():i64{
   let optval=mut.vec.new();
   lp(let f=0;f<6;f=f+1){
     let c=vec.get(cnt;f);
-    if(c>0){ if(vec.get(used;f)=0){
+    if(c>0){ if(vec.get(used;f)==0){
       let pts=mut.0;
-      if(f=5){ pts=5 }el{ pts=f+1 };
+      if(f==5){ pts=5 }el{ pts=f+1 };
       let val=c*pts;
       optidx=vec.push(optidx;f);
       optval=vec.push(optval;val)

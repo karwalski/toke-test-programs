@@ -84,7 +84,7 @@ f=main():$i64{
     let kid=kids.get(idx);
     let mid=mids.get(idx);
     let ok=oks.get(idx);
-    let stat=mut."FAILED"; if(ok=1){stat="OK";nsucc=nsucc+1};
+    let stat=mut."FAILED"; if(ok==1){stat="OK";nsucc=nsucc+1};
     io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("[";timeonly(tss.get(idx)));"] ");op);s.concat(" ";mid));s.concat(" with ";kid));": ");stat));
     let of=mut.false;
     lp(let j=0;j<optypes.len;j=j+1){

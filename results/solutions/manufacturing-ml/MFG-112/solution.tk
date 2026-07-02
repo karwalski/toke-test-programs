@@ -21,9 +21,9 @@ f=round3str(x:$f64):$str{
     lp(s.len(f3)<3){f3=s.concat("0";f3)};
     lp(true){
         if(s.endswith(f3;"0")){f3=s.slice(f3;0;s.len(f3)-1)}el{br};
-        if(s.len(f3)=0){br}
+        if(s.len(f3)==0){br}
     };
-    if(s.len(f3)=0){<s.fromint(intpart)};
+    if(s.len(f3)==0){<s.fromint(intpart)};
     <s.concat(s.concat(s.fromint(intpart);".");f3)
 };
 

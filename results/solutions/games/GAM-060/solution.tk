@@ -1,12 +1,12 @@
 m=othello;i=io:std.io;i=s:std.str;
 f=cellat(board:@($str);r:$i64;c:$i64):$str{<s.slice(board.get(r);c;c+1)};
-f=setcell(board:@($str);r:$i64;c:$i64;v:$str):@($str){let out=mut.@();lp(let i=0;i<board.len();i=i+1){if(i=r){let row=board.get(i);let nr=s.concat(s.concat(s.slice(row;0;c);v);s.slice(row;c+1;s.len(row)));out=out+@(nr)}el{out=out+@(board.get(i))}};<out};
-f=valid(board:@($str);player:$str;opp:$str;row:$i64;col:$i64;dr:$i64;dc:$i64):$bool{let r=mut.(row+dr);let c=mut.(col+dc);let cnt=mut.0;lp(r>=0&&r<8&&c>=0&&c<8&&s.eq(cellat(board;r;c);opp)){cnt=cnt+1;r=r+dr;c=c+dc};if(cnt>0&&r>=0&&r<8&&c>=0&&c<8){if(s.eq(cellat(board;r;c);player)){<1=1}};<1=0};
+f=setcell(board:@($str);r:$i64;c:$i64;v:$str):@($str){let out=mut.@();lp(let i=0;i<board.len();i=i+1){if(i==r){let row=board.get(i);let nr=s.concat(s.concat(s.slice(row;0;c);v);s.slice(row;c+1;s.len(row)));out=out+@(nr)}el{out=out+@(board.get(i))}};<out};
+f=valid(board:@($str);player:$str;opp:$str;row:$i64;col:$i64;dr:$i64;dc:$i64):$bool{let r=mut.(row+dr);let c=mut.(col+dc);let cnt=mut.0;lp(r>=0&&r<8&&c>=0&&c<8&&s.eq(cellat(board;r;c);opp)){cnt=cnt+1;r=r+dr;c=c+dc};if(cnt>0&&r>=0&&r<8&&c>=0&&c<8){if(s.eq(cellat(board;r;c);player)){<1==1}};<1==0};
 f=main():$i64{let board=mut.@();lp(let i=0;i<8;i=i+1){board=board+@(io.readln())};let player=s.trim(io.readln());let mv=s.split(s.trim(io.readln());" ");let row=s.toint(mv.get(0));let col=s.toint(mv.get(1));
 let opp=mut."W";if(s.eq(player;"W")){opp="B"};
 let drs=@(0-1;0-1;0-1;0;0;1;1;1);let dcs=@(0-1;0;1;0-1;1;0-1;0;1);
-let okmove=mut.(1=0);
-if(s.eq(cellat(board;row;col);".")){lp(let d=0;d<8;d=d+1){if(valid(board;player;opp;row;col;drs.get(d);dcs.get(d))){okmove=1=1}}};
+let okmove=mut.(1==0);
+if(s.eq(cellat(board;row;col);".")){lp(let d=0;d<8;d=d+1){if(valid(board;player;opp;row;col;drs.get(d);dcs.get(d))){okmove=1==1}}};
 if(!okmove){io.println("Invalid move");<0};
 let nb=mut.(setcell(board;row;col;player));
 lp(let d=0;d<8;d=d+1){if(valid(nb;player;opp;row;col;drs.get(d);dcs.get(d))){let r=mut.(row+drs.get(d));let c=mut.(col+dcs.get(d));lp(r>=0&&r<8&&c>=0&&c<8&&s.eq(cellat(nb;r;c);opp)){nb=setcell(nb;r;c;player);r=r+drs.get(d);c=c+dcs.get(d)}}};

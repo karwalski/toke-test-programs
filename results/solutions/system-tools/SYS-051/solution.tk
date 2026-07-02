@@ -11,7 +11,7 @@ f=runcmd(cmd:$str):$str{
 
 f=splitlines(text:$str):@($str){
   let out=mut.@();
-  if(s.len(text)=0){<out};
+  if(s.len(text)==0){<out};
   let t=mut.text;
   if(s.endswith(t;"\n")){t=s.slice(t;0;s.len(t)-1)};
   let parts=s.split(t;"\n");

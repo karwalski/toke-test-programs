@@ -10,19 +10,19 @@ f=runcmd(cmd:$str):$str{
 };
 f=countlines(text:$str):$i64{
   let t=s.trim(text);
-  if(s.len(t)=0){<0};
+  if(s.len(t)==0){<0};
   let parts=s.split(t;"\n");
   <(parts.len as $i64)
 };
 f=main():$i64{
   let repo=s.trim(io.readln());
-  if(file.exists(s.concat(repo;"/.git"))=(1=0)){
+  if(file.exists(s.concat(repo;"/.git"))==(1==0)){
     io.println(s.concat("ERROR: not a git repository: ";repo));
     <0
   };
   let commitsout=runcmd(s.concat(s.concat("git -C ";repo);" rev-list --count HEAD 2>/dev/null"));
   let commits=mut.s.trim(commitsout);
-  if(s.len(commits)=0){commits="0"};
+  if(s.len(commits)==0){commits="0"};
   let contribout=runcmd(s.concat(s.concat("git -C ";repo);" shortlog -s -n HEAD 2>/dev/null"));
   let contributors=countlines(contribout);
   let branchout=runcmd(s.concat(s.concat("git -C ";repo);" branch -a 2>/dev/null"));

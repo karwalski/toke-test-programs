@@ -1,6 +1,6 @@
 m=expsummary;i=io:std.io;i=s:std.str;
 f=main():$i64{let budget=s.tofloat(s.trim(io.readln()));let total=mut.0.0;
-lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)>0){let parts=s.split(l;" ");if(parts.len()>=3){total=total+s.tofloat(parts.get(2))}}};
+lp(1==1){let line=io.readln();if(s.len(line)==0){br};let l=s.trim(line);if(s.len(l)>0){let parts=s.split(l;" ");if(parts.len()>=3){total=total+s.tofloat(parts.get(2))}}};
 let remaining=budget-total;
 let status=mut."UNDER";if(remaining<0.0){status="OVER"};
 io.println(s.format(total;"%.2f"));io.println(s.format(remaining;"%.2f"));io.println(status);<0}

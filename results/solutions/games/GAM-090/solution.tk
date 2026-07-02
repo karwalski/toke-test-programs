@@ -9,7 +9,7 @@ f=main():i64{
   lp(done<1){
     let line=io.readln();
     if(io.eof()){done=1;br};
-    if(s.len(line)=0){done=1;br};
+    if(s.len(line)==0){done=1;br};
     lines=lines.push(line)
   };
   let rows=(lines.len as i64)-1;
@@ -44,7 +44,7 @@ f=main():i64{
     (* apply first-row presses from mask *)
     lp(let c=0;c<cols;c=c+1){
       let bit=(mask/pw2(c))%2;
-      if(bit=1){
+      if(bit==1){
         press=vec.set(press;c;1);
         g=toggle(g;rows;cols;0;c)
       }
@@ -53,7 +53,7 @@ f=main():i64{
     (* chase down *)
     lp(let r=1;r<rows;r=r+1){
       lp(let c=0;c<cols;c=c+1){
-        if(vec.get(g;(r-1)*cols+c)=1){
+        if(vec.get(g;(r-1)*cols+c)==1){
           press=vec.set(press;r*cols+c;1);
           g=toggle(g;rows;cols;r;c)
         }
@@ -63,10 +63,10 @@ f=main():i64{
     (* check bottom row all off *)
     let ok=mut.1;
     lp(let c=0;c<cols;c=c+1){
-      if(vec.get(g;(rows-1)*cols+c)=1){ok=0}
+      if(vec.get(g;(rows-1)*cols+c)==1){ok=0}
     };
 
-    if(ok=1){
+    if(ok==1){
       let cnt=mut.0;
       lp(let i=0;i<rows*cols;i=i+1){cnt=cnt+vec.get(press;i)};
       if(bestcount<0){
@@ -86,7 +86,7 @@ f=main():i64{
   }el{
     lp(let r=0;r<rows;r=r+1){
       lp(let c=0;c<cols;c=c+1){
-        if(vec.get(bestpress;r*cols+c)=1){
+        if(vec.get(bestpress;r*cols+c)==1){
           io.println(s.concat(s.concat(s.fromint(r);" ");s.fromint(c)))
         }
       }

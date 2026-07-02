@@ -8,7 +8,7 @@ f=stripprefix(line:$str;plen:$i64):$str{
   let b=s.bytes(line);
   lp(start<n){
     let c=b.get(start);
-    if(c=32){start=start+1}el{br};
+    if(c==32){start=start+1}el{br};
   };
   <s.substr(line;start;n)
 };
@@ -18,7 +18,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;

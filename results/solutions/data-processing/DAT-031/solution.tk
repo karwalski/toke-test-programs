@@ -8,7 +8,7 @@ f=fmtval(v:$f64;stat:$str):$str{
   };
   let iv=v as $i64;
   let back=iv as $f64;
-  if(back=v){
+  if(back==v){
     <s.fromint(iv)
   };
   <s.format(v;"%.2f")
@@ -19,11 +19,11 @@ f=main():$i64{
   let stat=s.trim(io.readln());
   let vals=mut.@(0.0);
   vals=@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let lt=s.trim(line);
-    if(s.len(lt)=0){br};
+    if(s.len(lt)==0){br};
     vals=vals.push(s.tofloat(lt))
   };
   let n=vals.len() as $i64;

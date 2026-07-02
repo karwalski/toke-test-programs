@@ -8,9 +8,9 @@ f=getuser():$str{
 f=main():$i64{
   let logpath=s.trim(io.readln());
   let user=getuser();
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     let line=s.trim(raw);
     if(s.len(line)>0){
       let sp=s.indexof(line;" ");
@@ -32,7 +32,7 @@ f=main():$i64{
       jsonline=s.concat(jsonline;"\"}\n");
       let wrote=mt file.append(logpath;jsonline){
         $bool:b b;
-        FileErr:e (1=0)
+        FileErr:e (1==0)
       };
       let out=mut."Logged: ";
       out=s.concat(out;action);

@@ -21,10 +21,10 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     lines=lines+@(line);
   };
-  if(lines.len=0){io.println("CLEAN");<0};
+  if(lines.len==0){io.println("CLEAN");<0};
   let flaggedline=lines.get(0);
   let rawparts=s.split(flaggedline;",");
   let flagged=mut.@();

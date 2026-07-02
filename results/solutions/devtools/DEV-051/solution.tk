@@ -16,12 +16,12 @@ f=streq(a:$str;b:$str):bool{
 
 f=iscomment(line:$str):bool{
   let t=s.trim(line);
-  if(s.len(t)=0){<true};
+  if(s.len(t)==0){<true};
   let first=mt s.slice(t;0;1){ $ok:v v; $err:e "" };
-  if(first="#"){<true};
+  if(first=="#"){<true};
   if(s.len(t) as i64>=2){
     let two=mt s.slice(t;0;2){ $ok:v v; $err:e "" };
-    if(two="//"){<true}
+    if(two=="//"){<true}
   };
   <false
 };
@@ -47,13 +47,13 @@ f=main():i64{
     let uniq=mut.@();
     lp(let i=0;i<rawlines.len;i=i+1){
       let ln=rawlines.get(i);
-      if(iscomment(ln)=false){
+      if(iscomment(ln)==false){
         let key=s.trim(ln);
         let seen=mut.false;
         lp(let j=0;j<uniq.len;j=j+1){
           if(streq(uniq.get(j);key)){seen=true}
         };
-        if(seen=false){ uniq=uniq.push(key) }
+        if(seen==false){ uniq=uniq.push(key) }
       }
     };
     allsets=allsets.push(uniq.len as i64);

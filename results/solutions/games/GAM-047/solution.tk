@@ -2,9 +2,9 @@ m=bfs;i=io:std.io;i=s:std.str;
 f=setchar(row:$str;idx:$i64;ch:$str):$str{<s.concat(s.concat(s.slice(row;0;idx);ch);s.slice(row;idx+1;s.len(row)))};
 f=main():$i64{
 let grid=mut.@($str);
-lp(1=1){let l=io.readln();if(s.len(l)=0){br};let t=s.trimsuffix(l;"\n");grid=grid+@(t)};
+lp(1==1){let l=io.readln();if(s.len(l)==0){br};let t=s.trimsuffix(l;"\n");grid=grid+@(t)};
 let nr=grid.len();
-if(nr=0){io.println("No solution");<0};
+if(nr==0){io.println("No solution");<0};
 let nc=s.len(grid.get(0));
 let srow=mut.0;let scol=mut.0;let erow=mut.0;let ecol=mut.0;srow=0-1;scol=0-1;erow=0-1;ecol=0-1;
 lp(let r=0;r<nr;r=r+1){let row=grid.get(r);lp(let c=0;c<nc;c=c+1){let ch=s.slice(row;c;c+1);if(s.equals(ch;"S")){srow=r;scol=c};if(s.equals(ch;"E")){erow=r;ecol=c}}};
@@ -24,13 +24,13 @@ let drr=@(0;1;0;0-1);
 let dcc=@(1;0;0-1;0);
 lp(head<qr.len()){
 let cr=qr.get(head);let col=qc.get(head);head=head+1;
-if(cr=erow){if(col=ecol){found=1;br}};
+if(cr==erow){if(col==ecol){found=1;br}};
 lp(let d=0;d<4;d=d+1){
 let nrr=cr+drr.get(d);let ncc=col+dcc.get(d);
 let ok=mut.0;
 if(nrr>=0){if(nrr<nr){if(ncc>=0){if(ncc<nc){ok=1}}}};
-if(ok=1){if(visited.get(nrr*nc+ncc)=0){let ch=s.slice(grid.get(nrr);ncc;ncc+1);let pass=mut.0;if(s.equals(ch;" ")){pass=1};if(s.equals(ch;"E")){pass=1};if(pass=1){visited=visited.set(nrr*nc+ncc;1);parent=parent.set(nrr*nc+ncc;cr*nc+col);qr=qr+@(nrr);qc=qc+@(ncc)}}}}};
-if(found=0){io.println("No solution");<0};
+if(ok==1){if(visited.get(nrr*nc+ncc)==0){let ch=s.slice(grid.get(nrr);ncc;ncc+1);let pass=mut.0;if(s.equals(ch;" ")){pass=1};if(s.equals(ch;"E")){pass=1};if(pass==1){visited=visited.set(nrr*nc+ncc;1);parent=parent.set(nrr*nc+ncc;cr*nc+col);qr=qr+@(nrr);qc=qc+@(ncc)}}}}};
+if(found==0){io.println("No solution");<0};
 let cur=mut.0;cur=erow*nc+ecol;
 let startid=srow*nc+scol;
 let endid=erow*nc+ecol;

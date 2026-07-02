@@ -17,18 +17,18 @@ f=opcodefor(ftype:$str):$i64{
   <0
 };
 f=opcodename(op:$i64):$str{
-  if(op=1){<"text"};
-  if(op=2){<"binary"};
-  if(op=8){<"close"};
-  if(op=9){<"ping"};
-  if(op=10){<"pong"};
+  if(op==1){<"text"};
+  if(op==2){<"binary"};
+  if(op==8){<"close"};
+  if(op==9){<"ping"};
+  if(op==10){<"pong"};
   <"unknown"
 };
 f=main():$i64{
   let lines=mut.@($str);
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let line=io.readln();
-    if(io.eof()){if(s.len(line)=0){br}};
+    if(io.eof()){if(s.len(line)==0){br}};
     lines=lines+@(s.trim(line))
   };
   let direction=lines.get(0);

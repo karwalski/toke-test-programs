@@ -26,7 +26,7 @@ f=strless(a:$str;b:$str):$bool{
 };
 f=main():$i64{
   let data=mut."";
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     data=s.concat(data;s.trim(line));
@@ -66,7 +66,7 @@ f=main():$i64{
       let cb=counts.get(ib);
       let swap=mut.false;
       if(cb>ca){swap=true};
-      if(cb=ca){
+      if(cb==ca){
         if(strless(names.get(ib);names.get(ia))){swap=true};
       };
       if(swap){

@@ -48,7 +48,7 @@ let sl=s.len(secret);
 lp(let i=0;i<sl;i=i+1){
 let ch=s.slice(secret;i;i+1);
 let idx=mut.0;
-lp(let j=0;j<32;j=j+1){if(s.slice(alpha;j;j+1)=ch){idx=j}};
+lp(let j=0;j<32;j=j+1){if(s.slice(alpha;j;j+1)==ch){idx=j}};
 acc=(acc<<5)|idx;
 bits=bits+5;
 if(bits>=8){bits=bits-8;out=out+@((acc>>bits)&255)}};

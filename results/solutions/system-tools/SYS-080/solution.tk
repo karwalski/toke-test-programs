@@ -1,8 +1,8 @@
 m=healthcheck;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;i=process:std.process;
 f=hasenv(name:$str):$bool{
   <mt env.get(name){
-    $str:v (1=1);
-    EnvErr:e (1=0)
+    $str:v (1==1);
+    EnvErr:e (1==0)
   }
 };
 f=procrunning(name:$str):$bool{
@@ -18,9 +18,9 @@ f=procrunning(name:$str):$bool{
 f=main():$i64{
   let passed=mut.0;
   let total=mut.0;
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     let line=s.trim(raw);
     if(s.len(line)>0){
       let sp=s.indexof(line;" ");
@@ -28,11 +28,11 @@ f=main():$i64{
         let ctype=s.slice(line;0 as $u64;sp as $u64);
         let cname=s.slice(line;(sp+1) as $u64;s.len(line));
         total=total+1;
-        let success=mut.(1=0);
+        let success=mut.(1==0);
         if(s.eq(ctype;"file")){success=file.exists(cname)}
         el{if(s.eq(ctype;"proc")){success=procrunning(cname)}
         el{if(s.eq(ctype;"env")){success=hasenv(cname)}
-        el{if(s.eq(ctype;"port")){success=(1=0)}}}};
+        el{if(s.eq(ctype;"port")){success=(1==0)}}}};
         let label=s.concat(s.concat(ctype;" ");cname);
         if(success){
           io.println(s.concat("PASS ";label));

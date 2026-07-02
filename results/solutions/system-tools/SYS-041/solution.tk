@@ -69,7 +69,7 @@ let line=lines.get(i);
 let isheader=mut.false;
 if(s.len(line)>0){
 let c0=s.substr(line;0;1);
-if(s.eq(c0;" ")=false){if(s.eq(c0;"\t")=false){isheader=true}}
+if(s.eq(c0;" ")==false){if(s.eq(c0;"\t")==false){isheader=true}}
 };
 if(isheader){
 (* flush previous *)
@@ -107,8 +107,8 @@ if(have){emit(curname;curip;curprefix;curmac;curmtu;curup;filter)};
 <0
 };
 f=emit(name:$str;ip:$str;prefix:$i64;mac:$str;mtu:$str;up:$bool;filter:$str):$i64{
-if(s.len(filter)>0){if(s.eq(name;filter)=false){<0}};
-if(s.len(ip)=0){<0};
+if(s.len(filter)>0){if(s.eq(name;filter)==false){<0}};
+if(s.len(ip)==0){<0};
 let b=s.buf();
 s.add(b;name);
 s.add(b;": ");

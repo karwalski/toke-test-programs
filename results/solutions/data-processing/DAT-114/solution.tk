@@ -11,29 +11,29 @@ f=isleap(y:$i64):$i64{
   <1
 };
 f=dim(y:$i64;m:$i64):$i64{
-  if(m=1){<31};
-  if(m=2){if(isleap(y)=1){<29};<28};
-  if(m=3){<31};
-  if(m=4){<30};
-  if(m=5){<31};
-  if(m=6){<30};
-  if(m=7){<31};
-  if(m=8){<31};
-  if(m=9){<30};
-  if(m=10){<31};
-  if(m=11){<30};
+  if(m==1){<31};
+  if(m==2){if(isleap(y)==1){<29};<28};
+  if(m==3){<31};
+  if(m==4){<30};
+  if(m==5){<31};
+  if(m==6){<30};
+  if(m==7){<31};
+  if(m==8){<31};
+  if(m==9){<30};
+  if(m==10){<31};
+  if(m==11){<30};
   <31
 };
 f=zoneoff(tz:$str;month:$i64):$i64{
-  if(tz="UTC"){<0};
+  if(tz=="UTC"){<0};
   let daylight=mut.0;
   if(month>=4){if(month<=10){daylight=1}};
-  if(tz="America/New_York"){
-    if(daylight=1){<(0-4)*60};
+  if(tz=="America/New_York"){
+    if(daylight==1){<(0-4)*60};
     <(0-5)*60
   };
-  if(tz="America/Los_Angeles"){
-    if(daylight=1){<(0-7)*60};
+  if(tz=="America/Los_Angeles"){
+    if(daylight==1){<(0-7)*60};
     <(0-8)*60
   };
   <0
@@ -66,7 +66,7 @@ f=main():$i64{
       let oh=s.toint(s.slice(rest;1;3));
       let om=s.toint(s.slice(rest;4;6));
       let total=oh*60+om;
-      if(osign="-"){srcoff=0-total}el{srcoff=total}
+      if(osign=="-"){srcoff=0-total}el{srcoff=total}
     };
     let totalmin=mut.hh*60+mi;
     totalmin=totalmin-srcoff;

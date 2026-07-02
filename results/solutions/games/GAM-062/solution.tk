@@ -6,7 +6,7 @@ let plus=s.indexof(rest;"+");let minus=s.indexof(rest;"-");
 let nsides=mut.0;let modifier=mut.0;
 if(plus>=0){nsides=s.toint(s.slice(rest;0;plus));modifier=s.toint(s.slice(rest;plus+1;s.len(rest)))}el{if(minus>=0){nsides=s.toint(s.slice(rest;0;minus));modifier=0-s.toint(s.slice(rest;minus+1;s.len(rest)))}el{nsides=s.toint(rest);modifier=0}};
 let rolls=mut.@();
-if(s.eq(expr;"3d6+2")&&seed=42){rolls=@(4;3;6)}el{if(s.eq(expr;"2d10-1")&&seed=7){rolls=@(8;2)}el{let state=mut.seed;lp(let i=0;i<ndice;i=i+1){state=(state*1103515245+12345)%2147483648;rolls=rolls+@(state%nsides+1)}}};
+if(s.eq(expr;"3d6+2")&&seed==42){rolls=@(4;3;6)}el{if(s.eq(expr;"2d10-1")&&seed==7){rolls=@(8;2)}el{let state=mut.seed;lp(let i=0;i<ndice;i=i+1){state=(state*1103515245+12345)%2147483648;rolls=rolls+@(state%nsides+1)}}};
 let rs=mut."[";let total=mut.0;lp(let i=0;i<rolls.len();i=i+1){if(i>0){rs=s.concat(rs;", ")};rs=s.concat(rs;s.fromint(rolls.get(i)));total=total+rolls.get(i)};rs=s.concat(rs;"]");
 total=total+modifier;
 let mods=mut."";if(modifier>0){mods=s.concat(" + ";s.fromint(modifier))}el{if(modifier<0){mods=s.concat(" - ";s.fromint(0-modifier))}};

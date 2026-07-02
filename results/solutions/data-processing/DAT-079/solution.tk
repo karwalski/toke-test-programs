@@ -4,13 +4,13 @@ i=s:std.str;
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)
   };
   let nl=mut.lines.len;
-  lp(1=1){
+  lp(1==1){
     if(nl<=0){br};
     if(s.eq(lines.get(nl-1);"")){nl=nl-1}el{br}
   };
@@ -42,13 +42,13 @@ f=main():i64{
       let m1=mut.0;
       if(s.eq(x;a)){ if(s.eq(y;b)){m1=1} };
       if(s.eq(x;b)){ if(s.eq(y;a)){m1=1} };
-      if(m1=1){
+      if(m1==1){
         pcount=pcount.set(p;pcount.get(p)+1);
         found=1;
         br
       }
     };
-    if(found=0){
+    if(found==0){
       pw1=pw1.push(a);
       pw2=pw2.push(b);
       pcount=pcount.push(1)
@@ -62,13 +62,13 @@ f=main():i64{
     let key=order.get(si);
     let kc=pcount.get(key);
     let sj=mut.si-1;
-    lp(1=1){
+    lp(1==1){
       if(sj<0){br};
       let cur=order.get(sj);
       let cc=pcount.get(cur);
       let swap=mut.0;
       if(cc<kc){swap=1};
-      if(swap=1){ order=order.set(sj+1;cur); sj=sj-1 }el{br}
+      if(swap==1){ order=order.set(sj+1;cur); sj=sj-1 }el{br}
     };
     order=order.set(sj+1;key)
   };

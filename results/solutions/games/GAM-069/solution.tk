@@ -5,7 +5,7 @@ f=toi(x:$str):$i64{ let r=mt s.toint(x){ $ok:v v; $err:e 0 }; <r };
 f=arrset(a:@$i64;idx:$i64;v:$i64):@$i64{
   let out=mut.@();
   lp(let i=0;i<(a.len as i64);i=i+1){
-    if(i=idx){ out=out+@(v) } el{ out=out+@(a.get(i as u64)) };
+    if(i==idx){ out=out+@(v) } el{ out=out+@(a.get(i as u64)) };
   };
   <out
 };
@@ -19,7 +19,7 @@ f=joinints(a:@$i64;lo:$i64;hi:$i64):$str{
 };
 f=main():$i64{
   let l1=io.readln();
-  if(s.len(l1)=0){ <0 };
+  if(s.len(l1)==0){ <0 };
   let l2=io.readln();
   let l3=io.readln();
   let l4=io.readln();
@@ -37,7 +37,7 @@ f=main():$i64{
   let movenum=mut.0;
   lp(let pit=0;pit<6;pit=pit+1){
     let boardidx=mut.0;
-    if(player=1){ boardidx=pit } el{ boardidx=pit+7 };
+    if(player==1){ boardidx=pit } el{ boardidx=pit+7 };
     let seeds=board.get(boardidx as u64);
     if(seeds>0){
       let nb=mut.arrset(board;boardidx;0);
@@ -45,7 +45,7 @@ f=main():$i64{
       lp(let k=0;k<seeds;k=k+1){
         pos=pos+1;
         if(pos>13){ pos=0 };
-        if(player=1){ if(pos=13){ pos=0 } } el{ if(pos=6){ pos=7 } };
+        if(player==1){ if(pos==13){ pos=0 } } el{ if(pos==6){ pos=7 } };
         nb=arrset(nb;pos;nb.get(pos as u64)+1);
       };
       movenum=movenum+1;

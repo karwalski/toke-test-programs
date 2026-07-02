@@ -30,7 +30,7 @@ f=main():i64{
   lp(parsing>0){
     if(i>total){parsing=0;br};
     let ln=lines.get(i);
-    if(s.len(ln)=0){i=i+1;parsing=0;br};
+    if(s.len(ln)==0){i=i+1;parsing=0;br};
     let p=s.split(ln;" ");
     names=names.push(p.get(0));
     ratings=ratings.push((s.toint(p.get(1)) as f64));

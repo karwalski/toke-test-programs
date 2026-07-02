@@ -19,14 +19,14 @@ f=main():$i64{
     let action=stmt.get("Action");
     let resource=stmt.get("Resource");
     
-    if(action.type="string"){
-      if(action.value="*"){
+    if(action.type=="string"){
+      if(action.value=="*"){
         io.println("RISK: Statement allows all actions (*)")
       }
     };
     
-    if(resource.type="string"){
-      if(resource.value="*"){
+    if(resource.type=="string"){
+      if(resource.value=="*"){
         io.println("RISK: Statement allows all resources (*)")
       }
     }

@@ -5,7 +5,7 @@ i=v:std.vec;
 
 f=indexof(hay:$str;needle:$str;from:$i64):$i64{
   let hn=s.len(hay);let nn=s.len(needle);
-  if(nn=0){<from};
+  if(nn==0){<from};
   lp(let i=from;i<=hn-nn;i=i+1){
     if(s.eq(s.substr(hay;i;i+nn);needle)){<i};
   };
@@ -22,8 +22,8 @@ f=escape(text:$str):$str{
   let out=mut."";
   lp(let i=0;i<n;i=i+1){
     let c=b.get(i);
-    if(c=34){out=s.concat(out;"\\\"")}el{
-    if(c=92){out=s.concat(out;"\\\\")}el{
+    if(c==34){out=s.concat(out;"\\\"")}el{
+    if(c==92){out=s.concat(out;"\\\\")}el{
       out=s.concat(out;s.substr(text;i;i+1));
     }};
   };
@@ -60,7 +60,7 @@ f=parseval(content:$str):$str{
         depth=depth+1;scan=no+oplen;
       }el{
         depth=depth-1;
-        if(depth=0){innerend=nc;scan=nc+cllen}el{scan=nc+cllen};
+        if(depth==0){innerend=nc;scan=nc+cllen}el{scan=nc+cllen};
       };
     };
     if(innerend<0){br};
@@ -95,7 +95,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;

@@ -1,7 +1,7 @@
 m=react;i=io:std.io;i=s:std.str;
 f=field(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":\"");let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
 f=idxof(arr:@($str);v:$str):$i64{lp(let i=0;i<arr.len();i=i+1){if(s.eq(arr.get(i);v)){<i}};<0-1};
-f=setstr(arr:@($str);idx:$i64;v:$str):@($str){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=setstr(arr:@($str);idx:$i64;v:$str):@($str){let out=mut.@();lp(let i=0;i<arr.len();i=i+1){if(i==idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
 f=main():$i64{let input=io.readln();let segs=s.split(input;"{");
 let msgs=mut.@();
 let emojis=mut.@();
@@ -15,7 +15,7 @@ let kk=idxof(emojis;key);
 let ulist=s.split(users.get(kk);",");
 let ufound=mut."";
 lp(let u=0;u<ulist.len();u=u+1){if(s.len(ulist.get(u))>0){if(s.eq(ulist.get(u);usr)){ufound="y"}}};
-if(s.eq(act;"add")){if(s.len(ufound)=0){let cur=users.get(kk);if(s.len(cur)=0){users=setstr(users;kk;usr)}el{users=setstr(users;kk;s.concat(s.concat(cur;",");usr))}}}el{let nu=mut."";lp(let u=0;u<ulist.len();u=u+1){let uu=ulist.get(u);if(s.len(uu)>0){if(!s.eq(uu;usr)){if(s.len(nu)=0){nu=uu}el{nu=s.concat(s.concat(nu;",");uu)}}}};users=setstr(users;kk;nu)}}};
-lp(let m=0;m<msgs.len();m=m+1){let mid=msgs.get(m);io.println(s.concat(mid;":"));let any=mut.(1=0);
-lp(let e=0;e<emojis.len();e=e+1){let key=emojis.get(e);let bar=s.indexof(key;"|");let kmid=s.slice(key;0;bar);let kemo=s.slice(key;bar+1;s.len(key));if(s.eq(kmid;mid)){let ulist=users.get(e);if(s.len(ulist)>0){any=1=1;let parts=s.split(ulist;",");let cnt=parts.len();let joined=mut."";lp(let p=0;p<parts.len();p=p+1){if(p>0){joined=s.concat(joined;", ")};joined=s.concat(joined;parts.get(p))};io.println(s.concat(s.concat(s.concat(s.concat(s.concat("  ";kemo);" (");s.fromint(cnt));"): ");joined))}}};
+if(s.eq(act;"add")){if(s.len(ufound)==0){let cur=users.get(kk);if(s.len(cur)==0){users=setstr(users;kk;usr)}el{users=setstr(users;kk;s.concat(s.concat(cur;",");usr))}}}el{let nu=mut."";lp(let u=0;u<ulist.len();u=u+1){let uu=ulist.get(u);if(s.len(uu)>0){if(!s.eq(uu;usr)){if(s.len(nu)==0){nu=uu}el{nu=s.concat(s.concat(nu;",");uu)}}}};users=setstr(users;kk;nu)}}};
+lp(let m=0;m<msgs.len();m=m+1){let mid=msgs.get(m);io.println(s.concat(mid;":"));let any=mut.(1==0);
+lp(let e=0;e<emojis.len();e=e+1){let key=emojis.get(e);let bar=s.indexof(key;"|");let kmid=s.slice(key;0;bar);let kemo=s.slice(key;bar+1;s.len(key));if(s.eq(kmid;mid)){let ulist=users.get(e);if(s.len(ulist)>0){any=1==1;let parts=s.split(ulist;",");let cnt=parts.len();let joined=mut."";lp(let p=0;p<parts.len();p=p+1){if(p>0){joined=s.concat(joined;", ")};joined=s.concat(joined;parts.get(p))};io.println(s.concat(s.concat(s.concat(s.concat(s.concat("  ";kemo);" (");s.fromint(cnt));"): ");joined))}}};
 if(!any){io.println("  (no reactions)")}};<0}

@@ -9,13 +9,13 @@ f=isbound(text:$str;ti:$i64;tlen:$i64):$bool{let before=mut.false;let after=mut.
 f=rxm(pat:$str;pi:$i64;plen:$i64;text:$str;ti:$i64;tlen:$i64):$i64{
 if(pi>=plen){<ti};
 let c=s.slice(pat;pi;pi+1);
-if(s.eq(c;"$")){if(ti=tlen){<rxm(pat;pi+1;plen;text;ti;tlen)};<0-1};
+if(s.eq(c;"$")){if(ti==tlen){<rxm(pat;pi+1;plen;text;ti;tlen)};<0-1};
 if(s.eq(c;"\\")){let nx=s.slice(pat;pi+1;pi+2);if(s.eq(nx;"b")){if(isbound(text;ti;tlen)){<rxm(pat;pi+2;plen;text;ti;tlen)};<0-1}};
 let ae=atomend(pat;pi;plen);
 let q=mut."";if(ae<plen){q=s.slice(pat;ae;ae+1)};
 if(s.eq(q;"+")||s.eq(q;"*")){let minc=mut.0;if(s.eq(q;"+")){minc=1};let cnt=mut.0;let tj=mut.ti;lp(tj<tlen){if(atom1(pat;pi;ae;s.slice(text;tj;tj+1))){cnt=cnt+1;tj=tj+1}el{br}};let k=mut.cnt;lp(k>=minc){let r=rxm(pat;ae+1;plen;text;ti+k;tlen);if(r>=0){<r};k=k-1};<0-1};
 if(s.eq(q;"?")){let consumed=mut.0;if(ti<tlen){if(atom1(pat;pi;ae;s.slice(text;ti;ti+1))){consumed=1}};let kk=mut.consumed;lp(kk>=0){let r=rxm(pat;ae+1;plen;text;ti+kk;tlen);if(r>=0){<r};kk=kk-1};<0-1};
-if(s.eq(q;"{")){let close=s.indexof(s.slice(pat;ae;plen);"}")+ae;let spec=s.slice(pat;ae+1;close);let comma=s.indexof(spec;",");let lo=mut.0;let hi=mut.0;if(comma<0){lo=s.toint(spec);hi=lo}el{lo=s.toint(s.slice(spec;0;comma));let hs=s.slice(spec;comma+1;s.len(spec));if(s.len(hs)=0){hi=tlen-ti}el{hi=s.toint(hs)}};let cnt=mut.0;let tj=mut.ti;lp(tj<tlen){if(cnt>=hi){br};if(atom1(pat;pi;ae;s.slice(text;tj;tj+1))){cnt=cnt+1;tj=tj+1}el{br}};let k=mut.cnt;lp(k>=lo){let r=rxm(pat;close+1;plen;text;ti+k;tlen);if(r>=0){<r};k=k-1};<0-1};
+if(s.eq(q;"{")){let close=s.indexof(s.slice(pat;ae;plen);"}")+ae;let spec=s.slice(pat;ae+1;close);let comma=s.indexof(spec;",");let lo=mut.0;let hi=mut.0;if(comma<0){lo=s.toint(spec);hi=lo}el{lo=s.toint(s.slice(spec;0;comma));let hs=s.slice(spec;comma+1;s.len(spec));if(s.len(hs)==0){hi=tlen-ti}el{hi=s.toint(hs)}};let cnt=mut.0;let tj=mut.ti;lp(tj<tlen){if(cnt>=hi){br};if(atom1(pat;pi;ae;s.slice(text;tj;tj+1))){cnt=cnt+1;tj=tj+1}el{br}};let k=mut.cnt;lp(k>=lo){let r=rxm(pat;close+1;plen;text;ti+k;tlen);if(r>=0){<r};k=k-1};<0-1};
 if(ti<tlen){if(atom1(pat;pi;ae;s.slice(text;ti;ti+1))){<rxm(pat;ae;plen;text;ti+1;tlen)}};
 <0-1};
 # strip top-level capture parens, return clean pattern
@@ -24,7 +24,7 @@ f=stripparens(pat:$str):$str{let out=mut."";let n=s.len(pat);let i=mut.0;lp(i<n)
 f=group1pat(pat:$str):$str{let op=s.indexof(pat;"(");let cl=s.indexof(pat;")");<s.slice(pat;op+1;cl)};
 f=main():$i64{
 let pat=io.readln();
-let rest=mut."";let first=mut.true;lp(1=1){if(io.eof()){br};let l=io.readln();if(first){rest=l;first=false}el{rest=s.concat(s.concat(rest;"\n");l)}};
+let rest=mut."";let first=mut.true;lp(1==1){if(io.eof()){br};let l=io.readln();if(first){rest=l;first=false}el{rest=s.concat(s.concat(rest;"\n");l)}};
 let hasgroup=s.contains(pat;"(");
 let cpat=mut.pat;if(hasgroup){cpat=stripparens(pat)};
 let g1=mut."";if(hasgroup){g1=group1pat(pat)};

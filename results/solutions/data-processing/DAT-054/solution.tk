@@ -4,15 +4,15 @@ f=matchbrace(strv:$str;openidx:$i64):$i64{
   let n=s.len(strv) as $i64;
   let depth=mut.0;
   let i=mut.openidx;
-  let instr=mut.(1=0);
+  let instr=mut.(1==0);
   lp(i<n){
     let c=charat(strv;i);
     if(instr){
-      if(s.eq(c;"\"")){instr=(1=0)}
+      if(s.eq(c;"\"")){instr=(1==0)}
     }el{
-      if(s.eq(c;"\"")){instr=(1=1)}
+      if(s.eq(c;"\"")){instr=(1==1)}
       el{if(s.eq(c;"{")){depth=depth+1}
-      el{if(s.eq(c;"}")){depth=depth-1;if(depth=0){<i}}}}
+      el{if(s.eq(c;"}")){depth=depth-1;if(depth==0){<i}}}}
     };
     i=i+1
   };
@@ -73,9 +73,9 @@ f=flattenobj(obj:$str;prefix:$str):$str{
 };
 f=main():$i64{
   let input=mut."";
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let line=io.readln();
-    if(io.eof()){if(s.len(line)=0){br}};
+    if(io.eof()){if(s.len(line)==0){br}};
     input=s.concat(input;s.trim(line))
   };
   let flat=flattenobj(input;"");
@@ -96,17 +96,17 @@ f=main():$i64{
     lp(let b=0;b<cnt-1-a;b=b+1){
       let ka=keys.get(order.get(b));
       let kb=keys.get(order.get(b+1));
-      let swap=mut.(1=0);
+      let swap=mut.(1==0);
       let la=s.len(ka) as $i64;
       let lb=s.len(kb) as $i64;
       let minl=mut.la;
       if(lb<la){minl=lb};
       let cmp=mut.0;
       lp(let z=0;z<minl;z=z+1){
-        if(cmp=0){
+        if(cmp==0){
           let ca=charat(ka;z);
           let cb=charat(kb;z);
-          if(s.eq(ca;cb)=(1=0)){
+          if(s.eq(ca;cb)==(1==0)){
             let dig="!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz";
             let ia=s.indexof(dig;ca);
             let ib=s.indexof(dig;cb);
@@ -114,8 +114,8 @@ f=main():$i64{
           }
         }
       };
-      if(cmp=0){if(la>lb){cmp=1}el{if(la<lb){cmp=0-1}}};
-      if(cmp>0){swap=(1=1)};
+      if(cmp==0){if(la>lb){cmp=1}el{if(la<lb){cmp=0-1}}};
+      if(cmp>0){swap=(1==1)};
       if(swap){let tmp=order.get(b);order=order.set(b;order.get(b+1));order=order.set(b+1;tmp)}
     }
   };

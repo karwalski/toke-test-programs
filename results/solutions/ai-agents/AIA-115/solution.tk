@@ -34,7 +34,7 @@ f=fmtscore(v:$f64):$str{
   let fp=asi-ip*100;
   let d1=fp/10;
   let d2=fp-d1*10;
-  if(d2=0){
+  if(d2==0){
     <s.concat(s.concat(s.fromint(ip);".");s.fromint(d1))
   };
   let fs=s.concat(s.fromint(d1);s.fromint(d2));

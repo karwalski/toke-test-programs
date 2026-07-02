@@ -15,11 +15,11 @@ f=streqlit(a:$str;b:$str):bool{
 
 f=isint(x:$str):bool{
   let n=s.len(x) as i64;
-  if(n=0){<false};
+  if(n==0){<false};
   let b=s.bytes(x);
   let start=mut.0;
   let first=b.get(0 as u64) as i64;
-  if(first=45){ start=1 };
+  if(first==45){ start=1 };
   if(start>=n){<false};
   lp(let i=start;i<n;i=i+1){
     let c=b.get(i as u64) as i64;
@@ -30,10 +30,10 @@ f=isint(x:$str):bool{
 };
 
 f=fmtfrac(num:i64;den:i64):$str{
-  if(den=0){<"0.0"};
+  if(den==0){<"0.0"};
   let rem0=num-((num/den)*den);
   let ipart=num/den;
-  if(rem0=0){
+  if(rem0==0){
     <s.concat(s.fromint(ipart);".0")
   };
   let r=mut.rem0;
@@ -102,7 +102,7 @@ f=main():i64{
     let allintsofar=mut.true;
     lp(let r=0;r<total;r=r+1){
       let cell=cells.get(r as u64);
-      if(s.len(cell)=0){
+      if(s.len(cell)==0){
         let dd=0
       }el{
         nonnull=nonnull+1;
@@ -111,13 +111,13 @@ f=main():i64{
     };
 
     let isinttype=mut.allintsofar;
-    if(nonnull=0){ isinttype=false };
+    if(nonnull==0){ isinttype=false };
 
     let distinct=mut.@();
     let counts=mut.@();
     lp(let r=0;r<total;r=r+1){
       let cell=cells.get(r as u64);
-      if(s.len(cell)=0){
+      if(s.len(cell)==0){
         let dd=0
       }el{
         let found=mut.(0-1);

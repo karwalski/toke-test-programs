@@ -37,7 +37,7 @@ f=strless(a:$str;b:$str):i64{
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)
@@ -51,7 +51,7 @@ f=main():i64{
     if(s.eq(l;"")){
       inq=1
     }el{
-      if(inq=0){words=words.push(l)}el{queries=queries.push(l)}
+      if(inq==0){words=words.push(l)}el{queries=queries.push(l)}
     }
   };
   let nq=queries.len;
@@ -72,11 +72,11 @@ f=main():i64{
       let key=matches.get(a);
       let lkey=s.lower(key);
       let b=mut.a-1;
-      lp(1=1){
+      lp(1==1){
         if(b<0){br};
         let cur=matches.get(b);
         let lcur=s.lower(cur);
-        if(strless(lkey;lcur)=1){
+        if(strless(lkey;lcur)==1){
           matches=matches.set(b+1;cur);
           b=b-1
         }el{br}

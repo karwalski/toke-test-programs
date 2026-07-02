@@ -1,10 +1,10 @@
 m=worddiff;i=io:std.io;i=s:std.str;
 f=main():$i64{
   let all=mut."";
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
-    if(s.len(all)=0){all=line}el{all=s.concat(all;s.concat("\n";line))};
+    if(s.len(all)==0){all=line}el{all=s.concat(all;s.concat("\n";line))};
   };
   let parts=s.split(all;"---");
   let txta=s.trim(parts.get(0));
@@ -37,7 +37,7 @@ f=main():$i64{
   let j=mut.0;
   let out=mut."";
   let parts2=mut.@();
-  lp(1=1){
+  lp(1==1){
     if(i>=n){br};
     if(j>=m){br};
     if(s.eq(w1.get(i);w2.get(j))){

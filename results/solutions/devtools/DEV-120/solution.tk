@@ -5,12 +5,12 @@ i=str:std.str;
 f=streq(a:$str;b:$str):$bool{
   let la=str.len(a) as i64;
   let lb=str.len(b) as i64;
-  if(!(la=lb)){<false};
+  if(!(la==lb)){<false};
   let ba=str.bytes(a);
   let bb=str.bytes(b);
   let ok=mut.true;
   lp(let i=0;i<la;i=i+1){
-    if(!((ba.get(i) as i64)=(bb.get(i) as i64))){ok=false};
+    if(!((ba.get(i) as i64)==(bb.get(i) as i64))){ok=false};
   };
   <ok
 };
@@ -39,7 +39,7 @@ f=getarr(obj:$str;key:$str):@$str{
   let rest=mt str.slice(obj;start;olen){ $ok:v v; $err:e "" };
   let close=str.indexof(rest;"]");
   if(close<0){<out};
-  if(close=0){<out};
+  if(close==0){<out};
   let body=mt str.slice(rest;0;close){ $ok:v v; $err:e "" };
   let items=str.split(body;",");
   lp(let i=0;i<(items.len as i64);i=i+1){
@@ -117,7 +117,7 @@ f=main():i64{
   let changedflag=mut.true;
   lp(let pass=0;pass<cnt+1;pass=pass+1){
     lp(let i=0;i<np;i=i+1){
-      if(rebuild.get(i)=0){
+      if(rebuild.get(i)==0){
         let raw=parts.get(i);
         let obj=mut.raw;
         if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
@@ -127,8 +127,8 @@ f=main():i64{
           let dn=deps.get(d);
           lp(let tt=0;tt<cnt;tt=tt+1){
             if(streq(names.get(tt);dn)){
-              if(rebuild.get(tt)=1){
-                if(rebuild.get(i)=0){
+              if(rebuild.get(tt)==1){
+                if(rebuild.get(i)==0){
                   rebuild=rebuild.set(i;1);
                   reason=reason.set(i;str.concat(str.concat("dependency ";dn);" changed"));
                 };
@@ -142,17 +142,17 @@ f=main():i64{
 
   let totalrebuild=mut.0;
   lp(let i=0;i<cnt;i=i+1){
-    if(rebuild.get(i)=1){totalrebuild=totalrebuild+1};
+    if(rebuild.get(i)==1){totalrebuild=totalrebuild+1};
   };
-  if(totalrebuild=0){<0};
+  if(totalrebuild==0){<0};
 
   let emitted=mut.@();
   lp(let i=0;i<cnt;i=i+1){emitted=emitted.push(0)};
   let order=mut.@();
   lp(let pass=0;pass<cnt;pass=pass+1){
     lp(let i=0;i<cnt;i=i+1){
-      if(emitted.get(i)=0){
-        if(rebuild.get(i)=1){
+      if(emitted.get(i)==0){
+        if(rebuild.get(i)==1){
           let raw=parts.get(i);
           let obj=mut.raw;
           if(!(str.startswith(obj;"{"))){obj=str.concat("{";obj)};
@@ -163,8 +163,8 @@ f=main():i64{
             let dn=deps.get(d);
             lp(let tt=0;tt<cnt;tt=tt+1){
               if(streq(names.get(tt);dn)){
-                if(rebuild.get(tt)=1){
-                  if(emitted.get(tt)=0){ready=false};
+                if(rebuild.get(tt)==1){
+                  if(emitted.get(tt)==0){ready=false};
                 };
               };
             };

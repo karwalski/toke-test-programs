@@ -5,12 +5,12 @@ i=str:std.str;
 f=streq(a:$str;b:$str):bool{
   let la=str.len(a) as i64;
   let lb=str.len(b) as i64;
-  if(!(la=lb)){<false};
+  if(!(la==lb)){<false};
   let ba=str.bytes(a);
   let bb=str.bytes(b);
   let ok=mut.true;
   lp(let i=0;i<la;i=i+1){
-    if(!(ba.get(i)=bb.get(i))){ok=false};
+    if(!(ba.get(i)==bb.get(i))){ok=false};
   };
   <ok
 };
@@ -33,7 +33,7 @@ f=parsekeys(obj:$str):@$str{
   lp(let g=0;g<n;g=g+1){
     if(i<n){
       let c=bytes.get(i);
-      if(c=q){
+      if(c==q){
         let start=i+1;
         let j=mut.start;
         let endpos=mut.start;
@@ -41,14 +41,14 @@ f=parsekeys(obj:$str):@$str{
         lp(let h=0;h<n;h=h+1){
           if(!(done)){
             if(j<n){
-              if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1};
+              if(bytes.get(j)==q){endpos=j;done=true}el{j=j+1};
             }el{done=true};
           };
         };
         let tok=mt str.slice(obj;start as u64;endpos as u64){ $ok:v v; $err:e "" };
         let after=endpos+1;
         let iscolon=mut.false;
-        if(after<n){ if(bytes.get(after)=colon){iscolon=true} };
+        if(after<n){ if(bytes.get(after)==colon){iscolon=true} };
         if(iscolon){
           keys=keys.push(tok);
         };
@@ -75,7 +75,7 @@ f=getval(obj:$str;key:$str):$str{
   lp(let h=0;h<n;h=h+1){
     if(!(done)){
       if(j<n){
-        if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1};
+        if(bytes.get(j)==q){endpos=j;done=true}el{j=j+1};
       }el{done=true};
     };
   };
@@ -93,11 +93,11 @@ f=verpart(ver:$str;which:$i64):$i64{
   lp(let g=0;g<n;g=g+1){
     if(i<n){
       let c=bytes.get(i);
-      if(c=dot){
+      if(c==dot){
         part=part+1;
       }el{
         if(isdigit(c)){
-          if(part=which){
+          if(part==which){
             cur=cur*10+((c as i64)-48);
             started=true;
           };
@@ -136,15 +136,15 @@ f=satisfies(ver:$str;con:$str):bool{
   let tilde=str.bytes("~").get(0);
   let op=mut."=";
   let vstart=mut.0;
-  if(c0=ge){
-    if(cn>1){ if(bytes.get(1)=eqs){op=">=";vstart=2}el{op=">";vstart=1} }el{op=">";vstart=1};
-  }el{ if(c0=le){
-    if(cn>1){ if(bytes.get(1)=eqs){op="<=";vstart=2}el{op="<";vstart=1} }el{op="<";vstart=1};
-  }el{ if(c0=eqs){
+  if(c0==ge){
+    if(cn>1){ if(bytes.get(1)==eqs){op=">=";vstart=2}el{op=">";vstart=1} }el{op=">";vstart=1};
+  }el{ if(c0==le){
+    if(cn>1){ if(bytes.get(1)==eqs){op="<=";vstart=2}el{op="<";vstart=1} }el{op="<";vstart=1};
+  }el{ if(c0==eqs){
     op="=";vstart=1;
-  }el{ if(c0=caret){
+  }el{ if(c0==caret){
     op="^";vstart=1;
-  }el{ if(c0=tilde){
+  }el{ if(c0==tilde){
     op="~";vstart=1;
   }el{
     op="=";vstart=0;
@@ -155,11 +155,11 @@ f=satisfies(ver:$str;con:$str):bool{
   if(streq(op;"<=")){ if(!(cmp>0)){<true}el{<false} };
   if(streq(op;">")){ if(cmp>0){<true}el{<false} };
   if(streq(op;"<")){ if(cmp<0){<true}el{<false} };
-  if(streq(op;"=")){ if(cmp=0){<true}el{<false} };
+  if(streq(op;"=")){ if(cmp==0){<true}el{<false} };
   if(streq(op;"^")){
     let vmaj=verpart(ver;0);
     let tmaj=verpart(target;0);
-    if(!(vmaj=tmaj)){<false};
+    if(!(vmaj==tmaj)){<false};
     if(!(cmp<0)){<true}el{<false}
   };
   if(streq(op;"~")){
@@ -167,8 +167,8 @@ f=satisfies(ver:$str;con:$str):bool{
     let tmaj=verpart(target;0);
     let vmin=verpart(ver;1);
     let tmin=verpart(target;1);
-    if(!(vmaj=tmaj)){<false};
-    if(!(vmin=tmin)){<false};
+    if(!(vmaj==tmaj)){<false};
+    if(!(vmin==tmin)){<false};
     if(!(cmp<0)){<true}el{<false}
   };
   <false

@@ -17,7 +17,7 @@ lp(let i=0;i<lst.len();i=i+1){
 let name=lst.get(i);
 let skip=mut.false;
 if(s.eq(name;".snapshot.json")){skip=true};
-if(skip=false){
+if(skip==false){
 let p=s.concat(s.concat(dir;"/");name);
 let rel=mut.name;
 if(s.len(prefix)>0){rel=s.concat(s.concat(prefix;"/");name)};
@@ -78,10 +78,10 @@ if(eq>0){
 let k=s.substr(line;0;eq);
 let v=s.substr(line;eq+1;s.len(line) as $i64);
 let ph=hashfor(prev;k);
-if(s.len(ph)=0){
+if(s.len(ph)==0){
 io.println(s.concat("ADDED ";k));
 changes=changes+1
-}el{if(s.eq(ph;v)=false){
+}el{if(s.eq(ph;v)==false){
 io.println(s.concat("MODIFIED ";k));
 changes=changes+1
 }}
@@ -97,14 +97,14 @@ let eq=s.indexof(line;"=");
 if(eq>0){
 let k=s.substr(line;0;eq);
 let ch=hashfor(cur;k);
-if(s.len(ch)=0){
+if(s.len(ch)==0){
 io.println(s.concat("DELETED ";k));
 changes=changes+1
 }
 }
 }
 };
-if(changes=0){io.println("No changes")};
+if(changes==0){io.println("No changes")};
 <0
 };
 io.println("ERROR: unknown command");

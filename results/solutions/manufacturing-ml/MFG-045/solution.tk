@@ -21,7 +21,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;
@@ -33,7 +33,7 @@ f=main():$i64{
   let sum=mut.0.0;
   lp(let i=1;i<lines.len;i=i+1){
     let line=s.trim(lines.get(i));
-    if(s.len(line)=0){}el{
+    if(s.len(line)==0){}el{
       let cols=s.split(line;",");
       let val=s.tofloat(s.trim(cols.get(0)));
       lsl=s.tofloat(s.trim(cols.get(1)));
@@ -46,7 +46,7 @@ f=main():$i64{
   let ss=mut.0.0;
   lp(let i=1;i<lines.len;i=i+1){
     let line=s.trim(lines.get(i));
-    if(s.len(line)=0){}el{
+    if(s.len(line)==0){}el{
       let cols=s.split(line;",");
       let val=s.tofloat(s.trim(cols.get(0)));
       let d=val-mean;

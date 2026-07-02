@@ -1,15 +1,15 @@
 m=textwrap;i=io:std.io;i=s:std.str;
 f=wrapline(text:$str;width:$i64):$str{
 let t=s.trim(text);
-if(s.len(t)=0){<""};
+if(s.len(t)==0){<""};
 let words=s.split(t;" ");
 let out=mut."";
 let cur=mut."";
 let started=mut.0;
 lp(let i=0;i<words.len();i=i+1){
 let w=words.get(i);
-if(s.len(w)=0){}el{
-if(started=0){cur=w;started=1}el{
+if(s.len(w)==0){}el{
+if(started==0){cur=w;started=1}el{
 if(s.len(cur)+1+s.len(w)<=width){cur=s.concat(s.concat(cur;" ");w)}el{out=s.concat(s.concat(out;cur);"\n");cur=w}}}};
 out=s.concat(out;cur);
 <out};
@@ -19,10 +19,10 @@ let width=s.toint(s.trim(widthline));
 let paras=mut.@($str);
 let curpar=mut."";
 let haspar=mut.0;
-lp(1=1){let l=io.readln();if(s.len(l)=0){br};let line=s.trimsuffix(l;"\n");let trimmed=s.trim(line);if(s.len(trimmed)=0){if(haspar=1){paras=paras+@(curpar);curpar="";haspar=0};paras=paras+@("")}el{if(haspar=0){curpar=trimmed;haspar=1}el{curpar=s.concat(s.concat(curpar;" ");trimmed)}}};
-if(haspar=1){paras=paras+@(curpar)};
+lp(1==1){let l=io.readln();if(s.len(l)==0){br};let line=s.trimsuffix(l;"\n");let trimmed=s.trim(line);if(s.len(trimmed)==0){if(haspar==1){paras=paras+@(curpar);curpar="";haspar=0};paras=paras+@("")}el{if(haspar==0){curpar=trimmed;haspar=1}el{curpar=s.concat(s.concat(curpar;" ");trimmed)}}};
+if(haspar==1){paras=paras+@(curpar)};
 let parts=mut.@($str);
-lp(let i=0;i<paras.len();i=i+1){let p=paras.get(i);if(s.len(p)=0){parts=parts+@("")}el{let w=wrapline(p;width);if(s.len(w)>0){parts=parts+@(w)}}};
+lp(let i=0;i<paras.len();i=i+1){let p=paras.get(i);if(s.len(p)==0){parts=parts+@("")}el{let w=wrapline(p;width);if(s.len(w)>0){parts=parts+@(w)}}};
 let result=mut."";
 lp(let i=0;i<parts.len();i=i+1){if(i>0){result=s.concat(result;"\n")};result=s.concat(result;parts.get(i))};
 let trimmedresult=mut.result;

@@ -8,9 +8,9 @@ f=modpow(base:$i64;exp:$i64;modp:$i64):$i64{
   if(b<0){b=b+modp};
   let e=mut.exp;
   lp(let i=0;i<64;i=i+1){
-    if(e=0){br};
+    if(e==0){br};
     let bit=e-e/2*2;
-    if(bit=1){result=result*b-result*b/modp*modp};
+    if(bit==1){result=result*b-result*b/modp*modp};
     e=e/2;
     b=b*b-b*b/modp*modp
   };
@@ -52,7 +52,7 @@ f=main():$i64{
     let lhs=modpow(g;response;p);
     let yterm=modpow(y;chal;p);
     let rcheck=commitment*yterm-commitment*yterm/p*p;
-    if(lhs=rcheck){io.println("VALID")}el{io.println("INVALID")}
+    if(lhs==rcheck){io.println("VALID")}el{io.println("INVALID")}
   };
   <0
 };

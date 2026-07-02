@@ -20,7 +20,7 @@ f=sortcopy(arr:@f64):@f64{
 
 f=percentile(sorted:@f64;p:f64):f64{
   let n=sorted.len as i64;
-  if(n=1){<sorted.get(0)};
+  if(n==1){<sorted.get(0)};
   let pos=p*((n-1) as f64);
   let lo=pos as i64;
   let frac=pos-(lo as f64);
@@ -32,7 +32,7 @@ f=percentile(sorted:@f64;p:f64):f64{
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)

@@ -85,7 +85,7 @@ f=main():$i64{
                             paths=paths+@(p);
                         }el{
                             let cur=mut.q2+1;
-                            lp(1=1){
+                            lp(1==1){
                                 let mq1=firstquote(line;cur);
                                 if(mq1<0){br};
                                 let mq=s.slice(line;mq1;mq1+1);
@@ -125,7 +125,7 @@ f=main():$i64{
                     };
                 };
             };
-            if(swap=1){
+            if(swap==1){
                 order=order.set(b;ib);
                 order=order.set(b+1;ia);
             };
@@ -141,9 +141,9 @@ f=main():$i64{
         lp(let k=0;k<seen.len;k=k+1){
             if(s.eq(seen.get(k);key)){dup=1};
         };
-        if(dup=0){
+        if(dup==0){
             seen=seen+@(key);
-            if(first=1){first=0}el{out=s.concat(out;"\n")};
+            if(first==1){first=0}el{out=s.concat(out;"\n")};
             out=s.concat(out;key);
         };
     };

@@ -6,10 +6,10 @@ let keys=mut.@("");keys=@();let counts=mut.@(0);counts=@();
 let i=mut.0;lp(i<nw-1){let bg=s.concat(s.concat(clean.get(i);" ");clean.get(i+1));
 let found=mut.-1;let j=mut.0;lp(j<keys.len()){if(s.eq(keys.get(j);bg)){found=j};j=j+1};
 if(found<0){keys=keys+@(bg);counts=counts+@(1)}el{
-let nc=mut.@(0);nc=@();let k=mut.0;lp(k<counts.len()){if(k=found){nc=nc+@(counts.get(k)+1)}el{nc=nc+@(counts.get(k))};k=k+1};counts=nc};
+let nc=mut.@(0);nc=@();let k=mut.0;lp(k<counts.len()){if(k==found){nc=nc+@(counts.get(k)+1)}el{nc=nc+@(counts.get(k))};k=k+1};counts=nc};
 i=i+1};
 let nk=keys.len();
 let order=mut.@(0);order=@();let o=mut.0;lp(o<nk){order=order+@(o);o=o+1};
-let a=mut.0;lp(a<nk){let b=mut.0;lp(b<nk-1){let p=order.get(b);let q=order.get(b+1);if(counts.get(p)<counts.get(q)){let no=mut.@(0);no=@();let k=mut.0;lp(k<nk){if(k=b){no=no+@(q)}el{if(k=b+1){no=no+@(p)}el{no=no+@(order.get(k))}};k=k+1};order=no};b=b+1};a=a+1};
+let a=mut.0;lp(a<nk){let b=mut.0;lp(b<nk-1){let p=order.get(b);let q=order.get(b+1);if(counts.get(p)<counts.get(q)){let no=mut.@(0);no=@();let k=mut.0;lp(k<nk){if(k==b){no=no+@(q)}el{if(k==b+1){no=no+@(p)}el{no=no+@(order.get(k))}};k=k+1};order=no};b=b+1};a=a+1};
 let z=mut.0;lp(z<nk){let idx=order.get(z);let line=s.concat(s.concat("\"";keys.get(idx));s.concat("\": ";s.fromint(counts.get(idx))));io.println(line);z=z+1};
 <0}

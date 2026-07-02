@@ -1,7 +1,7 @@
 m=curriculumtracker;i=io:std.io;i=s:std.str;
 f=pad(v:$str;w:$i64):$str{let l=s.len(v);if(l>=w){<v};<s.concat(v;s.repeat(" ";w-l))};
 f=getarr(json:$str;key:$str):@$str{let pat=s.concat(s.concat("\"";key);"\":[");let parts=s.split(json;pat);let out=mut.@($str);if(parts.len()<2){<out};let rest=parts.get(1);let endp=s.split(rest;"]");let inner=endp.get(0);let items=s.split(inner;",");lp(let i=0;i<items.len();i=i+1){let it=s.trim(items.get(i));let q=s.split(it;"\"");if(q.len()>=2){out=out+@(q.get(1))}};<out};
-f=getfield(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":");let parts=s.split(obj;pat);if(parts.len()<2){<""};let rest=parts.get(1);if(s.len(rest)=0){<""};let c0=s.substr(rest;0;1);if(c0="\""){let q=s.split(rest;"\"");<q.get(1)};let b=s.split(rest;"}");let p0=b.get(0);let cm=s.split(p0;",");<s.trim(cm.get(0))};
+f=getfield(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":");let parts=s.split(obj;pat);if(parts.len()<2){<""};let rest=parts.get(1);if(s.len(rest)==0){<""};let c0=s.substr(rest;0;1);if(c0=="\""){let q=s.split(rest;"\"");<q.get(1)};let b=s.split(rest;"}");let p0=b.get(0);let cm=s.split(p0;",");<s.trim(cm.get(0))};
 f=mark(score:$i64):$str{if(score>=80){<"M"};if(score>=50){<"D"};<"N"};
 f=main():$i64{let input=io.readln();let standards=getarr(input;"standards");
 let ssplit=s.split(input;"\"student_scores\":[");let scoresPart=mut."";if(ssplit.len()>=2){let r=ssplit.get(1);let e=s.split(r;"]");scoresPart=e.get(0)};

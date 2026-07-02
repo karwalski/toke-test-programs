@@ -6,7 +6,7 @@ let d=pdoc(line);
 let action=json.getstr(d;"action");
 let name=json.getstr(d;"name");
 let desc=json.getstr(d;"description");
-if(s.eq(action;"create_group")=false){
+if(s.eq(action;"create_group")==false){
 io.println("{\"error\":\"invalid action\"}");
 <1
 };

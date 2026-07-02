@@ -45,13 +45,13 @@ f=cat(a:@byte;b:@byte):@byte{let r=mut.a;let i=mut.0;lp(i<b.len()){r=r+@(b.get(i
 f=b58(data:@byte):$str{
 let alphabet="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 let n=data.len();
-let leadz=mut.0;let li=mut.0;lp(li<n){if(data.get(li)=0){leadz=leadz+1;li=li+1}el{li=n}};
+let leadz=mut.0;let li=mut.0;lp(li<n){if(data.get(li)==0){leadz=leadz+1;li=li+1}el{li=n}};
 let digits=mut.@();let work=mut.data;
 lp(work.len()>0){
 let rem=mut.0;let newwork=mut.@();let i=mut.0;
 lp(i<work.len()){let acc=rem*256+work.get(i);let q=acc/58;rem=acc%58;newwork=newwork+@(q);i=i+1};
 digits=digits+@(rem);
-let start=mut.0;lp(start<newwork.len()){if(newwork.get(start)=0){start=start+1}el{br}};
+let start=mut.0;lp(start<newwork.len()){if(newwork.get(start)==0){start=start+1}el{br}};
 let tmp=mut.@();let jj=mut.start;lp(jj<newwork.len()){tmp=tmp+@(newwork.get(jj));jj=jj+1};work=tmp;
 };
 let res=mut."";let z=mut.0;lp(z<leadz){res=s.concat(res;"1");z=z+1};

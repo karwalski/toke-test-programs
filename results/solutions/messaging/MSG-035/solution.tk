@@ -23,16 +23,16 @@ f=jint(seg:$str;field:$str):$i64{
   let numstr=mut."";
   let stop=mut.0;
   lp(i<s.len(rest)){
-    if(stop=0){
+    if(stop==0){
       let c=s.slice(rest;i;i+1);
       let isdigit=mut.0;
       if(s.contains("0123456789";c)){isdigit=1};
       if(s.equals(c;"-")){isdigit=1};
-      if(isdigit=1){numstr=s.concat(numstr;c)}el{stop=1};
+      if(isdigit==1){numstr=s.concat(numstr;c)}el{stop=1};
     };
     i=i+1;
   };
-  if(s.len(numstr)=0){<0};
+  if(s.len(numstr)==0){<0};
   <s.toint(numstr);
 };
 
@@ -85,15 +85,15 @@ f=main():$i64{
       let besti=mut.0-1;
       let k=mut.0;
       lp(k<msgs.len()){
-        if(active.get(k)=1){
+        if(active.get(k)==1){
           if(besti<0){
             besti=k;
           }el{
             if(pris.get(k)>pris.get(besti)){
               besti=k;
             }el{
-              if(pris.get(k)=pris.get(besti)){
-                if(strless(msgs.get(k);msgs.get(besti))=1){besti=k};
+              if(pris.get(k)==pris.get(besti)){
+                if(strless(msgs.get(k);msgs.get(besti))==1){besti=k};
               };
             };
           };

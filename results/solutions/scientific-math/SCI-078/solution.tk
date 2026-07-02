@@ -1,15 +1,15 @@
 m=nqueens;i=io:std.io;i=s:std.str;
 f=absi(x:$i64):$i64{if(x<0){<0-x};<x};
 f=issafe(board:@($i64);row:$i64;col:$i64):$bool{
-  let ok=mut.(1=1);
+  let ok=mut.(1==1);
   lp(let i=0;i<row;i=i+1){
-    if(board.get(i)=col){ok=(1=0)};
-    if(absi(board.get(i)-col)=absi(i-row)){ok=(1=0)}
+    if(board.get(i)==col){ok=(1==0)};
+    if(absi(board.get(i)-col)==absi(i-row)){ok=(1==0)}
   };
   <ok
 };
 f=solverec(board:@($i64);row:$i64;n:$i64):$str{
-  if(row=n){
+  if(row==n){
     let line=mut."";
     lp(let i=0;i<n;i=i+1){
       if(i>0){line=s.concat(line;" ")};

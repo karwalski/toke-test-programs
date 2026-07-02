@@ -14,7 +14,7 @@ f=splitsentences(text:$str):@$str{
   let n=s.len(text) as i64;
   lp(let i=0;i<n;i=i+1){
     let ch=charat(text;i);
-    if(ch="."){
+    if(ch=="."){
       let sent=s.trim(s.concat(cur;"."));
       if(s.len(sent)>1){ res=res+@(sent) };
       cur=""
@@ -38,8 +38,8 @@ f=isselected(rank:$i64;total:$i64;n:$i64):$bool{
   lp(let step=0;step<total;step=step+1){
     if(count>=n){<false};
     let pick=mut.0-1;
-    if((step % 2)=0){ pick=lo; lo=lo+1 }el{ pick=hi; hi=hi-1 };
-    if(pick=rank){<true};
+    if((step % 2)==0){ pick=lo; lo=lo+1 }el{ pick=hi; hi=hi-1 };
+    if(pick==rank){<true};
     count=count+1
   };
   <false
@@ -62,7 +62,7 @@ f=getint(line:$str;key:$str):$i64{
       acc=acc*10+(mt s.toint(c){ $ok:v v; $err:e 0 })
     }el{
       if(acc>0){br};
-      if(c="}"){br}
+      if(c=="}"){br}
     }
   };
   <acc

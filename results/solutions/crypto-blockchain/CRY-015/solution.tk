@@ -1,6 +1,6 @@
 m=core;i=io:std.io;i=s:std.str;i=enc:std.encoding;
-f=lshr(x:$i64;k:$i64):$i64{if(k=0){<x};let hi=(0-1)<<(64-k);<(x>>k)&(~hi)};
-f=rotl64(x:$i64;n:$i64):$i64{if(n=0){<x};<(x<<n)|lshr(x;64-n)};
+f=lshr(x:$i64;k:$i64):$i64{if(k==0){<x};let hi=(0-1)<<(64-k);<(x>>k)&(~hi)};
+f=rotl64(x:$i64;n:$i64):$i64{if(n==0){<x};<(x<<n)|lshr(x;64-n)};
 f=md5(a:$i64):$i64{let m=a-a/5*5;if(m<0){<m+5};<m};
 f=keccakf(st:@i64):@i64{
   let stt=mut.st;
@@ -71,7 +71,7 @@ f=keccak256(msg:@byte;padbyte:$i64):@byte{
   let mlen=msg.len();
   let padded=mut.msg;
   let padlen=rate-(mlen-mlen/rate*rate);
-  if(padlen=1){
+  if(padlen==1){
     padded=padded+@(padbyte|128);
   }el{
     padded=padded+@(padbyte);
@@ -114,7 +114,7 @@ f=keccak256(msg:@byte;padbyte:$i64):@byte{
 };
 f=main():$void{
   let line=io.readln();
-  if(s.len(line)=0){
+  if(s.len(line)==0){
     io.println("");
   }el{
     let msg=s.bytes(line);

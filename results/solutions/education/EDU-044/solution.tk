@@ -1,7 +1,7 @@
 m=bloom;i=io:std.io;i=s:std.str;
 f=field(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":\"");let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
-f=intfield(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("\"";key);"\":");let start=s.indexof(obj;pat);if(start<0){<0};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"0")||s.eq(ch;"1")||s.eq(ch;"2")||s.eq(ch;"3")||s.eq(ch;"4")||s.eq(ch;"5")||s.eq(ch;"6")||s.eq(ch;"7")||s.eq(ch;"8")||s.eq(ch;"9")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}};if(s.len(num)=0){<0};<s.toint(num)};
-f=lname(lvl:$i64):$str{if(lvl=1){<"REMEMBER"};if(lvl=2){<"UNDERSTAND"};if(lvl=3){<"APPLY"};if(lvl=4){<"ANALYSE"};if(lvl=5){<"EVALUATE"};<"CREATE"};
+f=intfield(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("\"";key);"\":");let start=s.indexof(obj;pat);if(start<0){<0};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"0")||s.eq(ch;"1")||s.eq(ch;"2")||s.eq(ch;"3")||s.eq(ch;"4")||s.eq(ch;"5")||s.eq(ch;"6")||s.eq(ch;"7")||s.eq(ch;"8")||s.eq(ch;"9")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}};if(s.len(num)==0){<0};<s.toint(num)};
+f=lname(lvl:$i64):$str{if(lvl==1){<"REMEMBER"};if(lvl==2){<"UNDERSTAND"};if(lvl==3){<"APPLY"};if(lvl==4){<"ANALYSE"};if(lvl==5){<"EVALUATE"};<"CREATE"};
 f=main():$i64{let input=io.readln();let segs=s.split(input;"{");let acts=mut.@();let lvls=mut.@();
 lp(let i=0;i<segs.len();i=i+1){let seg=segs.get(i);if(s.contains(seg;"\"activity\":\"")){acts=acts+@(field(seg;"activity"));lvls=lvls+@(intfield(seg;"level"))}};
-lp(let lvl=1;lvl<=6;lvl=lvl+1){lp(let i=0;i<acts.len();i=i+1){if(lvls.get(i)=lvl){io.println(s.concat(s.concat(lname(lvl);": ");acts.get(i)))}}};<0}
+lp(let lvl=1;lvl<=6;lvl=lvl+1){lp(let i=0;i<acts.len();i=i+1){if(lvls.get(i)==lvl){io.println(s.concat(s.concat(lname(lvl);": ");acts.get(i)))}}};<0}

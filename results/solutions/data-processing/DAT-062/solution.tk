@@ -12,18 +12,18 @@ f=fixed2(x:f64):$str{
   let fs=mut.s.fromint(frac);
   if(frac<10){fs=s.concat("0";fs)};
   let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
-  if(neg=1){out=s.concat("-";out)};
+  if(neg==1){out=s.concat("-";out)};
   <out
 };
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)
   };
-  if(lines.len=0){<0};
+  if(lines.len==0){<0};
   let first=lines.get(0);
   let parts=s.split(s.trim(first);" ");
   let nwin=s.toint(s.trim(parts.get(0)));

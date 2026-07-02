@@ -11,12 +11,12 @@ f=shell(cmd:$str):$str{
 f=main():$i64{
   let dir=s.trim(io.readln());
   let fmode=mut.s.trim(io.readln());
-  if(s.len(fmode)=0){fmode="644"};
+  if(s.len(fmode)==0){fmode="644"};
   let dmode=mut.s.trim(io.readln());
-  if(s.len(dmode)=0){dmode="755"};
+  if(s.len(dmode)==0){dmode="755"};
   let dryraw=s.trim(io.readln());
   let dryrun=s.eq(dryraw;"yes");
-  if(file.exists(dir)=(1=0)){
+  if(file.exists(dir)==(1==0)){
     io.println("Summary: 0 files changed.");
     <0
   };
@@ -30,10 +30,10 @@ f=main():$i64{
       let target=mut.fmode;
       if(isdir){target=dmode};
       let cur=s.trim(shell(s.concat("stat -f '%Lp' '";s.concat(path;"'"))));
-      if(s.eq(cur;target)=(1=0)){
+      if(s.eq(cur;target)==(1==0)){
         io.println(s.concat("chmod ";s.concat(target;s.concat(" ";path))));
         changed=changed+1;
-        if(dryrun=(1=0)){
+        if(dryrun==(1==0)){
           let r=shell(s.concat("chmod ";s.concat(target;s.concat(" '";s.concat(path;"'")))))
         }
       }

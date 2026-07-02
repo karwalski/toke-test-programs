@@ -2,8 +2,8 @@ m=percentile;i=io:std.io;i=s:std.str;
 f=fmt2(val:$f64):$str{
   let v=mut.0.0;
   v=val;
-  let neg=mut.(1=0);
-  if(v<0.0){neg=(1=1);v=0.0-v};
+  let neg=mut.(1==0);
+  if(v<0.0){neg=(1==1);v=0.0-v};
   let scaled=mut.0.0;
   scaled=v*100.0+0.5;
   let asi=mut.0;
@@ -54,9 +54,9 @@ f=main():$i64{
   let d3=mut.0.0;
   let d4=mut.0.0;
 
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(s.trim(raw))=0){br}};
+    if(io.eof()){if(s.len(s.trim(raw))==0){br}};
     let line=s.trim(raw);
     if(s.len(line)>0){
       let xi=mt s.toint(line){ $i64:x x; StrErr:e 0 };
@@ -66,11 +66,11 @@ f=main():$i64{
 
       if(count<6){
         io.println("null");
-        if(count=1){o0=x};
-        if(count=2){o1=x};
-        if(count=3){o2=x};
-        if(count=4){o3=x};
-        if(count=5){
+        if(count==1){o0=x};
+        if(count==2){o1=x};
+        if(count==3){o2=x};
+        if(count==4){o3=x};
+        if(count==5){
           o4=x;
           let a=mut.0.0;
           let b=mut.0.0;
@@ -131,16 +131,16 @@ f=main():$i64{
           let ni=mut.0;
           let nip=mut.0;
           let pdes=mut.0.0;
-          if(mi=1){qi=q1;qim=q0;qip=q2;nim=n0;ni=n1;nip=n2;pdes=p1};
-          if(mi=2){qi=q2;qim=q1;qip=q3;nim=n1;ni=n2;nip=n3;pdes=p2};
-          if(mi=3){qi=q3;qim=q2;qip=q4;nim=n2;ni=n3;nip=n4;pdes=p3};
+          if(mi==1){qi=q1;qim=q0;qip=q2;nim=n0;ni=n1;nip=n2;pdes=p1};
+          if(mi==2){qi=q2;qim=q1;qip=q3;nim=n1;ni=n2;nip=n3;pdes=p2};
+          if(mi==3){qi=q3;qim=q2;qip=q4;nim=n2;ni=n3;nip=n4;pdes=p3};
 
           let diff=mut.0.0;
           diff=pdes-(ni as $f64);
           let dsi=mut.0;
-          let go=mut.(1=0);
-          if(diff>=1.0){if((nip-ni)>1){dsi=1;go=(1=1)}};
-          if(diff<=(0.0-1.0)){if((nim-ni)<(0-1)){dsi=(0-1);go=(1=1)}};
+          let go=mut.(1==0);
+          if(diff>=1.0){if((nip-ni)>1){dsi=1;go=(1==1)}};
+          if(diff<=(0.0-1.0)){if((nim-ni)<(0-1)){dsi=(0-1);go=(1==1)}};
 
           if(go){
             let dsf=mut.0.0;
@@ -160,17 +160,17 @@ f=main():$i64{
 
             let newq=mut.0.0;
             if(qim<qp){if(qp<qip){newq=qp}el{
-              if(dsi=1){newq=qi+(qip-qi)/(nipf-nif)}el{newq=qi+(qim-qi)/(nimf-nif)}
+              if(dsi==1){newq=qi+(qip-qi)/(nipf-nif)}el{newq=qi+(qim-qi)/(nimf-nif)}
             }}el{
-              if(dsi=1){newq=qi+(qip-qi)/(nipf-nif)}el{newq=qi+(qim-qi)/(nimf-nif)}
+              if(dsi==1){newq=qi+(qip-qi)/(nipf-nif)}el{newq=qi+(qim-qi)/(nimf-nif)}
             };
 
             ni=ni+dsi;
             qi=newq;
 
-            if(mi=1){q1=qi;n1=ni};
-            if(mi=2){q2=qi;n2=ni};
-            if(mi=3){q3=qi;n3=ni}
+            if(mi==1){q1=qi;n1=ni};
+            if(mi==2){q2=qi;n2=ni};
+            if(mi==3){q3=qi;n3=ni}
           }
         };
 

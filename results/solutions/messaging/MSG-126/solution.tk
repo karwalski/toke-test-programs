@@ -23,11 +23,11 @@ let n=texts.len();
 lp(let i=0;i<n;i=i+1){
 let idx=i+1;
 let prev=mut."";
-if(i=0){prev=gd}el{prev=s.concat("hash";s.fromint(i))};
+if(i==0){prev=gd}el{prev=s.concat("hash";s.fromint(i))};
 let line=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("  [";s.fromint(idx));"] ");texts.get(i));" -> hash: sha256(");prev);s.concat(" || msg";s.concat(s.fromint(idx);")")));
 io.println(line);
 };
 let label=mut."messages";
-if(n=1){label="message"};
+if(n==1){label="message"};
 io.println(s.concat(s.concat(s.concat(s.concat("verification: INTACT (";s.fromint(n));" ");label);", no breaks)"));
 <0}

@@ -24,7 +24,7 @@ f=jsonname(content:$str):$str{
   let done=mut.false;
   lp(let h=0;h<n;h=h+1){
     if(!(done)){
-      if(j<n){ if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1} }el{done=true};
+      if(j<n){ if(bytes.get(j)==q){endpos=j;done=true}el{j=j+1} }el{done=true};
     };
   };
   <mt str.slice(content;start as u64;endpos as u64){ $ok:v v; $err:e "" }
@@ -35,7 +35,7 @@ f=lastpathseg(s:$str):$str{
   let n=str.len(s) as i64;
   let slash=str.bytes("/").get(0);
   let start=mut.0;
-  lp(let i=0;i<n;i=i+1){ if(bytes.get(i)=slash){start=i+1} };
+  lp(let i=0;i<n;i=i+1){ if(bytes.get(i)==slash){start=i+1} };
   <mt str.slice(s;start as u64;n as u64){ $ok:v v; $err:e s }
 };
 
@@ -56,7 +56,7 @@ f=gomodname(content:$str):$str{
     if(!(done)){
       if(j<n){
         let c=bytes.get(j);
-        if(c=nl){endpos=j;done=true}el{ if(c=cr){endpos=j;done=true}el{ if(c=sp){endpos=j;done=true}el{j=j+1} } };
+        if(c==nl){endpos=j;done=true}el{ if(c==cr){endpos=j;done=true}el{ if(c==sp){endpos=j;done=true}el{j=j+1} } };
       }el{endpos=j;done=true};
     };
   };
@@ -76,7 +76,7 @@ f=pyname(content:$str):$str{
   let endpos=mut.start;
   let done=mut.false;
   lp(let h=0;h<n;h=h+1){
-    if(!(done)){ if(j<n){ if(bytes.get(j)=q){endpos=j;done=true}el{j=j+1} }el{done=true} };
+    if(!(done)){ if(j<n){ if(bytes.get(j)==q){endpos=j;done=true}el{j=j+1} }el{done=true} };
   };
   <mt str.slice(content;start as u64;endpos as u64){ $ok:v v; $err:e "" }
 };
@@ -150,7 +150,7 @@ f=main():i64{
     if(str.len(ln)>0){ collected=collected.push(ln) };
   };
   let n=collected.len as i64;
-  if(n=0){
+  if(n==0){
     io.println("No packages detected");
     <0
   };

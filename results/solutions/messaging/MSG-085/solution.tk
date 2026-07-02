@@ -23,7 +23,7 @@ f=extractStrArr(json:$str;key:$str):@($str){
       let found=mut.false;
       let k=mut.0;
       lp(k<s.len(after)){
-        if(found=false){
+        if(found==false){
           let c=s.slice(after;k;k+1);
           if(s.eq(c;"\\")){k=k+2}
           el{if(s.eq(c;"\"")){endq=k;found=true;k=s.len(after)}el{k=k+1}}
@@ -47,8 +47,8 @@ f=findWord(text:$str;word:$str):$bool{
       if(i>0){before=s.slice(tl;i-1;i)};
       let after=mut."";
       if(i+wn<tn){after=s.slice(tl;i+wn;i+wn+1)};
-      if(isword(before)=false){
-        if(isword(after)=false){<true}
+      if(isword(before)==false){
+        if(isword(after)==false){<true}
       }
     };
     i=i+1
@@ -89,14 +89,14 @@ f=main():$i64{
   let violations=mut.@();
   let typeok=mut.false;
   lp(let i=0;i<allowed.len();i=i+1){if(s.eq(allowed.get(i);mtype)){typeok=true}};
-  if(typeok=false){violations=violations+@(s.concat("disallowed type: ";mtype))};
+  if(typeok==false){violations=violations+@(s.concat("disallowed type: ";mtype))};
   if(s.len(content)>maxlen){violations=violations+@(s.concat("exceeds max length: ";s.fromint(s.len(content))))};
   lp(let i=0;i<patterns.len();i=i+1){
     let words=patWords(patterns.get(i));
     let matched=mut."";
     let done=mut.false;
     lp(let w=0;w<words.len();w=w+1){
-      if(done=false){
+      if(done==false){
         if(findWord(content;words.get(w))){matched=s.lower(words.get(w));done=true}
       }
     };

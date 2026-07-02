@@ -4,8 +4,8 @@ f=haskey(obj:$str;key:$str):$bool{let pat=s.concat(s.concat("\"";key);"\":");<s.
 f=intstr(f:$f64):$str{let n=mut.0;if(f<0.0){n=0-1*intpart(0.0-f)}el{n=intpart(f)};<s.fromint(n)};
 f=intpart(f:$f64):$i64{let n=mut.0;lp(s.tofloat(s.fromint(n+1))<=f){n=n+1};<n};
 f=main():$i64{let fields=mut.@();let mins=mut.@($f64);let maxs=mut.@($f64);
-lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)=0){br};let parts=s.split(l;" ");if(parts.len()>=3){fields=fields+@(parts.get(0));mins=mins+@(s.tofloat(parts.get(1)));maxs=maxs+@(s.tofloat(parts.get(2)))}};
-lp(1=1){let line=io.readln();if(s.len(line)=0){br};let l=s.trim(line);if(s.len(l)=0){}el{
+lp(1==1){let line=io.readln();if(s.len(line)==0){br};let l=s.trim(line);if(s.len(l)==0){br};let parts=s.split(l;" ");if(parts.len()>=3){fields=fields+@(parts.get(0));mins=mins+@(s.tofloat(parts.get(1)));maxs=maxs+@(s.tofloat(parts.get(2)))}};
+lp(1==1){let line=io.readln();if(s.len(line)==0){br};let l=s.trim(line);if(s.len(l)==0){}el{
 let viol=mut.@();
 lp(let i=0;i<fields.len();i=i+1){let fld=fields.get(i);if(haskey(l;fld)){let raw=rawval(l;fld);let v=s.tofloat(raw);if(v<mins.get(i)||v>maxs.get(i)){let msg=s.concat(s.concat(s.concat(s.concat(s.concat(fld;"=");raw);" (expected ");intstr(mins.get(i)));s.concat("-";intstr(maxs.get(i))));viol=viol+@(s.concat(msg;")"))}}};
 if(viol.len()>0){let out=mut."INVALID: ";lp(let w=0;w<viol.len();w=w+1){if(w>0){out=s.concat(out;", ")};out=s.concat(out;viol.get(w))};io.println(out)}el{io.println(l)}}};<0}

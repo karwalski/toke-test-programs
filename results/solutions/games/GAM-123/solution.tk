@@ -9,7 +9,7 @@ let count=segcounts.get(si);
 let target=segtargets.get(si);
 let contains=mut.0;
 lp(let j=0;j<count;j=j+1){
-if(segcells.get(start+j)=cell){contains=1}
+if(segcells.get(start+j)==cell){contains=1}
 };
 if(contains>0){
 let total=mut.0;
@@ -17,10 +17,10 @@ let allset=mut.1;
 lp(let j=0;j<count;j=j+1){
 let idx=segcells.get(start+j);
 let v=vals.get(idx);
-if(v=0){allset=0}el{total=total+v}
+if(v==0){allset=0}el{total=total+v}
 };
 if(allset>0){
-if(total=target){}el{<0}
+if(total==target){}el{<0}
 }el{
 if(total>=target){<0}
 }
@@ -29,7 +29,7 @@ if(total>=target){<0}
 <1
 };
 f=bt(vals:@i64;cells:@i64;ci:i64;segstarts:@i64;segcounts:@i64;segtargets:@i64;segcells:@i64):@i64{
-if(ci=(cells.len as i64)){<vals};
+if(ci==(cells.len as i64)){<vals};
 let cell=cells.get(ci);
 lp(let v=1;v<10;v=v+1){
 let trial=mut.vals.set(cell;v);
@@ -46,7 +46,7 @@ let go=mut.1;
 lp(go>0){
 let line=io.readln();
 let trimmed=s.trim(line);
-if(s.len(trimmed)=0){go=0}el{
+if(s.len(trimmed)==0){go=0}el{
 rows=rows+@(trimmed)
 }
 };
@@ -127,7 +127,7 @@ r=rr;
 }
 };
 let result=bt(vals;cells;0;segstarts;segcounts;segtargets;segcells);
-if((result.len as i64)=0){
+if((result.len as i64)==0){
 io.println("No solution");
 <0
 };
@@ -141,7 +141,7 @@ if(s.equals(tk;"?")){cellstr=s.fromint(result.get(r*nc+c))}el{
 cellstr=s.slice(tk;1;s.len(tk))
 }
 };
-if(c=0){outln=cellstr}el{outln=s.concat(s.concat(outln;" ");cellstr)}
+if(c==0){outln=cellstr}el{outln=s.concat(s.concat(outln;" ");cellstr)}
 };
 io.println(outln);
 };

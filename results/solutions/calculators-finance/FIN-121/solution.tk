@@ -58,7 +58,7 @@ f=main():$i64{
 f=setidx(arr:@$i64;pos:$i64;val:$i64):@$i64{
   let res=mut.@();
   lp(let i=0;i<(arr.len as i64);i=i+1){
-    if(i=pos){res=res+@(val)}el{res=res+@(arr.get(i))}
+    if(i==pos){res=res+@(val)}el{res=res+@(arr.get(i))}
   };
   <res
 };

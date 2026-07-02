@@ -1,6 +1,6 @@
 m=eip155;i=io:std.io;i=s:std.str;i=enc:std.encoding;
-f=lsr(x:$i64;n:$i64):$i64{if(n=0){<x};<(x>>n)&((1<<(64-n))-1)};
-f=rotl(x:$i64;b:$i64):$i64{if(b=0){<x};<(x<<b)|lsr(x;64-b)};
+f=lsr(x:$i64;n:$i64):$i64{if(n==0){<x};<(x>>n)&((1<<(64-n))-1)};
+f=rotl(x:$i64;b:$i64):$i64{if(b==0){<x};<(x<<b)|lsr(x;64-b)};
 f=rc(i:$i64):$i64{
 let t=mut.@(1;32898;-9223372036854742902;-9223372034707259392;32907;2147483649;-9223372034707259263;-9223372036854743031;138;136;2147516425;2147483658;2147516555;-9223372036854775669;-9223372036854742903;-9223372036854743037;-9223372036854743038;-9223372036854775680;32778;-9223372034707292150;-9223372034707259263;-9223372036854742912;2147483649;-9223372034707259384);
 <t.get(i)};
@@ -70,7 +70,7 @@ if(c>=97){if(c<=102){<c-87}};
 if(c>=65){if(c<=70){<c-55}};
 <0};
 f=encint(n:$i64):@$i64{
-if(n=0){<@(128)};
+if(n==0){<@(128)};
 let tmp=mut.@();
 let v=mut.n;
 lp(v>0){tmp=tmp+@(v-v/256*256);v=v/256};
@@ -91,11 +91,11 @@ if(i+1<=hx.len()){
 let hi=hexval(hx.get(i));
 let lo=hexval(hx.get(i+1));
 bs=bs+@(hi*16+lo)}};
-if(nh=0){bs=@()};
+if(nh==0){bs=@()};
 <rlpstr(bs)};
 f=rlpstr(b:@$i64):@$i64{
 let ln=b.len();
-if(ln=1){if(b.get(0)<128){<b}};
+if(ln==1){if(b.get(0)<128){<b}};
 if(ln<56){
 let r=mut.@(128+ln);
 lp(let i=0;i<ln;i=i+1){r=r+@(b.get(i))};
@@ -130,7 +130,7 @@ let started=mut.0;
 lp(p<n){
 let ch=s.slice(j;p;p+1);
 let cb=s.bytes(ch).get(0);
-if(cb>=48){if(cb<=57){val=val*10+(cb-48);started=1;p=p+1}el{p=n}}el{if(started=1){p=n}el{p=p+1}}};
+if(cb>=48){if(cb<=57){val=val*10+(cb-48);started=1;p=p+1}el{p=n}}el{if(started==1){p=n}el{p=p+1}}};
 <val};
 f=jsonstr(j:$str;key:$str):$str{
 let pat=s.concat(s.concat("\"";key);"\":\"");

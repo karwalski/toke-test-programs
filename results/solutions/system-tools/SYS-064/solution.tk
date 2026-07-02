@@ -5,7 +5,7 @@ i=s:std.str;
 f=main():$i64{
   let input=s.trim(io.readln());
   let n=s.len(input);
-  if(n=0){io.println("ERROR: invalid JSON: ...");<0};
+  if(n==0){io.println("ERROR: invalid JSON: ...");<0};
   let first=s.slice(input;0;1);
   if(s.equals(first;"{")){
     if(s.indexof(input;":")<0){io.println("ERROR: invalid JSON: ...");<0};

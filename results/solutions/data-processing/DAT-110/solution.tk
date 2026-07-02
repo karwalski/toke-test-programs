@@ -44,20 +44,20 @@ f=splittop(content:$str):@$str{
   let start=mut.0;
   lp(let i=0;i<n;i=i+1){
     let c=s.slice(content;i;i+1);
-    if(instr=1){
-      if(c="\\"){
+    if(instr==1){
+      if(c=="\\"){
         i=i+1
       }el{
-        if(c="\""){instr=0}
+        if(c=="\""){instr=0}
       }
     }el{
-      if(c="\""){instr=1}
-      el{ if(c="{"){depth=depth+1} el{
-        if(c="["){depth=depth+1} el{
-        if(c="}"){depth=depth-1} el{
-        if(c="]"){depth=depth-1} el{
-        if(c=","){
-          if(depth=0){
+      if(c=="\""){instr=1}
+      el{ if(c=="{"){depth=depth+1} el{
+        if(c=="["){depth=depth+1} el{
+        if(c=="}"){depth=depth-1} el{
+        if(c=="]"){depth=depth-1} el{
+        if(c==","){
+          if(depth==0){
             res=res.push(s.slice(content;start;i));
             start=i+1
           }
@@ -80,11 +80,11 @@ f=findcolon(pair:$str):i64{
   let instr=mut.0;
   lp(let i=0;i<n;i=i+1){
     let c=s.slice(pair;i;i+1);
-    if(instr=1){
-      if(c="\\"){i=i+1}el{if(c="\""){instr=0}}
+    if(instr==1){
+      if(c=="\\"){i=i+1}el{if(c=="\""){instr=0}}
     }el{
-      if(c="\""){instr=1}el{
-        if(c=":"){<i}
+      if(c=="\""){instr=1}el{
+        if(c==":"){<i}
       }
     }
   };
@@ -96,10 +96,10 @@ f=unescape(lit:$str):$str{
   let out=mut."";
   lp(let i=0;i<n;i=i+1){
     let c=s.slice(lit;i;i+1);
-    if(c="\\"){
+    if(c=="\\"){
       let nx=s.slice(lit;i+1;i+2);
-      if(nx="n"){out=s.concat(out;"\n")}el{
-        if(nx="t"){out=s.concat(out;"\t")}el{
+      if(nx=="n"){out=s.concat(out;"\n")}el{
+        if(nx=="t"){out=s.concat(out;"\t")}el{
           out=s.concat(out;nx)
         }
       };
@@ -125,7 +125,7 @@ f=flattenobj(objtext:$str;prefix:$str):@(@$str){
     if(s.len(prefix)>0){fullkey=s.concat(s.concat(prefix;".");keyname)};
     let val=s.slice(pair;ci+1;s.len(pair));
     let first=s.slice(val;0;1);
-    if(first="{"){
+    if(first=="{"){
       let sub=flattenobj(val;fullkey);
       let sk=sub.get(0);
       let sv=sub.get(1);
@@ -134,7 +134,7 @@ f=flattenobj(objtext:$str;prefix:$str):@(@$str){
         vals=vals.push(sv.get(q))
       }
     }el{
-      if(first="\""){
+      if(first=="\""){
         keys=keys.push(fullkey);
         vals=vals.push(unescape(inner(val)))
       }el{
@@ -155,22 +155,22 @@ f=csvcell(v:$str):$str{
   let needwrap=mut.0;
   lp(let i=0;i<n;i=i+1){
     let c=s.slice(v;i;i+1);
-    if(c="\""){doubled=s.concat(doubled;"\"\"")}
+    if(c=="\""){doubled=s.concat(doubled;"\"\"")}
     el{
-      if(c=","){needwrap=1;doubled=s.concat(doubled;c)}
+      if(c==","){needwrap=1;doubled=s.concat(doubled;c)}
       el{
-        if(c="\n"){needwrap=1;doubled=s.concat(doubled;c)}
+        if(c=="\n"){needwrap=1;doubled=s.concat(doubled;c)}
         el{doubled=s.concat(doubled;c)}
       }
     }
   };
-  if(needwrap=1){<s.concat(s.concat("\"";doubled);"\"")};
+  if(needwrap==1){<s.concat(s.concat("\"";doubled);"\"")};
   <doubled
 };
 
 f=main():i64{
   let raw=mut."";
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     raw=s.concat(raw;l)
@@ -191,16 +191,16 @@ f=main():i64{
       let k=ks.get(i);
       let exists=mut.0;
       lp(let j=0;j<allcols.len;j=j+1){
-        if(streq(allcols.get(j);k)=1){exists=1;br}
+        if(streq(allcols.get(j);k)==1){exists=1;br}
       };
-      if(exists=0){allcols=allcols.push(k)}
+      if(exists==0){allcols=allcols.push(k)}
     }
   };
 
   let nc=allcols.len;
   lp(let i=0;i<nc;i=i+1){
     lp(let j=0;j<nc-1-i;j=j+1){
-      if(strless(allcols.get(j+1);allcols.get(j))=1){
+      if(strless(allcols.get(j+1);allcols.get(j))==1){
         let t=allcols.get(j);
         allcols=allcols.set(j;allcols.get(j+1));
         allcols=allcols.set(j+1;t)
@@ -225,7 +225,7 @@ f=main():i64{
       let col=allcols.get(c);
       let cell=mut."";
       lp(let i=0;i<ks.len;i=i+1){
-        if(streq(ks.get(i);col)=1){cell=vs.get(i);br}
+        if(streq(ks.get(i);col)==1){cell=vs.get(i);br}
       };
       line=s.concat(line;csvcell(cell))
     };

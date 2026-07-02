@@ -20,13 +20,13 @@ f=isdigitchar(c:$str):i64{
 f=isnum(x:$str):i64{
   let t=s.trim(x);
   let n=s.len(t);
-  if(n=0){<0};
+  if(n==0){<0};
   let ok=mut.1;
   let digits=mut.0;
   let dots=mut.0;
   lp(let i=0;i<n;i=i+1){
     let c=s.slice(t;i;i+1);
-    if(isdigitchar(c)=1){digits=digits+1}
+    if(isdigitchar(c)==1){digits=digits+1}
     el{
       if(s.eq(c;".")){dots=dots+1}
       el{
@@ -36,7 +36,7 @@ f=isnum(x:$str):i64{
     }
   };
   if(dots>1){ok=0};
-  if(digits=0){ok=0};
+  if(digits==0){ok=0};
   <ok
 };
 
@@ -49,7 +49,7 @@ f=fixed2(x:f64):$str{
   let fs=mut.s.fromint(frac);
   if(frac<10){fs=s.concat("0";fs)};
   let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
-  if(neg=1){out=s.concat("-";out)};
+  if(neg==1){out=s.concat("-";out)};
   <out
 };
 
@@ -80,7 +80,7 @@ f=sortcopy(arr:@f64):@f64{
 
 f=percentile(sorted:@f64;p:f64):f64{
   let n=sorted.len as i64;
-  if(n=1){<sorted.get(0)};
+  if(n==1){<sorted.get(0)};
   let pos=p*((n-1) as f64);
   let lo=pos as i64;
   let frac=pos-(lo as f64);
@@ -92,12 +92,12 @@ f=percentile(sorted:@f64;p:f64):f64{
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)
   };
-  if(lines.len=0){<0};
+  if(lines.len==0){<0};
   let header=lines.get(0);
   let hcols=s.split(header;",");
   let ncols=hcols.len as i64;
@@ -111,7 +111,7 @@ f=main():i64{
       let cells=s.split(row;",");
       if((c as u64)<cells.len){
         let cell=cells.get(c as u64);
-        if(isnum(cell)=0){isnumcol=0}
+        if(isnum(cell)==0){isnumcol=0}
       }el{ isnumcol=0 }
     };
     numericFlags=numericFlags.push(isnumcol)
@@ -120,7 +120,7 @@ f=main():i64{
   let colIdx=mut.@();
   let colHead=mut.@();
   lp(let c=0;c<ncols;c=c+1){
-    if(numericFlags.get(c as u64)=1){
+    if(numericFlags.get(c as u64)==1){
       colIdx=colIdx.push(c);
       colHead=colHead.push(hcols.get(c as u64))
     }

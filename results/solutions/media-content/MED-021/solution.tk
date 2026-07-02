@@ -38,9 +38,9 @@ f=keyof(line:$str):$str{
 
 f=main():$i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     if(s.len(s.trim(line))>0){lines=lines.push(line)}
   };
   let n=lines.len() as $i64;

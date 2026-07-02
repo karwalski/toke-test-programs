@@ -7,7 +7,7 @@ f=fmtval(x:$f64):$str{
   let ad=mut.diff;
   if(ad<0.0){ad=0.0-ad};
   if(ad<0.000001){
-    if(r=0){<"0.0"};
+    if(r==0){<"0.0"};
     <s.concat(s.fromint(r);".0")
   };
   <s.format(v;"%g")

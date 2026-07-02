@@ -16,7 +16,7 @@ f=copyb(v:$vec):$vec{
 f=pegcount(b:$vec):i64{
   let n=(vec.len(b) as i64);
   let c=mut.0;
-  lp(let i=0;i<n;i=i+1){ if(vec.get(b;i)=1){ c=c+1 } };
+  lp(let i=0;i<n;i=i+1){ if(vec.get(b;i)==1){ c=c+1 } };
   <c
 };
 
@@ -31,7 +31,7 @@ f=valid(r:$i64;c:$i64;rows:$i64):$bool{
 
 f=solve(b:$vec;rows:$i64):$str{
   let pc=pegcount(b);
-  if(pc=1){ <"" };
+  if(pc==1){ <"" };
   let res=mut."FAIL";
   let found=mut.0;
   lp(let r=0;r<rows;r=r+1){
@@ -39,20 +39,20 @@ f=solve(b:$vec;rows:$i64):$str{
     lp(let c=0;c<r+1;c=c+1){
       if(found<1){
       let idx=tri(r)+c;
-      if(vec.get(b;idx)=1){
+      if(vec.get(b;idx)==1){
         lp(let d=0;d<6;d=d+1){
           if(found<1){
           let mr=mut.0; let mc=mut.0; let tr2=mut.0; let tc2=mut.0;
-          if(d=0){ mr=r; mc=c-1; tr2=r; tc2=c-2 }el{
-          if(d=1){ mr=r; mc=c+1; tr2=r; tc2=c+2 }el{
-          if(d=2){ mr=r-1; mc=c-1; tr2=r-2; tc2=c-2 }el{
-          if(d=3){ mr=r-1; mc=c; tr2=r-2; tc2=c }el{
-          if(d=4){ mr=r+1; mc=c; tr2=r+2; tc2=c }el{
+          if(d==0){ mr=r; mc=c-1; tr2=r; tc2=c-2 }el{
+          if(d==1){ mr=r; mc=c+1; tr2=r; tc2=c+2 }el{
+          if(d==2){ mr=r-1; mc=c-1; tr2=r-2; tc2=c-2 }el{
+          if(d==3){ mr=r-1; mc=c; tr2=r-2; tc2=c }el{
+          if(d==4){ mr=r+1; mc=c; tr2=r+2; tc2=c }el{
                    mr=r+1; mc=c+1; tr2=r+2; tc2=c+2 }}}}};
           if(valid(mr;mc;rows)){ if(valid(tr2;tc2;rows)){
             let midi=tri(mr)+mc;
             let dsti=tri(tr2)+tc2;
-            if(vec.get(b;midi)=1){ if(vec.get(b;dsti)=2){
+            if(vec.get(b;midi)==1){ if(vec.get(b;dsti)==2){
               let nb=mut.copyb(b);
               nb=vec.set(nb;idx;2);
               nb=vec.set(nb;midi;2);
@@ -94,7 +94,7 @@ f=main():i64{
       let ch=mut.0;
       if(c<rl){ ch=rb.get(c) as i64 };
       let v=mut.0;
-      if(ch=79){ v=1 }el{ if(ch=46){ v=2 }el{ v=0 }};
+      if(ch==79){ v=1 }el{ if(ch==46){ v=2 }el{ v=0 }};
       b=vec.push(b;v)
     }
   };

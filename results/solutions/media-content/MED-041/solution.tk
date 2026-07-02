@@ -9,9 +9,9 @@ f=ellipsis(text:$str;maxlen:$i64):$str{
 };
 f=main():$i64{
   let maxlen=s.toint(io.readln());
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     io.println(ellipsis(line;maxlen))
   };
   <0

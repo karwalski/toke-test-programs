@@ -12,9 +12,9 @@ f=main():$i64{
   let words=mut.0;
   let bytes=mut.0;
   let maxline=mut.0;
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     lines=lines+1;
     bytes=bytes+(s.len(raw) as $i64)+1;
     words=words+countwords(raw);

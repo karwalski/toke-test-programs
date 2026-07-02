@@ -3,7 +3,7 @@ f=isminehere(mines:@$i64;cols:$i64;r:$i64;c:$i64):$bool{
   let pos=r*cols+c;
   let found=mut.false;
   lp(let k=0;k<(mines.len as i64);k=k+1){
-    if(mines.get(k)=pos){found=true};
+    if(mines.get(k)==pos){found=true};
   };
   <found
 };
@@ -36,10 +36,10 @@ f=solve(rows:$i64;cols:$i64;minecount:$i64;seed:$i64):$str{
         lp(let dr=0-1;dr<2;dr=dr+1){
           lp(let dc=0-1;dc<2;dc=dc+1){
             let nr=r+dr; let nc=c+dc;
-            if(!(dr=0)){
+            if(!(dr==0)){
               if(nr<0){}el{if(nr<rows){if(nc<0){}el{if(nc<cols){if(isminehere(mines;cols;nr;nc)){cnt=cnt+1};};};};};
             }el{
-              if(!(dc=0)){
+              if(!(dc==0)){
                 if(nr<0){}el{if(nr<rows){if(nc<0){}el{if(nc<cols){if(isminehere(mines;cols;nr;nc)){cnt=cnt+1};};};};};
               };
             };

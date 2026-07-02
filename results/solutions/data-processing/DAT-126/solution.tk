@@ -66,12 +66,12 @@ f=main():i64{
   };
   let empty=mut.0;
   lp(let i=0;i<m;i=i+1){
-    if(regs.get(i as u64)=0){ empty=empty+1; };
+    if(regs.get(i as u64)==0){ empty=empty+1; };
   };
   let mv=m as f64;
   let vv=empty as f64;
   let est=mut.0;
-  if(empty=0){
+  if(empty==0){
     est=m;
   }el{
     let lc=mv*lnval(mv/vv);

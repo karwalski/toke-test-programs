@@ -5,9 +5,9 @@ f=main():$i64{
   let bsucc=mut.0;
   let btot=mut.0;
   let first=mut.true;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let t=s.trim(line);
     if(s.len(t)>0){
       if(first){first=false}
@@ -15,8 +15,8 @@ f=main():$i64{
         let parts=s.split(t;",");
         let variant=parts.get(0);
         let outcome=s.toint(parts.get(1));
-        if(s.eq(variant;"A")){atot=atot+1;if(outcome=1){sucA=sucA+1}};
-        if(s.eq(variant;"B")){btot=btot+1;if(outcome=1){bsucc=bsucc+1}}
+        if(s.eq(variant;"A")){atot=atot+1;if(outcome==1){sucA=sucA+1}};
+        if(s.eq(variant;"B")){btot=btot+1;if(outcome==1){bsucc=bsucc+1}}
       }
     }
   };
@@ -43,7 +43,7 @@ f=main():$i64{
   chisq=chisq+(bf-eb)*(bf-eb)/eb;
   chisq=chisq+(failb-ebf)*(failb-ebf)/ebf;
   let pval=mut.0.0;
-  if(chisq=0.0){pval=1.0}
+  if(chisq==0.0){pval=1.0}
   el{if(chisq>=3.841){pval=0.0}
   el{pval=1.0-(chisq/3.841)*0.95;if(pval<0.0){pval=0.0}}};
   io.println(s.concat(s.concat(s.concat(s.concat(s.concat("A: ";s.fromint(sucA));"/");s.fromint(atot));" = ");s.concat(s.format(arate;"%.2f");"%")));

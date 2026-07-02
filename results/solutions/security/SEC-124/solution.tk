@@ -7,7 +7,7 @@ f=octet(ip:$str;n:$i64):$i64{
   lp(let i=0;i<s.len(str);i=i+1){
     let ch=s.slice(str;i;i+1);
     if(s.eq(ch;".")){
-      if(idx=n){res=s.toint(cur)};
+      if(idx==n){res=s.toint(cur)};
       idx=idx+1;
       cur="";
     }el{cur=s.concat(cur;ch)};
@@ -31,7 +31,7 @@ f=incidr(ip:$str;cidr:$str):$bool{
   let hostbits=32-preflen;
   let mask=mut.0;
   lp(let i=0;i<32;i=i+1){ if(i<preflen){mask=mask*2+1}el{mask=mask*2} };
-  <((ipv&mask)=(netv&mask))
+  <((ipv&mask)==(netv&mask))
 };
 f=main():$i64{
   let line=s.trim(io.readln());

@@ -20,7 +20,7 @@ f=main():$i64{
   let prevtemp=mut.0;
   let haveprev=mut.0;
   let cool=mut.0.0;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let trimmed=s.trim(line);
@@ -32,7 +32,7 @@ f=main():$i64{
         let tm=parsei(parts.get(0));
         let tp=parsei(parts.get(1));
         if(tp>peak){peak=tp};
-        if(haveprev=1){
+        if(haveprev==1){
           if(prevtemp>=230){if(tp>=230){above=above+(tm-prevtime)}};
           if(tp<prevtemp){
             let dn=(prevtemp-tp) as$f64;

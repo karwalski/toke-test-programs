@@ -1,7 +1,7 @@
 m=queue;i=io:std.io;i=s:std.str;i=fl:std.file;
 f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
 f=loadq(path:$str):$str{if(fl.exists(path)){<fl.read(path)};<"[]"};
-f=maxid(content:$str):$i64{let m=mut.0;let pos=mut.0;lp(1=1){let k=findfrom(content;"\"id\":";pos);if(k<0){br};let ns=k+5;let ne=mut.ns;lp(ne<s.len(content)){let ch=s.slice(content;ne;ne+1);if(s.eq(ch;",")||s.eq(ch;"}")){br};ne=ne+1};let id=s.toint(s.trim(s.slice(content;ns;ne)));if(id>m){m=id};pos=ne};<m};
+f=maxid(content:$str):$i64{let m=mut.0;let pos=mut.0;lp(1==1){let k=findfrom(content;"\"id\":";pos);if(k<0){br};let ns=k+5;let ne=mut.ns;lp(ne<s.len(content)){let ch=s.slice(content;ne;ne+1);if(s.eq(ch;",")||s.eq(ch;"}")){br};ne=ne+1};let id=s.toint(s.trim(s.slice(content;ns;ne)));if(id>m){m=id};pos=ne};<m};
 f=main():$i64{
 let path=s.trim(io.readln());
 let cmdline=s.trim(io.readln());
@@ -18,14 +18,14 @@ job=s.concat(job;arg);
 job=s.concat(job;"\",\"status\":\"queued\",\"created_at\":\"2026-01-01T00:00:00\"}");
 let trimmed=s.trim(content);
 let newc=mut."";
-if(s.eq(trimmed;"[]")||s.len(trimmed)=0){newc=s.concat(s.concat("[";job);"]")}el{let inner=s.slice(trimmed;1;s.len(trimmed)-1);newc=s.concat(s.concat(s.concat("[";inner);",");s.concat(job;"]"))};
+if(s.eq(trimmed;"[]")||s.len(trimmed)==0){newc=s.concat(s.concat("[";job);"]")}el{let inner=s.slice(trimmed;1;s.len(trimmed)-1);newc=s.concat(s.concat(s.concat("[";inner);",");s.concat(job;"]"))};
 let ok=fl.write(path;newc);
 io.println(s.concat(s.concat("Job ";s.fromint(nid));" queued."));
 }el{if(s.eq(cmd;"list")){
 let trimmed=s.trim(content);
-if(s.eq(trimmed;"[]")||s.len(trimmed)=0){io.println("Queue empty")}el{
+if(s.eq(trimmed;"[]")||s.len(trimmed)==0){io.println("Queue empty")}el{
 let pos=mut.0;
-lp(1=1){let k=findfrom(content;"\"id\":";pos);if(k<0){br};
+lp(1==1){let k=findfrom(content;"\"id\":";pos);if(k<0){br};
 let ns=k+5;let ne=mut.ns;lp(ne<s.len(content)){let ch=s.slice(content;ne;ne+1);if(s.eq(ch;",")||s.eq(ch;"}")){br};ne=ne+1};let id=s.trim(s.slice(content;ns;ne));
 let stk=findfrom(content;"\"status\":\"";ne);let ss=stk+10;let se=findfrom(content;"\"";ss);let status=s.slice(content;ss;se);
 let ck=findfrom(content;"\"command\":\"";ne);let cs=ck+11;let ce=findfrom(content;"\"";cs);let command=s.slice(content;cs;ce);

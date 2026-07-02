@@ -47,13 +47,13 @@ dig=dig+@((w>>24)&255)};
 <enc.hexencode(dig)};
 f=main():$i64{
 let cnt=mut.0;
-lp(let go=1;go=1;go=go){
+lp(let go=1;go==1;go=go){
 let line=io.readln();
 let e=io.eof();
-if(e=1){if(cnt>0){go=0}};
-if(go=1){
+if(e==1){if(cnt>0){go=0}};
+if(go==1){
 let h=md5hex(s.bytes(line));
 io.println(s.concat(h;s.concat("\t";line)));
 cnt=cnt+1;
-if(e=1){go=0}}};
+if(e==1){go=0}}};
 <0}

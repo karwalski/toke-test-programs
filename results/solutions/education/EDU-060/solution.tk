@@ -42,17 +42,17 @@ f=main():$i64{
       }
     }
   };
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
-    if(s.len(t)=0){br};
+    if(s.len(t)==0){br};
     let lower=s.lower(t);
     let matched=mut.@($str);
     lp(let ti=0;ti<tags.len();ti=ti+1){
       let found=mut.false;
       lp(let ki=0;ki<kwflat.len();ki=ki+1){
-        if(kwowner.get(ki)=ti){
+        if(kwowner.get(ki)==ti){
           if(!found){
             if(s.contains(lower;s.lower(kwflat.get(ki)))){found=true}
           }

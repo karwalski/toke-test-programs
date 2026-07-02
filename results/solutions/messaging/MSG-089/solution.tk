@@ -1,7 +1,7 @@
 m=reneg;i=io:std.io;i=s:std.str;
 f=main():$i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     lines=lines+@(s.trim(line));
@@ -13,7 +13,7 @@ f=main():$i64{
   io.println("3. Send renegotiation request");
   io.println("4. Await acknowledgement");
   io.println("5. Derive new session key");
-  if(pending=0){
+  if(pending==0){
     io.println("6. No pending messages to re-encrypt");
   }el{
     io.println(s.concat(s.concat("6. Re-encrypt ";s.fromint(pending));" pending messages"));

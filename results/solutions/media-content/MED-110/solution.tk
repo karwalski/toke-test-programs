@@ -12,7 +12,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){text=s.concat(text;" ")};
     text=s.concat(text;line);
     first=false;

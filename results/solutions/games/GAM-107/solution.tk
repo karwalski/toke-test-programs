@@ -56,7 +56,7 @@ f=main():i64{
   let results=mut.@("");
   lp(let xi=1;xi<=n;xi=xi+1){
     lp(let yi=1;yi<=n;yi=yi+1){
-      if(xi=yi){}el{
+      if(xi==yi){}el{
         if(comp(rights.get(yi);lefts.get(xi))){
           let r=s.concat(s.concat(ids.get(xi);" right of ");ids.get(yi));
           results=results.push(r)

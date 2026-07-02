@@ -31,7 +31,7 @@ f=parsebal(json:$str;name:$str):$i64{
           };
         };
       };
-      if(cleaned=name){
+      if(cleaned==name){
         result=s.toint(cleanval);
         found=1;
       };
@@ -56,13 +56,13 @@ f=main():$i64{
         let toaddr=parts.get(2);
         let amount=s.toint(parts.get(3));
         let frombal=mut.0;
-        if(fromaddr="alice"){frombal=alicebal}el{frombal=bobbal};
+        if(fromaddr=="alice"){frombal=alicebal}el{frombal=bobbal};
         if(frombal<amount){
           if(s.len(err)<1){
             err=s.concat("ERROR: Insufficient balance for ";fromaddr);
           };
         }el{
-          if(fromaddr="alice"){
+          if(fromaddr=="alice"){
             alicebal=alicebal-amount;
             bobbal=bobbal+amount;
           }el{

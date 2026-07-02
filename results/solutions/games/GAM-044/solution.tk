@@ -20,7 +20,7 @@ let done=mut.0;
 lp(done<1){
 let line=io.readln();
 let t=s.trim(line);
-if(s.len(t)=0){done=1}el{
+if(s.len(t)==0){done=1}el{
 let parts=s.split(t;" ");
 let pos=s.toint(s.trim(parts.get(0)));
 let typ=s.trim(parts.get(1));
@@ -41,6 +41,6 @@ io.println(s.fromint(sum*wmult));
 f=arrset(a:@$i64;idx:$i64;v:$i64):@$i64{
 let out=mut.@();
 let n=a.len as $i64;
-lp(let i=0;i<n;i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(a.get(i))}};
+lp(let i=0;i<n;i=i+1){if(i==idx){out=out+@(v)}el{out=out+@(a.get(i))}};
 <out
 };

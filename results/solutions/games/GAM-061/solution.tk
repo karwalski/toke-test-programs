@@ -10,7 +10,7 @@ f=arrseti(a:@$i64;idx:$i64;v:$i64):@$i64{
   let r=mut.@();
   let n=a.len as i64;
   lp(let i=0;i<n;i=i+1){
-    if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))};
+    if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))};
   };
   <r
 };
@@ -18,7 +18,7 @@ f=arrsetb(a:@$bool;idx:$i64;v:$bool):@$bool{
   let r=mut.@();
   let n=a.len as i64;
   lp(let i=0;i<n;i=i+1){
-    if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))};
+    if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))};
   };
   <r
 };
@@ -53,7 +53,7 @@ f=isace(card:$str):$bool{
   <str.eq(rank;"A")
 };
 f=isjack(card:$str):$bool{
-  if(rankval(card)=11){<true};
+  if(rankval(card)==11){<true};
   <false
 };
 f=suitof(card:$str):$str{
@@ -64,7 +64,7 @@ f=isrun(rv:@$i64;mask:$i64;length:$i64):$bool{
   let vals=mut.@();
   lp(let b=0;b<5;b=b+1){
     let bit=mask/pow2(b)-mask/pow2(b+1)*2;
-    if(bit=1){vals=vals+@(rv.get(b))};
+    if(bit==1){vals=vals+@(rv.get(b))};
   };
   let m=vals.len as i64;
   let sorted=mut.vals;
@@ -79,7 +79,7 @@ f=isrun(rv:@$i64;mask:$i64;length:$i64):$bool{
   };
   let ok=mut.true;
   lp(let i=0;i<m-1;i=i+1){
-    if(!(sorted.get(i+1)-sorted.get(i)=1)){ok=false};
+    if(!(sorted.get(i+1)-sorted.get(i)==1)){ok=false};
   };
   <ok
 };
@@ -102,7 +102,7 @@ f=main():i64{
     let aces=mut.0;
     lp(let b=0;b<5;b=b+1){
       let bit=mask/pow2(b)-mask/pow2(b+1)*2;
-      if(bit=1){
+      if(bit==1){
         cnt=cnt+1;
         base=base+fv.get(b);
         if(ace.get(b)){aces=aces+1};
@@ -111,7 +111,7 @@ f=main():i64{
     if(cnt>1){
       let ok=mut.false;
       lp(let k=0;k<(aces+1);k=k+1){
-        if(base+k*10=15){ok=true};
+        if(base+k*10==15){ok=true};
       };
       if(ok){fdisp=fdisp+1};
     };
@@ -122,28 +122,28 @@ f=main():i64{
     let base=mut.0;
     lp(let b=0;b<5;b=b+1){
       let bit=mask/pow2(b)-mask/pow2(b+1)*2;
-      if(bit=1){cnt=cnt+1;base=base+fv.get(b)};
+      if(bit==1){cnt=cnt+1;base=base+fv.get(b)};
     };
-    if(cnt>1){ if(base=15){fstd=fstd+1} };
+    if(cnt>1){ if(base==15){fstd=fstd+1} };
   };
   let pairs=mut.0;
   lp(let i=0;i<5;i=i+1){
     lp(let j=i+1;j<5;j=j+1){
-      if(rv.get(i)=rv.get(j)){pairs=pairs+1};
+      if(rv.get(i)==rv.get(j)){pairs=pairs+1};
     };
   };
   let runpts=mut.0;
   let runlen=mut.0;
   lp(let length=5;length>2;length=length-1){
-    if(runlen=0){
+    if(runlen==0){
       let cnt=mut.0;
       lp(let mask=1;mask<32;mask=mask+1){
         let sz=mut.0;
         lp(let b=0;b<5;b=b+1){
           let bit=mask/pow2(b)-mask/pow2(b+1)*2;
-          if(bit=1){sz=sz+1};
+          if(bit==1){sz=sz+1};
         };
-        if(sz=length){
+        if(sz==length){
           if(isrun(rv;mask;length)){cnt=cnt+1};
         };
       };

@@ -2,7 +2,7 @@ m=deser;i=io:std.io;i=s:std.str;
 f=hexval(c:$str):$i64{let d="0123456789";let p=s.indexof(d;c);if(!(p<0)){<p};let lo="abcdef";let q=s.indexof(lo;c);if(!(q<0)){<q+10};let up="ABCDEF";let r=s.indexof(up;c);if(!(r<0)){<r+10};<0};
 f=main():$i64{
   let lines=mut.@($str);
-  lp(1=1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trim(s.trimsuffix(l;"\n")))};
+  lp(1==1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trim(s.trimsuffix(l;"\n")))};
   let schema=lines.get(0);
   let hexraw=s.replace(lines.get(1);" ";"");
   let nbytes=s.len(hexraw)/2;
@@ -43,9 +43,9 @@ f=main():$i64{
     let tag=tw/8;
     let wire=tw%8;
     let fidx=mut.0-1;
-    lp(let f=0;f<ftags.len();f=f+1){if(ftags.get(f)=tag){fidx=f}};
+    lp(let f=0;f<ftags.len();f=f+1){if(ftags.get(f)==tag){fidx=f}};
     if(fidx<0){
-      if(wire=0){let cc=mut.true;lp(cc){if(pos<bytes.len()){let bt=bytes.get(pos);pos=pos+1;if(bt<128){cc=false}}el{cc=false}}}el{if(wire=2){let ln2=readv(bytes;pos);pos=pos+vlen(bytes;pos)+ln2}}
+      if(wire==0){let cc=mut.true;lp(cc){if(pos<bytes.len()){let bt=bytes.get(pos);pos=pos+1;if(bt<128){cc=false}}el{cc=false}}}el{if(wire==2){let ln2=readv(bytes;pos);pos=pos+vlen(bytes;pos)+ln2}}
     }el{
       let typ=ftypes.get(fidx);
       if(s.equals(typ;"string")){
@@ -54,7 +54,7 @@ f=main():$i64{
         outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(s.concat(s.concat("\"";str);"\""))
       }el{
         let v=readv(bytes;pos);pos=pos+vlen(bytes;pos);
-        if(s.equals(typ;"bool")){let b=mut."false";if(!(v=0)){b="true"};outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(b)}el{outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(s.fromint(v))}
+        if(s.equals(typ;"bool")){let b=mut."false";if(!(v==0)){b="true"};outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(b)}el{outnames=outnames+@(fnames.get(fidx));outvals=outvals+@(s.fromint(v))}
       }
     }
   };

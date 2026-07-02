@@ -20,10 +20,10 @@ let w=mut.@();lp(let i=0;i<32;i=i+1){w=w+@(key.get(i))};
 lp(let i=8;i<60;i=i+1){
 let t0=mut.w.get((i-1)*4+0);let t1=mut.w.get((i-1)*4+1);let t2=mut.w.get((i-1)*4+2);let t3=mut.w.get((i-1)*4+3);
 let im=i-i/8*8;
-if(im=0){
+if(im==0){
 let r0=t1;let r1=t2;let r2=t3;let r3=t0;
 t0=sb.get(r0)^rc.get(i/8-1);t1=sb.get(r1);t2=sb.get(r2);t3=sb.get(r3)}
-el{if(im=4){
+el{if(im==4){
 t0=sb.get(t0);t1=sb.get(t1);t2=sb.get(t2);t3=sb.get(t3)}};
 w=w+@(w.get((i-8)*4+0)^t0)+@(w.get((i-8)*4+1)^t1)+@(w.get((i-8)*4+2)^t2)+@(w.get((i-8)*4+3)^t3)};
 <w};

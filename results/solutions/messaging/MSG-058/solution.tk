@@ -31,13 +31,13 @@ f=main():$i64{
   lp(idx<recs.len()){
     let seg=recs.get(idx);
     let op=parseop(seg);
-    if(op="enqueue"){
+    if(op=="enqueue"){
       let msg=parsemsg(seg);
-      if(size=0){firstmsg=msg};
+      if(size==0){firstmsg=msg};
       size=size+1;
       out=str.concat(out;str.concat("enqueue ";str.concat(msg;str.concat(": ok (size=";str.concat(str.fromint(size);")\n")))))
     }el{
-      if(op="dequeue"){
+      if(op=="dequeue"){
         if(size>0){
           let dm=firstmsg;
           inflight=inflight+1;
@@ -46,18 +46,18 @@ f=main():$i64{
         }el{
           out=str.concat(out;"dequeue: EMPTY\n")}
       }el{
-        if(op="ack"){
+        if(op=="ack"){
           let msg=parsemsg(seg);
           inflight=inflight-1;
           out=str.concat(out;str.concat("ack ";str.concat(msg;": confirmed\n")))
         }el{
-          if(op="crash"){
+          if(op=="crash"){
             if(inflight>0){
               out=str.concat(out;"crash: lost in-flight messages\n")
             }el{
               out=str.concat(out;"crash: no in-flight messages\n")}
           }el{
-            if(op="recover"){
+            if(op=="recover"){
               if(inflight>0){
                 out=str.concat(out;str.concat("recover: requeued ";str.concat(str.fromint(inflight);" unacked\n")));
                 size=size+inflight;

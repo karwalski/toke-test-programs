@@ -13,7 +13,7 @@ f=main():$i64{
   let lines=mut.@();
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     lines=lines+@(line);
   };
   let template=mut."";
@@ -43,11 +43,11 @@ f=main():$i64{
   let missing=mut.@();
   let i=mut.0;
   lp(i<n){
-    if(i+1<n&&b.get(i)=123&&b.get(i+1)=123){
+    if(i+1<n&&b.get(i)==123&&b.get(i+1)==123){
       let start=i+2;
       let j=mut.start;
       lp(j<n){
-        if(j+1<n&&b.get(j)=125&&b.get(j+1)=125){br};
+        if(j+1<n&&b.get(j)==125&&b.get(j+1)==125){br};
         j=j+1;
       };
       let varname=s.substr(template;start;j);
@@ -59,7 +59,7 @@ f=main():$i64{
       i=i+1;
     };
   };
-  if(missing.len=0){
+  if(missing.len==0){
     io.println("VALID");
   }el{
     lp(let mi=0;mi<missing.len;mi=mi+1){

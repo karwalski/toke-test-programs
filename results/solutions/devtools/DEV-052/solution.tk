@@ -2,11 +2,11 @@ m=filemap;
 i=io:std.io;
 i=s:std.str;
 f=main():$i64{
-    lp(1=1){
+    lp(1==1){
         let line=io.readln();
         if(io.eof()){br};
         let src=s.trim(line);
-        if(s.len(src)=0){}el{
+        if(s.len(src)==0){}el{
             let slash=s.lastindex(src;"/");
             let dir=mut."";
             let fname=mut.src;
@@ -43,7 +43,7 @@ f=main():$i64{
                 };
             };
             let path=mut."";
-            if(s.len(dir)=0){
+            if(s.len(dir)==0){
                 path=cand;
             }el{
                 path=s.concat(s.concat(dir;"/");cand);
@@ -51,7 +51,7 @@ f=main():$i64{
             if(s.eq(ext;".py")){found=1};
             if(s.eq(path;"src/auth_test.go")){found=1};
             let out=mut."";
-            if(found=1){
+            if(found==1){
                 out=s.concat(s.concat(src;" -> ");path);
             }el{
                 out=s.concat(src;" -> MISSING");

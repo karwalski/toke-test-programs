@@ -8,10 +8,10 @@ f=main():$i64{
   let maxk=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){
-        if(first=1){
+        if(first==1){
           maxk=s.toint(tl);
           first=0;
         }el{
@@ -53,7 +53,7 @@ f=main():$i64{
       lp(let j=0;j<k;j=j+1){
         let sx=mut.0.0; let sy=mut.0.0; let cnt=mut.0;
         lp(let i=0;i<n;i=i+1){
-          if(asg.get(i)=j){ sx=sx+xs.get(i); sy=sy+ys.get(i); cnt=cnt+1; };
+          if(asg.get(i)==j){ sx=sx+xs.get(i); sy=sy+ys.get(i); cnt=cnt+1; };
         };
         if(cnt>0){
           cx=cx.set(j;sx/(cnt as $f64));

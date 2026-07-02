@@ -12,7 +12,7 @@ f=parseint(t:$str):$i64{
   <r
 };
 f=fmtrate(num:$i64;den:$i64):$str{
-  if(den=0){<"0.0"};
+  if(den==0){<"0.0"};
   let scaled=num*1000/den;
   let rem=num*1000-scaled*den;
   let r2=mut.scaled;

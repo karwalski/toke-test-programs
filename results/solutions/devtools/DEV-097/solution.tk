@@ -24,7 +24,7 @@ f=extractfield(obj:$str;key:$str):$str{
   let n=str.len(v) as i64;
   if(n>=2){
     let first=mt str.slice(v;0;1){ $ok:a a; $err:e "" };
-    if(first="\""){
+    if(first=="\""){
       let inner=mt str.slice(v;1;(n-1) as u64){ $ok:a a; $err:e "" };
       <inner
     }
@@ -64,7 +64,7 @@ f=main():i64{
       let obj=str.concat(raw;"}");
       let tms=toint(extractfield(obj;"time_ms"));
       let ep=extractfield(obj;"endpoint");
-      if(started=false){
+      if(started==false){
         last=tms;
         started=true
       };

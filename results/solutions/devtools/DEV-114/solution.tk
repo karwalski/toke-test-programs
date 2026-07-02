@@ -62,7 +62,7 @@ f=fmt1(x:$f64):$str{
 f=main():i64{
   let input=io.readln();
   let n=str.len(input) as i64;
-  if(n=0){<0};
+  if(n==0){<0};
   let inner=mt str.slice(input;1;n-1){ $ok:v v; $err:e "" };
   let parts=str.split(inner;"},{");
   let np=parts.len as i64;
@@ -106,7 +106,7 @@ f=main():i64{
     totalreq=totalreq+rc;
     totalerr=totalerr+ec;
     let rate=mut.0.0;
-    if(!(rc=0)){rate=(ec as f64)/(rc as f64)*100.0};
+    if(!(rc==0)){rate=(ec as f64)/(rc as f64)*100.0};
     let line=mut.str.concat(froms.get(i);" -> ");
     line=str.concat(line;tos.get(i));
     line=str.concat(line;": ");
@@ -120,7 +120,7 @@ f=main():i64{
   };
   io.println(str.concat("Total requests: ";str.fromint(totalreq)));
   let orate=mut.0.0;
-  if(!(totalreq=0)){orate=(totalerr as f64)/(totalreq as f64)*100.0};
+  if(!(totalreq==0)){orate=(totalerr as f64)/(totalreq as f64)*100.0};
   io.println(str.concat(str.concat("Overall error rate: ";fmt1(orate));"%"));
   <0
 };

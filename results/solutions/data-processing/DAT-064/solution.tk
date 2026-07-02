@@ -4,13 +4,13 @@ i=s:std.str;
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     lines=lines.push(l)
   };
   let nl=mut.lines.len;
-  lp(1=1){
+  lp(1==1){
     if(nl<=0){br};
     if(s.eq(lines.get(nl-1);"")){nl=nl-1}el{br}
   };
@@ -31,7 +31,7 @@ f=main():i64{
     if(kk<1){kk=1};
     lp(let i=0;i<total;i=i+1){
       let r=i-i/kk*kk;
-      if(r=0){ io.println(rows.get(i)) }
+      if(r==0){ io.println(rows.get(i)) }
     };
     <0
   };

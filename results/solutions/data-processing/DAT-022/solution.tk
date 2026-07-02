@@ -3,7 +3,7 @@ i=io:std.io;
 i=s:std.str;
 
 f=joincomma(a:@i64):$str{
-  if(a.len=0){<""};
+  if(a.len==0){<""};
   let out=mut.s.fromint(a.get(0));
   lp(let i=1;i<a.len;i=i+1){
     out=s.concat(out;s.concat(",";s.fromint(a.get(i))));
@@ -12,7 +12,7 @@ f=joincomma(a:@i64):$str{
 };
 
 f=joinspace(a:@i64):$str{
-  if(a.len=0){<""};
+  if(a.len==0){<""};
   let out=mut.s.fromint(a.get(0));
   lp(let i=1;i<a.len;i=i+1){
     out=s.concat(out;s.concat(" ";s.fromint(a.get(i))));

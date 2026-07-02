@@ -21,21 +21,21 @@ f=pow16(shift:$i64):$i64{
 };
 
 f=asciifor(cp:$i64):$str{
-  if(cp=1072){<"a"}; if(cp=1077){<"e"}; if(cp=1086){<"o"};
-  if(cp=1088){<"p"}; if(cp=1089){<"c"}; if(cp=1091){<"y"};
-  if(cp=1093){<"x"}; if(cp=1110){<"i"}; if(cp=1112){<"j"};
-  if(cp=1109){<"s"};
-  if(cp=1040){<"A"}; if(cp=1042){<"B"}; if(cp=1045){<"E"};
-  if(cp=1050){<"K"}; if(cp=1052){<"M"}; if(cp=1053){<"H"};
-  if(cp=1054){<"O"}; if(cp=1056){<"P"}; if(cp=1057){<"C"};
-  if(cp=1058){<"T"}; if(cp=1061){<"X"};
-  if(cp=945){<"a"}; if(cp=959){<"o"}; if(cp=961){<"p"};
-  if(cp=957){<"v"}; if(cp=965){<"u"};
-  if(cp=913){<"A"}; if(cp=914){<"B"}; if(cp=917){<"E"};
-  if(cp=918){<"Z"}; if(cp=919){<"H"}; if(cp=921){<"I"};
-  if(cp=922){<"K"}; if(cp=924){<"M"}; if(cp=925){<"N"};
-  if(cp=927){<"O"}; if(cp=929){<"P"}; if(cp=932){<"T"};
-  if(cp=933){<"Y"}; if(cp=935){<"X"};
+  if(cp==1072){<"a"}; if(cp==1077){<"e"}; if(cp==1086){<"o"};
+  if(cp==1088){<"p"}; if(cp==1089){<"c"}; if(cp==1091){<"y"};
+  if(cp==1093){<"x"}; if(cp==1110){<"i"}; if(cp==1112){<"j"};
+  if(cp==1109){<"s"};
+  if(cp==1040){<"A"}; if(cp==1042){<"B"}; if(cp==1045){<"E"};
+  if(cp==1050){<"K"}; if(cp==1052){<"M"}; if(cp==1053){<"H"};
+  if(cp==1054){<"O"}; if(cp==1056){<"P"}; if(cp==1057){<"C"};
+  if(cp==1058){<"T"}; if(cp==1061){<"X"};
+  if(cp==945){<"a"}; if(cp==959){<"o"}; if(cp==961){<"p"};
+  if(cp==957){<"v"}; if(cp==965){<"u"};
+  if(cp==913){<"A"}; if(cp==914){<"B"}; if(cp==917){<"E"};
+  if(cp==918){<"Z"}; if(cp==919){<"H"}; if(cp==921){<"I"};
+  if(cp==922){<"K"}; if(cp==924){<"M"}; if(cp==925){<"N"};
+  if(cp==927){<"O"}; if(cp==929){<"P"}; if(cp==932){<"T"};
+  if(cp==933){<"Y"}; if(cp==935){<"X"};
   <""
 };
 
@@ -44,7 +44,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;

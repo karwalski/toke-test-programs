@@ -5,7 +5,7 @@ let weak=mut.0;
 if(s.indexof(hostport;"v1-0")>=0){weak=1};
 if(s.indexof(hostport;"badssl")>=0){weak=1};
 let grade=mut."A";
-if(weak=1){grade="C"};
+if(weak==1){grade="C"};
 let out=mut.s.concat(s.concat("{\"host\":\"";hostport);"\",");
 out=s.concat(out;"\"protocols\":{\"TLS13\":true,\"TLS12\":true,\"TLS11\":false,\"TLS10\":false,\"SSL3\":false},");
 out=s.concat(out;"\"weakCiphers\":[],\"forwardSecrecy\":true,\"hsts\":false,");

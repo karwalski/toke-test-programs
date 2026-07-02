@@ -15,14 +15,14 @@ f=joinperm(state:@($str);n:$i64):$str{
 
 f=gen(state:@($str);n:$i64;k:$i64):@($str){
   let st=mut.state;
-  if(k=1){
+  if(k==1){
     st=st+@(joinperm(st;n));
     <st;
   };
   let i=mut.0;
   lp(i<k){
     st=gen(st;n;k-1);
-    if(k-(k/2)*2=0){
+    if(k-(k/2)*2==0){
       let tmp=st.get(i);
       st=st.set(i;st.get(k-1));
       st=st.set(k-1;tmp);

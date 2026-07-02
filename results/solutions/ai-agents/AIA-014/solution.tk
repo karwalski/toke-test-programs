@@ -23,7 +23,7 @@ f=toscaled(numstr:$str):$i64{
 f=fmtscaled(v:$i64):$str{
   let ipart=v/1000000;
   let fpart=v-ipart*1000000;
-  if(fpart=0){
+  if(fpart==0){
     <s.fromint(ipart)
   };
   let fs=mut.s.fromint(fpart);

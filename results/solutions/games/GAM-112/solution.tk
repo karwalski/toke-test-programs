@@ -13,7 +13,7 @@ f=fmt2(x:$f64):$str{
   let fs=mut.s.fromint(frac);
   if(frac<10){ fs=s.concat("0";fs) };
   let r=mut.s.concat(s.concat(s.fromint(whole);".");fs);
-  if(neg=1){ r=s.concat("-";r) };
+  if(neg==1){ r=s.concat("-";r) };
   <r
 };
 
@@ -24,19 +24,19 @@ f=score(h:$vec;cat:$i64):i64{
   let cnt=mut.vec.new();
   lp(let i=0;i<7;i=i+1){ cnt=vec.push(cnt;0) };
   lp(let i=0;i<5;i=i+1){ let fc=vec.get(h;i); cnt=vec.set(cnt;fc;vec.get(cnt;fc)+1) };
-  if(cat=1){
+  if(cat==1){
     (* yahtzee: any face count 5 *)
     let y=mut.0;
-    lp(let ga=1;ga<7;ga=ga+1){ if(vec.get(cnt;ga)=5){ y=50 } };
+    lp(let ga=1;ga<7;ga=ga+1){ if(vec.get(cnt;ga)==5){ y=50 } };
     <y
   };
   (* large straight: 1-5 or 2-6 *)
   let ls1=mut.1;
-  lp(let gb=1;gb<6;gb=gb+1){ if(vec.get(cnt;gb)=0){ ls1=0 } };
+  lp(let gb=1;gb<6;gb=gb+1){ if(vec.get(cnt;gb)==0){ ls1=0 } };
   let ls2=mut.1;
-  lp(let gd=2;gd<7;gd=gd+1){ if(vec.get(cnt;gd)=0){ ls2=0 } };
-  if(ls1=1){ <40 };
-  if(ls2=1){ <40 };
+  lp(let gd=2;gd<7;gd=gd+1){ if(vec.get(cnt;gd)==0){ ls2=0 } };
+  if(ls1==1){ <40 };
+  if(ls2==1){ <40 };
   <0
 };
 
@@ -79,14 +79,14 @@ f=main():i64{
     let label=mut."";
     lp(let i=0;i<nd;i=i+1){
       let bit=(mask/(ipow2(i)))%2;
-      if(bit=1){ kept=vec.push(kept;vec.get(dice;i)); label=s.concat(label;s.fromint(vec.get(dice;i))) }
+      if(bit==1){ kept=vec.push(kept;vec.get(dice;i)); label=s.concat(label;s.fromint(vec.get(dice;i))) }
     };
     let nkept=(vec.len(kept) as i64);
     let ndrop=nd-nkept;
     let ev=evkeep(kept;ndrop;cat);
     let disp=mut.label;
-    if(nkept=0){ disp="none" };
-    if(nkept=nd){ disp="all" };
+    if(nkept==0){ disp="none" };
+    if(nkept==nd){ disp="all" };
     io.println(s.concat(s.concat(s.concat("Keep ";disp);": EV ");fmt2(ev)))
   };
   <0

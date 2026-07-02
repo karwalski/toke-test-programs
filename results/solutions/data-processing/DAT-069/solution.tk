@@ -1,22 +1,22 @@
 m=ymerge;i=io:std.io;i=s:std.str;
 f=idxIn(arr:@$str;v:$str):$i64{lp(let i=0;i<arr.len();i=i+1){if(s.eq(arr.get(i);v)){<i}};<0-1};
 f=childIdx(cp:@$str;ck:@$str;p:$str;k:$str):$i64{lp(let i=0;i<cp.len();i=i+1){if(s.eq(cp.get(i);p)){if(s.eq(ck.get(i);k)){<i}}};<0-1};
-f=setStr(arr:@$str;idx:$i64;v:$str):@$str{let out=mut.@("x");out=@();lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
-f=setBool(arr:@$i64;idx:$i64;v:$i64):@$i64{let out=mut.@($i64);lp(let i=0;i<arr.len();i=i+1){if(i=idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
-f=sortKeys(keys:@$str):@$str{let out=mut.@("x");out=@();lp(out.len()<keys.len()){let best=mut."";let have=mut.false;lp(let i=0;i<keys.len();i=i+1){let k=keys.get(i);let used=mut.false;lp(let j=0;j<out.len();j=j+1){if(s.eq(out.get(j);k)){used=true}};if(!used){if(!have){best=k;have=true}el{let mn=mut.s.len(k);if(s.len(best)<mn){mn=s.len(best)};let dec=mut.0;lp(let c=0;c<mn;c=c+1){if(dec=0){let ca=s.slice(k;c;c+1);let cb=s.slice(best;c;c+1);if(!(s.eq(ca;cb))){if(s.indexof("abcdefghijklmnopqrstuvwxyz0123456789";ca)<s.indexof("abcdefghijklmnopqrstuvwxyz0123456789";cb)){dec=1}el{dec=0-1}}}};if(dec=0){if(s.len(k)<s.len(best)){dec=1}};if(dec=1){best=k}}}};out=out+@(best)};<out};
+f=setStr(arr:@$str;idx:$i64;v:$str):@$str{let out=mut.@("x");out=@();lp(let i=0;i<arr.len();i=i+1){if(i==idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=setBool(arr:@$i64;idx:$i64;v:$i64):@$i64{let out=mut.@($i64);lp(let i=0;i<arr.len();i=i+1){if(i==idx){out=out+@(v)}el{out=out+@(arr.get(i))}};<out};
+f=sortKeys(keys:@$str):@$str{let out=mut.@("x");out=@();lp(out.len()<keys.len()){let best=mut."";let have=mut.false;lp(let i=0;i<keys.len();i=i+1){let k=keys.get(i);let used=mut.false;lp(let j=0;j<out.len();j=j+1){if(s.eq(out.get(j);k)){used=true}};if(!used){if(!have){best=k;have=true}el{let mn=mut.s.len(k);if(s.len(best)<mn){mn=s.len(best)};let dec=mut.0;lp(let c=0;c<mn;c=c+1){if(dec==0){let ca=s.slice(k;c;c+1);let cb=s.slice(best;c;c+1);if(!(s.eq(ca;cb))){if(s.indexof("abcdefghijklmnopqrstuvwxyz0123456789";ca)<s.indexof("abcdefghijklmnopqrstuvwxyz0123456789";cb)){dec=1}el{dec=0-1}}}};if(dec==0){if(s.len(k)<s.len(best)){dec=1}};if(dec==1){best=k}}}};out=out+@(best)};<out};
 f=main():$i64{
 let topKeys=mut.@("x");topKeys=@();let topIsMap=mut.@($i64);let topScalar=mut.@("x");topScalar=@();
 let cp=mut.@("x");cp=@();let ck=mut.@("x");ck=@();let cv=mut.@("x");cv=@();
 let curParent=mut."";
-lp(1=1){if(io.eof()){br};let raw=io.readln();let line=s.trim(raw);if(s.len(line)=0){br};
+lp(1==1){if(io.eof()){br};let raw=io.readln();let line=s.trim(raw);if(s.len(line)==0){br};
  if(s.eq(line;"---")){curParent=""}
  el{let leading=mut.0;lp(leading<s.len(raw)){let ch=s.slice(raw;leading;leading+1);if(s.eq(ch;" ")){leading=leading+1}el{br}};
  let co=s.indexof(line;":");let key=s.trim(s.slice(line;0;co));let val=s.trim(s.slice(line;co+1;s.len(line)));
  if(leading>0){let ci=childIdx(cp;ck;curParent;key);if(ci<0){cp=cp+@(curParent);ck=ck+@(key);cv=cv+@(val)}el{cv=setStr(cv;ci;val)}}
- el{if(s.len(val)=0){curParent=key;let ti=idxIn(topKeys;key);if(ti<0){topKeys=topKeys+@(key);topIsMap=topIsMap+@(1);topScalar=topScalar+@("")}el{topIsMap=setBool(topIsMap;ti;1)}}
+ el{if(s.len(val)==0){curParent=key;let ti=idxIn(topKeys;key);if(ti<0){topKeys=topKeys+@(key);topIsMap=topIsMap+@(1);topScalar=topScalar+@("")}el{topIsMap=setBool(topIsMap;ti;1)}}
    el{curParent="";let ti=idxIn(topKeys;key);if(ti<0){topKeys=topKeys+@(key);topIsMap=topIsMap+@(0);topScalar=topScalar+@(val)}el{topIsMap=setBool(topIsMap;ti;0);topScalar=setStr(topScalar;ti;val)}}}}};
 let sk=sortKeys(topKeys);
-lp(let i=0;i<sk.len();i=i+1){let k=sk.get(i);let ti=idxIn(topKeys;k);if(topIsMap.get(ti)=1){io.println(s.concat(k;":"));
+lp(let i=0;i<sk.len();i=i+1){let k=sk.get(i);let ti=idxIn(topKeys;k);if(topIsMap.get(ti)==1){io.println(s.concat(k;":"));
   let myKeys=mut.@("x");myKeys=@();lp(let j=0;j<cp.len();j=j+1){if(s.eq(cp.get(j);k)){myKeys=myKeys+@(ck.get(j))}};let smk=sortKeys(myKeys);
   lp(let j=0;j<smk.len();j=j+1){let sub=smk.get(j);let cidx=childIdx(cp;ck;k;sub);io.println(s.concat("  ";s.concat(sub;s.concat(": ";cv.get(cidx)))))}}
  el{io.println(s.concat(k;s.concat(": ";topScalar.get(ti))))}};<0}

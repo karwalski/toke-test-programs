@@ -2,12 +2,12 @@ m=protocol;i=io:std.io;i=s:std.str;i=json:std.json;
 f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
 f=unq(q:$str):$str{ let n=s.len(q); <s.slice(q;1;n-1) };
 f=aliasof(rf:$str):$str{
-if(rf="sender"){<"from"};
-if(rf="receiver"){<"to"};
-if(rf="payload"){<"msg"};
+if(rf=="sender"){<"from"};
+if(rf=="receiver"){<"to"};
+if(rf=="payload"){<"msg"};
 <""};
 f=inferred(raw:Json;rf:$str):$str{
-if(rf="type"){
+if(rf=="type"){
 if(json.has(raw;"msg")){<"\"notification\""};
 if(json.has(raw;"payload")){<"\"notification\""};
 };
@@ -41,7 +41,7 @@ s.add(b;json.getobj(raw;al).raw);
 done=true;
 };
 };
-if(done=false){
+if(done==false){
 s.add(b;inferred(raw;rf));
 };
 };

@@ -40,7 +40,7 @@ f=main():i64{
   let b=s.bytes(line);
   let n=(b.len as i64);
 
-  if(n=0){
+  if(n==0){
     io.println("0");
     io.println("WEAK");
     <0
@@ -75,7 +75,7 @@ f=main():i64{
 
   if(!(n<4)){
     score=score+classes*10;
-    if(classes=4){score=score+1}
+    if(classes==4){score=score+1}
   };
 
   let nf=(n as f64);
@@ -83,7 +83,7 @@ f=main():i64{
   lp(let v=0;v<256;v=v+1){
     let cnt=mut.0;
     lp(let i=0;i<n;i=i+1){
-      if(b.get(i)=v){cnt=cnt+1}
+      if(b.get(i)==v){cnt=cnt+1}
     };
     if(cnt>0){
       let pr=(cnt as f64)/nf;

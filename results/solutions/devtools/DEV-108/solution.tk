@@ -28,7 +28,7 @@ f=getfloat(obj:$str;key:$str):$f64{
     if(go){
       if(i<n){
         let c=bytes.get(i);
-        if(c=dot){
+        if(c==dot){
           seendot=true;
           i=i+1;
         }el{
@@ -101,7 +101,7 @@ f=sumdurations(obj:$str):$f64{
           if(go){
             if(j<n){
               let c=bytes.get(j);
-              if(c=dot){seendot=true;j=j+1}el{
+              if(c==dot){seendot=true;j=j+1}el{
                 if(isdigit(c)){
                   if(seendot){frac=frac*10+((c as i64)-48);fracdiv=fracdiv*10}el{whole=whole*10+((c as i64)-48)};
                   j=j+1;

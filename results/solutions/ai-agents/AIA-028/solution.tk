@@ -14,12 +14,12 @@ f=getstr(obj:$str;key:$str):$str{
 };
 
 f=isstop(w:$str):$bool{
-  if(str.len(w)=0){<true};
-  if(w="is"){<true};
-  if(w="the"){<true};
-  if(w="a"){<true};
-  if(w="an"){<true};
-  if(w="of"){<true};
+  if(str.len(w)==0){<true};
+  if(w=="is"){<true};
+  if(w=="the"){<true};
+  if(w=="a"){<true};
+  if(w=="an"){<true};
+  if(w=="of"){<true};
   <false
 };
 
@@ -71,8 +71,8 @@ f=jsonesc(s:$str):$str{
   let n=str.len(s);
   lp(let i=0;i<(n as i64);i=i+1){
     let c=(bytes.get(i as u64) as i64);
-    if(c=34){out=str.concat(out;"\\\"")}el{
-      if(c=92){out=str.concat(out;"\\\\")}el{
+    if(c==34){out=str.concat(out;"\\\"")}el{
+      if(c==92){out=str.concat(out;"\\\\")}el{
         let ch=mt str.slice(s;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
         out=str.concat(out;ch)
       }

@@ -2,7 +2,7 @@ m=shamir;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
 f=gfmul(a:$i64;b:$i64):$i64{
   let p=mut.0;let aa=mut.a;let bb=mut.b;
   lp(let i=0;i<8;i=i+1){
-    if(bb-bb/2*2=1){p=p^aa};
+    if(bb-bb/2*2==1){p=p^aa};
     let hi=aa&128;
     aa=(aa<<1)&255;
     if(hi!=0){aa=aa^27};

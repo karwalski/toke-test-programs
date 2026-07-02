@@ -42,7 +42,7 @@ f=main():$i64{
   let last=mut.mtimeof(path);
   let triggers=mut.0;
   let polls=mut.0;
-  let watching=mut.(1=1);
+  let watching=mut.(1==1);
 
   lp(watching){
     let cur=mtimeof(path);
@@ -55,11 +55,11 @@ f=main():$i64{
       io.print(s.concat("Output: ";output));
       triggers=triggers+1;
       if(maxtrig>0){
-        if(triggers>=maxtrig){ watching=(1=0); };
+        if(triggers>=maxtrig){ watching=(1==0); };
       };
     };
     polls=polls+1;
-    if(polls>20){ watching=(1=0); };
+    if(polls>20){ watching=(1==0); };
   };
   <0
 }

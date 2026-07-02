@@ -2,16 +2,16 @@ m=roulette;
 i=io:std.io;
 i=str:std.str;
 f=isred(n:$i64):$bool{
-  if(n=1){<true}; if(n=3){<true}; if(n=5){<true}; if(n=7){<true};
-  if(n=9){<true}; if(n=12){<true}; if(n=14){<true}; if(n=16){<true};
-  if(n=18){<true}; if(n=19){<true}; if(n=21){<true}; if(n=23){<true};
-  if(n=25){<true}; if(n=27){<true}; if(n=30){<true}; if(n=32){<true};
-  if(n=34){<true}; if(n=36){<true};
+  if(n==1){<true}; if(n==3){<true}; if(n==5){<true}; if(n==7){<true};
+  if(n==9){<true}; if(n==12){<true}; if(n==14){<true}; if(n==16){<true};
+  if(n==18){<true}; if(n==19){<true}; if(n==21){<true}; if(n==23){<true};
+  if(n==25){<true}; if(n==27){<true}; if(n==30){<true}; if(n==32){<true};
+  if(n==34){<true}; if(n==36){<true};
   <false
 };
 f=colorof(n:$i64;bettype:$str):$str{
   if(str.startswith(bettype;"number")){<"Green"};
-  if(n=0){<"Green"};
+  if(n==0){<"Green"};
   if(isred(n)){<"Red"};
   <"Black"
 };
@@ -25,20 +25,20 @@ f=nextstate(s:$i64):$i64{
 f=wins(bettype:$str;num:$i64):$bool{
   if(str.eq(bettype;"red")){<isred(num)};
   if(str.eq(bettype;"black")){
-    if(num=0){<false};
+    if(num==0){<false};
     <!(isred(num))
   };
   if(str.eq(bettype;"even")){
-    if(num=0){<false};
-    <(num-num/2*2)=0
+    if(num==0){<false};
+    <(num-num/2*2)==0
   };
   if(str.eq(bettype;"odd")){
-    <(num-num/2*2)=1
+    <(num-num/2*2)==1
   };
   if(str.startswith(bettype;"number")){
     let nstr=mt str.slice(bettype;6 as u64;str.len(bettype)){ $ok:v v; $err:e "-1" };
     let target=mt str.toint(nstr){ $ok:v v; $err:e (0-1) };
-    <num=target
+    <num==target
   };
   <false
 };
@@ -55,7 +55,7 @@ f=main():$i64{
   let spin=mut.0;
   lp(let i=0;i<100000;i=i+1){
     let line=io.readln();
-    if(str.len(line)=0){br};
+    if(str.len(line)==0){br};
     let parts=str.split(line;" ");
     let bettype=parts.get(0 as u64);
     let amtstr=parts.get(1 as u64);

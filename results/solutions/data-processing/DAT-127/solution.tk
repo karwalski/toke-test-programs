@@ -58,14 +58,14 @@ let parts=s.split(first;" ");
 let size=s.toint(parts.get(0));
 let hc=s.toint(parts.get(1));
 let bits=mut.@();lp(let i=0;i<size;i=i+1){bits=bits+@(0)};
-lp(let go=1;go=1;go=go){
+lp(let go=1;go==1;go=go){
 let line=io.readln();
 let e=io.eof();
 if(s.len(line)>0){
 let p=s.split(line;" ");
 let cmd=p.get(0);
 let item=p.get(1);
-if(cmd="add"){
+if(cmd=="add"){
 lp(let k=0;k<hc;k=k+1){
 let idx=hashidx(item;k;size);
 bits=bits.set(idx;1)};
@@ -74,8 +74,8 @@ el{
 let all=mut.1;
 lp(let k=0;k<hc;k=k+1){
 let idx=hashidx(item;k;size);
-if(bits.get(idx)=0){all=0}};
-if(all=1){io.println(s.concat("Possibly in set: ";item))}
+if(bits.get(idx)==0){all=0}};
+if(all==1){io.println(s.concat("Possibly in set: ";item))}
 el{io.println(s.concat("Definitely not in set: ";item))}}};
-if(e=1){go=0}};
+if(e==1){go=0}};
 <0}

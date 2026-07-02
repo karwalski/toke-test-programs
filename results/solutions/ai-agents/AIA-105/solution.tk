@@ -2,11 +2,11 @@ m=dispatch;i=io:std.io;i=s:std.str;i=json:std.json;
 f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
 f=setint(a:@($i64);idx:$i64;v:$i64):@($i64){
 let r=mut.@(); let n=a.len(); let i=mut.0;
-lp(i<n){ if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
+lp(i<n){ if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
 <r};
 f=setstr(a:@($str);idx:$i64;v:$str):@($str){
 let r=mut.@(); let n=a.len(); let i=mut.0;
-lp(i<n){ if(i=idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
+lp(i<n){ if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
 <r};
 f=main():$i64{
 let line=io.readln();
@@ -43,7 +43,7 @@ let hit=mut.false;
 let si=mut.0;
 lp(si<ns){
 let sp="\(specs.get(si).raw)";
-if(sp=json.enc(itype)){hit=true};
+if(sp==json.enc(itype)){hit=true};
 si=si+1;
 };
 let curload=loads.get(k);
@@ -59,7 +59,7 @@ if(best>=0){
 loads=setint(loads;best;loads.get(best)+cx);
 let cur=listbufs.get(best);
 let nv=mut."";
-if(cur=""){nv=json.enc(itid)}el{nv="\(cur),\(json.enc(itid))"};
+if(cur==""){nv=json.enc(itid)}el{nv="\(cur),\(json.enc(itid))"};
 listbufs=setstr(listbufs;best;nv);
 };
 wi=wi+1;
@@ -71,7 +71,7 @@ let oi=mut.0;
 lp(oi<na){
 let ag=agents.get(oi);
 let id=json.getstr(ag;"id");
-if(first=false){s.add(b;",")};
+if(first==false){s.add(b;",")};
 first=false;
 s.add(b;json.enc(id));
 s.add(b;":[");

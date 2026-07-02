@@ -15,7 +15,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)};
     };
@@ -62,7 +62,7 @@ f=main():$i64{
     let d1=x1.get(i)-m1;
     let d2=x2.get(i)-m2;
     let m=mut.0.0;
-    if(useoff=1){
+    if(useoff==1){
       let i11=mut.0.0; i11=v2/det;
       let i22=mut.0.0; i22=v1/det;
       let i12=mut.0.0; i12=(0.0-cv)/det;

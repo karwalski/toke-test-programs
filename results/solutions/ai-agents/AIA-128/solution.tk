@@ -6,7 +6,7 @@ f=arrclose(t:$str):$i64{
     if(instr){if(s.eq(ch;"\"")){instr=false}}el{
       if(s.eq(ch;"\"")){instr=true}el{
         if(s.eq(ch;"[")){depth=depth+1}el{
-          if(s.eq(ch;"]")){if(depth=0){<i};depth=depth-1}
+          if(s.eq(ch;"]")){if(depth==0){<i};depth=depth-1}
         }
       }
     };
@@ -21,7 +21,7 @@ f=objclose(t:$str):$i64{
     if(instr){if(s.eq(ch;"\"")){instr=false}}el{
       if(s.eq(ch;"\"")){instr=true}el{
         if(s.eq(ch;"{")){depth=depth+1}el{
-          if(s.eq(ch;"}")){if(depth=0){<i};depth=depth-1}
+          if(s.eq(ch;"}")){if(depth==0){<i};depth=depth-1}
         }
       }
     };

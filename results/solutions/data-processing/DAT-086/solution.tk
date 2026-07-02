@@ -3,7 +3,7 @@ i=io:std.io;
 i=s:std.str;
 
 f=joinlist(a:@i64):$str{
-  if(a.len=0){<""};
+  if(a.len==0){<""};
   let out=mut.s.fromint(a.get(0));
   lp(let i=1;i<a.len;i=i+1){
     out=s.concat(out;s.concat(", ";s.fromint(a.get(i))));
@@ -20,13 +20,13 @@ f=fixed1(x:f64):$str{
   let whole=iscaled/10;
   let frac=iscaled-whole*10;
   let out=mut.s.concat(s.concat(s.fromint(whole);".");s.fromint(frac));
-  if(neg=1){out=s.concat("-";out)};
+  if(neg==1){out=s.concat("-";out)};
   <out
 };
 
 f=main():i64{
   let rows=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){
       let t=s.trim(l);

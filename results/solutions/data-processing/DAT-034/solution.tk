@@ -3,9 +3,9 @@ f=colidx(headers:@($str);name:$str):$i64{let i=mut.0;lp(i<headers.len()){if(s.eq
 f=main():$i64{
 let ds1=mut.@("");ds1=@();let ds2=mut.@("");ds2=@();let joinLine=mut."";
 let phase=mut.1;
-lp(1=1){let raw=io.readln();let line=s.trimsuffix(raw;"\n");
+lp(1==1){let raw=io.readln();let line=s.trimsuffix(raw;"\n");
 if(s.startswith(line;"join ")){joinLine=line;br};
-if(s.len(s.trim(line))=0){if(phase=1){phase=2}}el{if(phase=1){ds1=ds1+@(line)}el{ds2=ds2+@(line)}}}
+if(s.len(s.trim(line))==0){if(phase==1){phase=2}}el{if(phase==1){ds1=ds1+@(line)}el{ds2=ds2+@(line)}}}
 let jp=s.trimprefix(joinLine;"join ");let cols=s.split(jp;"=");let leftCol=s.trim(cols.get(0));let rightCol=s.trim(cols.get(1));
 let bh=s.split(ds1.get(0);",");let ph=s.split(ds2.get(0);",");
 let li=colidx(bh;leftCol);let ri=colidx(ph;rightCol);

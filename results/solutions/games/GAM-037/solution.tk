@@ -1,11 +1,11 @@
 m=bracket;i=io:std.io;i=s:std.str;
 f=sp(n:$i64):$str{let o=mut."";let i=mut.0;lp(i<n){o=s.concat(o;" ");i=i+1};<o};
 f=padname(name:$str;w:$i64):$str{let o=mut.name;let need=mut.w-s.len(name);if(need<0){need=0};let i=mut.0;lp(i<need){o=s.concat(o;" ");i=i+1};<o};
-f=main():$i64{let teams=mut.@("");teams=@();lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(s.len(t)>0){teams=teams+@(t)}};
+f=main():$i64{let teams=mut.@("");teams=@();lp(1==1){let line=io.readln();if(s.len(line)==0){br};let t=s.trim(line);if(s.len(t)>0){teams=teams+@(t)}};
 let n=teams.len();
 let w=mut.0;let i=mut.0;lp(i<n){if(s.len(teams.get(i))>w){w=s.len(teams.get(i))};i=i+1};
 let ind=sp(w+2);
-if(n=2){
+if(n==2){
 io.println(s.concat(padname(teams.get(0);w);" ─┐"));
 io.println(s.concat(ind;"├─ WINNER"));
 io.println(s.concat(padname(teams.get(1);w);" ─┘"))}el{

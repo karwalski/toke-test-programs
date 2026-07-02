@@ -13,7 +13,7 @@ f=tobig(d:@byte):@i64{
 f=geq(a:@i64;b:@i64):$i64{let i=mut.15;lp(i>=0){if(a.get(i)>b.get(i)){<1};if(a.get(i)<b.get(i)){<0};i=i-1};<1};
 f=qmod():@i64{<@(65347;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535;65535)};
 f=sub256(a:@i64;b:@i64):@i64{let r=mut.@();let borrow=mut.0;let i=mut.0;lp(i<16){let d=mut.a.get(i)-b.get(i)-borrow;if(d<0){d=d+65536;borrow=1}el{borrow=0};r=r+@(d);i=i+1};<r};
-f=reduceq(a:@i64):@i64{let q=qmod();let r=mut.a;lp(geq(r;q)=1){r=sub256(r;q)};<r};
+f=reduceq(a:@i64):@i64{let q=qmod();let r=mut.a;lp(geq(r;q)==1){r=sub256(r;q)};<r};
 f=mul256(a:@i64;b:@i64):@i64{
   let prod=mut.@();let z=mut.0;lp(z<32){prod=prod+@(0);z=z+1};
   let i=mut.0;
@@ -40,7 +40,7 @@ f=foldq(prod:@i64):@i64{
   let rounds=mut.0;
   lp(rounds<4){
     let allzero=mut.1;let z=mut.0;lp(z<16){if(hi.get(z)!=0){allzero=0};z=z+1};
-    if(allzero=1){rounds=4}el{
+    if(allzero==1){rounds=4}el{
       let m189=mut.zero16();m189=m189.set(0;189);
       let t=mul256(hi;m189);
       let newlo=mut.@();let k=mut.0;lp(k<16){newlo=newlo+@(t.get(k));k=k+1};
@@ -68,7 +68,7 @@ f=modexp(base:@i64;ex:@i64):@i64{
   let bit=mut.0;
   lp(bit<256){
     let limb=bit/16;let off=bit-limb*16;
-    if(((ex.get(limb)>>off)&1)=1){result=mulmod(result;b)};
+    if(((ex.get(limb)>>off)&1)==1){result=mulmod(result;b)};
     b=mulmod(b;b);
     bit=bit+1;
   };
@@ -78,7 +78,7 @@ f=tohex64(a:@i64):$str{let hx="0123456789abcdef";let out=mut."";let i=mut.15;lp(
 f=isz(a:@i64):$i64{let i=mut.0;lp(i<16){if(a.get(i)!=0){<0};i=i+1};<1};
 f=divsmall(a:@i64;d:$i64):@i64{let q=mut.zero16();let rem=mut.0;let i=mut.15;lp(i>=0){let cur=rem*65536+a.get(i);q=q.set(i;cur/d);rem=cur-(cur/d)*d;i=i-1};<q};
 f=modsmall(a:@i64;d:$i64):$i64{let rem=mut.0;let i=mut.15;lp(i>=0){let cur=rem*65536+a.get(i);rem=cur-(cur/d)*d;i=i-1};<rem};
-f=todec(a:@i64):$str{if(isz(a)=1){<"0"};let digs="0123456789";let out=mut."";let v=mut.a;lp(isz(v)=0){let r=modsmall(v;10);out=s.concat(s.slice(digs;r;r+1);out);v=divsmall(v;10)};<out};
+f=todec(a:@i64):$str{if(isz(a)==1){<"0"};let digs="0123456789";let out=mut."";let v=mut.a;lp(isz(v)==0){let r=modsmall(v;10);out=s.concat(s.slice(digs;r;r+1);out);v=divsmall(v;10)};<out};
 f=hashparts(parts:@byte):@i64{<tobig(cr.sha256(parts))};
 f=main():$i64{
 let msg=io.readln();

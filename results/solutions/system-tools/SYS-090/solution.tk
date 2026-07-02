@@ -1,11 +1,11 @@
 m=dirwalk;i=io:std.io;i=s:std.str;i=file:std.file;i=path:std.path;
 f=main():$i64{
   let dir=s.trim(io.readln());
-  if(file.exists(dir)=(1=0)){
+  if(file.exists(dir)==(1==0)){
     io.println(s.concat("ERROR: directory not found: ";dir));
     <0
   };
-  if(file.isdir(dir)=(1=0)){
+  if(file.isdir(dir)==(1==0)){
     io.println(s.concat("ERROR: directory not found: ";dir));
     <0
   };
@@ -21,14 +21,14 @@ f=main():$i64{
       ext=s.lower(s.slice(raw;1 as $u64;s.len(raw)))
     };
     total=total+1;
-    let found=mut.(1=0);
+    let found=mut.(1==0);
     lp(let j=0;j<exts.len;j=j+1){
       if(s.eq(exts.get(j);ext)){
         counts=counts.set(j;counts.get(j)+1);
-        found=(1=1)
+        found=(1==1)
       }
     };
-    if(found=(1=0)){
+    if(found==(1==0)){
       exts=exts+@(ext);
       counts=counts+@(1)
     }

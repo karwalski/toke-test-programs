@@ -22,7 +22,7 @@ f=blockafter(text:$str;startidx:$i64):$str{
   lp((i as $u64)<s.len(body)){
     let c=s.slice(body;i as $u64;(i+1) as $u64);
     if(s.eq(c;"{")){depth=depth+1};
-    if(s.eq(c;"}")){depth=depth-1;if(depth=0){endd=i+1;i=s.len(body) as $i64}};
+    if(s.eq(c;"}")){depth=depth-1;if(depth==0){endd=i+1;i=s.len(body) as $i64}};
     i=i+1
   };
   <s.slice(body;0;endd as $u64)
@@ -41,7 +41,7 @@ f=exitskeys(roomblk:$str):$str{
   if(idx<0){<""};
   let blk=blockafter(roomblk;idx+(s.len(pat) as $i64));
   let inner=s.slice(blk;1;s.len(blk)-1);
-  if(s.len(s.trim(inner))=0){<""};
+  if(s.len(s.trim(inner))==0){<""};
   let pairs=s.split(inner;",");
   let out=mut."";
   let i=mut.0;
@@ -76,15 +76,15 @@ f=main():$i64{
   let cmds=mut.@();
   let incmd=mut.0;
   let guard=mut.0;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     guard=guard+1;
     if(guard>100000){br};
     let lt=s.trim(line);
-    if(incmd=0){
-      if(s.len(line)=0){incmd=1}el{jsonlines=jsonlines.push(line)}
+    if(incmd==0){
+      if(s.len(line)==0){incmd=1}el{jsonlines=jsonlines.push(line)}
     }el{
-      if(s.len(line)=0){br};
+      if(s.len(line)==0){br};
       if(s.len(lt)>0){cmds=cmds.push(lt)}
     }
   };

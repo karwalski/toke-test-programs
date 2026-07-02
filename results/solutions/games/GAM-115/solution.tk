@@ -28,16 +28,16 @@ f=main():i64{
   let foundbad=mut.0;
   let badid=mut.0;
   lp(let id=1;id<10;id=id+1){
-    if(foundbad=0){
+    if(foundbad==0){
       let count=mut.0;
       let fr=mut.0;
       let fc=mut.0;
       let have=mut.0;
       lp(let r=0;r<nrows;r=r+1){
         lp(let c=0;c<ncols;c=c+1){
-          if(vec.get(grid;r*ncols+c)=id){
+          if(vec.get(grid;r*ncols+c)==id){
             count=count+1;
-            if(have=0){fr=r;fc=c;have=1}
+            if(have==0){fr=r;fc=c;have=1}
           }
         }
       };
@@ -57,24 +57,24 @@ f=main():i64{
           (* four neighbours *)
           if(cr>0){
             let ni=(cr-1)*ncols+cc;
-            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+            if(vec.get(grid;ni)==id){ if(vec.get(visited;ni)==0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
           };
           if(cr<nrows-1){
             let ni=(cr+1)*ncols+cc;
-            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+            if(vec.get(grid;ni)==id){ if(vec.get(visited;ni)==0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
           };
           if(cc>0){
             let ni=cr*ncols+(cc-1);
-            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+            if(vec.get(grid;ni)==id){ if(vec.get(visited;ni)==0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
           };
           if(cc<ncols-1){
             let ni=cr*ncols+(cc+1);
-            if(vec.get(grid;ni)=id){ if(vec.get(visited;ni)=0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
+            if(vec.get(grid;ni)==id){ if(vec.get(visited;ni)==0){visited=vec.set(visited;ni;1);stack=vec.push(stack;ni)} }
           }
         };
         (* valid tetromino: exactly 4 cells, all connected *)
-        if(count=4){
-          if(reached=4){}el{foundbad=1;badid=id}
+        if(count==4){
+          if(reached==4){}el{foundbad=1;badid=id}
         }el{
           foundbad=1;badid=id
         }

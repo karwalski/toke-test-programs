@@ -8,14 +8,14 @@ let trimmed=mut.fs;lp(s.len(trimmed)>1){let last=s.slice(trimmed;s.len(trimmed)-
 <s.concat(s.concat(s.fromint(ip);".");trimmed)};
 f=main():$i64{let input=s.trim(io.readln());
 let ids=mut.@("");ids=@();let toks=mut.@(0);toks=@();let rels=mut.@(0.0);rels=@();
-let cur=mut.0;lp(1=1){let idp=extafter(input;"\"id\":\"";cur);if(idp<0){br};let id=readstr(input;idp);
+let cur=mut.0;lp(1==1){let idp=extafter(input;"\"id\":\"";cur);if(idp<0){br};let id=readstr(input;idp);
 let tp=extafter(input;"\"token_count\":";idp);let tc=s.toint(readnum(input;tp));
 let rp=extafter(input;"\"relevance_score\":";idp);let rel=s.tofloat(readnum(input;rp));
 ids=ids+@(id);toks=toks+@(tc);rels=rels+@(rel);cur=tp};
 let mp=extafter(input;"\"max_tokens\":";0);let maxtok=s.toint(readnum(input;mp));
 let n=ids.len();
 let order=mut.@(0);order=@();let i=mut.0;lp(i<n){order=order+@(i);i=i+1};
-let a=mut.0;lp(a<n){let b=mut.0;lp(b<n-1){let p=order.get(b);let q=order.get(b+1);if(rels.get(q)>rels.get(p)){let no=mut.@(0);no=@();let k=mut.0;lp(k<n){if(k=b){no=no+@(q)}el{if(k=b+1){no=no+@(p)}el{no=no+@(order.get(k))}};k=k+1};order=no};b=b+1};a=a+1};
+let a=mut.0;lp(a<n){let b=mut.0;lp(b<n-1){let p=order.get(b);let q=order.get(b+1);if(rels.get(q)>rels.get(p)){let no=mut.@(0);no=@();let k=mut.0;lp(k<n){if(k==b){no=no+@(q)}el{if(k==b+1){no=no+@(p)}el{no=no+@(order.get(k))}};k=k+1};order=no};b=b+1};a=a+1};
 let selected=mut.@("");selected=@();let total=mut.0;
 let z=mut.0;lp(z<n){let ri=order.get(z);if(total+toks.get(ri)<=maxtok){selected=selected+@(ids.get(ri));total=total+toks.get(ri)};z=z+1};
 let util=mut.0.0;if(maxtok>0){util=total as $f64/maxtok as $f64};

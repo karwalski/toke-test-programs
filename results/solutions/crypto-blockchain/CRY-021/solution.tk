@@ -24,7 +24,7 @@ f=bxor(a:$i64;b:$i64):$i64{
 f=xtime(a:$i64):$i64{
   let shifted=(a*2)-((a*2)/256)*256;
   let h=a/128-(a/128/2)*2;
-  if(h=1){<bxor(shifted;27)};
+  if(h==1){<bxor(shifted;27)};
   <shifted;
 };
 
@@ -77,7 +77,7 @@ f=keyexpand(key:@($i64)):@($i64){
     let t2=mut.w.get((wi-1)*4+2);
     let t3=mut.w.get((wi-1)*4+3);
     let mod=wi-(wi/8)*8;
-    if(mod=0){
+    if(mod==0){
       let r0=t1;
       let r1=t2;
       let r2=t3;
@@ -88,7 +88,7 @@ f=keyexpand(key:@($i64)):@($i64){
       t3=sboxat(r3);
       t0=bxor(t0;rconat(wi/8));
     }el{
-      if(mod=4){
+      if(mod==4){
         t0=sboxat(t0);
         t1=sboxat(t1);
         t2=sboxat(t2);

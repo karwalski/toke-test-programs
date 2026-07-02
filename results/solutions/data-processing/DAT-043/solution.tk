@@ -11,14 +11,14 @@ f=fixed2(x:f64):$str{
   let fs=mut.s.fromint(frac);
   if(frac<10){fs=s.concat("0";fs)};
   let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
-  if(neg=1){out=s.concat("-";out)};
+  if(neg==1){out=s.concat("-";out)};
   <out
 };
 
 f=main():i64{
   (* read entire stdin (single line expected) *)
   let text=mut."";
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     text=s.concat(text;l)
@@ -32,13 +32,13 @@ f=main():i64{
     let ch=s.slice(text;i;i+1);
     let found=mut.0;
     lp(let j=0;j<chars.len;j=j+1){
-      if(chars.get(j)=ch){
+      if(chars.get(j)==ch){
         freqs=freqs.set(j;freqs.get(j)+1);
         found=1;
         br
       }
     };
-    if(found=0){
+    if(found==0){
       chars=chars.push(ch);
       freqs=freqs.push(1)
     }
@@ -71,14 +71,14 @@ f=main():i64{
     (* find min *)
     let a=mut.(0-1);
     lp(let i=0;i<nfreq.len;i=i+1){
-      if(nalive.get(i)=1){
+      if(nalive.get(i)==1){
         if(a<0){
           a=i
         }el{
           if(nfreq.get(i)<nfreq.get(a)){
             a=i
           }el{
-            if(nfreq.get(i)=nfreq.get(a)){
+            if(nfreq.get(i)==nfreq.get(a)){
               if(norder.get(i)<norder.get(a)){a=i}
             }
           }
@@ -89,14 +89,14 @@ f=main():i64{
     (* find second min *)
     let b=mut.(0-1);
     lp(let i=0;i<nfreq.len;i=i+1){
-      if(nalive.get(i)=1){
+      if(nalive.get(i)==1){
         if(b<0){
           b=i
         }el{
           if(nfreq.get(i)<nfreq.get(b)){
             b=i
           }el{
-            if(nfreq.get(i)=nfreq.get(b)){
+            if(nfreq.get(i)==nfreq.get(b)){
               if(norder.get(i)<norder.get(b)){b=i}
             }
           }
@@ -118,7 +118,7 @@ f=main():i64{
   (* root is the last pushed alive node *)
   let root=mut.0;
   lp(let i=0;i<nalive.len;i=i+1){
-    if(nalive.get(i)=1){root=i}
+    if(nalive.get(i)==1){root=i}
   };
 
   (* assign codes by DFS using an explicit stack (parallel arrays) *)
@@ -144,7 +144,7 @@ f=main():i64{
     if(s.len(nchar.get(node))>0){
       (* leaf *)
       let code=mut.pre;
-      if(s.len(code)=0){code="0"};
+      if(s.len(code)==0){code="0"};
       codeChars=codeChars.push(nchar.get(node));
       codeStrs=codeStrs.push(code)
     }el{
@@ -164,11 +164,11 @@ f=main():i64{
       let lb=s.len(codeStrs.get(j+1));
       let swap=mut.0;
       if(la>lb){swap=1}el{
-        if(la=lb){
+        if(la==lb){
           if(codeChars.get(j)>codeChars.get(j+1)){swap=1}
         }
       };
-      if(swap=1){
+      if(swap==1){
         let tc=codeChars.get(j); codeChars=codeChars.set(j;codeChars.get(j+1)); codeChars=codeChars.set(j+1;tc);
         let ts=codeStrs.get(j); codeStrs=codeStrs.set(j;codeStrs.get(j+1)); codeStrs=codeStrs.set(j+1;ts)
       }
@@ -188,7 +188,7 @@ f=main():i64{
   lp(let i=0;i<tlen;i=i+1){
     let ch=s.slice(text;i;i+1);
     lp(let j=0;j<nc;j=j+1){
-      if(codeChars.get(j)=ch){
+      if(codeChars.get(j)==ch){
         encoded=s.concat(encoded;codeStrs.get(j));
         br
       }

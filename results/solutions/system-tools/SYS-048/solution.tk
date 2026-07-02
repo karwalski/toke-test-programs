@@ -3,7 +3,7 @@ f=kvvalue(line:$str;key:$str):$str{
   let eq=s.indexof(line;"=");
   if(eq<0){<""};
   let k=s.trim(s.slice(line;0 as $u64;eq as $u64));
-  if(s.eq(s.lower(k);s.lower(key))=(1=0)){<""};
+  if(s.eq(s.lower(k);s.lower(key))==(1==0)){<""};
   <s.trim(s.slice(line;(eq+1) as $u64;s.len(line)))
 };
 f=tokenval(line:$str;n:$i64):$str{
@@ -13,7 +13,7 @@ f=tokenval(line:$str;n:$i64):$str{
     let p=parts.get(i as $u64);
     if(s.len(p)>0){
       idx=idx+1;
-      if(idx=n){<p};
+      if(idx==n){<p};
     };
   };
   <""
@@ -27,7 +27,7 @@ f=configpath():$str{
 };
 f=dolist():$i64{
   let path=configpath();
-  if(file.exists(path)=(1=0)){
+  if(file.exists(path)==(1==0)){
     io.println("No hosts configured");
     <0
   };
@@ -40,7 +40,7 @@ f=dolist():$i64{
   let curhost=mut."-";
   let curuser=mut."-";
   let curport=mut."22";
-  let have=mut.(1=0);
+  let have=mut.(1==0);
   let printed=mut.0;
   lp(let i=0;i<lines.len;i=i+1){
     let line=s.trim(lines.get(i as $u64));
@@ -53,7 +53,7 @@ f=dolist():$i64{
         };
         curalias=tokenval(line;2);
         curhost="-";curuser="-";curport="22";
-        have=(1=1);
+        have=(1==1);
       }el{
         if(s.eq(kw;"hostname")){curhost=tokenval(line;2)};
         if(s.eq(kw;"user")){curuser=tokenval(line;2)};
@@ -65,7 +65,7 @@ f=dolist():$i64{
     io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(curalias;" ");curhost);" ");curuser);" ");curport));
     printed=printed+1;
   };
-  if(printed=0){io.println("No hosts configured")};
+  if(printed==0){io.println("No hosts configured")};
   <0
 };
 f=doadd():$i64{
@@ -73,9 +73,9 @@ f=doadd():$i64{
   let hostname=mut."";
   let user=mut."";
   let port=mut."";
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     let line=s.trim(raw);
     if(s.len(line)>0){
       let h=kvvalue(line;"Host");
@@ -88,7 +88,7 @@ f=doadd():$i64{
       if(s.len(p)>0){port=p};
     };
   };
-  if(s.len(host)=0){
+  if(s.len(host)==0){
     io.println("ERROR: no Host specified");
     <0
   };

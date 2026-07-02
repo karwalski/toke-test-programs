@@ -16,7 +16,7 @@ f=fixed4(x:f64):$str{
   if(frac<100){fs=s.concat("0";fs)};
   if(frac<10){fs=s.concat("0";fs)};
   let out=mut.s.concat(s.concat(s.fromint(whole);".");fs);
-  if(neg=1){out=s.concat("-";out)};
+  if(neg==1){out=s.concat("-";out)};
   <out
 };
 
@@ -38,7 +38,7 @@ f=strless(a:$str;b:$str):i64{
   lp(let i=0;i<n;i=i+1){
     let ca=s.slice(a;i;i+1);
     let cb=s.slice(b;i;i+1);
-    if(s.eq(ca;cb)=0){
+    if(s.eq(ca;cb)==0){
       (* compare char codes via ordering: find which is smaller by scanning ascii *)
       <charless(ca;cb)
     }
@@ -63,14 +63,14 @@ f=charless(a:$str;b:$str):i64{
 
 f=main():i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let l=io.readln();
     if(io.eof()){br};
     let t=s.trim(l);
     if(s.len(t)>0){ lines=lines.push(t) }
   };
   let ndocs=lines.len as i64;
-  if(ndocs=0){<0};
+  if(ndocs==0){<0};
 
   (* parse each doc: id string and word list *)
   (* docIds: @$str ; docWords stored as array-of-arrays *)
@@ -147,7 +147,7 @@ f=main():i64{
       lp(let b=1;b<m-1;b=b+1){
         let x=outw.get(b as u64);
         let y=outw.get((b+1) as u64);
-        if(strless(y;x)=1){
+        if(strless(y;x)==1){
           let sx=outs.get(b as u64);
           let sy=outs.get((b+1) as u64);
           outw=outw.set(b as u64;y); outw=outw.set((b+1) as u64;x);

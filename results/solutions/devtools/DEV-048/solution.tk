@@ -10,9 +10,9 @@ f=extractstr(line:$str;key:$str):$str{
 };
 f=main():$i64{
   let input=mut."";
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let line=io.readln();
-    if(io.eof()){if(s.len(line)=0){br}};
+    if(io.eof()){if(s.len(line)==0){br}};
     input=s.concat(input;line)
   };
   let version=extractstr(input;"version");

@@ -2,12 +2,12 @@ m=feedback;i=io:std.io;i=s:std.str;
 f=fmtg(x:$f64):$str{let neg=mut.false;let v=mut.x;if(v<0.0){neg=true;v=0.0-v};let scaled=mut.v*1000000.0+0.5;let si=scaled as $i64;let ip=si/1000000;let fp=si%1000000;let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("0";fs)};let end=mut.6;lp(end>1){let last=s.slice(fs;end-1;end);if(s.eq(last;"0")){end=end-1}el{br}};fs=s.slice(fs;0;end);let r=mut.s.concat(s.concat(s.fromint(ip);".");fs);if(neg){r=s.concat("-";r)};<r};
 f=findfrom(hay:$str;needle:$str;start:$i64):$i64{let hl=s.len(hay);let nl=s.len(needle);let i=mut.start;lp(i+nl<=hl){if(s.eq(s.slice(hay;i;i+nl);needle)){<i};i=i+1};<0-1};
 f=main():$i64{
-let input=mut."";lp(1=1){if(io.eof()){br};input=s.concat(input;io.readln())};
+let input=mut."";lp(1==1){if(io.eof()){br};input=s.concat(input;io.readln())};
 let names=mut.@("");names=@();
 let sums=mut.@(0.0);sums=@();
 let counts=mut.@(0);counts=@();
 let pos=mut.0;
-lp(1=1){
+lp(1==1){
 let ck=findfrom(input;"\"category\":\"";pos);
 if(ck<0){br};
 let vstart=ck+12;
@@ -27,7 +27,7 @@ lp(let i=0;i<n;i=i+1){totalsum=totalsum+sums.get(i);totalcount=totalcount+counts
 let used=mut.@(false);used=@();lp(let i=0;i<n;i=i+1){used=used+@(false)};
 lp(let k=0;k<n;k=k+1){
 let best=mut.0-1;
-lp(let i=0;i<n;i=i+1){if(used.get(i)=false){let avi=sums.get(i)/(counts.get(i) as $f64);if(best<0){best=i}el{let avb=sums.get(best)/(counts.get(best) as $f64);if(avi>avb){best=i}}}};
+lp(let i=0;i<n;i=i+1){if(used.get(i)==false){let avi=sums.get(i)/(counts.get(i) as $f64);if(best<0){best=i}el{let avb=sums.get(best)/(counts.get(best) as $f64);if(avi>avb){best=i}}}};
 used=used.set(best;true);
 let avg=sums.get(best)/(counts.get(best) as $f64);
 io.println(s.concat(s.concat(names.get(best);": ");fmtg(avg)));

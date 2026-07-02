@@ -13,13 +13,13 @@ f=fixed2(x:$f64):$str{
   let scaled=prod as$i64;
   let whole=scaled/100; let frac=scaled-whole*100;
   let r=mut."";
-  if(frac=0){
+  if(frac==0){
     r=s.concat(s.fromint(whole);".0");
   }el{
     let fs=mut.s.fromint(frac);
     if(frac<10){fs=s.concat("0";fs)};
     let last=mut.0; last=frac-(frac/10)*10;
-    if(last=0){fs=s.fromint(frac/10)};
+    if(last==0){fs=s.fromint(frac/10)};
     r=s.concat(s.concat(s.fromint(whole);".");fs);
   };
   if(neg){r=s.concat("-";r)};
@@ -53,14 +53,14 @@ f=main():$i64{
   let testvec=mut.@();
   let phase=mut.0;
   let seenheader=mut.0;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
     if(s.len(t)<1){}el{
       if(s.eq(t;"---")){phase=1}el{
-        if(phase=0){
-          if(seenheader=0){seenheader=1}el{
+        if(phase==0){
+          if(seenheader==0){seenheader=1}el{
             let parts=s.split(t;",");
             names=names+@(parts.get(0));
             vecs=vecs+@(feats(t;true));
@@ -83,7 +83,7 @@ f=main():$i64{
     out=s.concat(out;"\",\"similarity\":");
     out=s.concat(out;fixed2(sim));
     out=s.concat(out;"}");
-    if(havebest=0){best=nm;bestsim=sim;havebest=1}el{
+    if(havebest==0){best=nm;bestsim=sim;havebest=1}el{
       if(sim>bestsim){best=nm;bestsim=sim};
     };
   };

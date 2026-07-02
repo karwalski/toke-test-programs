@@ -3,12 +3,12 @@ i=io:std.io;
 i=s:std.str;
 
 f=classify(cp:$i64):$str{
-  if(cp=32||cp=9||cp=10||cp=13||cp=12||cp=11){<"Space"};
+  if(cp==32||cp==9||cp==10||cp==13||cp==12||cp==11){<"Space"};
   if(cp>=48&&cp<=57){<"DecimalDigit"};
   if(cp>=65&&cp<=90){<"Letter"};
   if(cp>=97&&cp<=122){<"Letter"};
-  if(cp=33||cp=34||cp=35||cp=37||cp=38||cp=39||cp=40||cp=41||cp=42||cp=44||cp=45||cp=46||cp=47||cp=58||cp=59||cp=63||cp=64||cp=91||cp=92||cp=93||cp=95||cp=123||cp=125){<"Punctuation"};
-  if(cp=36||cp=43||cp=60||cp=61||cp=62||cp=94||cp=96||cp=124||cp=126){<"Symbol"};
+  if(cp==33||cp==34||cp==35||cp==37||cp==38||cp==39||cp==40||cp==41||cp==42||cp==44||cp==45||cp==46||cp==47||cp==58||cp==59||cp==63||cp==64||cp==91||cp==92||cp==93||cp==95||cp==123||cp==125){<"Punctuation"};
+  if(cp==36||cp==43||cp==60||cp==61||cp==62||cp==94||cp==96||cp==124||cp==126){<"Symbol"};
   if(cp>=128){
     if(cp>=160&&cp<=191){<"Symbol"};
     <"Letter"
@@ -21,7 +21,7 @@ f=main():$i64{
   let first=mut.true;
   lp(!io.eof()){
     let line=io.readln();
-    if(io.eof()&&s.len(line)=0){br};
+    if(io.eof()&&s.len(line)==0){br};
     if(!first){all=s.concat(all;"\n")};
     all=s.concat(all;line);
     first=false;
@@ -88,7 +88,7 @@ f=main():$i64{
       let y=order.get(bb+1);
       let swap=mut.false;
       if(counts.get(x)<counts.get(y)){swap=true};
-      if(counts.get(x)=counts.get(y)){
+      if(counts.get(x)==counts.get(y)){
         if(firstpos.get(x)>firstpos.get(y)){swap=true};
       };
       if(swap){

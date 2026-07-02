@@ -30,7 +30,7 @@ f=bytestostr(bs:@$i64;n:$i64):$str{
 f=fitness(cand:@$i64;target:@$i64;n:$i64):$i64{
   let f=mut.0;
   lp(let i=0;i<n;i=i+1){
-    if(cand.get(i)=target.get(i)){f=f+1}
+    if(cand.get(i)==target.get(i)){f=f+1}
   };
   <f
 };
@@ -72,11 +72,11 @@ f=main():i64{
     lp(let p=0;p<popsize;p=p+1){
       let f=mut.0;
       lp(let i=0;i<n;i=i+1){
-        if(vec.get(pop;p*n+i)=(tb.get(i) as i64)){f=f+1}
+        if(vec.get(pop;p*n+i)==(tb.get(i) as i64)){f=f+1}
       };
       if(f>bestfit){bestfit=f;bestidx=p}
     };
-    if(bestfit=n){solved=1;br};
+    if(bestfit==n){solved=1;br};
 
     (* build next generation: keep best (elitism), others = mutated copies of best *)
     let newpop=mut.vec.new();

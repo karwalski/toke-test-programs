@@ -35,7 +35,7 @@ f=getint(json:$str;key:$str):$i64{
         if(s.equals(c;"9")){n=s.concat(n;c)}el{br}}}}}}}}}};
         i=i+1
     };
-    if(s.len(n)=0){<0-1};
+    if(s.len(n)==0){<0-1};
     <s.toint(n)
 };
 
@@ -62,7 +62,7 @@ f=main():$i64{
         label="Opening Question: ";
         if(s.equals(subject;"Science")){if(s.equals(topic;"Gravity")){content="If there were no gravity, what would happen to everything on Earth?"}}
         el{content=s.concat(s.concat("What do you think you know about ";topic);"?")};
-        if(s.len(content)=0){content=s.concat(s.concat("What do you think you know about ";topic);"?")}
+        if(s.len(content)==0){content=s.concat(s.concat("What do you think you know about ";topic);"?")}
     }el{
     if(s.equals(hooktype;"story")){
         label="Opening Story: ";

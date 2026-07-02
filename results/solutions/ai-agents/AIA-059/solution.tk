@@ -7,19 +7,19 @@ f=charat(text:$str;i:$i64):$str{
 };
 
 f=isdigit(c:$str):$bool{
-  if(!(s.len(c)=1)){<false};
+  if(!(s.len(c)==1)){<false};
   if(s.contains("0123456789";c)){<true};
   <false
 };
 
 f=isalnumdot(c:$str):$bool{
-  if(!(s.len(c)=1)){<false};
+  if(!(s.len(c)==1)){<false};
   if(s.contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._%+-";c)){<true};
   <false
 };
 
 f=isalnumhost(c:$str):$bool{
-  if(!(s.len(c)=1)){<false};
+  if(!(s.len(c)==1)){<false};
   if(s.contains("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-";c)){<true};
   <false
 };
@@ -27,18 +27,18 @@ f=isalnumhost(c:$str):$bool{
 f=dotcount(tok:$str):$i64{
   let n=mut.0;
   lp(let i=0;i<(s.len(tok) as i64);i=i+1){
-    if(charat(tok;i)="."){n=n+1}
+    if(charat(tok;i)=="."){n=n+1}
   };
   <n
 };
 
 f=isdigitsdots(tok:$str):$bool{
-  if(s.len(tok)=0){<false};
+  if(s.len(tok)==0){<false};
   lp(let i=0;i<(s.len(tok) as i64);i=i+1){
     let c=charat(tok;i);
     let ok=mut.false;
     if(isdigit(c)){ok=true};
-    if(c="."){ok=true};
+    if(c=="."){ok=true};
     if(!(ok)){<false}
   };
   <true
@@ -48,7 +48,7 @@ f=extractemails(text:$str):@$str{
   let res=mut.@();
   let n=s.len(text) as i64;
   lp(let i=0;i<n;i=i+1){
-    if(charat(text;i)="@"){
+    if(charat(text;i)=="@"){
       let lo=mut.i;
       lp(let k=i-1;k>=0;k=k-1){
         if(isalnumdot(charat(text;k))){lo=k}el{br}
@@ -58,7 +58,7 @@ f=extractemails(text:$str):@$str{
         if(isalnumhost(charat(text;k))){hi=k+1}el{br}
       };
       lp(hi>i+1){
-        if(charat(text;hi-1)="."){hi=hi-1}el{br}
+        if(charat(text;hi-1)=="."){hi=hi-1}el{br}
       };
       if(lo<i){
         if(hi>i+1){
@@ -84,8 +84,8 @@ f=extracttokens(text:$str;wantversion:$bool):@$str{
     let isbody=mut.false;
     if(i<n){
       if(isdigit(c)){isbody=true};
-      if(c="."){isbody=true};
-      if(wantversion){ if(c="v"){isbody=true} }
+      if(c=="."){isbody=true};
+      if(wantversion){ if(c=="v"){isbody=true} }
     };
     if(isbody){
       cur=s.concat(cur;c)
@@ -93,17 +93,17 @@ f=extracttokens(text:$str;wantversion:$bool):@$str{
       if(s.len(cur)>0){
         let tok=cur;
         if(wantversion){
-          if(charat(tok;0)="v"){
+          if(charat(tok;0)=="v"){
             let rest=mt s.slice(tok;1;s.len(tok) as i64){ $ok:v v; $err:e "" };
             if(isdigitsdots(rest)){
-              if(dotcount(rest)=2){
+              if(dotcount(rest)==2){
                 res=res+@(tok)
               }
             }
           }
         }el{
           if(isdigitsdots(tok)){
-            if(dotcount(tok)=3){
+            if(dotcount(tok)==3){
               res=res+@(tok)
             }
           }

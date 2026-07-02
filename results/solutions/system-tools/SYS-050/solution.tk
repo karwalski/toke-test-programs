@@ -29,9 +29,9 @@ f=main():$i64{
   if((parts.len as $i64)>0){sepin=parts.get(0)};
   if((parts.len as $i64)>2){align=parts.get(2)};
   let rows=mut.@();
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let raw=io.readln();
-    if(io.eof()){if(s.len(raw)=0){br}};
+    if(io.eof()){if(s.len(raw)==0){br}};
     let line=mut.raw;
     if(s.endswith(line;"\n")){line=s.slice(line;0 as $u64;((s.len(line) as $i64) - 1) as $u64)};
     if(s.len(line)>0){rows=rows+@(line)}

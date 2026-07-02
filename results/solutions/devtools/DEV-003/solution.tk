@@ -15,9 +15,9 @@ f=cmp(a:$str;b:$str):$i64{
 f=main():$i64{
   let command=s.trim(io.readln());
   let versions=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=s.trim(io.readln());
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     versions=versions+@(line)
   };
   if(s.eq(command;"compare")){
@@ -35,7 +35,7 @@ f=main():$i64{
           let tmp=arr.get(j);
           let na=mut.@();
           lp(let k=0;k<n;k=k+1){
-            if(k=j){na=na+@(arr.get(j+1))}el{if(k=j+1){na=na+@(tmp)}el{na=na+@(arr.get(k))}}
+            if(k==j){na=na+@(arr.get(j+1))}el{if(k==j+1){na=na+@(tmp)}el{na=na+@(arr.get(k))}}
           };
           arr=na
         }
@@ -47,7 +47,7 @@ f=main():$i64{
   if(s.eq(command;"validate")){
     lp(let i=0;i<versions.len();i=i+1){
       let parts=s.split(versions.get(i);".");
-      if(parts.len()=3){io.println("VALID")}el{io.println("INVALID")}
+      if(parts.len()==3){io.println("VALID")}el{io.println("INVALID")}
     };
     <0
   };

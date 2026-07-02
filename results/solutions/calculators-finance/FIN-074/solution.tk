@@ -19,10 +19,10 @@ f=main():i64{
   let rawsubtotal=mut.0.0;
   let discounttotal=mut.0.0;
   let taxrate=mut.0.0;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
-    if(s.len(line)=0){}el{
+    if(s.len(line)==0){}el{
       let parts=s.split(line;" ");
       if(s.eq(parts.get(0);"TAX")){
         taxrate=s.tofloat(parts.get(1));
