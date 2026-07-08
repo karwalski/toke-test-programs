@@ -4,8 +4,7 @@ f=main():$i64{
 let pwd=s.bytes(s.trim(io.readln()));
 let salt=s.bytes(s.trim(io.readln()));
 let iters=s.toint(s.trim(io.readln()));
-let block1=salt+@(0;0;0;1);
-let u=mut.cr.hmacsha256(pwd;block1);
+let u=mut.cr.hmacsha256(pwd;salt+@(0;0;0;1));
 let t=mut.u;
 let j=mut.1;
 lp(j<iters){u=cr.hmacsha256(pwd;u);t=xorbytes(t;u);j=j+1};

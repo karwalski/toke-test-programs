@@ -1,16 +1,13 @@
 m=fft;i=io:std.io;i=s:std.str;i=math:std.math;
 f=fmtval(x:$f64):$str{
-  let v=mut.x;
-  let r=mut.0;
-  if(v<0.0){r=0-((0.0-v)+0.5) as $i64}el{r=(v+0.5) as $i64};
-  let diff=v-(r as $f64);
-  let ad=mut.diff;
-  if(ad<0.0){ad=0.0-ad};
+  let r=if(x<0.0){0-((0.0-x)+0.5) as $i64}el{(x+0.5) as $i64};
+  let diff=x-(r as $f64);
+  let ad=if(diff<0.0){0.0-diff}el{diff};
   if(ad<0.000001){
     if(r==0){<"0.0"};
     <s.concat(s.fromint(r);".0")
   };
-  <s.format(v;"%g")
+  <s.format(x;"%g")
 };
 f=main():$i64{
   let n=s.toint(s.trim(io.readln()));

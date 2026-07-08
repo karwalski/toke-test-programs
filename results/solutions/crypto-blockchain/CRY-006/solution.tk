@@ -1,1 +1,1 @@
-m=b64dec;i=io:std.io;i=s:std.str;i=enc:std.encoding;f=main():$i64{let line=s.trim(io.readln());let dec=enc.b64decode(line);if(dec){let txt=s.frombytes(dec);if(txt){io.println(txt)}el{io.println("")}}el{io.println("")};<0}
+m=b64dec;i=io:std.io;i=s:std.str;i=enc:std.encoding;f=main():$i64{let line=s.trim(io.readln());let dec=enc.b64decode(line);io.println(if(dec){let txt=s.frombytes(dec);if(txt){txt}el{""}}el{""});<0}

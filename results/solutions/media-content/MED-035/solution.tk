@@ -1,9 +1,8 @@
 m=extract;i=io:std.io;i=s:std.str;
-f=attr(tag:$str;name:$str):$str{let pat=s.concat(name;"=\"");let p=s.indexof(tag;pat);if(p<0){<""};let vs=p+s.len(pat);let rest=s.slice(tag;vs;s.len(tag));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
-f=main():$i64{let html=mut."";let first=mut.(1==1);
-lp(1==1){let line=io.readln();if(s.len(line)==0){br};if(first){html=line;first=1==0}el{html=s.concat(s.concat(html;"\n");line)}};
+f=attr(tag:$str;name:$str):$str{let pat=s.concat(name;"=\"");let p=s.indexof(tag;pat);if(p<0){<""};let rest=s.slice(tag;p+s.len(pat);s.len(tag));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=main():$i64{let html=mut."";let first=mut.true;
+lp(true){let line=io.readln();if(s.len(line)==0){br};if(first){html=line;first=false}el{html=s.concat(s.concat(html;"\n");line)}};
 let rest=mut.html;
-lp(1==1){let p=s.indexof(rest;"<img");if(p<0){br};let after=s.slice(rest;p;s.len(rest));let close=s.indexof(after;">");if(close<0){br};let tag=s.slice(after;0;close+1);
-let src=attr(tag;"src");let hassrc=s.contains(tag;"src=\"");let hasalt=s.contains(tag;"alt=\"");
-if(hassrc&&hasalt){let alt=attr(tag;"alt");io.println(s.concat(s.concat(src;" | ");alt))};
+lp(true){let p=s.indexof(rest;"<img");if(p<0){br};let after=s.slice(rest;p;s.len(rest));let close=s.indexof(after;">");if(close<0){br};let tag=s.slice(after;0;close+1);
+if(s.contains(tag;"src=\"")&&s.contains(tag;"alt=\"")){io.println(s.concat(s.concat(attr(tag;"src");" | ");attr(tag;"alt")))};
 rest=s.slice(after;close+1;s.len(after))};<0}

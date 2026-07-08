@@ -12,6 +12,6 @@ f=main():$i64{
     let dice=s.split(t;" ");
     lp(let i=0;i<dice.len();i=i+1){let d=s.toint(dice.get(i));if(d==bf){actual=actual+1}}
   };
-  if(actual>=bc){io.println(s.concat("Bid stands: actual count ";s.fromint(actual)))}el{io.println(s.concat("Liar! actual count ";s.fromint(actual)))};
+  io.println(s.concat(if(actual>=bc){"Bid stands: actual count "}el{"Liar! actual count "};s.fromint(actual)));
   <0
 }
