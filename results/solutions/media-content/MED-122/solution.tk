@@ -22,7 +22,7 @@ f=tokenize(doc:$str):@$str{
 
 f=contains(set:@$str;w:$str):$bool{
   lp(let i=0;i<set.len;i=i+1){
-    if(s.eq(set.get(i);w)){<true};
+    if(set.get(i)==w){<true};
   };
   <false
 };
@@ -37,8 +37,7 @@ f=toset(arr:@$str):@$str{
 };
 
 f=fmt3(v:$f64):$str{
-  let x=mut.0.0; x=v;
-  let scaled=mut.0.0; scaled=math.round(x*1000.0);
+  let scaled=math.round(v*1000.0);
   let total=scaled as i64;
   let ip=total/1000;
   let frac=total-ip*1000;
@@ -57,7 +56,7 @@ f=main():$i64{
   lp(!io.eof()){
     let line=io.readln();
     if(io.eof()&&s.len(line)==0){br};
-    if(s.eq(line;"---")){
+    if(line=="---"){
       insecond=true;
       first=true;
     }el{

@@ -6,15 +6,15 @@ f=cameltosnake(line:$str):$str{
   let lower="abcdefghijklmnopqrstuvwxyz";
   let n=s.len(line) as $i64;
   let out=mut."";
-  let prevlower=mut.(1==0);
+  let prevlower=mut.false;
   lp(let i=0;i<n;i=i+1){
     let c=s.slice(line;i as $u64;(i+1) as $u64);
     let uidx=s.indexof(upper;c);
     let lidx=s.indexof(lower;c);
     if(uidx>=0){
       if(prevlower){out=s.concat(out;"_")};
-      out=s.concat(out;s.slice(lower;uidx as $u64;(uidx+1) as $u64));
-      prevlower=(1==0)
+      out=s.concat(out;s.tolower(c));
+      prevlower=false
     }el{
       out=s.concat(out;c);
       prevlower=(lidx>=0)
@@ -23,7 +23,7 @@ f=cameltosnake(line:$str):$str{
   <out
 };
 f=main():$i64{
-  lp(1==1){
+  lp(true){
     let line=io.readln();
     if(s.len(line)==0){br};
     io.println(cameltosnake(line))

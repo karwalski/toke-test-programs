@@ -1,16 +1,15 @@
 m=monitor;i=io:std.io;i=s:std.str;
-f=getint(json:$str;key:$str):$i64{let needle=s.concat(s.concat("\"";key);"\":");let idx=s.indexof(json;needle);if(idx<0){<0};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let num=mut."";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;",")){br};if(s.equals(c;"}")){br};if(s.equals(c;"]")){br};num=s.concat(num;c)};<s.toint(s.trim(num))};
-f=getstr(json:$str;key:$str):$str{let needle=s.concat(s.concat("\"";key);"\":\"");let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"\"");<s.slice(rest;0;endidx)};
-f=findidx(names:@$str;name:$str):$i64{lp(let i=0;i<names.len();i=i+1){if(s.equals(names.get(i);name)){<i}};<-1};
+f=getint(json:$str;key:$str):$i64{let needle="\"\(key)\":";let idx=s.indexof(json;needle);if(idx<0){<0};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let num=mut."";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(c==","||c=="}"||c=="]"){br};num=s.concat(num;c)};<s.toint(s.trim(num))};
+f=getstr(json:$str;key:$str):$str{let needle="\"\(key)\":\"";let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"\"");<s.slice(rest;0;endidx)};
+f=findidx(names:@$str;name:$str):$i64{lp(let i=0;i<names.len();i=i+1){if(names.get(i)==name){<i}};<-1};
 f=main():$i64{
-let timeout=mut.0;timeout=s.toint(s.trim(io.readln()));
+let timeout=s.toint(s.trim(io.readln()));
 let eventsline=io.readln();
-let checktime=mut.0;checktime=s.toint(s.trim(io.readln()));
+let checktime=s.toint(s.trim(io.readln()));
 let names=mut.@($str);
 let times=mut.@($i64);
-let body=mut."";
 let lb=s.indexof(eventsline;"[");
-if(lb>=0){body=s.slice(eventsline;lb+1;s.len(eventsline))}el{body=eventsline};
+let body=if(lb>=0){s.slice(eventsline;lb+1;s.len(eventsline))}el{eventsline};
 let objs=s.split(body;"}");
 lp(let i=0;i<objs.len();i=i+1){
 let o=objs.get(i);
@@ -26,13 +25,11 @@ lp(let i=0;i<names.len();i=i+1){
 let cons=names.get(i);
 let lasttime=times.get(i);
 let ago=checktime-lasttime;
-let status=mut."";
-if(ago*2>timeout){status="DEAD";deadcount=deadcount+1}el{status="ALIVE"};
+let status=if(ago*2>timeout){deadcount=deadcount+1;"DEAD"}el{"ALIVE"};
 io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(cons;": ");status);" (last heartbeat ");s.fromint(ago));"ms ago at t=");s.fromint(lasttime));")"))
 };
 if(deadcount>0){
-let word=mut."consumers";
-if(deadcount==1){word="consumer"};
+let word=if(deadcount==1){"consumer"}el{"consumers"};
 io.println(s.concat(s.concat(s.concat(s.concat("ACTION: rebalance triggered (";s.fromint(deadcount));" dead ");word);")"))
 };
 <0}

@@ -3,10 +3,8 @@ i=io:std.io;
 i=str:std.str;
 
 f=main():i64{
-  let seedline=io.readln();
-  let seed=mt str.toint(str.trim(seedline)){ $ok:v v; $err:e 0 };
-  let gsline=io.readln();
-  let groupsize=mt str.toint(str.trim(gsline)){ $ok:v v; $err:e 1 };
+  let seed=mt str.toint(str.trim(io.readln())){ $ok:v v; $err:e 0 };
+  let groupsize=mt str.toint(str.trim(io.readln())){ $ok:v v; $err:e 1 };
 
   let names=mut.@();
   lp(let i=0;i<100000;i=i+1){
@@ -35,12 +33,7 @@ f=main():i64{
       let ib=order.get(j+1);
       let ka=keys.get(ia);
       let kb=keys.get(ib);
-      let swap=mut.false;
-      if(ka>kb){swap=true};
-      if(ka==kb){
-        if(ia>ib){swap=true};
-      };
-      if(swap){
+      if(ka>kb||(ka==kb&&ia>ib)){
         order=order.set(j;ib);
         order=order.set(j+1;ia);
       };
@@ -52,15 +45,12 @@ f=main():i64{
   lp(let g=0;g<n;g=g+1){
     if(pos<n){
       groupnum=groupnum+1;
-      let grpline=mut."";
-      grpline=str.concat(str.concat("Group ";str.fromint(groupnum));": ");
+      let grpline=mut."Group \(groupnum): ";
       let cnt=mut.0;
       lp(let k=0;k<groupsize;k=k+1){
         if(pos<n){
-          let idx=order.get(pos);
-          let nm=names.get(idx);
-          let sep=mut."";
-          if(cnt>0){sep=", "};
+          let nm=names.get(order.get(pos));
+          let sep=if(cnt>0){", "}el{""};
           grpline=str.concat(str.concat(grpline;sep);nm);
           cnt=cnt+1;
           pos=pos+1;

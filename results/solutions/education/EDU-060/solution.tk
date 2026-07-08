@@ -19,7 +19,7 @@ f=main():$i64{
       let br1=s.indexof(r2;"[");
       let br2=s.indexof(r2;"]");
       if(br1<0){i=n}el{
-        if(s.equals(key;"")){i=afterkey}el{
+        if(key==""){i=afterkey}el{
           let tagidx=tags.len();
           tags=tags+@(key);
           let arrbody=s.slice(r2;br1+1;br2);
@@ -42,7 +42,7 @@ f=main():$i64{
       }
     }
   };
-  lp(1==1){
+  lp(true){
     let line=io.readln();
     if(io.eof()){br};
     let t=s.trim(line);
@@ -52,21 +52,12 @@ f=main():$i64{
     lp(let ti=0;ti<tags.len();ti=ti+1){
       let found=mut.false;
       lp(let ki=0;ki<kwflat.len();ki=ki+1){
-        if(kwowner.get(ki)==ti){
-          if(!found){
-            if(s.contains(lower;s.lower(kwflat.get(ki)))){found=true}
-          }
-        }
+        if(kwowner.get(ki)==ti&&!found&&s.contains(lower;s.lower(kwflat.get(ki)))){found=true}
       };
       if(found){matched=matched+@(tags.get(ti))}
     };
     if(matched.len()>0){
-      let tagstr=mut."";
-      lp(let mi=0;mi<matched.len();mi=mi+1){
-        if(mi>0){tagstr=s.concat(tagstr;", ")};
-        tagstr=s.concat(tagstr;matched.get(mi))
-      };
-      io.println(s.concat(s.concat(s.concat(t;" [");tagstr);"]"))
+      io.println("\(t) [\(s.join(", ";matched))]")
     }el{
       io.println(t)
     }

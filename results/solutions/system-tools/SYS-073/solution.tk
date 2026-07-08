@@ -6,15 +6,15 @@ i=time:std.time;
 
 f=main():$i64{
   let cmd=s.trim(io.readln());
-  if(s.eq(cmd;"")){<0};
+  if(cmd==""){<0};
   let argv=s.split(cmd;" ");
   let prog=argv.get(0);
   let result=mt process.spawn(argv){
     Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "__STDOUTERR__" });
     ProcessErr:e "__NOTFOUND__"
   };
-  if(s.eq(result;"__NOTFOUND__")){
-    io.println(s.concat("ERROR: command not found: ";prog));
+  if(result=="__NOTFOUND__"){
+    io.println("ERROR: command not found: \(prog)");
     <0
   };
   let t0=time.now();
@@ -24,7 +24,7 @@ f=main():$i64{
     let line=lines.get(i);
     let islast=((i as $u64)==(n-1));
     if(islast){
-      if(s.eq(line;"")){br};
+      if(line==""){br};
     };
     let elapsed=(time.since(t0) as $i64);
     let prefix=s.concat(s.concat("[T+";s.fromint(elapsed));"ms] ");

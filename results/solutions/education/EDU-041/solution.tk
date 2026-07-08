@@ -1,9 +1,9 @@
 m=prereq;i=io:std.io;i=s:std.str;
-f=field(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":\"");let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
-f=arrayfield(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":[");let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let ce=s.indexof(rest;"]");if(ce<0){<""};<s.slice(rest;0;ce)};
+f=field(obj:$str;key:$str):$str{let pat="\"\(key)\":\"";let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
+f=arrayfield(obj:$str;key:$str):$str{let pat="\"\(key)\":[";let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let ce=s.indexof(rest;"]");if(ce<0){<""};<s.slice(rest;0;ce)};
 f=tokens(arr:$str):@($str){let out=mut.@();if(s.len(arr)==0){<out};let parts=s.split(arr;",");lp(let i=0;i<parts.len();i=i+1){let p=s.trim(parts.get(i));let q=s.replace(p;"\"";"");out=out+@(q)};<out};
-f=contains(arr:@($str);v:$str):$bool{lp(let i=0;i<arr.len();i=i+1){if(s.eq(arr.get(i);v)){<1==1}};<1==0};
+f=contains(arr:@($str);v:$str):$bool{lp(let i=0;i<arr.len();i=i+1){if(arr.get(i)==v){<true}};<false};
 f=main():$i64{let input=io.readln();let courseskey="\"courses\":[";let cstart=s.indexof(input;courseskey);let body=s.slice(input;cstart+s.len(courseskey);s.len(input));let completedarr=arrayfield(input;"student_completed");let completed=tokens(completedarr);
 let segs=s.split(body;"{");
 lp(let i=0;i<segs.len();i=i+1){let seg=segs.get(i);if(s.contains(seg;"\"id\":\"")){let cid=field(seg;"id");let prereqs=tokens(arrayfield(seg;"prerequisites"));let missing=mut.@();lp(let k=0;k<prereqs.len();k=k+1){let pr=prereqs.get(k);if(!contains(completed;pr)){missing=missing+@(pr)}};
-if(missing.len()==0){io.println(s.concat(cid;": ELIGIBLE"))}el{let ms=mut."";lp(let m=0;m<missing.len();m=m+1){if(m>0){ms=s.concat(ms;", ")};ms=s.concat(ms;missing.get(m))};io.println(s.concat(s.concat(s.concat(cid;": MISSING prereqs: [");ms);"]"))}}};<0}
+if(missing.len()==0){io.println("\(cid): ELIGIBLE")}el{let ms=s.join(", ";missing);io.println("\(cid): MISSING prereqs: [\(ms)]")}}};<0}
