@@ -79,7 +79,7 @@ for cf in cats:
                                         capture_output=True, text=True, timeout=10)
                 except subprocess.TimeoutExpired:
                     status = "RUN_FAIL"; break
-                if 132 <= rr.returncode <= 139:
+                if rr.returncode < 0 or rr.returncode >= 128:   # signal/crash (negative on POSIX)
                     status = "RUN_FAIL"; break
                 if norm(rr.stdout) != norm(tc.get("expected_output","")):
                     status = "WRONG_OUTPUT"; break
