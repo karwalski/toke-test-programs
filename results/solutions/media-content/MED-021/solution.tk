@@ -9,17 +9,16 @@ f=charcode(c:$str):$i64{
   let d=s.indexof(digits;c);if(d>=0){<48+d};
   let u=s.indexof(upper;c);if(u>=0){<65+u};
   let l=s.indexof(lower;c);if(l>=0){<97+l};
-  if(s.eq(c;" ")){<32};
-  if(s.eq(c;",")){<44};
-  if(s.eq(c;".")){<46};
+  if(c==" "){<32};
+  if(c==","){<44};
+  if(c=="."){<46};
   <0
 };
 
 f=strless(a:$str;b:$str):$bool{
   let la=s.len(a) as $i64;
   let lb=s.len(b) as $i64;
-  let n=mut.la;
-  if(lb<la){n=lb};
+  let n=if(lb<la){lb}el{la};
   let i=mut.0;
   lp(i<n){
     let ca=charcode(s.slice(a;i as $u64;(i+1) as $u64));
@@ -38,7 +37,7 @@ f=keyof(line:$str):$str{
 
 f=main():$i64{
   let lines=mut.@();
-  lp(1==1){
+  lp(true){
     let line=io.readln();
     if(s.len(line)==0){br};
     if(s.len(s.trim(line))>0){lines=lines.push(line)}

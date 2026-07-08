@@ -12,11 +12,8 @@ f=main():$i64{
   let input=s.trim(io.readln());
   let action=getstr(input;"action");
   let conv=getstr(input;"conversation_id");
-  if(s.eq(action;"mark_conv_read")){
-    let out=mut."{\"conversation_id\":\"";
-    out=s.concat(out;conv);
-    out=s.concat(out;"\",\"all_read\":true,\"status\":\"marked_read\"}");
-    io.println(out)
+  if(action=="mark_conv_read"){
+    io.println(s.concat(s.concat("{\"conversation_id\":\"";conv);"\",\"all_read\":true,\"status\":\"marked_read\"}"))
   }el{
     io.println("{\"status\":\"invalid_action\"}")
   };

@@ -1,28 +1,15 @@
 m=main;
 i=io:std.io;
 i=s:std.str;
-f=tohex2(b:$i64):$str{
-  let hi=b/16;
-  let lo=b-hi*16;
-  let digits="0123456789abcdef";
-  let hc=s.slice(digits;hi;hi+1);
-  let lc=s.slice(digits;lo;lo+1);
-  <s.concat(hc;lc)
-};
+i=enc:std.encoding;
 f=main():$void{
-  let key=io.readln();
-  let plaintext=io.readln();
-  let kb=s.bytes(key);
-  let pb=s.bytes(plaintext);
+  let kb=s.bytes(io.readln());
+  let pb=s.bytes(io.readln());
   let keylen=kb.len as i64;
   let ptlen=pb.len as i64;
-  let out=mut."";
+  let ob=mut.@($i64);
   lp(let i=0;i<ptlen;i=i+1){
-    let pc=pb.get(i) as i64;
-    let kidx=i-i/keylen*keylen;
-    let kc=kb.get(kidx) as i64;
-    let x=pc^kc;
-    out=s.concat(out;tohex2(x));
+    ob=ob+@((pb.get(i) as i64)^(kb.get(i%keylen) as i64));
   };
-  io.println(out);
+  io.println(enc.hexencode(ob));
 };

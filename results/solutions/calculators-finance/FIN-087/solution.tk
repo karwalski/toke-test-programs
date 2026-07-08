@@ -1,1 +1,1 @@
-m=per;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");let pmt=s.tofloat(parts.get(0));let dr=s.tofloat(parts.get(1));let gr=s.tofloat(parts.get(2));let perp=pmt/dr;let gperp=pmt/(dr-gr);io.println(s.format(perp;"%.2f"));io.println(s.format(gperp;"%.2f"));<0}
+m=per;i=io:std.io;i=s:std.str;f=main():$i64{let line=io.readln();let parts=s.split(line;" ");let pmt=s.tofloat(parts.get(0));let dr=s.tofloat(parts.get(1));let gr=s.tofloat(parts.get(2));io.println(s.format(pmt/dr;"%.2f"));io.println(s.format(pmt/(dr-gr);"%.2f"));<0}

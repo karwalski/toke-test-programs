@@ -1,9 +1,6 @@
-m=githook;
-i=io:std.io;
-i=str:std.str;
-
+m=githook;i=io:std.io;i=str:std.str;
 f=getstr(obj:$str;key:$str):$str{
-  let pat=str.concat(str.concat("\"";key);"\":\"");
+  let pat=str.join("";@("\"";key;"\":\""));
   let idx=str.indexof(obj;pat);
   if(idx<0){<""};
   let start=idx+(str.len(pat) as i64);
@@ -12,9 +9,8 @@ f=getstr(obj:$str;key:$str):$str{
   if(q<0){<rest};
   <mt str.slice(rest;0;q){ $ok:v v; $err:e "" }
 };
-
 f=getarr(obj:$str;key:$str):@$str{
-  let pat=str.concat(str.concat("\"";key);"\":[");
+  let pat=str.join("";@("\"";key;"\":["));
   let idx=str.indexof(obj;pat);
   if(idx<0){<@()};
   let start=idx+(str.len(pat) as i64);
@@ -36,24 +32,20 @@ f=getarr(obj:$str;key:$str):@$str{
         cur=str.concat(cur;ch);
       };
     }el{
-      if(ch=="\""){
-        inq=true;
-      };
+      if(ch=="\""){inq=true};
     };
   };
   <out
 };
-
 f=main():$i64{
   let input=io.readln();
   let hooktype=getstr(input;"hook_type");
   let cmds=getarr(input;"commands");
-  let out=mut."#!/bin/sh\nset -e\n\n";
-  out=str.concat(out;str.concat(str.concat("# ";hooktype);" hook\n"));
+  let out=mut.str.join("";@("#!/bin/sh\nset -e\n\n# ";hooktype;" hook\n"));
   lp(let i=0;i<(cmds.len as i64);i=i+1){
-    out=str.concat(out;str.concat(cmds.get(i);"\n"));
+    out=str.join("";@(out;cmds.get(i);"\n"));
   };
-  out=str.concat(out;str.concat(str.concat("\necho '";hooktype);" checks passed'"));
+  out=str.join("";@(out;"\necho '";hooktype;" checks passed'"));
   io.println(out);
   <0
 };

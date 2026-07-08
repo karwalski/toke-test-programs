@@ -1,1 +1,1 @@
-m=ng;i=io:std.io;i=s:std.str;f=main():$i64{let secret=s.toint(s.trim(io.readln()));lp(1){let line=io.readln();if(s.len(line)==0){br};let t=s.trim(line);if(s.len(t)==0){br};let guess=s.toint(t);if(guess<secret){io.println("Too low")}el{if(guess>secret){io.println("Too high")}el{io.println("Correct!")}}};<0}
+m=ng;i=io:std.io;i=s:std.str;f=main():$i64{let secret=s.toint(s.trim(io.readln()));lp(true){let t=s.trim(io.readln());if(s.len(t)==0){br};let guess=s.toint(t);io.println(if(guess<secret){"Too low"}el if(guess>secret){"Too high"}el{"Correct!"})};<0}

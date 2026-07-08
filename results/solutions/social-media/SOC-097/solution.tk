@@ -1,10 +1,1 @@
-m=pushreg;
-i=io:std.io;
-i=s:std.str;
-f=main():i64{
-  let line=io.readln();
-  if(s.contains(line;"register_push")){
-    io.println("{\"device_token\":\"fcm_abc123\",\"platform\":\"ios\",\"status\":\"registered\"}");
-  };
-  <0;
-};
+m=pushreg;i=io:std.io;i=s:std.str;f=main():i64{if(s.contains(io.readln();"register_push")){io.println("{\"device_token\":\"fcm_abc123\",\"platform\":\"ios\",\"status\":\"registered\"}")};<0}
