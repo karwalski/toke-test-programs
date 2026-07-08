@@ -1,1 +1,1 @@
-m=norm;i=io:std.io;i=s:std.str;f=main():$i64{let mxLine=io.readln();let mx=s.tofloat(mxLine);lp(1==1){let line=io.readln();if(s.len(line)==0){br};let raw=s.tofloat(line);let pct=(raw/mx)*100.0;io.println(s.format(pct;"%.1f"))};<0}
+m=norm;i=io:std.io;i=s:std.str;f=main():$i64{let mx=s.tofloat(io.readln());lp(true){let line=io.readln();if(s.len(line)==0){br};let pct=(s.tofloat(line)/mx)*100.0;io.println("\(s.format(pct;"%.1f"))")};<0}

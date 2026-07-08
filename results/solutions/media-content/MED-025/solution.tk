@@ -3,14 +3,15 @@ i=io:std.io;
 i=s:std.str;
 
 f=main():$i64{
-  let raw=mut."";
+  let raw=s.buf();
+  let first=mut.true;
   let line=mut.io.readln();
   lp(s.len(line)>0){
-    if(s.len(raw)>0){raw=s.concat(raw;" ")};
-    raw=s.concat(raw;s.trim(line));
+    if(first){first=false}el{s.add(raw;" ")};
+    s.add(raw;s.trim(line));
     line=io.readln();
   };
-  let text=s.trim(raw);
+  let text=s.trim(s.done(raw));
   let words=s.split(text;" ");
   let n=words.len();
 
@@ -20,11 +21,11 @@ f=main():$i64{
   if(n>=3){
     let i=mut.0;
     lp(i<n-2){
-      let tg=s.concat(words.get(i);s.concat(" ";s.concat(words.get(i+1);s.concat(" ";words.get(i+2)))));
+      let tg="\(words.get(i)) \(words.get(i+1)) \(words.get(i+2))";
       let found=mut.0-1;
       let j=mut.0;
       lp(j<uniq.len()){
-        if(s.equals(uniq.get(j);tg)){found=j};
+        if(uniq.get(j)==tg){found=j};
         j=j+1;
       };
       if(found<0){
@@ -52,11 +53,7 @@ f=main():$i64{
       };
       k=k+1;
     };
-    let out=mut."\"";
-    out=s.concat(out;uniq.get(besti));
-    out=s.concat(out;"\": ");
-    out=s.concat(out;s.fromint(cnts.get(besti)));
-    io.println(out);
+    io.println(s.concat("\"";s.concat(uniq.get(besti);s.concat("\": ";s.fromint(cnts.get(besti))))));
   };
   <0;
 }

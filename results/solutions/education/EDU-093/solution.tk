@@ -43,13 +43,13 @@ f=main():$i64{
       let q=mut.0;
       lp(q<sl){
         let qch=s.slice(seg;q;q+1);
-        if(s.eq(qch;"\"")){
+        if(qch=="\""){
           let after=s.slice(seg;q+1;sl);
           let endq=s.indexof(after;"\"");
           let val=s.slice(after;0;endq);
           let dup=mut.false;
-          lp(let t=0;t<topics.len();t=t+1){if(s.eq(topics.get(t);val)){dup=true}};
-          if(dup==false){topics=topics+@(val)};
+          lp(let t=0;t<topics.len();t=t+1){if(topics.get(t)==val){dup=true}};
+          if(!dup){topics=topics+@(val)};
           q=q+1+endq+1
         }el{q=q+1}
       };
@@ -70,7 +70,7 @@ f=main():$i64{
       let q=mut.0;
       lp(q<sl){
         let qch=s.slice(seg;q;q+1);
-        if(s.eq(qch;"\"")){
+        if(qch=="\""){
           let after=s.slice(seg;q+1;sl);
           let endq=s.indexof(after;"\"");
           let val=s.slice(after;0;endq);
@@ -96,13 +96,13 @@ f=main():$i64{
     a=a+1
   };
   io.println("Weekly Summary");
-  io.println(s.concat("Days studied: ";s.fromint(days)));
+  io.println("Days studied: \(days)");
   let joined=mut."";
   lp(let t=0;t<tc;t=t+1){
     if(t>0){joined=s.concat(joined;", ")};
     joined=s.concat(joined;topics.get(t))
   };
-  io.println(s.concat(s.concat(s.concat(s.concat("Topics covered: ";joined);" (");s.fromint(tc));" unique)"));
+  io.println("Topics covered: \(joined) (\(tc) unique)");
   if(questions.len()==0){
     io.println("Unresolved questions: none")
   }el{

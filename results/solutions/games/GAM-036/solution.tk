@@ -3,11 +3,11 @@ f=main():$i64{let total=mut.0;let wickets=mut.0;let noballs=mut.0;let wides=mut.
 let continuing=mut.true;
 lp(continuing){let line=s.trim(io.readln());
 if(s.len(line)==0){continuing=false}el{
-if(s.equals(line;"W")){wickets=wickets+1}el{
-if(s.equals(line;"nb")){noballs=noballs+1}el{
-if(s.equals(line;"wd")){wides=wides+1}el{
+if(line=="W"){wickets=wickets+1}el{
+if(line=="nb"){noballs=noballs+1}el{
+if(line=="wd"){wides=wides+1}el{
 total=total+s.toint(line)}}}}};
-io.println(s.concat(s.concat(s.fromint(total);"/");s.fromint(wickets)));
+io.println("\(total)/\(wickets)");
 let extras=noballs+wides;
-if(extras>0){io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("Extras: ";s.fromint(extras));" (");s.fromint(noballs));"nb ");s.fromint(wides));"wd)"))}el{io.println("Extras: 0")};
+if(extras>0){io.println("Extras: \(extras) (\(noballs)nb \(wides)wd)")}el{io.println("Extras: 0")};
 <0}

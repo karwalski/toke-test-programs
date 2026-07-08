@@ -1,12 +1,11 @@
 m=creategroup;i=io:std.io;i=s:std.str;i=json:std.json;
 f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
 f=main():$i64{
-let line=io.readln();
-let d=pdoc(line);
+let d=pdoc(io.readln());
 let action=json.getstr(d;"action");
 let name=json.getstr(d;"name");
 let desc=json.getstr(d;"description");
-if(s.eq(action;"create_group")==false){
+if(action!="create_group"){
 io.println("{\"error\":\"invalid action\"}");
 <1
 };

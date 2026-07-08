@@ -1,6 +1,6 @@
 m=engtype;i=io:std.io;i=s:std.str;
 f=getstr(obj:$str;key:$str):$str{
-  let pat=s.concat(s.concat("\"";key);"\":\"");
+  let pat="\"\(key)\":\"";
   let idx=s.indexof(obj;pat);
   if(idx<0){<""};
   let rest=s.slice(obj;(idx as $u64)+s.len(pat);s.len(obj));
@@ -11,7 +11,7 @@ f=getstr(obj:$str;key:$str):$str{
 f=main():$i64{
   let input=s.trim(io.readln());
   let action=getstr(input;"action");
-  if(s.eq(action;"engagement_by_type")){
+  if(action=="engagement_by_type"){
     io.println("{\"types\":[{\"type\":\"image\",\"posts\":15,\"avg_engagement_rate\":0.08},{\"type\":\"text\",\"posts\":30,\"avg_engagement_rate\":0.04},{\"type\":\"poll\",\"posts\":3,\"avg_engagement_rate\":0.12}]}")
   }el{
     io.println("{\"status\":\"invalid_action\"}")

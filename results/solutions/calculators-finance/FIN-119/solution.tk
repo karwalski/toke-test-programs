@@ -5,10 +5,9 @@ f=main():$i64{
   let rate=s.tofloat(parts.get(1));
   let months=s.toint(parts.get(2));
   let mr=rate/12.0;
-  let emi=mut.0.0;
-  if(mr==0.0){emi=principal/(months as $f64)}el{
+  let emi=if(mr==0.0){principal/(months as $f64)}el{
     let factor=math.pow(1.0+mr;months as $f64);
-    emi=principal*mr*factor/(factor-1.0);
+    principal*mr*factor/(factor-1.0)
   };
   let totalpay=emi*(months as $f64);
   let interest=totalpay-principal;
