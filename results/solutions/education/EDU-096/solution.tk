@@ -1,16 +1,11 @@
 m=blueprint;i=io:std.io;i=s:std.str;
-f=ffloor(x:$f64):$i64{
-  let n=mut.0;
-  lp(s.tofloat(s.fromint(n+1))<=x){n=n+1};
-  <n
-};
 f=padright(str:$str;width:$i64):$str{
   let out=mut.str;
   lp(s.len(out)<width){out=s.concat(out;" ")};
   <out
 };
 f=extractArr(json:$str;key:$str):@($str){
-  let pat=s.concat(s.concat("\"";key);"\":[");
+  let pat=s.join("";@("\"";key;"\":["));
   let idx=s.indexof(json;pat);
   let res=mut.@();
   if(idx<0){<res};
@@ -22,7 +17,7 @@ f=extractArr(json:$str;key:$str):@($str){
   let q=mut.0;
   lp(q<sl){
     let qch=s.slice(seg;q;q+1);
-    if(s.eq(qch;"\"")){
+    if(qch=="\""){
       let after=s.slice(seg;q+1;sl);
       let endq=s.indexof(after;"\"");
       res=res+@(s.slice(after;0;endq));
@@ -32,7 +27,7 @@ f=extractArr(json:$str;key:$str):@($str){
   <res
 };
 f=weightFor(json:$str;topic:$str):$f64{
-  let pat=s.concat(s.concat("\"";topic);"\":");
+  let pat=s.join("";@("\"";topic;"\":"));
   let widx=s.indexof(json;"\"weights\":");
   if(widx<0){<0.0};
   let wrest=s.slice(json;widx;s.len(json));
@@ -54,8 +49,7 @@ f=main():$i64{
   let json=io.readln();
   let topics=extractArr(json;"topics");
   let blooms=extractArr(json;"bloom_levels");
-  let tqidx=s.indexof(json;"\"total_questions\":");
-  let tqrest=s.slice(json;tqidx+18;s.len(json));
+  let tqrest=s.slice(json;s.indexof(json;"\"total_questions\":")+18;s.len(json));
   let tqnum=mut."";
   let ti=mut.0;
   lp(ti<s.len(tqrest)){
@@ -74,8 +68,7 @@ f=main():$i64{
   lp(let k=0;k<topics.len();k=k+1){
     let topic=topics.get(k);
     let w=weightFor(json;topic);
-    let topicq=ffloor(s.tofloat(s.fromint(totalq))*w);
-    let perlevel=topicq/nlevels;
+    let perlevel=((s.tofloat(s.fromint(totalq))*w) as $i64)/nlevels;
     let row=mut.padright(topic;9);
     lp(let n=0;n<nlevels;n=n+1){
       row=s.concat(row;" | ");

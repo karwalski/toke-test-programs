@@ -77,7 +77,7 @@ f=main():$i64{
   lp(let qi=0;qi<total;qi=qi+1){
     let qobj=questions.get(qi);
     let qtext=getstrval(qobj;"q");
-    io.println(s.concat("Q";s.concat(s.fromint(qi+1);s.concat(": ";qtext))));
+    io.println(s.join("";@("Q";s.fromint(qi+1);": ";qtext)));
     let optarr=extractarr(qobj;"options");
     let opts=splitstrlist(optarr);
     lp(let oi=0;oi<opts.len();oi=oi+1){
@@ -92,7 +92,6 @@ f=main():$i64{
       io.println(s.concat("Incorrect. Answer: ";answer))
     }
   };
-  let pct=correct*100/total;
-  io.println(s.concat("Score: ";s.concat(s.fromint(correct);s.concat("/";s.concat(s.fromint(total);s.concat(" (";s.concat(s.fromint(pct);"%)")))))));
+  io.println(s.join("";@("Score: ";s.fromint(correct);"/";s.fromint(total);" (";s.fromint(correct*100/total);"%)")));
   <0
 }

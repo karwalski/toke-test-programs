@@ -24,20 +24,20 @@ f=checkreqs(prereqs:@($str);completed:@($str)):$bool{
   let idx=mut.0;
   lp(idx<prereqs.len()){
     let reqid=s.trim(prereqs.get(idx));
-    let found=mut.0;
+    let found=mut.false;
     let cidx=mut.0;
     lp(cidx<completed.len()){
       if(s.trim(completed.get(cidx))==reqid){
-        found=1
+        found=true
       };
       cidx=cidx+1
     };
-    if(found==0){
-      <(0==1)
+    if(!found){
+      <false
     };
     idx=idx+1
   };
-  <(1==1)
+  <true
 };
 f=main():$i64{
   let line=io.readln();
@@ -85,7 +85,7 @@ f=main():$i64{
                 prereqs=parsepreqs(prereqstr)
               }
             };
-            if(s.contains(topic;"\"completed\":true")==(1==0)){
+            if(!s.contains(topic;"\"completed\":true")){
               if(checkreqs(prereqs;completed)){
                 available=available+@(title)
               }

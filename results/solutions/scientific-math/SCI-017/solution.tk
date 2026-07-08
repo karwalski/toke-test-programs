@@ -43,15 +43,7 @@ f=main():$i64{
       let cf=openf.get(i as $u64);
       let cr=openr.get(i as $u64);
       let cc=openc.get(i as $u64);
-      let better=mut.0;
-      if(cf<bestf){better=1}el{
-        if(cf==bestf){
-          if(cr<bestr){better=1}el{
-            if(cr==bestr){if(cc<bestc){better=1}}
-          }
-        }
-      };
-      if(better==1){besti=i;bestf=cf;bestr=cr;bestc=cc};
+      if(cf<bestf||(cf==bestf&&(cr<bestr||(cr==bestr&&cc<bestc)))){besti=i;bestf=cf;bestr=cr;bestc=cc};
       i=i+1
     };
     let curr=openr.get(besti as $u64);
@@ -63,7 +55,7 @@ f=main():$i64{
       k=k+1
     };
     openr=newr;openc=newc;openf=newf;
-    if(curr==er){if(curc==ec){found=1}};
+    if(curr==er&&curc==ec){found=1};
     if(found==1){br};
     let dr=@(0;0;1;0-1);
     let dc=@(1;0-1;0;0);
@@ -71,11 +63,10 @@ f=main():$i64{
     lp(d<4){
       let nr=curr+dr.get(d as $u64);
       let nc=curc+dc.get(d as $u64);
-      let ok=mut.0;
-      if(nr>=0){if(nr<rows){if(nc>=0){if(nc<cols){ok=1}}}};
+      let ok=if(nr>=0&&nr<rows&&nc>=0&&nc<cols){1}el{0};
       if(ok==1){
         let cell=s.slice(grid.get(nr as $u64);nc as $u64;(nc+1) as $u64);
-        if(s.eq(cell;"#")==false){
+        if(!s.eq(cell;"#")){
           let curid=curr*cols+curc;
           let nid=nr*cols+nc;
           let tg=g.get(curid as $u64)+1;
@@ -96,7 +87,7 @@ f=main():$i64{
   let cr2=mut.er;let cc2=mut.ec;
   lp(1==1){
     pr=pr.push(cr2);pc=pc.push(cc2);
-    if(cr2==sr){if(cc2==scol){br}};
+    if(cr2==sr&&cc2==scol){br};
     let id=cr2*cols+cc2;
     let ppr=camer.get(id as $u64);
     let ppc=camec.get(id as $u64);
