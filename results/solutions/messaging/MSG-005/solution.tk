@@ -18,8 +18,8 @@ f=main():$i64{
   let alicepub=modpow(g;a;p);
   let bobpub=modpow(g;b;p);
   let shared=modpow(bobpub;a;p);
-  io.println(s.fromint(alicepub));
-  io.println(s.fromint(bobpub));
-  io.println(s.fromint(shared));
+  io.println("\(alicepub)");
+  io.println("\(bobpub)");
+  io.println("\(shared)");
   <0
 }

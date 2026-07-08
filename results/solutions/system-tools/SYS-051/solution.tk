@@ -35,24 +35,24 @@ f=main():$i64{
   let j=mut.0;
   lp(i<na){
     if(j<nb){
-      if(s.equals(a.get(i);b.get(j))){
+      if(a.get(i)==b.get(j)){
         i=i+1;
         j=j+1;
       }el{
-        io.println(s.concat("-";a.get(i)));
-        io.println(s.concat("+";b.get(j)));
+        io.println("-\(a.get(i))");
+        io.println("+\(b.get(j))");
         printed=1;
         i=i+1;
         j=j+1;
       };
     }el{
-      io.println(s.concat("-";a.get(i)));
+      io.println("-\(a.get(i))");
       printed=1;
       i=i+1;
     };
   };
   lp(j<nb){
-    io.println(s.concat("+";b.get(j)));
+    io.println("+\(b.get(j))");
     printed=1;
     j=j+1;
   };
