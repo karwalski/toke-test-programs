@@ -22,7 +22,7 @@ let first=mut.1;
 let go=mut.1;
 lp(go>0){
 let line=s.trim(io.readln());
-if(s.len(line)=0){go=0}el{
+if(s.len(line)==0){go=0}el{
 if(first>0){first=0}el{
 let parts=s.split(line;",");
 let cat=s.trim(parts.get(0));
@@ -50,7 +50,7 @@ let a=order.get(j);
 let b=order.get(j+1);
 let swap=mut.0;
 if(rates.get(a)<rates.get(b)){swap=1}el{
-if(rates.get(a)=rates.get(b)){
+if(rates.get(a)==rates.get(b)){
 if(scraps.get(a)<scraps.get(b)){swap=1}
 }
 };

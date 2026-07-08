@@ -1,7 +1,7 @@
 m=actions;i=io:std.io;i=s:std.str;
 f=jstr(v:$str):$str{<s.concat("\"";s.concat(v;"\""))};
 f=main():$i64{let items=mut."";let first=mut.true;
-lp(1=1){if(io.eof()){br};let raw=io.readln();let line=s.trim(raw);if(s.len(line)=0){br};
+lp(1==1){if(io.eof()){br};let raw=io.readln();let line=s.trim(raw);if(s.len(line)==0){br};
  if(s.startswith(line;"-")){let body=s.trim(s.slice(line;1;s.len(line)));
   let sp=s.indexof(body;" ");if(sp>0){let assignee=s.slice(body;0;sp);let rest=s.slice(body;sp+1;s.len(body));
    let assignee2=mut.assignee;let task=mut."";let deadline=mut."";let hasDeadline=mut.false;let matched=mut.false;

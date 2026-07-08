@@ -14,7 +14,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)}
     }
@@ -60,8 +60,8 @@ f=main():$i64{
       let ni=mut.@(0);
       ni=@();
       lp(let k=0;k<nrows;k=k+1){
-        if(k=i){ni=ni+@(bi)}el{
-          if(k=best){ni=ni+@(tmp)}el{ni=ni+@(idx.get(k))}
+        if(k==i){ni=ni+@(bi)}el{
+          if(k==best){ni=ni+@(tmp)}el{ni=ni+@(idx.get(k))}
         }
       };
       idx=ni
@@ -101,8 +101,8 @@ f=main():$i64{
   ky=@();
   lp(let i=0;i<npts;i=i+1){
     let keep=mut.0;
-    if(i=0){keep=1};
-    if(i=npts-1){keep=1};
+    if(i==0){keep=1};
+    if(i==npts-1){keep=1};
     if(i>0){if(i<npts-1){
       // check collinearity with neighbors via cross product
       let x0=fx.get(i-1);let y0=ty.get(i-1);
@@ -113,7 +113,7 @@ f=main():$i64{
       if(ac<0.0){ac=0.0-ac};
       if(ac>0.0000001){keep=1}
     }};
-    if(keep=1){
+    if(keep==1){
       kx=kx+@(fx.get(i));
       ky=ky+@(ty.get(i))
     }

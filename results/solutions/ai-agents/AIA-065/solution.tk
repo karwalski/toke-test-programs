@@ -58,7 +58,7 @@ f=extractrisks(text:$str):@($str){
 };
 
 f=buildjsonarray(arr:@($str)):$str{
-  if(arr.len=0 as$u64){<"[]"};
+  if(arr.len==0 as$u64){<"[]"};
   let bld=s.builder();
   s.add(bld;"[");
   lp(let idx=0;idx<arr.len;idx=idx+1){

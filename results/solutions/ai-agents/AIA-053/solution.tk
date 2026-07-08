@@ -9,12 +9,12 @@ f=strippunct(tok:$str):$str{
     if(n<=0){br};
     let c=(bytes.get((n-1) as u64) as i64);
     let punct=mut.false;
-    if(c=46){punct=true};
-    if(c=44){punct=true};
-    if(c=59){punct=true};
-    if(c=58){punct=true};
-    if(c=33){punct=true};
-    if(c=63){punct=true};
+    if(c==46){punct=true};
+    if(c==44){punct=true};
+    if(c==59){punct=true};
+    if(c==58){punct=true};
+    if(c==33){punct=true};
+    if(c==63){punct=true};
     if(punct){n=n-1}el{br};
   };
   <mt str.slice(tok;0;n as u64){ $ok:v v; $err:e "" }
@@ -25,16 +25,16 @@ f=endswithdot(tok:$str):$bool{
   if(n<=0){<false};
   let bytes=str.bytes(tok);
   let c=(bytes.get((n-1) as u64) as i64);
-  if(c=46){<true};
+  if(c==46){<true};
   <false
 };
 
 f=isconj(word:$str):$bool{
   let w=str.lower(strippunct(word));
-  if(w="or"){<true};
-  if(w="and"){<true};
-  if(w="but"){<true};
-  if(w="however"){<true};
+  if(w=="or"){<true};
+  if(w=="and"){<true};
+  if(w=="but"){<true};
+  if(w=="however"){<true};
   <false
 };
 
@@ -53,8 +53,8 @@ f=jsonesc(s:$str):$str{
   let n=str.len(s);
   lp(let i=0;i<(n as i64);i=i+1){
     let c=(bytes.get(i as u64) as i64);
-    if(c=34){out=str.concat(out;"\\\"")}el{
-      if(c=92){out=str.concat(out;"\\\\")}el{
+    if(c==34){out=str.concat(out;"\\\"")}el{
+      if(c==92){out=str.concat(out;"\\\\")}el{
         let ch=mt str.slice(s;i as u64;(i+1) as u64){ $ok:v v; $err:e "" };
         out=str.concat(out;ch)
       }
@@ -67,8 +67,8 @@ f=main():i64{
   let input=mut."";
   lp(let z=0;z<100000;z=z+1){
     let ln=io.readln();
-    if(str.len(ln)=0){br};
-    if(str.len(input)=0){input=ln}el{input=str.concat(str.concat(input;" ");ln)};
+    if(str.len(ln)==0){br};
+    if(str.len(input)==0){input=ln}el{input=str.concat(str.concat(input;" ");ln)};
   };
 
   let raw=str.split(input;" ");
@@ -122,8 +122,8 @@ f=main():i64{
 
       let value=strippunct(tk);
       let typ=mut."url";
-      if(ty=2){typ="email"};
-      if(ty=3){typ="phone"};
+      if(ty==2){typ="email"};
+      if(ty==3){typ="phone"};
 
       if(!(first)){out=str.concat(out;",")};
       first=false;

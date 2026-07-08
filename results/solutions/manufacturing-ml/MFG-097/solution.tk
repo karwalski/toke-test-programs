@@ -7,7 +7,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)}
     }
@@ -28,7 +28,7 @@ f=main():$i64{
     let firstq=mut.1;
     lp(let c=1;c<ncols;c=c+1){
       let q=s.tofloat(parts.get(c));
-      if(firstq=1){lo=q;firstq=0}el{if(q<lo){lo=q}};
+      if(firstq==1){lo=q;firstq=0}el{if(q<lo){lo=q}};
     };
     temps=temps+@(t);
     minq=minq+@(lo);
@@ -47,11 +47,11 @@ f=main():$i64{
     let lo=minq.get(i);
     if(!(lo<spec)){
       qualcount=qualcount+1;
-      if(haswin=0){wmin=t;wmax=t;haswin=1}el{
+      if(haswin==0){wmin=t;wmax=t;haswin=1}el{
         if(t<wmin){wmin=t};
         if(t>wmax){wmax=t};
       };
-      if(qualcount=1){bestt=t;bestq=lo}el{if(lo>bestq){bestq=lo;bestt=t}};
+      if(qualcount==1){bestt=t;bestq=lo}el{if(lo>bestq){bestq=lo;bestt=t}};
       if(lo>spec){strictcount=strictcount+1};
     }
   };

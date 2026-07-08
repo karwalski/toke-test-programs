@@ -15,7 +15,7 @@ f=stripend(w:$str):$str{
   <out
 };
 f=titlecase(w:$str):$str{
-  if(s.len(w)=0){<w};
+  if(s.len(w)==0){<w};
   let first=s.upper(s.slice(w;0;1));
   let rest=s.lower(s.slice(w;1;s.len(w)));
   <s.concat(first;rest)
@@ -52,13 +52,13 @@ f=main():$i64{
   let lowerquery=s.lower(input);
   if(s.contains(lowerquery;"weather")){
     let city=mut.wordafter(input;"in");
-    if(s.len(city)=0){city=wordafter(input;"for")};
+    if(s.len(city)==0){city=wordafter(input;"for")};
     let tc=titlecase(city);
     io.println("{\"tool\":\"weather\",\"arguments\":{\"city\":\"\(tc)\"}}")
   }el{
     if(s.contains(lowerquery;"schedule")||s.contains(lowerquery;"calendar")){
       let date=mut.wordafter(input;"for");
-      if(s.len(date)=0){date=wordafter(input;"on")};
+      if(s.len(date)==0){date=wordafter(input;"on")};
       io.println("{\"tool\":\"calendar\",\"arguments\":{\"date\":\"\(date)\"}}")
     }el{
       io.println("{\"tool\":null,\"arguments\":{}}")

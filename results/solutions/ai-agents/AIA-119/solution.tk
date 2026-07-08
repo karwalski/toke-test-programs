@@ -13,7 +13,7 @@ f=parseint(t:$str):$i64{
 };
 f=isnum(t:$str):$bool{
   let n=s.len(t) as i64;
-  if(n=0){<false};
+  if(n==0){<false};
   let i=mut.0;
   lp(i<n){
     let ch=s.slice(t;i;i+1);
@@ -76,8 +76,8 @@ f=evalsingle(ctx:$str;expr:$str):$bool{
   if(isnum(value)){
     let av=parseint(actual);
     let bv=parseint(value);
-    if(s.eq(op;"==")){<av=bv};
-    if(s.eq(op;"!=")){<!(av=bv)};
+    if(s.eq(op;"==")){<av==bv};
+    if(s.eq(op;"!=")){<!(av==bv)};
     if(s.eq(op;">=")){<av>=bv};
     if(s.eq(op;"<=")){<av<=bv};
     if(s.eq(op;">")){<av>bv};

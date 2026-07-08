@@ -57,11 +57,11 @@ f=main():$i64{
   let p1=mut.@();
   let p2=mut.@();
   let first=mut.true;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let l=s.trim(line);
-    if(s.len(l)=0){}el{
+    if(s.len(l)==0){}el{
       if(first){first=false}el{
         let parts=s.split(l;",");
         let ph=parts.get(0);

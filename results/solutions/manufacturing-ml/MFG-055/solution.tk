@@ -15,7 +15,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)}
     }
@@ -96,7 +96,7 @@ f=main():$i64{
     };
     // eliminate other rows
     lp(let row=0;row<3;row=row+1){
-      if(!(row=col)){
+      if(!(row==col)){
         let factor=m.get(row*4+col);
         lp(let k=0;k<4;k=k+1){
           m=setarr(m;row*4+k;m.get(row*4+k)-factor*m.get(col*4+k))
@@ -143,7 +143,7 @@ f=setarr(arr:@$f64;idx:$i64;val:$f64):@$f64{
   let out=mut.@(0.0);
   out=@();
   lp(let i=0;i<arr.len();i=i+1){
-    if(i=idx){out=out+@(val)}el{out=out+@(arr.get(i))}
+    if(i==idx){out=out+@(val)}el{out=out+@(arr.get(i))}
   };
   <out
 };

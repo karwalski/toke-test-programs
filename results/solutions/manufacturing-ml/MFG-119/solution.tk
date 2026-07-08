@@ -15,7 +15,7 @@ f=round2even(x:$f64):$i64{
   if(r<5){res=h}el{
     if(r>5){res=h+1}el{
       let half=h/2; let twice=half*2;
-      if(twice=h){res=h}el{res=h+1}
+      if(twice==h){res=h}el{res=h+1}
     }
   };
   if(neg){res=0-res};
@@ -27,11 +27,11 @@ f=jfloat2(cents:$i64):$str{
   let whole=c/100; let frac=c-whole*100;
   let out=mut.s.fromint(whole);
   out=s.concat(out;".");
-  if(frac=0){
+  if(frac==0){
     out=s.concat(out;"0")
   }el{
     let tens=frac/10; let ones=frac-tens*10;
-    if(ones=0){
+    if(ones==0){
       out=s.concat(out;s.fromint(tens))
     }el{
       let fs=mut.s.fromint(frac);
@@ -46,7 +46,7 @@ f=main():$i64{
   let names=mut.@();
   let stabs=mut.@();
   let first=mut.true;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let l=s.trim(line);

@@ -41,8 +41,8 @@ f=main():$i64{
         };
       };
       vidx=vidx+1};
-    if(usedlen=0){
-      if(found=false){
+    if(usedlen==0){
+      if(found==false){
         let issue=s.concat("{\"package\":\"";s.concat(name;"\",\"type\":\"unused\",\"severity\":\"low\",\"detail\":\"Imported but not used in any file\"}"));
         issues=issues+@(issue);
       };

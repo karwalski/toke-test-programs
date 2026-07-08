@@ -50,7 +50,7 @@ f=main():$i64{
   let sn=sentences.len() as $i64;
   lp(let i=0;i<sn;i=i+1){
     let st=s.trim(sentences.get(i));
-    if(s.len(st)=0){}el{
+    if(s.len(st)==0){}el{
       let sl=s.lower(st);
       if(s.contains(sl;"revenue")){fin=fin+@(st)};
       if(s.contains(sl;"costs")){fin=fin+@(st)};
@@ -63,11 +63,11 @@ f=main():$i64{
   let topics=@("Features";"Security";"Known Issues";"Financial";"Team");
   lp(let t=0;t<5;t=t+1){
     let pts=mut.@();
-    if(t=0){pts=feat};
-    if(t=1){pts=sec};
-    if(t=2){pts=known};
-    if(t=3){pts=fin};
-    if(t=4){pts=team};
+    if(t==0){pts=feat};
+    if(t==1){pts=sec};
+    if(t==2){pts=known};
+    if(t==3){pts=fin};
+    if(t==4){pts=team};
     let pn=pts.len() as $i64;
     if(pn>0){
       if(total<maxb){

@@ -19,7 +19,7 @@ f=arrclose(t:$str):$i64{
     if(instr){if(s.eq(ch;"\"")){instr=false}}el{
       if(s.eq(ch;"\"")){instr=true}el{
         if(s.eq(ch;"[")){depth=depth+1}el{
-          if(s.eq(ch;"]")){if(depth=0){<i};depth=depth-1}
+          if(s.eq(ch;"]")){if(depth==0){<i};depth=depth-1}
         }
       }
     };
@@ -35,7 +35,7 @@ f=objclose(t:$str):$i64{
     if(instr){if(s.eq(ch;"\"")){instr=false}}el{
       if(s.eq(ch;"\"")){instr=true}el{
         if(s.eq(ch;"{")){depth=depth+1}el{
-          if(s.eq(ch;"}")){if(depth=0){<i};depth=depth-1}
+          if(s.eq(ch;"}")){if(depth==0){<i};depth=depth-1}
         }
       }
     };
@@ -143,7 +143,7 @@ f=main():$i64{
       let ia=order.get(a);let ib=order.get(b);
       let swap=mut.false;
       if(durs.get(ib)>durs.get(ia)){swap=true};
-      if(durs.get(ib)=durs.get(ia)){if(ib<ia){swap=true}};
+      if(durs.get(ib)==durs.get(ia)){if(ib<ia){swap=true}};
       if(swap){order=order.set(a;ib);order=order.set(b;ia)}
     }
   };
@@ -218,7 +218,7 @@ f=main():$i64{
       let ia=oorder.get(a);let ib=oorder.get(b);
       let swap=mut.false;
       if(starts.get(ib)<starts.get(ia)){swap=true};
-      if(starts.get(ib)=starts.get(ia)){if(ib<ia){swap=true}};
+      if(starts.get(ib)==starts.get(ia)){if(ib<ia){swap=true}};
       if(swap){oorder=oorder.set(a;ib);oorder=oorder.set(b;ia)}
     }
   };
@@ -236,8 +236,8 @@ f=main():$i64{
   let hund=(avgmyriad+50)/100;
   let ip=hund/100;let fp=hund-ip*100;
   let utilstr=mut."";
-  if(fp=0){utilstr=s.concat(s.fromint(ip);".0")}el{
-    if(fp-(fp/10)*10=0){utilstr=s.concat(s.concat(s.fromint(ip);".");s.fromint(fp/10))}el{
+  if(fp==0){utilstr=s.concat(s.fromint(ip);".0")}el{
+    if(fp-(fp/10)*10==0){utilstr=s.concat(s.concat(s.fromint(ip);".");s.fromint(fp/10))}el{
       let fs=mut.s.fromint(fp);if(fp<10){fs=s.concat("0";fs)};
       utilstr=s.concat(s.concat(s.fromint(ip);".");fs)
     }

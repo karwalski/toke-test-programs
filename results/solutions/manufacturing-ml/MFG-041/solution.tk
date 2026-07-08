@@ -4,7 +4,7 @@ let avail=mut.0.0;
 let demand=mut.0.0;
 let names=mut.@($str);
 let cycles=mut.@($str);
-lp(1=1){let l=io.readln();if(s.len(l)=0){br};let line=s.trimsuffix(l;"\n");if(s.len(line)=0){br};let parts=s.split(line;",");if(parts.len()>=2){let key=parts.get(0);let val=parts.get(1);if(s.equals(key;"available_time")){avail=s.tofloat(val)}el{if(s.equals(key;"demand")){demand=s.tofloat(val)}el{if(s.equals(key;"station")){}el{names=names+@(key);cycles=cycles+@(val)}}}}};
+lp(1==1){let l=io.readln();if(s.len(l)==0){br};let line=s.trimsuffix(l;"\n");if(s.len(line)==0){br};let parts=s.split(line;",");if(parts.len()>=2){let key=parts.get(0);let val=parts.get(1);if(s.equals(key;"available_time")){avail=s.tofloat(val)}el{if(s.equals(key;"demand")){demand=s.tofloat(val)}el{if(s.equals(key;"station")){}el{names=names+@(key);cycles=cycles+@(val)}}}}};
 let takt=avail/demand;
 let out=mut."{\"takt_time\":";
 out=s.concat(out;s.fromfloat(takt));

@@ -8,7 +8,7 @@ f=main():$i64{
   let done=mut.0;
   lp(done<1){
     let line=io.readln();
-    if(s.len(line)=0){done=1}el{
+    if(s.len(line)==0){done=1}el{
       let tl=s.trim(line);
       if(s.len(tl)>0){lines=lines+@(tl)}
     }
@@ -41,7 +41,7 @@ f=main():$i64{
         let tmp=mut.@(0.0);
         tmp=@();
         lp(let k=0;k<m;k=k+1){
-          if(k=j){tmp=tmp+@(b)}el{if(k=j+1){tmp=tmp+@(a)}el{tmp=tmp+@(sorted.get(k))}}
+          if(k==j){tmp=tmp+@(b)}el{if(k==j+1){tmp=tmp+@(a)}el{tmp=tmp+@(sorted.get(k))}}
         };
         sorted=tmp;
       }
@@ -49,7 +49,7 @@ f=main():$i64{
   };
   let median=mut.0.0;
   let half=m/2;
-  if(m-half*2=0){
+  if(m-half*2==0){
     median=(sorted.get(half-1)+sorted.get(half))/2.0;
   }el{
     median=sorted.get(half);
@@ -73,7 +73,7 @@ f=main():$i64{
     diff=r-med;
     if(diff<0.0){diff=0.0-diff};
     if(diff>thr){
-      if(first=0){out=s.concat(out;",")};
+      if(first==0){out=s.concat(out;",")};
       first=0;
       let ti=(ts.get(i) as $i64);
       out=s.concat(out;"{\"timestamp\":");

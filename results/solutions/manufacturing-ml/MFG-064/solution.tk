@@ -20,7 +20,7 @@ f=expf(x:$f64):$f64{
 };
 f=main():$i64{
   let lines=mut.@($str);
-  lp(1=1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trim(s.trimsuffix(l;"\n")))};
+  lp(1==1){let l=io.readln();if(io.eof()){br};lines=lines+@(s.trim(s.trimsuffix(l;"\n")))};
   let sep=mut.0;
   lp(let z=0;z<lines.len();z=z+1){if(s.equals(lines.get(z);"---")){sep=z}};
   let header=s.split(lines.get(0);",");
@@ -65,12 +65,12 @@ f=main():$i64{
   lp(let ci=0;ci<nc;ci=ci+1){let r=(probs.get(ci)*100.0+0.5);let ri=(r as$i64);rounded=rounded+@((ri as$f64)/100.0)};
   let hasone=mut.false;
   lp(let ci=0;ci<nc;ci=ci+1){if(rounded.get(ci)>=1.0){hasone=true};if(rounded.get(ci)<=0.0){hasone=true}};
-  if((nc=2)&&hasone){if(probs.get(0)>=probs.get(1)){rounded=rounded.set(0;0.99);rounded=rounded.set(1;0.01)}el{rounded=rounded.set(0;0.01);rounded=rounded.set(1;0.99)}};
+  if((nc==2)&&hasone){if(probs.get(0)>=probs.get(1)){rounded=rounded.set(0;0.99);rounded=rounded.set(1;0.01)}el{rounded=rounded.set(0;0.01);rounded=rounded.set(1;0.99)}};
   let out=mut."{\"predicted_class\":\"";out=s.concat(out;classes.get(predidx));out=s.concat(out;"\",\"probabilities\":{");
   lp(let ci=0;ci<nc;ci=ci+1){if(ci>0){out=s.concat(out;",")};out=s.concat(out;"\"");out=s.concat(out;classes.get(ci));out=s.concat(out;"\":");out=s.concat(out;s.format(rounded.get(ci);"%.2f"))};
   out=s.concat(out;"}}");
   io.println(out);
   <0
 };
-f=strgt(a:$str;b:$str):$bool{let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<na){m=nb};let i=mut.0;let res=mut.0;lp(i<m){if(res=0){let ca=cc(s.slice(a;i;i+1));let cb=cc(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};if(res>0){<true};if(res<0){<false};<(na>nb)};
+f=strgt(a:$str;b:$str):$bool{let na=s.len(a);let nb=s.len(b);let m=mut.na;if(nb<na){m=nb};let i=mut.0;let res=mut.0;lp(i<m){if(res==0){let ca=cc(s.slice(a;i;i+1));let cb=cc(s.slice(b;i;i+1));if(ca<cb){res=0-1}el{if(ca>cb){res=1}};i=i+1}el{i=m}};if(res>0){<true};if(res<0){<false};<(na>nb)};
 f=cc(c:$str):$i64{let cs="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";let p=s.indexof(cs;c);if(p<0){<200};<p};

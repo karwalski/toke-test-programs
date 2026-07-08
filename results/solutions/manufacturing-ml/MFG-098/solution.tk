@@ -2,12 +2,12 @@ m=doe;i=io:std.io;i=s:std.str;
 f=pow2(n:$i64):$i64{let r=mut.1;lp(let i=0;i<n;i=i+1){r=r*2};<r};
 f=fmtnum(v:$f64):$str{
   let iv=v as $i64;
-  if((iv as $f64)=v){<s.fromint(iv)};
+  if((iv as $f64)==v){<s.fromint(iv)};
   <s.format(v;"%g");
 };
 f=main():$i64{
   let lines=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     lines=lines+@(s.trim(line));
@@ -25,7 +25,7 @@ f=main():$i64{
   let resp=mut.@($f64);
   lp(let i=respidx+1;i<ln;i=i+1){
     let t=lines.get(i);
-    if(s.len(t)=0){}el{
+    if(s.len(t)==0){}el{
       let parts=s.split(t;",");
       let pn=parts.len() as $i64;
       lp(let k=0;k<pn;k=k+1){resp=resp+@(s.tofloat(parts.get(k)))};
@@ -41,7 +41,7 @@ f=main():$i64{
     let lcnt=mut.0;
     lp(let r=0;r<nruns;r=r+1){
       let bit=(r/pow2(f))%2;
-      if(bit=1){hsum=hsum+resp.get(r);hcnt=hcnt+1}el{lsum=lsum+resp.get(r);lcnt=lcnt+1};
+      if(bit==1){hsum=hsum+resp.get(r);hcnt=hcnt+1}el{lsum=lsum+resp.get(r);lcnt=lcnt+1};
     };
     let eff=hsum/(hcnt as $f64)-lsum/(lcnt as $f64);
     maineff=maineff+@(eff);
@@ -63,11 +63,11 @@ f=main():$i64{
         let ba=(r/pow2(a))%2;
         let bb=(r/pow2(b))%2;
         let ca=mut.0-1;
-        if(ba=1){ca=1};
+        if(ba==1){ca=1};
         let cb=mut.0-1;
-        if(bb=1){cb=1};
+        if(bb==1){cb=1};
         let prod=ca*cb;
-        if(prod=1){hsum=hsum+resp.get(r);hcnt=hcnt+1}el{lsum=lsum+resp.get(r);lcnt=lcnt+1};
+        if(prod==1){hsum=hsum+resp.get(r);hcnt=hcnt+1}el{lsum=lsum+resp.get(r);lcnt=lcnt+1};
       };
       let eff=hsum/(hcnt as $f64)-lsum/(lcnt as $f64);
       out=s.concat(out;s.concat(s.concat(",\"interaction_";s.concat(names.get(a);names.get(b)));"\":"));

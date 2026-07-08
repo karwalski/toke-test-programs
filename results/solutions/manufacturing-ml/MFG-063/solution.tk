@@ -2,9 +2,9 @@ m=kfold;i=io:std.io;i=s:std.str;
 f=fmtscore(x:$f64):$str{
   let scaled=x*100.0+0.5;
   let h=mut.0;
-  let neg=mut.(1=0);
+  let neg=mut.(1==0);
   let xv=mut.scaled;
-  if(xv<0.0){neg=(1=1);xv=0.0-xv};
+  if(xv<0.0){neg=(1==1);xv=0.0-xv};
   lp(xv>=1.0){h=h+1;xv=xv-1.0};
   if(neg){h=0-h};
   let whole=h/100;
@@ -12,7 +12,7 @@ f=fmtscore(x:$f64):$str{
   if(frac<0){frac=0-frac};
   let out=mut.s.fromint(whole);
   out=s.concat(out;".");
-  if(frac%10=0){
+  if(frac%10==0){
     out=s.concat(out;s.fromint(frac/10))
   }el{
     if(frac<10){out=s.concat(out;"0")};
@@ -22,9 +22,9 @@ f=fmtscore(x:$f64):$str{
 };
 f=main():$i64{
   let lines=mut.@($str);
-  lp(io.eof()=(1=0)){
+  lp(io.eof()==(1==0)){
     let line=io.readln();
-    if(io.eof()){if(s.len(line)=0){br}};
+    if(io.eof()){if(s.len(line)==0){br}};
     lines=lines+@(s.trim(line))
   };
   let k=s.toint(lines.get(0));
@@ -46,16 +46,16 @@ f=main():$i64{
   lp(let fi=0;fi<k;fi=fi+1){
     let startidx=fi*foldsize;
     let endidx=mut.(fi+1)*foldsize;
-    if(fi=k-1){endidx=n};
+    if(fi==k-1){endidx=n};
     let sumx=mut.0.0;
     let sumy=mut.0.0;
     let sumxy=mut.0.0;
     let sumxx=mut.0.0;
     let ntrain=mut.0;
     lp(let j=0;j<n;j=j+1){
-      let intest=mut.(1=0);
-      if(j>=startidx){if(j<endidx){intest=(1=1)}};
-      if(intest=(1=0)){
+      let intest=mut.(1==0);
+      if(j>=startidx){if(j<endidx){intest=(1==1)}};
+      if(intest==(1==0)){
         let xv=xs.get(j);
         let yv=ys.get(j);
         sumx=sumx+xv;

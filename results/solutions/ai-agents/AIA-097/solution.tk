@@ -21,16 +21,16 @@ let handles=mut.false;
 lp(j<tn){
 let t=types.get(j);
 let traw="\(t.raw)";
-if(traw=want){handles=true};
+if(traw==want){handles=true};
 j=j+1;
 };
 if(handles){
-if(found=false){target=id;found=true};
+if(found==false){target=id;found=true};
 };
 i=i+1;
 };
 let priority=mut."normal";
-if(mtype="error"){priority="high"};
+if(mtype=="error"){priority="high"};
 let b=s.buf();
 s.add(b;"{\"route_to\":");
 s.add(b;json.enc(target));

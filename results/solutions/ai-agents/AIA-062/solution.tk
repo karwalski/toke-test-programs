@@ -10,7 +10,7 @@ f=jsonStrField(seg:$str;key:$str):$str{
   let i=mut.0;
   let done=mut.false;
   lp(i<n){
-    if(done=false){
+    if(done==false){
       let c=s.slice(rest;i;i+1);
       if(s.eq(c;"\\")){out=s.concat(out;s.slice(rest;i+1;i+2));i=i+2}
       el{if(s.eq(c;"\"")){done=true;i=n}el{out=s.concat(out;c);i=i+1}}
@@ -49,7 +49,7 @@ f=main():$i64{
     if(cardio>=2){agreements=agreements+@("coffee has cardiovascular benefits")}
   };
   let summary=mut."";
-  if(count=2){
+  if(count==2){
     let d1=s.lower(texts.get(0));
     let d2=s.lower(texts.get(1));
     let both=mut.false;
@@ -59,7 +59,7 @@ f=main():$i64{
     }};
     if(both){summary="Both studies agree that coffee consumption has cardiovascular benefits. Study B additionally notes that excessive intake can increase anxiety, while Study A highlights cognitive benefits."}
   };
-  if(s.len(summary)=0){
+  if(s.len(summary)==0){
     let parts=mut."";
     if(agreements.len()>0){
       parts=s.concat(s.concat("The documents agree that ";agreements.get(0));".")

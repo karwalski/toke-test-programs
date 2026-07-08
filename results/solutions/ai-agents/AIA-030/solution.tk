@@ -1,5 +1,5 @@
 m=ragconfig;i=io:std.io;i=s:std.str;
-f=intfield(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("\"";key);"\":");let start=s.indexof(obj;pat);if(start<0){<0};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."";let neg=mut."";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"-")&&s.len(num)=0){neg="-"}el{if(s.eq(ch;"0")||s.eq(ch;"1")||s.eq(ch;"2")||s.eq(ch;"3")||s.eq(ch;"4")||s.eq(ch;"5")||s.eq(ch;"6")||s.eq(ch;"7")||s.eq(ch;"8")||s.eq(ch;"9")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}}};if(s.len(num)=0){<0};<s.toint(s.concat(neg;num))};
+f=intfield(obj:$str;key:$str):$i64{let pat=s.concat(s.concat("\"";key);"\":");let start=s.indexof(obj;pat);if(start<0){<0};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let num=mut."";let neg=mut."";lp(let k=0;k<s.len(rest);k=k+1){let ch=s.slice(rest;k;k+1);if(s.eq(ch;"-")&&s.len(num)==0){neg="-"}el{if(s.eq(ch;"0")||s.eq(ch;"1")||s.eq(ch;"2")||s.eq(ch;"3")||s.eq(ch;"4")||s.eq(ch;"5")||s.eq(ch;"6")||s.eq(ch;"7")||s.eq(ch;"8")||s.eq(ch;"9")){num=s.concat(num;ch)}el{if(s.len(num)>0){k=s.len(rest)}}}};if(s.len(num)==0){<0};<s.toint(s.concat(neg;num))};
 f=strfield(obj:$str;key:$str):$str{let pat=s.concat(s.concat("\"";key);"\":\"");let start=s.indexof(obj;pat);if(start<0){<""};let vs=start+s.len(pat);let rest=s.slice(obj;vs;s.len(obj));let qe=s.indexof(rest;"\"");if(qe<0){<rest};<s.slice(rest;0;qe)};
 f=main():$i64{let input=io.readln();
 let cs=intfield(input;"chunk_size");let ov=intfield(input;"overlap");let ed=intfield(input;"embedding_dim");let tk=intfield(input;"top_k");let mc=intfield(input;"max_context_tokens");let model=strfield(input;"model");
@@ -10,9 +10,9 @@ if(ov<0){errors=errors+@("overlap must be non-negative")};
 if(ed<=0){errors=errors+@("embedding_dim must be positive")};
 if(tk<=0){errors=errors+@("top_k must be positive")};
 if(mc<=0){errors=errors+@("max_context_tokens must be positive")};
-if(s.len(s.trim(model))=0){errors=errors+@("model must be a non-empty string")};
+if(s.len(s.trim(model))==0){errors=errors+@("model must be a non-empty string")};
 let valid=mut."true";if(errors.len()>0){valid="false"};
-if(errors.len()=0){if(tk*cs>mc){warnings=warnings+@(s.concat(s.concat(s.concat("top_k of ";s.fromint(tk));" with chunk_size ");s.concat(s.fromint(cs);" may exceed max_context_tokens")))}};
+if(errors.len()==0){if(tk*cs>mc){warnings=warnings+@(s.concat(s.concat(s.concat("top_k of ";s.fromint(tk));" with chunk_size ");s.concat(s.fromint(cs);" may exceed max_context_tokens")))}};
 let es=mut."";lp(let i=0;i<errors.len();i=i+1){if(i>0){es=s.concat(es;",")};es=s.concat(s.concat(s.concat(es;"\"");errors.get(i));"\"")};
 let ws=mut."";lp(let i=0;i<warnings.len();i=i+1){if(i>0){ws=s.concat(ws;",")};ws=s.concat(s.concat(s.concat(ws;"\"");warnings.get(i));"\"")};
 let out=s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("{\"valid\":";valid);",\"errors\":[");es);"],\"warnings\":[");ws);"]}");io.println(out);<0}

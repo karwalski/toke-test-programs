@@ -3,9 +3,9 @@ i=io:std.io;
 i=s:std.str;
 
 f=fmtacc(correct:$i64;total:$i64):$str{
-  if(total=0){<"0.0"};
-  if(correct=total){<"1.0"};
-  if(correct=0){<"0.0"};
+  if(total==0){<"0.0"};
+  if(correct==total){<"1.0"};
+  if(correct==0){<"0.0"};
   let scaled=(correct*1000000)/total;
   let ipart=scaled/1000000;
   let fpart=scaled-ipart*1000000;
@@ -22,15 +22,15 @@ f=main():$i64{
   let ncols=features.len() as $i64;
   let labelidx=ncols-1;
   let rows=mut.@();
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
-    if(s.len(line)=0){br};
+    if(s.len(line)==0){br};
     let lt=s.trim(line);
-    if(s.len(lt)=0){br};
+    if(s.len(lt)==0){br};
     rows=rows.push(lt)
   };
   let nrows=rows.len() as $i64;
-  if(nrows=0){io.println("{\"error\":\"No data\"}");<0};
+  if(nrows==0){io.println("{\"error\":\"No data\"}");<0};
   let cells=mut.@();
   let r=mut.0;
   lp(r<nrows){cells=cells.push(s.split(rows.get(r as $u64);","));r=r+1};

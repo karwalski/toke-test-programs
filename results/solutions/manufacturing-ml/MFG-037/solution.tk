@@ -5,7 +5,7 @@ let fs=mut.s.fromint(fp);lp(s.len(fs)<6){fs=s.concat("0";fs)};
 let trimmed=mut.fs;lp(s.len(trimmed)>1){let last=s.slice(trimmed;s.len(trimmed)-1;s.len(trimmed));if(s.eq(last;"0")){trimmed=s.slice(trimmed;0;s.len(trimmed)-1)}el{br}};
 let out=mut.s.concat(s.fromint(ip);".");out=s.concat(out;trimmed);if(neg){out=s.concat("-";out)};<out};
 f=main():$i64{let bx=mut.@(0.0);bx=@();let by=mut.@(0.0);by=@();let first=mut.true;
-lp(1=1){let line=io.readln();if(s.len(line)=0){br};let t=s.trim(line);if(s.len(t)=0){}el{if(first){first=false}el{let parts=s.split(t;",");bx=bx+@(s.tofloat(s.trim(parts.get(0))));by=by+@(s.tofloat(s.trim(parts.get(1))))}}};
+lp(1==1){let line=io.readln();if(s.len(line)==0){br};let t=s.trim(line);if(s.len(t)==0){}el{if(first){first=false}el{let parts=s.split(t;",");bx=bx+@(s.tofloat(s.trim(parts.get(0))));by=by+@(s.tofloat(s.trim(parts.get(1))))}}};
 let n=bx.len();
 let slope=mut.0.0;let dir=mut."stable";let alert=mut.false;
 if(n<2){}el{let sx=mut.0.0;let sy=mut.0.0;let sxy=mut.0.0;let sxx=mut.0.0;let i=mut.0;lp(i<n){let xv=bx.get(i);let yv=by.get(i);sx=sx+xv;sy=sy+yv;sxy=sxy+xv*yv;sxx=sxx+xv*xv;i=i+1};

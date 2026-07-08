@@ -7,7 +7,7 @@ f=fmt1(v:$f64):$str{
   let last=mut.1;
   lp(let k=1;k<s.len(frac);k=k+1){
     let ch=s.slice(frac;k;k+1);
-    if(s.eq(ch;"0")=false){last=k+1}
+    if(s.eq(ch;"0")==false){last=k+1}
   };
   <s.concat(s.concat(intpart;".");s.slice(frac;0;last))
 };

@@ -15,7 +15,7 @@ f=main():$i64{
   let ids=mut.@();
   let scores=mut.@();
   let first=mut.true;
-  lp(1=1){
+  lp(1==1){
     let line=io.readln();
     if(io.eof()){br};
     let l=s.trim(line);
@@ -62,7 +62,7 @@ f=main():$i64{
     lp(let i=0;i<n;i=i+1){
       let isused=mut.false;
       lp(let j=0;j<order.len;j=j+1){
-        if(order.get(j)=i){isused=true}
+        if(order.get(j)==i){isused=true}
       };
       if(!(isused)){
         if(bestidx<0){
