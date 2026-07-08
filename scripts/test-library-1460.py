@@ -19,10 +19,17 @@ cats = sorted(f for f in glob.glob(os.path.join(ROOT, "results", "library", "*.j
 totals = dict(PASS=0, WRONG_OUTPUT=0, COMPILE_FAIL=0, RUN_FAIL=0, NO_SOLUTION=0, NO_TESTS=0)
 fails = []            # (id, status, detail)
 toke_bigger = []      # (id, byte_ratio, toke_bytes, python_bytes) where toke > python
+REPORT = os.path.join(ROOT, "reports", "library-1460-test.json")
+def dump():
+    json.dump({"totals": totals, "fails": fails,
+               "toke_bigger": sorted(toke_bigger, key=lambda x: x[1])},
+              open(REPORT, "w"), indent=1)
+
 n = 0
 for cf in cats:
     d = json.load(open(cf))
     catkey = d["category"]
+    dump()   # incremental: survive a kill (Epic 126.0)
     for p in d["programs"]:
         n += 1
         pid = p["id"]
