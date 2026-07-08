@@ -1,18 +1,18 @@
 m=limits;i=io:std.io;i=s:std.str;
-f=getint(json:$str;key:$str):$i64{let needle=s.concat(s.concat("\"";key);"\":");let idx=s.indexof(json;needle);if(idx<0){<0};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let num=mut."";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(s.equals(c;",")){br};if(s.equals(c;"}")){br};if(s.equals(c;"]")){br};num=s.concat(num;c)};<s.toint(s.trim(num))};
+f=getint(json:$str;key:$str):$i64{let needle=s.concat(s.concat("\"";key);"\":");let idx=s.indexof(json;needle);if(idx<0){<0};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let num=mut."";lp(let i=0;i<s.len(rest);i=i+1){let c=s.slice(rest;i;i+1);if(c==","||c=="}"||c=="]"){br};num=s.concat(num;c)};<s.toint(s.trim(num))};
 f=getstr(json:$str;key:$str):$str{let needle=s.concat(s.concat("\"";key);"\":\"");let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"\"");<s.slice(rest;0;endidx)};
 f=tierobj(json:$str;tier:$str):$str{let needle=s.concat(s.concat("\"";tier);"\":{");let idx=s.indexof(json;needle);if(idx<0){<""};let start=idx+s.len(needle);let rest=s.slice(json;start;s.len(json));let endidx=s.indexof(rest;"}");<s.slice(rest;0;endidx)};
-f=parsenames(arr:$str):@$str{let result=mut.@($str);let cur=mut."";let inq=mut.false;lp(let i=0;i<s.len(arr);i=i+1){let c=s.slice(arr;i;i+1);if(s.equals(c;"\"")){if(inq){result=result+@(cur);cur="";inq=false}el{inq=true}}el{if(inq){cur=s.concat(cur;c)}}};<result};
+f=parsenames(arr:$str):@$str{let result=mut.@($str);let cur=mut."";let inq=mut.false;lp(let i=0;i<s.len(arr);i=i+1){let c=s.slice(arr;i;i+1);if(c=="\""){if(inq){result=result+@(cur);cur="";inq=false}el{inq=true}}el{if(inq){cur=s.concat(cur;c)}}};<result};
 f=main():$i64{
 let limitsline=io.readln();
 let convline=io.readln();
 let reqline=io.readln();
 let tier=getstr(convline;"tier");
 let ctype=getstr(convline;"type");
-let current=mut.0;current=getint(convline;"current_members");
+let current=mut.getint(convline;"current_members");
 let to=tierobj(limitsline;tier);
 let limit=mut.0;
-if(s.equals(ctype;"dm")){limit=2}el{limit=getint(to;ctype)};
+if(ctype=="dm"){limit=2}el{limit=getint(to;ctype)};
 let names=parsenames(reqline);
 lp(let i=0;i<names.len();i=i+1){
 let name=names.get(i);
