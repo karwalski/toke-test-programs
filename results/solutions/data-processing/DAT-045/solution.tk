@@ -8,12 +8,7 @@ f=crc32(line:$str):$i64{
     crc=(crc^byte)&4294967295;
     let k=mut.0;
     lp(k<8){
-      let lsb=crc&1;
-      if(lsb==1){
-        crc=((crc>>1)^3988292384)&4294967295
-      }el{
-        crc=(crc>>1)&4294967295
-      };
+      crc=(if(crc&1==1){(crc>>1)^3988292384}el{crc>>1})&4294967295;
       k=k+1
     };
     i=i+1

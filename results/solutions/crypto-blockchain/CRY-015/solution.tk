@@ -97,15 +97,13 @@ f=keccak256(msg:@byte;padbyte:$i64):@byte{
     st=keccakf(st);
     bs=bs+rate;
   };
-  let out=mut.@(0&255);
-  out=@();
+  let out=mut.@();
   let oi=mut.0;
   lp(oi<4){
     let lane=st.get(oi);
     let j=mut.0;
     lp(j<8){
-      let bv=lshr(lane;8*j)&255;
-      out=out+@(bv&255);
+      out=out+@(lshr(lane;8*j)&255);
       j=j+1;
     };
     oi=oi+1;

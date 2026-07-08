@@ -34,10 +34,6 @@ f=main():$i64{
   }}}};
   if(!matched){io.println(all);<0};
   let body=stripprefix(all;plen);
-  let out=mut.s.concat("```";label);
-  out=s.concat(out;"\n");
-  out=s.concat(out;body);
-  out=s.concat(out;"\n```");
-  io.println(out);
+  io.println(s.join("\n";@(s.concat("```";label);body;"```")));
   <0
 };
