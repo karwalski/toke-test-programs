@@ -2,8 +2,5 @@ m=mac;i=io:std.io;i=s:std.str;i=cr:std.crypto;i=enc:std.encoding;
 f=main():$i64{
   let key=s.trim(io.readln());
   let msg=s.trim(io.readln());
-  let kb=s.bytes(key);
-  let mb=s.bytes(msg);
-  let mac=cr.hmacsha256(kb;mb);
-  io.println(enc.hexencode(mac));
+  io.println(enc.hexencode(cr.hmacsha256(s.bytes(key);s.bytes(msg))));
   <0}
