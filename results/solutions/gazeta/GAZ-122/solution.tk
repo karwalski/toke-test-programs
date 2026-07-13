@@ -1,0 +1,60 @@
+m=tworeaders;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let nn=s.toint(toks.get(0));
+  let kk=s.toint(toks.get(1));
+  let idx=mut.2;
+
+  let a=mut.@(0);
+  lp(let i=1;i<=nn;i=i+1){ a=a.push(s.toint(toks.get(idx))); idx=idx+1 };
+  let b=mut.@(0);
+  lp(let i=1;i<=nn;i=i+1){ b=b.push(s.toint(toks.get(idx))); idx=idx+1 };
+
+  let base=mut.0;
+  lp(let j=1;j<=kk;j=j+1){ base=base+a.get(j)+b.get(j) };
+
+  let loada=mut.0;
+  let loadb=mut.0;
+  lp(let i=kk+1;i<=nn;i=i+1){ loada=loada+a.get(i); loadb=loadb+b.get(i) };
+  let ll=if(loada>loadb){loada}el{loadb};
+  let tt=base+ll;
+
+  let awho=mut.@($i64);
+  let bwho=mut.@($i64);
+  lp(let i=0;i<tt;i=i+1){ awho=awho.push(0); bwho=bwho.push(0) };
+
+
+  let t=mut.0;
+  lp(let j=1;j<=kk;j=j+1){
+    lp(let c=0;c<a.get(j);c=c+1){ awho=awho.set(t;j); t=t+1 };
+    lp(let c=0;c<b.get(j);c=c+1){ bwho=bwho.set(t;j); t=t+1 };
+  };
+
+
+  let p=mut.0;
+  lp(let i=kk+1;i<=nn;i=i+1){
+    lp(let c=0;c<a.get(i);c=c+1){ awho=awho.set(base+p;i); p=p+1 };
+  };
+
+  if(ll>0){
+    let pb=mut.(loada%ll);
+    lp(let i=kk+1;i<=nn;i=i+1){
+      lp(let c=0;c<b.get(i);c=c+1){ bwho=bwho.set(base+(pb%ll);i); pb=pb+1 };
+    };
+  };
+
+  io.println(s.concat("T = ";s.fromint(tt)));
+  lp(let h=0;h<tt;h=h+1){
+    let av=awho.get(h); let bv=bwho.get(h);
+    let astr=if(av!=0){s.fromint(av)}el{"-"};
+    let bstr=if(bv!=0){s.fromint(bv)}el{"-"};
+    io.println(s.concat(s.concat(s.concat(s.concat(s.fromint(h);" ");astr);" ");bstr));
+  };
+  <0
+};

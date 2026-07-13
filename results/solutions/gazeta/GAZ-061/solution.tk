@@ -1,0 +1,52 @@
+m=minmax;i=io:std.io;i=s:std.str;
+f=fmt(v:f64):$str{
+  if(v==0.0){<"0"};
+  let iv=v as i64;
+  if((iv as f64)==v){ <s.fromint(iv) };
+  let raw=s.format(v;"%.6f");
+  let n=mut.s.len(raw);
+  lp(n>0){ if(s.slice(raw;n-1;n)=="0"){n=n-1}el{br} };
+  if(n>0){ if(s.slice(raw;n-1;n)=="."){n=n-1} };
+  let r=mut.s.slice(raw;0;n);
+  if(r==""){r="0"};
+  if(r=="-0"){r="0"};
+  <r
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let n=s.toint(toks.get(0));
+  let a=mut.@($f64);
+  lp(let i=0;i<n;i=i+1){ a=a.push(s.tofloat(toks.get(1+i))) };
+  let mn=mut.a.get(0);
+  let mx=mut.a.get(0);
+  let comp=mut.0;
+  let k=mut.0;
+  if(n%2==1){
+    k=1;
+  }el{
+    comp=comp+1;
+    if(a.get(0)<=a.get(1)){ mn=a.get(0); mx=a.get(1); }el{ mn=a.get(1); mx=a.get(0); };
+    k=2;
+  };
+  lp(k<=n-2){
+    comp=comp+1;
+    let small=mut.a.get(k);
+    let large=mut.a.get(k+1);
+    if(a.get(k)<=a.get(k+1)){ small=a.get(k); large=a.get(k+1); }el{ small=a.get(k+1); large=a.get(k); };
+    comp=comp+1;
+    if(small<mn){mn=small};
+    comp=comp+1;
+    if(large>mx){mx=large};
+    k=k+2;
+  };
+  io.println(s.concat("min = ";fmt(mn)));
+  io.println(s.concat("max = ";fmt(mx)));
+  io.println(s.concat("comparisons = ";s.fromint(comp)));
+  <0
+};

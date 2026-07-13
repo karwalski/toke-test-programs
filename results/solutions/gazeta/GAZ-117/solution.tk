@@ -1,0 +1,114 @@
+m=poset;i=io:std.io;i=s:std.str;
+let par=mut.@($i64);
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=findroot(x:i64):i64{
+  let c=mut.x;
+  lp(par.get(c)!=c){
+    par=par.set(c;par.get(par.get(c)));
+    c=par.get(c);
+  };
+  <c
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let idx=mut.0;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let letters=mut.@($str);
+  lp(let i=0;i<n;i=i+1){ letters=letters.push(toks.get(idx)); idx=idx+1 };
+  let m=s.toint(toks.get(idx)); idx=idx+1;
+  (* less matrix flattened n*n *)
+  let less=mut.@($bool);
+  lp(let i=0;i<n*n;i=i+1){ less=less.push(false) };
+  lp(let e=0;e<m;e=e+1){
+    let a=toks.get(idx); idx=idx+1;
+    let b=toks.get(idx); idx=idx+1;
+    let pa=mut.0; let pb=mut.0;
+    lp(let i=0;i<n;i=i+1){
+      if(letters.get(i)==a){ pa=i };
+      if(letters.get(i)==b){ pb=i };
+    };
+    less=less.set(pa*n+pb;true);
+  };
+  (* Floyd-Warshall transitive closure *)
+  lp(let k=0;k<n;k=k+1){
+    lp(let i=0;i<n;i=i+1){
+      if(less.get(i*n+k)){
+        lp(let j=0;j<n;j=j+1){
+          if(less.get(k*n+j)){ less=less.set(i*n+j;true) };
+        };
+      };
+    };
+  };
+  (* cover arcs *)
+  let arci=mut.@($i64);
+  let arcj=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n;j=j+1){
+      if(less.get(i*n+j)){
+        let covered=mut.false;
+        lp(let c=0;c<n;c=c+1){
+          if(less.get(i*n+c)&&less.get(c*n+j)){ covered=true };
+        };
+        if(covered){}el{ arci=arci.push(i); arcj=arcj.push(j) };
+      };
+    };
+  };
+  (* sort arcs by (letters[i],letters[j]) -- selection sort on index arrays *)
+  let na=arci.len();
+  let order=mut.@($i64);
+  lp(let t=0;t<na;t=t+1){ order=order.push(t) };
+  lp(let a=0;a<na;a=a+1){
+    lp(let b=a+1;b<na;b=b+1){
+      let oa=order.get(a); let ob=order.get(b);
+      let ka1=letters.get(arci.get(oa)); let ka2=letters.get(arcj.get(oa));
+      let kb1=letters.get(arci.get(ob)); let kb2=letters.get(arcj.get(ob));
+      let swap=mut.false;
+      if(kb1<ka1){ swap=true }el{
+        if(kb1==ka1&&kb2<ka2){ swap=true };
+      };
+      if(swap){ order=order.set(a;ob); order=order.set(b;oa) };
+    };
+  };
+  let out=mut.@($str);
+  lp(let t=0;t<na;t=t+1){
+    let o=order.get(t);
+    out=out.push(s.concat(s.concat(letters.get(arci.get(o));"->");letters.get(arcj.get(o))));
+  };
+  (* tree test *)
+  let indeg=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){ indeg=indeg.push(0) };
+  lp(let t=0;t<na;t=t+1){ let j=arcj.get(t); indeg=indeg.set(j;indeg.get(j)+1) };
+  let nroots=mut.0; let root=mut.0;
+  lp(let i=0;i<n;i=i+1){ if(indeg.get(i)==0){ nroots=nroots+1; root=i } };
+  let istree=mut.true;
+  if(nroots!=1){ istree=false }el{
+    lp(let i=0;i<n;i=i+1){
+      if(i!=root&&indeg.get(i)!=1){ istree=false };
+    };
+    if(na!=n-1){ istree=false };
+    if(istree){
+      par=@($i64);
+      lp(let i=0;i<n;i=i+1){ par=par.push(i) };
+      lp(let t=0;t<na;t=t+1){
+        let ri=findroot(arci.get(t)); let rj=findroot(arcj.get(t));
+        if(ri!=rj){ par=par.set(ri;rj) };
+      };
+      let comps=mut.0;
+      let seen=mut.@($i64);
+      lp(let i=0;i<n;i=i+1){
+        let r=findroot(i);
+        let found=mut.false;
+        lp(let k=0;k<seen.len();k=k+1){ if(seen.get(k)==r){ found=true } };
+        if(found){}el{ seen=seen.push(r); comps=comps+1 };
+      };
+      if(comps!=1){ istree=false };
+    };
+  };
+  out=out.push(if(istree){"yes"}el{"no"});
+  io.println(s.join("\n";out));
+  <0
+};

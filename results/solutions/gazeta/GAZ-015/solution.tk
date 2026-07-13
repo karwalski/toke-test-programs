@@ -1,0 +1,55 @@
+m=incircle;i=io:std.io;i=s:std.str;i=math:std.math;
+f=readall():$str{
+  let all=mut.""; lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} }; <all
+};
+f=mysin(x:f64):f64{
+  let pi=3.14159265358979311600; let twopi=pi+pi;
+  let a=mut.x;
+  lp(a>pi){a=a-twopi}; lp(a<(0.0-pi)){a=a+twopi};
+  let term=mut.a; let sum=mut.a; let n=mut.1;
+  lp(let k=0;k<20;k=k+1){
+    let d1=(2*n)*(2*n+1);
+    term=term*(0.0-(a*a))/(d1 as f64);
+    sum=sum+term; n=n+1;
+  };
+  <sum
+};
+f=mycos(x:f64):f64{ let pi=3.14159265358979311600; <mysin(pi/2.0-x) };
+f=hyp(dx:f64;dy:f64):f64{ <math.sqrt(dx*dx+dy*dy) };
+f=absf(x:f64):f64{ if(x<0.0){<0.0-x}; <x };
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let n=s.toint(toks.get(0));
+  if(n<=0){ <0 };
+  let bx=58.0; let by=40.0; let cx=197.0; let cy=40.0;
+  let ccx=128.0; let ccy=80.0; let cr=80.0;
+  let pi=3.14159265358979311600;
+  let out=mut.""; let first=mut.1;
+  lp(let k=0;k<n;k=k+1){
+    let t=2.0*pi*(k as f64)/(n as f64);
+    let ax=ccx+cr*mycos(t);
+    let ay=ccy+cr*mysin(t);
+    let a=hyp(bx-cx;by-cy);
+    let b=hyp(cx-ax;cy-ay);
+    let c=hyp(ax-bx;ay-by);
+    let sm=a+b+c;
+    let cross=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax);
+    let degen=mut.0;
+    if(sm<0.000000001){degen=1};
+    if(absf(cross)<0.000000001){degen=1};
+    let line=mut."";
+    if(degen==1){ line=s.concat(s.fromint(k);" DEGENERATE"); }
+    el{
+      let ix=(a*ax+b*bx+c*cx)/sm;
+      let iy=(a*ay+b*by+c*cy)/sm;
+      let p1=s.concat(s.fromint(k);" ");
+      let p2=s.concat(p1;s.format(ix;"%.4f"));
+      let p3=s.concat(p2;" ");
+      line=s.concat(p3;s.format(iy;"%.4f"));
+    };
+    if(first==1){ out=line; first=0; }el{ out=s.concat(out;s.concat("\n";line)); };
+  };
+  io.println(out);
+  <0
+};

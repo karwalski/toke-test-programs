@@ -1,0 +1,47 @@
+m=linsys;i=io:std.io;i=s:std.str;
+f=fmt(x:f64):$str{
+  let raw=s.format(x;"%.6f");
+  let n=mut.s.len(raw);
+  lp(n>0){ if(s.slice(raw;n-1;n)=="0"){n=n-1}el{br} };
+  if(n>0){ if(s.slice(raw;n-1;n)=="."){n=n-1} };
+  let r=mut.s.slice(raw;0;n);
+  if(r==""){r="0"};
+  if(r=="-0"){r="0"};
+  <r
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let raw=readall();
+  let cleaned=s.replace(raw;",";" ");
+  let toks=s.fields(cleaned);
+  if(toks.len()<6){<0};
+  let a1=s.tofloat(toks.get(0));
+  let b1=s.tofloat(toks.get(1));
+  let c1=s.tofloat(toks.get(2));
+  let a2=s.tofloat(toks.get(3));
+  let b2=s.tofloat(toks.get(4));
+  let c2=s.tofloat(toks.get(5));
+  let det=a1*b2-a2*b1;
+  if(det!=0.0){
+    let x=(c1*b2-c2*b1)/det;
+    let y=(a1*c2-a2*c1)/det;
+    io.println(s.concat(s.concat(s.concat("x=";fmt(x));", y=");fmt(y)));
+    <0
+  };
+  if(a1==0.0){
+    if(b1==0.0){
+      if(c1!=0.0){ io.println("inconsistent") }el{
+        if((a2==0.0&&b2==0.0)&&c2!=0.0){ io.println("inconsistent") }el{ io.println("dependent") }
+      }
+    }el{
+      if(b1*c2==b2*c1){ io.println("dependent") }el{ io.println("inconsistent") }
+    }
+  }el{
+    if(a1*c2==a2*c1){ io.println("dependent") }el{ io.println("inconsistent") }
+  };
+  <0
+};

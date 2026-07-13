@@ -1,0 +1,133 @@
+m=slidepuz;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+(* grid is @($i64) length 16; key = "v0,v1,...,v15" *)
+f=gridkey(g:@($i64)):$str{
+  let r=mut."";
+  lp(let i=0;i<16;i=i+1){
+    if(i>0){ r=s.concat(r;",") };
+    r=s.concat(r;s.fromint(g.get(i)));
+  };
+  <r
+};
+f=keygrid(k:$str):@($i64){
+  let parts=s.split(k;",");
+  let g=mut.@($i64);
+  lp(let i=0;i<16;i=i+1){ g=g.push(s.toint(parts.get(i))) };
+  <g
+};
+f=pad2(v:i64):$str{
+  let raw=s.fromint(v);
+  if(s.len(raw)<2){ <s.concat(" ";raw) };
+  <raw
+};
+f=fmtlines(g:@($i64);out:@($str)):@($str){
+  let o=mut.out;
+  lp(let r=0;r<4;r=r+1){
+    let line=mut."";
+    lp(let c=0;c<4;c=c+1){
+      if(c>0){ line=s.concat(line;" ") };
+      line=s.concat(line;pad2(g.get(r*4+c)));
+    };
+    o=o.push(line);
+  };
+  <o
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()!=16){ io.println("INVALID"); <0 };
+  let grid=mut.@($i64);
+  lp(let i=0;i<16;i=i+1){ grid=grid.push(s.toint(toks.get(i))) };
+  (* validate: exactly two zeros, nonzero sorted == 1..14 *)
+  let zeros=mut.0;
+  lp(let i=0;i<16;i=i+1){ if(grid.get(i)==0){ zeros=zeros+1 } };
+  let nz=mut.@($i64);
+  lp(let i=0;i<16;i=i+1){ if(grid.get(i)!=0){ nz=nz.push(grid.get(i)) } };
+  (* sort nz *)
+  lp(let a=0;a<nz.len();a=a+1){
+    lp(let b=a+1;b<nz.len();b=b+1){
+      if(nz.get(b)<nz.get(a)){ let t=nz.get(a); nz=nz.set(a;nz.get(b)); nz=nz.set(b;t) };
+    };
+  };
+  let valid=mut.true;
+  if(zeros!=2){ valid=false };
+  if(nz.len()!=14){ valid=false }el{
+    lp(let i=0;i<14;i=i+1){ if(nz.get(i)!=i+1){ valid=false } };
+  };
+  if(valid){}el{ io.println("INVALID"); <0 };
+  let goal=mut.@($i64);
+  lp(let i=1;i<=14;i=i+1){ goal=goal.push(i) };
+  goal=goal.push(0); goal=goal.push(0);
+  let startkey=gridkey(grid);
+  let goalkey=gridkey(goal);
+  let out=mut.@($str);
+  if(startkey==goalkey){ io.println("MOVES 0"); <0 };
+  (* BFS *)
+  let pstate=mut.@(startkey);
+  let pparent=mut.@(0-1);
+  let queue=mut.@(0);
+  let head=mut.0;
+  let found=mut.false;
+  let goalidx=mut.(0-1);
+  lp(head<queue.len()&&!found){
+    let si=queue.get(head); head=head+1;
+    let g=keygrid(pstate.get(si));
+    (* neighbours: for each blank cell, slide adjacent tile in *)
+    lp(let r=0;r<4;r=r+1){
+      lp(let c=0;c<4;c=c+1){
+        let idx=r*4+c;
+        if(g.get(idx)==0&&!found){
+          (* four directions *)
+          lp(let d=0;d<4;d=d+1){
+            let nr=mut.r; let nc=mut.c;
+            if(d==0){ nr=r-1 };
+            if(d==1){ nr=r+1 };
+            if(d==2){ nc=c-1 };
+            if(d==3){ nc=c+1 };
+            if(nr>=0&&nr<4&&nc>=0&&nc<4){
+              let nidx=nr*4+nc;
+              if(g.get(nidx)!=0){
+                let ng=mut.g;
+                let v=g.get(nidx);
+                ng=ng.set(nidx;0);
+                ng=ng.set(idx;v);
+                let nk=gridkey(ng);
+                (* membership scan *)
+                let seen=mut.false;
+                lp(let z=0;z<pstate.len();z=z+1){ if(pstate.get(z)==nk){ seen=true; br } };
+                if(seen){}el{
+                  pstate=pstate.push(nk);
+                  pparent=pparent.push(si);
+                  let newidx=pstate.len()-1;
+                  if(nk==goalkey){ found=true; goalidx=newidx }el{ queue=queue.push(newidx) };
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  if(found){}el{ io.println("UNSOLVABLE"); <0 };
+  (* reconstruct path from goalidx back to start *)
+  let path=mut.@($i64);
+  let cur=mut.goalidx;
+  lp(cur!=(0-1)){ path=path.push(cur); cur=pparent.get(cur) };
+  (* reverse *)
+  let rpath=mut.@($i64);
+  lp(let i=path.len()-1;i>=0;i=i-1){ rpath=rpath.push(path.get(i)) };
+  let n=rpath.len()-1;
+  out=out.push(s.concat("MOVES ";s.fromint(n)));
+  lp(let i=0;i<n;i=i+1){
+    out=out.push(s.concat("STEP ";s.fromint(i+1)));
+    out=fmtlines(keygrid(pstate.get(rpath.get(i)));out);
+    out=out.push("--");
+    out=fmtlines(keygrid(pstate.get(rpath.get(i+1)));out);
+    out=out.push("");
+  };
+  io.println(s.join("\n";out));
+  <0
+};

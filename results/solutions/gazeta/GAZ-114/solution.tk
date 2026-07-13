@@ -1,0 +1,31 @@
+m=cantor;i=io:std.io;i=s:std.str;
+f=incantor(p:i64;q:i64):bool{
+  if(p==0){<true};
+  let seen=mut.@($i64);
+  let rem=mut.p;
+  lp(rem!=0){
+    let sl=seen.len();
+    let found=mut.false;
+    lp(let j=0;j<sl;j=j+1){ if(seen.get(j)==rem){found=true; br} };
+    if(found){<true};
+    seen=seen.push(rem);
+    rem=rem*3;
+    let digit=rem/q;
+    rem=rem%q;
+    if(rem==0){ <(digit==1) };
+    if(digit==1){<false};
+  };
+  <true
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let p=s.toint(toks.get(0));
+  let q=s.toint(toks.get(1));
+  if(incantor(p;q)){ io.println("yes") }el{ io.println("no") };
+  <0
+};

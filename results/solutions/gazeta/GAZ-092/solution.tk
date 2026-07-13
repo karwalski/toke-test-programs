@@ -1,0 +1,159 @@
+m=bishops;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+(* bit helpers over two i64 halves (low = bits 0..31, high = bits 32..63) *)
+f=setbit(arr:@i64;sid:i64):@i64{
+  let a=mut.arr;
+  if(sid<32){ a=a.set(0;a.get(0)|shl(sid)) }el{ a=a.set(1;a.get(1)|shl(sid-32)) };
+  <a
+};
+f=shl(k:i64):i64{
+  let v=mut.1;
+  lp(let i=0;i<k;i=i+1){ v=v*2 };
+  <v
+};
+(* build cover mask for a bishop at (r,c) on n board, returned as @(low;high) *)
+f=covermask(r:i64;c:i64;n:i64):@i64{
+  let m=mut.@(0;0);
+  let sid=(r-1)*n+(c-1);
+  m=setbit(m;sid);
+(* four diagonal directions *)
+  m=raydir(m;r;c;n;1;1);
+  m=raydir(m;r;c;n;1;0-1);
+  m=raydir(m;r;c;n;0-1;1);
+  m=raydir(m;r;c;n;0-1;0-1);
+  <m
+};
+f=raydir(m0:@i64;r:i64;c:i64;n:i64;dr:i64;dc:i64):@i64{
+  let m=mut.m0;
+  let x=mut.(r+dr); let y=mut.(c+dc);
+  lp(x>=1&&x<=n&&y>=1&&y<=n){
+    m=setbit(m;(x-1)*n+(y-1));
+    x=x+dr; y=y+dc;
+  };
+  <m
+};
+f=orm(a:@i64;b:@i64):@i64{ <@(a.get(0)|b.get(0);a.get(1)|b.get(1)) };
+f=covers(a:@i64;target:@i64):bool{
+  <((a.get(0)&target.get(0))==target.get(0))&&((a.get(1)&target.get(1))==target.get(1))
+};
+(* combinations recursion for min_color: find smallest k of ids covering target. *)
+(* returns chosen list of sids in `chosen`; we search k ascending. *)
+(* global-ish via helper returning found list or empty. *)
+f=trycombo(ids:@i64;start:i64;need:i64;curlo:i64;curhi:i64;acc:@i64;target:@i64;lows:@i64;highs:@i64):@i64{
+  if(need==0){
+    if(((curlo&target.get(0))==target.get(0))&&((curhi&target.get(1))==target.get(1))){ <acc }el{ <@() };
+  };
+  lp(let i=start;i<=ids.len()-need;i=i+1){
+    let sid=ids.get(i);
+    let nlo=curlo|lows.get(sid);
+    let nhi=curhi|highs.get(sid);
+    let res=trycombo(ids;i+1;need-1;nlo;nhi;acc+@(sid);target;lows;highs);
+    if(res.len()>0){ <res };
+  };
+  <@()
+};
+f=mincolor(n:i64;color:i64;lows:@i64;highs:@i64):@i64{
+(* returns @(k; sid0; sid1; ...) ; sids are the witness placement *)
+  let ids=mut.@();
+  lp(let r=1;r<=n;r=r+1){
+    lp(let c=1;c<=n;c=c+1){
+      if((r+c)%2==color){ ids=ids+@((r-1)*n+(c-1)) };
+    };
+  };
+  if(ids.len()==0){ <@(0) };
+  let tlo=mut.0; let thi=mut.0;
+  lp(let i=0;i<ids.len();i=i+1){
+    let sid=ids.get(i);
+    if(sid<32){ tlo=tlo|shl(sid) }el{ thi=thi|shl(sid-32) };
+  };
+  let target=@(tlo;thi);
+  lp(let k=1;k<=ids.len();k=k+1){
+    let res=trycombo(ids;0;k;0;0;@();target;lows;highs);
+    if(res.len()>0){ <@(k)+res };
+  };
+  <@(ids.len())+ids
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let n=s.toint(toks.get(0));
+  let mode=s.upper(toks.get(1));
+(* precompute all masks as parallel lows/highs indexed by sid *)
+  let lows=mut.@();
+  let highs=mut.@();
+  lp(let r=1;r<=n;r=r+1){
+    lp(let c=1;c<=n;c=c+1){
+      let m=covermask(r;c;n);
+      lows=lows+@(m.get(0));
+      highs=highs+@(m.get(1));
+    };
+  };
+  if(mode=="MIN"){
+    let rw=mincolor(n;0;lows;highs);
+    let rb=mincolor(n;1;lows;highs);
+    let kw=rw.get(0); let kb=rb.get(0);
+    let mk=kw+kb;
+(* try central row first *)
+    let row=(n+1)/2;
+    let central=mut.@();
+    lp(let c=1;c<=n;c=c+1){ central=central+@((row-1)*n+(c-1)) };
+    let ccov=mut.@(0;0);
+    lp(let i=0;i<central.len();i=i+1){
+      let sid=central.get(i);
+      ccov=orm(ccov;@(lows.get(sid);highs.get(sid)));
+    };
+    let fulllo=mut.0; let fullhi=mut.0;
+    lp(let sid=0;sid<n*n;sid=sid+1){
+      if(sid<32){ fulllo=fulllo|shl(sid) }el{ fullhi=fullhi|shl(sid-32) };
+    };
+    let full=@(fulllo;fullhi);
+    let placesids=mut.@();
+    if(central.len()==mk&&covers(ccov;full)){
+      placesids=central;
+    }el{
+(* witness sids from both colors, sorted by (r,c) i.e. by sid (since sid=(r-1)*n+(c-1) is row-major) *)
+      let w=mut.@();
+      lp(let i=1;i<rw.len();i=i+1){ w=w+@(rw.get(i)) };
+      lp(let i=1;i<rb.len();i=i+1){ w=w+@(rb.get(i)) };
+(* sort ascending *)
+      let ws=mut.w;
+      lp(let a=0;a<ws.len();a=a+1){
+        lp(let b=0;b<ws.len()-1;b=b+1){
+          if(ws.get(b)>ws.get(b+1)){ let t=ws.get(b); ws=ws.set(b;ws.get(b+1)); ws=ws.set(b+1;t) };
+        };
+      };
+      placesids=ws;
+    };
+    io.println(s.concat("min = ";s.fromint(mk)));
+    let line=mut."placement = ";
+    lp(let i=0;i<placesids.len();i=i+1){
+      let sid=placesids.get(i);
+      let r=sid/n+1; let c=sid%n+1;
+      if(i>0){ line=s.concat(line;" ") };
+      line=s.concat(line;s.concat(s.concat(s.concat(s.concat("(";s.fromint(r));",");s.fromint(c));")"));
+    };
+    io.println(line);
+  }el{
+    if(mode=="VERIFY"){
+      let k=s.toint(toks.get(2));
+      let comb=mut.@(0;0);
+      lp(let i=0;i<k;i=i+1){
+        let r=s.toint(toks.get(3+i*2));
+        let c=s.toint(toks.get(3+i*2+1));
+        let sid=(r-1)*n+(c-1);
+        comb=orm(comb;@(lows.get(sid);highs.get(sid)));
+      };
+      let fulllo=mut.0; let fullhi=mut.0;
+      lp(let sid=0;sid<n*n;sid=sid+1){
+        if(sid<32){ fulllo=fulllo|shl(sid) }el{ fullhi=fullhi|shl(sid-32) };
+      };
+      let full=@(fulllo;fullhi);
+      if(covers(comb;full)){ io.println("covers = true") }el{ io.println("covers = false") };
+    };
+  };
+  <0
+};

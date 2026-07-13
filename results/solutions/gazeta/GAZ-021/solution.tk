@@ -1,0 +1,65 @@
+m=plot;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=evalval(fnc:$str;x:i64):i64{
+  if(fnc=="F"){ if(x<=2){<3*x-1}el{<2*x+1} };
+  if(x<=-1){<-2*x+1}el{<x+1}
+};
+f=evalbranch(fnc:$str;x:i64):$str{
+  if(fnc=="F"){ if(x<=2){<"3x-1"}el{<"2x+1"} };
+  if(x<=-1){<"-2x+1"}el{<"x+1"}
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let ntok=toks.len();
+  let out=mut.@($str);
+  let i=mut.0;
+  lp(i<ntok){
+    let cmd=toks.get(i);
+    i=i+1;
+    if(cmd=="eval"){
+      let n=s.toint(toks.get(i));
+      i=i+1;
+      lp(let k=0;k<n;k=k+1){
+        let fnc=toks.get(i);
+        let x=s.toint(toks.get(i+1));
+        i=i+2;
+        let y=evalval(fnc;x);
+        let brn=evalbranch(fnc;x);
+        let line=s.join("";@(fnc;"(";s.fromint(x);") = ";s.fromint(y);" [";brn;"]"));
+        out=out.push(line);
+      };
+    }el{
+      let fnc=toks.get(i);
+      let xmin=s.toint(toks.get(i+1));
+      let xmax=s.toint(toks.get(i+2));
+      let ymin=s.toint(toks.get(i+3));
+      let ymax=s.toint(toks.get(i+4));
+      i=i+5;
+      let hdr=s.join("";@("grid ";fnc;" x[";s.fromint(xmin);",";s.fromint(xmax);"] y[";s.fromint(ymin);",";s.fromint(ymax);"]"));
+      out=out.push(hdr);
+      lp(let y=ymax;y>=ymin;y=y-1){
+        let row=mut."";
+        lp(let x=xmin;x<=xmax;x=x+1){
+          let fy=evalval(fnc;x);
+          let ch=mut.".";
+          if(fy==y){ch="*"}el{
+            if(x==0&&y==0){ch="+"}el{
+              if(y==0){ch="-"}el{
+                if(x==0){ch="|"}
+              }
+            }
+          };
+          row=s.concat(row;ch);
+        };
+        out=out.push(row);
+      };
+    };
+  };
+  io.print(s.join("\n";out));
+  if(out.len()>0){io.print("\n")};
+  <0
+};

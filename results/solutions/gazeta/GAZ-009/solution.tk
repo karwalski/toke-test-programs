@@ -1,0 +1,28 @@
+m=heron;i=io:std.io;i=s:std.str;i=m:std.math;
+f=fmt(x:f64):$str{
+  let raw=s.format(x;"%.6f");
+  let n=mut.s.len(raw);
+  lp(n>0){ if(s.slice(raw;n-1;n)=="0"){n=n-1}el{br} };
+  if(n>0){ if(s.slice(raw;n-1;n)=="."){n=n-1} };
+  let r=mut.s.slice(raw;0;n);
+  if(r==""){r="0"};
+  if(r=="-0"){r="0"};
+  <r
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let a=s.tofloat(toks.get(0));
+  let b=s.tofloat(toks.get(1));
+  let c=s.tofloat(toks.get(2));
+  let p=(a+b+c)/2.0;
+  let s2=p*(p-a)*(p-b)*(p-c);
+  io.println(s.concat("p = ";fmt(p)));
+  io.println(s.concat("S2 = ";fmt(s2)));
+  if(s2>0.0){ io.println(s.concat("S = ";fmt(m.sqrt(s2)))) }el{ io.println("S = undefined") };
+  <0
+};

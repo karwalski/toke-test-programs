@@ -1,0 +1,136 @@
+m=mindist;i=io:std.io;i=s:std.str;
+let gn=mut.0;
+let gdm=mut.0;
+let gnn=mut.0;
+let gwidth=mut.0;
+let chosen=mut.@($i64);
+let results=mut.@($str);
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=popcount(x:i64):i64{
+  let c=mut.0; let v=mut.x;
+  lp(v>0){ c=c+(v%2); v=v/2 };
+  <c
+};
+f=hamm(a:i64;b:i64):i64{
+  (* xor via bit loop *)
+  let x=mut.0; let bit=mut.1;
+  let aa=mut.a; let bb=mut.b;
+  lp(aa>0||bb>0){
+    if((aa%2)!=(bb%2)){ x=x+bit };
+    aa=aa/2; bb=bb/2; bit=bit*2;
+  };
+  <popcount(x)
+};
+f=compat(a:i64;b:i64):bool{
+  <hamm(a;b)>=gdm
+};
+f=padnum(v:i64):$str{
+  let raw=s.fromint(v);
+  let r=mut.raw;
+  lp(s.len(r)<gwidth){ r=s.concat("0";r) };
+  <r
+};
+f=fmtbin(v:i64):$str{
+  let r=mut."";
+  lp(let b=0;b<gn;b=b+1){
+    let shift=gn-1-b;
+    let p=mut.1;
+    lp(let z=0;z<shift;z=z+1){ p=p*2 };
+    let bit=(v/p)%2;
+    r=s.concat(r;if(bit==1){"1"}el{"0"});
+  };
+  <r
+};
+f=ismaximal():bool{
+  lp(let x=0;x<gnn;x=x+1){
+    (* if x in chosen skip *)
+    let inch=mut.false;
+    lp(let c=0;c<chosen.len();c=c+1){ if(chosen.get(c)==x){ inch=true } };
+    if(inch){}el{
+      let ok=mut.true;
+      lp(let c=0;c<chosen.len();c=c+1){
+        if(compat(x;chosen.get(c))){}el{ ok=false };
+      };
+      if(ok){ <false };
+    };
+  };
+  <true
+};
+f=minpair():i64{
+  let m=mut.(0-1);
+  let k=chosen.len();
+  lp(let i=0;i<k;i=i+1){
+    lp(let j=i+1;j<k;j=j+1){
+      let d=hamm(chosen.get(i);chosen.get(j));
+      if(m==(0-1)||d<m){ m=d };
+    };
+  };
+  <m
+};
+f=recordresult():i64{
+  let key=mut."";
+  lp(let i=0;i<chosen.len();i=i+1){
+    key=s.concat(key;s.concat(",";padnum(chosen.get(i))));
+  };
+  results=results.push(key);
+  <0
+};
+f=build(start:i64):i64{
+  if(chosen.len()>=2&&ismaximal()&&minpair()==gdm){ recordresult() };
+  lp(let i=start;i<gnn;i=i+1){
+    let ok=mut.true;
+    lp(let c=0;c<chosen.len();c=c+1){
+      if(compat(i;chosen.get(c))){}el{ ok=false };
+    };
+    if(ok){
+      chosen=chosen.push(i);
+      build(i+1);
+      let nl=chosen.len()-1;
+      let tmp=mut.@($i64);
+      lp(let z=0;z<nl;z=z+1){ tmp=tmp.push(chosen.get(z)) };
+      chosen=tmp;
+    };
+  };
+  <0
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){ <0 };
+  gn=s.toint(toks.get(0));
+  gdm=s.toint(toks.get(1));
+  if(gn<0||gn>20){ io.println("0"); <0 };
+  gnn=1;
+  lp(let z=0;z<gn;z=z+1){ gnn=gnn*2 };
+  (* width for zero-pad = digits of gnn-1 *)
+  let maxv=gnn-1;
+  gwidth=s.len(s.fromint(maxv));
+  build(0);
+  (* sort results (string sort matches numeric-lex due to zero pad + comma sep) *)
+  let n=results.len();
+  let sorted=mut.results;
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=a+1;b<n;b=b+1){
+      if(sorted.get(b)<sorted.get(a)){
+        let t=sorted.get(a); sorted=sorted.set(a;sorted.get(b)); sorted=sorted.set(b;t);
+      };
+    };
+  };
+  io.println(s.fromint(n));
+  lp(let r=0;r<n;r=r+1){
+    let key=sorted.get(r);
+    (* split on "," -> first empty token *)
+    let parts=s.split(key;",");
+    let line=mut."";
+    lp(let p=1;p<parts.len();p=p+1){
+      let v=s.toint(parts.get(p));
+      if(p>1){ line=s.concat(line;" ") };
+      line=s.concat(line;fmtbin(v));
+    };
+    io.println(line);
+  };
+  <0
+};

@@ -1,0 +1,36 @@
+m=triangleangles;i=io:std.io;i=s:std.str;i=m:std.math;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=clampv(x:f64):f64{
+  if(x<(0.0-1.0)){<0.0-1.0};
+  if(x>1.0){<1.0};
+  <x
+};
+f=angle(x:f64;y:f64;z:f64):f64{
+  <m.acos(clampv((y*y+z*z-x*x)/(2.0*y*z)))
+};
+f=fmt2(v:f64):$str{
+  let raw=s.format(v;"%.2f");
+  if(raw=="-0.00"){<"0.00"};
+  <raw
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<3){ io.println("INVALID"); <0 };
+  let a=s.tofloat(toks.get(0));
+  let b=s.tofloat(toks.get(1));
+  let c=s.tofloat(toks.get(2));
+  if(a<=0.0||b<=0.0||c<=0.0||a+b<=c||b+c<=a||c+a<=b){ io.println("INVALID"); <0 };
+  let pi=m.acos(0.0-1.0);
+  let deg=180.0/pi;
+  let aa=angle(a;b;c)*deg;
+  let bb=angle(b;c;a)*deg;
+  let cc=angle(c;a;b)*deg;
+  io.println(s.concat("A=";fmt2(aa)));
+  io.println(s.concat("B=";fmt2(bb)));
+  io.println(s.concat("C=";fmt2(cc)));
+  <0
+};

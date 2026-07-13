@@ -1,0 +1,43 @@
+m=maxdet;i=io:std.io;i=s:std.str;
+f=pow2(n:i64):i64{
+  let r=mut.1;
+  lp(let i=0;i<n;i=i+1){ r=r*2 };
+  <r
+};
+f=bit(mask:i64;pos:i64):i64{
+  <(mask/pow2(pos))%2
+};
+f=det3(mask:i64):i64{
+  let a00=bit(mask;0);
+  let a01=bit(mask;1);
+  let a02=bit(mask;2);
+  let a10=bit(mask;3);
+  let a11=bit(mask;4);
+  let a12=bit(mask;5);
+  let a20=bit(mask;6);
+  let a21=bit(mask;7);
+  let a22=bit(mask;8);
+  <(a00*(a11*a22-a12*a21)-a01*(a10*a22-a12*a20)+a02*(a10*a21-a11*a20))
+};
+f=main():i64{
+  let best=mut.-10;
+  let bestmask=mut.0;
+  lp(let mask=0;mask<512;mask=mask+1){
+    let d=det3(mask);
+    if(d>best){ best=d; bestmask=mask };
+  };
+  let count=mut.0;
+  lp(let mask=0;mask<512;mask=mask+1){
+    if(det3(mask)==best){ count=count+1 };
+  };
+  io.println(s.concat("max det = ";s.fromint(best)));
+  io.println(s.concat("count = ";s.fromint(count)));
+  io.println("witness:");
+  lp(let r=0;r<3;r=r+1){
+    let c0=bit(bestmask;3*r+0);
+    let c1=bit(bestmask;3*r+1);
+    let c2=bit(bestmask;3*r+2);
+    io.println(s.concat(s.concat(s.concat(s.concat(s.fromint(c0);" ");s.fromint(c1));" ");s.fromint(c2)));
+  };
+  <0
+};

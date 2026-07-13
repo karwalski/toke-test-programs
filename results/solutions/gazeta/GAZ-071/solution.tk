@@ -1,0 +1,72 @@
+m=hamiltonian;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=cost(cmat:@(i64);size:i64;i:i64;j:i64):i64{ <cmat.get(i*size+j) };
+f=search(current:i64;count:i64;costsofar:i64;route:@(i64);visited:@(i64);bestcost:i64;cmat:@(i64);size:i64;inf:i64):@(i64){
+  (* returns array: index0 = best cost in this subtree (or inf), rest = best route *)
+  let none=mut.@($i64);
+  none=none.push(bestcost);
+  if(costsofar>=bestcost){ <none };
+  if(count==size){
+    let back=cost(cmat;size;current;0);
+    if(back<inf){
+      let total=costsofar+back;
+      if(total<bestcost){
+        let res=mut.@($i64);
+        res=res.push(total);
+        lp(let i=0;i<route.len();i=i+1){ res=res.push(route.get(i)) };
+        res=res.push(0);
+        <res
+      };
+    };
+    <none
+  };
+  let curbest=mut.bestcost;
+  let curroute=mut.none;
+  lp(let nx=1;nx<size;nx=nx+1){
+    if(visited.get(nx)==0){
+      if(cost(cmat;size;current;nx)<inf){
+        let nvis=visited.set(nx;1);
+        let nroute=route.push(nx);
+        let sub=search(nx;count+1;costsofar+cost(cmat;size;current;nx);nroute;nvis;curbest;cmat;size;inf);
+        let subcost=sub.get(0);
+        if(subcost<curbest){ curbest=subcost; curroute=sub; };
+      };
+    };
+  };
+  <curroute
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let idx=mut.0;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let size=n+1;
+  let inf=1000000000;
+  let cmat=mut.@($i64);
+  lp(let i=0;i<size;i=i+1){
+    lp(let j=0;j<size;j=j+1){
+      let v=s.toint(toks.get(idx)); idx=idx+1;
+      if(v<0){ cmat=cmat.push(inf) }el{ cmat=cmat.push(v) };
+    };
+  };
+  let visited=mut.@($i64);
+  lp(let i=0;i<size;i=i+1){ visited=visited.push(0) };
+  visited=visited.set(0;1);
+  let route=mut.@($i64);
+  route=route.push(0);
+  let result=search(0;1;0;route;visited;inf;cmat;size;inf);
+  let bestcost=result.get(0);
+  if(bestcost>=inf){
+    io.println("impossible");
+  }el{
+    io.println(s.concat("cost ";s.fromint(bestcost)));
+    let line=mut."route";
+    lp(let i=1;i<result.len();i=i+1){ line=s.concat(line;s.concat(" ";s.fromint(result.get(i)))) };
+    io.println(line);
+  };
+  <0
+};

@@ -1,0 +1,49 @@
+m=crypto;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=repdigit(d:i64;n:i64):i64{
+  let value=mut.0;
+  lp(let k=0;k<n;k=k+1){ value=value*10+d };
+  <value
+};
+f=holds(a:i64;b:i64;c:i64;n:i64):bool{
+  let sm=repdigit(a;n)+repdigit(b;n);
+  let expected=mut.s.concat(s.fromint(c);"");
+  lp(let k=0;k<n-1;k=k+1){ expected=s.concat(expected;s.fromint(b)) };
+  expected=s.concat(expected;s.fromint(c));
+  <s.fromint(sm)==expected
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){ <0 };
+  let nmin=s.toint(toks.get(0));
+  let nmax=s.toint(toks.get(1));
+  io.println("SOLUTIONS:");
+  lp(let a=1;a<10;a=a+1){
+    lp(let b=1;b<10;b=b+1){
+      lp(let c=1;c<10;c=c+1){
+        if(a==b || a==c || b==c){}el{
+          let ok=mut.true;
+          lp(let n=nmin;n<=nmax;n=n+1){
+            if(holds(a;b;c;n)){}el{ ok=false; br }
+          };
+          if(ok){
+            io.println(cat(cat(cat(cat(cat("A=";s.fromint(a));" B=");s.fromint(b));" C=");s.fromint(c)))
+          }
+        }
+      }
+    }
+  };
+  io.println("CHECKS:");
+  lp(let n=nmin;n<=nmax;n=n+1){
+    let ra=repdigit(9;n);
+    let rb=repdigit(2;n);
+    let sm=ra+rb;
+    io.println(cat(cat(cat(cat(cat(cat(cat("n=";s.fromint(n));": ");s.fromint(ra));" + ");s.fromint(rb));" = ");s.fromint(sm)))
+  };
+  <0
+};

@@ -1,0 +1,27 @@
+m=lightyear;i=io:std.io;i=s:std.str;
+f=fmt(x:f64):$str{
+  let raw=s.format(x;"%.10f");
+  let n=mut.s.len(raw);
+  lp(n>0){ if(s.slice(raw;n-1;n)=="0"){n=n-1}el{br} };
+  if(n>0){ if(s.slice(raw;n-1;n)=="."){n=n-1} };
+  let r=mut.s.slice(raw;0;n);
+  if(r==""){r="0"};
+  if(r=="-0"){r="0"};
+  <r
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let lykm=300000.0*60.0*60.0*24.0*365.0;
+  let nt=toks.len();
+  lp(let i=0;i+1<nt;i=i+2){
+    let mode=toks.get(i);
+    let value=s.tofloat(toks.get(i+1));
+    if(mode=="ly"){ io.println(fmt(value*lykm)) }el{ if(mode=="km"){ io.println(fmt(value/lykm)) } };
+  };
+  <0
+};

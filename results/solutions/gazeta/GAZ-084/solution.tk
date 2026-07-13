@@ -1,0 +1,141 @@
+m=faraoni;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+(* floor division by 2 *)
+f=fdiv2(x:i64):i64{
+  if(x>=0){ <x/2 }el{
+    (* floor for negatives: -(( -x + 1)/2) when odd *)
+    let q=(0-x)/2;
+    if((0-x)%2==0){ <0-q }el{ <0-q-1 };
+  }
+};
+(* encode point *)
+f=enc(x:i64;y:i64):i64{ <(x+2000)*100000+(y+2000) };
+f=contains(arr:@i64;v:i64):bool{
+  lp(let i=0;i<arr.len();i=i+1){ if(arr.get(i)==v){<true} };
+  <false
+};
+f=cross(ox:i64;oy:i64;ax:i64;ay:i64;bx:i64;by:i64):i64{
+  <(ax-ox)*(by-oy)-(ay-oy)*(bx-ox)
+};
+(* ax,ay,bx,by,cx,cy passed as arrays a,b,c of len2 *)
+f=intri(px:i64;py:i64;ax:i64;ay:i64;bx:i64;by:i64;cx:i64;cy:i64):bool{
+  let d1=cross(px;py;ax;ay;bx;by);
+  let d2=cross(px;py;bx;by;cx;cy);
+  let d3=cross(px;py;cx;cy;ax;ay);
+  let hasneg=(d1<0)||(d2<0)||(d3<0);
+  let haspos=(d1>0)||(d2>0)||(d3>0);
+  <!(hasneg&&haspos)
+};
+(* next positions: given P (px,py) and vertices, returns array of 3 encoded points as @(x0;y0;x1;y1;x2;y2) *)
+f=nextpos(px:i64;py:i64;ax:i64;ay:i64;bx:i64;by:i64;cx:i64;cy:i64):@i64{
+  <@(fdiv2(px+ax);fdiv2(py+ay);fdiv2(px+bx);fdiv2(py+by);fdiv2(px+cx);fdiv2(py+cy))
+};
+f=onseg(px:i64;py:i64;vx:i64;vy:i64;wx:i64;wy:i64):bool{
+  if(cross(vx;vy;wx;wy;px;py)!=0){<false};
+  let lox=if(vx<wx){vx}el{wx}; let hix=if(vx>wx){vx}el{wx};
+  let loy=if(vy<wy){vy}el{wy}; let hiy=if(vy>wy){vy}el{wy};
+  if(!(lox<=px&&px<=hix)){<false};
+  if(!(loy<=py&&py<=hiy)){<false};
+  <true
+};
+f=onbound(px:i64;py:i64;ax:i64;ay:i64;bx:i64;by:i64;cx:i64;cy:i64):bool{
+  <onseg(px;py;ax;ay;bx;by)||onseg(px;py;bx;by;cx;cy)||onseg(px;py;cx;cy;ax;ay)
+};
+f=mn(a:i64;b:i64;c:i64):i64{ let m=mut.a; if(b<m){m=b}; if(c<m){m=c}; <m };
+f=mx(a:i64;b:i64;c:i64):i64{ let m=mut.a; if(b>m){m=b}; if(c>m){m=c}; <m };
+f=main():i64{
+  let toks=s.fields(readall());
+  let idx=mut.0;
+  let mode=toks.get(0); idx=1;
+  let ax=s.toint(toks.get(1)); let ay=s.toint(toks.get(2));
+  let bx=s.toint(toks.get(3)); let by=s.toint(toks.get(4));
+  let cx=s.toint(toks.get(5)); let cy=s.toint(toks.get(6));
+  idx=7;
+  if(mode=="SIM"){
+    let sx=s.toint(toks.get(idx)); let sy=s.toint(toks.get(idx+1)); let nn=s.toint(toks.get(idx+2));
+    idx=idx+3;
+    let px=mut.sx; let py=mut.sy;
+    io.println(s.concat(s.concat(s.fromint(px);" ");s.fromint(py)));
+    lp(let i=0;i<nn;i=i+1){
+      let np=nextpos(px;py;ax;ay;bx;by;cx;cy);
+      let ch=s.toint(toks.get(idx+i));
+      px=np.get(ch*2); py=np.get(ch*2+1);
+      io.println(s.concat(s.concat(s.fromint(px);" ");s.fromint(py)));
+    };
+  }el{ if(mode=="REACH"){
+    let sx=s.toint(toks.get(idx)); let sy=s.toint(toks.get(idx+1));
+    let tx=s.toint(toks.get(idx+2)); let ty=s.toint(toks.get(idx+3));
+    let tenc=enc(tx;ty);
+    let seen=mut.@();
+    let stack=mut.@(enc(sx;sy));
+    let ans=mut.false;
+    lp(stack.len()>0){
+      let top=stack.get(stack.len()-1);
+      let ns=mut.@();
+      lp(let j=0;j<stack.len()-1;j=j+1){ ns=ns+@(stack.get(j)) };
+      stack=ns;
+      if(top==tenc){ ans=true; br };
+      if(contains(seen;top)){}el{
+        seen=seen+@(top);
+        let dx=top/100000-2000; let dy=top%100000-2000;
+        let np=nextpos(dx;dy;ax;ay;bx;by;cx;cy);
+        lp(let q=0;q<3;q=q+1){
+          let qe=enc(np.get(q*2);np.get(q*2+1));
+          if(contains(seen;qe)){}el{ stack=stack+@(qe) };
+        };
+      };
+    };
+    if(ans){ io.println("reachable: yes") }el{ io.println("reachable: no") };
+  }el{ if(mode=="SAFE"){
+    let minx=mn(ax;bx;cx); let maxx=mx(ax;bx;cx);
+    let miny=mn(ay;by;cy); let maxy=mx(ay;by;cy);
+    (* triangle points in order y outer, x inner *)
+    let ptsx=mut.@(); let ptsy=mut.@();
+    lp(let y=miny;y<=maxy;y=y+1){
+      lp(let x=minx;x<=maxx;x=x+1){
+        if(intri(x;y;ax;ay;bx;by;cx;cy)){ ptsx=ptsx+@(x); ptsy=ptsy+@(y) };
+      };
+    };
+    (* reach_all set from all boundary starts *)
+    let reachall=mut.@();
+    lp(let p=0;p<ptsx.len();p=p+1){
+      let x=ptsx.get(p); let y=ptsy.get(p);
+      if(onbound(x;y;ax;ay;bx;by;cx;cy)){
+        (* DFS reachable_set from (x,y), add to reachall *)
+        let stack=mut.@(enc(x;y));
+        lp(stack.len()>0){
+          let top=stack.get(stack.len()-1);
+          let ns=mut.@();
+          lp(let j=0;j<stack.len()-1;j=j+1){ ns=ns+@(stack.get(j)) };
+          stack=ns;
+          if(contains(reachall;top)){}el{
+            reachall=reachall+@(top);
+            let dx=top/100000-2000; let dy=top%100000-2000;
+            let np=nextpos(dx;dy;ax;ay;bx;by;cx;cy);
+            lp(let q=0;q<3;q=q+1){
+              let qe=enc(np.get(q*2);np.get(q*2+1));
+              if(contains(reachall;qe)){}el{ stack=stack+@(qe) };
+            };
+          };
+        };
+      };
+    };
+    (* safe = pts not in reachall, in pts order *)
+    let safex=mut.@(); let safey=mut.@();
+    lp(let p=0;p<ptsx.len();p=p+1){
+      let e=enc(ptsx.get(p);ptsy.get(p));
+      if(contains(reachall;e)){}el{ safex=safex+@(ptsx.get(p)); safey=safey+@(ptsy.get(p)) };
+    };
+    io.println(s.fromint(safex.len()));
+    lp(let p=0;p<safex.len();p=p+1){
+      io.println(s.concat(s.concat(s.fromint(safex.get(p));" ");s.fromint(safey.get(p))));
+    };
+  }el{
+    io.println("error: unknown mode");
+  }}};
+  <0
+};

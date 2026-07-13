@@ -1,0 +1,36 @@
+m=firstdeg;i=io:std.io;i=s:std.str;
+f=strip(raw:$str):$str{
+  let n=mut.s.len(raw);
+  lp(n>0){ if(s.slice(raw;n-1;n)=="0"){n=n-1}el{br} };
+  if(n>0){ if(s.slice(raw;n-1;n)=="."){n=n-1} };
+  <s.slice(raw;0;n)
+};
+f=fmt(x:f64):$str{
+  let r=(if(x<0.0){x-0.5}el{x+0.5}) as i64;
+  let diff=x-(r as f64);
+  let ad=if(diff<0.0){0.0-diff}el{diff};
+  if(ad<0.000000001){ <s.fromint(r) };
+  <strip(s.format(x;"%.6f"))
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let src=s.replace(readall();",";" ");
+  let toks=s.fields(src);
+  let a=s.tofloat(toks.get(0));
+  let b=s.tofloat(toks.get(1));
+  if(a!=0.0){
+    let x=(0.0-b)/a;
+    io.println(s.concat("Unique solution: x = ";fmt(x)))
+  }el{
+    if(b==0.0){
+      io.println("Infinitely many solutions")
+    }el{
+      io.println("No solution")
+    }
+  };
+  <0
+};

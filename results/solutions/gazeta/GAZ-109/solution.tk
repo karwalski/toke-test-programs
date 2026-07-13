@@ -1,0 +1,51 @@
+m=shunting;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let idx=mut.0;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let a=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){ a=a.push(s.toint(toks.get(idx+i))) };
+  idx=idx+n;
+  let b=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){ b=b.push(s.toint(toks.get(idx+i))) };
+  idx=idx+n;
+  let ai=mut.0;
+  let stack=mut.@($i64);
+  let sp=mut.0;
+  let moves=mut.@($str);
+  let nextneeded=mut.0;
+  let possible=mut.true;
+  lp(nextneeded<n){
+    let want=b.get(nextneeded);
+    if(sp>0&&stack.get(sp-1)==want){
+      let wagon=stack.get(sp-1);
+      sp=sp-1;
+      moves=moves.push(s.concat(s.fromint(wagon);": C->B"));
+      nextneeded=nextneeded+1;
+    }el{
+      if(ai<n){
+        let wagon=a.get(ai); ai=ai+1;
+        if(sp<stack.len()){ stack=stack.set(sp;wagon) }el{ stack=stack.push(wagon) };
+        sp=sp+1;
+        moves=moves.push(s.concat(s.fromint(wagon);": A->C"));
+      }el{
+        possible=false; br
+      }
+    }
+  };
+  let out=mut.@($str);
+  if(possible){
+    out=out.push("POSSIBLE");
+    lp(let i=0;i<moves.len();i=i+1){ out=out.push(moves.get(i)) };
+  }el{
+    out=out.push("IMPOSSIBLE");
+  };
+  io.print(s.concat(s.join("\n";out);"\n"));
+  <0
+};

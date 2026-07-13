@@ -1,0 +1,184 @@
+m=evalexpr;i=io:std.io;i=s:std.str;
+
+f=readall():$str{
+  let all=mut."";
+  let first=mut.1;
+  lp(1==1){
+    let ln=io.readln();
+    if(first==1){ all=ln; first=0 }el{ all=s.concat(all;s.concat("\n";ln)) };
+    if(io.eof()){br}
+  };
+  <all
+};
+
+f=strip(x:$str):$str{
+  let n=s.len(x);
+  let a=mut.0;
+  let b=mut.n;
+  lp(a<b){
+    let c=s.slice(x;a;a+1);
+    if(c==" "||c=="\t"||c=="\n"||c=="\r"){a=a+1}el{br}
+  };
+  lp(b>a){
+    let c=s.slice(x;b-1;b);
+    if(c==" "||c=="\t"||c=="\n"||c=="\r"){b=b-1}el{br}
+  };
+  <s.slice(x;a;b)
+};
+
+f=isdigit(c:$str):bool{
+  <c=="0"||c=="1"||c=="2"||c=="3"||c=="4"||c=="5"||c=="6"||c=="7"||c=="8"||c=="9"
+};
+
+f=isspace(c:$str):bool{
+  <c==" "||c=="\t"||c=="\n"||c=="\r"
+};
+
+f=idiv(a:i64;b:i64):i64{
+  let aa=if(a<0){0-a}el{a};
+  let bb=if(b<0){0-b}el{b};
+  let q=aa/bb;
+  let sa=if(a<0){1}el{0};
+  let sb=if(b<0){1}el{0};
+  let neg=sa != sb;
+  <if(neg){0-q}el{q}
+};
+
+f=main():i64{
+  let expr=strip(readall());
+  if(s.len(expr)==0){ io.println("error: malformed expression"); <0 };
+
+  (* tokenize into parallel arrays: tkind, tnum (i64 for num), top (op/paren char) *)
+  let tkind=mut.@($str);
+  let tnum=mut.@($i64);
+  let top=mut.@($str);
+  let n=s.len(expr);
+  let i=mut.0;
+  let bad=mut.0;
+  lp(i<n){
+    let c=s.slice(expr;i;i+1);
+    if(isspace(c)){ i=i+1 }
+    el{ if(isdigit(c)){
+      let j=mut.i;
+      lp(j<n){ let d=s.slice(expr;j;j+1); if(isdigit(d)){j=j+1}el{br} };
+      tkind=tkind.push("num");
+      tnum=tnum.push(s.toint(s.slice(expr;i;j)));
+      top=top.push("");
+      i=j
+    }
+    el{ if(c=="+"||c=="-"||c=="*"||c=="/"){
+      tkind=tkind.push("op"); tnum=tnum.push(0); top=top.push(c); i=i+1
+    }
+    el{ if(c=="("){
+      tkind=tkind.push("lp"); tnum=tnum.push(0); top=top.push("("); i=i+1
+    }
+    el{ if(c==")"){
+      tkind=tkind.push("rp"); tnum=tnum.push(0); top=top.push(")"); i=i+1
+    }
+    el{ bad=1; i=n }
+    }}}}
+  };
+  if(bad==1||tkind.len()==0){ io.println("error: malformed expression"); <0 };
+
+  (* shunting-yard to postfix. output arrays okind/onum/oop with olen logical length.
+     op stack skind/sop with slen logical length. *)
+  let okind=mut.@($str);
+  let onum=mut.@($i64);
+  let oop=mut.@($str);
+  let olen=mut.0;
+  let skind=mut.@($str);
+  let sop=mut.@($str);
+  let slen=mut.0;
+  let mism=mut.0;
+  let tn=tkind.len();
+  lp(let k=0;k<tn;k=k+1){
+    let kind=tkind.get(k);
+    if(kind=="num"){
+      okind=okind.push("num"); onum=onum.push(tnum.get(k)); oop=oop.push(""); olen=olen+1
+    }
+    el{ if(kind=="op"){
+      let v=top.get(k);
+      let pv=if(v=="+"||v=="-"){1}el{2};
+      lp(slen>0){
+        let tk=skind.get(slen-1);
+        if(tk=="op"){
+          let so=sop.get(slen-1);
+          let ps=if(so=="+"||so=="-"){1}el{2};
+          if(ps>=pv){
+            okind=okind.push("op"); onum=onum.push(0); oop=oop.push(so); olen=olen+1;
+            slen=slen-1
+          }el{br}
+        }el{br}
+      };
+      if(slen<skind.len()){ skind=skind.set(slen;"op"); sop=sop.set(slen;v) }
+      el{ skind=skind.push("op"); sop=sop.push(v) };
+      slen=slen+1
+    }
+    el{ if(kind=="lp"){
+      if(slen<skind.len()){ skind=skind.set(slen;"lp"); sop=sop.set(slen;"(") }
+      el{ skind=skind.push("lp"); sop=sop.push("(") };
+      slen=slen+1
+    }
+    el{ if(kind=="rp"){
+      lp(slen>0){
+        let tk=skind.get(slen-1);
+        if(tk!="lp"){
+          let so=sop.get(slen-1);
+          okind=okind.push("op"); onum=onum.push(0); oop=oop.push(so); olen=olen+1;
+          slen=slen-1
+        }el{br}
+      };
+      if(slen==0){ mism=1 }el{ slen=slen-1 }
+    }
+    el{}
+    }}}
+  };
+  lp(slen>0){
+    let tk=skind.get(slen-1);
+    if(tk=="lp"){ mism=1; br };
+    let so=sop.get(slen-1);
+    okind=okind.push("op"); onum=onum.push(0); oop=oop.push(so); olen=olen+1;
+    slen=slen-1
+  };
+  if(mism==1){ io.println("error: malformed expression"); <0 };
+
+  (* eval postfix using stk array with stlen logical length *)
+  let stk=mut.@($i64);
+  let stlen=mut.0;
+  let malformed=mut.0;
+  let divzero=mut.0;
+  let out=mut."";
+  lp(let k=0;k<olen;k=k+1){
+    if(malformed==0&&divzero==0){
+      let kind=okind.get(k);
+      if(kind=="num"){
+        if(stlen<stk.len()){ stk=stk.set(stlen;onum.get(k)) }el{ stk=stk.push(onum.get(k)) };
+        stlen=stlen+1
+      }
+      el{
+        if(stlen<2){ malformed=1 }
+        el{
+          let b=stk.get(stlen-1);
+          let a=stk.get(stlen-2);
+          stlen=stlen-2;
+          let op=oop.get(k);
+          let r=mut.0;
+          if(op=="+"){ r=a+b }
+          el{ if(op=="-"){ r=a-b }
+          el{ if(op=="*"){ r=a*b }
+          el{ if(b==0){ divzero=1 }el{ r=idiv(a;b) } }}};
+          if(divzero==0){
+            out=s.concat(out;s.concat(s.fromint(a);s.concat(" ";s.concat(op;s.concat(" ";s.concat(s.fromint(b);s.concat(" = ";s.concat(s.fromint(r);"\n"))))))));
+            if(stlen<stk.len()){ stk=stk.set(stlen;r) }el{ stk=stk.push(r) };
+            stlen=stlen+1
+          }
+        }
+      }
+    }
+  };
+  if(divzero==1){ io.println("error: division by zero"); <0 };
+  if(malformed==1||stlen!=1){ io.println("error: malformed expression"); <0 };
+  out=s.concat(out;s.concat(s.fromint(stk.get(0));"\n"));
+  io.print(out);
+  <0
+};

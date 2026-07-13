@@ -1,0 +1,45 @@
+m=freq;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n=toks.len();
+  let nums=mut.@($i64);
+  lp(let k=0;k<n;k=k+1){ nums=nums.push(s.toint(toks.get(k))) };
+  # insertion sort ascending
+  lp(let a=1;a<n;a=a+1){
+    let key=nums.get(a);
+    let b=mut.a-1;
+    lp(b>=0){
+      if(nums.get(b)>key){ nums=nums.set(b+1;nums.get(b)); b=b-1 }el{ br };
+    };
+    nums=nums.set(b+1;key);
+  };
+  let values=mut.@($i64);
+  let freqs=mut.@($i64);
+  let i=mut.0;
+  lp(i<n){
+    let j=mut.i;
+    lp(j<n){ if(nums.get(j)==nums.get(i)){ j=j+1 }el{ br } };
+    values=values.push(nums.get(i));
+    freqs=freqs.push(j-i);
+    i=j;
+  };
+  let maxf=mut.0;
+  lp(let k=0;k<freqs.len();k=k+1){ if(freqs.get(k)>maxf){ maxf=freqs.get(k) } };
+  let out=mut."";
+  lp(let k=0;k<values.len();k=k+1){
+    let f=freqs.get(k);
+    let bars=mut."";
+    lp(let t=0;t<f;t=t+1){ bars=s.concat(bars;"#") };
+    # ljust to maxf
+    lp(let t=f;t<maxf;t=t+1){ bars=s.concat(bars;" ") };
+    let line=s.join("";@(s.fromint(values.get(k));": ";bars;"      (";s.fromint(f);")"));
+    out=s.concat(out;s.concat(line;"\n"));
+  };
+  io.print(out);
+  <0
+};

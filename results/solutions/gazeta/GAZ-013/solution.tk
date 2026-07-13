@@ -1,0 +1,32 @@
+m=movesq;i=io:std.io;i=s:std.str;
+f=readraw():$str{
+  (* preserve newlines between lines; trailing separators are ignored chars anyway *)
+  let all=mut.""; let first=mut.1;
+  lp(1==1){
+    let ln=io.readln();
+    if(first==1){ all=ln; first=0; }el{ all=s.concat(all;s.concat("\n";ln)); };
+    if(io.eof()){br}
+  };
+  <all
+};
+f=main():i64{
+  let data=readraw();
+  let x=mut.117; let y=mut.88;
+  let out=mut.s.concat(s.concat(s.fromint(x);" ");s.fromint(y));
+  lp(let idx=0;idx<s.len(data);idx=idx+1){
+    let ch=s.upper(s.slice(data;idx;idx+1));
+    let moved=mut.1;
+    if(ch=="Q"){ y=y+10; }
+    el{ if(ch=="A"){ y=y-10; }
+    el{ if(ch=="O"){ x=x-10; }
+    el{ if(ch=="P"){ x=x+10; }
+    el{ moved=0; } } } };
+    if(moved==1){
+      if(x<0){x=0}; if(x>236){x=236};
+      if(y<0){y=0}; if(y>156){y=156};
+      out=s.concat(out;s.concat(s.concat(s.concat("\n";s.fromint(x));" ");s.fromint(y)));
+    }
+  };
+  io.println(out);
+  <0
+};

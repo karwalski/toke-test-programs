@@ -1,0 +1,27 @@
+m=polycomplex;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let idx=mut.0;
+  let deg=s.toint(toks.get(idx)); idx=idx+1;
+  let coeffs=mut.@($f64);
+  lp(let i=0;i<=deg;i=i+1){ coeffs=coeffs.push(s.tofloat(toks.get(idx))); idx=idx+1 };
+  let a=s.tofloat(toks.get(idx)); idx=idx+1;
+  let b=s.tofloat(toks.get(idx)); idx=idx+1;
+  let re=mut.0.0;
+  let im=mut.0.0;
+  lp(let k=deg;k>=0;k=k-1){
+    let newre=re*a-im*b;
+    let newim=re*b+im*a;
+    re=newre+coeffs.get(k);
+    im=newim;
+  };
+  io.println(s.concat("Re=";s.format(re;"%.4f")));
+  io.println(s.concat("Im=";s.format(im;"%.4f")));
+  <0
+};

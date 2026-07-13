@@ -1,0 +1,63 @@
+m=schedule;i=io:std.io;i=s:std.str;
+f=lesson(t:$str;subj:$str):$str{ <s.concat(s.concat(s.concat("  ";t);"  ");subj) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){
+    io.println("Invalid day number (expected 1..7)");
+    <0
+  };
+  let d=s.toint(toks.get(0));
+  if(d<1){ io.println("Invalid day number (expected 1..7)"); <0 };
+  if(d>7){ io.println("Invalid day number (expected 1..7)"); <0 };
+  if(d==1){
+    io.println("Monday:");
+    io.println(lesson("08:00";"Mathematics"));
+    io.println(lesson("09:00";"Romanian"));
+    io.println(lesson("10:00";"Physics"));
+    io.println(lesson("11:00";"History"))
+  };
+  if(d==2){
+    io.println("Tuesday:");
+    io.println(lesson("08:00";"Chemistry"));
+    io.println(lesson("09:00";"Biology"));
+    io.println(lesson("10:00";"English"));
+    io.println(lesson("11:00";"Mathematics"))
+  };
+  if(d==3){
+    io.println("Wednesday:");
+    io.println(lesson("08:00";"Geography"));
+    io.println(lesson("09:00";"Romanian"));
+    io.println(lesson("10:00";"Computer Science"));
+    io.println(lesson("11:00";"Physics"))
+  };
+  if(d==4){
+    io.println("Thursday:");
+    io.println(lesson("08:00";"History"));
+    io.println(lesson("09:00";"Mathematics"));
+    io.println(lesson("10:00";"English"));
+    io.println(lesson("11:00";"Art"))
+  };
+  if(d==5){
+    io.println("Friday:");
+    io.println(lesson("08:00";"Physical Education"));
+    io.println(lesson("09:00";"Chemistry"));
+    io.println(lesson("10:00";"Romanian"));
+    io.println(lesson("11:00";"Music"))
+  };
+  if(d==6){
+    io.println("Saturday:");
+    io.println(lesson("08:00";"Computer Science"));
+    io.println(lesson("09:00";"Mathematics"));
+    io.println(lesson("10:00";"Biology"))
+  };
+  if(d==7){
+    io.println("Sunday:");
+    io.println("  Free / rest day")
+  };
+  <0
+};

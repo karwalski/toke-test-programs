@@ -1,0 +1,52 @@
+m=maxseg;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=orient(px:i64;py:i64;qx:i64;qy:i64;rx:i64;ry:i64):i64{
+  <(qx-px)*(ry-py)-(qy-py)*(rx-px)
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ io.println("0"); <0 };
+  let n=s.toint(toks.get(0));
+  let ax=mut.@($i64);
+  let ay=mut.@($i64);
+  let bx=mut.@($i64);
+  let by=mut.@($i64);
+  let idx=mut.1;
+  lp(let i=0;i<n;i=i+1){
+    ax=ax.push(s.toint(toks.get(idx))); idx=idx+1;
+    ay=ay.push(s.toint(toks.get(idx))); idx=idx+1;
+    bx=bx.push(s.toint(toks.get(idx))); idx=idx+1;
+    by=by.push(s.toint(toks.get(idx))); idx=idx+1;
+  };
+  if(n==0){ io.println("0"); <0 };
+  let px=mut.@($i64);
+  let py=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){
+    px=px.push(ax.get(i)); py=py.push(ay.get(i));
+    px=px.push(bx.get(i)); py=py.push(by.get(i));
+  };
+  let m=px.len();
+  let best=mut.1;
+  lp(let u=0;u<m;u=u+1){
+    lp(let v=u+1;v<m;v=v+1){
+      let pxu=px.get(u); let pyu=py.get(u);
+      let qxv=px.get(v); let qyv=py.get(v);
+      if(pxu==qxv&&pyu==qyv){}el{
+        let count=mut.0;
+        lp(let i=0;i<n;i=i+1){
+          let sa=orient(pxu;pyu;qxv;qyv;ax.get(i);ay.get(i));
+          let sb=orient(pxu;pyu;qxv;qyv;bx.get(i);by.get(i));
+          let bad=if((sa>0)==(sb>0)){0}el{1};
+          if(sa==0||sb==0||bad==1){ count=count+1 };
+        };
+        if(count>best){ best=count };
+      };
+    };
+  };
+  io.println(s.fromint(best));
+  <0
+};

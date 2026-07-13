@@ -1,0 +1,68 @@
+m=square;i=io:std.io;i=s:std.str;i=m:std.math;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=rnd(v:f64):i64{ <m.floor(v+0.5) as i64 };
+f=corners(cx:f64;cy:f64;half:f64;cc:f64;ss:f64):@($i64){
+  let bxs=@(-half;half;half;-half);
+  let bys=@(-half;-half;half;half);
+  let r=mut.@($i64);
+  lp(let ci=0;ci<4;ci=ci+1){
+    let ux=bxs.get(ci); let uy=bys.get(ci);
+    let rx=ux*cc-uy*ss;
+    let ry=ux*ss+uy*cc;
+    r=r.push(rnd(cx+rx)); r=r.push(rnd(cy+ry));
+  };
+  <r
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<8){<0};
+  let a=s.toint(toks.get(0));
+  let x=s.toint(toks.get(1));
+  let y=s.toint(toks.get(2));
+  let dx=s.toint(toks.get(3));
+  let alpha=s.toint(toks.get(4));
+  let w=s.toint(toks.get(5));
+  let h=s.toint(toks.get(6));
+  let frames=s.toint(toks.get(7));
+  let pi=3.14159265358979311600;
+  let half=(a as f64)/2.0;
+  let cx=mut.(x as f64)+half;
+  let cy=(y as f64)+half;
+  let angledeg=mut.0;
+  let sdx=mut.dx;
+  let sdalpha=alpha;
+  let out=mut.@($str);
+  lp(let fr=1;fr<=frames;fr=fr+1){
+    cx=cx+(sdx as f64);
+    angledeg=angledeg+sdalpha;
+    let ang=(angledeg as f64)*pi/180.0;
+    let cc=m.cos(ang);
+    let ss=m.sin(ang);
+    let cor=mut.corners(cx;cy;half;cc;ss);
+    let off=mut.1==0;
+    lp(let ci=0;ci<4;ci=ci+1){
+      let px=cor.get(ci*2); let py=cor.get(ci*2+1);
+      if(px<0||px>w||py<0||py>h){off=1==1};
+    };
+    let bounce=mut.0;
+    if(off){
+      sdx=-sdx;
+      cx=cx+(sdx as f64);
+      cor=corners(cx;cy;half;cc;ss);
+      bounce=1;
+    };
+    let cstr=mut."";
+    lp(let ci=0;ci<4;ci=ci+1){
+      cstr=s.join("";@(cstr;"(";s.fromint(cor.get(ci*2));",";s.fromint(cor.get(ci*2+1));")"));
+    };
+    let line=s.join("";@("f=";s.fromint(fr);" angle=";s.fromint(angledeg);" c=(";s.fromint(rnd(cx));",";s.fromint(rnd(cy));") corners=";cstr;" bounce=";s.fromint(bounce)));
+    out=out.push(line);
+  };
+  io.print(s.join("\n";out));
+  io.print("\n");
+  <0
+};

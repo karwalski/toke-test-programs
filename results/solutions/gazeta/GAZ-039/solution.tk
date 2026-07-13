@@ -1,0 +1,166 @@
+m=library;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+# indexof a label in an array of strings, return position (0-based from start), or -1
+f=idxof(arr:@($str);lbl:$str):i64{
+  let r=mut.0-1;
+  lp(let i=0;i<arr.len();i=i+1){ if(r<0){ if(arr.get(i)==lbl){ r=i } } };
+  <r
+};
+f=fmtc(items:@($str)):$str{
+  if(items.len()==0){ <"(empty)" };
+  let r=mut."";
+  lp(let i=items.len()-1;i>=0;i=i-1){
+    if(i<items.len()-1){ r=s.concat(r;" ") };
+    r=s.concat(r;items.get(i));
+  };
+  <r
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let n=s.toint(toks.get(0));
+  let books=mut.@($str);
+  lp(let i=0;i<n;i=i+1){ books=books.push(toks.get(1+i)) };
+  let out=mut."";
+  let firstout=mut.1==1;
+  lp(let variant=1;variant<=2;variant=variant+1){
+    # shelves as arrays; index 0 = bottom, last = top
+    let aitems=mut.@($str);
+    let xitems=mut.@($str);
+    let bitems=mut.@($str);
+    let rfitems=mut.@($str);
+    let rlitems=mut.@($str);
+    let rmiitems=mut.@($str);
+    # counters: takes,puts for each; idents for B
+    let atakes=mut.0; let aputs=mut.0;
+    let xtakes=mut.0; let xputs=mut.0;
+    let btakes=mut.0; let bputs=mut.0; let bidents=mut.0;
+    let rftakes=mut.0; let rfputs=mut.0;
+    let rltakes=mut.0; let rlputs=mut.0;
+    let rmitakes=mut.0; let rmiputs=mut.0;
+    # load A: for lbl in reversed(books): A.push(lbl)
+    lp(let i=n-1;i>=0;i=i-1){ aitems=aitems.push(books.get(i)) };
+    # types: parallel arrays typelabels/typechars
+    let tlabels=mut.@($str);
+    let tchars=mut.@($str);
+    # identification phase
+    lp(let it=0;it<n;it=it+1){
+      let m=aitems.len();
+      # move m-1 from A to B
+      lp(let z=0;z<m-1;z=z+1){
+        let top=aitems.get(aitems.len()-1);
+        let na=mut.@($str);
+        lp(let q=0;q<aitems.len()-1;q=q+1){ na=na.push(aitems.get(q)) };
+        aitems=na; atakes=atakes+1;
+        bitems=bitems.push(top); bputs=bputs+1;
+      };
+      # move A to X (bottom book target)
+      let topA=aitems.get(aitems.len()-1);
+      let na2=mut.@($str);
+      lp(let q=0;q<aitems.len()-1;q=q+1){ na2=na2.push(aitems.get(q)) };
+      aitems=na2; atakes=atakes+1;
+      xitems=xitems.push(topA); xputs=xputs+1;
+      # move m-1 from B back to A
+      lp(let z=0;z<m-1;z=z+1){
+        let top=bitems.get(bitems.len()-1);
+        let nb=mut.@($str);
+        lp(let q=0;q<bitems.len()-1;q=q+1){ nb=nb.push(bitems.get(q)) };
+        bitems=nb; btakes=btakes+1;
+        aitems=aitems.push(top); aputs=aputs+1;
+      };
+      # move X to B (target alone on B)
+      let topX=xitems.get(xitems.len()-1);
+      let nx=mut.@($str);
+      lp(let q=0;q<xitems.len()-1;q=q+1){ nx=nx.push(xitems.get(q)) };
+      xitems=nx; xtakes=xtakes+1;
+      bitems=bitems.push(topX); bputs=bputs+1;
+      # read B (idents++), record type = first char of label
+      bidents=bidents+1;
+      let lbl=bitems.get(bitems.len()-1);
+      tlabels=tlabels.push(lbl);
+      tchars=tchars.push(s.slice(lbl;0;1));
+      # move B back to A
+      let topB=bitems.get(bitems.len()-1);
+      let nb2=mut.@($str);
+      lp(let q=0;q<bitems.len()-1;q=q+1){ nb2=nb2.push(bitems.get(q)) };
+      bitems=nb2; btakes=btakes+1;
+      aitems=aitems.push(topB); aputs=aputs+1;
+    };
+    # build plan. rev = reversed(books) = bottom->top order
+    let rev=mut.@($str);
+    lp(let i=n-1;i>=0;i=i-1){ rev=rev.push(books.get(i)) };
+    let plan=mut.@($str);
+    if(variant==1){
+      plan=rev;
+    }el{
+      # non-I first, then I
+      lp(let i=0;i<rev.len();i=i+1){
+        let lbl=rev.get(i);
+        let t=tchars.get(idxof(tlabels;lbl));
+        if(t!="I"){ plan=plan.push(lbl) };
+      };
+      lp(let i=0;i<rev.len();i=i+1){
+        let lbl=rev.get(i);
+        let t=tchars.get(idxof(tlabels;lbl));
+        if(t=="I"){ plan=plan.push(lbl) };
+      };
+    };
+    # delivery phase
+    lp(let pi=0;pi<plan.len();pi=pi+1){
+      let label=plan.get(pi);
+      let j=idxof(aitems;label);
+      let above=aitems.len()-1-j;
+      # move above from A to B
+      lp(let z=0;z<above;z=z+1){
+        let top=aitems.get(aitems.len()-1);
+        let na=mut.@($str);
+        lp(let q=0;q<aitems.len()-1;q=q+1){ na=na.push(aitems.get(q)) };
+        aitems=na; atakes=atakes+1;
+        bitems=bitems.push(top); bputs=bputs+1;
+      };
+      # move A to X (target)
+      let topA=aitems.get(aitems.len()-1);
+      let na2=mut.@($str);
+      lp(let q=0;q<aitems.len()-1;q=q+1){ na2=na2.push(aitems.get(q)) };
+      aitems=na2; atakes=atakes+1;
+      xitems=xitems.push(topA); xputs=xputs+1;
+      # restore above from B to A
+      lp(let z=0;z<above;z=z+1){
+        let top=bitems.get(bitems.len()-1);
+        let nb=mut.@($str);
+        lp(let q=0;q<bitems.len()-1;q=q+1){ nb=nb.push(bitems.get(q)) };
+        bitems=nb; btakes=btakes+1;
+        aitems=aitems.push(top); aputs=aputs+1;
+      };
+      # deliver: move X to output shelf per type
+      let t=tchars.get(idxof(tlabels;label));
+      let topX=xitems.get(xitems.len()-1);
+      let nx=mut.@($str);
+      lp(let q=0;q<xitems.len()-1;q=q+1){ nx=nx.push(xitems.get(q)) };
+      xitems=nx; xtakes=xtakes+1;
+      if(t=="F"){ rfitems=rfitems.push(topX); rfputs=rfputs+1 }
+      el{ if(t=="L"){ rlitems=rlitems.push(topX); rlputs=rlputs+1 }
+      el{ rmiitems=rmiitems.push(topX); rmiputs=rmiputs+1 } };
+    };
+    # output for this variant
+    if(!firstout){ out=s.concat(out;"\n") };
+    firstout=1==0;
+    out=s.concat(out;s.concat("=== Variant ";s.concat(s.fromint(variant);" ===")));
+    out=s.concat(out;s.concat("\nRF (top->bottom): ";fmtc(rfitems)));
+    out=s.concat(out;s.concat("\nRL (top->bottom): ";fmtc(rlitems)));
+    out=s.concat(out;s.concat("\nRMI (top->bottom): ";fmtc(rmiitems)));
+    out=s.concat(out;"\nOperations:");
+    out=s.concat(out;s.concat("\nA: ";s.concat("takes=";s.concat(s.fromint(atakes);s.concat(" puts=";s.fromint(aputs))))));
+    out=s.concat(out;s.concat("\nX: ";s.concat("takes=";s.concat(s.fromint(xtakes);s.concat(" puts=";s.fromint(xputs))))));
+    out=s.concat(out;s.concat("\nB: ";s.concat("takes=";s.concat(s.fromint(btakes);s.concat(" puts=";s.concat(s.fromint(bputs);s.concat(" idents=";s.fromint(bidents))))))));
+    out=s.concat(out;s.concat("\nRF: ";s.concat("takes=";s.concat(s.fromint(rftakes);s.concat(" puts=";s.fromint(rfputs))))));
+    out=s.concat(out;s.concat("\nRL: ";s.concat("takes=";s.concat(s.fromint(rltakes);s.concat(" puts=";s.fromint(rlputs))))));
+    out=s.concat(out;s.concat("\nRMI: ";s.concat("takes=";s.concat(s.fromint(rmitakes);s.concat(" puts=";s.fromint(rmiputs))))));
+  };
+  io.println(out);
+  <0
+};

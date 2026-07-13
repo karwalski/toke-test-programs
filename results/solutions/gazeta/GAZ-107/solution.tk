@@ -1,0 +1,33 @@
+m=fracarith;i=io:std.io;i=s:std.str;
+f=absi(x:i64):i64{ if(x<0){<0-x}el{<x} };
+f=gcd(x:i64;y:i64):i64{
+  let a=mut.absi(x); let b=mut.absi(y);
+  lp(b!=0){ let t=b; b=a%b; a=t };
+  <a
+};
+f=redfrac(num:i64;den:i64):$str{
+  let g=gcd(num;den);
+  let n=mut.0; let d=mut.1;
+  if(g==0){ n=0; d=1 }el{ n=num/g; d=den/g; if(d<0){ n=0-n; d=0-d } };
+  <s.concat(s.concat(s.fromint(n);"/");s.fromint(d))
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<4){<0};
+  let a=s.toint(toks.get(0));
+  let b=s.toint(toks.get(1));
+  let c=s.toint(toks.get(2));
+  let d=s.toint(toks.get(3));
+  let out=mut.@($str);
+  out=out.push(s.concat("sum: ";redfrac(a*d+c*b;b*d)));
+  out=out.push(s.concat("difference: ";redfrac(a*d-c*b;b*d)));
+  out=out.push(s.concat("product: ";redfrac(a*c;b*d)));
+  if(c==0){ out=out.push("quotient: undefined") }el{ out=out.push(s.concat("quotient: ";redfrac(a*d;b*c))) };
+  io.print(s.concat(s.join("\n";out);"\n"));
+  <0
+};

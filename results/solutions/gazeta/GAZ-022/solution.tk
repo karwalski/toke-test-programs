@@ -1,0 +1,40 @@
+m=goldbach;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let v=s.toint(toks.get(0));
+  if(v<4){<0};
+  let isp=mut.@($bool);
+  lp(let k=0;k<=v;k=k+1){ isp=isp.push(1==1) };
+  isp=isp.set(0;1==0);
+  if(v>=1){ isp=isp.set(1;1==0) };
+  let i=mut.2;
+  lp(i*i<=v){
+    if(isp.get(i)){
+      lp(let j=i*i;j<=v;j=j+i){ isp=isp.set(j;1==0) };
+    };
+    i=i+1;
+  };
+  let out=mut.@($str);
+  lp(let n=4;n<=v;n=n+2){
+    let found=mut.1==0;
+    let p=mut.2;
+    lp(p<=n/2){
+      if(isp.get(p)&&isp.get(n-p)){
+        out=out.push(s.join("";@(s.fromint(n);"=";s.fromint(p);"+";s.fromint(n-p))));
+        found=1==1;
+        br
+      };
+      p=p+1;
+    };
+    if(!found){ out=out.push(s.concat("COUNTEREXAMPLE:";s.fromint(n))) };
+  };
+  io.print(s.join("\n";out));
+  if(out.len()>0){io.print("\n")};
+  <0
+};

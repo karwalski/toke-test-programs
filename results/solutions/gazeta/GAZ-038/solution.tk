@@ -1,0 +1,121 @@
+m=coingame;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=totalxor(piles:@($i64);g:@($i64)):i64{
+  let x=mut.0;
+  lp(let i=0;i<piles.len();i=i+1){ x=xor(x;g.get(piles.get(i))) };
+  <x
+};
+# bitwise xor via helper (no ^ operator assumed)
+f=xor(a:i64;b:i64):i64{
+  let r=mut.0;
+  let bit=mut.1;
+  let x=mut.a;
+  let y=mut.b;
+  lp(x>0||y>0){
+    let xb=x%2;
+    let yb=y%2;
+    if(xb!=yb){ r=r+bit };
+    x=x/2; y=y/2; bit=bit*2;
+  };
+  <r
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let n=s.toint(toks.get(0));
+  let limit=mut.if(n>20){n}el{20};
+  if(limit<1){ limit=20 };
+  # build grundy
+  let g=mut.@($i64);
+  lp(let z=0;z<=limit;z=z+1){ g=g.push(0) };
+  lp(let pp=1;pp<=limit;pp=pp+1){
+    # reachable set as bool array; mex
+    let reach=mut.@($i64);
+    lp(let z=0;z<=limit+128;z=z+1){ reach=reach.push(0) };
+    let a=mut.1;
+    lp(a*2<pp){
+      let b=pp-a;
+      let v=xor(g.get(a);g.get(b));
+      if(v<reach.len()){ reach=reach.set(v;1) };
+      a=a+1;
+    };
+    let m=mut.0;
+    lp(m<reach.len()&&reach.get(m)==1){ m=m+1 };
+    g=g.set(pp;m);
+  };
+  let out=mut."grundy 1..20: ";
+  lp(let i=1;i<=20;i=i+1){
+    if(i>1){ out=s.concat(out;" ") };
+    out=s.concat(out;s.fromint(g.get(i)));
+  };
+  out=s.concat(out;s.concat("\nn = ";s.fromint(n)));
+  let gn=if(n>=1&&n<=limit){g.get(n)}el{0};
+  out=s.concat(out;s.concat("\ngrundy(";s.concat(s.fromint(n);s.concat(") = ";s.fromint(gn)))));
+  out=s.concat(out;s.concat("\nA wins: ";if(gn!=0){"YES"}el{"NO"}));
+  out=s.concat(out;"\nSimulation (optimal play):");
+  # piles
+  let piles=mut.@($i64);
+  if(n>=1){ piles=piles.push(n) };
+  let turn=mut."A";
+  lp(1==1){
+    let base=totalxor(piles;g);
+    let winning=base!=0;
+    # choose move: scan piles, then a
+    let fi=mut.0-1;
+    let fa=mut.0;
+    let fb=mut.0;
+    let hasfirst=mut.1==0;
+    let ci=mut.0-1;
+    let ca=mut.0;
+    let cb=mut.0;
+    let hasc=mut.1==0;
+    lp(let i=0;i<piles.len();i=i+1){
+      if(!hasc){
+        let pp=piles.get(i);
+        let a=mut.1;
+        lp(a*2<pp){
+          if(!hasc){
+            let b=pp-a;
+            if(!hasfirst){ fi=i; fa=a; fb=b; hasfirst=1==1 };
+            if(winning){
+              let nx=xor(xor(xor(base;g.get(pp));g.get(a));g.get(b));
+              if(nx==0){ ci=i; ca=a; cb=b; hasc=1==1 };
+            };
+          };
+          a=a+1;
+        };
+      };
+    };
+    let mi=mut.0;
+    let ma=mut.0;
+    let mb=mut.0;
+    let hasmove=mut.1==1;
+    if(hasc){ mi=ci; ma=ca; mb=cb }
+    el{ if(hasfirst){ mi=fi; ma=fa; mb=fb }el{ hasmove=1==0 } };
+    if(!hasmove){
+      out=s.concat(out;s.concat("\n";s.concat(turn;" cannot move and loses")));
+      br
+    };
+    let pp=piles.get(mi);
+    # piles = piles[:mi] + [ma,mb] + piles[mi+1:]
+    let np=mut.@($i64);
+    lp(let i=0;i<mi;i=i+1){ np=np.push(piles.get(i)) };
+    np=np.push(ma);
+    np=np.push(mb);
+    lp(let i=mi+1;i<piles.len();i=i+1){ np=np.push(piles.get(i)) };
+    piles=np;
+    let pstr=mut."";
+    lp(let i=0;i<piles.len();i=i+1){
+      if(i>0){ pstr=s.concat(pstr;" ") };
+      pstr=s.concat(pstr;s.fromint(piles.get(i)));
+    };
+    out=s.concat(out;s.concat("\n";s.concat(turn;s.concat(" splits ";s.concat(s.fromint(pp);s.concat(" -> ";s.concat(s.fromint(ma);s.concat(" + ";s.concat(s.fromint(mb);s.concat(" ; piles: ";pstr))))))))));
+    turn=if(turn=="A"){"B"}el{"A"};
+  };
+  io.println(out);
+  <0
+};

@@ -1,0 +1,139 @@
+m=icosa;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=buildedge():@(@($i64)){
+  <@(
+    @(2;5;6);@(1;3;7);@(2;4;8);@(3;5;9);@(1;4;10);
+    @(1;11;15);@(2;11;12);@(3;12;13);@(4;13;14);@(5;14;15);
+    @(6;7;16);@(7;8;17);@(8;9;18);@(9;10;19);@(6;10;20);
+    @(11;17;20);@(12;16;18);@(13;17;19);@(14;18;20);@(15;16;19)
+  )
+};
+f=buildvert():@(@($i64)){
+  <@(
+    @(2;3;4;5;6;7;10;11;15);@(1;3;4;5;6;7;8;11;12);
+    @(1;2;4;5;7;8;9;12;13);@(1;2;3;5;8;9;10;13;14);
+    @(1;2;3;4;6;9;10;14;15);@(1;2;5;7;10;11;15;16;20);
+    @(1;2;3;6;8;11;12;16;17);@(2;3;4;7;9;12;13;17;18);
+    @(3;4;5;8;10;13;14;18;19);@(1;4;5;6;9;14;15;19;20);
+    @(1;2;6;7;12;15;16;17;20);@(2;3;7;8;11;13;16;17;18);
+    @(3;4;8;9;12;14;17;18;19);@(4;5;9;10;13;15;18;19;20);
+    @(1;5;6;10;11;14;16;19;20);@(6;7;11;12;15;17;18;19;20);
+    @(7;8;11;12;13;16;18;19;20);@(8;9;12;13;14;16;17;19;20);
+    @(9;10;13;14;15;16;17;18;20);@(6;10;11;14;15;16;17;18;19)
+  )
+};
+f=lowbound(visited:@($i64)):i64{
+  let total=mut.0;
+  let w=mut.20;
+  lp(let ff=1;ff<=20;ff=ff+1){
+    if(visited.get(ff)==0){
+      total=total+w*ff;
+      w=w-1;
+    };
+  };
+  <total
+};
+f=solve(adj:@(@($i64))):@($i64){
+  let big=1152921504606846976;
+  let best=mut.big;
+  let bestpath=mut.@($i64);
+  let visited=mut.@($i64);
+  lp(let i=0;i<=20;i=i+1){ visited=visited.push(0) };
+  visited=visited.set(1;1);
+  # path and idx have one slot per level (level = step-1, 0-indexed)
+  let path=mut.@($i64);
+  lp(let i=0;i<20;i=i+1){ path=path.push(0) };
+  let idx=mut.@($i64);
+  lp(let i=0;i<20;i=i+1){ idx=idx.push(0) };
+  path=path.set(0;1);
+  idx=idx.set(0;0);
+  let cost=mut.1;
+  let step=mut.1;
+  # level = step-1. On entry to a level we try neighbours of path[level].
+  lp(step>=1){
+    let lvl=step-1;
+    # completed a full Hamiltonian path?
+    if(step==20){
+      if(cost<best){
+        best=cost;
+        bestpath=@($i64);
+        lp(let k=0;k<20;k=k+1){ bestpath=bestpath.push(path.get(k)) };
+      };
+      # backtrack: remove node at this level (except root)
+      visited=visited.set(path.get(lvl);0);
+      cost=cost-step*path.get(lvl);
+      step=step-1;
+    }
+    el{
+      # pruning check only when first entering the level (idx==0)
+      let pruned=mut.1==0;
+      if(idx.get(lvl)==0){
+        if(cost+lowbound(visited)>=best){ pruned=1==1 };
+      };
+      if(pruned){
+        visited=visited.set(path.get(lvl);0);
+        cost=cost-step*path.get(lvl);
+        step=step-1;
+      }
+      el{
+        let cur=path.get(lvl);
+        let nbrs=adj.get(cur-1);
+        let ci=mut.idx.get(lvl);
+        let moved=mut.1==0;
+        lp(ci<nbrs.len()){
+          let nxt=nbrs.get(ci);
+          if(visited.get(nxt)==0){
+            idx=idx.set(lvl;ci+1);
+            visited=visited.set(nxt;1);
+            cost=cost+(step+1)*nxt;
+            step=step+1;
+            path=path.set(step-1;nxt);
+            idx=idx.set(step-1;0);
+            moved=1==1;
+            br;
+          }
+          el{ ci=ci+1 };
+        };
+        if(!moved){
+          # exhausted neighbours: backtrack
+          visited=visited.set(path.get(lvl);0);
+          cost=cost-step*path.get(lvl);
+          step=step-1;
+        };
+      };
+    };
+  };
+  let res=mut.@($i64);
+  res=res.push(best);
+  lp(let k=0;k<bestpath.len();k=k+1){ res=res.push(bestpath.get(k)) };
+  <res
+};
+f=emit(title:$str;adj:@(@($i64))):i64{
+  let r=solve(adj);
+  io.println(title);
+  io.println(s.concat("cost ";s.fromint(r.get(0))));
+  let line=mut."order";
+  lp(let k=1;k<r.len();k=k+1){ line=s.concat(line;s.concat(" ";s.fromint(r.get(k)))) };
+  io.println(line);
+  <0
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let sel=mut.0;
+  if(toks.len()>0){ sel=s.toint(toks.get(0)) };
+  if(sel==1){
+    emit("Variant 1 (edge-adjacency)";buildedge());
+  }
+  el{ if(sel==2){
+    emit("Variant 2 (vertex-adjacency)";buildvert());
+  }
+  el{
+    emit("Variant 1 (edge-adjacency)";buildedge());
+    emit("Variant 2 (vertex-adjacency)";buildvert());
+  } };
+  <0
+};

@@ -1,0 +1,77 @@
+m=liviu;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<1){ <0 };
+  # rules: ante_pred, ante_val(1/0), cons_pred, cons_val(1/0)
+  let ra=@("postman";"buys";"longhair";"poet";"cousin";"likesCold";"poet";"postman";"buys";"cousin";"shorthair";"mountain";"shorthair";"longhair";"shorthair";"longhair");
+  let rav=@(1;0;1;1;1;0;1;0;1;0;1;0;1;1;0;0);
+  let rc=@("buys";"postman";"poet";"longhair";"likesCold";"cousin";"postman";"poet";"cousin";"buys";"mountain";"shorthair";"longhair";"shorthair";"longhair";"shorthair");
+  let rcv=@(1;0;0;0;1;0;1;0;1;0;1;0;0;0;1;1);
+  # known: map pred -> value. Use two arrays keys/vals.
+  let keys=mut.@($str);
+  let kvals=mut.@($bool);
+  let out=mut."";
+  let first=mut.true;
+  let idx=mut.0;
+  let f=s.toint(toks.get(idx)); idx=idx+1;
+  let order=mut.@($str);
+  lp(let g=0;g<f;g=g+1){
+    let pred=toks.get(idx); idx=idx+1;
+    let vs=toks.get(idx); idx=idx+1;
+    let b=vs=="T";
+    keys=keys.push(pred);
+    kvals=kvals.push(b);
+    order=order.push(pred)
+  };
+  let query=toks.get(idx); idx=idx+1;
+  lp(let g=0;g<order.len();g=g+1){
+    let p=order.get(g);
+    # find value
+    let v=mut.false;
+    lp(let h=0;h<keys.len();h=h+1){ if(keys.get(h)==p){v=kvals.get(h)} };
+    let line=cat(cat("GIVEN ";p);cat("=";if(v){"T"}el{"F"}));
+    if(first){out=line;first=false}el{out=cat(cat(out;"
+");line)}
+  };
+  let changed=mut.true;
+  lp(changed){
+    changed=false;
+    lp(let r=0;r<ra.len();r=r+1){
+      let ap=ra.get(r);
+      let av=rav.get(r)==1;
+      let cp=rc.get(r);
+      let cv=rcv.get(r)==1;
+      # known.get(ap)==av  AND cp not in known
+      let apknown=mut.false;
+      let apval=mut.false;
+      lp(let h=0;h<keys.len();h=h+1){ if(keys.get(h)==ap){apknown=true; apval=kvals.get(h)} };
+      let cpknown=mut.false;
+      lp(let h=0;h<keys.len();h=h+1){ if(keys.get(h)==cp){cpknown=true} };
+      if(apknown && apval==av && cpknown==false){
+        keys=keys.push(cp);
+        kvals=kvals.push(cv);
+        let dl=cat(cat("DERIVED ";cp);cat("=";if(cv){"T"}el{"F"}));
+        if(first){out=dl;first=false}el{out=cat(cat(out;"
+");dl)};
+        changed=true
+      }
+    }
+  };
+  # query
+  let qknown=mut.false;
+  let qval=mut.false;
+  lp(let h=0;h<keys.len();h=h+1){ if(keys.get(h)==query){qknown=true; qval=kvals.get(h)} };
+  let verdict=mut."UNDETERMINED";
+  if(qknown){ if(qval){verdict="TRUE"}el{verdict="FALSE"} };
+  let rl=cat(cat(cat("RESULT ";verdict);" ");query);
+  if(first){out=rl;first=false}el{out=cat(cat(out;"
+");rl)};
+  io.println(out);
+  <0
+};

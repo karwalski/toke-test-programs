@@ -1,0 +1,40 @@
+m=permsig;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<1){ <0 };
+  let n=s.toint(toks.get(0));
+  let p=mut.@($i64);
+  p=p.push(0);
+  lp(let i=1;i<=n;i=i+1){ p=p.push(s.toint(toks.get(i))) };
+  let eps=mut.1;
+  let visited=mut.@($bool);
+  lp(let i=0;i<=n;i=i+1){ visited=visited.push(false) };
+  let out=mut."";
+  lp(let i=1;i<=n;i=i+1){
+    if(visited.get(i)){}el{
+      let cycle=mut.s.fromint(i);
+      let m=mut.1;
+      visited=visited.set(i;true);
+      let j=mut.p.get(i);
+      lp(j!=i){
+        cycle=cat(cat(cycle;" ");s.fromint(j));
+        m=m+1;
+        visited=visited.set(j;true);
+        j=p.get(j)
+      };
+      if((m-1)%2==1){ eps=0-eps };
+      out=cat(cat(cat(out;"(");cycle);")")
+    }
+  };
+  io.println(out);
+  let sign=mut."+";
+  if(eps<0){ sign="-" };
+  io.println(cat(cat("SIGNATURE=";sign);s.fromint(if(eps<0){0-eps}el{eps})));
+  <0
+};

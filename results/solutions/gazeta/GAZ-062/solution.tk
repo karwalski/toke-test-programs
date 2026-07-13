@@ -1,0 +1,105 @@
+m=pokeloader;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=upper1(x:$str):$str{ <s.upper(x) };
+f=main():i64{
+  let toks=s.fields(readall());
+  let idx=mut.0;
+  let blockstart=s.toint(toks.get(idx)); idx=idx+1;
+  let count=s.toint(toks.get(idx)); idx=idx+1;
+  let screenbase=16384;
+  let imagesize=65536;
+  let maxpatches=11;
+  let recbase=65500;
+  let paddr=mut.@($i64);
+  let pval=mut.@($i64);
+  let pA=mut.@($i64);
+  let plo=mut.@($i64);
+  let phi=mut.@($i64);
+  let prec=mut.@($i64);
+  let error=mut."";
+  let haserr=mut.false;
+  if(count<0||count>maxpatches){
+    error=s.concat(s.concat("ERROR: too many patches (";s.fromint(count));s.concat(" > ";s.concat(s.fromint(maxpatches);")")));
+    haserr=true;
+  }el{
+    let brk=mut.false;
+    lp(let k=0;k<count;k=k+1){
+      if(!brk){
+        let addr=s.toint(toks.get(idx)); idx=idx+1;
+        let value=s.toint(toks.get(idx)); idx=idx+1;
+        let biga=addr-blockstart+screenbase;
+        let lo=biga%256;
+        let hi=biga/256;
+        let recaddr=recbase+3*k;
+        if(value<0||value>255){
+          error=s.concat(s.concat("ERROR: value out of range (";s.fromint(value));")");
+          haserr=true; brk=true;
+        }el{
+          if(biga<0||biga>=imagesize){
+            error=s.concat(s.concat("ERROR: image offset out of range (";s.fromint(biga));")");
+            haserr=true; brk=true;
+          }el{
+            paddr=paddr.push(addr); pval=pval.push(value); pA=pA.push(biga);
+            plo=plo.push(lo); phi=phi.push(hi); prec=prec.push(recaddr);
+          };
+        };
+      };
+    };
+  };
+  let tapelen=mut.0;
+  if(!haserr){
+    tapelen=s.toint(toks.get(idx)); idx=idx+1;
+    if(tapelen<0||tapelen>(imagesize-screenbase)){
+      error=s.concat(s.concat("ERROR: block length out of range (";s.fromint(tapelen));")");
+      haserr=true;
+    };
+  };
+  if(haserr){ io.println(error); <0 };
+  let out=mut."";
+  out=s.concat(out;s.concat("block_start=";s.fromint(blockstart)));
+  out=s.concat(out;s.concat("\ncount=";s.fromint(count)));
+  lp(let k=0;k<paddr.len();k=k+1){
+    out=s.concat(out;s.concat("\npatch ";s.fromint(k+1)));
+    out=s.concat(out;s.concat(": addr=";s.fromint(paddr.get(k))));
+    out=s.concat(out;s.concat(" image=";s.fromint(pA.get(k))));
+    out=s.concat(out;s.concat(" lo=";s.fromint(plo.get(k))));
+    out=s.concat(out;s.concat(" hi=";s.fromint(phi.get(k))));
+    out=s.concat(out;s.concat(" value=";s.fromint(pval.get(k))));
+    out=s.concat(out;s.concat(" rec@";s.fromint(prec.get(k))));
+  };
+  let base=mut.0;
+  lp(let i=0;i<tapelen;i=i+1){ base=base+i%256; };
+  let cksum=mut.0;
+  lp(let j=0;j<paddr.len();j=j+1){
+    let rel=pA.get(j)-screenbase;
+    if(rel>=0&&rel<tapelen){
+      let dup=mut.false;
+      lp(let k2=j+1;k2<paddr.len();k2=k2+1){ if(pA.get(k2)==pA.get(j)){dup=true} };
+      if(!dup){ base=base-rel%256+pval.get(j); };
+    };
+  };
+  cksum=base%65536;
+  if(cksum<0){cksum=cksum+65536};
+  out=s.concat(out;s.concat("\nLOAD length=";s.fromint(tapelen)));
+  out=s.concat(out;s.concat("\nPATCHED checksum=";s.fromint(cksum)));
+  lp(let t=idx;t<toks.len();t=t+1){
+    let key=s.upper(toks.get(t));
+    if(key=="L"){
+      out=s.concat(out;s.concat("\nKEY L -> RELOAD length=";s.fromint(tapelen)));
+      out=s.concat(out;s.concat(" PATCHED checksum=";s.fromint(cksum)));
+    }el{
+      if(key=="E"||key=="CR"||key=="ENTER"){
+        out=s.concat(out;s.concat("\nKEY E -> SAVE length=";s.fromint(tapelen)));
+        out=s.concat(out;s.concat(" checksum=";s.fromint(cksum)));
+      }el{
+        out=s.concat(out;s.concat(s.concat("\nKEY ";key);" -> WAIT"));
+      };
+    };
+  };
+  io.println(out);
+  <0
+};

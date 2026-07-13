@@ -1,0 +1,50 @@
+m=visibletrees;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=gcd(a:i64;b:i64):i64{
+  let x=mut.a; let y=mut.b;
+  lp(y!=0){ let t=y; y=x%y; x=t };
+  <x
+};
+f=absv(x:i64):i64{ if(x<0){<0-x}el{<x} };
+f=countvis(fx:i64;fy:i64;n:i64):i64{
+  let count=mut.0;
+  lp(let x=1;x<=n;x=x+1){
+    lp(let y=1;y<=n;y=y+1){
+      if(x==fx&&y==fy){}el{
+        let dx=absv(x-fx);
+        let dy=absv(y-fy);
+        if(gcd(dx;dy)==1){count=count+1};
+      };
+    };
+  };
+  <count
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<3){<0};
+  let n=s.toint(toks.get(0));
+  let fx=s.toint(toks.get(1));
+  let fy=s.toint(toks.get(2));
+  let a=countvis(fx;fy;n);
+  let best=mut.(0-1);
+  let posx=mut.@($i64);
+  let posy=mut.@($i64);
+  lp(let px=1;px<=n;px=px+1){
+    lp(let py=1;py<=n;py=py+1){
+      let c=countvis(px;py;n);
+      if(c>best){ best=c; posx=@(px); posy=@(py) }el{
+        if(c==best){ posx=posx+@(px); posy=posy+@(py) };
+      };
+    };
+  };
+  io.println(s.concat("a ";s.fromint(a)));
+  io.println(s.concat(s.concat(s.concat("b ";s.fromint(best));" ");s.fromint(posx.len())));
+  lp(let i=0;i<posx.len();i=i+1){
+    io.println(s.concat(s.concat(s.fromint(posx.get(i));" ");s.fromint(posy.get(i))));
+  };
+  <0
+};

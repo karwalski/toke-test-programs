@@ -1,0 +1,124 @@
+m=sortnames;i=io:std.io;i=s:std.str;
+f=lowerchar(ch:$str):$str{
+  let up="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let lo="abcdefghijklmnopqrstuvwxyz";
+  let idx=s.indexof(up;ch);
+  if(idx<0){<ch}el{<s.slice(lo;idx;idx+1)};
+};
+f=casefold(x:$str):$str{
+  let n=s.len(x);
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(x;i;i+1);
+    out=s.concat(out;lowerchar(ch));
+  };
+  <out
+};
+# read all lines into an array of raw lines
+f=readlines():@($str){
+  let lines=mut.@($str);
+  lp(1==1){
+    let ln=io.readln();
+    let e=io.eof();
+    lines=lines.push(ln);
+    if(e){br};
+  };
+  <lines
+};
+# compare two keys (surname-fold, given-fold); returns true if a<b
+f=keyless(sa:$str;ga:$str;sb:$str;gb:$str):bool{
+  if(sa<sb){<true};
+  if(sa>sb){<false};
+  <(ga<gb)
+};
+f=main():i64{
+  let lines=readlines();
+  let nl=lines.len();
+  # find count: skip leading blank lines
+  let idx=mut.0;
+  lp(idx<nl){ if(s.trim(lines.get(idx))==""){idx=idx+1}el{br} };
+  let n=mut.0;
+  if(idx<nl){ n=s.toint(s.trim(lines.get(idx))); idx=idx+1 };
+  # read people
+  let sur=mut.@($str);
+  let giv=mut.@($str);
+  let read=mut.0;
+  lp(read<n&&idx<nl){
+    let line=lines.get(idx); idx=idx+1;
+    let parts=s.fields(line);
+    if(parts.len()==0){ }el{
+      sur=sur.push(parts.get(0));
+      if(parts.len()>1){ giv=giv.push(parts.get(1)) }el{ giv=giv.push("") };
+      read=read+1;
+    }
+  };
+  let np=sur.len();
+  # stable sort indices by (casefold surname, casefold given)
+  let fsur=mut.@($str); let fgiv=mut.@($str);
+  lp(let i=0;i<np;i=i+1){ fsur=fsur.push(casefold(sur.get(i))); fgiv=fgiv.push(casefold(giv.get(i))) };
+  let ord=mut.@($i64);
+  lp(let i=0;i<np;i=i+1){ ord=ord.push(i) };
+  # insertion sort (stable)
+  lp(let i=1;i<np;i=i+1){
+    let key=ord.get(i);
+    let j=mut.i-1;
+    lp(j>=0){
+      let oj=ord.get(j);
+      if(keyless(fsur.get(key);fgiv.get(key);fsur.get(oj);fgiv.get(oj))){
+        ord=ord.set(j+1;oj); j=j-1;
+      }el{ br }
+    };
+    ord=ord.set(j+1;key);
+  };
+  let out=mut.@($str);
+  out=out.push("Sorted:");
+  lp(let i=0;i<np;i=i+1){
+    let p=ord.get(i);
+    if(giv.get(p)==""){ out=out.push(sur.get(p)) }el{ out=out.push(s.concat(s.concat(sur.get(p);" ");giv.get(p))) };
+  };
+  # frequency: iterate sorted order, group by casefold surname
+  # keys in first-seen order
+  let keys=mut.@($str); let kcnt=mut.@($i64); let kdisp=mut.@($str);
+  lp(let i=0;i<np;i=i+1){
+    let p=ord.get(i);
+    let key=fsur.get(p);
+    let fi=mut.(0-1);
+    lp(let t=0;t<keys.len();t=t+1){ if(keys.get(t)==key){fi=t; br} };
+    if(fi<0){
+      keys=keys.push(key); kcnt=kcnt.push(1); kdisp=kdisp.push(sur.get(p));
+    }el{
+      kcnt=kcnt.set(fi;kcnt.get(fi)+1);
+    }
+  };
+  if(keys.len()==0){
+    out=out.push("Most frequent: none");
+  }el{
+    let maxc=mut.0;
+    lp(let t=0;t<kcnt.len();t=t+1){ if(kcnt.get(t)>maxc){maxc=kcnt.get(t)} };
+    # winners in keys_order filtered by max, then sorted by casefold(display)
+    let widx=mut.@($i64);
+    lp(let t=0;t<keys.len();t=t+1){ if(kcnt.get(t)==maxc){widx=widx.push(t)} };
+    # sort widx by casefold(display) stable (insertion)
+    lp(let a=1;a<widx.len();a=a+1){
+      let kk=widx.get(a);
+      let b=mut.a-1;
+      lp(b>=0){
+        let ob=widx.get(b);
+        if(casefold(kdisp.get(kk))<casefold(kdisp.get(ob))){ widx=widx.set(b+1;ob); b=b-1 }el{ br }
+      };
+      widx=widx.set(b+1;kk);
+    };
+    let parts=mut.@($str);
+    lp(let t=0;t<widx.len();t=t+1){
+      let w=widx.get(t);
+      parts=parts.push(s.concat(s.concat(s.concat(kdisp.get(w);" (");s.fromint(kcnt.get(w)));")"));
+    };
+    if(parts.len()==1){
+      out=out.push(s.concat("Most frequent: ";parts.get(0)));
+    }el{
+      out=out.push(s.concat("Most frequent: tie: ";s.join(", ";parts)));
+    }
+  };
+  io.print(s.concat(s.join("\n";out);"\n"));
+  <0
+};

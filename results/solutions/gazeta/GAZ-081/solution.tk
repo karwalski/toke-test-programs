@@ -1,0 +1,128 @@
+m=parity;i=io:std.io;i=s:std.str;
+
+f=pow2(n:i64):i64{
+  let r=mut.1;
+  lp(let i=0;i<n;i=i+1){ r=r*2 };
+  <r
+};
+
+f=popcount(x:i64):i64{
+  let c=mut.0;
+  let y=mut.x;
+  lp(y>0){ c=c+(y%2); y=y/2 };
+  <c
+};
+
+f=tobits(x:i64;k:i64):$str{
+  let r=mut."";
+  lp(let i=k-1;i>=0;i=i-1){
+    let bit=(x/pow2(i))%2;
+    if(bit==1){r=s.concat(r;"1")}el{r=s.concat(r;"0")};
+  };
+  <r
+};
+
+f=alphabet():$str{ <"ABCDEFGHIJKLMNOPQRSTUVWXYZ.,?!-:;+" };
+
+f=codebook(k:i64;count:i64):$str{
+  let out=mut."";
+  let found=mut.0;
+  let total=pow2(k);
+  lp(let x=0;x<total;x=x+1){
+    if(found<count){
+      if((popcount(x)%2)==0){
+        out=s.concat(out;s.concat(tobits(x;k);" "));
+        found=found+1;
+      };
+    };
+  };
+  <out
+};
+
+f=encode(msg:$str;codes:@($str);k:i64):$str{
+  let ab=alphabet();
+  let n=s.len(msg);
+  let out=mut."";
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(msg;i;i+1);
+    let idx=s.indexof(ab;ch);
+    if(idx<0){ <"ERROR" };
+    out=s.concat(out;codes.get(idx));
+  };
+  <out
+};
+
+f=isbits(str:$str):bool{
+  let n=s.len(str);
+  let ok=mut.1==1;
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(str;i;i+1);
+    if(c!="0"){ if(c!="1"){ ok=1==0 } };
+  };
+  <ok
+};
+
+f=findcode(codes:@($str);chunk:$str):i64{
+  let n=codes.len();
+  let res=mut.0-1;
+  lp(let i=0;i<n;i=i+1){
+    if(codes.get(i)==chunk){ res=i };
+  };
+  <res
+};
+
+f=decode(bits:$str;codes:@($str);k:i64):$str{
+  if(!isbits(bits)){ <"ERROR" };
+  let n=s.len(bits);
+  if((n%k)!=0){ <"ERROR" };
+  let ab=alphabet();
+  let out=mut."";
+  lp(let i=0;i<n;i=i+k){
+    let chunk=s.slice(bits;i;i+k);
+    if((countones(chunk)%2)!=0){ <"ERROR" };
+    let idx=findcode(codes;chunk);
+    if(idx<0){ <"ERROR" };
+    out=s.concat(out;s.slice(ab;idx;idx+1));
+  };
+  <out
+};
+
+f=countones(str:$str):i64{
+  let n=s.len(str);
+  let c=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    if(s.slice(str;i;i+1)=="1"){ c=c+1 };
+  };
+  <c
+};
+
+f=main():i64{
+  let k=7;
+  let count=s.len(alphabet());
+  let codes=s.fields(codebook(k;count));
+  lp(1==1){
+    let ln=io.readln();
+    let done=io.eof();
+    let trimmed=s.trim(ln);
+    if(trimmed!=""){
+      let parts=s.fields(ln);
+      let cmd=parts.get(0);
+      let arg=mut."";
+      if(parts.len()>1){
+        let after=s.slice(ln;s.len(cmd);s.len(ln));
+        arg=s.trim(after);
+      };
+      if(cmd=="K"){
+        io.println(s.fromint(k));
+      }el{ if(cmd=="encode"){
+        io.println(encode(arg;codes;k));
+      }el{ if(cmd=="decode"){
+        io.println(decode(arg;codes;k));
+      }el{
+        io.println("ERROR");
+      }};};
+    };
+    if(done){ br };
+  };
+  <0
+};

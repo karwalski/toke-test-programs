@@ -1,0 +1,19 @@
+m=guessanimal;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=tobit(tok:$str):i64{
+  let t=s.lower(s.trim(tok));
+  if(t=="yes"){<0}; if(t=="y"){<0}; if(t=="da"){<0}; if(t=="1"){<0}; if(t=="true"){<0};
+  <1
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let leaves=@("duck";"hen";"hawk";"pigeon";"hummingbird";"condor";"penguin";"ostrich";"dog";"horse";"antelope";"lion";"snake";"earthworm";"cricket";"butterfly");
+  let idx=mut.0;
+  lp(let i=0;i<4;i=i+1){ idx=(idx*2)+tobit(toks.get(i)) };
+  io.println(leaves.get(idx));
+  <0
+};

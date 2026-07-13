@@ -1,0 +1,31 @@
+m=lcmtab;i=io:std.io;i=s:std.str;
+f=gcd(a:i64;b:i64):i64{
+  let x=mut.a;
+  let y=mut.b;
+  lp(y!=0){ let t=y; y=x%y; x=t };
+  <x
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let a=s.toint(toks.get(0));
+  let b=s.toint(toks.get(1));
+  let g=gcd(a;b);
+  let lcm=a/g*b;
+  let r1=lcm/a;
+  let r2=lcm/b;
+  let rows=if(r1>r2){r1}el{r2};
+  let m1=mut.0;
+  let m2=mut.0;
+  lp(let i=1;i<=rows;i=i+1){
+    m1=m1+a;
+    m2=m2+b;
+    io.println(s.concat(s.concat(s.concat(s.concat(s.fromint(i);" ");s.concat(s.fromint(m1);" "));s.fromint(m2));""))
+  };
+  io.println(s.concat("LCM ";s.fromint(lcm)));
+  <0
+};

@@ -1,0 +1,22 @@
+m=remtwo;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=absv(x:i64):i64{ if(x<0){<0-x}el{<x} };
+f=inttrunc(x:i64;y:i64):i64{
+  let q=mut.(absv(x)/absv(y));
+  if((x<0)!=(y<0)){q=0-q};
+  <q
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){<0};
+  let a=s.toint(toks.get(0));
+  let b=s.toint(toks.get(1));
+  if(b==0){ io.println("error"); <0 };
+  let r=a-inttrunc(a;b)*b;
+  io.println(s.fromint(r));
+  <0
+};

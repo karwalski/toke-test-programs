@@ -1,0 +1,26 @@
+m=powersums;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){<0};
+  let sv=s.toint(toks.get(0));
+  let pv=s.toint(toks.get(1));
+  let bigs=mut.@($i64);
+  bigs=bigs.push(2);
+  bigs=bigs.push(sv);
+  lp(let n=2;n<=10;n=n+1){
+    let v=sv*bigs.get(n-1)-pv*bigs.get(n-2);
+    bigs=bigs.push(v);
+  };
+  let out=mut."";
+  lp(let n=1;n<=10;n=n+1){
+    if(n>1){out=s.concat(out;" ")};
+    out=s.concat(out;s.fromint(bigs.get(n)));
+  };
+  io.println(out);
+  <0
+};

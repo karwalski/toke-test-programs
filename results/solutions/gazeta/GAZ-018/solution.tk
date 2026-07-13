@@ -1,0 +1,30 @@
+m=dedup;i=io:std.io;i=s:std.str;
+f=readraw():$str{
+  let all=mut.""; let first=mut.1;
+  lp(1==1){
+    let ln=io.readln();
+    if(first==1){ all=ln; first=0; }el{ all=s.concat(all;s.concat("\n";ln)); };
+    if(io.eof()){br}
+  };
+  <all
+};
+f=isblank(ch:$str):i64{
+  if(ch==" "){<1}; if(ch=="\t"){<1}; if(ch=="\n"){<1}; if(ch=="\r"){<1};
+  <0
+};
+f=main():i64{
+  let data=readraw();
+  let seen=mut.""; let out=mut.""; let cnt=mut.0;
+  lp(let i=0;i<s.len(data);i=i+1){
+    let ch=s.slice(data;i;i+1);
+    if(isblank(ch)==1){}
+    el{ if(s.contains(seen;ch)){}
+    el{
+      seen=s.concat(seen;ch);
+      if(cnt==0){ out=ch; }el{ out=s.concat(out;s.concat(" ";ch)); };
+      cnt=cnt+1;
+    } }
+  };
+  io.println(out);
+  <0
+};

@@ -1,0 +1,23 @@
+m=reducefrac;i=io:std.io;i=s:std.str;
+f=absi(x:i64):i64{ if(x<0){<0-x}el{<x} };
+f=gcd(x:i64;y:i64):i64{
+  let a=mut.absi(x); let b=mut.absi(y);
+  lp(b!=0){ let t=b; b=a%b; a=t };
+  <a
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){<0};
+  let a=s.toint(toks.get(0));
+  let b=s.toint(toks.get(1));
+  let g=gcd(a;b);
+  let num=mut.0; let den=mut.1;
+  if(g==0){ num=0; den=1 }el{ num=a/g; den=b/g; if(den<0){ num=0-num; den=0-den } };
+  io.println(s.concat(s.concat(s.fromint(num);"/");s.fromint(den)));
+  <0
+};

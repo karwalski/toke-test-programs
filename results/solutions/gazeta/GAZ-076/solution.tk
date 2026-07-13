@@ -1,0 +1,132 @@
+m=p076;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+(* recursive descendant search: return @(bestj;bestdepth) for equal-label deepest descendant (depth>=1) *)
+f=visit(node:i64;depth:i64;target:i64;label:@($i64);left:@($i64);right:@($i64);bj:i64;bd:i64):@($i64){
+  if(node==-1){ <@(bj;bd) };
+  let cj=mut.bj;
+  let cd=mut.bd;
+  if(depth>=1){
+    if(label.get(node)==target){
+      if(depth>cd){ cd=depth; cj=node };
+    };
+  };
+  let l=visit(left.get(node);depth+1;target;label;left;right;cj;cd);
+  cj=l.get(0); cd=l.get(1);
+  let r=visit(right.get(node);depth+1;target;label;left;right;cj;cd);
+  cj=r.get(0); cd=r.get(1);
+  <@(cj;cd)
+};
+(* BFS over candidate ancestors; return @(i;j) conflict or @(-1;-1) if none *)
+f=findconflict(root:i64;label:@($i64);left:@($i64);right:@($i64)):@($i64){
+  let q=mut.@($i64);
+  if(root!=-1){ q=q.push(root); };
+  let head=mut.0;
+  let res=mut.@(-1;-1);
+  lp(1==1){
+    if(head>=q.len()){ br };
+    let i=q.get(head);
+    head=head+1;
+    let target=label.get(i);
+    let best=visit(i;0;target;label;left;right;-1;-1);
+    let bj=best.get(0);
+    if(bj!=-1){ res=@(i;bj); br };
+    if(left.get(i)!=-1){ q=q.push(left.get(i)); };
+    if(right.get(i)!=-1){ q=q.push(right.get(i)); };
+  };
+  <res
+};
+(* find parent of target via DFS (top-pointer stack); return @(par;side) or @(-1;-1); side 0=left 1=right *)
+f=findparent(root:i64;target:i64;left:@($i64);right:@($i64)):@($i64){
+  let stk=mut.@($i64);
+  stk=stk.push(root);
+  let top=mut.1;
+  let res=mut.@(-1;-1);
+  lp(1==1){
+    if(top==0){ br };
+    let n=stk.get(top-1);
+    top=top-1;
+    if(n!=-1){
+      if(left.get(n)==target){ res=@(n;0); br };
+      if(right.get(n)==target){ res=@(n;1); br };
+      if(top<stk.len()){ stk=stk.set(top;left.get(n)); }el{ stk=stk.push(left.get(n)); };
+      top=top+1;
+      if(top<stk.len()){ stk=stk.set(top;right.get(n)); }el{ stk=stk.push(right.get(n)); };
+      top=top+1;
+    };
+  };
+  <res
+};
+f=emit(node:i64;label:@($i64);left:@($i64);right:@($i64)):$str{
+  if(node==-1){ <"#" };
+  let s0=s.fromint(label.get(node));
+  let ls=emit(left.get(node);label;left;right);
+  let rs=emit(right.get(node);label;left;right);
+  <s.concat(s.concat(s.concat(s.concat(s0;" ");ls);" ");rs)
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let ntok=toks.len();
+  let label=mut.@($i64);
+  let left=mut.@($i64);
+  let right=mut.@($i64);
+  (* iterative preorder parse using a slot stack (parent, side); side -1 = root; top-pointer to avoid array slice *)
+  let stkpar=mut.@($i64);
+  let stkside=mut.@($i64);
+  stkpar=stkpar.push(-1);
+  stkside=stkside.push(-1);
+  let top=mut.1;
+  let root=mut.-1;
+  let pos=mut.0;
+  lp(1==1){
+    if(top==0){ br };
+    if(pos>=ntok){ br };
+    let parent=stkpar.get(top-1);
+    let side=stkside.get(top-1);
+    top=top-1;
+    let tok=toks.get(pos);
+    pos=pos+1;
+    let child=mut.-1;
+    if(tok=="#"){
+      child=-1;
+    }el{
+      child=label.len();
+      label=label.push(s.toint(tok));
+      left=left.push(-1);
+      right=right.push(-1);
+      (* push right slot then left slot (LIFO -> left filled first) *)
+      if(top<stkpar.len()){ stkpar=stkpar.set(top;child); stkside=stkside.set(top;1); }el{ stkpar=stkpar.push(child); stkside=stkside.push(1); };
+      top=top+1;
+      if(top<stkpar.len()){ stkpar=stkpar.set(top;child); stkside=stkside.set(top;0); }el{ stkpar=stkpar.push(child); stkside=stkside.push(0); };
+      top=top+1;
+    };
+    if(parent==-1){
+      root=child;
+    }el{
+      if(side==0){ left=left.set(parent;child); }el{ right=right.set(parent;child); };
+    };
+  };
+  (* reduction loop *)
+  let guard=mut.label.len()+1;
+  lp(guard>0){
+    guard=guard-1;
+    let c=findconflict(root;label;left;right);
+    let ci=c.get(0);
+    if(ci==-1){ br };
+    let cj=c.get(1);
+    if(ci==root){
+      root=cj;
+    }el{
+      let p=findparent(root;ci;left;right);
+      let par=p.get(0);
+      if(par==-1){ br };
+      let pside=p.get(1);
+      if(pside==0){ left=left.set(par;cj); }el{ right=right.set(par;cj); };
+    };
+  };
+  io.println(emit(root;label;left;right));
+  <0
+};

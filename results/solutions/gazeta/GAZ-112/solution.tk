@@ -1,0 +1,65 @@
+m=queensdraw;i=io:std.io;i=s:std.str;
+f=absi(x:i64):i64{ if(x<0){<0-x}el{<x} };
+f=safe(row:i64;c:i64;col:@($i64)):bool{
+  lp(let prev=0;prev<row;prev=prev+1){
+    if(col.get(prev)==c){<false};
+    if(absi(col.get(prev)-c)==absi(prev-row)){<false};
+  };
+  <true
+};
+f=drawboard(out:@($str);col:@($i64);n:i64;k:i64):@($str){
+  let o=mut.out;
+  o=o.push(s.concat("Solution ";s.concat(s.fromint(k);":")));
+  lp(let r=0;r<n;r=r+1){
+    let line=mut."";
+    lp(let c=0;c<n;c=c+1){
+      if(col.get(r)==c){ line=s.concat(line;"Q") }el{
+        if((r+c)%2==1){ line=s.concat(line;"#") }el{ line=s.concat(line;".") }
+      }
+    };
+    o=o.push(line);
+  };
+  o=o.push("");
+  <o
+};
+# state array: index0 = count (str), rest = output lines
+f=place(row:i64;n:i64;col:@($i64);state:@($str)):@($str){
+  if(row==n){
+    let cnt=s.toint(state.get(0))+1;
+    let out=mut.@($str);
+    lp(let j=1;j<state.len();j=j+1){ out=out.push(state.get(j)) };
+    out=drawboard(out;col;n;cnt);
+    let res=mut.@($str);
+    res=res.push(s.fromint(cnt));
+    lp(let j=0;j<out.len();j=j+1){ res=res.push(out.get(j)) };
+    <res
+  };
+  let st=mut.state;
+  lp(let c=0;c<n;c=c+1){
+    if(safe(row;c;col)){
+      let ncol=col.set(row;c);
+      st=place(row+1;n;ncol;st);
+    }
+  };
+  <st
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n=if(toks.len()>0){s.toint(toks.get(0))}el{8};
+  let col=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){ col=col.push(0) };
+  let state=mut.@($str);
+  state=state.push("0");
+  if(n>0){ state=place(0;n;col;state) };
+  let cnt=state.get(0);
+  let out=mut.@($str);
+  lp(let j=1;j<state.len();j=j+1){ out=out.push(state.get(j)) };
+  out=out.push(s.concat("Total solutions: ";cnt));
+  io.print(s.concat(s.join("\n";out);"\n"));
+  <0
+};

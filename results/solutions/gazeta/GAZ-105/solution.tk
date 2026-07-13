@@ -1,0 +1,37 @@
+m=triangle;i=io:std.io;i=s:std.str;i=m:std.math;
+f=classify(a:f64;b:f64;c:f64):$str{
+  if(a<=0.0||b<=0.0||c<=0.0){<"not a triangle"};
+  if(a+b<=c||a+c<=b||b+c<=a){<"not a triangle"};
+  let x=mut.a; let y=mut.b; let z=mut.c;
+  if(x>y){ let t=x; x=y; y=t };
+  if(y>z){ let t=y; y=z; z=t };
+  if(x>y){ let t=x; x=y; y=t };
+  let lhs=x*x+y*y;
+  let rhs=z*z;
+  let tol=0.000000001*(lhs+rhs);
+  let d=lhs-rhs;
+  let ad=if(d<0.0){0.0-d}el{d};
+  if(ad<=tol){<"right-angled"};
+  if(lhs>rhs){<"acute-angled"};
+  <"obtuse-angled"
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n=toks.len();
+  let i=mut.0;
+  let out=mut.@($str);
+  lp(i+3<=n){
+    let a=s.tofloat(toks.get(i));
+    let b=s.tofloat(toks.get(i+1));
+    let c=s.tofloat(toks.get(i+2));
+    out=out.push(classify(a;b;c));
+    i=i+3;
+  };
+  if(out.len()>0){ io.print(s.concat(s.join("\n";out);"\n")) };
+  <0
+};
