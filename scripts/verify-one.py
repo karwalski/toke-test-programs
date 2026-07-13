@@ -32,6 +32,12 @@ with tempfile.TemporaryDirectory() as td:
                      for l in (r.stdout+r.stderr).splitlines() if '"error_code"' in l), "")
         print(f"{pid}: COMPILE_FAIL {code}"); sys.exit(1)
     for i, tc in enumerate(p.get("test_cases") or []):
+        fx = tc.get("fixtures") or {}
+        for d in fx.get("dirs", []):
+            os.makedirs(d, exist_ok=True)
+        for fpath, content in (fx.get("files") or {}).items():
+            os.makedirs(os.path.dirname(fpath), exist_ok=True)
+            open(fpath,"wb").write(content.encode("latin-1"))
         try:
             rr = subprocess.run([b], input=tc.get("input","") or "", capture_output=True, text=True, timeout=10)
         except subprocess.TimeoutExpired:

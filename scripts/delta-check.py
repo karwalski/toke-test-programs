@@ -45,6 +45,10 @@ for pid,(cat,p) in meta.items():
             if r is None or r.returncode!=0 or not os.path.exists(b): st="COMPILE_FAIL"
             else:
                 for tc in (p.get("test_cases") or []):
+                    fx=tc.get("fixtures") or {}
+                    for dd in fx.get("dirs",[]): os.makedirs(dd,exist_ok=True)
+                    for fpath,content in (fx.get("files") or {}).items():
+                        os.makedirs(os.path.dirname(fpath),exist_ok=True); open(fpath,"wb").write(content.encode("latin-1"))
                     try: rr=subprocess.run([b],input=tc.get("input","") or "",capture_output=True,text=True,timeout=10)
                     except: st="RUN_FAIL"; break
                     if rr.returncode<0 or rr.returncode>=128: st="CRASH"; break
