@@ -33,9 +33,12 @@ categories/
 
 ## Each Program Includes
 
+Requirements (description, I/O format, test cases) live per category in
+`categories/{category}/requirements.yaml`. Generated, verified solutions
+live under `results/solutions/`:
+
 ```
-categories/{category}/{id}/
-  requirement.yaml       # What to build (description, I/O format, test cases)
+results/solutions/{category}/{id}/
   solution.tk            # Working toke source code
   solution.tkc.md        # Companion file (algorithm docs, complexity analysis)
   solution.stripped.tk    # String-stripped version (for model training)
@@ -57,15 +60,17 @@ Every program is:
 ## Using the Test Harness
 
 ```bash
-# Test a single program
-./scripts/test-runner.sh categories/games/GAM-001/
-
-# Test all programs
-./scripts/run-all.sh
+# Verify a single program (compile + run its manifest test cases)
+python3 scripts/verify-one.py GAM-001
 
 # Validate requirement uniqueness and diversity
 python3 scripts/validate-uniqueness.py
 ```
+
+`scripts/test-runner.sh <program-dir>` and `scripts/run-all.sh` are the
+lower-level harness; they expect a program directory containing
+`solution.tk` plus a `tests/` folder of `input_*.txt`/`expected_*.txt`
+files.
 
 ## Contributing Programs
 
@@ -100,6 +105,9 @@ The `infra/` directory contains scripts for automated program generation at scal
 ## Links
 
 - [toke language](https://github.com/karwalski/toke) — compiler, spec, stdlib
+- [toke-corpus](https://github.com/karwalski/toke-corpus) — training-data pipeline that verified programs from this repo feed into
+- [toke-model](https://github.com/karwalski/toke-models) — model training and adapter merging
+- [toke-tokenizer](https://github.com/karwalski/toke-tokenizer) — custom toke tokenizer
 - [tokelang.dev](https://tokelang.dev) — website and documentation
 - [API](https://api.tokelang.dev) — free tier for toke code generation
 - [VS Code extension](https://marketplace.visualstudio.com/items?itemName=tokelang.toke-language) — syntax highlighting and LSP
