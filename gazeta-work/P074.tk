@@ -1,0 +1,92 @@
+m=p074;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+(* compare column c1 vs c2 under row order perm; returns -1,0,1 *)
+f=cmpcol(mat:@($i64);perm:@($i64);mrows:i64;ncols:i64;c1:i64;c2:i64):i64{
+  let res=mut.0;
+  lp(let i=0;i<mrows;i=i+1){
+    if(res==0){
+      let r=perm.get(i);
+      let av=mat.get(r*ncols+c1);
+      let bv=mat.get(r*ncols+c2);
+      if(av<bv){res=-1}el{if(av>bv){res=1}};
+    };
+  };
+  <res
+};
+(* canonical string for one fixed row permutation, columns sorted *)
+f=canonperm(mat:@($i64);perm:@($i64);mrows:i64;ncols:i64):$str{
+  (* colorder = column indices sorted by column vector under perm *)
+  let colorder=mut.@($i64);
+  lp(let j=0;j<ncols;j=j+1){ colorder=colorder.push(j); };
+  lp(let a=1;a<ncols;a=a+1){
+    let cur=colorder.get(a);
+    let b=mut.a-1;
+    lp(1==1){
+      if(b<0){br};
+      let cb=colorder.get(b);
+      if(cmpcol(mat;perm;mrows;ncols;cb;cur)>0){
+        colorder=colorder.set(b+1;cb);
+        b=b-1;
+      }el{br};
+    };
+    colorder=colorder.set(b+1;cur);
+  };
+  (* flatten row-major: for i in rows, for k in cols: mat[perm[i]][colorder[k]] *)
+  let out=mut."";
+  lp(let i=0;i<mrows;i=i+1){
+    let r=perm.get(i);
+    lp(let k=0;k<ncols;k=k+1){
+      let c=colorder.get(k);
+      out=s.concat(out;s.concat(s.fromint(mat.get(r*ncols+c));","));
+    };
+  };
+  <out
+};
+(* recursive permutation generator over rows, tracking best canonical string *)
+f=permgo(mat:@($i64);perm:@($i64);used:@($i64);mrows:i64;ncols:i64;best:$str;hasbest:i64):$str{
+  if(perm.len()==mrows){
+    let cand=canonperm(mat;perm;mrows;ncols);
+    if(hasbest==0){<cand};
+    if(cand<best){<cand};
+    <best
+  }el{
+    let curbest=mut.best;
+    let curhas=mut.hasbest;
+    lp(let v=0;v<mrows;v=v+1){
+      if(used.get(v)==0){
+        let nused=used.set(v;1);
+        let nperm=perm.push(v);
+        let r=permgo(mat;nperm;nused;mrows;ncols;curbest;curhas);
+        curbest=r;
+        curhas=1;
+      };
+    };
+    <curbest
+  }
+};
+f=canonical(mat:@($i64);mrows:i64;ncols:i64):$str{
+  let perm=mut.@($i64);
+  let used=mut.@($i64);
+  lp(let i=0;i<mrows;i=i+1){ used=used.push(0); };
+  <permgo(mat;perm;used;mrows;ncols;"";0)
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let mrows=s.toint(toks.get(0));
+  let ncols=s.toint(toks.get(1));
+  let total=mrows*ncols;
+  (* read matrix A flat *)
+  let a=mut.@($i64);
+  lp(let k=0;k<total;k=k+1){ a=a.push(s.toint(toks.get(2+k))); };
+  (* read matrix B flat *)
+  let b=mut.@($i64);
+  lp(let k=0;k<total;k=k+1){ b=b.push(s.toint(toks.get(2+total+k))); };
+  let ca=canonical(a;mrows;ncols);
+  let cb=canonical(b;mrows;ncols);
+  if(ca==cb){ io.println("yes") }el{ io.println("no") };
+  <0
+};

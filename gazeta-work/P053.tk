@@ -1,0 +1,19 @@
+m=yrsconv;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let years=s.toint(toks.get(0));
+  let months=years*12;
+  let days=years*365;
+  let hours=days*24;
+  let minutes=hours*60;
+  io.println(s.concat("Months: ";s.fromint(months)));
+  io.println(s.concat("Days: ";s.fromint(days)));
+  io.println(s.concat("Hours: ";s.fromint(hours)));
+  io.println(s.concat("Minutes: ";s.fromint(minutes)));
+  <0
+};

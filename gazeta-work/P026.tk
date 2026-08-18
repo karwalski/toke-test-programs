@@ -1,0 +1,15 @@
+m=blanks;i=io:std.io;i=s:std.str;
+f=main():i64{
+  let a=io.readln();
+  let replline=io.readln();
+  let replacement=if(s.len(replline)>=1){s.slice(replline;0;1)}el{""};
+  let count=mut.0;
+  let out=mut."";
+  lp(let i=0;i<s.len(a);i=i+1){
+    let ch=s.slice(a;i;i+1);
+    if(ch==" "){ count=count+1; out=s.concat(out;replacement) }el{ out=s.concat(out;ch) };
+  };
+  io.println(s.fromint(count));
+  io.println(out);
+  <0
+};

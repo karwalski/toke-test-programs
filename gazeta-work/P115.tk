@@ -1,0 +1,99 @@
+m=seqtree;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=isdigits(x:$str):bool{
+  let n=s.len(x);
+  if(n==0){ <false };
+  lp(let i=0;i<n;i=i+1){
+    let ch=s.slice(x;i;i+1);
+    if(ch>="0"&&ch<="9"){}el{ <false };
+  };
+  <true
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let labels=mut.@($str);
+  if(toks.len()>0){
+    let n=s.toint(toks.get(0));
+    lp(let i=0;i<n;i=i+1){ labels=labels.push(toks.get(1+i)) };
+  };
+  (* parse each label into a "."-joined canonical string; wellformed flag *)
+  let wellformed=mut.true;
+  (* parsed seqs stored as their normalized dotted strings; also present set *)
+  let parsed=mut.@($str);
+  let cnt=labels.len();
+  lp(let li=0;li<cnt;li=li+1){
+    if(wellformed){
+      let lab=labels.get(li);
+      let parts=s.split(lab;".");
+      let ok=mut.true;
+      let pn=parts.len();
+      if(pn==0){ ok=false };
+      lp(let pi=0;pi<pn;pi=pi+1){
+        let pp=parts.get(pi);
+        if(s.len(pp)==0){ ok=false }el{
+          if(isdigits(pp)){
+            let v=s.toint(pp);
+            if(v<1){ ok=false };
+          }el{ ok=false };
+        };
+      };
+      if(ok){
+        (* first part must equal 1 *)
+        if(s.toint(parts.get(0))!=1){ ok=false };
+      };
+      if(ok){ parsed=parsed.push(lab) }el{ wellformed=false };
+    };
+  };
+  if(wellformed){}el{
+    io.println("well-formed: no");
+    io.println("tree: -");
+    <0
+  };
+  (* build present set as list of dotted strings; membership by scan *)
+  (* defines_tree logic *)
+  let pcnt=parsed.len();
+  let istree=mut.true;
+  (* helper: check (1,) present *)
+  let hasroot=mut.false;
+  lp(let i=0;i<pcnt;i=i+1){ if(parsed.get(i)=="1"){ hasroot=true } };
+  if(hasroot){}el{ istree=false };
+  if(istree){
+    lp(let i=0;i<pcnt;i=i+1){
+      let seq=parsed.get(i);
+      let parts=s.split(seq;".");
+      let plen=parts.len();
+      if(plen==1){}el{
+        (* x = seq[:-1] dotted; m = last *)
+        let xstr=mut."";
+        lp(let k=0;k<plen-1;k=k+1){
+          if(k==0){ xstr=parts.get(0) }el{ xstr=s.concat(s.concat(xstr;".");parts.get(k)) };
+        };
+        let m=s.toint(parts.get(plen-1));
+        if(m==1){
+          (* x must be present *)
+          let found=mut.false;
+          lp(let j=0;j<pcnt;j=j+1){ if(parsed.get(j)==xstr){ found=true } };
+          if(found){}el{ istree=false };
+        }el{
+          (* left = x + (m-1); and x must both be present *)
+          let leftstr=s.concat(s.concat(xstr;".");s.fromint(m-1));
+          let fl=mut.false;
+          let fx=mut.false;
+          lp(let j=0;j<pcnt;j=j+1){
+            if(parsed.get(j)==leftstr){ fl=true };
+            if(parsed.get(j)==xstr){ fx=true };
+          };
+          if(fl){}el{ istree=false };
+          if(fx){}el{ istree=false };
+        };
+      };
+    };
+  };
+  io.println("well-formed: yes");
+  io.println(s.concat("tree: ";if(istree){"yes"}el{"no"}));
+  <0
+};

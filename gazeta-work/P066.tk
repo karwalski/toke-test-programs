@@ -1,0 +1,83 @@
+m=exteuclid;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=absi(x:i64):i64{ if(x<0){<0-x}; <x };
+f=signi(v:i64):i64{ if(v>0){<1}; if(v<0){<0-1}; <0 };
+f=floordiv(n:i64;d:i64):i64{
+  let qq=n/d;
+  let rr=n-qq*d;
+  if(rr!=0){ if((rr<0)!=(d<0)){ <qq-1 } };
+  <qq
+};
+f=cdiv(n:i64;d:i64):i64{ <0-floordiv(0-n;d) };
+f=main():i64{
+  let toks=s.fields(readall());
+  let a=s.toint(toks.get(0));
+  let b=s.toint(toks.get(1));
+  let p=s.toint(toks.get(2));
+  let u=s.toint(toks.get(3));
+  let mode=s.toint(toks.get(4));
+  let oldr=mut.absi(a);
+  let r=mut.absi(b);
+  let olds=mut.1;
+  let scur=mut.0;
+  let oldt=mut.0;
+  let tcur=mut.1;
+  lp(r!=0){
+    let quo=oldr/r;
+    let tmpr=oldr-quo*r; oldr=r; r=tmpr;
+    let tmps=olds-quo*scur; olds=scur; scur=tmps;
+    let tmpt=oldt-quo*tcur; oldt=tcur; tcur=tmpt;
+  };
+  let g=oldr;
+  let bigx=olds;
+  let bigy=oldt;
+  let d=g;
+  let out=mut."";
+  out=s.concat(out;s.concat("d=";s.fromint(d)));
+  if(d==0){
+    out=s.concat(out;"\nno solution");
+    io.println(out); <0
+  };
+  let x0=signi(a)*bigx;
+  let y0=signi(b)*bigy;
+  let stepx=floordiv(b;d);
+  let stepy=floordiv(a;d);
+  let lo=mut.0;
+  let hi=mut.0;
+  let haslo=mut.false;
+  let empty=mut.false;
+  if(stepx==0){
+    if(!(p<=x0&&x0<=u)){empty=true};
+  }el{
+    let clo=mut.0; let chi=mut.0;
+    if(stepx>0){ clo=cdiv(p-x0;stepx); chi=floordiv(u-x0;stepx); }
+    el{ clo=cdiv(u-x0;stepx); chi=floordiv(p-x0;stepx); };
+    if(haslo){ if(clo>lo){lo=clo}; if(chi<hi){hi=chi}; }el{ lo=clo; hi=chi; haslo=true; };
+  };
+  if(mode==1){
+    let stp=0-stepy;
+    if(stp==0){
+      if(!(p<=y0&&y0<=u)){empty=true};
+    }el{
+      let clo=mut.0; let chi=mut.0;
+      if(stp>0){ clo=cdiv(p-y0;stp); chi=floordiv(u-y0;stp); }
+      el{ clo=cdiv(u-y0;stp); chi=floordiv(p-y0;stp); };
+      if(haslo){ if(clo>lo){lo=clo}; if(chi<hi){hi=chi}; }el{ lo=clo; hi=chi; haslo=true; };
+    };
+  };
+  if(empty||!haslo||lo>hi){
+    out=s.concat(out;"\nno solution");
+    io.println(out); <0
+  };
+  lp(let k=lo;k<=hi;k=k+1){
+    let x=x0+k*stepx;
+    let y=y0-k*stepy;
+    out=s.concat(out;s.concat("\n";s.concat(s.fromint(x);s.concat(" ";s.fromint(y)))));
+  };
+  io.println(out);
+  <0
+};

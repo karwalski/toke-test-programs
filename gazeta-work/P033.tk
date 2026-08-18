@@ -1,0 +1,46 @@
+m=transp;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let n=s.toint(toks.get(0));
+  let p=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){ p=p.push(s.toint(toks.get(1+i))) };
+  let moves=mut.@($i64);
+  # reduce to identity via star swaps
+  lp(1==1){
+    let isid=mut.1==1;
+    lp(let k=0;k<n;k=k+1){ if(p.get(k)!=k+1){ isid=1==0 } };
+    if(isid){ br };
+    if(p.get(0)==1){
+      # find first misplaced position (1-based index j>=2)
+      let j=mut.0;
+      let found=mut.1==0;
+      lp(let k=1;k<n;k=k+1){ if(!found){ if(p.get(k)!=k+1){ j=k+1; found=1==1 } } };
+      # swap positions 1 and j
+      let t=p.get(0);
+      p=p.set(0;p.get(j-1));
+      p=p.set(j-1;t);
+      moves=moves.push(j);
+    }el{
+      let j=p.get(0);
+      let t=p.get(0);
+      p=p.set(0;p.get(j-1));
+      p=p.set(j-1;t);
+      moves=moves.push(j);
+    };
+  };
+  # answer = reversed moves
+  let m=moves.len();
+  if(m==0){ io.println("(empty)"); <0 };
+  let out=mut."";
+  lp(let i=m-1;i>=0;i=i-1){
+    out=s.concat(out;s.concat("(1,";s.concat(s.fromint(moves.get(i));")")));
+  };
+  io.println(out);
+  <0
+};

@@ -1,0 +1,79 @@
+m=queendom;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+# apply queen qi: increment coverage for its covered cells (flat[start..start+cnt])
+f=applyq(cov:@($i64);flat:@($i64);start:i64;cnt:i64):@($i64){
+  let nc=mut.cov;
+  lp(let j=0;j<cnt;j=j+1){
+    let ci=flat.get(start+j);
+    nc=nc.set(ci;nc.get(ci)+1);
+  };
+  <nc
+};
+f=lowestuncov(cov:@($i64);ncells:i64):i64{
+  lp(let i=0;i<ncells;i=i+1){ if(cov.get(i)==0){<i} };
+  <(0-1)
+};
+f=countuncov(cov:@($i64);ncells:i64):i64{
+  let cnt=mut.0;
+  lp(let i=0;i<ncells;i=i+1){ if(cov.get(i)==0){cnt=cnt+1} };
+  <cnt
+};
+f=search(cov:@($i64);count:i64;k:i64;ncells:i64;maxcov:i64;flat:@($i64);start:@($i64);clen:@($i64)):bool{
+  let u=lowestuncov(cov;ncells);
+  if(u==(0-1)){<true};
+  let remaining=k-count;
+  if(remaining==0){<false};
+  if(countuncov(cov;ncells)>remaining*maxcov){<false};
+  # cells whose queen covers u = the covered-cell list of u (symmetric)
+  let ust=start.get(u);
+  let ucnt=clen.get(u);
+  lp(let j=0;j<ucnt;j=j+1){
+    let cell=flat.get(ust+j);
+    let ncov=applyq(cov;flat;start.get(cell);clen.get(cell));
+    if(search(ncov;count+1;k;ncells;maxcov;flat;start;clen)){<true};
+  };
+  <false
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let n=s.toint(toks.get(0));
+  let ncells=n*n;
+  if(ncells==0){ io.println("0"); <0 };
+  # build flat coverage lists
+  let flat=mut.@($i64);
+  let start=mut.@($i64);
+  let clen=mut.@($i64);
+  let maxcov=mut.0;
+  lp(let qr=0;qr<n;qr=qr+1){
+    lp(let qc=0;qc<n;qc=qc+1){
+      start=start.push(flat.len());
+      let cnt=mut.0;
+      lp(let r=0;r<n;r=r+1){
+        lp(let c=0;c<n;c=c+1){
+          if(r==qr||c==qc||(r-c)==(qr-qc)||(r+c)==(qr+qc)){
+            flat=flat.push(r*n+c);
+            cnt=cnt+1;
+          }
+        }
+      };
+      clen=clen.push(cnt);
+      if(cnt>maxcov){maxcov=cnt};
+    }
+  };
+  let zero=mut.@($i64);
+  lp(let i=0;i<ncells;i=i+1){ zero=zero.push(0) };
+  let ans=mut.ncells;
+  let found=mut.false;
+  lp(let k=1;k<=ncells;k=k+1){
+    if(!found){
+      if(search(zero;0;k;ncells;maxcov;flat;start;clen)){ ans=k; found=true }
+    }
+  };
+  io.println(s.fromint(ans));
+  <0
+};

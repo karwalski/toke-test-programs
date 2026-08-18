@@ -1,0 +1,21 @@
+m=divis;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){<0};
+  let n=mut.s.toint(toks.get(0));
+  let k=mut.s.toint(toks.get(1));
+  if(n<k){ let x=n; n=k; k=x };
+  if(k==0){ io.println("error: k must not be zero"); <0 };
+  let x=n-(n/k)*k;
+  if(x!=0){
+    io.println(s.concat(s.concat(s.fromint(n);" is not divisible by ");s.fromint(k)))
+  }el{
+    io.println(s.concat(s.concat(s.fromint(n);" is divisible by ");s.fromint(k)))
+  };
+  <0
+};

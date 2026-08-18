@@ -1,0 +1,31 @@
+m=sumfirstn;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let first=toks.get(0);
+  let ismode=if(first=="sum"){1}el{if(first=="evens"){1}el{if(first=="squares"){1}el{if(first=="cubes"){1}el{if(first=="recip"){1}el{0}}}}};
+  let mode=if(ismode==1){first}el{"sum"};
+  let n=if(ismode==1){s.toint(toks.get(1))}el{s.toint(toks.get(0))};
+  if(mode=="recip"){
+    let total=mut.0.0;
+    lp(let i=1;i<=n;i=i+1){ total=total+1.0/(i as f64) };
+    io.println(s.format(total;"%.6f"));
+  }el{
+    let total=mut.0;
+    if(mode=="evens"){
+      lp(let i=2;i<=n;i=i+2){ total=total+i };
+    }el{ if(mode=="squares"){
+      lp(let i=1;i<=n;i=i+1){ total=total+i*i };
+    }el{ if(mode=="cubes"){
+      lp(let i=1;i<=n;i=i+1){ total=total+i*i*i };
+    }el{
+      lp(let i=1;i<=n;i=i+1){ total=total+i };
+    }}};
+    io.println(s.fromint(total));
+  };
+  <0
+};

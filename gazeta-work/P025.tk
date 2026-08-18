@@ -1,0 +1,53 @@
+m=setops;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=contains(arr:@($str);x:$str):bool{
+  lp(let i=0;i<arr.len();i=i+1){ if(arr.get(i)==x){<1==1} };
+  <1==0
+};
+f=sortstr(arr:@($str)):@($str){
+  let a=mut.arr;
+  let n=a.len();
+  lp(let i=1;i<n;i=i+1){
+    let key=a.get(i);
+    let j=mut.i-1;
+    lp(j>=0){
+      if(s.gt(a.get(j);key)){ a=a.set(j+1;a.get(j)); j=j-1 }el{ br };
+    };
+    a=a.set(j+1;key);
+  };
+  <a
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let idx=mut.0;
+  # read three sets (dedup, insertion order)
+  let a=mut.@($str);
+  let b=mut.@($str);
+  let c=mut.@($str);
+  # read set a
+  let na=s.toint(toks.get(idx)); idx=idx+1;
+  lp(let k=0;k<na;k=k+1){ let x=toks.get(idx); idx=idx+1; if(!contains(a;x)){a=a.push(x)} };
+  let nb=s.toint(toks.get(idx)); idx=idx+1;
+  lp(let k=0;k<nb;k=k+1){ let x=toks.get(idx); idx=idx+1; if(!contains(b;x)){b=b.push(x)} };
+  let nc=s.toint(toks.get(idx)); idx=idx+1;
+  lp(let k=0;k<nc;k=k+1){ let x=toks.get(idx); idx=idx+1; if(!contains(c;x)){c=c.push(x)} };
+  # intersection a&b
+  let inter=mut.@($str);
+  lp(let k=0;k<a.len();k=k+1){ if(contains(b;a.get(k))){inter=inter.push(a.get(k))} };
+  # difference a-b
+  let diff=mut.@($str);
+  lp(let k=0;k<a.len();k=k+1){ if(!contains(b;a.get(k))){diff=diff.push(a.get(k))} };
+  # union3
+  let uni=mut.@($str);
+  lp(let k=0;k<a.len();k=k+1){ if(!contains(uni;a.get(k))){uni=uni.push(a.get(k))} };
+  lp(let k=0;k<b.len();k=k+1){ if(!contains(uni;b.get(k))){uni=uni.push(b.get(k))} };
+  lp(let k=0;k<c.len();k=k+1){ if(!contains(uni;c.get(k))){uni=uni.push(c.get(k))} };
+  io.println(s.join(" ";sortstr(inter)));
+  io.println(s.join(" ";sortstr(diff)));
+  io.println(s.join(" ";sortstr(uni)));
+  <0
+};

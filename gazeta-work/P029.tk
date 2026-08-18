@@ -1,0 +1,101 @@
+m=knight;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=onboard(r:i64;c:i64):bool{ <r>=0&&r<8&&c>=0&&c<8 };
+f=mvr(i:i64):i64{
+  let a=@(-2;-2;-1;-1;1;1;2;2);
+  <a.get(i)
+};
+f=mvc(i:i64):i64{
+  let a=@(-1;1;-2;2;-2;2;-1;1);
+  <a.get(i)
+};
+f=onwarddeg(board:@($i64);r:i64;c:i64):i64{
+  let cnt=mut.0;
+  lp(let i=0;i<8;i=i+1){
+    let nr=r+mvr(i); let nc=c+mvc(i);
+    if(onboard(nr;nc)&&board.get(nr*8+nc)==0){cnt=cnt+1};
+  };
+  <cnt
+};
+# solve returns board (all cells filled) on success, or empty array on failure.
+f=solve(board:@($i64);r:i64;c:i64;step:i64):@($i64){
+  if(step>64){<board};
+  # build candidate list: onward degree, move index, nr, nc
+  let deg=mut.@($i64);
+  let midx=mut.@($i64);
+  let nrs=mut.@($i64);
+  let ncs=mut.@($i64);
+  lp(let i=0;i<8;i=i+1){
+    let nr=r+mvr(i); let nc=c+mvc(i);
+    if(onboard(nr;nc)&&board.get(nr*8+nc)==0){
+      deg=deg.push(onwarddeg(board;nr;nc));
+      midx=midx.push(i);
+      nrs=nrs.push(nr);
+      ncs=ncs.push(nc);
+    };
+  };
+  # selection sort by (deg, midx) ascending — stable enough via explicit tie on midx
+  let cnt=deg.len();
+  let order=mut.@($i64);
+  lp(let k=0;k<cnt;k=k+1){ order=order.push(k) };
+  lp(let a=0;a<cnt;a=a+1){
+    let bestj=mut.a;
+    lp(let b=a+1;b<cnt;b=b+1){
+      let ob=order.get(b); let obest=order.get(bestj);
+      let db=deg.get(ob); let dbest=deg.get(obest);
+      let better=mut.1==0;
+      if(db<dbest){better=1==1}el{
+        if(db==dbest){ if(midx.get(ob)<midx.get(obest)){better=1==1} };
+      };
+      if(better){bestj=b};
+    };
+    let tmp=order.get(a);
+    order=order.set(a;order.get(bestj));
+    order=order.set(bestj;tmp);
+  };
+  lp(let k=0;k<cnt;k=k+1){
+    let o=order.get(k);
+    let nr=nrs.get(o); let nc=ncs.get(o);
+    let nb=board.set(nr*8+nc;step);
+    let res=solve(nb;nr;nc;step+1);
+    if(res.len()>0){<res};
+  };
+  let empty=@($i64);
+  <empty
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let tok=s.lower(toks.get(0));
+  let col=s.charcode(tok;0)-s.charcode("a";0);
+  let rowstr=s.slice(tok;1;s.len(tok));
+  let row=s.toint(rowstr)-1;
+  if(!onboard(row;col)){ io.println("no tour"); <0 };
+  let board=mut.@($i64);
+  lp(let k=0;k<64;k=k+1){ board=board.push(0) };
+  board=board.set(row*8+col;1);
+  let res=solve(board;row;col;2);
+  if(res.len()>0){
+    let out=mut.@($str);
+    lp(let rr=0;rr<8;rr=rr+1){
+      let cells=mut.@($str);
+      lp(let cc=0;cc<8;cc=cc+1){
+        let v=res.get(rr*8+cc);
+        let vs=s.fromint(v);
+        # pad to width 2 (right-justified) like "%2d"
+        let padded=if(s.len(vs)<2){s.concat(" ";vs)}el{vs};
+        cells=cells.push(padded);
+      };
+      out=out.push(s.join(" ";cells));
+    };
+    io.print(s.join("\n";out));
+    io.print("\n");
+  }el{
+    io.println("no tour");
+  };
+  <0
+};

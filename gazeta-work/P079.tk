@@ -1,0 +1,116 @@
+m=bookcirc;i=io:std.io;i=s:std.str;
+
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+
+f=isfriend(friend:@($bool);n:i64;a:i64;b:i64):bool{
+  <friend.get(a*n+b)
+};
+
+(* dfs returns the completed Hamiltonian path (length n) or empty array on failure. *)
+f=dfs(friend:@($bool);n:i64;owner:i64;visited:@($bool);path:@($i64)):@($i64){
+  if(path.len()==n){
+    if(isfriend(friend;n;path.get(path.len()-1);owner)){ <path };
+    let e0=mut.@($i64);
+    <e0
+  };
+  let last=path.get(path.len()-1);
+  lp(let w=0;w<n;w=w+1){
+    if(!visited.get(w) && isfriend(friend;n;last;w)){
+      let vis=visited.set(w;true);
+      let pth=path.push(w);
+      let res=dfs(friend;n;owner;vis;pth);
+      if(res.len()>0){ <res };
+    }
+  };
+  let e1=mut.@($i64);
+  <e1
+};
+
+f=enemiesin(friend:@($bool);n:i64;grp:@($i64);v:i64;g:i64):i64{
+  let c=mut.0;
+  lp(let u=0;u<n;u=u+1){
+    if(u!=v && grp.get(u)==g){
+      if(!isfriend(friend;n;v;u)){ c=c+1 };
+    }
+  };
+  <c
+};
+
+f=joinints(arr:@($i64)):$str{
+  let out=mut."";
+  lp(let i=0;i<arr.len();i=i+1){
+    if(i>0){ out=s.concat(out;" ") };
+    out=s.concat(out;s.fromint(arr.get(i)));
+  };
+  <out
+};
+
+f=main():i64{
+  let toks=s.fields(readall());
+  let idx=mut.0;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let friend=mut.@($bool);
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=0;j<n;j=j+1){
+      let val=s.toint(toks.get(idx)); idx=idx+1;
+      friend=friend.push(val!=0);
+    };
+  };
+  let owner=s.toint(toks.get(idx)); idx=idx+1;
+  let subgroups=s.toint(toks.get(idx)); idx=idx+1;
+  let pp=s.toint(toks.get(idx)); idx=idx+1;
+
+  (* Part 1: lexicographically smallest Hamiltonian cycle from owner *)
+  let cycle=mut.@($i64);
+  if(n==1){
+    cycle=cycle.push(owner);
+    cycle=cycle.push(owner);
+  }el{
+    let visited=mut.@($bool);
+    lp(let i=0;i<n;i=i+1){ visited=visited.push(false) };
+    visited=visited.set(owner;true);
+    let startpath=mut.@($i64);
+    startpath=startpath.push(owner);
+    let res=dfs(friend;n;owner;visited;startpath);
+    if(res.len()>0){
+      lp(let i=0;i<res.len();i=i+1){ cycle=cycle.push(res.get(i)) };
+      cycle=cycle.push(owner);
+    };
+  };
+
+  (* Part 2: split into subgroups, each person <= pp enemies inside *)
+  let grp=mut.@($i64);
+  lp(let v=0;v<n;v=v+1){ grp=grp.push(v%subgroups) };
+
+  let maxiter=n*n*subgroups+10;
+  lp(let it=0;it<maxiter;it=it+1){
+    let moved=mut.false;
+    lp(let v=0;v<n;v=v+1){
+      let g=grp.get(v);
+      let cnt=enemiesin(friend;n;grp;v;g);
+      if(cnt>pp){
+        let best=mut.(0-1);
+        let bestcnt=mut.1073741824;
+        lp(let g2=0;g2<subgroups;g2=g2+1){
+          if(g2!=g){
+            let c=enemiesin(friend;n;grp;v;g2);
+            if(c<bestcnt){ bestcnt=c; best=g2 };
+          }
+        };
+        if(best!=(0-1) && bestcnt<cnt){
+          grp=grp.set(v;best);
+          moved=true;
+        }
+      }
+    };
+    if(!moved){ br };
+  };
+
+  io.println(joinints(cycle));
+  io.println(joinints(grp));
+  <0
+};

@@ -1,0 +1,55 @@
+m=gridpath;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+# returns best matched length reachable from (i,j) with given visited, having matched `matched` chars
+f=extend(i:i64;j:i64;matched:i64;m:i64;n:i64;grid:@($str);word:$str;wlen:i64;visited:@($bool)):i64{
+  let best=mut.matched;
+  if(matched==wlen){<best};
+  lp(let di=-1;di<=1;di=di+1){
+    lp(let dj=-1;dj<=1;dj=dj+1){
+      if(di==0&&dj==0){}el{
+        let ni=i+di; let nj=j+dj;
+        if(ni>=0&&ni<m&&nj>=0&&nj<n){
+          let vidx=ni*n+nj;
+          let wc=s.slice(word;matched;matched+1);
+          if(!visited.get(vidx)&&grid.get(vidx)==wc){
+            let nv=visited.set(vidx;1==1);
+            let r=extend(ni;nj;matched+1;m;n;grid;word;wlen;nv);
+            if(r>best){best=r};
+          };
+        };
+      };
+    };
+  };
+  <best
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ io.println("0"); <0 };
+  let idx=mut.0;
+  let m=s.toint(toks.get(idx)); idx=idx+1;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let grid=mut.@($str);
+  lp(let k=0;k<m*n;k=k+1){ grid=grid.push(toks.get(idx)); idx=idx+1 };
+  let word=if(idx<toks.len()){toks.get(idx)}el{""};
+  let wlen=s.len(word);
+  let best=mut.0;
+  if(wlen>0){
+    lp(let i=0;i<m;i=i+1){
+      lp(let j=0;j<n;j=j+1){
+        if(grid.get(i*n+j)==s.slice(word;0;1)){
+          let visited=mut.@($bool);
+          lp(let k=0;k<m*n;k=k+1){ visited=visited.push(1==0) };
+          visited=visited.set(i*n+j;1==1);
+          let r=extend(i;j;1;m;n;grid;word;wlen;visited);
+          if(r>best){best=r};
+        };
+      };
+    };
+  };
+  io.println(s.fromint(best));
+  <0
+};

@@ -1,0 +1,155 @@
+m=p075;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=isalpha(c:$str):bool{
+  let lo=(c>="a")&&(c<="z");
+  let up=(c>="A")&&(c<="Z");
+  <(lo||up)
+};
+(* split text into maximal runs of alpha characters *)
+f=splitwords(text:$str):@($str){
+  let words=mut.@($str);
+  let cur=mut."";
+  let n=s.len(text);
+  lp(let i=0;i<n;i=i+1){
+    let c=s.slice(text;i;i+1);
+    if(isalpha(c)){
+      cur=s.concat(cur;c);
+    }el{
+      if(s.len(cur)>0){ words=words.push(cur); cur=""; };
+    };
+  };
+  if(s.len(cur)>0){ words=words.push(cur); };
+  <words
+};
+(* digrams of uppercased word: list of 2-char strings *)
+f=digrams(word:$str):@($str){
+  let up=s.upper(word);
+  let out=mut.@($str);
+  let n=s.len(up);
+  lp(let i=0;i<n-1;i=i+1){
+    out=out.push(s.slice(up;i;i+2));
+  };
+  <out
+};
+(* index of key in keys array, or -1 *)
+f=indexof(keys:@($str);key:$str):i64{
+  let n=keys.len();
+  let res=mut.-1;
+  lp(let i=0;i<n;i=i+1){
+    if(res<0){ if(keys.get(i)==key){ res=i; }; };
+  };
+  <res
+};
+(* score of a word = sum of weights of its digrams that are in top5 *)
+f=scoreword(word:$str;top5:@($str);weights:@($i64)):i64{
+  let ds=digrams(word);
+  let total=mut.0;
+  let n=ds.len();
+  lp(let i=0;i<n;i=i+1){
+    let idx=indexof(top5;ds.get(i));
+    if(idx>=0){ total=total+weights.get(idx); };
+  };
+  <total
+};
+(* does word contain at least one top5 digram *)
+f=hastop(word:$str;top5:@($str)):bool{
+  let ds=digrams(word);
+  let n=ds.len();
+  let found=mut.false;
+  lp(let i=0;i<n;i=i+1){
+    if(!found){ if(indexof(top5;ds.get(i))>=0){ found=true; }; };
+  };
+  <found
+};
+f=main():i64{
+  let text=readall();
+  let words=splitwords(text);
+  (* count digrams: parallel arrays dkeys / dcount *)
+  let dkeys=mut.@($str);
+  let dcount=mut.@($i64);
+  let wn=words.len();
+  lp(let wi=0;wi<wn;wi=wi+1){
+    let ds=digrams(words.get(wi));
+    let dn=ds.len();
+    lp(let di=0;di<dn;di=di+1){
+      let d=ds.get(di);
+      let idx=indexof(dkeys;d);
+      if(idx>=0){ dcount=dcount.set(idx;dcount.get(idx)+1); }
+      el{ dkeys=dkeys.push(d); dcount=dcount.push(1); };
+    };
+  };
+  (* order digrams: count desc, then key asc (byte). insertion sort on parallel arrays. *)
+  let kn=dkeys.len();
+  lp(let a=1;a<kn;a=a+1){
+    let ck=dkeys.get(a);
+    let cc=dcount.get(a);
+    let b=mut.a-1;
+    lp(1==1){
+      if(b<0){br};
+      let bk=dkeys.get(b);
+      let bc=dcount.get(b);
+      (* is (bk,bc) greater than (ck,cc) in sort order? i.e. should come after *)
+      let after=mut.false;
+      if(bc<cc){ after=true; }
+      el{ if(bc==cc){ if(bk>ck){ after=true; }; }; };
+      if(after){
+        dkeys=dkeys.set(b+1;bk);
+        dcount=dcount.set(b+1;bc);
+        b=b-1;
+      }el{br};
+    };
+    dkeys=dkeys.set(b+1;ck);
+    dcount=dcount.set(b+1;cc);
+  };
+  (* top5 keys + their weights *)
+  let top5=mut.@($str);
+  let weights=mut.@($i64);
+  let lim=mut.5;
+  if(kn<5){ lim=kn; };
+  lp(let i=0;i<lim;i=i+1){
+    top5=top5.push(dkeys.get(i));
+    weights=weights.push(dcount.get(i));
+  };
+  (* (b) keep words with a top5 digram, original order *)
+  let kept=mut.@($str);
+  lp(let wi=0;wi<wn;wi=wi+1){
+    let w=words.get(wi);
+    if(hastop(w;top5)){ kept=kept.push(w); };
+  };
+  (* (c) sort kept by score desc, then spelling asc (byte). insertion sort. *)
+  let ordered=mut.kept;
+  let on=ordered.len();
+  lp(let a=1;a<on;a=a+1){
+    let cw=ordered.get(a);
+    let cs=scoreword(cw;top5;weights);
+    let b=mut.a-1;
+    lp(1==1){
+      if(b<0){br};
+      let bw=ordered.get(b);
+      let bs=scoreword(bw;top5;weights);
+      let after=mut.false;
+      if(bs<cs){ after=true; }
+      el{ if(bs==cs){ if(bw>cw){ after=true; }; }; };
+      if(after){
+        ordered=ordered.set(b+1;bw);
+        b=b-1;
+      }el{br};
+    };
+    ordered=ordered.set(b+1;cw);
+  };
+  (* output *)
+  let la=mut."(a)";
+  lp(let i=0;i<top5.len();i=i+1){ la=s.concat(la;s.concat(" ";top5.get(i))); };
+  io.println(la);
+  let lb=mut."(b)";
+  lp(let i=0;i<kept.len();i=i+1){ lb=s.concat(lb;s.concat(" ";kept.get(i))); };
+  io.println(lb);
+  let lc=mut."(c)";
+  lp(let i=0;i<ordered.len();i=i+1){ lc=s.concat(lc;s.concat(" ";ordered.get(i))); };
+  io.println(lc);
+  <0
+};

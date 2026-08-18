@@ -1,0 +1,19 @@
+m=currencyexchange;i=io:std.io;i=s:std.str;i=m:std.math;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let rate=s.tofloat(toks.get(0));
+  let units=s.tofloat(toks.get(1));
+  let available=s.tofloat(toks.get(2));
+  let cost=units*rate;
+  let buyable=available/rate;
+  let bfloor=m.floor(buyable) as i64;
+  io.println(s.format(cost;"%.4f"));
+  io.println(s.format(buyable;"%.4f"));
+  io.println(s.fromint(bfloor));
+  <0
+};

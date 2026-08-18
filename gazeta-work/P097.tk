@@ -1,0 +1,39 @@
+m=allperms;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<1){ <0 };
+  let n=s.toint(toks.get(0));
+  let q=mut.@($i64);
+  lp(let k=0;k<n;k=k+1){ q=q.push(s.toint(toks.get(1+k))) };
+  # p is 1-indexed; store size n+1, p.get(0) unused
+  let p=mut.@($i64);
+  lp(let k=0;k<=n;k=k+1){ p=p.push(0) };
+  let i=mut.1;
+  let mn=mut.q.get(0);
+  let eps=mut.1;
+  lp(let j=1;j<n;j=j+1){
+    if(q.get(j)<mn){
+      p=p.set(q.get(j-1);q.get(i-1));
+      i=j+1;
+      mn=q.get(i-1)
+    }el{
+      eps=0-eps;
+      p=p.set(q.get(j-1);q.get(j))
+    }
+  };
+  p=p.set(q.get(n-1);q.get(i-1));
+  let out=mut."";
+  lp(let k=1;k<=n;k=k+1){
+    if(k>1){ out=cat(out;" ") };
+    out=cat(out;s.fromint(p.get(k)))
+  };
+  io.println(out);
+  io.println(s.fromint(eps));
+  <0
+};

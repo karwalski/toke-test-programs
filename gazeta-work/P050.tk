@@ -1,0 +1,12 @@
+m=vote;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let age=s.toint(toks.get(0));
+  if(age>=18){ io.println("You have the right to vote") }el{ io.println("You do not have the right to vote") };
+  <0
+};

@@ -1,0 +1,25 @@
+m=bankint;i=io:std.io;i=s:std.str;
+f=fmt(x:f64):$str{
+  let raw=s.format(x;"%.4f");
+  let n=mut.s.len(raw);
+  lp(n>0){ if(s.slice(raw;n-1;n)=="0"){n=n-1}el{br} };
+  if(n>0){ if(s.slice(raw;n-1;n)=="."){n=n-1} };
+  let r=mut.s.slice(raw;0;n);
+  if(r==""){r="0"};
+  if(r=="-0"){r="0"};
+  <r
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let d=s.tofloat(toks.get(0));
+  let c=s.tofloat(toks.get(1));
+  let n=s.tofloat(toks.get(2));
+  let interest=c*(d/100.0)*(n/365.0);
+  io.println(fmt(interest));
+  <0
+};

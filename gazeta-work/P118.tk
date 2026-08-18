@@ -1,0 +1,200 @@
+m=beadstr;i=io:std.io;i=s:std.str;
+let memokeys=mut.@($str);
+let memovals=mut.@($i64);
+let p2result=mut.@($str);
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=popcount(x:i64):i64{
+  let c=mut.0; let v=mut.x;
+  lp(v>0){ c=c+(v%2); v=v/2 };
+  <c
+};
+f=pow2(k:i64):i64{
+  let r=mut.1;
+  lp(let i=0;i<k;i=i+1){ r=r*2 };
+  <r
+};
+f=maskstr(mask:i64;length:i64):$str{
+  let r=mut."";
+  lp(let i=0;i<length;i=i+1){
+    let bit=(mask/pow2(i))%2;
+    r=s.concat(r;if(bit==1){"W"}el{"B"});
+  };
+  <r
+};
+f=inset(arr:@($str);x:$str):bool{
+  lp(let i=0;i<arr.len();i=i+1){ if(arr.get(i)==x){ <true } };
+  <false
+};
+f=disp(x:$str):$str{
+  if(x==""){ <"\"\"" };
+  <x
+};
+(* sort array of strings by (len, lexical) via selection sort -- returns new *)
+f=sortkey(arr:@($str)):@($str){
+  let a=mut.arr;
+  let n=a.len();
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=i+1;j<n;j=j+1){
+      let x=a.get(i); let y=a.get(j);
+      let swap=mut.false;
+      if(s.len(y)<s.len(x)){ swap=true }el{
+        if(s.len(y)==s.len(x)&&y<x){ swap=true };
+      };
+      if(swap){ a=a.set(i;y); a=a.set(j;x) };
+    };
+  };
+  <a
+};
+f=countw(w:$str):i64{
+  let c=mut.0;
+  lp(let i=0;i<s.len(w);i=i+1){ if(s.slice(w;i;i+1)=="W"){ c=c+1 } };
+  <c
+};
+f=countb(w:$str):i64{
+  let c=mut.0;
+  lp(let i=0;i<s.len(w);i=i+1){ if(s.slice(w;i;i+1)=="B"){ c=c+1 } };
+  <c
+};
+f=balanced(w:$str):bool{
+  <countw(w)==countb(w)
+};
+f=buildtarget(ll:i64):@($str){
+  let target=mut.@($str);
+  lp(let length=0;length<=ll;length=length+2){
+    let nn=length/2;
+    let lim=pow2(length);
+    lp(let mask=0;mask<lim;mask=mask+1){
+      if(popcount(mask)==nn){
+        let str=maskstr(mask;length);
+        if(inset(target;str)){}el{ target=target.push(str) };
+      };
+    };
+  };
+  <target
+};
+f=part1(ll:i64):i64{
+  let reached=mut.@("");
+  let changed=mut.true;
+  lp(changed){
+    changed=false;
+    let cur=mut.reached;
+    let new=mut.@($str);
+    (* team A wrap *)
+    lp(let i=0;i<cur.len();i=i+1){
+      let str=cur.get(i);
+      if(s.len(str)+2<=ll){
+        let w1=s.concat(s.concat("W";str);"B");
+        let w2=s.concat(s.concat("B";str);"W");
+        if(inset(new;w1)){}el{ new=new.push(w1) };
+        if(inset(new;w2)){}el{ new=new.push(w2) };
+      };
+    };
+    (* team B join *)
+    lp(let i=0;i<cur.len();i=i+1){
+      let sstr=cur.get(i);
+      lp(let j=0;j<cur.len();j=j+1){
+        let tstr=cur.get(j);
+        if(s.len(sstr)>0&&s.len(tstr)>0&&s.len(sstr)+s.len(tstr)<=ll){
+          let c1=s.concat(sstr;tstr);
+          let c2=s.concat(tstr;sstr);
+          if(inset(new;c1)){}el{ new=new.push(c1) };
+          if(inset(new;c2)){}el{ new=new.push(c2) };
+        };
+      };
+    };
+    let before=reached.len();
+    lp(let i=0;i<new.len();i=i+1){
+      if(inset(reached;new.get(i))){}el{ reached=reached.push(new.get(i)) };
+    };
+    if(reached.len()!=before){ changed=true };
+  };
+  let target=buildtarget(ll);
+  (* status: reached == target -> same size and all reached in target *)
+  let status=mut."VERIFIED";
+  if(reached.len()!=target.len()){ status="MISMATCH" }el{
+    lp(let i=0;i<reached.len();i=i+1){
+      if(inset(target;reached.get(i))){}el{ status="MISMATCH" };
+    };
+  };
+  io.println(s.concat("L=";s.fromint(ll)));
+  let srt=sortkey(reached);
+  lp(let i=0;i<srt.len();i=i+1){ io.println(disp(srt.get(i))) };
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat("reachable=";s.fromint(reached.len()));" target=");s.fromint(target.len()));" status=");status));
+  <0
+};
+(* part2 recursion accumulates into global result set *)
+f=recurse2(str:$str;k:i64):i64{
+  if(k==0){
+    if(inset(p2result;str)){}el{ p2result=p2result.push(str) };
+    <0
+  };
+  recurse2(s.concat(s.concat("W";str);"B");k-1);
+  recurse2(s.concat(s.concat("B";str);"W");k-1);
+  <0
+};
+f=part2(nn:i64):i64{
+  p2result=@($str);
+  recurse2("";nn);
+  io.println(s.concat("n=";s.fromint(nn)));
+  let srt=sortkey(p2result);
+  lp(let i=0;i<srt.len();i=i+1){ io.println(disp(srt.get(i))) };
+  io.println(s.concat("count=";s.fromint(srt.len())));
+  <0
+};
+f=memoget(w:$str):i64{
+  lp(let i=0;i<memokeys.len();i=i+1){ if(memokeys.get(i)==w){ <i } };
+  <(0-1)
+};
+f=countfn(w:$str):i64{
+  if(w==""){ <1 };
+  let mi=memoget(w);
+  if(mi>=0){ <memovals.get(mi) };
+  let total=mut.0;
+  let ln=s.len(w);
+  (* A-move *)
+  if(s.slice(w;0;1)!=s.slice(w;ln-1;ln)){
+    total=total+countfn(s.slice(w;1;ln-1));
+  };
+  (* B-move balanced splits *)
+  lp(let i=1;i<ln;i=i+1){
+    let u=s.slice(w;0;i);
+    let v=s.slice(w;i;ln);
+    if(balanced(u)&&balanced(v)){
+      total=total+countfn(u)*countfn(v);
+    };
+  };
+  memokeys=memokeys.push(w);
+  memovals=memovals.push(total);
+  <total
+};
+f=part3(nn:i64):i64{
+  let length=2*nn;
+  let result=mut.@($str);
+  let lim=pow2(length);
+  lp(let mask=0;mask<lim;mask=mask+1){
+    if(popcount(mask)==nn){
+      let str=maskstr(mask;length);
+      if(countfn(str)==1){ result=result.push(str) };
+    };
+  };
+  io.println(s.concat("n=";s.fromint(nn)));
+  let srt=sortkey(result);
+  lp(let i=0;i<srt.len();i=i+1){ io.println(disp(srt.get(i))) };
+  io.println(s.concat("count=";s.fromint(srt.len())));
+  <0
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let task=s.toint(toks.get(0));
+  let param=s.toint(toks.get(1));
+  if(task==1){ part1(param) }el{
+    if(task==2){ part2(param) }el{
+      if(task==3){ part3(param) };
+    };
+  };
+  <0
+};

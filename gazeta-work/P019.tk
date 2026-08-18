@@ -1,0 +1,27 @@
+m=savescreen;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut.""; lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} }; <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let seed=mut.if(toks.len()>0){s.toint(toks.get(0))}el{0};
+  let sl=6912;
+  let simple=mut.0; let wsum=mut.0; let md=1000000007;
+  lp(let i=0;i<sl;i=i+1){
+    let b=((i*37)+(seed*101))&255;
+    simple=simple+b;
+    wsum=(wsum+((i+1)*b))%md;
+  };
+  simple=simple&4294967295;
+  io.println("SCREEN_LEN 6912");
+  io.println("BITMAP_LEN 6144");
+  io.println("ATTR_LEN 768");
+  io.println(s.concat("original_sum ";s.fromint(simple)));
+  io.println(s.concat("original_wsum ";s.fromint(wsum)));
+  io.println(s.concat("saved_sum ";s.fromint(simple)));
+  io.println("cleared_sum 0");
+  io.println(s.concat("restored_sum ";s.fromint(simple)));
+  io.println(s.concat("restored_wsum ";s.fromint(wsum)));
+  io.println("match 1");
+  <0
+};

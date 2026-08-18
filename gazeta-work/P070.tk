@@ -1,0 +1,25 @@
+m=conjpow;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=tval(n:i64):i64{
+  if(n==0){<2};
+  if(n==1){<4};
+  let prev2=mut.2;
+  let prev1=mut.4;
+  lp(let i=2;i<=n;i=i+1){
+    let cur=4*prev1-prev2;
+    prev2=prev1;
+    prev1=cur;
+  };
+  <prev1
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let n=s.toint(toks.get(0));
+  io.println(s.fromint(tval(n)));
+  <0
+};

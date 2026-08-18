@@ -1,0 +1,74 @@
+m=partition;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let n=s.toint(toks.get(0));
+  let coins=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){ coins=coins.push(s.toint(toks.get(1+i))) };
+  let total=mut.0;
+  lp(let i=0;i<n;i=i+1){ total=total+coins.get(i) };
+  if(total%2!=0){
+    io.println("IMPOSSIBLE");
+    io.println("Charity receives the estate.");
+    <0
+  };
+  let target=total/2;
+  let reachable=mut.@($i64);
+  lp(let z=0;z<=target;z=z+1){ reachable=reachable.push(0) };
+  reachable=reachable.set(0;1);
+  let chosen=mut.@($i64);
+  lp(let z=0;z<=target;z=z+1){ chosen=chosen.push(0-1) };
+  lp(let i=0;i<n;i=i+1){
+    if(reachable.get(target)==0){
+      let c=coins.get(i);
+      lp(let sv=target;sv>=c;sv=sv-1){
+        if(reachable.get(sv-c)==1&&reachable.get(sv)==0){
+          reachable=reachable.set(sv;1);
+          chosen=chosen.set(sv;i);
+        };
+      };
+    };
+  };
+  if(reachable.get(target)==0){
+    io.println("IMPOSSIBLE");
+    io.println("Charity receives the estate.");
+    <0
+  };
+  let inpart1=mut.@($i64);
+  lp(let z=0;z<n;z=z+1){ inpart1=inpart1.push(0) };
+  let sv=mut.target;
+  lp(sv>0){
+    let i=chosen.get(sv);
+    inpart1=inpart1.set(i;1);
+    sv=sv-coins.get(i);
+  };
+  let p1=mut."";
+  let sum1=mut.0;
+  let first1=mut.1==1;
+  let p2=mut."";
+  let sum2=mut.0;
+  let first2=mut.1==1;
+  lp(let i=0;i<n;i=i+1){
+    let cv=coins.get(i);
+    if(inpart1.get(i)==1){
+      if(!first1){ p1=s.concat(p1;" ") };
+      first1=1==0;
+      p1=s.concat(p1;s.fromint(cv));
+      sum1=sum1+cv;
+    }el{
+      if(!first2){ p2=s.concat(p2;" ") };
+      first2=1==0;
+      p2=s.concat(p2;s.fromint(cv));
+      sum2=sum2+cv;
+    };
+  };
+  io.println("POSSIBLE");
+  io.println(s.concat(s.concat(s.concat("Brother 1: ";p1);" = ");s.fromint(sum1)));
+  io.println(s.concat(s.concat(s.concat("Brother 2: ";p2);" = ");s.fromint(sum2)));
+  <0
+};

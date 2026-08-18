@@ -1,0 +1,24 @@
+m=roadmarker;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<5){ <0 };
+  let km=s.toint(toks.get(0));
+  let m=s.toint(toks.get(1));
+  let cm=s.toint(toks.get(2));
+  let mm=s.toint(toks.get(3));
+  let d=s.toint(toks.get(4));
+  let total=mut.(((km*1000+m)*100+cm)*10+mm)+d;
+  let outmm=total%10;
+  total=total/10;
+  let outcm=total%100;
+  total=total/100;
+  let outm=total%1000;
+  let outkm=total/1000;
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.fromint(outkm);" ");s.fromint(outm));" ");s.fromint(outcm));" ");s.fromint(outmm)));
+  <0
+};

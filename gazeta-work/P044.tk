@@ -1,0 +1,116 @@
+m=matrix5;i=io:std.io;i=s:std.str;
+f=dx(m:i64):i64{
+  if(m==0){<0}; if(m==1){<0}; if(m==2){<3}; if(m==3){<-3};
+  if(m==4){<2}; if(m==5){<2}; if(m==6){<-2}; <-2
+};
+f=dy(m:i64):i64{
+  if(m==0){<3}; if(m==1){<-3}; if(m==2){<0}; if(m==3){<0};
+  if(m==4){<2}; if(m==5){<-2}; if(m==6){<2}; <-2
+};
+f=inside(v:i64):bool{
+  <v>=0&&v<5
+};
+f=pad3(n:i64):$str{
+  let out=mut.s.fromint(n);
+  lp(s.len(out)<3){ out=s.concat(" ";out) };
+  <out
+};
+f=hascomplete(g:@($i64)):bool{
+  lp(let i=0;i<25;i=i+1){ if(g.get(i)==25){<1==1} };
+  <1==0
+};
+(* filla returns a completed grid (contains 25) on success, else grid with no 25 *)
+f=filla(g:@($i64);x:i64;y:i64;k:i64):@($i64){
+  let grid=mut.g.set(x*5+y;k);
+  if(k==25){ <grid };
+  lp(let m=0;m<8;m=m+1){
+    let nx=x+dx(m);
+    let ny=y+dy(m);
+    if(inside(nx)&&inside(ny)&&grid.get(nx*5+ny)==0){
+      let res=filla(grid;nx;ny;k+1);
+      if(hascomplete(res)){ <res };
+    };
+  };
+  <g
+};
+(* countfrom returns number of full tours starting at (x,y) *)
+f=countfrom(g:@($i64);x:i64;y:i64;k:i64):i64{
+  let grid=mut.g.set(x*5+y;k);
+  if(k==25){ <1 };
+  let cnt=mut.0;
+  lp(let m=0;m<8;m=m+1){
+    let nx=x+dx(m);
+    let ny=y+dy(m);
+    if(inside(nx)&&inside(ny)&&grid.get(nx*5+ny)==0){
+      cnt=cnt+countfrom(grid;nx;ny;k+1);
+    };
+  };
+  <cnt
+};
+f=emptygrid():@($i64){
+  let g=mut.@($i64);
+  lp(let i=0;i<25;i=i+1){ g=g.push(0) };
+  <g
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=parta(x0:i64;y0:i64):i64{
+  let grid=filla(emptygrid();x0;y0;1);
+  let border=mut."+";
+  lp(let j=0;j<5;j=j+1){ border=s.concat(border;"----+") };
+  io.println(border);
+  lp(let i=0;i<5;i=i+1){
+    let row=mut."|";
+    lp(let j=0;j<5;j=j+1){
+      row=s.concat(row;s.concat(pad3(grid.get(i*5+j));" |"));
+    };
+    io.println(row);
+    io.println(border);
+  };
+  <0
+};
+f=partb():i64{
+  let b=mut.emptygrid();
+  let r0=countfrom(emptygrid();0;0;1);
+  b=b.set(0;r0); b=b.set(4;r0); b=b.set(24;r0);
+  let r1=countfrom(emptygrid();0;1;1);
+  b=b.set(1;r1); b=b.set(3;r1); b=b.set(9;r1); b=b.set(19;r1);
+  let r2=countfrom(emptygrid();2;2;1);
+  b=b.set(12;r2);
+  let r3=countfrom(emptygrid();1;1;1);
+  b=b.set(6;r3); b=b.set(8;r3); b=b.set(18;r3);
+  let r4=countfrom(emptygrid();0;2;1);
+  b=b.set(2;r4); b=b.set(14;r4);
+  let r5=countfrom(emptygrid();1;2;1);
+  b=b.set(7;r5); b=b.set(13;r5);
+  let total=mut.0;
+  lp(let i=0;i<5;i=i+1){
+    let prefix=mut."";
+    let np=1+5*i;
+    lp(let p=0;p<np;p=p+1){ prefix=s.concat(prefix;" ") };
+    let vals=mut."";
+    lp(let j=i;j<5;j=j+1){
+      if(j>i){ vals=s.concat(vals;"  ") };
+      vals=s.concat(vals;pad3(b.get(i*5+j)));
+      total=total+b.get(i*5+j);
+    };
+    io.println(s.concat(prefix;vals));
+  };
+  io.println(s.concat("total= ";s.fromint(total)));
+  <0
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let mode=s.toint(toks.get(0));
+  if(mode==1){
+    let x0=s.toint(toks.get(1));
+    let y0=s.toint(toks.get(2));
+    parta(x0-1;y0-1);
+  }el{
+    partb();
+  };
+  <0
+};

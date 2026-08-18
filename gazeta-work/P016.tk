@@ -1,0 +1,45 @@
+m=nthroot;i=io:std.io;i=s:std.str;i=math:std.math;
+f=readall():$str{
+  let all=mut.""; lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} }; <all
+};
+f=an(n:f64):f64{ <math.exp(math.ln(n)/n) };
+f=main():i64{
+  let toks=s.fields(readall());
+  io.println("behaviour of a(n) = n^(1/n)");
+  let p=mut.1;
+  lp(let k=1;k<8;k=k+1){
+    p=p*10;
+    io.println(s.concat(s.concat(s.concat("a(";s.fromint(p));") = ");s.format(an(p as f64);"%.7f")));
+  };
+  let a3=an(3.0);
+  lp(let ti=0;ti<toks.len();ti=ti+1){
+    let tok=toks.get(ti);
+    let e=s.tofloat(tok);
+    if(e<=0.0){
+      io.println(s.concat(s.concat("epsilon = ";tok);": invalid tolerance, re-prompt"));
+    }el{
+      let target=1.0+e;
+      if(a3<target){
+        io.println(s.concat(s.concat(s.concat(s.concat(s.concat("epsilon = ";tok);": rank 2, all terms lie in (1 - ");tok);", 1 + ");s.concat(tok;")")));
+      }el{
+        let lo=mut.3; let hi=mut.(0-1); let pw=mut.1;
+        lp(let z=1;z<19;z=z+1){
+          pw=pw*10;
+          if(an(pw as f64)<target){ hi=pw; br };
+        };
+        if(hi<0){
+          io.println(s.concat(s.concat("epsilon = ";tok);": no crossover within 10^18"));
+        }el{
+          lp(hi-lo>1){
+            let mid=(lo+hi)/2;
+            if(an(mid as f64)<target){ hi=mid }el{ lo=mid };
+          };
+          let r=hi;
+          let rs=s.fromint(r);
+          io.println(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat(s.concat("epsilon = ";tok);": boundary rank ");rs);", all terms from n = ");rs);" lie in (1 - ");tok);", 1 + ");s.concat(tok;")")));
+        }
+      }
+    }
+  };
+  <0
+};

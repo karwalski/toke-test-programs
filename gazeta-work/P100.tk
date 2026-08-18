@@ -1,0 +1,69 @@
+m=melodyviz;i=io:std.io;i=s:std.str;i=math:std.math;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=freqscaled(code:i64):i64{
+  let f=mut.0.0;
+  if(code<=6){ f=32767.0 }el{
+    f=36.8*math.pow(2.0;(code-6) as f64/12.0)
+  };
+  <math.floor(f*10.0+0.5) as i64
+};
+f=colof(code:i64):i64{
+  let r=mut.0;
+  if(code==28){r=1}el{if(code==30){r=4}el{if(code==32){r=7}el{if(code==33){r=10}el{
+  if(code==35){r=13}el{if(code==37){r=17}el{if(code==39){r=20}el{if(code==40){r=23}el{
+  if(code==42){r=26}el{if(code==44){r=29}el{if(code==45){r=29}el{if(code==46){r=32}el{
+  if(code==47){r=35}el{if(code==49){r=39}el{if(code==51){r=42}el{if(code==52){r=45}el{
+  if(code==54){r=48}el{if(code==56){r=59}el{if(code==57){r=54}el{if(code==59){r=57}el{
+  if(code==61){r=61}el{if(code==63){r=64}el{r=0}}}}}}}}}}}}}}}}}}}}}};
+  <r
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let vals=mut.@($i64);
+  lp(let k=0;k<toks.len();k=k+1){ vals=vals.push(s.toint(toks.get(k))) };
+  let out=mut."";
+  let notes=mut.0;
+  let rests=mut.0;
+  let ticks=mut.0;
+  let i=mut.0;
+  let pairs=mut.0;
+  let first=mut.true;
+  lp(i+1<vals.len() && pairs<1000000){
+    let j=vals.get(i);
+    let k=vals.get(i+1);
+    i=i+2;
+    pairs=pairs+1;
+    if(j== 0-1){ br };
+    let scv=freqscaled(j);
+    let fint=scv/10;
+    let fdec=scv%10;
+    let freqstr=cat(cat(s.fromint(fint);".");s.fromint(fdec));
+    let line=mut."";
+    if(j>6){
+      let col=colof(j);
+      let a=cat(cat("NOTE ";s.fromint(j));" ");
+      let b=cat(cat(s.fromint(k);" ");freqstr);
+      line=cat(cat(a;b);cat(" ";s.fromint(col)));
+      notes=notes+1
+    }el{
+      let a=cat(cat("REST ";s.fromint(j));" ");
+      let b=cat(cat(s.fromint(k);" ");freqstr);
+      line=cat(cat(a;b);" 0");
+      rests=rests+1
+    };
+    if(first){ out=line; first=false }el{ out=cat(cat(out;"
+");line) };
+    ticks=ticks+k
+  };
+  let ta=cat(cat("TOTAL notes=";s.fromint(notes));" rests=");
+  let total=cat(cat(cat(ta;s.fromint(rests));" ticks=");s.fromint(ticks));
+  if(first){ out=total }el{ out=cat(cat(out;"
+");total) };
+  io.println(out);
+  <0
+};

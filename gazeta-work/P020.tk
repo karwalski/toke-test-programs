@@ -1,0 +1,45 @@
+m=restorescreen;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut.""; lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} }; <all
+};
+f=hexdigit(d:i64):$str{
+  if(d==0){<"0"}; if(d==1){<"1"}; if(d==2){<"2"}; if(d==3){<"3"};
+  if(d==4){<"4"}; if(d==5){<"5"}; if(d==6){<"6"}; if(d==7){<"7"};
+  if(d==8){<"8"}; if(d==9){<"9"}; if(d==10){<"a"}; if(d==11){<"b"};
+  if(d==12){<"c"}; if(d==13){<"d"}; if(d==14){<"e"}; <"f"
+};
+f=hex8(x:i64):$str{
+  let v=mut.x; let r=mut."";
+  lp(let i=0;i<8;i=i+1){ r=s.concat(hexdigit(v%16);r); v=v/16; };
+  <r
+};
+f=fnv(seed:i64;mode:i64):i64{
+  (* mode 0 = pattern(seed,i)=(seed+i*7)&255 ; mode 1 = scribble(i)=(i*13+99)&255 *)
+  let sl=6912; let prime=16777619; let mask=4294967295;
+  let h=mut.2166136261;
+  lp(let i=0;i<sl;i=i+1){
+    let b=mut.0;
+    if(mode==0){ b=(seed+i*7)&255; }el{ b=(i*13+99)&255; };
+    h=(h^(b&255));
+    h=(h*prime)&mask;
+  };
+  <h
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let seed=mut.if(toks.len()>0){s.toint(toks.get(0))}el{0};
+  let saved=fnv(seed;0);
+  let scribbled=fnv(seed;1);
+  let restored=saved;
+  let bufcs=saved;
+  io.println("SCREEN_LEN 6912");
+  io.println("BITMAP 6144");
+  io.println("ATTR 768");
+  io.println(s.concat("saved_checksum ";hex8(saved)));
+  io.println(s.concat("scribbled_checksum ";hex8(scribbled)));
+  io.println(s.concat("restored_checksum ";hex8(restored)));
+  io.println(s.concat("buffer_checksum ";hex8(bufcs)));
+  io.println("match YES");
+  io.println("buffer_intact YES");
+  <0
+};

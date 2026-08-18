@@ -1,0 +1,184 @@
+m=abswaps;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=charat(b:$str;i:i64):$str{ <s.slice(b;i;i+1) };
+f=findgap(b:$str):i64{
+  let res=mut.0-1;
+  lp(let i=0;i<s.len(b)-1;i=i+1){
+    if(res<0){ if(charat(b;i)=="_"&&charat(b;i+1)=="_"){ res=i } };
+  };
+  <res
+};
+f=isfinal(b:$str):bool{
+  let seenb=mut.1==0;
+  let ok=mut.1==1;
+  lp(let i=0;i<s.len(b);i=i+1){
+    let c=charat(b;i);
+    if(c=="B"){ seenb=1==1 }
+    el{ if(c=="A"){ if(seenb){ ok=1==0 } } };
+  };
+  <ok
+};
+f=applymove(b:$str;p:i64):$str{
+  let i=findgap(b);
+  let out=mut."";
+  lp(let k=0;k<s.len(b);k=k+1){
+    let ch=mut.charat(b;k);
+    if(k==i){ ch=charat(b;p) };
+    if(k==i+1){ ch=charat(b;p+1) };
+    if(k==p){ ch=charat(b;i) };
+    if(k==p+1){ ch=charat(b;i+1) };
+    out=s.concat(out;ch);
+  };
+  <out
+};
+f=legalmove(b:$str;p:i64):bool{
+  if(p<0||p+1>=s.len(b)){ <1==0 };
+  <charat(b;p)!="_"&&charat(b;p+1)!="_"
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let mode=s.toint(toks.get(0));
+  # toks.get(1) is n (unused directly); board is toks.get(2)
+  let board=toks.get(2);
+  let out=mut.@($str);
+  if(mode==1){
+    let k=s.toint(toks.get(3));
+    let b=mut.board;
+    let bad=mut.1==0;
+    lp(let t=0;t<k;t=t+1){
+      if(!bad){
+        let p=s.toint(toks.get(4+t));
+        if(!legalmove(b;p)){ out=out.push("ILLEGAL"); bad=1==1 }
+        el{ b=applymove(b;p); out=out.push(b) };
+      };
+    };
+  }
+  el{ if(mode==2){
+    # DFS
+    let found=mut.1==0;
+    let path=mut.@($i64);
+    if(isfinal(board)){ found=1==1 }
+    el{
+      let visited=mut.@($str);
+      visited=visited.push(board);
+      # explicit stack: parallel arrays
+      let stst=mut.@($str);            # state at frame
+      let stcur=mut.@($i64);           # cursor into successors
+      stst=stst.push(board); stcur=stcur.push(0);
+      lp(1==1){
+        if(stst.len()==0){ br };
+        if(found){ br };
+        let fi=stst.len()-1;
+        let cur=stst.get(fi);
+        let ci=mut.stcur.get(fi);
+        # advance cursor to next legal successor position >= ci
+        let n=s.len(cur);
+        let picked=mut.0-1;
+        lp(let p=ci;p<n-1;p=p+1){
+          if(picked<0){
+            if(charat(cur;p)!="_"&&charat(cur;p+1)!="_"){ picked=p };
+          };
+        };
+        if(picked<0){
+          # exhausted this frame
+          stst=stst.slice(0;fi);
+          stcur=stcur.slice(0;fi);
+          if(path.len()>0){ path=path.slice(0;path.len()-1) };
+        }
+        el{
+          stcur=stcur.set(fi;picked+1);
+          let s2=applymove(cur;picked);
+          # visited check
+          let seen=mut.1==0;
+          lp(let vi=0;vi<visited.len();vi=vi+1){
+            if(visited.get(vi)==s2){ seen=1==1 };
+          };
+          if(!seen){
+            if(isfinal(s2)){
+              path=path.push(picked);
+              found=1==1;
+            }
+            el{
+              visited=visited.push(s2);
+              path=path.push(picked);
+              stst=stst.push(s2); stcur=stcur.push(0);
+            };
+          };
+        };
+      };
+    };
+    if(!found){ out=out.push("UNREACHABLE") }
+    el{
+      out=out.push(s.fromint(path.len()));
+      let parts=mut.@($str);
+      lp(let x=0;x<path.len();x=x+1){ parts=parts.push(s.fromint(path.get(x))) };
+      out=out.push(s.join(" ";parts));
+      # apply seq
+      let fin=mut.board;
+      lp(let x=0;x<path.len();x=x+1){ fin=applymove(fin;path.get(x)) };
+      out=out.push(fin);
+    };
+  }
+  el{ if(mode==3){
+    # BFS
+    let states=mut.@($str);
+    let par=mut.@($i64);   # parent index
+    let pmv=mut.@($i64);   # move used from parent
+    states=states.push(board); par=par.push(0-1); pmv=pmv.push(0-1);
+    let head=mut.0;
+    let goal=mut.0-1;
+    lp(1==1){
+      if(head>=states.len()){ br };
+      if(goal>=0){ br };
+      let cur=states.get(head);
+      if(isfinal(cur)){ goal=head }
+      el{
+        let n=s.len(cur);
+        lp(let p=0;p<n-1;p=p+1){
+          if(charat(cur;p)!="_"&&charat(cur;p+1)!="_"){
+            let s2=applymove(cur;p);
+            let seen=mut.1==0;
+            lp(let vi=0;vi<states.len();vi=vi+1){
+              if(states.get(vi)==s2){ seen=1==1 };
+            };
+            if(!seen){
+              states=states.push(s2); par=par.push(head); pmv=pmv.push(p);
+            };
+          };
+        };
+        head=head+1;
+      };
+    };
+    if(goal<0){ out=out.push("UNREACHABLE") }
+    el{
+      # reconstruct moves
+      let rev=mut.@($i64);
+      let cur=mut.goal;
+      lp(1==1){
+        if(par.get(cur)<0){ br };
+        rev=rev.push(pmv.get(cur));
+        cur=par.get(cur);
+      };
+      let m=rev.len();
+      out=out.push(s.fromint(m));
+      let parts=mut.@($str);
+      lp(let x=m-1;x>=0;x=x-1){ parts=parts.push(s.fromint(rev.get(x))) };
+      out=out.push(s.join(" ";parts));
+      # apply seq to get final board
+      let fin=mut.board;
+      lp(let x=m-1;x>=0;x=x-1){ fin=applymove(fin;rev.get(x)) };
+      out=out.push(fin);
+    };
+  } } };
+  # emit joined by newline, trailing newline if nonempty
+  if(out.len()>0){
+    io.print(s.join("\n";out));
+    io.print("\n");
+  };
+  <0
+};

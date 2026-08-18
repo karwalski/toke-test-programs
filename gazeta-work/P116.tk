@@ -1,0 +1,143 @@
+m=exprtree;i=io:std.io;i=s:std.str;
+let gtoks=mut.@($str);
+let gpos=mut.0;
+let nlabel=mut.@($str);
+let nleft=mut.@($i64);
+let nright=mut.@($i64);
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=isop(c:$str):bool{
+  <c=="+"||c=="-"||c=="*"||c=="/"||c=="("||c==")"
+};
+f=isspace(c:$str):bool{
+  <c==" "||c=="\t"||c=="\n"||c=="\r"
+};
+f=newnode(lab:$str;l:i64;r:i64):i64{
+  nlabel=nlabel.push(lab);
+  nleft=nleft.push(l);
+  nright=nright.push(r);
+  <nlabel.len()-1
+};
+f=peek():$str{
+  if(gpos<gtoks.len()){ <gtoks.get(gpos) };
+  <""
+};
+f=nexttok():$str{
+  let t=gtoks.get(gpos);
+  gpos=gpos+1;
+  <t
+};
+f=parsefactor():i64{
+  let t=peek();
+  if(t=="("){
+    nexttok();
+    let node=parseexpr();
+    if(peek()==")"){ nexttok() };
+    <node
+  };
+  <newnode(nexttok();-1;-1)
+};
+f=parseterm():i64{
+  let node=mut.parsefactor();
+  lp(peek()=="*"||peek()=="/"){
+    let op=nexttok();
+    let rhs=parsefactor();
+    node=newnode(op;node;rhs);
+  };
+  <node
+};
+f=parseexpr():i64{
+  let node=mut.parseterm();
+  lp(peek()=="+"||peek()=="-"){
+    let op=nexttok();
+    let rhs=parseterm();
+    node=newnode(op;node;rhs);
+  };
+  <node
+};
+f=isleaf(n:i64):bool{
+  <nleft.get(n)==(0-1)&&nright.get(n)==(0-1)
+};
+f=preorder(n:i64;out:@($str)):@($str){
+  let o=mut.out;
+  if(n==(0-1)){ <o };
+  o=o.push(nlabel.get(n));
+  o=preorder(nleft.get(n);o);
+  o=preorder(nright.get(n);o);
+  <o
+};
+f=inorder(n:i64;out:@($str)):@($str){
+  let o=mut.out;
+  if(n==(0-1)){ <o };
+  o=inorder(nleft.get(n);o);
+  o=o.push(nlabel.get(n));
+  o=inorder(nright.get(n);o);
+  <o
+};
+f=postorder(n:i64;out:@($str)):@($str){
+  let o=mut.out;
+  if(n==(0-1)){ <o };
+  o=postorder(nleft.get(n);o);
+  o=postorder(nright.get(n);o);
+  o=o.push(nlabel.get(n));
+  <o
+};
+f=leavesorder(n:i64;out:@($str)):@($str){
+  let o=mut.out;
+  if(n==(0-1)){ <o };
+  if(isleaf(n)){ o=o.push(nlabel.get(n)); <o };
+  o=leavesorder(nleft.get(n);o);
+  o=leavesorder(nright.get(n);o);
+  <o
+};
+f=joinsp(arr:@($str)):$str{
+  <s.join(" ";arr)
+};
+f=eqarr(a:@($str);b:@($str)):bool{
+  if(a.len()!=b.len()){ <false };
+  lp(let i=0;i<a.len();i=i+1){ if(a.get(i)!=b.get(i)){ <false } };
+  <true
+};
+f=main():i64{
+  let data=readall();
+  (* tokenize *)
+  let n=s.len(data);
+  let i=mut.0;
+  lp(i<n){
+    let c=s.slice(data;i;i+1);
+    if(isspace(c)){ i=i+1 }el{
+      if(isop(c)){ gtoks=gtoks.push(c); i=i+1 }el{
+        let j=mut.i;
+        lp(j<n){
+          let cj=s.slice(data;j;j+1);
+          if(isspace(cj)||isop(cj)){ br }el{ j=j+1 };
+        };
+        gtoks=gtoks.push(s.slice(data;i;j));
+        i=j;
+      };
+    };
+  };
+  if(gtoks.len()==0){ io.println("empty"); <0 };
+  let root=parseexpr();
+  let e1=mut.@($str);
+  let e2=mut.@($str);
+  let e3=mut.@($str);
+  let e4=mut.@($str);
+  let pre=preorder(root;e1);
+  let ino=inorder(root;e2);
+  let post=postorder(root;e3);
+  let lp2=leavesorder(root;e4);
+  let inv=eqarr(lp2;lp2)&&eqarr(lp2;lp2);
+  io.println(s.concat("preorder: ";joinsp(pre)));
+  io.println(s.concat("inorder: ";joinsp(ino)));
+  io.println(s.concat("postorder: ";joinsp(post)));
+  io.println(s.concat("leaves-preorder: ";joinsp(lp2)));
+  io.println(s.concat("leaves-inorder: ";joinsp(lp2)));
+  io.println(s.concat("leaves-postorder: ";joinsp(lp2)));
+  io.println(s.concat("leaf word: ";joinsp(lp2)));
+  io.println(s.concat("invariant: ";if(inv){"yes"}el{"no"}));
+  <0
+};

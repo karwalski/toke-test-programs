@@ -1,0 +1,32 @@
+m=powtwo;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=powtwo(n:i64):i64{
+  let v=mut.1;
+  lp(let i=0;i<n;i=i+1){ v=v*2 };
+  <v
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let lo=mut.30;
+  let hi=mut.50;
+  if(toks.len()>=2){
+    lo=s.toint(toks.get(0));
+    hi=s.toint(toks.get(1));
+  };
+  if(hi<lo){<0};
+  if(hi-lo>1000){hi=lo+1000};
+  let out=mut."";
+  let value=mut.powtwo(lo);
+  let first=mut.true;
+  lp(let n=lo;n<=hi;n=n+1){
+    if(first){first=false}el{out=s.concat(out;"\n")};
+    out=s.concat(out;s.concat("2^";s.concat(s.fromint(n);s.concat(" = ";s.fromint(value)))));
+    value=value*2;
+  };
+  io.println(out);
+  <0
+};

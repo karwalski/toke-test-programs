@@ -1,0 +1,65 @@
+m=polygon;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=iabs(x:i64):i64{ if(x<0){<-x}el{<x} };
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let idx=mut.0;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let vx=mut.@($i64);
+  let vy=mut.@($i64);
+  lp(let k=0;k<n;k=k+1){
+    vx=vx.push(s.toint(toks.get(idx))); idx=idx+1;
+    vy=vy.push(s.toint(toks.get(idx))); idx=idx+1;
+  };
+  if(n<3){<0};
+  let minx=mut.vx.get(0); let maxx=mut.vx.get(0);
+  let miny=mut.vy.get(0); let maxy=mut.vy.get(0);
+  lp(let k=1;k<n;k=k+1){
+    if(vx.get(k)<minx){minx=vx.get(k)};
+    if(vx.get(k)>maxx){maxx=vx.get(k)};
+    if(vy.get(k)<miny){miny=vy.get(k)};
+    if(vy.get(k)>maxy){maxy=vy.get(k)};
+  };
+  let width=maxx-minx+1;
+  let height=maxy-miny+1;
+  # flat boolean grid size width*height, index (y-miny)*width+(x-minx)
+  let grid=mut.@($bool);
+  lp(let r=0;r<width*height;r=r+1){ grid=grid.push(1==0) };
+  # bresenham for each edge
+  lp(let e=0;e<n;e=e+1){
+    let ax=vx.get(e); let ay=vy.get(e);
+    let ni=if(e+1==n){0}el{e+1};
+    let bx=vx.get(ni); let by=vy.get(ni);
+    let x0=mut.ax; let y0=mut.ay;
+    let dx=iabs(bx-ax);
+    let dy=-iabs(by-ay);
+    let sx=if(ax<bx){1}el{-1};
+    let sy=if(ay<by){1}el{-1};
+    let err=mut.dx+dy;
+    lp(1==1){
+      grid=grid.set((y0-miny)*width+(x0-minx);1==1);
+      if(x0==bx&&y0==by){br};
+      let e2=2*err;
+      if(e2>=dy){ err=err+dy; x0=x0+sx };
+      if(e2<=dx){ err=err+dx; y0=y0+sy };
+    };
+  };
+  let out=mut.@($str);
+  lp(let row=0;row<height;row=row+1){
+    let y=maxy-row;
+    let line=mut."";
+    lp(let col=0;col<width;col=col+1){
+      let x=minx+col;
+      if(grid.get((y-miny)*width+(x-minx))){ line=s.concat(line;"*") }el{ line=s.concat(line;".") };
+    };
+    out=out.push(line);
+  };
+  io.print(s.join("\n";out));
+  io.print("\n");
+  <0
+};

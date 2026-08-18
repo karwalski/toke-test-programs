@@ -1,0 +1,81 @@
+m=shuntyard;i=io:std.io;i=s:std.str;
+f=isadmissible(seq:$str;n:i64):bool{
+  let aremaining=mut.n;
+  let csize=mut.0;
+  let ln=s.len(seq);
+  lp(let i=0;i<ln;i=i+1){
+    let mv=s.slice(seq;i;i+1);
+    if(mv=="S"){
+      if(aremaining==0){<false};
+      aremaining=aremaining-1;
+      csize=csize+1;
+    }el{
+      if(mv=="T"){
+        if(csize==0){<false};
+        csize=csize-1;
+      }el{
+        <false
+      }
+    }
+  };
+  <(aremaining==0&&csize==0)
+};
+f=findseq(inp:@($str);outp:@($str);n:i64):$str{
+  let ai=mut.0;
+  let stack=mut.@($str);
+  let sp=mut.0;
+  let seq=mut."";
+  let nextneeded=mut.0;
+  lp(nextneeded<n){
+    if(sp>0&&stack.get(sp-1)==outp.get(nextneeded)){
+      seq=s.concat(seq;"T");
+      sp=sp-1;
+      nextneeded=nextneeded+1;
+    }el{
+      if(ai<n){
+        seq=s.concat(seq;"S");
+        let wagon=inp.get(ai); ai=ai+1;
+        if(sp<stack.len()){ stack=stack.set(sp;wagon) }el{ stack=stack.push(wagon) };
+        sp=sp+1;
+      }el{
+        <"@@NONE@@"
+      }
+    }
+  };
+  <seq
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let nt=toks.len();
+  let i=mut.0;
+  let out=mut.@($str);
+  lp(i<nt){
+    let cmd=toks.get(i); i=i+1;
+    if(cmd=="VALIDATE"){
+      let n=s.toint(toks.get(i)); i=i+1;
+      let seq=toks.get(i); i=i+1;
+      if(isadmissible(seq;n)){ out=out.push("admissible") }el{ out=out.push("not admissible") };
+    }el{
+      if(cmd=="SOLVE"){
+        let n=s.toint(toks.get(i)); i=i+1;
+        let inp=mut.@($str);
+        lp(let j=0;j<n;j=j+1){ inp=inp.push(toks.get(i+j)) };
+        i=i+n;
+        let outp=mut.@($str);
+        lp(let j=0;j<n;j=j+1){ outp=outp.push(toks.get(i+j)) };
+        i=i+n;
+        let res=findseq(inp;outp;n);
+        if(res=="@@NONE@@"){ out=out.push("NOT reachable") }el{ out=out.push("reachable"); out=out.push(res) };
+      }el{
+        br
+      }
+    }
+  };
+  io.print(s.concat(s.join("\n";out);"\n"));
+  <0
+};

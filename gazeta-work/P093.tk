@@ -1,0 +1,58 @@
+m=crypto;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=maskn(number:i64;pat:$str):bool{
+  let digits=s.fromint(number);
+  if(s.len(digits)!=s.len(pat)){<false};
+  let ok=mut.true;
+  lp(let k=0;k<s.len(pat);k=k+1){
+    let d=s.toint(s.slice(digits;k;k+1));
+    let par=if(d%2==0){"P"}el{"I"};
+    if(par!=s.slice(pat;k;k+1)){ok=false};
+  };
+  <ok
+};
+f=verify(a:i64;b:i64):bool{
+  if(!maskn(a;"PPI")){<false};
+  if(!maskn(b;"II")){<false};
+  let e=b%10;
+  let d=b/10;
+  let pp1=a*e;
+  let pp2=a*d;
+  let total=a*b;
+  <maskn(pp1;"PIPI")&&maskn(pp2;"PII")&&maskn(total;"IIIII")
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){
+    let ra=mut.0;
+    let rb=mut.0;
+    let found=mut.false;
+    lp(let a=100;a<1000;a=a+1){
+      if(!found){
+        if(maskn(a;"PPI")){
+          lp(let b=10;b<100;b=b+1){
+            if(!found){
+              if(maskn(b;"II")){
+                if(verify(a;b)){ ra=a; rb=b; found=true };
+              };
+            };
+          };
+        };
+      };
+    };
+    io.println(s.concat(s.concat(s.concat(s.concat(s.fromint(ra);" × ");s.fromint(rb));" = ");s.fromint(ra*rb)));
+    <0
+  };
+  if(toks.len()==2){
+    let a=s.toint(toks.get(0));
+    let b=s.toint(toks.get(1));
+    if(verify(a;b)){ io.println("valid") }el{ io.println("invalid") };
+    <0
+  };
+  io.println("error");
+  <0
+};

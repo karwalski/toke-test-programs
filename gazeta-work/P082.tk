@@ -1,0 +1,65 @@
+m=osana;i=io:std.io;i=s:std.str;
+f=chareq(str:$str;pos:i64;c:$str):bool{
+  let n=s.len(str);
+  if(pos<0){<false};
+  if(pos>=n){<false};
+  <s.slice(str;pos;pos+1)==c
+};
+f=matchtok(str:$str;pos:i64;tok:$str):bool{
+  let n=s.len(str);
+  let tl=s.len(tok);
+  if(pos+tl>n){<false};
+  <s.slice(str;pos;pos+tl)==tok
+};
+f=parsevers(str:$str;start:i64):i64{
+  let n=s.len(str);
+  let pos=mut.start;
+  if(!chareq(str;pos;"a")){<0-1};
+  pos=pos+1;
+  lp(chareq(str;pos;"a")){ pos=pos+1 };
+  if(!matchtok(str;pos;"l")){<0-1};
+  pos=pos+1;
+  if(!matchtok(str;pos;"le")){<0-1};
+  pos=pos+2;
+  if(!matchtok(str;pos;"lu")){<0-1};
+  pos=pos+2;
+  lp(chareq(str;pos;"u")){ pos=pos+1 };
+  if(!matchtok(str;pos;"ia")){<0-1};
+  pos=pos+2;
+  <pos
+};
+f=isosana(str:$str):bool{
+  let n=s.len(str);
+  let pos=mut.parsevers(str;0);
+  if(pos<0){<false};
+  let bad=mut.false;
+  lp(chareq(str;pos;",")){
+    pos=pos+1;
+    pos=parsevers(str;pos);
+    if(pos<0){ bad=true; br }
+  };
+  if(bad){<false};
+  if(pos>=n){<false};
+  if(s.slice(str;pos;pos+1)!="!"){<false};
+  <pos==n-1
+};
+f=readraw():$str{
+  let all=mut."";
+  let first=mut.true;
+  lp(1==1){
+    let ln=io.readln();
+    if(first){ all=ln; first=false }el{ all=s.concat(all;s.concat("\n";ln)) };
+    if(io.eof()){br}
+  };
+  let n1=s.len(all);
+  if(n1>0){ if(s.slice(all;n1-1;n1)=="\n"){ all=s.slice(all;0;n1-1) } };
+  let n2=s.len(all);
+  if(n2>0){ if(s.slice(all;n2-1;n2)=="\r"){ all=s.slice(all;0;n2-1) } };
+  <all
+};
+f=main():i64{
+  let data=readraw();
+  let res=if(isosana(data)){"valid"}el{"invalid"};
+  io.println(res);
+  <0
+};

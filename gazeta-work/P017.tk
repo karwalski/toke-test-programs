@@ -1,0 +1,25 @@
+m=altitude;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut.""; lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} }; <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let count=mut.0; let mn=mut.0; let mx=mut.0; let has=mut.0;
+  lp(let i=0;i<toks.len();i=i+1){
+    let a=s.toint(toks.get(i));
+    if(a==0){ br };
+    count=count+1;
+    if(has==0){ mn=a; mx=a; has=1; }
+    el{ if(a<mn){mn=a}; if(a>mx){mx=a}; };
+  };
+  if(count==0){
+    io.println("max altitude: undefined");
+    io.println("min altitude: undefined");
+    io.println("number of values entered: 0");
+  }el{
+    io.println(s.concat("max altitude: ";s.fromint(mx)));
+    io.println(s.concat("min altitude: ";s.fromint(mn)));
+    io.println(s.concat("number of values entered: ";s.fromint(count)));
+  };
+  <0
+};

@@ -1,0 +1,92 @@
+m=syllable;i=io:std.io;i=s:std.str;
+f=findidx(col:@($str);syl:$str):i64{
+  let ln=col.len();
+  lp(let i=0;i<ln;i=i+1){ if(col.get(i)==syl){<i} };
+  <-1
+};
+f=iabs(x:i64):i64{
+  <if(x<0){0-x}el{x}
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n0=s.toint(toks.get(0));
+  let n1=s.toint(toks.get(1));
+  let n2=s.toint(toks.get(2));
+  (* build columns from flat stream *)
+  let pos=mut.3;
+  let col0=mut.@($str);
+  lp(let i=0;i<n0;i=i+1){ col0=col0.push(toks.get(pos)); pos=pos+1 };
+  let col1=mut.@($str);
+  lp(let i=0;i<n1;i=i+1){ col1=col1.push(toks.get(pos)); pos=pos+1 };
+  let col2=mut.@($str);
+  lp(let i=0;i<n2;i=i+1){ col2=col2.push(toks.get(pos)); pos=pos+1 };
+  let start0=toks.get(pos); let start1=toks.get(pos+1); let start2=toks.get(pos+2);
+  let target0=toks.get(pos+3); let target1=toks.get(pos+4); let target2=toks.get(pos+5);
+  let si0=findidx(col0;start0); let ti0=findidx(col0;target0);
+  let si1=findidx(col1;start1); let ti1=findidx(col1;target1);
+  let si2=findidx(col2;start2); let ti2=findidx(col2;target2);
+  if(si0<0||ti0<0||si1<0||ti1<0||si2<0||ti2<0){
+    io.println("unreachable");
+    <0
+  };
+  (* linear decomposition *)
+  let si=@(si0;si1;si2);
+  let ti=@(ti0;ti1;ti2);
+  let ncol=@(n0;n1;n2);
+  let total=mut.0;
+  let out=mut."";
+  lp(let c=0;c<3;c=c+1){
+    let i=si.get(c); let j=ti.get(c);
+    let d=iabs(i-j);
+    total=total+d;
+    let dir=if(j>i){"down"}el{"up"};
+    lp(let k=0;k<d;k=k+1){
+      out=s.concat(out;s.concat(s.concat(s.concat(s.fromint(c);" ");dir);"\n"));
+    };
+  };
+  (* BFS over state space, index=(i0*n1+i1)*n2+i2 *)
+  let sz=n0*n1*n2;
+  let dist=mut.@($i64);
+  lp(let i=0;i<sz;i=i+1){ dist=dist.push(-1) };
+  let startidx=(si0*n1+si1)*n2+si2;
+  let targetidx=(ti0*n1+ti1)*n2+ti2;
+  dist=dist.set(startidx;0);
+  let queue=mut.@($i64);
+  queue=queue.push(startidx);
+  let head=mut.0;
+  let bfslen=mut.-1;
+  lp(head<queue.len()){
+    let cur=queue.get(head);
+    head=head+1;
+    if(cur==targetidx){ bfslen=dist.get(cur); br };
+    let c2=cur%n2;
+    let c1=(cur/n2)%n1;
+    let c0=cur/(n1*n2);
+    let cs=@(c0;c1;c2);
+    lp(let c=0;c<3;c=c+1){
+      let deltas=@(-1;1);
+      lp(let di=0;di<2;di=di+1){
+        let ni=cs.get(c)+deltas.get(di);
+        if(ni>=0&&ni<ncol.get(c)){
+          let m0=if(c==0){ni}el{c0};
+          let m1=if(c==1){ni}el{c1};
+          let m2=if(c==2){ni}el{c2};
+          let nidx=(m0*n1+m1)*n2+m2;
+          if(dist.get(nidx)==-1){
+            dist=dist.set(nidx;dist.get(cur)+1);
+            queue=queue.push(nidx);
+          };
+        };
+      };
+    };
+  };
+  io.println(s.fromint(total));
+  io.print(out);
+  io.println(s.concat("bfs=";s.fromint(bfslen)));
+  <0
+};

@@ -1,0 +1,20 @@
+m=minmax3;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let a=s.toint(toks.get(0));
+  let b=s.toint(toks.get(1));
+  let c=s.toint(toks.get(2));
+  let mn=mut.a;
+  if(b<mn){mn=b};
+  if(c<mn){mn=c};
+  let mx=mut.a;
+  if(b>mx){mx=b};
+  if(c>mx){mx=c};
+  io.println(s.concat(s.concat(s.concat("min=";s.fromint(mn));", max=");s.fromint(mx)));
+  <0
+};

@@ -1,0 +1,22 @@
+m=binom;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n=s.toint(toks.get(0));
+  let k=mut.s.toint(toks.get(1));
+  if(k<0||k>n){ io.println("0"); <0 };
+  if(k>n-k){ k=n-k };
+  let row=mut.@($i64);
+  lp(let z=0;z<=k;z=z+1){ row=row.push(0) };
+  row=row.set(0;1);
+  lp(let i=1;i<=n;i=i+1){
+    let top=if(i<k){i}el{k};
+    lp(let j=top;j>0;j=j-1){ row=row.set(j;row.get(j)+row.get(j-1)) };
+  };
+  io.println(s.fromint(row.get(k)));
+  <0
+};

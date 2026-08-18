@@ -1,0 +1,33 @@
+m=polyroots;i=io:std.io;i=s:std.str;
+f=roundi(x:f64):i64{
+  let r=if(x>=0.0){ (x+0.5) as i64 }el{ ((0.0-((0.0-x)+0.5)) as i64) };
+  <r
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ io.println("1"); <0 };
+  let n=s.toint(toks.get(0));
+  let coeff=mut.@($f64);
+  lp(let i=0;i<=n;i=i+1){ coeff=coeff.push(0.0) };
+  coeff=coeff.set(0;1.0);
+  let degree=mut.0;
+  lp(let ri=0;ri<n;ri=ri+1){
+    let r=s.tofloat(toks.get(1+ri));
+    degree=degree+1;
+    lp(let k=degree;k>0;k=k-1){ coeff=coeff.set(k;coeff.get(k-1)-r*coeff.get(k)) };
+    coeff=coeff.set(0;(0.0-r)*coeff.get(0));
+  };
+  let out=mut."";
+  lp(let i=0;i<=n;i=i+1){
+    let v=roundi(coeff.get(i));
+    if(i>0){ out=s.concat(out;" ") };
+    out=s.concat(out;s.fromint(v));
+  };
+  io.println(out);
+  <0
+};

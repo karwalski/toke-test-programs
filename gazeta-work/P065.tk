@@ -1,0 +1,43 @@
+m=centres;i=io:std.io;i=s:std.str;
+f=fmt(v:f64):$str{
+  let raw=s.format(v;"%.3f");
+  if(raw=="-0.000"){<"0.000"};
+  <raw
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=absf(x:f64):f64{ if(x<0.0){<0.0-x}; <x };
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<6){<0};
+  let ax=s.tofloat(toks.get(0));
+  let ay=s.tofloat(toks.get(1));
+  let bx=s.tofloat(toks.get(2));
+  let by=s.tofloat(toks.get(3));
+  let cx=s.tofloat(toks.get(4));
+  let cy=s.tofloat(toks.get(5));
+  let gx=(ax+bx+cx)/3.0;
+  let gy=(ay+by+cy)/3.0;
+  let d=2.0*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+  io.println(s.concat(s.concat(s.concat("A=(";fmt(ax));",");s.concat(fmt(ay);")")));
+  io.println(s.concat(s.concat(s.concat("B=(";fmt(bx));",");s.concat(fmt(by);")")));
+  io.println(s.concat(s.concat(s.concat("C=(";fmt(cx));",");s.concat(fmt(cy);")")));
+  if(d==0.0){ io.println("DEGENERATE"); <0 };
+  let a2=ax*ax+ay*ay;
+  let b2=bx*bx+by*by;
+  let c2=cx*cx+cy*cy;
+  let ux=(a2*(by-cy)+b2*(cy-ay)+c2*(ay-by))/d;
+  let uy=(a2*(cx-bx)+b2*(ax-cx)+c2*(bx-ax))/d;
+  let hx=3.0*gx-2.0*ux;
+  let hy=3.0*gy-2.0*uy;
+  let area=0.5*((ux-gx)*(hy-gy)-(hx-gx)*(uy-gy));
+  io.println(s.concat(s.concat(s.concat("G=(";fmt(gx));",");s.concat(fmt(gy);")")));
+  io.println(s.concat(s.concat(s.concat("O=(";fmt(ux));",");s.concat(fmt(uy);")")));
+  io.println(s.concat(s.concat(s.concat("H=(";fmt(hx));",");s.concat(fmt(hy);")")));
+  io.println(s.concat("area=";fmt(area)));
+  if(absf(area)<0.000001){ io.println("COLLINEAR") }el{ io.println("NOT_COLLINEAR") };
+  <0
+};

@@ -1,0 +1,96 @@
+m=matchtri;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+# line_inter of segs i,j. Returns @(valid; px; py; d) with d>0. valid=0 if parallel.
+f=lineinter(x1:i64;y1:i64;x2:i64;y2:i64;x3:i64;y3:i64;x4:i64;y4:i64):@($i64){
+  let d=mut.(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+  if(d==0){ <@(0;0;0;0) };
+  let a=x1*y2-y1*x2;
+  let b=x3*y4-y3*x4;
+  let px=mut.a*(x3-x4)-(x1-x2)*b;
+  let py=mut.a*(y3-y4)-(y1-y2)*b;
+  if(d<0){ px=0-px; py=0-py; d=0-d };
+  <@(1;px;py;d)
+};
+# on_seg: p=(px,py,d) d>0 ; seg=(x1,y1,x2,y2)
+f=onseg(px:i64;py:i64;d:i64;x1:i64;y1:i64;x2:i64;y2:i64):bool{
+  if((x2-x1)*(py-y1*d)-(y2-y1)*(px-x1*d)!=0){ <false };
+  let lo=mut.x1; let hi=mut.x2;
+  if(x1<=x2){ lo=x1; hi=x2 }el{ lo=x2; hi=x1 };
+  if(lo*d<=px && px<=hi*d){}el{ <false };
+  let lo2=mut.y1; let hi2=mut.y2;
+  if(y1<=y2){ lo2=y1; hi2=y2 }el{ lo2=y2; hi2=y1 };
+  if(lo2*d<=py && py<=hi2*d){}el{ <false };
+  <true
+};
+f=samept(px:i64;py:i64;pd:i64;qx:i64;qy:i64;qd:i64):bool{
+  <px*qd==qx*pd && py*qd==qy*pd
+};
+f=isendpoint(px:i64;py:i64;d:i64;x1:i64;y1:i64;x2:i64;y2:i64):bool{
+  if(px==x1*d && py==y1*d){ <true };
+  if(px==x2*d && py==y2*d){ <true };
+  <false
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<1){ io.println("0"); <0 };
+  let mode=s.toint(toks.get(0));
+  let n=s.toint(toks.get(1));
+  let sx1=mut.@($i64); let sy1=mut.@($i64); let sx2=mut.@($i64); let sy2=mut.@($i64);
+  let idx=mut.2;
+  lp(let t=0;t<n;t=t+1){
+    sx1=sx1.push(s.toint(toks.get(idx)));
+    sy1=sy1.push(s.toint(toks.get(idx+1)));
+    sx2=sx2.push(s.toint(toks.get(idx+2)));
+    sy2=sy2.push(s.toint(toks.get(idx+3)));
+    idx=idx+4
+  };
+  let c=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    lp(let j=i+1;j<n;j=j+1){
+      lp(let k=j+1;k<n;k=k+1){
+        let ax1=sx1.get(i); let ay1=sy1.get(i); let ax2=sx2.get(i); let ay2=sy2.get(i);
+        let bx1=sx1.get(j); let by1=sy1.get(j); let bx2=sx2.get(j); let by2=sy2.get(j);
+        let cx1=sx1.get(k); let cy1=sy1.get(k); let cx2=sx2.get(k); let cy2=sy2.get(k);
+        let p12=lineinter(ax1;ay1;ax2;ay2;bx1;by1;bx2;by2);
+        let p13=lineinter(ax1;ay1;ax2;ay2;cx1;cy1;cx2;cy2);
+        let p23=lineinter(bx1;by1;bx2;by2;cx1;cy1;cx2;cy2);
+        let ok=mut.true;
+        if(p12.get(0)==0 || p13.get(0)==0 || p23.get(0)==0){ ok=false };
+        if(ok){
+          if(samept(p12.get(1);p12.get(2);p12.get(3);p13.get(1);p13.get(2);p13.get(3))){ ok=false }
+        };
+        if(ok){
+          if(samept(p12.get(1);p12.get(2);p12.get(3);p23.get(1);p23.get(2);p23.get(3))){ ok=false }
+        };
+        if(ok){
+          if(samept(p13.get(1);p13.get(2);p13.get(3);p23.get(1);p23.get(2);p23.get(3))){ ok=false }
+        };
+        if(ok){
+          if(onseg(p12.get(1);p12.get(2);p12.get(3);ax1;ay1;ax2;ay2) && onseg(p12.get(1);p12.get(2);p12.get(3);bx1;by1;bx2;by2)){}el{ok=false}
+        };
+        if(ok){
+          if(onseg(p13.get(1);p13.get(2);p13.get(3);ax1;ay1;ax2;ay2) && onseg(p13.get(1);p13.get(2);p13.get(3);cx1;cy1;cx2;cy2)){}el{ok=false}
+        };
+        if(ok){
+          if(onseg(p23.get(1);p23.get(2);p23.get(3);bx1;by1;bx2;by2) && onseg(p23.get(1);p23.get(2);p23.get(3);cx1;cy1;cx2;cy2)){}el{ok=false}
+        };
+        if(ok && mode==1){
+          if(isendpoint(p12.get(1);p12.get(2);p12.get(3);ax1;ay1;ax2;ay2) && isendpoint(p12.get(1);p12.get(2);p12.get(3);bx1;by1;bx2;by2)){}el{ok=false}
+        };
+        if(ok && mode==1){
+          if(isendpoint(p13.get(1);p13.get(2);p13.get(3);ax1;ay1;ax2;ay2) && isendpoint(p13.get(1);p13.get(2);p13.get(3);cx1;cy1;cx2;cy2)){}el{ok=false}
+        };
+        if(ok && mode==1){
+          if(isendpoint(p23.get(1);p23.get(2);p23.get(3);bx1;by1;bx2;by2) && isendpoint(p23.get(1);p23.get(2);p23.get(3);cx1;cy1;cx2;cy2)){}el{ok=false}
+        };
+        if(ok){ c=c+1 }
+      }
+    }
+  };
+  io.println(s.fromint(c));
+  <0
+};

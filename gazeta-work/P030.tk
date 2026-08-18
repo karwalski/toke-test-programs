@@ -1,0 +1,71 @@
+m=queens;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+# count solutions in subtree starting at row, given occupancy arrays
+f=countplace(row:i64;n:i64;cols:@($bool);d1:@($bool);d2:@($bool)):i64{
+  if(row==n){<1};
+  let total=mut.0;
+  lp(let col=0;col<n;col=col+1){
+    let a1=row+col;
+    let a2=row-col+n;
+    if(cols.get(col)||d1.get(a1)||d2.get(a2)){}el{
+      let nc=cols.set(col;1==1);
+      let nd1=d1.set(a1;1==1);
+      let nd2=d2.set(a2;1==1);
+      total=total+countplace(row+1;n;nc;nd1;nd2);
+    };
+  };
+  <total
+};
+# find first solution: returns array of columns (len n) or empty if none.
+f=firstplace(row:i64;n:i64;a:@($i64);cols:@($bool);d1:@($bool);d2:@($bool)):@($i64){
+  if(row==n){<a};
+  lp(let col=0;col<n;col=col+1){
+    let a1=row+col;
+    let a2=row-col+n;
+    if(cols.get(col)||d1.get(a1)||d2.get(a2)){}el{
+      let na=a.set(row;col);
+      let nc=cols.set(col;1==1);
+      let nd1=d1.set(a1;1==1);
+      let nd2=d2.set(a2;1==1);
+      let res=firstplace(row+1;n;na;nc;nd1;nd2);
+      if(res.len()>0){<res};
+    };
+  };
+  let empty=@($i64);
+  <empty
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n=mut.if(toks.len()>0){s.toint(toks.get(0))}el{8};
+  if(n<1){n=1};
+  if(n>12){n=12};
+  let cols=mut.@($bool);
+  let d1=mut.@($bool);
+  let d2=mut.@($bool);
+  let a=mut.@($i64);
+  lp(let k=0;k<n;k=k+1){ cols=cols.push(1==0); a=a.push(0) };
+  lp(let k=0;k<2*n;k=k+1){ d1=d1.push(1==0); d2=d2.push(1==0) };
+  let count=countplace(0;n;cols;d1;d2);
+  let first=firstplace(0;n;a;cols;d1;d2);
+  let out=mut.@($str);
+  out=out.push(s.fromint(count));
+  if(first.len()>0){
+    let cparts=mut.@($str);
+    lp(let k=0;k<n;k=k+1){ cparts=cparts.push(s.fromint(first.get(k))) };
+    out=out.push(s.join(" ";cparts));
+    lp(let row=0;row<n;row=row+1){
+      let cells=mut.@($str);
+      lp(let col=0;col<n;col=col+1){
+        if(first.get(row)==col){cells=cells.push("Q")}el{cells=cells.push(".")};
+      };
+      out=out.push(s.join(" ";cells));
+    };
+  };
+  io.print(s.join("\n";out));
+  io.print("\n");
+  <0
+};

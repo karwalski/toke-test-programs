@@ -1,0 +1,114 @@
+m=validconc;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=negate(t:$str):$str{
+  if(s.startswith(t;"!")){ <s.slice(t;1;s.len(t)) }el{ <cat("!";t) }
+};
+f=findidx(arr:@($str);key:$str):i64{
+  let r=mut.(0-1);
+  lp(let h=0;h<arr.len();h=h+1){ if(arr.get(h)==key){r=h} };
+  <r
+};
+# string less-than (lexicographic by char code)
+f=strlt(a:$str;b:$str):bool{
+  let la=s.len(a);
+  let lb=s.len(b);
+  let m=mut.la; if(lb<la){m=lb};
+  let i=mut.0;
+  let res=mut.2;
+  lp(i<m && res==2){
+    let ca=s.charcode(a;i);
+    let cb=s.charcode(b;i);
+    if(ca<cb){res=1}el{if(ca>cb){res=0}};
+    i=i+1
+  };
+  if(res==2){ if(la<lb){res=1}el{res=0} };
+  <res==1
+};
+f=edgeexists(bu:@($str);bv:@($str);u:$str;v:$str):bool{
+  let r=mut.false;
+  lp(let e=0;e<bu.len();e=e+1){ if(bu.get(e)==u && bv.get(e)==v){r=true} };
+  <r
+};
+f=mkflat(n:i64):@($bool){
+  let g=mut.@($bool);
+  lp(let a=0;a<n*n;a=a+1){ g=g.push(false) };
+  <g
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let nodes=mut.@($str);
+  # base edges as parallel arrays bu,bv (with dedup via set semantics)
+  let bu=mut.@($str);
+  let bv=mut.@($str);
+  let i=mut.0;
+  lp(i+1<toks.len()){
+    let u=toks.get(i);
+    let v=toks.get(i+1);
+    i=i+2;
+    if(findidx(nodes;u)== 0-1){ nodes=nodes.push(u) };
+    if(findidx(nodes;v)== 0-1){ nodes=nodes.push(v) };
+    let nu=negate(u);
+    let nv=negate(v);
+    if(findidx(nodes;nu)== 0-1){ nodes=nodes.push(nu) };
+    if(findidx(nodes;nv)== 0-1){ nodes=nodes.push(nv) };
+    # base.add((u,v))
+    if(edgeexists(bu;bv;u;v)==false){ bu=bu.push(u); bv=bv.push(v) };
+    if(edgeexists(bu;bv;nv;nu)==false){ bu=bu.push(nv); bv=bv.push(nu) }
+  };
+  let n=nodes.len();
+  # reach and adj as flat bool arrays n*n, index a*n+b
+  let reach=mut.mkflat(n);
+  let adj=mut.mkflat(n);
+  lp(let e=0;e<bu.len();e=e+1){
+    let iu=findidx(nodes;bu.get(e));
+    let iv=findidx(nodes;bv.get(e));
+    adj=adj.set(iu*n+iv;true);
+    reach=reach.set(iu*n+iv;true)
+  };
+  # Floyd-Warshall
+  lp(let k=0;k<n;k=k+1){
+    lp(let a=0;a<n;a=a+1){
+      if(reach.get(a*n+k)){
+        lp(let b=0;b<n;b=b+1){
+          if(reach.get(k*n+b)){ reach=reach.set(a*n+b;true) }
+        }
+      }
+    }
+  };
+  # collect derived (nodes[a], nodes[b]) where reach and not adj and a!=b
+  let du=mut.@($str);
+  let dv=mut.@($str);
+  lp(let a=0;a<n;a=a+1){
+    lp(let b=0;b<n;b=b+1){
+      if(a!=b){
+        if(reach.get(a*n+b) && adj.get(a*n+b)==false){
+          du=du.push(nodes.get(a));
+          dv=dv.push(nodes.get(b))
+        }
+      }
+    }
+  };
+  # sort by (u,v) lexicographic - simple selection sort
+  let cnt=du.len();
+  lp(let x=0;x<cnt;x=x+1){
+    let best=mut.x;
+    lp(let y=x+1;y<cnt;y=y+1){
+      let ltc=if(du.get(y)==du.get(best)){ strlt(dv.get(y);dv.get(best)) }el{ strlt(du.get(y);du.get(best)) };
+      if(ltc){ best=y }
+    };
+    if(best!=x){
+      let tu=du.get(x); let tv=dv.get(x);
+      du=du.set(x;du.get(best)); dv=dv.set(x;dv.get(best));
+      du=du.set(best;tu); dv=dv.set(best;tv)
+    }
+  };
+  lp(let x=0;x<cnt;x=x+1){
+    io.println(cat(cat(du.get(x);" => ");dv.get(x)))
+  };
+  <0
+};

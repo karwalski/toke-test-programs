@@ -1,0 +1,77 @@
+m=queens;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=coveredby(qr:i64;qc:i64;x:i64;y:i64):bool{
+  <x==qr || y==qc || x+y==qr+qc || x-y==qr-qc
+};
+f=anycovers(qr:@($i64);qc:@($i64);r:i64;c:i64):bool{
+  let res=mut.false;
+  lp(let t=0;t<qr.len();t=t+1){ if(coveredby(qr.get(t);qc.get(t);r;c)){res=true} };
+  <res
+};
+f=allcovered(qr:@($i64);qc:@($i64)):bool{
+  let ok=mut.true;
+  lp(let x=1;x<=8;x=x+1){
+    lp(let y=1;y<=8;y=y+1){
+      if(anycovers(qr;qc;x;y)==false){ ok=false }
+    }
+  };
+  <ok
+};
+# recursive placement: returns accumulated output string (each solution line joined by \n, trailing marker handled by caller via count)
+# we thread a solutions-string and a count via a small struct-free approach: encode as "count\nlines"
+# Simpler: build lines into a passed-in string 'acc' and return updated acc; track count separately by counting lines.
+f=fmtsol(qr:@($i64);qc:@($i64)):$str{
+  let cells=mut."";
+  lp(let t=0;t<qr.len();t=t+1){
+    cells=cat(cat(cat(cat(cat(cells;"(");s.fromint(qr.get(t)));",");s.fromint(qc.get(t)));")")
+  };
+  <cells
+};
+f=place(qr:@($i64);qc:@($i64);k:i64;lastidx:i64;acc:$str):$str{
+  if(k==5){
+    if(allcovered(qr;qc)){
+      <cat(acc;cat(fmtsol(qr;qc);"\n"))
+    }el{ <acc }
+  }el{
+    let a=mut.acc;
+    lp(let idx=lastidx+1;idx<64;idx=idx+1){
+      let r=idx/8+1;
+      let c=idx%8+1;
+      if(anycovers(qr;qc;r;c)){}el{
+        let nqr=qr.push(r);
+        let nqc=qc.push(c);
+        a=place(nqr;nqc;k+1;idx;a)
+      }
+    };
+    <a
+  }
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<2){ <0 };
+  let r0=s.toint(toks.get(0));
+  let c0=s.toint(toks.get(1));
+  let qr=mut.@($i64); qr=qr.push(r0);
+  let qc=mut.@($i64); qc=qc.push(c0);
+  let firstidx=(r0-1)*8+(c0-1);
+  let raw=place(qr;qc;1;firstidx;"");
+  # raw is solutions separated by \n (each ends with \n). Split and number.
+  let lines=s.split(raw;"\n");
+  let out=mut."";
+  let n=mut.0;
+  lp(let t=0;t<lines.len();t=t+1){
+    let ln=lines.get(t);
+    if(s.len(ln)>0){
+      n=n+1;
+      out=cat(out;cat(cat(cat(cat("sol.";s.fromint(n));": ");ln);"\n"))
+    }
+  };
+  out=cat(out;cat(cat("Total: ";s.fromint(n));""));
+  io.println(out);
+  <0
+};

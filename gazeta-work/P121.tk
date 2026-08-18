@@ -1,0 +1,260 @@
+m=galleryguard;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+(* coverage at a single point t *)
+f=coverpoint(gs:@($i64);n:i64;t:i64):i64{
+  let c=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let sv=gs.get(2*i);
+    let ev=gs.get(2*i+1);
+    if(sv<=t){ if(ev>=t){ c=c+1 } };
+  };
+  <c
+};
+(* coverage strictly inside open interval (a,b) with a,b consecutive crit points *)
+f=coveropen(gs:@($i64);n:i64;a:i64;b:i64):i64{
+  let c=mut.0;
+  lp(let i=0;i<n;i=i+1){
+    let sv=gs.get(2*i);
+    let ev=gs.get(2*i+1);
+    if(sv<=a){ if(ev>=b){ c=c+1 } };
+  };
+  <c
+};
+(* build sorted unique critical xs in [0,end] into a flat array *)
+f=buildxs(gs:@($i64);n:i64;endt:i64):@($i64){
+  let raw=mut.@($i64);
+  raw=raw.push(0);
+  raw=raw.push(endt);
+  lp(let i=0;i<n;i=i+1){
+    raw=raw.push(gs.get(2*i));
+    raw=raw.push(gs.get(2*i+1));
+  };
+  (* filter to [0,endt] and dedup via selection into xs *)
+  let xs=mut.@($i64);
+  (* insertion of sorted unique *)
+  lp(let k=0;k<raw.len();k=k+1){
+    let v=raw.get(k);
+    if(v<0){}el{ if(v>endt){}el{
+      (* insert v into xs keeping sorted unique *)
+      let exists=mut.0;
+      lp(let j=0;j<xs.len();j=j+1){ if(xs.get(j)==v){ exists=1 } };
+      if(exists==0){ xs=xs.push(v) };
+    } };
+  };
+  (* sort xs ascending (small, simple bubble) *)
+  lp(let a=0;a<xs.len();a=a+1){
+    lp(let b=0;b<xs.len()-1;b=b+1){
+      if(xs.get(b)>xs.get(b+1)){
+        let tmp=xs.get(b);
+        xs=xs.set(b;xs.get(b+1));
+        xs=xs.set(b+1;tmp);
+      };
+    };
+  };
+  <xs
+};
+(* returns true (1) if every cell has coverage>=2 *)
+f=fulldouble(gs:@($i64);n:i64;endt:i64):i64{
+  let xs=buildxs(gs;n;endt);
+  let ok=mut.1;
+  lp(let i=0;i<xs.len();i=i+1){
+    let x=xs.get(i);
+    if(coverpoint(gs;n;x)<2){ ok=0 };
+    if(i+1<xs.len()){
+      let a=x;
+      let b=xs.get(i+1);
+      if(coveropen(gs;n;a;b)<2){ ok=0 };
+    };
+  };
+  <ok
+};
+(* recursive product over subset start options: returns flat guards array on success, empty on fail.
+   gs = current full guard array (flat, 2*n). subset = flat array of guard indices to change.
+   pos = current position in subset. *)
+f=tryproduct(gs:@($i64);n:i64;endt:i64;subset:@($i64);pos:i64):@($i64){
+  if(pos==subset.len()){
+    if(fulldouble(gs;n;endt)==1){
+      let res=mut.@($i64);
+      lp(let i=0;i<gs.len();i=i+1){ res=res.push(gs.get(i)) };
+      <res
+    };
+    let empty=@($i64);
+    <empty
+  };
+  let idx=subset.get(pos);
+  let origs=gs.get(2*idx);
+  let lenv=gs.get(2*idx+1)-origs;
+  (* iterate start s in 0..endt-lenv, s != origs *)
+  lp(let sv=0;sv<=endt-lenv;sv=sv+1){
+    if(sv==origs){}el{
+      let ngs=gs.set(2*idx;sv);
+      let ngs2=ngs.set(2*idx+1;sv+lenv);
+      let sub=tryproduct(ngs2;n;endt;subset;pos+1);
+      if(sub.len()>0){ <sub };
+    };
+  };
+  let empty=@($i64);
+  <empty
+};
+(* recursive combinations of range(n) choose k: build subset then try product.
+   start = next index to consider; chosen = flat array of picked indices; need = remaining to pick. *)
+f=trycombos(gs:@($i64);n:i64;endt:i64;k:i64;start:i64;chosen:@($i64)):@($i64){
+  if(chosen.len()==k){
+    (* feasibility: each chosen idx must have at least one valid new start *)
+    let feasible=mut.1;
+    lp(let p=0;p<chosen.len();p=p+1){
+      let idx=chosen.get(p);
+      let lenv=gs.get(2*idx+1)-gs.get(2*idx);
+      let origs=gs.get(2*idx);
+      let cnt=mut.0;
+      lp(let sv=0;sv<=endt-lenv;sv=sv+1){ if(sv==origs){}el{ cnt=cnt+1 } };
+      if(cnt==0){ feasible=0 };
+    };
+    if(k>0){ if(feasible==0){ let empty=@($i64); <empty } };
+    <tryproduct(gs;n;endt;chosen;0)
+  };
+  lp(let i=start;i<n;i=i+1){
+    let nchosen=chosen.push(i);
+    let sub=trycombos(gs;n;endt;k;i+1;nchosen);
+    if(sub.len()>0){ <sub };
+  };
+  let empty=@($i64);
+  <empty
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let idx=mut.0;
+  let endt=s.toint(toks.get(idx)); idx=idx+1;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  let length=s.toint(toks.get(idx)); idx=idx+1;
+  let gs=mut.@($i64);
+  lp(let i=0;i<n;i=i+1){
+    let sv=s.toint(toks.get(idx)); idx=idx+1;
+    let ev=s.toint(toks.get(idx)); idx=idx+1;
+    gs=gs.push(sv);
+    gs=gs.push(ev);
+  };
+  (* build cells as parallel flat arrays: ispoint, lo, hi, cover *)
+  let xs=buildxs(gs;n;endt);
+  let cispoint=mut.@($i64);
+  let clo=mut.@($i64);
+  let chi=mut.@($i64);
+  let ccover=mut.@($i64);
+  lp(let i=0;i<xs.len();i=i+1){
+    let x=xs.get(i);
+    cispoint=cispoint.push(1);
+    clo=clo.push(x);
+    chi=chi.push(x);
+    ccover=ccover.push(coverpoint(gs;n;x));
+    if(i+1<xs.len()){
+      let a=x;
+      let b=xs.get(i+1);
+      cispoint=cispoint.push(0);
+      clo=clo.push(a);
+      chi=chi.push(b);
+      ccover=ccover.push(coveropen(gs;n;a;b));
+    };
+  };
+  (* deficient regions: merge consecutive cells with cover<2.
+     region flat arrays: rlc(leftclosed 1/0), rlo, rhi, rrc(rightclosed 1/0) *)
+  let rlc=mut.@($i64);
+  let rlo=mut.@($i64);
+  let rhi=mut.@($i64);
+  let rrc=mut.@($i64);
+  let nc=cispoint.len();
+  let i=mut.0;
+  lp(i<nc){
+    if(ccover.get(i)<2){
+      let j=mut.i;
+      lp(1==1){
+        if(j+1<nc){ if(ccover.get(j+1)<2){ j=j+1 }el{ br } }el{ br };
+      };
+      rlc=rlc.push(cispoint.get(i));
+      rlo=rlo.push(clo.get(i));
+      rhi=rhi.push(chi.get(j));
+      rrc=rrc.push(cispoint.get(j));
+      i=j+1;
+    }el{
+      i=i+1;
+    };
+  };
+  let numreg=rlc.len();
+
+  (* (a) *)
+  if(numreg==0){
+    io.println("a) true");
+  }el{
+    io.println("a) false");
+  };
+  (* (b) *)
+  if(numreg==0){
+    io.println("b) none");
+  }el{
+    let line=mut."b) ";
+    lp(let r=0;r<numreg;r=r+1){
+      let lb=if(rlc.get(r)==1){"["}el{"("};
+      let rb=if(rrc.get(r)==1){"]"}el{")"};
+      let piece=s.concat(s.concat(s.concat(s.concat(lb;s.fromint(rlo.get(r)));",");s.fromint(rhi.get(r)));rb);
+      if(r==0){ line=s.concat(line;piece) }el{ line=s.concat(line;s.concat(" ";piece)) };
+    };
+    io.println(line);
+  };
+  (* (c) greedy min extra patches over deficient regions *)
+  let plo=mut.@($i64);
+  let phi=mut.@($i64);
+  let hascov=mut.0;
+  let covup=mut.0;
+  lp(let r=0;r<numreg;r=r+1){
+    let lo=rlo.get(r);
+    let hi=rhi.get(r);
+    lp(1==1){
+      let stop=if(hascov==0){0}el{ if(covup<hi){0}el{1} };
+      if(stop==1){ br };
+      let p=if(hascov==0){lo}el{ if(covup<lo){lo}el{covup} };
+      plo=plo.push(p);
+      phi=phi.push(p+length);
+      covup=p+length;
+      hascov=1;
+    };
+  };
+  if(plo.len()==0){
+    io.println("c) 0");
+  }el{
+    let line=mut.s.concat(s.concat("c) ";s.fromint(plo.len()));" ");
+    lp(let p=0;p<plo.len();p=p+1){
+      let piece=s.concat(s.concat(s.concat(s.concat("[";s.fromint(plo.get(p)));",");s.fromint(phi.get(p)));"]");
+      if(p==0){ line=s.concat(line;piece) }el{ line=s.concat(line;s.concat(" ";piece)) };
+    };
+    io.println(line);
+  };
+  (* (d) brute-force repair *)
+  let found=mut.0;
+  let fk=mut.0;
+  let fgs=mut.@($i64);
+  lp(let k=0;k<=n;k=k+1){
+    if(found==0){
+      let emptysub=@($i64);
+      let res=trycombos(gs;n;endt;k;0;emptysub);
+      if(res.len()>0){
+        found=1;
+        fk=k;
+        fgs=res;
+      };
+    };
+  };
+  if(found==0){
+    io.println("d) infeasible");
+  }el{
+    let line=mut.s.concat(s.concat("d) ";s.fromint(fk));" changes: ");
+    lp(let i2=0;i2<n;i2=i2+1){
+      let piece=s.concat(s.concat(s.concat(s.concat("[";s.fromint(fgs.get(2*i2)));",");s.fromint(fgs.get(2*i2+1)));"]");
+      if(i2==0){ line=s.concat(line;piece) }el{ line=s.concat(line;s.concat(" ";piece)) };
+    };
+    io.println(line);
+  };
+  <0
+};

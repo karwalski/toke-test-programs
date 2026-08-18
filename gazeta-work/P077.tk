@@ -1,0 +1,91 @@
+m=justify;i=io:std.io;i=s:std.str;
+
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+
+f=spaces(n:i64):$str{
+  let r=mut."";
+  lp(let k=0;k<n;k=k+1){ r=s.concat(r;" ") };
+  <r
+};
+
+f=main():i64{
+  let width=65;
+  let raw=s.fields(readall());
+  let toks=mut.@($str);
+  lp(let ri=0;ri<raw.len();ri=ri+1){
+    let piece=raw.get(ri);
+    let parts=s.split(piece;"$");
+    lp(let pi=0;pi<parts.len();pi=pi+1){
+      let pp=parts.get(pi);
+      if(s.len(pp)>0){ toks=toks.push(pp) };
+      if(pi!=parts.len()-1){ toks=toks.push("$") };
+    };
+  };
+
+  let out=mut.@($str);
+  let buffer=mut.@($str);
+  let pendingIndent=mut.0;
+
+  lp(let ti=0;ti<toks.len();ti=ti+1){
+    let t=toks.get(ti);
+    if(t=="$"){
+      if(buffer.len()>0){
+        out=out.push(s.concat(spaces(pendingIndent);s.join(" ";buffer)));
+      };
+      buffer=@($str);
+      pendingIndent=5;
+    }el{
+      let candidate=mut.0;
+      if(buffer.len()>0){
+        let textLen=mut.0;
+        lp(let bi=0;bi<buffer.len();bi=bi+1){ textLen=textLen+s.len(buffer.get(bi)) };
+        candidate=pendingIndent+textLen+s.len(t)+buffer.len();
+      }el{
+        candidate=pendingIndent+s.len(t);
+      };
+      if(buffer.len()>0 && candidate>width){
+        let n=buffer.len();
+        let textLen=mut.0;
+        lp(let bi=0;bi<n;bi=bi+1){ textLen=textLen+s.len(buffer.get(bi)) };
+        let gaps=n-1;
+        if(gaps==0){
+          out=out.push(s.concat(spaces(pendingIndent);s.join(" ";buffer)));
+        }el{
+          let slots=width-pendingIndent-textLen;
+          if(slots<gaps){
+            out=out.push(s.concat(spaces(pendingIndent);s.join(" ";buffer)));
+          }el{
+            let base=slots/gaps;
+            let extra=slots%gaps;
+            let line=mut.spaces(pendingIndent);
+            lp(let bi=0;bi<n;bi=bi+1){
+              line=s.concat(line;buffer.get(bi));
+              if(bi<gaps){
+                let pad=if(bi<extra){base+1}el{base};
+                line=s.concat(line;spaces(pad));
+              };
+            };
+            out=out.push(line);
+          };
+        };
+        buffer=@(t);
+        pendingIndent=0;
+      }el{
+        buffer=buffer.push(t);
+      };
+    };
+  };
+
+  if(buffer.len()>0){
+    out=out.push(s.concat(spaces(pendingIndent);s.join(" ";buffer)));
+  };
+
+  lp(let oi=0;oi<out.len();oi=oi+1){
+    io.println(out.get(oi));
+  };
+  <0
+};

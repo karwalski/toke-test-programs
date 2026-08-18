@@ -1,0 +1,199 @@
+m=sterm;i=io:std.io;i=s:std.str;
+(* catalan(m) as in python: c=1; for i in 0..m-1: c=c*2*(2i+1)//(i+2) *)
+f=catalan(m:i64):i64{
+  let c=mut.1;
+  lp(let i=0;i<m;i=i+1){
+    c=c*2*(2*i+1)/(i+2);
+  };
+  <c
+};
+(* length in chars of the full-paren term starting at pos *)
+f=termlen(t:$str;pos:i64):i64{
+  if(s.slice(t;pos;pos+1)=="s"){ <1 };
+  (* char is '(' : read left then right *)
+  let l=termlen(t;pos+1);
+  let r=termlen(t;pos+1+l);
+  <2+l+r
+};
+(* split a full-paren node string into left substring, returns left part *)
+f=leftpart(t:$str):$str{
+  (* t = "(" left right ")" ; inner starts at 1 *)
+  let l=termlen(t;1);
+  <s.slice(t;1;1+l)
+};
+f=rightpart(t:$str):$str{
+  let l=termlen(t;1);
+  let total=s.len(t);
+  <s.slice(t;1+l;total-1)
+};
+(* leftmost preorder reduction; returns reduced string, or same string if none *)
+f=reduceonce(t:$str):$str{
+  if(t=="s"){ <t };
+  let l=leftpart(t);
+  let r=rightpart(t);
+  if(l!="s"){
+    let yy=leftpart(l);
+    let bb=rightpart(l);
+    if(yy!="s"){
+      let zz=leftpart(yy);
+      let aa=rightpart(yy);
+      if(zz=="s"){
+        let cc=r;
+        let ac=s.concat(s.concat("(";s.concat(aa;cc));")");
+        let bc=s.concat(s.concat("(";s.concat(bb;cc));")");
+        <s.concat(s.concat("(";s.concat(ac;bc));")")
+      };
+    };
+  };
+  let nl=reduceonce(l);
+  if(nl!=l){ <s.concat(s.concat("(";s.concat(nl;r));")") };
+  let nr=reduceonce(r);
+  if(nr!=r){ <s.concat(s.concat("(";s.concat(l;nr));")") };
+  <t
+};
+(* normalize: returns iterations count; sets ok via sentinel. we compute both. *)
+(* returns final string via normstr and count via normit and ok via normok using globals is not possible; encode as "final|it|ok" *)
+f=normfinal(t:$str):$str{
+  let cur=mut.t;
+  let it=mut.0;
+  lp(1==1){
+    let nt=reduceonce(cur);
+    if(nt==cur){ br };
+    cur=nt;
+    it=it+1;
+    if(it>30){ br };
+  };
+  <cur
+};
+f=normit(t:$str):i64{
+  let cur=mut.t;
+  let it=mut.0;
+  lp(1==1){
+    let nt=reduceonce(cur);
+    if(nt==cur){ br };
+    cur=nt;
+    it=it+1;
+    if(it>30){ br };
+  };
+  <it
+};
+f=normok(t:$str):bool{
+  let cur=mut.t;
+  let it=mut.0;
+  let ok=mut.1==0;
+  lp(1==1){
+    let nt=reduceonce(cur);
+    if(nt==cur){ ok=1==1; br };
+    cur=nt;
+    it=it+1;
+    if(it>30){ br };
+  };
+  <ok
+};
+(* length of open-paren term at pos *)
+f=openlen(t:$str;pos:i64):i64{
+  if(s.slice(t;pos;pos+1)=="s"){ <1 };
+  let l=openlen(t;pos+1);
+  let r=openlen(t;pos+1+l);
+  <1+l+r
+};
+(* convert open-paren substring at pos to full-paren string *)
+f=convert(t:$str;pos:i64):$str{
+  if(s.slice(t;pos;pos+1)=="s"){ <"s" };
+  let llen=openlen(t;pos+1);
+  let left=convert(t;pos+1);
+  let right=convert(t;pos+1+llen);
+  <s.concat(s.concat("(";s.concat(left;right));")")
+};
+(* parse_term: strip ')' then convert *)
+f=parseterm(text:$str):$str{
+  let stripped=mut."";
+  let ln=s.len(text);
+  lp(let i=0;i<ln;i=i+1){
+    let ch=s.slice(text;i;i+1);
+    if(ch!=")"){ stripped=s.concat(stripped;ch) };
+  };
+  <convert(stripped;0)
+};
+(* gensterm: returns array of open-paren strings *)
+f=gensterm(n:i64):@($str){
+  if(n==1){ <@("s") };
+  let nn=2*n;
+  (* v indices 1..nn ; use array size nn+1, index 0 unused *)
+  let v=mut.@($str);
+  lp(let k=0;k<=nn;k=k+1){ v=v.push("") };
+  lp(let i=1;i<n;i=i+1){ v=v.set(2*i-1;"("); v=v.set(2*i;"s") };
+  v=v.set(nn-1;"s");
+  v=v.set(nn;";");
+  let out=mut.@($str);
+  (* emit v[1..nn-1] *)
+  let e0=mut.""; lp(let k=1;k<nn;k=k+1){ e0=s.concat(e0;v.get(k)) }; out=out.push(e0);
+  lp(1==1){
+    let i=mut.nn-3;
+    lp(v.get(i)!="("){ i=i-1 };
+    let j=mut.nn-3;
+    lp(i>1&&v.get(i-1)=="("){
+      v=v.set(i;"s"); v=v.set(j;"(");
+      j=j-2; i=i-1;
+    };
+    if(i>1){
+      v=v.set(i-1;"("); v=v.set(i;"s");
+      let em=mut.""; lp(let k=1;k<nn;k=k+1){ em=s.concat(em;v.get(k)) }; out=out.push(em);
+    };
+    if(i<=1){ br };
+  };
+  <out
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ <0 };
+  let cmd=toks.get(0);
+  if(cmd=="counts"){
+    let n=s.toint(toks.get(1));
+    lp(let k=1;k<=n;k=k+1){
+      io.println(s.concat(s.concat(s.fromint(k);" ");s.fromint(catalan(k-1))));
+    };
+  }el{
+    if(cmd=="survey"){
+      let n=s.toint(toks.get(1));
+      let terms=gensterm(n);
+      let analyzed=mut.0;
+      let normed=mut.0;
+      let tn=terms.len();
+      lp(let idx=0;idx<tn;idx=idx+1){
+        let t=parseterm(terms.get(idx));
+        let orig=t;
+        let nt=normfinal(t);
+        let it=normit(t);
+        let ok=normok(t);
+        analyzed=analyzed+1;
+        if(ok){
+          normed=normed+1;
+          io.println(s.concat(s.concat(s.concat(orig;" -> ");s.concat(nt;" "));s.fromint(it)));
+        }el{
+          io.println(s.concat(s.concat(orig;" -> ");s.concat(nt;" not normalized")));
+        };
+      };
+      io.println(s.concat(s.fromint(analyzed);" s-terms analyzed"));
+      io.println(s.concat(s.fromint(normed);" normalized"));
+    }el{
+      if(cmd=="norm"){
+        let t=parseterm(toks.get(1));
+        let nt=normfinal(t);
+        let it=normit(t);
+        let ok=normok(t);
+        if(ok){
+          io.println(s.concat(s.concat(nt;" ");s.fromint(it)));
+        }el{
+          io.println(s.concat(nt;" not normalized"));
+        };
+      };
+    };
+  };
+  <0
+};

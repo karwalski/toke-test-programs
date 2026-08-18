@@ -1,0 +1,22 @@
+m=baseq;i=io:std.io;i=s:std.str;
+f=onlyzeroone(a0:i64;q:i64):bool{
+  let a=mut.a0;
+  lp(a>0){ if(a%q>1){<false}; a=a/q };
+  <true
+};
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){<0};
+  let q=s.toint(toks.get(0));
+  let out=mut.@($str);
+  lp(let a=1;a<=100;a=a+1){
+    if(onlyzeroone(a;q)){ out=out.push(s.fromint(a)) };
+  };
+  if(out.len()>0){ io.print(s.concat(s.join("\n";out);"\n")) };
+  <0
+};

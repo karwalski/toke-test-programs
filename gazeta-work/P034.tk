@@ -1,0 +1,43 @@
+m=permsig;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()==0){ io.println("+1"); <0 };
+  let n=s.toint(toks.get(0));
+  if(n<0){ io.println("invalid"); <0 };
+  let perm=mut.@($i64);
+  let bad=mut.1==0;
+  lp(let i=0;i<n;i=i+1){
+    if(1+i>=toks.len()){ bad=1==1 }
+    el{ perm=perm.push(s.toint(toks.get(1+i))) };
+  };
+  if(bad){ io.println("invalid"); <0 };
+  let seen=mut.@($i64);
+  lp(let i=0;i<=n;i=i+1){ seen=seen.push(0) };
+  let invalid=mut.1==0;
+  lp(let i=0;i<n;i=i+1){
+    let v=perm.get(i);
+    if(v<1||v>n){ invalid=1==1 }
+    el{ if(seen.get(v)==1){ invalid=1==1 }el{ seen=seen.set(v;1) } };
+  };
+  if(invalid){ io.println("invalid"); <0 };
+  let visited=mut.@($i64);
+  lp(let i=0;i<=n;i=i+1){ visited=visited.push(0) };
+  let cycles=mut.0;
+  lp(let start=1;start<=n;start=start+1){
+    if(visited.get(start)==0){
+      cycles=cycles+1;
+      let j=mut.start;
+      lp(visited.get(j)==0){
+        visited=visited.set(j;1);
+        j=perm.get(j-1);
+      };
+    };
+  };
+  if((n-cycles)%2==0){ io.println("+1") }el{ io.println("-1") };
+  <0
+};

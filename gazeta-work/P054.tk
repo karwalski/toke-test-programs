@@ -1,0 +1,25 @@
+m=cyclist;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let h=s.tofloat(toks.get(0));
+  let v=s.tofloat(toks.get(1));
+  let d=s.tofloat(toks.get(2));
+  let travel=d/v;
+  let ts=(travel*3600.0+0.5) as i64;
+  let th=ts/3600;
+  let tm=(ts%3600)/60;
+  let tsec=ts%60;
+  let arr=h+travel;
+  let ars=(arr*3600.0+0.5) as i64;
+  let ah=(ars/3600)%24;
+  let am=(ars%3600)/60;
+  let asec=ars%60;
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat("Travel time: ";s.fromint(th));"h ");s.fromint(tm));"min ");s.concat(s.fromint(tsec);"s")));
+  io.println(s.concat(s.concat(s.concat(s.concat(s.concat("Arrival hour: ";s.fromint(ah));"h ");s.fromint(am));"min ");s.concat(s.fromint(asec);"s")));
+  <0
+};

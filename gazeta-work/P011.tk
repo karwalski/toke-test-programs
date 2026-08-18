@@ -1,0 +1,43 @@
+m=grains;i=io:std.io;i=s:std.str;
+f=readall():$str{
+  let all=mut.""; lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} }; <all
+};
+f=bmul(big:@(i64);mlt:i64):@(i64){
+  let out=mut.@($i64); let carry=mut.0;
+  lp(let i=0;i<big.len();i=i+1){ let p=big.get(i)*mlt+carry; out=out.push(p%10); carry=p/10; };
+  lp(carry>0){ out=out.push(carry%10); carry=carry/10; };
+  if(out.len()==0){out=out.push(0)};
+  <out
+};
+f=badd(a:@(i64);b:@(i64)):@(i64){
+  let out=mut.@($i64); let carry=mut.0;
+  let mx=if(a.len()>b.len()){a.len()}el{b.len()};
+  lp(let i=0;i<mx;i=i+1){
+    let av=if(i<a.len()){a.get(i)}el{0};
+    let bv=if(i<b.len()){b.get(i)}el{0};
+    let p=av+bv+carry; out=out.push(p%10); carry=p/10;
+  };
+  lp(carry>0){out=out.push(carry%10);carry=carry/10};
+  if(out.len()==0){out=out.push(0)};
+  <out
+};
+f=brender(big:@(i64)):$str{
+  let n=mut.big.len(); lp(n>1){if(big.get(n-1)==0){n=n-1}el{br}};
+  let r=mut.""; lp(let i=n-1;i>=0;i=i-1){r=s.concat(r;s.fromint(big.get(i)))}; if(r==""){r="0"}; <r
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  let n=mut.if(toks.len()>0){s.toint(toks.get(0))}el{64};
+  if(n<0){n=0}; if(n>64){n=64};
+  (* grains = 2^n - 1 = sum of 2^0..2^(n-1) *)
+  let sm=mut.@(0); let c=mut.@(1);
+  if(n>0){ sm=@(1); lp(let i=1;i<n;i=i+1){ c=bmul(c;2); sm=badd(sm;c); }; };
+  let g=brender(sm);
+  io.println(s.concat(g;" grains"));
+  let gl=s.len(g);
+  let rem=mut.if(gl>=7){s.slice(g;gl-7;gl)}el{g};
+  lp(s.len(rem)<7){rem=s.concat("0";rem)};
+  let q=if(gl>7){s.slice(g;0;gl-7)}el{"0"};
+  io.println(s.concat(s.concat(s.concat(q;".");rem);" wagons"));
+  <0
+};

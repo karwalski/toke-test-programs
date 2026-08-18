@@ -1,0 +1,80 @@
+m=bones;i=io:std.io;i=s:std.str;
+f=cat(a:$str;b:$str):$str{ <s.concat(a;b) };
+f=readall():$str{
+  let all=mut."";
+  lp(1==1){ let ln=io.readln(); all=s.concat(all;s.concat(ln;" ")); if(io.eof()){br} };
+  <all
+};
+# index of key in array, or -1
+f=findidx(arr:@($str);key:$str):i64{
+  let r=mut.(0-1);
+  lp(let h=0;h<arr.len();h=h+1){ if(arr.get(h)==key){r=h} };
+  <r
+};
+f=main():i64{
+  let toks=s.fields(readall());
+  if(toks.len()<1){ <0 };
+  let idx=mut.0;
+  let n=s.toint(toks.get(idx)); idx=idx+1;
+  # edges stored as parallel arrays: efrom, eto, elabel (input order)
+  let efrom=mut.@($str);
+  let eto=mut.@($str);
+  let elabel=mut.@($str);
+  lp(let g=0;g<n;g=g+1){
+    let label=toks.get(idx); idx=idx+1;
+    let frm=toks.get(idx); idx=idx+1;
+    let to=toks.get(idx); idx=idx+1;
+    efrom=efrom.push(frm);
+    eto=eto.push(to);
+    elabel=elabel.push(label)
+  };
+  let hyp=toks.get(idx); idx=idx+1;
+  let concl=toks.get(idx); idx=idx+1;
+  # BFS. prev: pnode(key) -> pfrom, plabel
+  let pkeys=mut.@($str);
+  let pfrom=mut.@($str);
+  let plabel=mut.@($str);
+  pkeys=pkeys.push(hyp); pfrom=pfrom.push(""); plabel=plabel.push("");
+  let queue=mut.@($str);
+  queue=queue.push(hyp);
+  let qh=mut.0;
+  let found=mut.hyp==concl;
+  lp(qh<queue.len() && found==false){
+    let cur=queue.get(qh); qh=qh+1;
+    # scan edges in input order from cur
+    lp(let e=0;e<efrom.len();e=e+1){
+      if(found==false && efrom.get(e)==cur){
+        let to=eto.get(e);
+        if(findidx(pkeys;to)== 0-1){
+          pkeys=pkeys.push(to);
+          pfrom=pfrom.push(cur);
+          plabel=plabel.push(elabel.get(e));
+          if(to==concl){ found=true }el{ queue=queue.push(to) }
+        }
+      }
+    }
+  };
+  if(found){
+    # reconstruct chain of labels from concl back to hyp
+    let chain=mut.@($str);
+    let node=mut.concl;
+    lp(1==1){
+      let pi=findidx(pkeys;node);
+      let fr=pfrom.get(pi);
+      if(fr==""){ br };
+      chain=chain.push(plabel.get(pi));
+      node=fr
+    };
+    # reverse
+    let proof=mut."";
+    lp(let c=chain.len()-1;c>=0;c=c-1){
+      if(c==chain.len()-1){ proof=chain.get(c) }el{ proof=cat(cat(proof;" -> ");chain.get(c)) }
+    };
+    io.println("TRUE");
+    io.println(cat("proof: ";proof))
+  }el{
+    io.println("FALSE");
+    io.println("Cannot be proven")
+  };
+  <0
+};
