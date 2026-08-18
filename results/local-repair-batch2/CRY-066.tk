@@ -1,1 +1,0 @@
-m=diff;i=io:std.io;i=s:std.str;f=adjust(d:$i64;tgt:$i64;act:$i64):$i64{let raw=(d*tgt)/act;let minD=d/4;let maxD=d*4;if(raw<minD){<minD};if(raw>maxD){<maxD};<raw};f=main():$i64{let d=s.toint(io.readln());let tgt=s.toint(io.readln());let act=s.toint(io.readln());let newDiff=adjust(d;tgt;act);io.println(s.fromint(newDiff));<0}

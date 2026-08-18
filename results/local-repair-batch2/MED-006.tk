@@ -1,1 +1,0 @@
-m=html;i=io:std.io;i=s:std.str;f=main():$i64{let line=mut.io.readln();let empties=mut.0;let first=mut.true;let out=mut."";lp(empties<2){let t=s.trim(line);if(s.len(t)>0){empties=0;if(!first){out=s.concat(out;"\n")};out=s.concat(out;"<p>");out=s.concat(out;t);out=s.concat(out;"</p>");first=false}el{empties=empties+1};line=io.readln()};io.print(out);<0}
