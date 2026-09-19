@@ -8,6 +8,26 @@ This repository serves three purposes:
 2. **Build a verified training corpus** — every generated program is compile-tested and functionally verified, producing high-quality training data for toke code generation models
 3. **Invite contributions** — anyone can add requirements, generate solutions, or verify existing ones
 
+## About toke
+
+> toke: a compiled language designed for LLM code generation, with a small grammar, one
+> canonical form and compiler verification.
+
+toke is a compiled programming language designed for LLM code generation. It has 14
+keywords, a 55-character set, a backtrack-free grammar with bounded lookahead, and one
+canonical form per construct, chosen by measurement in a 46-pattern catalogue and
+reproduced by `tkc --min`. That makes generated code cheap to constrain during decoding,
+cheap for a compiler to verify afterwards, and compact to emit. Token efficiency is one
+measured property of toke, always reported with its tokenizer and its baseline, not the
+whole claim.
+
+*The one-liner and the paragraph above are reproduced word for word from the canonical
+description,
+[`docs/about/canonical.md`](https://github.com/karwalski/toke/blob/main/docs/about/canonical.md).
+Every number published about toke comes from
+[`docs/metrics-baseline.md`](https://github.com/karwalski/toke/blob/main/docs/metrics-baseline.md)
+and nowhere else.*
+
 ## Categories
 
 ```
@@ -49,13 +69,21 @@ results/solutions/{category}/{id}/
 
 ## Why This Matters
 
-toke is a programming language designed for token-efficient AI code generation. These programs demonstrate that toke can express real-world applications across every major domain — not just toy examples.
+toke is a compiled programming language designed for LLM code generation. These programs
+demonstrate that toke can express real-world applications across every major domain — not
+just toy examples. They measure what the *language* can express; they are not a model
+result and may not be quoted as one.
 
-Every program is:
-- **Compiled** — passes `tkc --check` (zero errors)
-- **Tested** — runs with test inputs and produces expected outputs
+Every banked solution was, at the time it was banked:
+- **Compiled** — passed `tkc --check` (zero errors)
+- **Tested** — ran with test inputs and produced expected outputs
 - **Documented** — companion files explain the algorithm and design
 - **Training-ready** — string-stripped versions feed directly into model training
+
+Verification is against the compiler version of the day. toke went through a breaking
+v0.4 change (`=`/`==`, expression-`if`, `&&`/`||`), so a solution banked before that
+change is not guaranteed to compile under `tkc` 2.8.0 until it is re-verified. Re-run
+`scripts/verify-one.py` before quoting any of these programs as working.
 
 ## Using the Test Harness
 
