@@ -79,7 +79,7 @@ def _load_grammar() -> str:
 
 # --- Hardcoded syntax quick-reference ---
 SYNTAX_RULES = {
-    "keywords": "Keywords (13): m f t i if el lp br let mut as rt mt",
+    "keywords": "Keywords (14): m f t i if el lp br let mut as rt mt sc",
     "module": "Module declaration: m=name; (must be first line, lowercase)",
     "import": "Import: i=alias:std.module; then use alias.func()",
     "function": "Function: f=name(p1:type;p2:type):rettype{body};",

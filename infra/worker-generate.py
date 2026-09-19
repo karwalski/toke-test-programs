@@ -81,10 +81,10 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # --- Toke system prompt for repair ---
-TOKE_SYSTEM_PROMPT = """You write toke programs. toke is a compiled language with a 55-char alphabet.
+TOKE_SYSTEM_PROMPT = """You write toke programs. toke is a compiled language with a closed 59-character alphabet, lowercase only.
 
 STRUCTURE: m=name; then i=alias:std.module; then f= and t= declarations.
-KEYWORDS (13): m f t i if el lp br let mut as rt mt
+KEYWORDS (14): m f t i if el lp br let mut as rt mt sc
 
 SYNTAX RULES:
 - Semicolons separate ALL statements AND function parameters. NEVER use commas.
