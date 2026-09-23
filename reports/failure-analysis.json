@@ -1,7 +1,7 @@
 {
   "analysis_date": "2026-05-25",
   "story": "102.11 / 4.4.1",
-  "source": "Worker 2 at 3.25.118.108 (instance shut down after completion)",
+  "source": "Worker 2 on a cloud instance, shut down after completion",
   "methodology": "Initial SSH data capture + local compiler testing + spec/stdlib cross-reference",
   "overview": {
     "total_programs_generated": "~1700 across 5 workers",
@@ -287,7 +287,8 @@
         "id": "SP-04",
         "priority": "HIGH",
         "title": "Add complete stdlib reference",
-        "detail": "List ALL 57 stdlib modules with ALL function signatures. Explicitly state which modules do NOT exist (no std.math, no std.regex, no std.collections, no std.os, no std.net, no std.fmt, no std.sort)."
+        "facts-exempt": "2026-05-25 dated snapshot: this report records what was true on its analysis_date, and its counts are evidence rather than claims. The stdlib had 57 modules then; do not re-sync a historical measurement.",
+        "detail": "List ALL 57 stdlib modules (as of this report's analysis_date) with ALL function signatures. Explicitly state which modules do NOT exist (no std.math, no std.regex, no std.collections, no std.os, no std.net, no std.fmt, no std.sort)."
       },
       {
         "id": "SP-05",
