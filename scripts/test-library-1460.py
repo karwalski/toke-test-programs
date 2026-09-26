@@ -10,6 +10,14 @@ import json, glob, os, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOKE = os.path.expanduser("~/tk/toke/toke")
+
+def capflags(sol):
+    """126.3: build with the program's own tkc.toml grants (ADR-0010), never
+    --allow-all, so a missing grant fails its test instead of being masked.
+    No manifest -> an empty config, so a stray ./tkc.toml cannot grant."""
+    m = os.path.join(os.path.dirname(sol), "tkc.toml")
+    return ["--config=" + m] if os.path.exists(m) else ["--config=/dev/null"]
+
 SOL = os.path.join(ROOT, "results", "solutions")
 
 def norm(s): return "\n".join(l.rstrip() for l in s.strip().splitlines())
@@ -44,7 +52,7 @@ for cf in cats:
             totals["NO_TESTS"] += 1; continue
         with tempfile.TemporaryDirectory() as td:
             binp = os.path.join(td, "b")
-            r = subprocess.run([TOKE, sol, "--allow-all", "--out", binp],
+            r = subprocess.run([TOKE, sol, *capflags(sol), "--out", binp],
                                capture_output=True, text=True, timeout=60)
             if r.returncode != 0 or not os.path.exists(binp):
                 totals["COMPILE_FAIL"] += 1
