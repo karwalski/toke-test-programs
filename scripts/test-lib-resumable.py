@@ -6,6 +6,14 @@ import json, glob, os, subprocess, sys, tempfile
 
 ROOT = os.path.expanduser("~/tk/toke-test-programs")
 TOKE = os.path.expanduser("~/tk/toke/toke")
+
+def capflags(sol):
+    """126.3: build with the program's own tkc.toml grants (ADR-0010), never
+    --allow-all, so a missing grant fails its test instead of being masked.
+    No manifest -> an empty config, so a stray ./tkc.toml cannot grant."""
+    m = os.path.join(os.path.dirname(sol), "tkc.toml")
+    return ["--config=" + m] if os.path.exists(m) else ["--config=/dev/null"]
+
 JSONL = os.path.join(ROOT, "reports", "lib-results.jsonl")
 
 def norm(s): return "\n".join(l.rstrip() for l in s.strip().splitlines())
@@ -62,7 +70,7 @@ for cf in cats:
         with tempfile.TemporaryDirectory() as td:
             b = td + "/b"
             try:
-                r = subprocess.run([TOKE, sol, "--allow-all", "--out", b],
+                r = subprocess.run([TOKE, sol, *capflags(sol), "--out", b],
                                    capture_output=True, text=True, timeout=60)
             except subprocess.TimeoutExpired:
                 rec["status"] = "COMPILE_FAIL"; rec["code"] = "COMPILE_TIMEOUT"

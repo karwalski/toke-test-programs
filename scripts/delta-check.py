@@ -5,6 +5,14 @@ fail) and RECOVERED (was fail, now PASS) across all 1460. Resumable: writes
 reports/delta.jsonl per program, skips done."""
 import json, glob, os, subprocess, sys, tempfile
 ROOT=os.path.expanduser("~/tk/toke-test-programs"); TOKE=os.path.expanduser("~/tk/toke/toke")
+
+def capflags(sol):
+    """126.3: build with the program's own tkc.toml grants (ADR-0010), never
+    --allow-all, so a missing grant fails its test instead of being masked.
+    No manifest -> an empty config, so a stray ./tkc.toml cannot grant."""
+    m = os.path.join(os.path.dirname(sol), "tkc.toml")
+    return ["--config=" + m] if os.path.exists(m) else ["--config=/dev/null"]
+
 OUT=ROOT+"/reports/delta.jsonl"
 def norm(s): return "\n".join(l.rstrip() for l in s.strip().splitlines())
 base={}
@@ -40,7 +48,7 @@ for pid,(cat,p) in meta.items():
     else:
         with tempfile.TemporaryDirectory() as td:
             b=td+"/b"
-            try: r=subprocess.run([TOKE,sol,"--allow-all","--out",b],capture_output=True,text=True,timeout=60)
+            try: r=subprocess.run([TOKE,sol,*capflags(sol),"--out",b],capture_output=True,text=True,timeout=60)
             except: r=None
             if r is None or r.returncode!=0 or not os.path.exists(b): st="COMPILE_FAIL"
             else:
