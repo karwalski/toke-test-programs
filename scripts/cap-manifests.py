@@ -42,6 +42,9 @@ GATED = {
         "writelines": {W}, "appendline": {W}, "ensuredir": {W}, "writebytes": {W},
         "copy": {R, W},
     },
+    # std.fs is a second, smaller file surface over the same gated glue
+    # (found by the full-library run: SYS-115 hit CAP001 fs.write).
+    "fs": {"read": {R}, "write": {W}, "writetext": {W}},
     "process": {"spawn": {RUN}, "exec": {RUN}, "spawndetached": {RUN},
                 "stdout": set(), "stderr": set(), "wait": set(), "kill": set()},
     "env": {"set": {ENV}, "get": set(), "getor": set(), "getint": set(), "expand": set()},
