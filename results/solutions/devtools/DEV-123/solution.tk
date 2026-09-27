@@ -18,12 +18,10 @@ f=getint(obj:$str;key:$str):$i64{
 };
 f=fmtbytes(v:$i64):$str{
   if(v>=1048576){
-    let f=v;
-    <s.concat(s.format(f/1048576.0;"%.1f");" MB");
+    <s.concat(s.format((v as f64)/1048576.0;"%.1f");" MB");
   };
   if(v>=1024){
-    let f=v;
-    <s.concat(s.format(f/1024.0;"%.1f");" KB");
+    <s.concat(s.format((v as f64)/1024.0;"%.1f");" KB");
   };
   <s.concat(s.fromint(v);" B");
 };
