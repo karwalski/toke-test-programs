@@ -29,12 +29,12 @@ f=processfile(name:$str;content:$str):i64{
   let lines=countlines(content);
   let words=countwords(content);
   let summary=summarise(name; lines; words);
-  log.info(summary);
+  log.info(summary; @());
   < 1
 };
 
 f=skipfile(name:$str):i64{
-  log.warn(str.concat("skipped: "; name));
+  log.warn(str.concat("skipped: "; name); @());
   < 0
 };
 
@@ -50,13 +50,13 @@ f=processdir(dir:$str):i64!$err{
     };
     total=total+counted
   };
-  log.info(str.concat("processed "; str.fromint(total)));
+  log.info(str.concat("processed "; str.fromint(total)); @());
   < 0
 };
 
 f=main():i64!$err{
   let dir="docs";
-  log.info(str.concat("scanning: "; dir));
+  log.info(str.concat("scanning: "; dir); @());
   processdir(dir)!$err;
   < 0
 };
