@@ -20,7 +20,7 @@ let ch=s.slice(input;idx;idx+1);
 if(ch=="\""){
 if(instr==1){instr=0;if(isval==1){curisstr=1;};}el{instr=1;};
 }el{
-if(instr==1){cur=cur+ch;}el{
+if(instr==1){cur=s.concat(cur;ch);}el{
 if(ch=="{"){isval=0;cur="";curisstr=0;}el{
 if(ch==":"){
 if(objcount==0){if(keycount==0){header=cur;}el{header=s.concat(header;",");header=s.concat(header;cur);};keycount=keycount+1;};
@@ -47,7 +47,7 @@ row="";
 objcount=objcount+1;
 isval=0;cur="";curisstr=0;
 }el{
-if(isval==1){if(ch!=" "){cur=cur+ch;}el{cur=cur+ch;};};
+if(isval==1){if(ch!=" "){cur=s.concat(cur;ch);}el{cur=s.concat(cur;ch);};};
 };
 };
 };

@@ -16,7 +16,7 @@ f=parsebal(json:$str;name:$str):$i64{
         if(ch!="{"){
           if(ch!="}"){
             if(ch!="\""){
-              cleaned=cleaned+ch;
+              cleaned=s.concat(cleaned;ch);
             };
           };
         };
@@ -27,7 +27,7 @@ f=parsebal(json:$str;name:$str):$i64{
         let ch2=s.slice(rawval;k;k+1);
         if(ch2!="}"){
           if(ch2!="{"){
-            cleanval=cleanval+ch2;
+            cleanval=s.concat(cleanval;ch2);
           };
         };
       };
