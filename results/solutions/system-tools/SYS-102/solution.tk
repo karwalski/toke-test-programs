@@ -1,6 +1,6 @@
 m=filecrypt;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
-f=runcmd(cmd:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     Handle:h (mt process.stdout(h){
       $str:o o;
       ProcessErr:e ""
@@ -14,15 +14,11 @@ f=main():$i64{
   let outfile=s.trim(io.readln());
   let passphrase=s.trim(io.readln());
   let isdecrypt=s.eq(mode;"decrypt");
-  let cmd=mut."openssl enc -aes-256-cbc -pbkdf2 -salt";
-  if(isdecrypt){cmd=s.concat(cmd;" -d")};
-  cmd=s.concat(cmd;" -in ");
-  cmd=s.concat(cmd;infile);
-  cmd=s.concat(cmd;" -out ");
-  cmd=s.concat(cmd;outfile);
-  cmd=s.concat(cmd;" -pass pass:");
-  cmd=s.concat(cmd;passphrase);
-  let ignore=runcmd(cmd);
+  let pass=s.concat("pass:";passphrase);
+  let argv=mut.@("openssl";"enc";"-aes-256-cbc";"-pbkdf2";"-salt");
+  if(isdecrypt){argv=argv+@("-d")};
+  argv=argv+@("-in";infile;"-out";outfile;"-pass";pass);
+  let ignore=run(argv);
   if(isdecrypt){
     io.println(s.concat("Decrypted: ";outfile))
   }el{
