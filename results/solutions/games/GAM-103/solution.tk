@@ -6,14 +6,14 @@ i=vec:std.vec;
 (* board stored as flat vec indexed by tri(r)+c, tri(r)=r*(r+1)/2 *)
 f=tri(r:$i64):i64{ <r*(r+1)/2 };
 
-f=copyb(v:$vec):$vec{
+f=copyb(v:$vechandle):$vechandle{
   let n=vec.len(v);
   let r=mut.vec.new();
   lp(let i=0;i<(n as i64);i=i+1){ r=vec.push(r;vec.get(v;i)) };
   <r
 };
 
-f=pegcount(b:$vec):i64{
+f=pegcount(b:$vechandle):i64{
   let n=(vec.len(b) as i64);
   let c=mut.0;
   lp(let i=0;i<n;i=i+1){ if(vec.get(b;i)==1){ c=c+1 } };
@@ -29,7 +29,7 @@ f=valid(r:$i64;c:$i64;rows:$i64):$bool{
   <true
 };
 
-f=solve(b:$vec;rows:$i64):$str{
+f=solve(b:$vechandle;rows:$i64):$str{
   let pc=pegcount(b);
   if(pc==1){ <"" };
   let res=mut."FAIL";
@@ -101,4 +101,4 @@ f=main():i64{
   let out=solve(b;rows);
   if(s.eq(out;"FAIL")){ io.println("No solution") }el{ io.println(out) };
   <0
-}
+};

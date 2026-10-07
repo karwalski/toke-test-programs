@@ -19,7 +19,7 @@ f=fmt2(x:$f64):$str{
 
 (* score a 5-die hand (vec of 5 ints 1..6) for category code:
    cat=0 Large Straight, cat=1 Yahtzee *)
-f=score(h:$vec;cat:$i64):i64{
+f=score(h:$vechandle;cat:$i64):i64{
   (* counts of faces 1..6 *)
   let cnt=mut.vec.new();
   lp(let i=0;i<7;i=i+1){ cnt=vec.push(cnt;0) };
@@ -42,7 +42,7 @@ f=score(h:$vec;cat:$i64):i64{
 
 (* EV of keeping a given subset: kept = vec of kept face values; k dropped dice rerolled,
    enumerate all 6^k outcomes, average score. *)
-f=evkeep(kept:$vec;ndrop:$i64;cat:$i64):$f64{
+f=evkeep(kept:$vechandle;ndrop:$i64;cat:$i64):$f64{
   let total=mut.0;
   let combos=mut.1;
   lp(let i=0;i<ndrop;i=i+1){ combos=combos*6 };
@@ -92,4 +92,4 @@ f=main():i64{
   <0
 };
 
-f=ipow2(n:$i64):i64{ let r=mut.1; lp(let i=0;i<n;i=i+1){ r=r*2 }; <r }
+f=ipow2(n:$i64):i64{ let r=mut.1; lp(let i=0;i<n;i=i+1){ r=r*2 }; <r };

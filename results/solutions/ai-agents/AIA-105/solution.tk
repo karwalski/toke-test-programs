@@ -1,10 +1,10 @@
 m=dispatch;i=io:std.io;i=s:std.str;i=json:std.json;
-f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
-f=setint(a:@($i64);idx:$i64;v:$i64):@($i64){
+f=pdoc(x:$str):$jsonval{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=setint(a:@$i64;idx:$i64;v:$i64):@$i64{
 let r=mut.@(); let n=a.len(); let i=mut.0;
 lp(i<n){ if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
 <r};
-f=setstr(a:@($str);idx:$i64;v:$str):@($str){
+f=setstr(a:@$str;idx:$i64;v:$str):@$str{
 let r=mut.@(); let n=a.len(); let i=mut.0;
 lp(i<n){ if(i==idx){r=r+@(v)}el{r=r+@(a.get(i))}; i=i+1; };
 <r};

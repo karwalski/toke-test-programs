@@ -4,7 +4,7 @@ i=s:std.str;
 i=vec:std.vec;
 
 (* visible buildings scanning a column top->bottom for column c *)
-f=visiblecol(g:$vec;n:$i64;c:$i64;rev:$i64):$i64{
+f=visiblecol(g:$vechandle;n:$i64;c:$i64;rev:$i64):$i64{
   let mx=mut.0;
   let cnt=mut.0;
   lp(let k=0;k<n;k=k+1){
@@ -16,7 +16,7 @@ f=visiblecol(g:$vec;n:$i64;c:$i64;rev:$i64):$i64{
   <cnt
 };
 
-f=visiblerow(g:$vec;n:$i64;r:$i64;rev:$i64):$i64{
+f=visiblerow(g:$vechandle;n:$i64;r:$i64;rev:$i64):$i64{
   let mx=mut.0;
   let cnt=mut.0;
   lp(let k=0;k<n;k=k+1){
@@ -29,7 +29,7 @@ f=visiblerow(g:$vec;n:$i64;r:$i64;rev:$i64):$i64{
 };
 
 (* recursive backtracking. returns solved grid vec on success, or empty vec on fail *)
-f=bt(g:$vec;pos:$i64;n:$i64;top:$vec;bottom:$vec;left:$vec;right:$vec):$vec{
+f=bt(g:$vechandle;pos:$i64;n:$i64;top:$vechandle;bottom:$vechandle;left:$vechandle;right:$vechandle):$vechandle{
   if(pos>=n*n){<g};
   let r=pos/n;
   let c=pos-r*n;
@@ -115,4 +115,4 @@ f=main():i64{
     io.println("No solution")
   };
   <0
-}
+};

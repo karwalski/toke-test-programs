@@ -1,5 +1,5 @@
 m=mincut;i=io:std.io;i=s:std.str;i=v:std.vec;
-f=bfs(n:$i64;src:$i64;snk:$i64;cap:Vec;parent:Vec):$bool{
+f=bfs(n:$i64;src:$i64;snk:$i64;cap:$vechandle;parent:$vechandle):$bool{
 lp(let i=0;i<n;i=i+1){parent.set(i;0-1)};
 parent.set(src;src);
 let q=v.new();q.push(src);let head=mut.0;
@@ -10,7 +10,7 @@ if(parent.get(w)<0){if(cap.get(u*n+w)>0){parent.set(w;u);if(w==snk){<true};q.pus
 };
 };
 <false};
-f=reach(n:$i64;src:$i64;cap:Vec;vis:Vec):$i64{
+f=reach(n:$i64;src:$i64;cap:$vechandle;vis:$vechandle):$i64{
 lp(let i=0;i<n;i=i+1){vis.set(i;0)};
 vis.set(src;1);
 let q=v.new();q.push(src);let head=mut.0;
