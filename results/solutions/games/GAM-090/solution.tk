@@ -103,7 +103,7 @@ f=pw2(n:$i64):$i64{
 };
 
 (* toggle cell (r,c) and its 4 orthogonal neighbours *)
-f=toggle(g:$vec;rows:$i64;cols:$i64;r:$i64;c:$i64):$vec{
+f=toggle(g:$vechandle;rows:$i64;cols:$i64;r:$i64;c:$i64):$vechandle{
   let res=mut.g;
   res=vec.set(res;r*cols+c;1-vec.get(res;r*cols+c));
   if(r>0){ let i=(r-1)*cols+c; res=vec.set(res;i;1-vec.get(res;i)) };
@@ -111,4 +111,4 @@ f=toggle(g:$vec;rows:$i64;cols:$i64;r:$i64;c:$i64):$vec{
   if(c>0){ let i=r*cols+(c-1); res=vec.set(res;i;1-vec.get(res;i)) };
   if(c<cols-1){ let i=r*cols+(c+1); res=vec.set(res;i;1-vec.get(res;i)) };
   <res
-}
+};

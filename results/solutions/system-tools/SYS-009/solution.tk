@@ -1,8 +1,8 @@
 m=envmod;i=io:std.io;i=s:std.str;i=process:std.process;i=env:std.env;
 f=runcmd(argv:@$str):$str{
 <mt process.spawn(argv){
-Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
-ProcessErr:e ""
+$handle:h (mt process.stdout(h){$str:o o;$processerr:e ""});
+$processerr:e ""
 }
 };
 f=main():$i64{

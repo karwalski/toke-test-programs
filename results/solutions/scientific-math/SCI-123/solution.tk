@@ -1,5 +1,5 @@
 m=maxflow;i=io:std.io;i=s:std.str;i=v:std.vec;
-f=bfs(n:$i64;src:$i64;snk:$i64;cap:Vec;parent:Vec):$bool{
+f=bfs(n:$i64;src:$i64;snk:$i64;cap:$vechandle;parent:$vechandle):$bool{
 lp(let i=0;i<n;i=i+1){parent.set(i;0-1)};
 parent.set(src;src);
 let q=v.new();q.push(src);

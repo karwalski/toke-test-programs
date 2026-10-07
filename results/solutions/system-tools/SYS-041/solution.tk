@@ -1,8 +1,8 @@
 m=ifaces;i=io:std.io;i=s:std.str;i=process:std.process;
 f=getout():$str{
 <mt process.spawn(@("ifconfig")){
-Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
-ProcessErr:e ""
+$handle:h (mt process.stdout(h){$str:o o;$processerr:e ""});
+$processerr:e ""
 }
 };
 f=hexprefix(hx:$str):$i64{

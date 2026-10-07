@@ -1,17 +1,17 @@
 m=decompress;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
 f=runshell(cmd:$str):$str{
   <mt process.spawn(@("/bin/sh";"-c";cmd)){
-    Handle:h (mt process.stdout(h){
+    $handle:h (mt process.stdout(h){
       $str:o o;
-      ProcessErr:e ""
+      $processerr:e ""
     });
-    ProcessErr:e ""
+    $processerr:e ""
   }
 };
 f=detect(path:$str):$str{
   let data=mt file.read(path){
     $str:v v;
-    FileErr:e ""
+    $fileerr:e ""
   };
   let b=s.bytes(data);
   let nb=(b.len as $i64);
@@ -53,7 +53,7 @@ f=main():$i64{
     let dummy=runshell(cmd);
     let outdata=mt file.read(outfile){
       $str:v v;
-      FileErr:e ""
+      $fileerr:e ""
     };
     let n=(s.len(outdata) as $i64);
     io.println(s.concat(s.concat(s.concat("Decompressed: ";s.fromint(n));" bytes to ");outfile))

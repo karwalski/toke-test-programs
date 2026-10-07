@@ -1,5 +1,5 @@
 m=validate;i=io:std.io;i=s:std.str;i=json:std.json;
-f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=pdoc(x:$str):$jsonval{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
 f=main():$i64{
 let line=io.readln();
 let d=pdoc(line);

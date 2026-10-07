@@ -7,8 +7,8 @@ i=time:std.time;
 f=runcmd(cmd:$str):$i64{
   let argv=s.split(s.trim(cmd);" ");
   let code=mt process.spawn(argv){
-    Handle:h (mt process.wait(h){ $i32:c (c as $i64); ProcessErr:e (0-1) });
-    ProcessErr:e (0-127)
+    $handle:h (mt process.wait(h){ $i32:c (c as $i64); $processerr:e (0-1) });
+    $processerr:e (0-127)
   };
   if(code<0){<0};
   <code

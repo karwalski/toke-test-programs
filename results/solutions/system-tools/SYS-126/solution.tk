@@ -4,11 +4,11 @@ f=main():$i64{
   let rows=mut.24;
   let cols=mut.80;
   let out=mt process.spawn(@("/bin/sh";"-c";"stty size 2>/dev/null")){
-    Handle:h (mt process.stdout(h){
+    $handle:h (mt process.stdout(h){
       $str:o o;
-      ProcessErr:e ""
+      $processerr:e ""
     });
-    ProcessErr:e ""
+    $processerr:e ""
   };
   let trimmed=s.trim(out);
   if(s.len(trimmed)>0){
@@ -16,8 +16,8 @@ f=main():$i64{
     if(sp>0){
       let rstr=s.slice(trimmed;0 as $u64;sp as $u64);
       let cstr=s.slice(trimmed;(sp+1) as $u64;s.len(trimmed));
-      let rv=mt s.toint(rstr){ $i64:v v; StrErr:e 24 };
-      let cv=mt s.toint(cstr){ $i64:v v; StrErr:e 80 };
+      let rv=mt s.toint(rstr){ $i64:v v; $strerr:e 24 };
+      let cv=mt s.toint(cstr){ $i64:v v; $strerr:e 80 };
       rows=rv;
       cols=cv
     }

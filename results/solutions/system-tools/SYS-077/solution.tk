@@ -27,8 +27,8 @@ f=main():$i64{
 
   let t0=time.now();
   let raw=mt process.spawn(@("/bin/sh";"-c";wrapped)){
-    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "__RC__127" });
-    ProcessErr:e "__RC__127"
+    $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "__RC__127" });
+    $processerr:e "__RC__127"
   };
   let ms=(time.since(t0) as $i64);
 
@@ -39,7 +39,7 @@ f=main():$i64{
     body=s.slice(raw;0;(marker as $u64));
     let after=s.slice(raw;((marker+6) as $u64);s.len(raw));
     let rcstr=s.trim(after);
-    rc=mt s.toint(rcstr){ $i64:v v; ParseErr:e 0 };
+    rc=mt s.toint(rcstr){ $i64:v v; $parseerr:e 0 };
   };
 
   io.print(body);

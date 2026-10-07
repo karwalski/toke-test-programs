@@ -1,8 +1,8 @@
 m=pathscan;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;
 f=listdir(dir:$str):@$str{
   <mt file.list(dir){
-    Ok:v v;
-    FileErr:e @()
+    $ok:v v;
+    $fileerr:e @()
   }
 };
 f=contains(arr:@$str;needle:$str):$bool{
@@ -40,7 +40,7 @@ f=main():$i64{
   };
   let path=mt env.get("PATH"){
     $str:v v;
-    EnvErr:e ""
+    $enverr:e ""
   };
   let dirs=s.split(path;":");
   let seen=mut.@();

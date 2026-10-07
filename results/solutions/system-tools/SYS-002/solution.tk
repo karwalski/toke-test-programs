@@ -1,8 +1,8 @@
 m=processmonitor;i=io:std.io;i=s:std.str;i=process:std.process;i=vec:std.vec;
 f=getout():$str{
 <mt process.spawn(@("ps";"-axo";"pid=,comm=,%cpu=,rss=")){
-Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
-ProcessErr:e ""
+$handle:h (mt process.stdout(h){$str:o o;$processerr:e ""});
+$processerr:e ""
 }
 };
 f=cpux100(cpu:$str):$i64{

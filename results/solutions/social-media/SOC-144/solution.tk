@@ -1,5 +1,5 @@
 m=joingroup;i=io:std.io;i=s:std.str;i=json:std.json;
-f=pdoc(x:$str):Json{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=pdoc(x:$str):$jsonval{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
 f=main():$i64{
 let line=io.readln();
 let d=pdoc(line);
@@ -14,4 +14,4 @@ s.add(b;"{\"group_id\":");
 s.add(b;json.enc(gid));
 s.add(b;",\"member\":true,\"role\":\"member\",\"status\":\"joined\"}");
 io.println(s.done(b));
-<0}
+<0};

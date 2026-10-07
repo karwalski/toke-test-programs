@@ -1,5 +1,5 @@
 m=bipartite;i=io:std.io;i=s:std.str;i=v:std.vec;
-f=tryaug(u:$i64;e:$i64;eu:Vec;ev:Vec;seen:Vec;matchr:Vec):$bool{
+f=tryaug(u:$i64;e:$i64;eu:$vechandle;ev:$vechandle;seen:$vechandle;matchr:$vechandle):$bool{
 let res=mut.false;
 let done=mut.false;
 lp(let i=0;i<e;i=i+1){

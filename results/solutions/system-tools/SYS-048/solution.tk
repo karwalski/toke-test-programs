@@ -21,7 +21,7 @@ f=tokenval(line:$str;n:$i64):$str{
 f=configpath():$str{
   let home=mt env.get("HOME"){
     $str:v v;
-    EnvErr:e ""
+    $enverr:e ""
   };
   <s.concat(home;"/.ssh/config")
 };
@@ -33,7 +33,7 @@ f=dolist():$i64{
   };
   let content=mt file.read(path){
     $str:c c;
-    FileErr:e ""
+    $fileerr:e ""
   };
   let lines=s.split(content;"\n");
   let curalias=mut."";
