@@ -10,8 +10,8 @@ f=main():$i64{
   let argv=s.split(cmd;" ");
   let prog=argv.get(0);
   let result=mt process.spawn(argv){
-    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "__STDOUTERR__" });
-    ProcessErr:e "__NOTFOUND__"
+    $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "__STDOUTERR__" });
+    $processerr:e "__NOTFOUND__"
   };
   if(result=="__NOTFOUND__"){
     io.println("ERROR: command not found: \(prog)");

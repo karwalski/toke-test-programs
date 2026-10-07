@@ -1,8 +1,8 @@
 m=fdlist;i=io:std.io;i=s:std.str;i=process:std.process;
 f=runcmd(c:$str):$str{
   <mt process.spawn(@("/bin/sh";"-c";c)){
-    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
-    ProcessErr:e ""
+    $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "" });
+    $processerr:e ""
   }
 };
 f=main():$i64{

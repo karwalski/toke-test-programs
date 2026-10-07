@@ -1,11 +1,11 @@
 m=mountinfo;i=io:std.io;i=s:std.str;i=process:std.process;
 f=runcmd(cmd:$str):$str{
   <mt process.spawn(@("/bin/sh";"-c";cmd)){
-    Handle:h (mt process.stdout(h){
+    $handle:h (mt process.stdout(h){
       $str:o o;
-      ProcessErr:e ""
+      $processerr:e ""
     });
-    ProcessErr:e ""
+    $processerr:e ""
   }
 };
 f=field(line:$str;n:$i64):$str{
@@ -61,9 +61,9 @@ f=main():$i64{
     let line=s.trim(lines.get(i as $u64));
     if(s.len(line)>0){
       let device=field(line;1);
-      let totalkb=mt s.toint(field(line;2)){ $i64:v v; ParseErr:e 0 };
-      let usedkb=mt s.toint(field(line;3)){ $i64:v v; ParseErr:e 0 };
-      let freekb=mt s.toint(field(line;4)){ $i64:v v; ParseErr:e 0 };
+      let totalkb=mt s.toint(field(line;2)){ $i64:v v; $parseerr:e 0 };
+      let usedkb=mt s.toint(field(line;3)){ $i64:v v; $parseerr:e 0 };
+      let freekb=mt s.toint(field(line;4)){ $i64:v v; $parseerr:e 0 };
       let cap=field(line;5);
       let mp=field(line;6);
       if((totalkb*100)/1048576>0){

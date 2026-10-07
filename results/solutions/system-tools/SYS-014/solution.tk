@@ -1,8 +1,8 @@
 m=tempmgr;i=io:std.io;i=s:std.str;i=fl:std.file;i=process:std.process;i=time:std.time;
 f=runcmd(argv:@$str):$str{
 <mt process.spawn(argv){
-Handle:h (mt process.stdout(h){$str:o o;ProcessErr:e ""});
-ProcessErr:e ""
+$handle:h (mt process.stdout(h){$str:o o;$processerr:e ""});
+$processerr:e ""
 }
 };
 f=mtimeof(path:$str):$i64{

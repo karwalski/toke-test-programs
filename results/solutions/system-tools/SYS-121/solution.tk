@@ -1,17 +1,17 @@
 m=watch;i=io:std.io;i=s:std.str;i=process:std.process;
 f=runshell(cmd:$str):$str{
   <mt process.spawn(@("/bin/sh";"-c";cmd)){
-    Handle:h (mt process.stdout(h){
+    $handle:h (mt process.stdout(h){
       $str:o o;
-      ProcessErr:e ""
+      $processerr:e ""
     });
-    ProcessErr:e ""
+    $processerr:e ""
   }
 };
 f=toi(v:$str):$i64{
   <mt s.toint(s.trim(v)){
     $i64:n n;
-    ParseErr:e 0
+    $parseerr:e 0
   }
 };
 f=main():$i64{

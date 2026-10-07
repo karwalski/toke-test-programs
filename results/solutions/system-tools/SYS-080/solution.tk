@@ -2,16 +2,16 @@ m=healthcheck;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;i=process:st
 f=hasenv(name:$str):$bool{
   <mt env.get(name){
     $str:v (1==1);
-    EnvErr:e (1==0)
+    $enverr:e (1==0)
   }
 };
 f=procrunning(name:$str):$bool{
   let out=mt process.spawn(@("/usr/bin/pgrep";"-f";name)){
-    Handle:h (mt process.stdout(h){
+    $handle:h (mt process.stdout(h){
       $str:o o;
-      ProcessErr:e ""
+      $processerr:e ""
     });
-    ProcessErr:e ""
+    $processerr:e ""
   };
   <(s.len(s.trim(out))>0)
 };

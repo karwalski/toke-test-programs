@@ -2,7 +2,7 @@ m=logapp;i=io:std.io;i=s:std.str;i=file:std.file;i=env:std.env;i=time:std.time;
 f=getuser():$str{
   <mt env.get("USER"){
     $str:v v;
-    EnvErr:e "unknown"
+    $enverr:e "unknown"
   }
 };
 f=main():$i64{
@@ -32,7 +32,7 @@ f=main():$i64{
       jsonline=s.concat(jsonline;"\"}\n");
       let wrote=mt file.append(logpath;jsonline){
         $bool:b b;
-        FileErr:e (1==0)
+        $fileerr:e (1==0)
       };
       let out=mut."Logged: ";
       out=s.concat(out;action);

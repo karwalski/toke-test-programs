@@ -1,11 +1,11 @@
 m=permfix;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
 f=shell(cmd:$str):$str{
   <mt process.spawn(@("/bin/sh";"-c";cmd)){
-    Handle:h (mt process.stdout(h){
+    $handle:h (mt process.stdout(h){
       $str:o o;
-      ProcessErr:e ""
+      $processerr:e ""
     });
-    ProcessErr:e ""
+    $processerr:e ""
   }
 };
 f=main():$i64{

@@ -7,8 +7,8 @@ i=time:std.time;
 
 f=shellout(cmd:$str):$str{
   let res=mt process.spawn(@("/bin/sh";"-c";cmd)){
-    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
-    ProcessErr:e ""
+    $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "" });
+    $processerr:e ""
   };
   <res
 };
@@ -22,8 +22,8 @@ f=mtimeof(path:$str):$str{
 f=runargv(cmd:$str):$str{
   let argv=s.split(s.trim(cmd);" ");
   let res=mt process.spawn(argv){
-    Handle:h (mt process.stdout(h){ $str:o o; ProcessErr:e "" });
-    ProcessErr:e ""
+    $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "" });
+    $processerr:e ""
   };
   <res
 };
@@ -32,7 +32,7 @@ f=main():$i64{
   let path=s.trim(io.readln());
   let cmd=s.trim(io.readln());
   let maxstr=s.trim(io.readln());
-  let maxtrig=mt s.toint(maxstr){ $i64:v v; ParseErr:e 0 };
+  let maxtrig=mt s.toint(maxstr){ $i64:v v; $parseerr:e 0 };
 
   if(!file.exists(path)){
     io.println(s.concat("ERROR: path not found: ";path));

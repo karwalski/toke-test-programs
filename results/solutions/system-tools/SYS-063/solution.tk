@@ -16,9 +16,9 @@ f=randchar():$str{
 f=main():$i64{
   let typ=s.trim(io.readln());
   let countraw=s.trim(io.readln());
-  let count=mt s.toint(countraw){$i64:v v; ParseErr:e 0};
+  let count=mt s.toint(countraw){$i64:v v; $parseerr:e 0};
   if(s.eq(typ;"string")){
-    let length=mt s.toint(s.trim(io.readln())){$i64:v v; ParseErr:e 8};
+    let length=mt s.toint(s.trim(io.readln())){$i64:v v; $parseerr:e 8};
     lp(let n=0;n<count;n=n+1){
       let out=mut."";
       lp(let i=0;i<length;i=i+1){out=s.concat(out;randchar())};
@@ -30,8 +30,8 @@ f=main():$i64{
   let rparts=s.split(rangeraw;" ");
   let mn=mut.0;
   let mx=mut.100;
-  if((rparts.len as $i64)>0){mn=mt s.toint(s.trim(rparts.get(0))){$i64:v v; ParseErr:e 0}};
-  if((rparts.len as $i64)>1){mx=mt s.toint(s.trim(rparts.get(1))){$i64:v v; ParseErr:e 100}};
+  if((rparts.len as $i64)>0){mn=mt s.toint(s.trim(rparts.get(0))){$i64:v v; $parseerr:e 0}};
+  if((rparts.len as $i64)>1){mx=mt s.toint(s.trim(rparts.get(1))){$i64:v v; $parseerr:e 100}};
   if(s.eq(typ;"bytes")){
     let b=crypto.randombytes(count as $u64);
     lp(let i=0;i<(b.len as $i64);i=i+1){io.println(s.fromint(b.get(i) as $i64))};
