@@ -21,7 +21,7 @@ f=main():$i64{
   };
   lp(let i=n-1;i>=0;i=i-1){
     lp(let j=m-1;j>=0;j=j-1){
-      let row=dp.get(i);
+      let row=mut.dp.get(i);
       let rdown=dp.get(i+1);
       if(s.eq(w1.get(i);w2.get(j))){
         row=row.set(j;rdown.get(j+1)+1);
