@@ -22,7 +22,7 @@ f=fmt2(val:$f64):$str{
 };
 f=main():$i64{
   let pline=io.readln();
-  let p=mt s.toint(s.trim(pline)){ $i64:x x; StrErr:e 50 };
+  let p=mt s.toint(s.trim(pline)){ $i64:x x; $parseerr:e 50 };
   let pf=mut.0.0;
   pf=(p as $f64)/100.0;
 
@@ -59,7 +59,7 @@ f=main():$i64{
     if(io.eof()){if(s.len(s.trim(raw))==0){br}};
     let line=s.trim(raw);
     if(s.len(line)>0){
-      let xi=mt s.toint(line){ $i64:x x; StrErr:e 0 };
+      let xi=mt s.toint(line){ $i64:x x; $parseerr:e 0 };
       let x=mut.0.0;
       x=xi as $f64;
       count=count+1;
