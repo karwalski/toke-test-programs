@@ -12,7 +12,7 @@ f=main():$i64{
       if(s.eq(cmd;"CREATE")){
         let name=parts.get(1);
         let ttlstr=parts.get(2);
-        let ttl=mt s.toint(ttlstr){ $i64:v v; StrErr:e 0 };
+        let ttl=mt s.toint(ttlstr){ $i64:v v; $parseerr:e 0 };
         let path=s.concat("/tmp/managed/";name);
         let made=file.mkdir(path);
         names=names+@(name);
