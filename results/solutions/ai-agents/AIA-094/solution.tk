@@ -1,1 +1,61 @@
-m=typeinfer;i=io:std.io;i=s:std.str;i=j:std.json;f=extractparams(code:$str;start:$i64):@($str){let params=mut.@();let depth=mut.0;let current=mut."";let idx=mut.start;lp(idx<s.len(code)){let ch=s.slice(code;idx;idx+1);if(ch=="("){depth=depth+1}el{if(ch==")"){depth=depth-1;if(depth==0){if(s.len(current)>0){params=params.append(s.trim(current))};br}}el{if(ch==","&&depth==1){if(s.len(current)>0){params=params.append(s.trim(current));current=""}}el{current=s.concat(current;ch)}}};idx=idx+1};<params};f=inferparamtype(param:$str;body:$str):$str{if(s.contains(body;s.concat("`";param))||s.contains(body;s.concat(param;"`"))||s.contains(body;s.concat("${";param))){<"string"}el{if(s.contains(body;s.concat(param;"+"))||s.contains(body;s.concat(param;"-"))||s.contains(body;s.concat(param;"*"))||s.contains(body;s.concat(param;"/"))){<"number"}el{<"string"}}};f=inferreturntype(body:$str):$str{let retidx=s.indexof(body;"return");if(retidx==-1){<"void"};let afterret=s.slice(body;retidx+6;s.len(body));if(s.contains(afterret;"`")){<"string"}el{if(s.contains(afterret;"+")||s.contains(afterret;"-")||s.contains(afterret;"*")||s.contains(afterret;"/")){<"number"}el{<"void"}}};f=processfunction(code:$str):$json{let namestart=s.indexof(code;"function");let nameend=mut.-1;let funcname=mut."";if(namestart!=-1){namestart=namestart+8;lp(namestart<s.len(code)&&s.slice(code;namestart;namestart+1)==" "){namestart=namestart+1};nameend=namestart;lp(nameend<s.len(code)){let ch=s.slice(code;nameend;nameend+1);if(ch=="("){br};nameend=nameend+1};funcname=s.slice(code;namestart;nameend)};let params=extractparams(code;nameend);let types=mut.@();let paramtypes=mut.@();lp(let idx=0;idx<params.len;idx=idx+1){let p=params.get(idx);let ptype=inferparamtype(p;code);types=types.append(j.parse(s.concat(s.concat("{\"name\":\"";p);s.concat("\",\"type\":\"";s.concat(ptype;"\"}")))));paramtypes=paramtypes.append(s.concat(s.concat(p;": ");ptype))};let rettype=inferreturntype(code);types=types.append(j.parse(s.concat("{\"name\":\"return\",\"type\":\"";s.concat(rettype;"\"}"))));let typedparams=s.join(paramtypes;", ");let bodystart=s.indexof(code;"{");let bodyend=mut.s.len(code);let bidx=mut.s.len(code)-1;lp(bidx>=0){if(s.slice(code;bidx;bidx+1)=="}"){bodyend=bidx+1;br};bidx=bidx-1};let body="";if(bodystart!=-1&&bodyend>bodystart){body=s.slice(code;bodystart;bodyend)};let typed=s.concat(s.concat(s.concat(s.concat("function ";funcname);"(");typedparams);s.concat(s.concat("): ";rettype);s.concat(" ";body)));<j.parse(s.concat(s.concat("{\"typed_code\":\"";typed);s.concat("\",\"inferred_types\":";s.concat(j.stringify(types);"}"))))};f=processarrow(code:$str):$json{let eqgt=s.indexof(code;"=>");if(eqgt==-1){<j.parse("{}")};let parenstart=mut.-1;let idx=mut.eqgt-1;lp(idx>=0){if(s.slice(code;idx;idx+1)=="("){parenstart=idx;br};idx=idx-1};let params=extractparams(code;parenstart);let afterarrow=s.slice(code;eqgt+2;s.len(code));let types=mut.@();let paramtypes=mut.@();lp(let pidx=0;pidx<params.len;pidx=pidx+1){let p=params.get(pidx);types=types.append(j.parse(s.concat(s.concat("{\"name\":\"";p);"\",\"type\":\"number\"}")));paramtypes=paramtypes.append(s.concat(p;": number"))};types=types.append(j.parse("{\"name\":\"result\",\"type\":\"number\"}"));let typedparams=s.join(paramtypes;", ");let namestart=s.indexof(code;"const");let varname=mut."add";if(namestart!=-1){let eqpos=s.indexof(code;"=");if(eqpos>namestart){varname=s.trim(s.slice(code;namestart+5;eqpos))}};let arrowbody=s.trim(afterarrow);let semipos=s.indexof(arrowbody;";");if(semipos!=-1){arrowbody=s.slice(arrowbody;0;semipos)};let typed=s.concat(s.concat(s.concat(s.concat("const ";varname);" = (");typedparams);s.concat("): number => ";s.concat(arrowbody;";\nconst result: number = ";s.concat(varname;"(1, 2);"))));<j.parse(s.concat(s.concat("{\"typed_code\":\"";typed);s.concat("\",\"inferred_types\":";s.concat(j.stringify(types);"}"))))};f=main():$i64{let input=j.parse(io.readln());let code=input.get("code")as$str;let result=mut.j.parse("{}");if(s.contains(code;"function")){result=processfunction(code)}el{if(s.contains(code;"=>")){result=processarrow(code)}};io.println(j.stringify(result));<0}
+m=typeinfer;i=io:std.io;i=s:std.str;i=json:std.json;
+f=pdoc(x:$str):$jsonval{<mt json.dec(x){$ok:d d;$err:e pdoc("{}")}};
+f=sl(x:$str;a:$i64;b:$i64):$str{<mt s.slice(x;a;b){$ok:v v;$err:e ""}};
+f=isnumname(p:$str):$bool{
+let names=s.split("age,count,n,num,number,total,size,len,length,index,idx,i,j,k,x,y,z,price,amount,qty,quantity,score,id";",");
+let r=mut.false;
+lp(let i=0;i<names.len;i=i+1){if(names.get(i)==p){r=true}};
+<r};
+f=arith(p:$str;body:$str):$bool{
+let ops=s.split("+,-,*,/,%";",");
+let r=mut.false;
+lp(let i=0;i<ops.len;i=i+1){
+let o=ops.get(i);
+if(s.contains(body;s.concat(p;s.concat(" ";o)))||s.contains(body;s.concat(p;o))||s.contains(body;s.concat(o;s.concat(" ";p)))){r=true};
+};
+<r};
+f=paramtype(p:$str;body:$str):$str{
+if(isnumname(p)||arith(p;body)){<"number"};
+if(s.contains(body;s.concat("${";s.concat(p;"}")))){<"string"};
+<"any"};
+f=rettype(body:$str):$str{
+let ri=s.indexof(body;"return");
+if(ri<0){<"void"};
+let after=s.trim(sl(body;ri+6;s.len(body) as $i64));
+if(s.startswith(after;"`")||s.startswith(after;"\"")||s.startswith(after;"'")){<"string"};
+if(s.startswith(after;"true")||s.startswith(after;"false")){<"boolean"};
+if(after!=""&&s.isdigit(sl(after;0;1))){<"number"};
+let expr=sl(after;0;s.indexof(s.concat(after;";");";"));
+if(s.contains(expr;"*")||s.contains(expr;" - ")||s.contains(expr;"/")||s.contains(expr;"%")){<"number"};
+<"any"};
+f=main():$i64{
+let d=pdoc(io.readln());
+let code=mt json.str(d;"code"){$ok:v v;$err:e ""};
+let fi=s.indexof(code;"function ");
+let op=s.indexof(code;"(");
+let cp=s.indexof(code;")");
+if(fi<0||op<fi||cp<op){
+io.println(s.concat("{\"typed_code\":";s.concat(json.enc(code);",\"inferred_types\":[]}")));
+<0};
+let fname=s.trim(sl(code;fi+9;op));
+let ps=s.split(sl(code;op+1;cp);",");
+let body=sl(code;cp+1;s.len(code) as $i64);
+let rty=rettype(body);
+let sig=s.buf();
+let types=s.buf();
+let first=mut.true;
+lp(let i=0;i<ps.len;i=i+1){
+let p=s.trim(ps.get(i));
+if(p!=""){
+let t=paramtype(p;body);
+if(first==false){s.add(sig;", ");s.add(types;",")};
+first=false;
+s.add(sig;s.concat(p;s.concat(": ";t)));
+s.add(types;s.concat("{\"name\":";s.concat(json.enc(p);s.concat(",\"type\":";s.concat(json.enc(t);"}")))));
+};
+};
+if(first==false){s.add(types;",")};
+s.add(types;s.concat("{\"name\":\"return\",\"type\":";s.concat(json.enc(rty);"}")));
+let typed=s.concat(sl(code;0;fi);s.concat("function ";s.concat(fname;s.concat("(";s.concat(s.done(sig);s.concat("): ";s.concat(rty;body)))))));
+io.println(s.concat("{\"typed_code\":";s.concat(json.enc(typed);s.concat(",\"inferred_types\":[";s.concat(s.done(types);"]}")))));
+<0};
