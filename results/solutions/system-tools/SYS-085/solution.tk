@@ -70,6 +70,7 @@ f=main():$i64{
     };
     polls=polls+1;
     if(polls>20){ watching=(1==0); };
+    if(watching){ let slept=time.sleepms(500); };
   };
   <0
 }

@@ -31,15 +31,17 @@ f=topfiles(log:$str;k:$i64):$str{
   let counts=mut.@($i64);
   lp(let i=0;i<lines.len;i=i+1){
     let name=lines.get(i);
-    let at=mut.(0-1);
-    lp(let j=0;j<names.len;j=j+1){
-      if(at<0){if(s.eq(names.get(j);name)){at=j}}
-    };
-    if(at<0){
-      names=names+@(name);
-      counts=counts+@(1)
-    }el{
-      counts=counts.set(at;counts.get(at)+1)
+    if(s.len(name)>0){
+      let at=mut.(0-1);
+      lp(let j=0;j<names.len;j=j+1){
+        if(at<0){if(s.eq(names.get(j);name)){at=j}}
+      };
+      if(at<0){
+        names=names+@(name);
+        counts=counts+@(1)
+      }el{
+        counts=counts.set(at;counts.get(at)+1)
+      }
     }
   };
   let used=mut.@($i64);

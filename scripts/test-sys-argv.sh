@@ -150,7 +150,8 @@ t104() {  # git stats: hostile repository path
     && echo 4 >> a.txt && echo y >> b1.txt && git commit -qam c4 ) || { bad "fixture repo"; return; }
   printf '%s\n' "$R" | "$B" > out 2>&1
   nomarks
-  top=$(git -C "$R" log --pretty=format: --name-only | LC_ALL=C sort | uniq -c \
+  # git log puts a blank line between commits; it names no file (136.81)
+  top=$(git -C "$R" log --pretty=format: --name-only | grep -v '^$' | LC_ALL=C sort | uniq -c \
         | awk '{c=$1; sub(/^ *[0-9]+ ?/, ""); printf "%4d %s\n", c, $0}' | LC_ALL=C sort -rn | head -5)
   exp=$(printf 'Commits: 4\nContributors: 1\nBranches: 1\nTop files: %s' "$(printf '%s' "$top" | sed '1s/^ *//')")
   [ "$(cat out)" = "$exp" ] || { bad "stats differ from the git reference"; printf '%s\n---\n' "$exp"; cat out; }
