@@ -1,12 +1,18 @@
 m=permfix;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
-f=shell(cmd:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     $handle:h (mt process.stdout(h){
       $str:o o;
       $processerr:e ""
     });
     $processerr:e ""
   }
+};
+f=operand(p:$str):$str{
+  if(s.startswith(p;"-")){<s.concat("./";p)};
+  if(s.startswith(p;"!")){<s.concat("./";p)};
+  if(s.startswith(p;"(")){<s.concat("./";p)};
+  <p
 };
 f=main():$i64{
   let dir=s.trim(io.readln());
@@ -20,7 +26,7 @@ f=main():$i64{
     io.println("Summary: 0 files changed.");
     <0
   };
-  let listing=shell(s.concat("find '";s.concat(dir;"' ! -type l")));
+  let listing=run(@("find";operand(dir);"!";"-type";"l"));
   let entries=s.split(listing;"\n");
   let changed=mut.0;
   lp(let i=0;i<entries.len;i=i+1){
@@ -29,12 +35,12 @@ f=main():$i64{
       let isdir=file.isdir(path);
       let target=mut.fmode;
       if(isdir){target=dmode};
-      let cur=s.trim(shell(s.concat("stat -f '%Lp' '";s.concat(path;"'"))));
+      let cur=s.trim(run(@("stat";"-f";"%Lp";path)));
       if(s.eq(cur;target)==(1==0)){
         io.println(s.concat("chmod ";s.concat(target;s.concat(" ";path))));
         changed=changed+1;
         if(dryrun==(1==0)){
-          let r=shell(s.concat("chmod ";s.concat(target;s.concat(" '";s.concat(path;"'")))))
+          let r=run(@("chmod";target;path))
         }
       }
     }

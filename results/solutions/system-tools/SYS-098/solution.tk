@@ -1,15 +1,24 @@
 m=nslist;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
-f=runcmd(c:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";c)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "" });
     $processerr:e ""
+  }
+};
+f=waitrc(h:$handle):$i64{
+  let o=mt process.stdout(h){ $str:v v; $processerr:e "" };
+  <(process.wait(h) as $i64)
+};
+f=status(argv:@$str):$i64{
+  <mt process.spawn(argv){
+    $handle:h waitrc(h);
+    $processerr:e 0-1
   }
 };
 f=nsinode(pid:$str;name:$str):$str{
   let path=s.concat(s.concat(s.concat("/proc/";pid);"/ns/");name);
   if(file.exists(path)){
-    let cmd=s.concat(s.concat("readlink ";path);" 2>/dev/null");
-    let r=s.trim(runcmd(cmd));
+    let r=s.trim(run(@("readlink";path)));
     if(s.len(r)>0){<r}el{<"unavailable"}
   };
   <"unavailable"
@@ -24,9 +33,7 @@ f=main():$i64{
     io.println("ERROR: no PID provided");
     <0
   };
-  let chk=s.concat(s.concat("if ps -p ";pid);" >/dev/null 2>&1; then echo EXISTS; else echo NOTFOUND; fi");
-  let exists=s.trim(runcmd(chk));
-  if(s.eq(exists;"NOTFOUND")){
+  if(status(@("ps";"-p";pid))!=0){
     io.println(s.concat("ERROR: PID not found: ";pid));
     <0
   };

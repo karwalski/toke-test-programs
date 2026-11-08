@@ -1,12 +1,16 @@
 m=decompress;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
-f=runshell(cmd:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     $handle:h (mt process.stdout(h){
       $str:o o;
       $processerr:e ""
     });
     $processerr:e ""
   }
+};
+f=operand(p:$str):$str{
+  if(s.startswith(p;"-")){<s.concat("./";p)};
+  <p
 };
 f=detect(path:$str):$str{
   let data=mt file.read(path){
@@ -29,10 +33,10 @@ f=detect(path:$str):$str{
   <"unknown"
 };
 f=tool(fmt:$str):$str{
-  if(s.eq(fmt;"gzip")){<"gzip -dc"};
-  if(s.eq(fmt;"bzip2")){<"bzip2 -dc"};
-  if(s.eq(fmt;"xz")){<"xz -dc"};
-  if(s.eq(fmt;"zstd")){<"zstd -dc"};
+  if(s.eq(fmt;"gzip")){<"gzip"};
+  if(s.eq(fmt;"bzip2")){<"bzip2"};
+  if(s.eq(fmt;"xz")){<"xz"};
+  if(s.eq(fmt;"zstd")){<"zstd"};
   <""
 };
 f=main():$i64{
@@ -43,14 +47,14 @@ f=main():$i64{
     io.println("ERROR: unrecognized format");
     <0
   };
-  let dc=tool(fmt);
+  let content=run(@(tool(fmt);"-dc";operand(infile)));
   if(s.eq(outfile;"-")){
-    let cmd=s.concat(s.concat(dc;" ");infile);
-    let content=runshell(cmd);
     io.print(content)
   }el{
-    let cmd=s.concat(s.concat(s.concat(s.concat(dc;" ");infile);" > ");outfile);
-    let dummy=runshell(cmd);
+    let wrote=mt file.write(outfile;content){
+      $bool:v v;
+      $fileerr:e (1==0)
+    };
     let outdata=mt file.read(outfile){
       $str:v v;
       $fileerr:e ""

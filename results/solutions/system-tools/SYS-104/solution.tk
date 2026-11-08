@@ -1,6 +1,6 @@
 m=gitstat;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
-f=runcmd(cmd:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     $handle:h (mt process.stdout(h){
       $str:o o;
       $processerr:e ""
@@ -8,11 +8,63 @@ f=runcmd(cmd:$str):$str{
     $processerr:e ""
   }
 };
+f=git(repo:$str;args:@$str):$str{
+  <run(@("git";"-C";repo)+args)
+};
 f=countlines(text:$str):$i64{
   let t=s.trim(text);
   if(s.len(t)==0){<0};
   let parts=s.split(t;"\n");
   <(parts.len as $i64)
+};
+f=pad4(n:$i64):$str{
+  let t=mut.s.fromint(n);
+  lp(s.len(t)<(4 as $u64)){t=s.concat(" ";t)};
+  <t
+};
+f=topfiles(log:$str;k:$i64):$str{
+  let raw=mut.log;
+  if(s.len(raw)==0){<""};
+  if(s.endswith(raw;"\n")){raw=s.slice(raw;0 as $u64;s.len(raw)-(1 as $u64))};
+  let lines=s.split(raw;"\n");
+  let names=mut.@($str);
+  let counts=mut.@($i64);
+  lp(let i=0;i<lines.len;i=i+1){
+    let name=lines.get(i);
+    let at=mut.(0-1);
+    lp(let j=0;j<names.len;j=j+1){
+      if(at<0){if(s.eq(names.get(j);name)){at=j}}
+    };
+    if(at<0){
+      names=names+@(name);
+      counts=counts+@(1)
+    }el{
+      counts=counts.set(at;counts.get(at)+1)
+    }
+  };
+  let used=mut.@($i64);
+  lp(let j=0;j<names.len;j=j+1){used=used+@(0)};
+  let out=mut."";
+  let picked=mut.0;
+  lp(picked<k){
+    let best=mut.(0-1);
+    lp(let j=0;j<names.len;j=j+1){
+      if(used.get(j)==0){
+        if(best<0){best=j}el{
+          let cj=counts.get(j);
+          let cb=counts.get(best);
+          if(cj>cb){best=j}el{
+            if(cj==cb){if(s.compare(names.get(j);names.get(best))>0){best=j}}
+          }
+        }
+      }
+    };
+    if(best<0){br};
+    used=used.set(best;1);
+    out=s.concat(out;s.concat(s.concat(pad4(counts.get(best));" ");s.concat(names.get(best);"\n")));
+    picked=picked+1
+  };
+  <out
 };
 f=main():$i64{
   let repo=s.trim(io.readln());
@@ -20,14 +72,14 @@ f=main():$i64{
     io.println(s.concat("ERROR: not a git repository: ";repo));
     <0
   };
-  let commitsout=runcmd(s.concat(s.concat("git -C ";repo);" rev-list --count HEAD 2>/dev/null"));
+  let commitsout=git(repo;@("rev-list";"--count";"HEAD"));
   let commits=mut.s.trim(commitsout);
   if(s.len(commits)==0){commits="0"};
-  let contribout=runcmd(s.concat(s.concat("git -C ";repo);" shortlog -s -n HEAD 2>/dev/null"));
+  let contribout=git(repo;@("shortlog";"-s";"-n";"HEAD"));
   let contributors=countlines(contribout);
-  let branchout=runcmd(s.concat(s.concat("git -C ";repo);" branch -a 2>/dev/null"));
+  let branchout=git(repo;@("branch";"-a"));
   let branches=countlines(branchout);
-  let topout=runcmd(s.concat(s.concat("git -C ";repo);" log --pretty=format: --name-only 2>/dev/null | sort | uniq -c | sort -rn | head -5"));
+  let topout=topfiles(git(repo;@("log";"--pretty=format:";"--name-only"));5);
   io.println(s.concat("Commits: ";commits));
   io.println(s.concat("Contributors: ";s.fromint(contributors)));
   io.println(s.concat("Branches: ";s.fromint(branches)));

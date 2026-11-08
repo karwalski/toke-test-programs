@@ -1,9 +1,35 @@
 m=fdlist;i=io:std.io;i=s:std.str;i=process:std.process;
-f=runcmd(c:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";c)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "" });
     $processerr:e ""
   }
+};
+f=waitrc(h:$handle):$i64{
+  let o=mt process.stdout(h){ $str:v v; $processerr:e "" };
+  <(process.wait(h) as $i64)
+};
+f=status(argv:@$str):$i64{
+  <mt process.spawn(argv){
+    $handle:h waitrc(h);
+    $processerr:e 0-1
+  }
+};
+f=fdtable(raw:$str):$str{
+  let lines=s.split(raw;"\n");
+  let fd=mut."";
+  let ty=mut."";
+  let out=mut."";
+  lp(let i=0;i<lines.len;i=i+1){
+    let line=lines.get(i);
+    if(s.startswith(line;"f")){fd=s.slice(line;1 as $u64;s.len(line))};
+    if(s.startswith(line;"t")){ty=s.slice(line;1 as $u64;s.len(line))};
+    if(s.startswith(line;"n")){
+      let rec=s.concat(s.concat(s.concat(s.concat(fd;" ");ty);" ");s.slice(line;1 as $u64;s.len(line)));
+      out=s.concat(s.concat(out;rec);"\n")
+    }
+  };
+  <out
 };
 f=main():$i64{
   let pid=s.trim(io.readln());
@@ -11,14 +37,11 @@ f=main():$i64{
     io.println("ERROR: no PID provided");
     <0
   };
-  let chk=s.concat(s.concat("if ps -p ";pid);" >/dev/null 2>&1; then echo EXISTS; else echo NOTFOUND; fi");
-  let exists=s.trim(runcmd(chk));
-  if(s.eq(exists;"NOTFOUND")){
+  if(status(@("ps";"-p";pid))!=0){
     io.println(s.concat("ERROR: PID not found: ";pid));
     <0
   };
-  let cmd=s.concat(s.concat("lsof -p ";pid);" -Fftn 2>/dev/null | awk '/^f/{fd=substr($0,2)} /^t/{ty=substr($0,2)} /^n/{print fd, ty, substr($0,2)}'");
-  let out=runcmd(cmd);
+  let out=fdtable(run(@("lsof";"-p";pid;"-Fftn")));
   let lines=s.split(out;"\n");
   let warm=lines.get(0);
   lp(let i=0;i<(s.len(lines) as $i64);i=i+1){

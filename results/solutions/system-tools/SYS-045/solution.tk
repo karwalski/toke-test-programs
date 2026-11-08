@@ -1,6 +1,6 @@
 m=extract;i=io:std.io;i=s:std.str;i=file:std.file;i=process:std.process;
-f=runcmd(cmd:$str):$str{
-  <mt process.spawn(@("/bin/sh";"-c";cmd)){
+f=run(argv:@$str):$str{
+  <mt process.spawn(argv){
     $handle:h (mt process.stdout(h){
       $str:o o;
       $processerr:e ""
@@ -8,23 +8,25 @@ f=runcmd(cmd:$str):$str{
     $processerr:e ""
   }
 };
-f=listcmd(path:$str):$str{
-  let lo=s.lower(path);
-  if(s.endswith(lo;".tar.gz")){<s.concat(s.concat("tar tzf '";path);"'")};
-  if(s.endswith(lo;".tgz")){<s.concat(s.concat("tar tzf '";path);"'")};
-  if(s.endswith(lo;".tar.bz2")){<s.concat(s.concat("tar tjf '";path);"'")};
-  if(s.endswith(lo;".zip")){<s.concat(s.concat("unzip -Z1 '";path);"'")};
-  <s.concat(s.concat("tar tf '";path);"'")
+f=operand(p:$str):$str{
+  if(s.startswith(p;"-")){<s.concat("./";p)};
+  <p
 };
-f=extractcmd(path:$str;dest:$str):$str{
+f=listargv(path:$str):@$str{
   let lo=s.lower(path);
-  let q=s.concat(s.concat("'";path);"'");
-  let d=s.concat(s.concat("'";dest);"'");
-  if(s.endswith(lo;".tar.gz")){<s.concat(s.concat(s.concat("tar xzf ";q);" -C ");d)};
-  if(s.endswith(lo;".tgz")){<s.concat(s.concat(s.concat("tar xzf ";q);" -C ");d)};
-  if(s.endswith(lo;".tar.bz2")){<s.concat(s.concat(s.concat("tar xjf ";q);" -C ");d)};
-  if(s.endswith(lo;".zip")){<s.concat(s.concat(s.concat("unzip -o -q ";q);" -d ");d)};
-  <s.concat(s.concat(s.concat("tar xf ";q);" -C ");d)
+  if(s.endswith(lo;".tar.gz")){<@("tar";"tzf";path)};
+  if(s.endswith(lo;".tgz")){<@("tar";"tzf";path)};
+  if(s.endswith(lo;".tar.bz2")){<@("tar";"tjf";path)};
+  if(s.endswith(lo;".zip")){<@("unzip";"-Z1";operand(path))};
+  <@("tar";"tf";path)
+};
+f=extractargv(path:$str;dest:$str):@$str{
+  let lo=s.lower(path);
+  if(s.endswith(lo;".tar.gz")){<@("tar";"xzf";path;"-C";dest)};
+  if(s.endswith(lo;".tgz")){<@("tar";"xzf";path;"-C";dest)};
+  if(s.endswith(lo;".tar.bz2")){<@("tar";"xjf";path;"-C";dest)};
+  if(s.endswith(lo;".zip")){<@("unzip";"-o";"-q";operand(path);"-d";dest)};
+  <@("tar";"xf";path;"-C";dest)
 };
 f=main():$i64{
   let path=s.trim(io.readln());
@@ -33,9 +35,9 @@ f=main():$i64{
     io.println(s.concat("ERROR: archive not found: ";path));
     <0
   };
-  runcmd(s.concat("mkdir -p '";s.concat(dest;"'")));
-  runcmd(extractcmd(path;dest));
-  let listing=runcmd(listcmd(path));
+  run(@("mkdir";"-p";operand(dest)));
+  run(extractargv(path;dest));
+  let listing=run(listargv(path));
   let lines=s.split(listing;"\n");
   let count=mut.0;
   lp(let i=0;i<lines.len;i=i+1){
