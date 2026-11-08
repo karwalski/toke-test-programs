@@ -5,18 +5,28 @@ i=file:std.file;
 i=process:std.process;
 i=time:std.time;
 
-f=shellout(cmd:$str):$str{
-  let res=mt process.spawn(@("/bin/sh";"-c";cmd)){
-    $handle:h (mt process.stdout(h){ $str:o o; $processerr:e "" });
+f=okout(h:$handle):$str{
+  let o=mt process.stdout(h){ $str:v v; $processerr:e "" };
+  if(process.wait(h)==0){<o};
+  <""
+};
+
+f=runok(argv:@$str):$str{
+  <mt process.spawn(argv){
+    $handle:h okout(h);
     $processerr:e ""
-  };
-  <res
+  }
+};
+
+f=operand(p:$str):$str{
+  if(s.startswith(p;"-")){<s.concat("./";p)};
+  <p
 };
 
 f=mtimeof(path:$str):$str{
-  let cmd=s.concat(s.concat("stat -f %m \"";path);"\" 2>/dev/null || stat -c %Y \"");
-  let full=s.concat(cmd;s.concat(path;"\" 2>/dev/null"));
-  <s.trim(shellout(full))
+  let bsd=s.trim(runok(@("stat";"-f";"%m";operand(path))));
+  if(s.len(bsd)>0){<bsd};
+  <s.trim(runok(@("stat";"-c";"%Y";operand(path))))
 };
 
 f=runargv(cmd:$str):$str{
