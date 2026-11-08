@@ -93,6 +93,11 @@ python3 scripts/verify-one.py GAM-001
 
 # Validate requirement uniqueness and diversity
 python3 scripts/validate-uniqueness.py
+
+# No program runs a shell command line built from its input (argv-only exec)
+python3 scripts/check-shell-spawn.py
+scripts/test-sys-argv.sh        # hostile-input tests for the programs that used to
+scripts/test-sys102-argv.sh     # build /bin/sh -c commands (136.72, 136.80)
 ```
 
 `scripts/test-runner.sh <program-dir>` and `scripts/run-all.sh` are the
