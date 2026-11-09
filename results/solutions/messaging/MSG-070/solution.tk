@@ -1,5 +1,5 @@
 m=rotkey;i=io:std.io;i=s:std.str;i=enc:std.encoding;
-f=xorcyc(p:@$i64;k:@$i64):@$i64{let r=mut.@();let kl=k.len();lp(let i=0;i<p.len();i=i+1){let kb=k.get(i-i/kl*kl);r=r+@(p.get(i)^kb)};<r};
+f=xorcyc(p:@byte;k:@byte):@byte{let r=mut.s.bytes("");let kl=k.len();lp(let i=0;i<p.len();i=i+1){let kb=k.get(i-i/kl*kl);r=r+@(p.get(i)^kb)};<r};
 f=getkey(js:$str;ver:$i64):$str{
   let tok=s.concat("\"version\":";s.fromint(ver));
   let vi=s.indexof(js;tok);
@@ -9,12 +9,12 @@ f=getkey(js:$str;ver:$i64):$str{
   let endq=s.indexof(after;"\"");
   <s.slice(after;0;endq)
 };
-f=render(b:@$i64):$str{
-  let out=mut.@();
+f=render(b:@byte):$str{
+  let out=mut.s.bytes("");
   lp(let i=0;i<b.len();i=i+1){
     let c=b.get(i);
-    if(c<32){out=out+@(63)}el{
-      if(c<128){out=out+@(c)}el{out=out+@(239)+@(191)+@(189)}
+    if(c<32){out=out.append(63 as byte)}el{
+      if(c<128){out=out.append(c)}el{out=out.append(239 as byte).append(191 as byte).append(189 as byte)}
     }
   };
   <s.frombytes(out)

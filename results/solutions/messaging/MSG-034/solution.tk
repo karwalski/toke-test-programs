@@ -10,8 +10,8 @@ i=cr:std.crypto;
 i=enc:std.encoding;
 
 (* 5 big-endian bytes of the fingerprint at `off` -> value mod 100000. *)
-f=chunkval(h:@i64;off:i64):i64{
-  let v=h.get(off)*4294967296+h.get(off+1)*16777216+h.get(off+2)*65536+h.get(off+3)*256+h.get(off+4);
+f=chunkval(h:@byte;off:i64):i64{
+  let v=(h.get(off) as i64)*4294967296+h.get(off+1)*16777216+h.get(off+2)*65536+h.get(off+3)*256+h.get(off+4);
   <v-(v/100000)*100000
 };
 
@@ -23,9 +23,9 @@ f=pad5(n:i64):str{
 };
 
 (* per-party fingerprint: 64-byte SHA-512 chain (first 30 bytes are used). *)
-f=fp(keyhex:str;id:str):@i64{
-  let key=mt enc.hexdecode(keyhex){$ok:v v;$err:e @()};
-  let h=mut.@(0;0);
+f=fp(keyhex:str;id:str):@byte{
+  let key=mt enc.hexdecode(keyhex){$ok:v v;$err:e s.bytes("")};
+  let h=mut.s.bytes("").append(0 as byte).append(0 as byte);
   h=h+key;
   h=h+s.bytes(id);
   lp(let i=0;i<5200;i=i+1){ h=cr.sha512(h+key); };
@@ -33,14 +33,14 @@ f=fp(keyhex:str;id:str):@i64{
 };
 
 (* the 30-digit string with no separators — used for ordering. *)
-f=keystr(h:@i64):str{
+f=keystr(h:@byte):str{
   let out=mut.pad5(chunkval(h;0));
   lp(let k=1;k<6;k=k+1){ out=s.concat(out;pad5(chunkval(h;k*5))); };
   <out
 };
 
 (* the same six chunks joined by single spaces. *)
-f=groupstr(h:@i64):str{
+f=groupstr(h:@byte):str{
   let out=mut.pad5(chunkval(h;0));
   lp(let k=1;k<6;k=k+1){ out=s.concat(s.concat(out;" ");pad5(chunkval(h;k*5))); };
   <out

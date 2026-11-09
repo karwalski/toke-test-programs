@@ -1,7 +1,7 @@
 m=x3dh;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
-f=bcat(a:@$i64;b:@$i64):@$i64{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
-f=blt(a:@$i64;b:@$i64):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1==1};if(y<x){<1==0}};<la<lb};
-f=simdh(k1:@$i64;k2:@$i64):@$i64{let lo=mut.k1;let hi=mut.k2;if(blt(k2;k1)){lo=k2;hi=k1};<cr.sha256(bcat(lo;hi))};
+f=bcat(a:@byte;b:@byte):@byte{let r=mut.a;lp(let i=0;i<b.len();i=i+1){r=r+@(b.get(i))};<r};
+f=blt(a:@byte;b:@byte):$bool{let la=a.len();let lb=b.len();let n=mut.la;if(lb<la){n=lb};lp(let i=0;i<n;i=i+1){let x=a.get(i);let y=b.get(i);if(x<y){<1==1};if(y<x){<1==0}};<la<lb};
+f=simdh(k1:@byte;k2:@byte):@byte{let lo=mut.k1;let hi=mut.k2;if(blt(k2;k1)){lo=k2;hi=k1};<cr.sha256(bcat(lo;hi))};
 f=main():$i64{
 let ika=enc.hexdecode(s.trim(io.readln()));
 let ikb=enc.hexdecode(s.trim(io.readln()));
@@ -14,9 +14,9 @@ let dh2=simdh(eka;ikb);
 let dh3=simdh(eka;spkb);
 let dh4=simdh(eka;opkb);
 let ss=bcat(bcat(bcat(dh1;dh2);dh3);dh4);
-let salt=mut.@(0);lp(let i=0;i<31;i=i+1){salt=salt+@(0)};
+let salt=mut.s.bytes("");lp(let i=0;i<32;i=i+1){salt=salt.append(0 as byte)};
 let prk=cr.hmacsha256(salt;ss);
-let info=bcat(s.bytes("X3DH-SHA256");@(1));
+let info=bcat(s.bytes("X3DH-SHA256");@(1 as byte));
 let sk=cr.hmacsha256(prk;info);
 let ad=bcat(ika;ikb);
 let out=s.concat("{\"shared_secret\": \"";s.concat(enc.hexencode(ss);s.concat("\", \"session_key\": \"";s.concat(enc.hexencode(sk);s.concat("\", \"associated_data\": \"";s.concat(enc.hexencode(ad);"\"}"))))));

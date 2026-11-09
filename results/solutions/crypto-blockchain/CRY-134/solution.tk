@@ -3,8 +3,8 @@ f=lsr(x:$i64;n:$i64):$i64{if(n==0){<x};<(x>>n)&((1<<(64-n))-1)};
 f=wadd(a:$i64;b:$i64):$i64{let lo=(a&4294967295)+(b&4294967295);let hi=(lsr(a;32)&4294967295)+(lsr(b;32)&4294967295)+lsr(lo;32);<((hi&4294967295)<<32)|(lo&4294967295)};
 f=rotl(x:$i64;b:$i64):$i64{if(b==0){<x};<(x<<b)|lsr(x;64-b)};
 f=mulhismall(a:$i64;b:$i64):$i64{let al=a&4294967295;let ah=lsr(a;32);let lo=al*b;let hi=ah*b;let t=wadd(hi;lsr(lo;32));<lsr(t;32)};
-f=ldle64(d:@$i64;off:$i64;ln:$i64):$i64{let v=mut.0;lp(let j=0;j<ln;j=j+1){let by=d.get(off+j);v=v|(by<<(8*j))};<v};
-f=siphash(k0:$i64;k1:$i64;data:@$i64):$i64{
+f=ldle64(d:@byte;off:$i64;ln:$i64):$i64{let v=mut.0;lp(let j=0;j<ln;j=j+1){let by=d.get(off+j) as i64;v=v|(by<<(8*j))};<v};
+f=siphash(k0:$i64;k1:$i64;data:@byte):$i64{
 let v0=mut.k0^8317987319222330741;
 let v1=mut.k1^7237128888997146477;
 let v2=mut.k0^7816392313619706465;
@@ -24,7 +24,7 @@ i=i+8};
 let last=ln&255;
 let tailn=ln-i;
 let b=mut.(last<<56);
-lp(let j=0;j<tailn;j=j+1){b=b|(data.get(i+j)<<(8*j))};
+lp(let j=0;j<tailn;j=j+1){b=b|((data.get(i+j) as i64)<<(8*j))};
 v3=v3^b;
 lp(let rr=0;rr<2;rr=rr+1){
 v0=wadd(v0;v1);v1=rotl(v1;13);v1=v1^v0;v0=rotl(v0;32);
@@ -39,7 +39,7 @@ v2=wadd(v2;v3);v3=rotl(v3;16);v3=v3^v2;
 v0=wadd(v0;v3);v3=rotl(v3;21);v3=v3^v0;
 v2=wadd(v2;v1);v1=rotl(v1;17);v1=v1^v2;v2=rotl(v2;32)};
 <v0^v1^v2^v3};
-f=hashtorange(item:@$i64;f:$i64;k0:$i64;k1:$i64):$i64{let h=siphash(k0;k1;item);<mulhismall(h;f)};
+f=hashtorange(item:@byte;f:$i64;k0:$i64;k1:$i64):$i64{let h=siphash(k0;k1;item);<mulhismall(h;f)};
 f=parseelems(line:$str):@$str{
 let inner=mut.line;
 let n=s.len(line);
@@ -75,8 +75,8 @@ let bodylen=mut.nbits;let pad=mut.0;if(nbits-nbits/8*8!=0){pad=8-(nbits-nbits/8*
 let body=mut.@();
 let bi=mut.0;
 lp(bi<nbits){let by=mut.0;lp(let j=0;j<8;j=j+1){let bit=mut.0;if(bi+j<nbits){bit=bits.get(bi+j)};by=(by<<1)|bit};body=body+@(by);bi=bi+8};
-let filt=mut.@(nn);
-lp(let z=0;z<body.len();z=z+1){filt=filt+@(body.get(z))};
+let filt=mut.s.bytes("").append(nn as byte);
+lp(let z=0;z<body.len();z=z+1){filt=filt.append(body.get(z) as byte)};
 io.println(enc.hexencode(filt));
 let qh=hashtorange(s.bytes(s.trim(query));ff;k0;k1);
 let cur=mut.0;let matched=mut.0;let done=mut.0;

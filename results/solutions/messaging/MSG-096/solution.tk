@@ -1,5 +1,5 @@
 m=attach;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;
-f=xorb(p:@$i64;k:@$i64):@$i64{let r=mut.@();let kl=k.len();lp(let i=0;i<p.len();i=i+1){let kb=k.get(i-i/kl*kl);r=r+@(p.get(i)^kb)};<r};
+f=xorb(p:@byte;k:@byte):@byte{let r=mut.s.bytes("");let kl=k.len();lp(let i=0;i<p.len();i=i+1){let kb=k.get(i-i/kl*kl);r=r+@(p.get(i)^kb)};<r};
 f=main():$i64{
 let filename=s.trim(io.readln());
 let size=s.trim(io.readln());
