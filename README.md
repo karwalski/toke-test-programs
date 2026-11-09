@@ -150,4 +150,4 @@ The `infra/` directory contains scripts for automated program generation at scal
 
 ## License
 
-MIT
+Apache 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
