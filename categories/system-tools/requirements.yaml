@@ -113,23 +113,28 @@
     - "Preserve directory structure"
 
 - id: "SYS-008"
-  disabled: true
-  disabled_reason: "[CHEAT-AUDIT] test_cases admit input-discriminator hardcoded-output bypass"
-  disabled_at: "2026-06-02"
-  disabled_by: "epic-112-cheat-audit"
   title: "Service Monitor"
-  description: "Check whether a list of system services (process names) are running. Print status for each."
+  description: "Check whether a list of system services (process names) are running against a process-table snapshot, and print the status of each. The snapshot keeps the check portable (114.28): PID 1 is init or systemd on Linux and launchd on macOS, so a live probe for a fixed name has no single expected output."
   difficulty: 2
-  stdlib_modules: [std.process, std.io, std.str]
-  input_format: "Lines of service/process names (one per line)"
-  output_format: "service_name: RUNNING | STOPPED"
+  stdlib_modules: [std.io, std.str]
+  input_format: "The process table, one command per line as `ps -A -o comm=` prints it (a bare name or an absolute path), then a line containing only '--', then service names one per line. The service list ends at a blank line or end of input; a blank line or end of input before '--' means no services."
+  output_format: "'service_name: RUNNING' or 'service_name: STOPPED', one line per service in input order; '(empty output)' when no service names are given."
+  algorithm: >
+    A service is RUNNING when some process-table command equals its name
+    exactly, or when a command written as a path ("/usr/sbin/sshd") has the
+    name as its final path component. Substrings never match ("ssh" is not
+    "sshd"). Reference: results/python-refs/system-tools/SYS-008/solution.py.
   test_cases:
-    - input: "init\nnonexistentservice123"
-      expected_output: "init: RUNNING\nnonexistentservice123: STOPPED"
+    - input: "systemd\n/usr/sbin/sshd\ncron\nnginx\n(sd-pam)\n--\nsshd\nssh\ncron\nnginx-worker\nsystemd"
+      expected_output: "sshd: RUNNING\nssh: STOPPED\ncron: RUNNING\nnginx-worker: STOPPED\nsystemd: RUNNING"
+    - input: "/sbin/launchd\n/usr/libexec/logd\n/usr/sbin/sshd-keygen-wrapper\n/usr/sbin/cfprefsd\n--\nlaunchd\nlogd\nsshd\ninit"
+      expected_output: "launchd: RUNNING\nlogd: RUNNING\nsshd: STOPPED\ninit: STOPPED"
+    - input: "--\nnginx"
+      expected_output: "nginx: STOPPED"
     - input: ""
       expected_output: "(empty output)"
   constraints:
-    - "Match process names exactly (not substrings)"
+    - "Match process names exactly (not substrings); a path matches on its final component"
     - "Exit code 0 even if services are stopped"
 
 - id: "SYS-009"
