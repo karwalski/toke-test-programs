@@ -41,7 +41,7 @@ let v=b.get(idx)^((~b.get(x1+5*y))&b.get(x2+5*y));
 a=a.set(idx;v)}};
 a=a.set(0;a.get(0)^rc(rnd))};
 <a};
-f=keccak256(msg:@$i64):@$i64{
+f=keccak256(msg:@$i64):@byte{
 let m=mut.msg;
 m=m+@(1);
 lp(m.len()-m.len()/136*136!=0){m=m+@(0)};
@@ -58,11 +58,11 @@ lane=lane|(bb<<(8*j))};
 state=state.set(i;state.get(i)^lane)};
 state=keccakf(state);
 off=off+136};
-let out=mut.@();
+let out=mut.s.bytes("");
 lp(let i=0;i<4;i=i+1){
 let lane=state.get(i);
 lp(let j=0;j<8;j=j+1){
-out=out+@(lsr(lane;8*j)&255)}};
+out=out.append((lsr(lane;8*j)&255) as byte)}};
 <out};
 f=hexval(c:$i64):$i64{
 if(c>=48){if(c<=57){<c-48}};
@@ -78,18 +78,18 @@ let bs=mut.@();
 let tl=tmp.len();
 lp(let i=0;i<tl;i=i+1){bs=bs+@(tmp.get(tl-1-i))};
 <rlpstr(bs)};
-f=enchex(hx:@$i64):@$i64{
+f=enchex(hx:@byte):@$i64{
 let bs=mut.@();
 let nh=hx.len();
 let start=mut.0;
 let cnt=mut.nh;
 if(nh-nh/2*2!=0){
-bs=bs+@(hexval(hx.get(0)));
+bs=bs+@(hexval(hx.get(0) as i64));
 start=1;cnt=nh-1};
 lp(let i=start;i+1<hx.len()+1;i=i+2){
 if(i+1<=hx.len()){
-let hi=hexval(hx.get(i));
-let lo=hexval(hx.get(i+1));
+let hi=hexval(hx.get(i) as i64);
+let lo=hexval(hx.get(i+1) as i64);
 bs=bs+@(hi*16+lo)}};
 if(nh==0){bs=@()};
 <rlpstr(bs)};
@@ -143,7 +143,7 @@ lp(p<n){
 let ch=s.slice(j;p;p+1);
 if(s.eq(ch;"\"")){p=n}el{out=s.concat(out;ch);p=p+1}};
 <out};
-f=striphex(hs:$str):@$i64{
+f=striphex(hs:$str):@byte{
 let body=mut.hs;
 if(s.len(hs)>=2){
 let pre=s.slice(hs;0;2);
