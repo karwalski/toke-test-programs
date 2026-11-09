@@ -1,1 +1,48 @@
-m=checkrunning;i=io:std.io;i=s:std.str;f=main():$i64{let stop=mut.0;let count=mut.0;lp(stop<1){let line=io.readln();let svc=s.trim(line);if(s.len(svc)==0){stop=1}el{count=count+1;if(s.equals(svc;"init")){io.println(s.concat(svc;": RUNNING"))}el{io.println(s.concat(svc;": STOPPED"))}}};if(count==0){io.println("(empty output)")};<0}
+(* SYS-008 — Service monitor over a process-table snapshot (114.28).
+ * The snapshot (one command per line, as `ps -A -o comm=` prints it) makes the
+ * check portable: PID 1 is init/systemd on Linux and launchd on macOS, so a
+ * live probe for a fixed name has no single expected output. A service is
+ * RUNNING when a command equals its name exactly, or when a command written
+ * as a path has the name as its final component. Substrings never match. *)
+m=svcmon;
+i=io:std.io;
+i=s:std.str;
+
+(* the final path component of a command ("/usr/sbin/sshd" -> "sshd"). *)
+f=base(cmd:str):str{
+  let at=s.lastindex(cmd;"/");
+  if(at<0){<cmd};
+  <mt s.slice(cmd;(at+1) as u64;s.len(cmd)){$ok:v v;$err:e cmd}
+};
+
+f=running(table:@str;svc:str):bool{
+  lp(let i=0;i<table.len;i=i+1){
+    let cmd=table.get(i);
+    if(s.eq(cmd;svc)||s.eq(base(cmd);svc)){<true}
+  };
+  <false
+};
+
+f=main():i64{
+  let table=mut.@($str);
+  let done=mut.false;
+  let eof=mut.false;
+  lp(!done&&!eof){
+    let line=s.trim(io.readln());
+    if(s.eq(line;"--")){done=true}el{
+      if(s.len(line)>0){table=table+@(line)}el{eof=true}
+    }
+  };
+  let count=mut.0;
+  let more=mut.done;
+  lp(more){
+    let svc=s.trim(io.readln());
+    if(s.len(svc)==0){more=false}el{
+      count=count+1;
+      let st=if(running(table;svc)){"RUNNING"}el{"STOPPED"};
+      io.println("\(svc): \(st)")
+    }
+  };
+  if(count==0){io.println("(empty output)")};
+  <0
+};

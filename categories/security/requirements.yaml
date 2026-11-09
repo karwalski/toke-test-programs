@@ -978,25 +978,38 @@
     - "Must list all exposed operations if introspection is on"
 
 - id: "SEC-053"
-  disabled: true
-  disabled_reason: "[ALL_TESTS_SAME_OUTPUT] test_cases admit trivially-hardcoded constants. Expected sample: 'Testing'"
-  disabled_at: "2026-06-01"
-  disabled_by: "107-R7-trivial-test-cases"
   title: "XML External Entity (XXE) Tester"
-  description: "Reads an XML-accepting URL from stdin. Tests for XXE vulnerabilities by injecting DOCTYPE with external entity references and observing if file contents leak in response."
+  description: "Reads an XML-accepting URL and the responses a mock endpoint returned to two XXE probes (114.28: the corpus harness has no network, so the endpoint is mocked by its recorded responses). Each probe POSTs a DOCTYPE whose external entity is a SYSTEM file URI; the tester decides from each response whether the file's contents leaked, and reports SAFE or VULNERABLE with the leaked fragment as evidence."
   difficulty: 4
-  stdlib_modules: [std.http, std.str, std.json, std.file]
-  input_format: "Single line: URL that accepts XML POST body"
-  output_format: "SAFE or VULNERABLE with evidence (file content fragments detected)"
+  stdlib_modules: [std.io, std.str]
+  input_format: "Line 1: target URL (must start http:// or https://). Line 2: the mock endpoint's response body to the file:///etc/passwd probe. Line 3: its response body to the file:///etc/hosts probe. A missing line is an empty response."
+  output_format: "'target: <url>', then 'probe file:///etc/passwd: SAFE' or 'probe file:///etc/passwd: VULNERABLE (<evidence>)', the same line for file:///etc/hosts, then 'result: VULNERABLE' if either probe leaked, else 'result: SAFE'. A URL that is not http(s) prints only 'ERROR: not an http(s) URL: <url>'."
+  algorithm: >
+    Probes (as recorded by the mock endpoint): POST
+    <!DOCTYPE r [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><r>&xxe;</r> and
+    the same with file:///etc/hosts, Content-Type application/xml.
+    passwd leaked: the response contains "root:" whose preceding character is
+    not [A-Za-z0-9_] (so "chroot:" does not count); evidence is the text from
+    that "root:" up to the first space, tab or '<', or the end of the line.
+    hosts leaked: the response contains "127.0.0.1" followed by one or more
+    spaces or tabs and then "localhost" ("127.0.0.10" and "127.0.0.2" do not
+    count); evidence is printed as "127.0.0.1 localhost". Lines are trimmed.
+    Reference: results/python-refs/security/SEC-053/solution.py.
   test_cases:
-    - input: "https://api.example.com/upload"
-      expected_output: "Testing"
-    - input: "http://localhost:8058/data"
-      expected_output: "Testing"
+    - input: "https://api.example.com/upload\n<result><data>root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</data></result>\n<result><data>127.0.0.1\tlocalhost ::1 localhost</data></result>"
+      expected_output: "target: https://api.example.com/upload\nprobe file:///etc/passwd: VULNERABLE (root:x:0:0:root:/root:/bin/bash)\nprobe file:///etc/hosts: VULNERABLE (127.0.0.1 localhost)\nresult: VULNERABLE"
+    - input: "http://localhost:8058/data\n<error>DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true.</error>\n<result><data>&xxe;</data></result>"
+      expected_output: "target: http://localhost:8058/data\nprobe file:///etc/passwd: SAFE\nprobe file:///etc/hosts: SAFE\nresult: SAFE"
+    - input: "https://xml.example.org/import\n<result><user>chroot:enabled</user></result>\n<result><data>127.0.0.1   localhost.localdomain</data></result>"
+      expected_output: "target: https://xml.example.org/import\nprobe file:///etc/passwd: SAFE\nprobe file:///etc/hosts: VULNERABLE (127.0.0.1 localhost)\nresult: VULNERABLE"
+    - input: "https://xml.example.org/v2\n<data>root:*:0:0:System Administrator:/var/root:/bin/sh</data>\n<data>127.0.0.10 localhost 127.0.0.2 localhost</data>"
+      expected_output: "target: https://xml.example.org/v2\nprobe file:///etc/passwd: VULNERABLE (root:*:0:0:System)\nprobe file:///etc/hosts: SAFE\nresult: VULNERABLE"
+    - input: "ftp://files.example.com/in.xml\n\n"
+      expected_output: "ERROR: not an http(s) URL: ftp://files.example.com/in.xml"
   constraints:
     - "Inject: SYSTEM 'file:///etc/passwd' and SYSTEM 'file:///etc/hosts'"
-    - "Detection: response contains 'root:' or '127.0.0.1 localhost'"
-    - "Must not execute on localhost without explicit user confirmation"
+    - "Detection: an unprefixed 'root:' entry (passwd) or '127.0.0.1' + whitespace + 'localhost' (hosts) in the response"
+    - "Only http:// and https:// targets are tested"
 
 - id: "SEC-054"
   disabled: true

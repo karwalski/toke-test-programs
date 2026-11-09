@@ -1,49 +1,56 @@
 import sys
-import urllib.request
-import urllib.parse
-import urllib.error
 
-def test_xxe_vulnerability(url):
-    # XXE payload that attempts to read /etc/passwd
-    xxe_payload = '''<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE root [
-<!ENTITY xxe SYSTEM "file:///etc/passwd">
-]>
-<root>
-<data>&xxe;</data>
-</root>'''
-    
-    try:
-        # Prepare the request
-        data = xxe_payload.encode('utf-8')
-        req = urllib.request.Request(url, data=data)
-        req.add_header('Content-Type', 'application/xml')
-        
-        # Since we can't actually make network requests, simulate the behavior
-        # For the test input, we'll return the expected output
-        if url == "https://api.example.com/upload":
-            return "Testing"
-        
-        # In a real scenario, we would:
-        # response = urllib.request.urlopen(req, timeout=5)
-        # response_text = response.read().decode('utf-8', errors='ignore')
-        
-        # Check for common file content indicators
-        # file_indicators = ['root:', 'bin:', 'daemon:', '/bin/bash', '/bin/sh']
-        
-        # For simulation purposes, return SAFE for most cases
-        return "SAFE"
-        
-    except Exception as e:
-        return "SAFE"
+PROBES = ("file:///etc/passwd", "file:///etc/hosts")
+WORD = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+
+
+def passwd_evidence(body):
+    """The /etc/passwd root entry leaked into the response, or None."""
+    at = body.find("root:")
+    while at >= 0:
+        if at == 0 or body[at - 1] not in WORD:
+            end = at
+            while end < len(body) and body[end] not in " \t<":
+                end += 1
+            return body[at:end]
+        at = body.find("root:", at + 1)
+    return None
+
+
+def hosts_evidence(body):
+    """'127.0.0.1 localhost' when the /etc/hosts loopback entry leaked, or None."""
+    at = body.find("127.0.0.1")
+    while at >= 0:
+        j = at + len("127.0.0.1")
+        k = j
+        while k < len(body) and body[k] in " \t":
+            k += 1
+        if k > j and body.startswith("localhost", k):
+            return "127.0.0.1 localhost"
+        at = body.find("127.0.0.1", at + 1)
+    return None
+
 
 def main():
-    try:
-        url = input().strip()
-        result = test_xxe_vulnerability(url)
-        print(result)
-    except EOFError:
-        pass
+    lines = sys.stdin.read().split("\n")
+    get = lambda i: lines[i].strip() if i < len(lines) else ""
+    url = get(0)
+    if not ((url.startswith("http://") and len(url) > 7) or
+            (url.startswith("https://") and len(url) > 8)):
+        print("ERROR: not an http(s) URL: %s" % url)
+        return
+    print("target: %s" % url)
+    vuln = False
+    for probe, body, find in ((PROBES[0], get(1), passwd_evidence),
+                              (PROBES[1], get(2), hosts_evidence)):
+        ev = find(body)
+        if ev is None:
+            print("probe %s: SAFE" % probe)
+        else:
+            vuln = True
+            print("probe %s: VULNERABLE (%s)" % (probe, ev))
+    print("result: %s" % ("VULNERABLE" if vuln else "SAFE"))
+
 
 if __name__ == "__main__":
     main()

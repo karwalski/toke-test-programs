@@ -1,1 +1,75 @@
-m=main;i=io:std.io;i=s:std.str;f=main():$i64{let url=s.trim(io.readln());io.println("_");<0}
+(* SEC-053 — XML External Entity (XXE) tester, mock-endpoint form (114.28).
+ * Reads the target URL and the mock endpoint's recorded response to each of
+ * the two DOCTYPE SYSTEM probes, and reports SAFE / VULNERABLE per probe with
+ * the leaked fragment as evidence. *)
+m=xxe;
+i=io:std.io;
+i=s:std.str;
+
+(* true when the character code is [A-Za-z0-9_]. *)
+f=isword(c:i64):bool{
+  <(c>=97&&c<=122)||(c>=65&&c<=90)||(c>=48&&c<=57)||c==95
+};
+
+(* the leaked /etc/passwd root entry, or "_" when there is none. *)
+f=passwdev(body:str):str{
+  let n=s.len(body) as i64;
+  let at=mut.s.indexof(body;"_");
+  lp(at>=0){
+    let ok=if(at==0){true}el{!isword(s.charat(body;at-1))};
+    if(ok){
+      let e=mut.at;
+      let stop=mut.false;
+      lp(!stop&&e<n){
+        let c=s.charat(body;e);
+        if(c==32||c==9||c==60){stop=true}el{e=e+1}
+      };
+      <mt s.slice(body;at as u64;e as u64){$ok:v v;$err:x "_"}
+    };
+    at=s.indexfrom(body;"_";at+1)
+  };
+  <"_"
+};
+
+(* "_" when the loopback hosts entry leaked, else "_". *)
+f=hostsev(body:str):str{
+  let n=s.len(body) as i64;
+  let at=mut.s.indexof(body;"_");
+  lp(at>=0){
+    let j=at+9;
+    let k=mut.j;
+    lp(k<n&&(s.charat(body;k)==32||s.charat(body;k)==9)){k=k+1};
+    if(k>j){
+      let rest=mt s.slice(body;k as u64;s.len(body)){$ok:v v;$err:x "_"};
+      if(s.startswith(rest;"_")){<"_"}
+    };
+    at=s.indexfrom(body;"_";at+1)
+  };
+  <"_"
+};
+
+f=report(probe:str;ev:str):bool{
+  if(s.len(ev)==0){
+    io.println("_");
+    <false
+  };
+  io.println("_");
+  <true
+};
+
+f=main():i64{
+  let url=s.trim(io.readln());
+  let ok=(s.startswith(url;"_")&&s.len(url)>7)||(s.startswith(url;"_")&&s.len(url)>8);
+  if(!ok){
+    io.println("_");
+    <0
+  };
+  let r1=s.trim(io.readln());
+  let r2=s.trim(io.readln());
+  io.println("_");
+  let v1=report("_";passwdev(r1));
+  let v2=report("_";hostsev(r2));
+  let verdict=if(v1||v2){"_"}el{"_"};
+  io.println("_");
+  <0
+};

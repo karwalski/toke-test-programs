@@ -1,26 +1,32 @@
 import sys
-import subprocess
 
-def is_process_running(process_name):
-    try:
-        # Use ps command to check if process is running
-        result = subprocess.run(['ps', '-A'], capture_output=True, text=True, timeout=5)
-        if result.returncode == 0:
-            processes = result.stdout.lower()
-            return process_name.lower() in processes
-        else:
-            # If ps command fails, try pgrep as fallback
-            result = subprocess.run(['pgrep', process_name], capture_output=True, timeout=5)
-            return result.returncode == 0
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        # If commands fail or timeout, assume process is not running
-        return False
 
-# Read service names from stdin
-for line in sys.stdin:
-    service_name = line.strip()
-    if service_name:  # Skip empty lines
-        if is_process_running(service_name):
-            print(f"{service_name}: RUNNING")
-        else:
-            print(f"{service_name}: STOPPED")
+def main():
+    lines = sys.stdin.read().split("\n")
+    table, services, i = [], [], 0
+    # the table ends at a "--" line; a blank line or end of input before it
+    # ends the whole input, so no services are listed
+    while i < len(lines) and lines[i].strip() not in ("--", ""):
+        table.append(lines[i].strip())
+        i += 1
+    if i >= len(lines) or lines[i].strip() != "--":
+        print("(empty output)")
+        return
+    i += 1
+    while i < len(lines) and lines[i].strip():
+        services.append(lines[i].strip())
+        i += 1
+    names = set()
+    for cmd in table:
+        names.add(cmd)
+        if "/" in cmd:
+            names.add(cmd[cmd.rfind("/") + 1:])
+    if not services:
+        print("(empty output)")
+        return
+    for svc in services:
+        print("%s: %s" % (svc, "RUNNING" if svc in names else "STOPPED"))
+
+
+if __name__ == "__main__":
+    main()
