@@ -55,7 +55,8 @@ categories/
 
 Requirements (description, I/O format, test cases) live per category in
 `categories/{category}/requirements.yaml`. Generated, verified solutions
-live under `results/solutions/`:
+live under `results/solutions/`. A fully generated solution directory looks like
+this; many carry only `solution.tk` (and `solution.stripped.tk`):
 
 ```
 results/solutions/{category}/{id}/
@@ -65,7 +66,11 @@ results/solutions/{category}/{id}/
   toke_api_original.tk   # Initial model output (before repair)
   repair_pairs/          # Error-fix training pairs from repair loop
   meta.json              # Generation metadata (repair count, warnings, etc.)
+  tkc.toml               # Capability grants for programs that need them (ADR-0010)
 ```
+
+`results/solutions/gazeta/` and `gazeta-work/` hold a separate set of programs
+(`scripts/test-gazeta.py`, `scripts/add-gazeta-to-corpus.py`).
 
 ## Why This Matters
 
@@ -82,8 +87,9 @@ Every banked solution was, at the time it was banked:
 
 Verification is against the compiler version of the day. toke went through a breaking
 v0.4 change (`=`/`==`, expression-`if`, `&&`/`||`), so a solution banked before that
-change is not guaranteed to compile under `tkc` 2.8.0 until it is re-verified. Re-run
-`scripts/verify-one.py` before quoting any of these programs as working.
+change is not guaranteed to compile under the current `tkc` (toke 3.1.0) until it is
+re-verified. Re-run `scripts/verify-one.py` before quoting any of these programs as
+working.
 
 ## Using the Test Harness
 
@@ -139,7 +145,7 @@ The `infra/` directory contains scripts for automated program generation at scal
 
 - [toke language](https://github.com/karwalski/toke) — compiler, spec, stdlib
 - [toke-corpus](https://github.com/karwalski/toke-corpus) — training-data pipeline that verified programs from this repo feed into
-- [toke-model](https://github.com/karwalski/toke-models) — model training and adapter merging
+- [toke-models](https://github.com/karwalski/toke-models) — model training and adapter merging
 - [toke-tokenizer](https://github.com/karwalski/toke-tokenizer) — custom toke tokenizer
 - [tokelang.dev](https://tokelang.dev) — website and documentation
 - [API](https://api.tokelang.dev) — free tier for toke code generation
