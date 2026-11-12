@@ -1,0 +1,21 @@
+# workers.local.conf.example -- template for infra/workers.local.conf
+#
+# Copy to infra/workers.local.conf (gitignored) and fill in your own values.
+# Every variable can also be set in the environment, which takes precedence
+# over this file. Shell scripts source it; Python scripts read it through
+# worker_config.py (plain KEY=VALUE lines, '#' comments, optional quotes,
+# a leading ~ or $HOME is expanded).
+#
+# Never commit the filled-in copy: this repository is public.
+
+# Private key used to SSH to the workers. launch-workers.sh writes a newly
+# created Lightsail key pair here if the file does not exist yet.
+TOKE_WORKER_SSH_KEY=~/.ssh/<your-key>
+
+# Login user on the worker instances.
+TOKE_WORKER_SSH_USER=ubuntu
+
+# Worker addresses do not live here: they live in infra/workers.json
+# (also gitignored), written by launch-workers.sh, of the form
+#   {"1": "203.0.113.10", "2": "203.0.113.11"}
+# (203.0.113.0/24 is the RFC 5737 documentation range -- use your own.)

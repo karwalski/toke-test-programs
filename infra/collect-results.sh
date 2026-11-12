@@ -9,8 +9,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 WORKERS_FILE="$SCRIPT_DIR/workers.json"
-SSH_KEY="$HOME/.ssh/toke-workers.pem"
-SSH_USER="ubuntu"
+# shellcheck source=worker-config.sh
+. "$SCRIPT_DIR/worker-config.sh"
+require_worker_ssh_key
+SSH_KEY="$TOKE_WORKER_SSH_KEY"
+SSH_USER="$TOKE_WORKER_SSH_USER"
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -i $SSH_KEY"
 
 # --- Validate ---

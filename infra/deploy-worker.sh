@@ -14,19 +14,22 @@
 # Usage:
 #   deploy-worker.sh -i <ip> -w <id> [-k <ssh_key>] [-e <env_file>] [-m <manifest>]
 #
-# Env defaults:
-#   SSH_KEY  ~/.ssh/toke-workers-rsa
-#   SSH_USER ubuntu
+# Env / config (environment wins; else infra/workers.local.conf, gitignored,
+# template workers.local.conf.example):
+#   SSH_KEY  or TOKE_WORKER_SSH_KEY   path to the worker private key (required)
+#   SSH_USER or TOKE_WORKER_SSH_USER  login user (default ubuntu)
 #
-# Example:
-#   deploy-worker.sh -i 3.25.144.196 -w 1 -e .env.w1 -m manifests/w1.json
+# Example (203.0.113.10 is an RFC 5737 documentation address):
+#   deploy-worker.sh -i 203.0.113.10 -w 1 -e .env.w1 -m manifests/w1.json
 #
 # Story 108.4.
 
 set -euo pipefail
 
-SSH_KEY="${SSH_KEY:-$HOME/.ssh/toke-workers-rsa}"
-SSH_USER="${SSH_USER:-ubuntu}"
+# shellcheck source=worker-config.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/worker-config.sh"
+SSH_KEY="${SSH_KEY:-$TOKE_WORKER_SSH_KEY}"
+SSH_USER="${SSH_USER:-$TOKE_WORKER_SSH_USER}"
 IP=""
 WID=""
 ENV_FILE=""
@@ -39,13 +42,14 @@ while getopts ":i:w:k:e:m:h" opt; do
         k) SSH_KEY="$OPTARG" ;;
         e) ENV_FILE="$OPTARG" ;;
         m) MANIFEST="$OPTARG" ;;
-        h) sed -n '2,28p' "$0"; exit 0 ;;
+        h) sed -n '2,25p' "$0"; exit 0 ;;
         *) echo "unknown option: -$OPTARG" >&2; exit 2 ;;
     esac
 done
 
 [ -z "$IP" ]  && { echo "ERROR: -i <ip> required"  >&2; exit 2; }
 [ -z "$WID" ] && { echo "ERROR: -w <id> required"  >&2; exit 2; }
+[ -n "$SSH_KEY" ] || require_worker_ssh_key
 [ -f "$SSH_KEY" ] || { echo "ERROR: ssh key not found: $SSH_KEY" >&2; exit 2; }
 
 SSH_OPTS=(-i "$SSH_KEY" -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=15)

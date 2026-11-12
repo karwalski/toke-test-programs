@@ -45,6 +45,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from worker_config import ssh_key, ssh_user
+
 ROOT = Path(__file__).resolve().parent.parent
 INFRA = Path(__file__).resolve().parent
 AUDIT = ROOT / "results" / "audit-report.json"
@@ -54,8 +56,11 @@ MANIFEST_DIR = INFRA / "manifests"
 
 DEPLOY_SCRIPT = INFRA / "deploy-worker.sh"
 
-# Worker IPs are managed via workers.json:
-#   { "1": "3.25.144.196", "2": "16.176.96.93", ... }
+# Worker IPs are managed via the gitignored workers.json, e.g. (RFC 5737
+# documentation addresses -- use your own):
+#   { "1": "203.0.113.10", "2": "203.0.113.11", ... }
+# SSH key and user come from the environment or the gitignored
+# workers.local.conf (see workers.local.conf.example and worker_config.py).
 # IPs change on each Lightsail restart — refresh before runs.
 
 
@@ -300,7 +305,8 @@ def cmd_collect(args):
     """
     workers = load_workers()
     worker_ids = [int(w) for w in args.workers.split(",")]
-    key = Path.home() / ".ssh" / "toke-workers-rsa"
+    key = ssh_key()
+    user = ssh_user()
     base = INFRA / "collected"
     base.mkdir(exist_ok=True)
 
@@ -316,7 +322,7 @@ def cmd_collect(args):
             "rsync", "-az",
             "--rsync-path=sudo rsync",
             "-e", f"ssh -i {key} -o BatchMode=yes -o StrictHostKeyChecking=accept-new",
-            f"ubuntu@{ip}:/opt/toke-worker/solutions/",
+            f"{user}@{ip}:/opt/toke-worker/solutions/",
             str(dest / "solutions") + "/",
         ]
         # Pull state, budget, logs, per-iteration attempts
@@ -330,7 +336,7 @@ def cmd_collect(args):
         for name, local_path in single_files:
             subprocess.run([
                 "scp", "-i", str(key), "-o", "BatchMode=yes",
-                f"ubuntu@{ip}:/opt/toke-worker/{name}",
+                f"{user}@{ip}:/opt/toke-worker/{name}",
                 str(local_path),
             ], check=False, capture_output=True)
         # Logs and attempts subtrees
@@ -339,7 +345,7 @@ def cmd_collect(args):
                 "rsync", "-az",
                 "--rsync-path=sudo rsync",
                 "-e", f"ssh -i {key} -o BatchMode=yes",
-                f"ubuntu@{ip}:/opt/toke-worker/{sub}/",
+                f"{user}@{ip}:/opt/toke-worker/{sub}/",
                 str(dest / sub) + "/",
             ], check=False)
         # Print compact summary
@@ -358,7 +364,8 @@ def cmd_status(args):
     workers = load_workers()
     worker_ids = [int(w) for w in (args.workers or
                                    ",".join(map(str, workers.keys()))).split(",")]
-    key = Path.home() / ".ssh" / "toke-workers-rsa"
+    key = ssh_key()
+    user = ssh_user()
     for wid in worker_ids:
         ip = workers.get(wid)
         if not ip:
@@ -366,7 +373,7 @@ def cmd_status(args):
             continue
         # Avoid pgrep matching its own argv: use `pgrep -f [w]orker-generate`
         cmd = ["ssh", "-i", str(key), "-o", "BatchMode=yes",
-               "-o", "ConnectTimeout=8", f"ubuntu@{ip}",
+               "-o", "ConnectTimeout=8", f"{user}@{ip}",
                "echo tkc=$(tkc --version 2>&1 | head -1) "
                "manifest=$(ls /opt/toke-worker/manifests/ 2>/dev/null | head -1 || echo none) "
                "procs=$(pgrep -f '[w]orker-generate' | wc -l)"]

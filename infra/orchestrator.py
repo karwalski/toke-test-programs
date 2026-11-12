@@ -20,17 +20,22 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from worker_config import ssh_key, ssh_user
+
 # --- Configuration ---
 # Worker IPs are read from workers.json (created by launch-workers.sh)
+# SSH key and user come from the environment or the gitignored
+# workers.local.conf (see workers.local.conf.example and worker_config.py).
 WORKERS_FILE = Path(__file__).parent / "workers.json"
-SSH_KEY = Path.home() / ".ssh" / "toke-workers.pem"
-SSH_USER = "ubuntu"
-SSH_OPTS = [
-    "-o", "StrictHostKeyChecking=no",
-    "-o", "ConnectTimeout=10",
-    "-o", "BatchMode=yes",
-    "-i", str(SSH_KEY),
-]
+
+
+def ssh_opts() -> list[str]:
+    return [
+        "-o", "StrictHostKeyChecking=no",
+        "-o", "ConnectTimeout=10",
+        "-o", "BatchMode=yes",
+        "-i", str(ssh_key()),
+    ]
 
 STUCK_THRESHOLD_MINUTES = 10
 
@@ -40,7 +45,7 @@ def load_workers() -> dict[int, str]:
     if not WORKERS_FILE.exists():
         print(f"ERROR: {WORKERS_FILE} not found.")
         print("Run launch-workers.sh first, or create workers.json manually:")
-        print('  {"1": "1.2.3.4", "2": "5.6.7.8", ...}')
+        print('  {"1": "203.0.113.10", "2": "203.0.113.11", ...}')
         sys.exit(1)
 
     with open(WORKERS_FILE) as f:
@@ -50,7 +55,7 @@ def load_workers() -> dict[int, str]:
 
 def ssh_cmd(ip: str, command: str) -> tuple[int, str]:
     """Execute a command on a remote worker via SSH."""
-    full_cmd = ["ssh"] + SSH_OPTS + [f"{SSH_USER}@{ip}", command]
+    full_cmd = ["ssh"] + ssh_opts() + [f"{ssh_user()}@{ip}", command]
     try:
         result = subprocess.run(
             full_cmd, capture_output=True, text=True, timeout=30
