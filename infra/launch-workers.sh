@@ -37,7 +37,11 @@ if ! aws sts get-caller-identity &>/dev/null; then
 fi
 
 # --- Create key pair if it doesn't exist ---
-SSH_KEY="$HOME/.ssh/toke-workers.pem"
+# Key path comes from the environment or infra/workers.local.conf.
+# shellcheck source=worker-config.sh
+. "$SCRIPT_DIR/worker-config.sh"
+require_worker_ssh_key
+SSH_KEY="$TOKE_WORKER_SSH_KEY"
 if [ ! -f "$SSH_KEY" ]; then
     echo "Creating SSH key pair: $KEY_PAIR_NAME"
     aws lightsail create-key-pair \
