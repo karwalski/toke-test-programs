@@ -1,4 +1,4 @@
-# Toke Worker Infrastructure — Automated Program Generation Pipeline
+# toke worker infrastructure — automated program generation pipeline
 
 This directory contains everything needed to provision, run, and monitor a fleet
 of 5 Lightsail workers that generate toke programs from requirements.
@@ -52,7 +52,7 @@ bash infra/launch-workers.sh
 SSH into each worker and set the real API keys:
 
 ```bash
-ssh -i ~/.ssh/toke-workers.pem ubuntu@<IP>
+ssh -i <your-worker-key> ubuntu@<worker-address>
 sudo vi /opt/toke-worker/.env
 # Set: ANTHROPIC_API_KEY, TOKE_API_KEY, WORKER_ID (1-5)
 ```
@@ -114,11 +114,11 @@ requirement. If a worker crashes or is restarted, it picks up where it left off.
 - `.env` files contain API keys and are chmod 600
 - `.env` is in `.gitignore` — never committed
 - `workers.json` contains IPs — also gitignored
-- SSH keys stored at `~/.ssh/toke-workers.pem`
+- The SSH key stays on the orchestrating machine and is never committed
 - Only port 22 open on worker instances
 
 ## Cost Estimate
 
 - 5x Lightsail Small: ~$50/month total ($10/instance)
 - Anthropic API: varies by repair rate (~$0.003/repair call)
-- Toke API: included in tokelang.dev plan
+- toke API: included in tokelang.dev plan
