@@ -1,7 +1,7 @@
 m=scrypt;i=io:std.io;i=s:std.str;i=enc:std.encoding;i=cr:std.crypto;i=v:std.vec;
 f=rotl(a:$i64;b:$i64):$i64{<((a<<b)|(a>>(32-b)))&4294967295};
 (* Salsa20/8 core, in place on a 16-word Vec X (little-endian words) *)
-f=salsa8(x:$i64):$i64{
+f=salsa8(x:$vechandle):$i64{
   let z=v.new();let i=mut.0;lp(i<16){v.push(z;v.get(x;i));i=i+1};
   let r=mut.0;
   lp(r<4){
@@ -43,7 +43,7 @@ f=salsa8(x:$i64):$i64{
   <0
 };
 (* BlockMix: Bin = 256-word Vec (16 blocks of 16 words, r=8). Returns 256-word Vec. *)
-f=blockmix(bin:$i64):$i64{
+f=blockmix(bin:$vechandle):$vechandle{
   let x=v.new();let i=mut.0;lp(i<16){v.push(x;v.get(bin;240+i));i=i+1};
   let y=v.new();i=0;lp(i<256){v.push(y;0);i=i+1};
   let bi=mut.0;
@@ -57,7 +57,7 @@ f=blockmix(bin:$i64):$i64{
   <y
 };
 (* ROMix on a 256-word Vec X, N iterations. Returns final X. *)
-f=romix(xin:$i64;n:$i64):$i64{
+f=romix(xin:$vechandle;n:$i64):$vechandle{
   let cur=mut.xin;
   let bigv=v.new();
   let i=mut.0;
